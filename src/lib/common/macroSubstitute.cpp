@@ -54,22 +54,25 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
     ExprResult r = exprMgr.evaluate(exprContextObjectP, macroName);
+    std::string result;
     if (r.valueType == orion::ValueTypeNull)
     {
-      return notFoundDefault;
+      result = notFoundDefault;
     }
     else
     {
       // in legacy mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
       if (exprContextObjectP->isLegacy())
       {
-        return removeQuotes(r.toString());
+        result = removeQuotes(r.toString());
       }
       else
       {
-        return r.toString();
+        result = r.toString();
       }
     }
+    r.release();
+    return result;
   }
   else if (exprContextObjectP != NULL)
   {
@@ -101,10 +104,11 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
 static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, const std::string key, const std::string& notFoundDefault, bool raw)
 {
   ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
+  std::string result;
 
   if (r.valueType == orion::ValueTypeNull)
   {
-    return notFoundDefault;
+    result = notFoundDefault;
   }
   else
   {
@@ -120,13 +124,16 @@ static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, c
     {
       // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
       // so double quotes have to be be removed
-      return removeQuotes(s);
+      result = removeQuotes(s);
     }
     else
     {
-      return s;
+      result = s;
     }
   }
+
+  r.release();
+  return result;
 }
 
 

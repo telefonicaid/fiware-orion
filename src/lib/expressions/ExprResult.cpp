@@ -25,7 +25,7 @@
 
 // The ExprResult class is used as return value in ExprManager::evaluate(). We could return std::string
 // in that function and simplify (so avoiding the ExprResult class). But in that case float rounding is
-// problematic (e.g. 1.999999 instead of 2), as they don't take advanage of the ad hoc logic implemented
+// problematic (e.g. 1.999999 instead of 2), as they don't take advantage of the ad hoc logic implemented
 // in ContextAttribute rendering
 
 #include "rapidjson/document.h"
@@ -175,7 +175,7 @@ void processDictItem(orion::CompoundValueNode* parentP, const rapidjson::Value::
 * fill -
 *
 */
-void ExprResult::fill(std::string result)
+void ExprResult::fill(const std::string& result)
 {
   // If nothing changes, the returned value would be null (failsafe)
   valueType = orion::ValueTypeNull;

@@ -85,6 +85,9 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     LM_T(LmtExpr, ("evaluating JEXL expression <%s> with context <%s>", _expression.c_str(), context.c_str()));
     const char* result = cjexl_eval(jexlEngine, _expression.c_str(), context.c_str());
     LM_T(LmtExpr, ("JEXL evaluation result: <%s>", result));
+
+    // The ExprResult::fill() method allocates dynamic memory. So, the callers to evaluate() are supposed to invoke ExprResult::release()
+    // method to free it
     r.fill(result);
   }
 

@@ -49,7 +49,7 @@ public:
   // Use only when valueType is object or vector
   orion::CompoundValueNode*  compoundValueP;
 
-  void fill(std::string result);
+  void fill(const std::string& result);
 
   std::string  toString(void);
   void         release(void);
