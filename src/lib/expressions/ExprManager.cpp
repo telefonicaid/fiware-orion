@@ -54,13 +54,12 @@ void ExprManager::init(void)
   LM_T(LmtExpr, ("JEXL engine has been initialized"));
 
   // Create context
-  ExprContextObject eco;
+  ExprContextObject eco(false);
   eco.add("x", 4.0);
-  eco.add("y", 11.0);
   LM_T(LmtExpr, ("jexl context has been built"));
 
   // Call evaluate method
-  ExprResult r = evaluate(&eco, "x + y");
+  ExprResult r = evaluate(&eco, "x");
   LM_T(LmtExpr, ("jexl evaluation is done"));
 
   // Print result
