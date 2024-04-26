@@ -1,2 +1,3 @@
 - Add: exprLang field in custom notifications (#4004)
+- Add: expression context build and evaluation counter in timing section in GET /statistics (#4004)
 - Fix: lighter operation to get databases list from MongoDB (#4517)

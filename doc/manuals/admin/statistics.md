@@ -133,6 +133,10 @@ Provides timing information, i.e. the time that CB passes executing in different
       "mongoReadWait": 4656.924425628,
       "mongoWriteWait": 259.347915990,
       "mongoCommandWait": 0.514811318,
+      "exprLegacyCtxBld": FIXME PR,
+      "exprLegacyEval": FIXME PR,
+      "exprJexlCtxBld": FIXME PR,
+      "exprJexlEval": FIXME PR,
       "render": 108.162782114,
       "total": 6476.593504743
      },
@@ -140,6 +144,10 @@ Provides timing information, i.e. the time that CB passes executing in different
       "mongoBackend": 0.014752309,
       "mongoReadWait": 0.012018445,
       "mongoWriteWait": 0.000574611,
+      "exprLegacyCtxBld": FIXME PR,
+      "exprLegacyEval": FIXME PR,
+      "exprJexlCtxBld": FIXME PR,
+      "exprJexlEval": FIXME PR,
       "render": 0.000019136,
       "total": 0.015148915
      }
@@ -155,6 +163,8 @@ The block includes two main sections:
 * `accumulated`: accumulated time corresponding to all requests since the broker was started.
 
 The particular counters are as follows:
+
+FIXME PR: explain expr* fields
 
 * `total`: processing time for the whole request, excluding the time that the HTTP library
   takes for request/response dispatching (pseudo end-to-end time)

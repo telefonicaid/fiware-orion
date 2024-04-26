@@ -195,6 +195,10 @@ std::string renderTimingStatistics(void)
   bool accMongoReadWaitTime    = (accTimeStat.mongoReadWaitTime.tv_sec != 0)      || (accTimeStat.mongoReadWaitTime.tv_nsec != 0);
   bool accMongoWriteWaitTime   = (accTimeStat.mongoWriteWaitTime.tv_sec != 0)     || (accTimeStat.mongoWriteWaitTime.tv_nsec != 0);
   bool accMongoCommandWaitTime = (accTimeStat.mongoCommandWaitTime.tv_sec != 0)   || (accTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool accExprLegacyCtxBldTime = (accTimeStat.exprLegacyCtxBldTime.tv_sec != 0)   || (accTimeStat.exprLegacyCtxBldTime.tv_nsec != 0);
+  bool accExprLegacyEvalTime   = (accTimeStat.exprLegacyEvalTime.tv_sec != 0)     || (accTimeStat.exprLegacyEvalTime.tv_nsec != 0);
+  bool accExprJexlCtxBldTime   = (accTimeStat.exprJexlCtxBldTime.tv_sec != 0)     || (accTimeStat.exprJexlCtxBldTime.tv_nsec != 0);
+  bool accExprJexlEvalTime     = (accTimeStat.exprJexlEvalTime.tv_sec != 0)       || (accTimeStat.exprJexlEvalTime.tv_nsec != 0);
   bool accRenderTime           = (accTimeStat.renderTime.tv_sec != 0)             || (accTimeStat.renderTime.tv_nsec != 0);
   bool accReqTime              = (accTimeStat.reqTime.tv_sec != 0)                || (accTimeStat.reqTime.tv_nsec != 0);
 
@@ -204,6 +208,10 @@ std::string renderTimingStatistics(void)
   bool lastMongoReadWaitTime    = (lastTimeStat.mongoReadWaitTime.tv_sec != 0)    || (lastTimeStat.mongoReadWaitTime.tv_nsec != 0);
   bool lastMongoWriteWaitTime   = (lastTimeStat.mongoWriteWaitTime.tv_sec != 0)   || (lastTimeStat.mongoWriteWaitTime.tv_nsec != 0);
   bool lastMongoCommandWaitTime = (lastTimeStat.mongoCommandWaitTime.tv_sec != 0) || (lastTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool lastExprLegacyCtxBldTime = (lastTimeStat.exprLegacyCtxBldTime.tv_sec != 0) || (lastTimeStat.exprLegacyCtxBldTime.tv_nsec != 0);
+  bool lastExprLegacyEvalTime   = (lastTimeStat.exprLegacyEvalTime.tv_sec != 0)   || (lastTimeStat.exprLegacyEvalTime.tv_nsec != 0);
+  bool lastExprJexlCtxBldTime   = (lastTimeStat.exprJexlCtxBldTime.tv_sec != 0)   || (lastTimeStat.exprJexlCtxBldTime.tv_nsec != 0);
+  bool lastExprJexlEvalTime     = (lastTimeStat.exprJexlEvalTime.tv_sec != 0)     || (lastTimeStat.exprJexlEvalTime.tv_nsec != 0);
   bool lastRenderTime           = (lastTimeStat.renderTime.tv_sec != 0)           || (lastTimeStat.renderTime.tv_nsec != 0);
   bool lastReqTime              = (lastTimeStat.reqTime.tv_sec != 0)              || (lastTimeStat.reqTime.tv_nsec != 0);
 
@@ -228,6 +236,10 @@ std::string renderTimingStatistics(void)
     if (accMongoReadWaitTime)    accJh.addNumber("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
     if (accMongoWriteWaitTime)   accJh.addNumber("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
     if (accMongoCommandWaitTime) accJh.addNumber("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
+    if (accExprLegacyCtxBldTime) accJh.addNumber("exprLegacyCtxBld", timeSpecToFloat(accTimeStat.exprLegacyCtxBldTime));
+    if (accExprLegacyEvalTime)   accJh.addNumber("exprLegacyEval",   timeSpecToFloat(accTimeStat.exprLegacyEvalTime));
+    if (accExprJexlCtxBldTime)   accJh.addNumber("exprJexlCtxBld",   timeSpecToFloat(accTimeStat.exprJexlCtxBldTime));
+    if (accExprJexlEvalTime)     accJh.addNumber("exprJexlEval",     timeSpecToFloat(accTimeStat.exprJexlEvalTime));
     if (accRenderTime)           accJh.addNumber("render",           timeSpecToFloat(accTimeStat.renderTime));
     if (accReqTime)              accJh.addNumber("total",            timeSpecToFloat(accTimeStat.reqTime));
 
@@ -243,6 +255,10 @@ std::string renderTimingStatistics(void)
     if (lastMongoReadWaitTime)    lastJh.addNumber("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
     if (lastMongoWriteWaitTime)   lastJh.addNumber("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
     if (lastMongoCommandWaitTime) lastJh.addNumber("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
+    if (lastExprLegacyCtxBldTime) lastJh.addNumber("exprLegacyCtxBld", timeSpecToFloat(lastTimeStat.exprLegacyCtxBldTime));
+    if (lastExprLegacyEvalTime)   lastJh.addNumber("exprLegacyEval",   timeSpecToFloat(lastTimeStat.exprLegacyEvalTime));
+    if (lastExprJexlCtxBldTime)   lastJh.addNumber("exprJexlCtxBld",   timeSpecToFloat(lastTimeStat.exprJexlCtxBldTime));
+    if (lastExprJexlEvalTime)     lastJh.addNumber("exprJexlEval",     timeSpecToFloat(lastTimeStat.exprJexlEvalTime));
     if (lastRenderTime)           lastJh.addNumber("render",           timeSpecToFloat(lastTimeStat.renderTime));
     if (lastReqTime)              lastJh.addNumber("total",            timeSpecToFloat(lastTimeStat.reqTime));
 

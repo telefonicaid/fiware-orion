@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 
 #include "orionTypes/OrionValueType.h"
+#include "common/statistics.h"
 
 // Interface to use libcjexl.a
 extern "C" {
@@ -66,6 +67,8 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   if (exprContextObjectP->isLegacy())
   {
     // std::map based evaluation. Only pure replacement is supported
+
+    TIME_EXPR_LEGACY_EVAL_START();
     LM_T(LmtExpr, ("evaluating legacy expression: <%s>", _expression.c_str()));
 
     std::map<std::string, std::string>* replacementsP = exprContextObjectP->getMap();
@@ -77,10 +80,13 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
       r.stringValue = iter->second;
       LM_T(LmtExpr, ("legacy evaluation result: <%s>", r.stringValue.c_str()));
     }
+    TIME_EXPR_LEGACY_EVAL_STOP();
   }
   else
   {
     // JEXL based evaluation
+
+    TIME_EXPR_JEXL_EVAL_START();
     std::string context = exprContextObjectP->getJexlContext();
     LM_T(LmtExpr, ("evaluating JEXL expression <%s> with context <%s>", _expression.c_str(), context.c_str()));
     const char* result = cjexl_eval(jexlEngine, _expression.c_str(), context.c_str());
@@ -89,6 +95,7 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     // The ExprResult::fill() method allocates dynamic memory. So, the callers to evaluate() are supposed to invoke ExprResult::release()
     // method to free it
     r.fill(result);
+    TIME_EXPR_JEXL_EVAL_STOP();
   }
 
   return r;

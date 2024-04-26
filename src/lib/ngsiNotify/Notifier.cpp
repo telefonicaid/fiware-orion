@@ -326,6 +326,7 @@ static SenderThreadParams* buildSenderParamsCustom
   // updated. In legacy model, if the key already exists, the operation is ignored (so previous value is preserved). Taking
   // into account that in the case of an attribute with name "service", "servicePath" and "authToken", must have precedence
   // over macros comming from macros of the same name we conditionally add them depending the case
+  TIME_EXPR_CTXBLD_START();
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
   if (!legacy)
@@ -344,6 +345,7 @@ static SenderThreadParams* buildSenderParamsCustom
     exprContext.add("servicePath", en.servicePath);
     exprContext.add("authToken", xauthToken);
   }
+  TIME_EXPR_CTXBLD_STOP();
 
   //
   // 1. Verb/Method

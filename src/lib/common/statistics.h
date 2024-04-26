@@ -210,6 +210,103 @@
 
 /* ****************************************************************************
 *
+* TIME_EXPR_CTXBLD_START -
+*/
+#define TIME_EXPR_CTXBLD_START()                                     \
+  struct timespec exprCtxBldStart;                                   \
+  struct timespec exprCtxBldEnd;                                     \
+                                                                     \
+  if (timingStatistics)                                              \
+  {                                                                  \
+    clock_gettime(CLOCK_REALTIME, &exprCtxBldStart);                 \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_EXPR_CTXBLD_STOP -
+*/
+#define TIME_EXPR_CTXBLD_STOP()                                        \
+  if (timingStatistics)                                                \
+  {                                                                    \
+    struct timespec diff;                                              \
+    clock_gettime(CLOCK_REALTIME, &exprCtxBldEnd);                     \
+    clock_difftime(&exprCtxBldEnd, &exprCtxBldStart, &diff);           \
+    if (legacy)                                                        \
+    {                                                                  \
+      clock_addtime(&threadLastTimeStat.exprLegacyCtxBldTime, &diff);  \
+    }                                                                  \
+    else                                                               \
+    {                                                                  \
+      clock_addtime(&threadLastTimeStat.exprJexlCtxBldTime, &diff);    \
+    }                                                                  \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_EXPR_LEGACY_EVAL_START -
+*/
+#define TIME_EXPR_LEGACY_EVAL_START()                                     \
+  struct timespec exprLegacyEvalStart;                                    \
+  struct timespec exprLegacyEvalEnd;                                      \
+                                                                          \
+  if (timingStatistics)                                                   \
+  {                                                                       \
+    clock_gettime(CLOCK_REALTIME, &exprLegacyEvalStart);                  \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_EXPR_LEGACY_EVAL_STOP -
+*/
+#define TIME_EXPR_LEGACY_EVAL_STOP()                                   \
+  if (timingStatistics)                                                \
+  {                                                                    \
+    struct timespec diff;                                              \
+    clock_gettime(CLOCK_REALTIME, &exprLegacyEvalEnd);                 \
+    clock_difftime(&exprLegacyEvalEnd, &exprLegacyEvalStart, &diff); \
+    clock_addtime(&threadLastTimeStat.exprLegacyEvalTime, &diff);      \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_EXPR_JEXL_EVAL_START -
+*/
+#define TIME_EXPR_JEXL_EVAL_START()                                     \
+  struct timespec exprJexlEvalStart;                                    \
+  struct timespec exprJexlEvalEnd;                                      \
+                                                                        \
+  if (timingStatistics)                                                 \
+  {                                                                     \
+    clock_gettime(CLOCK_REALTIME, &exprJexlEvalStart);                  \
+  }
+
+
+
+/* ****************************************************************************
+*
+* TIME_EXPR_JEXL_EVAL_STOP -
+*/
+#define TIME_EXPR_JEXL_EVAL_STOP()                                   \
+  if (timingStatistics)                                              \
+  {                                                                  \
+    struct timespec diff;                                            \
+    clock_gettime(CLOCK_REALTIME, &exprJexlEvalEnd);                 \
+    clock_difftime(&exprJexlEvalEnd, &exprJexlEvalStart, &diff); \
+    clock_addtime(&threadLastTimeStat.exprJexlEvalTime, &diff);      \
+  }
+
+
+
+/* ****************************************************************************
+*
 * TimeStat - 
 */
 typedef struct TimeStat
@@ -220,6 +317,10 @@ typedef struct TimeStat
   struct timespec  mongoReadWaitTime;
   struct timespec  mongoWriteWaitTime;
   struct timespec  mongoCommandWaitTime;
+  struct timespec  exprLegacyCtxBldTime;
+  struct timespec  exprLegacyEvalTime;
+  struct timespec  exprJexlCtxBldTime;
+  struct timespec  exprJexlEvalTime;
   struct timespec  renderTime;
   struct timespec  reqTime;
 } TimeStat;
