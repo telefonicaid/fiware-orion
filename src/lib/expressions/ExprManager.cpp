@@ -51,6 +51,23 @@ extern "C" {
 void ExprManager::init(void)
 {
   jexlEngine = cjexl_new_engine();
+  LM_T(LmtExpr, ("JEXL engine has been initialized"));
+
+  // Create context
+  ExprContextObject eco;
+  eco.add("x", 4.0);
+  eco.add("y", 11.0);
+  LM_T(LmtExpr, ("jexl context has been built"));
+
+  // Call evaluate method
+  ExprResult r = evaluate(&eco, "x + y");
+  LM_T(LmtExpr, ("jexl evaluation is done"));
+
+  // Print result
+  LM_T(LmtExpr, ("jexl evaluation result is obtainted"));
+  LM_T(LmtExpr, ("jexl result: %f", r.numberValue));
+
+  cjexl_free_engine(jexlEngine);
 }
 
 
