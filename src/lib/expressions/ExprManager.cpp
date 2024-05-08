@@ -65,12 +65,12 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
   ExprResult r;
   r.valueType = orion::ValueTypeNull;
 
-  if (exprContextObjectP->isLegacy())
+  if (exprContextObjectP->isBasic())
   {
     // std::map based evaluation. Only pure replacement is supported
 
-    TIME_EXPR_LEGACY_EVAL_START();
-    LM_T(LmtExpr, ("evaluating legacy expression: <%s>", _expression.c_str()));
+    TIME_EXPR_BASIC_EVAL_START();
+    LM_T(LmtExpr, ("evaluating basic expression: <%s>", _expression.c_str()));
 
     std::map<std::string, std::string>* replacementsP = exprContextObjectP->getMap();
 
@@ -79,9 +79,9 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     {
       r.valueType   = orion::ValueTypeString;
       r.stringValue = iter->second;
-      LM_T(LmtExpr, ("legacy evaluation result: <%s>", r.stringValue.c_str()));
+      LM_T(LmtExpr, ("basic evaluation result: <%s>", r.stringValue.c_str()));
     }
-    TIME_EXPR_LEGACY_EVAL_STOP();
+    TIME_EXPR_BASIC_EVAL_STOP();
   }
   else
   {

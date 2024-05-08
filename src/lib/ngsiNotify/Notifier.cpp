@@ -316,19 +316,19 @@ static SenderThreadParams* buildSenderParamsCustom
   Entity&                             en      = notifyCerP->entity;
 
   // Used by several macroSubstitute() calls along this function
-  // FIXME PR: unhardwire legacy == false
-  bool legacy = false;
-  ExprContextObject exprContext(legacy);
+  // FIXME PR: unhardwire basic == false
+  bool basic = false;
+  ExprContextObject exprContext(basic);
 
-  // FIXME PR: no-legacy context is now based in JsonHelper, which may mess with key repetition. Check this
-  // It seems that add() semantics are different in legacy and jexl mode. In jexl mode, if the key already exists, it is
-  // updated. In legacy model, if the key already exists, the operation is ignored (so previous value is preserved). Taking
+  // FIXME PR: jexl context (i.e. no basic) is now based in JsonHelper, which may mess with key repetition. Check this
+  // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
+  // updated. In basic model, if the key already exists, the operation is ignored (so previous value is preserved). Taking
   // into account that in the case of an attribute with name "service", "servicePath" and "authToken", must have precedence
   // over macros comming from macros of the same name we conditionally add them depending the case
   TIME_EXPR_CTXBLD_START();
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
-  if (!legacy)
+  if (!basic)
   {
     exprContext.add("service", tenant);
     exprContext.add("servicePath", en.servicePath);
@@ -336,9 +336,9 @@ static SenderThreadParams* buildSenderParamsCustom
   }
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
-    en.attributeVector[ix]->addToContext(&exprContext, legacy);
+    en.attributeVector[ix]->addToContext(&exprContext, basic);
   }
-  if (legacy)
+  if (basic)
   {
     exprContext.add("service", tenant);
     exprContext.add("servicePath", en.servicePath);

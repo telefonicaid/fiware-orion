@@ -61,8 +61,8 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
     }
     else
     {
-      // in legacy mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
-      if (exprContextObjectP->isLegacy())
+      // in basic mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
+      if (exprContextObjectP->isBasic())
       {
         result = removeQuotes(r.toString());
       }
@@ -114,8 +114,8 @@ static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, c
   {
     std::string s = r.toString();
 
-    // in legacy mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
-    if (exprContextObjectP->isLegacy())
+    // in basic mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
+    if (exprContextObjectP->isBasic())
     {
       s = removeQuotes(s);
     }

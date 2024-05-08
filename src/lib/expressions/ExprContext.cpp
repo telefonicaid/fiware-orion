@@ -34,9 +34,9 @@
 *
 * ExprContextObject::ExprContextObject -
 */
-ExprContextObject::ExprContextObject(bool _legacy)
+ExprContextObject::ExprContextObject(bool _basic)
 {
-  legacy = _legacy;
+  basic = _basic;
 }
 
 
@@ -69,7 +69,7 @@ std::map<std::string,std::string>* ExprContextObject::getMap(void)
 */
 void ExprContextObject::add(const std::string &key, const std::string &_value, bool raw)
 {
-  if (legacy)
+  if (basic)
   {
     std::string value = _value;
     if (!raw)
@@ -77,7 +77,7 @@ void ExprContextObject::add(const std::string &key, const std::string &_value, b
       // This is the case of regular string. The raw case is for JSON generated from compound values
       value = '"' + _value + '"';
     }
-    LM_T(LmtExpr, ("adding to legacy expression context object (string): %s=%s", key.c_str(), value.c_str()));
+    LM_T(LmtExpr, ("adding to basic expression context object (string): %s=%s", key.c_str(), value.c_str()));
     repl.insert(std::pair<std::string, std::string>(key, value));
   }
   else
@@ -95,9 +95,9 @@ void ExprContextObject::add(const std::string &key, const std::string &_value, b
 */
 void ExprContextObject::add(const std::string &key, double _value)
 {
-  if (legacy)
+  if (basic)
   {
-    LM_T(LmtExpr, ("adding to legacy expression context object (double): %s=%f", key.c_str(), _value));
+    LM_T(LmtExpr, ("adding to basic expression context object (double): %s=%f", key.c_str(), _value));
     repl.insert(std::pair<std::string, std::string>(key, double2string(_value)));
   }
   else
@@ -115,9 +115,9 @@ void ExprContextObject::add(const std::string &key, double _value)
 */
 void ExprContextObject::add(const std::string &key, bool _value)
 {
-  if (legacy)
+  if (basic)
   {
-    LM_T(LmtExpr, ("adding to legacy expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
+    LM_T(LmtExpr, ("adding to basic expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
     repl.insert(std::pair<std::string, std::string>(key, _value? "true": "false"));
   }
   else
@@ -135,9 +135,9 @@ void ExprContextObject::add(const std::string &key, bool _value)
 */
 void ExprContextObject::add(const std::string &key)
 {
-  if (legacy)
+  if (basic)
   {
-    LM_T(LmtExpr, ("adding to legacy expression context object (none): %s", key.c_str()));
+    LM_T(LmtExpr, ("adding to basic expression context object (none): %s", key.c_str()));
     repl.insert(std::pair<std::string, std::string>(key, "null"));
   }
   else
@@ -155,9 +155,9 @@ void ExprContextObject::add(const std::string &key)
 */
 void ExprContextObject::add(const std::string &key, ExprContextObject exprContextObject)
 {
-  if (legacy)
+  if (basic)
   {
-    LM_E(("Runtime Error (this method must not be invoked in legacy mode)"));
+    LM_E(("Runtime Error (this method must not be invoked in basic mode)"));
   }
   else
   {
@@ -175,9 +175,9 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
 */
 void ExprContextObject::add(const std::string &key, ExprContextList exprContextList)
 {
-  if (legacy)
+  if (basic)
   {
-    LM_E(("Runtime Error (this method must not be invoked in legacy mode)"));
+    LM_E(("Runtime Error (this method must not be invoked in basic mode)"));
   }
   else
   {
@@ -191,11 +191,11 @@ void ExprContextObject::add(const std::string &key, ExprContextList exprContextL
 
 /* ****************************************************************************
 *
-* ExprContextObject::isLegacy -
+* ExprContextObject::isBasic -
 */
-bool ExprContextObject::isLegacy(void)
+bool ExprContextObject::isBasic(void)
 {
-  return legacy;
+  return basic;
 }
 
 

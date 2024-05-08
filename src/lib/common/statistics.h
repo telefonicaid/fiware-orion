@@ -233,9 +233,9 @@
     struct timespec diff;                                              \
     clock_gettime(CLOCK_REALTIME, &exprCtxBldEnd);                     \
     clock_difftime(&exprCtxBldEnd, &exprCtxBldStart, &diff);           \
-    if (legacy)                                                        \
+    if (basic)                                                         \
     {                                                                  \
-      clock_addtime(&threadLastTimeStat.exprLegacyCtxBldTime, &diff);  \
+      clock_addtime(&threadLastTimeStat.exprBasicCtxBldTime, &diff);   \
     }                                                                  \
     else                                                               \
     {                                                                  \
@@ -247,30 +247,30 @@
 
 /* ****************************************************************************
 *
-* TIME_EXPR_LEGACY_EVAL_START -
+* TIME_EXPR_BASIC_EVAL_START -
 */
-#define TIME_EXPR_LEGACY_EVAL_START()                                     \
-  struct timespec exprLegacyEvalStart;                                    \
-  struct timespec exprLegacyEvalEnd;                                      \
-                                                                          \
-  if (timingStatistics)                                                   \
-  {                                                                       \
-    clock_gettime(CLOCK_REALTIME, &exprLegacyEvalStart);                  \
+#define TIME_EXPR_BASIC_EVAL_START()                                     \
+  struct timespec exprBasicEvalStart;                                    \
+  struct timespec exprBasicEvalEnd;                                      \
+                                                                         \
+  if (timingStatistics)                                                  \
+  {                                                                      \
+    clock_gettime(CLOCK_REALTIME, &exprBasicEvalStart);                  \
   }
 
 
 
 /* ****************************************************************************
 *
-* TIME_EXPR_LEGACY_EVAL_STOP -
+* TIME_EXPR_BASIC_EVAL_STOP -
 */
-#define TIME_EXPR_LEGACY_EVAL_STOP()                                   \
-  if (timingStatistics)                                                \
-  {                                                                    \
-    struct timespec diff;                                              \
-    clock_gettime(CLOCK_REALTIME, &exprLegacyEvalEnd);                 \
-    clock_difftime(&exprLegacyEvalEnd, &exprLegacyEvalStart, &diff); \
-    clock_addtime(&threadLastTimeStat.exprLegacyEvalTime, &diff);      \
+#define TIME_EXPR_BASIC_EVAL_STOP()                                   \
+  if (timingStatistics)                                               \
+  {                                                                   \
+    struct timespec diff;                                             \
+    clock_gettime(CLOCK_REALTIME, &exprBasicEvalEnd);                 \
+    clock_difftime(&exprBasicEvalEnd, &exprBasicEvalStart, &diff);    \
+    clock_addtime(&threadLastTimeStat.exprBasicEvalTime, &diff);      \
   }
 
 
@@ -299,7 +299,7 @@
   {                                                                  \
     struct timespec diff;                                            \
     clock_gettime(CLOCK_REALTIME, &exprJexlEvalEnd);                 \
-    clock_difftime(&exprJexlEvalEnd, &exprJexlEvalStart, &diff); \
+    clock_difftime(&exprJexlEvalEnd, &exprJexlEvalStart, &diff);     \
     clock_addtime(&threadLastTimeStat.exprJexlEvalTime, &diff);      \
   }
 
@@ -317,8 +317,8 @@ typedef struct TimeStat
   struct timespec  mongoReadWaitTime;
   struct timespec  mongoWriteWaitTime;
   struct timespec  mongoCommandWaitTime;
-  struct timespec  exprLegacyCtxBldTime;
-  struct timespec  exprLegacyEvalTime;
+  struct timespec  exprBasicCtxBldTime;
+  struct timespec  exprBasicEvalTime;
   struct timespec  exprJexlCtxBldTime;
   struct timespec  exprJexlEvalTime;
   struct timespec  renderTime;

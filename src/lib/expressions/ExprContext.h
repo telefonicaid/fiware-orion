@@ -40,12 +40,12 @@ class ExprContextList;   // forward declaration
 class ExprContextObject
 {
 private:
-  bool                                legacy;
-  JsonObjectHelper                    jh;       // used in regular (i.e. not legacy) mode
-  std::map<std::string, std::string>  repl;     // used in legacy mode
+  bool                                basic;
+  JsonObjectHelper                    jh;       // used in regular (i.e. not basic) mode
+  std::map<std::string, std::string>  repl;     // used in basic mode
 
 public:
-  ExprContextObject(bool legacy = false);
+  ExprContextObject(bool basic = false);
 
   std::string                          getJexlContext(void);
   std::map<std::string, std::string>*  getMap(void);
@@ -57,7 +57,7 @@ public:
   void      add(const std::string& key, ExprContextObject exprContextObject);
   void      add(const std::string& key, ExprContextList exprContextList);
 
-  bool      isLegacy(void);
+  bool      isBasic(void);
 };
 
 class ExprContextList
