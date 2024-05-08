@@ -173,6 +173,7 @@ echo "Builder: create temp folders"
 rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
 
 # FIXME PR: unhardwire release number
+# FIXME PR: use get_cjexl script
 CJEXL_VERSION="0.0.0"
 if [ -z "${REPO_ACCESS_TOKEN}" ]; then
     echo "Builder: no REPO_ACCESS_TOKEN, skipping cjexl lib download"
