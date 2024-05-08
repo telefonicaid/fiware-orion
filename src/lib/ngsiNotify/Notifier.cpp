@@ -315,9 +315,13 @@ static SenderThreadParams* buildSenderParamsCustom
   std::map<std::string, std::string>  headers;
   Entity&                             en      = notifyCerP->entity;
 
-  // Used by several macroSubstitute() calls along this function
-  // FIXME PR: unhardwire basic == false depending on conditional compiling
+#ifdef EXPR_BASIC
+  bool basic = true;
+#else
   bool basic = false;
+#endif
+
+  // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
 
   // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is

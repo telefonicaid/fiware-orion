@@ -30,6 +30,22 @@
 #include "orionTypes/OrionValueType.h"
 #include "common/statistics.h"
 
+#ifdef EXPR_BASIC
+// Never called, but need to be defined to avoid compilation errors
+static void* cjexl_new_engine()
+{
+  return NULL;
+}
+
+static void cjexl_free_engine(void* ptr)
+{
+}
+
+static const char* cjexl_eval(void* ptr, const char* script_ptr, const char* context_ptr)
+{
+  return "";
+}
+#else
 // Interface to use libcjexl.a
 extern "C" {
     void* cjexl_new_engine();
@@ -42,6 +58,7 @@ extern "C" {
 extern "C" {
    const char* cjexl_eval(void* ptr, const char* script_ptr, const char* context_ptr);
 }
+#endif
 
 
 /* ****************************************************************************
