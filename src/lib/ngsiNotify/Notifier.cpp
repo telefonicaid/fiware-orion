@@ -315,10 +315,9 @@ static SenderThreadParams* buildSenderParamsCustom
   std::map<std::string, std::string>  headers;
   Entity&                             en      = notifyCerP->entity;
 
-  const std::string exprLang = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.exprLang : notification.mqttInfo.exprLang;
-
   // Used by several macroSubstitute() calls along this function
-  bool legacy = (exprLang == "legacy");
+  // FIXME PR: unhardwire legacy == false
+  bool legacy = false;
   ExprContextObject exprContext(legacy);
 
   // FIXME PR: no-legacy context is now based in JsonHelper, which may mess with key repetition. Check this

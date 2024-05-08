@@ -53,8 +53,6 @@ struct MqttInfo
   CustomPayloadType          payloadType;
   bool                       includePayload;
 
-  std::string                exprLang;
-
   bool          providedAuth;
   std::string   user;
   std::string   passwd;

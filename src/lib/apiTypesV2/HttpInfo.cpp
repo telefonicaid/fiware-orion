@@ -106,8 +106,6 @@ std::string HttpInfo::toJson()
     {
       jh.addRaw("headers", objectToJson(headers));
     }
-
-    jh.addString("exprLang", this->exprLang);
   }
 
   return jh.str();
@@ -234,9 +232,6 @@ void HttpInfo::fill(const orion::BSONObj& bo)
       orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
       headers.toStringMap(&this->headers);
     }
-
-    // expression language used in custom notifications
-    this->exprLang = bo.hasField(CSUB_EXPRLANG) ? getStringFieldF(bo, CSUB_EXPRLANG) : "legacy";
   }
 }
 
@@ -257,7 +252,6 @@ void HttpInfo::fill(const HttpInfo& _httpInfo)
   this->custom         = _httpInfo.custom;
   this->includePayload = _httpInfo.includePayload;
   this->timeout        = _httpInfo.timeout;
-  this->exprLang       = _httpInfo.exprLang;
 
   this->json = _httpInfo.json == NULL? NULL : _httpInfo.json->clone();
 

@@ -245,7 +245,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 527
+Content-Length: 509
 
 [
     {
@@ -258,7 +258,6 @@ Content-Length: 527
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "mqttCustom": {
-                "exprLang": "jexl",
                 "payload": "{ %22A%22: %22${A}%22 }",
                 "qos": 0,
                 "retain": false,

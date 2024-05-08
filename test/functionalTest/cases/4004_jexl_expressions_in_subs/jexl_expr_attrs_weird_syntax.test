@@ -31,17 +31,15 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# Same as legacy_expr_attrs_weird_syntax.test, but using jexl expression language
-#
-# 01. 01. Create custom sub with custom expression: R1=A-B and R2=A:B
+# 01. Create custom sub with custom expression: A-B and A:B
 # 02. Create entity E1 with A-B 1 and A:B 2
 # 03. Update entity E1 with A-B 3 and A:B 4
 # 04. Dump accumulator and see notifications (R1 null, R2 null and R1 null, R2 null)
 #
 
 
-echo "01. Create custom sub with custom expression: R1=A-B and R2=A:B"
-echo "==============================================================="
+echo "01. Create custom sub with custom expression: A-B and A:B"
+echo "========================================================="
 payload='{
   "subject": {
     "entities": [
@@ -117,8 +115,8 @@ echo
 
 
 --REGEXPECT--
-01. Create custom sub with custom expression: R1=A-B and R2=A:B
-===============================================================
+01. Create custom sub with custom expression: A-B and A:B
+=========================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

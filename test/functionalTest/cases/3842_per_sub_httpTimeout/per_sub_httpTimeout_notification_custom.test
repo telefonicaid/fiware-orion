@@ -175,7 +175,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 514
+Content-Length: 496
 
 {
     "description": "HTTP sub",
@@ -185,7 +185,6 @@ Content-Length: 514
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "payload": "Custom payload",
             "timeout": 12000,
             "url": "http://localhost:9997/noresponse"
@@ -218,7 +217,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 550
+Content-Length: 532
 
 {
     "description": "HTTP sub",
@@ -229,7 +228,6 @@ Content-Length: 550
         "covered": false,
         "failsCounter": 1,
         "httpCustom": {
-            "exprLang": "jexl",
             "payload": "Custom payload",
             "timeout": 8000,
             "url": "http://localhost:9997/noresponse"

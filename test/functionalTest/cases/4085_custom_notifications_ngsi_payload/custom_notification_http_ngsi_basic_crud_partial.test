@@ -259,7 +259,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 371
+Content-Length: 353
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -268,7 +268,6 @@ Content-Length: 371
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "A": {
                     "type": "Number",
@@ -310,7 +309,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 336
+Content-Length: 318
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -319,7 +318,6 @@ Content-Length: 336
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "payload": "foo",
             "url": "http://127.0.0.1:9997/notify"
         },
@@ -355,7 +353,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 343
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -364,7 +362,6 @@ Content-Length: 361
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "B": {
                     "type": "Number",
@@ -405,7 +402,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 351
+Content-Length: 333
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -414,7 +411,6 @@ Content-Length: 351
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "id": "E3",
                 "type": "T3"
@@ -453,7 +449,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 336
+Content-Length: 318
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -462,7 +458,6 @@ Content-Length: 336
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "payload": "bar",
             "url": "http://127.0.0.1:9997/notify"
         },
@@ -500,7 +495,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 336
+Content-Length: 318
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -509,7 +504,6 @@ Content-Length: 336
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "payload": "zzz",
             "url": "http://127.0.0.1:9997/notify"
         },
@@ -545,7 +539,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 373
+Content-Length: 355
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -554,7 +548,6 @@ Content-Length: 373
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "D": {
                     "type": "Number",

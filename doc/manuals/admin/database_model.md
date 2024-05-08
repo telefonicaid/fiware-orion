@@ -329,7 +329,6 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     in the Orion API. More detail of this functionality [here](../orion-api.md#ngsi-payload-patching).
     The value of this field is an object with a `attrs` key which value is a simplified version of
     `attrs` in [the entities collection](#entities-collection).
--   **exprLang**: optional field to store the expression language. Only for custom subscriptions. If omitted `legacy` is assumed.
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.

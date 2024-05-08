@@ -373,7 +373,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 582
+Content-Length: 564
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -382,7 +382,6 @@ Content-Length: 582
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "headers": {
                 "Content-type": "application/json"
             },
@@ -416,7 +415,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 582
+Content-Length: 564
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -425,7 +424,6 @@ Content-Length: 582
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "headers": {
                 "Content-type": "application/json"
             },
@@ -459,7 +457,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 582
+Content-Length: 564
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -468,7 +466,6 @@ Content-Length: 582
         "attrsFormat": "normalized",
         "covered": false,
         "httpCustom": {
-            "exprLang": "jexl",
             "headers": {
                 "Content-type": "application/json"
             },

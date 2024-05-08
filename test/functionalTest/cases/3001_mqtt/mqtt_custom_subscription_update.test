@@ -204,7 +204,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 407
+Content-Length: 389
 
 {
     "description": "Original sub",
@@ -214,7 +214,6 @@ Content-Length: 407
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "payload": "t:${t}",
             "qos": 2,
             "retain": false,
@@ -253,7 +252,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 407
+Content-Length: 389
 
 {
     "description": "Modified sub",
@@ -263,7 +262,6 @@ Content-Length: 407
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "payload": "t:${t}",
             "qos": 2,
             "retain": false,
@@ -302,7 +300,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 400
+Content-Length: 382
 
 {
     "description": "Modified sub",
@@ -312,7 +310,6 @@ Content-Length: 400
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "payload": null,
             "qos": 0,
             "retain": false,
@@ -395,7 +392,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 390
+Content-Length: 372
 
 {
     "description": "Modified sub",
@@ -405,7 +402,6 @@ Content-Length: 390
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "qos": 1,
             "retain": false,
             "topic": "/orionbk/${d}",

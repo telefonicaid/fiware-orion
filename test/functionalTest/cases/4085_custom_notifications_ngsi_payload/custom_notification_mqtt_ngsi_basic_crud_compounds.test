@@ -300,7 +300,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 465
+Content-Length: 447
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -309,7 +309,6 @@ Content-Length: 465
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "A": {
                     "type": "StructuredValue",
@@ -364,7 +363,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 369
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -373,7 +372,6 @@ Content-Length: 369
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "payload": "foo",
             "qos": 0,
             "retain": false,
@@ -412,7 +410,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 466
+Content-Length: 448
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -421,7 +419,6 @@ Content-Length: 466
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "B": {
                     "type": "StructuredValue",
@@ -480,7 +477,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 462
+Content-Length: 444
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -489,7 +486,6 @@ Content-Length: 462
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "C": {
                     "type": "StructuredValue",
@@ -544,7 +540,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 369
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -553,7 +549,6 @@ Content-Length: 369
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "payload": "bar",
             "qos": 0,
             "retain": false,
@@ -594,7 +589,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 369
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -603,7 +598,6 @@ Content-Length: 369
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "payload": "zzz",
             "qos": 0,
             "retain": false,
@@ -642,7 +636,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 468
+Content-Length: 450
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -651,7 +645,6 @@ Content-Length: 468
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "ngsi": {
                 "D": {
                     "type": "StructuredValue",

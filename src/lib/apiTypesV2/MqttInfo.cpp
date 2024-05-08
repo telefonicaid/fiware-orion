@@ -102,8 +102,6 @@ std::string MqttInfo::toJson()
       jh.addRaw("ngsi", this->ngsi.toJson(NGSI_V2_NORMALIZED, true));
       break;
     }
-
-    jh.addString("exprLang", this->exprLang);
   }
 
   return jh.str();
@@ -218,9 +216,6 @@ void MqttInfo::fill(const orion::BSONObj& bo)
         this->ngsi.attributeVector.fill(getObjectFieldF(ngsiObj, ENT_ATTRS));
       }
     }
-
-    // expression language used in custom notifications
-    this->exprLang = bo.hasField(CSUB_EXPRLANG) ? getStringFieldF(bo, CSUB_EXPRLANG) : "legacy";
   }
 }
 
@@ -243,7 +238,6 @@ void MqttInfo::fill(const MqttInfo& _mqttInfo)
   this->providedAuth   = _mqttInfo.providedAuth;
   this->user           = _mqttInfo.user;
   this->passwd         = _mqttInfo.passwd;
-  this->exprLang       = _mqttInfo.exprLang;
 
   this->json = _mqttInfo.json == NULL ? NULL : _mqttInfo.json->clone();
 

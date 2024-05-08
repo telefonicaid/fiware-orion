@@ -262,7 +262,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 358
+Content-Length: 340
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -271,7 +271,6 @@ Content-Length: 358
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "qos": 0,
             "retain": true,
             "topic": "orion",
@@ -301,7 +300,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 360
+Content-Length: 342
 
 [
     {
@@ -311,7 +310,6 @@ Content-Length: 360
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
-                "exprLang": "jexl",
                 "qos": 0,
                 "retain": true,
                 "topic": "orion",
@@ -350,7 +348,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 359
+Content-Length: 341
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -359,7 +357,6 @@ Content-Length: 359
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "qos": 0,
             "retain": false,
             "topic": "orion",
@@ -389,7 +386,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 343
 
 [
     {
@@ -399,7 +396,6 @@ Content-Length: 361
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
-                "exprLang": "jexl",
                 "qos": 0,
                 "retain": false,
                 "topic": "orion",
@@ -438,7 +434,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 359
+Content-Length: 341
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -447,7 +443,6 @@ Content-Length: 359
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "qos": 0,
             "retain": false,
             "topic": "orion",
@@ -477,7 +472,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 343
 
 [
     {
@@ -487,7 +482,6 @@ Content-Length: 361
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
-                "exprLang": "jexl",
                 "qos": 0,
                 "retain": false,
                 "topic": "orion",
@@ -526,7 +520,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 358
+Content-Length: 340
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -535,7 +529,6 @@ Content-Length: 358
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "qos": 0,
             "retain": true,
             "topic": "orion",
@@ -565,7 +558,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 360
+Content-Length: 342
 
 [
     {
@@ -575,7 +568,6 @@ Content-Length: 360
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
-                "exprLang": "jexl",
                 "qos": 0,
                 "retain": true,
                 "topic": "orion",
@@ -620,7 +612,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 358
+Content-Length: 340
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -629,7 +621,6 @@ Content-Length: 358
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "qos": 0,
             "retain": true,
             "topic": "orion",
@@ -659,7 +650,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 360
+Content-Length: 342
 
 [
     {
@@ -669,7 +660,6 @@ Content-Length: 360
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
-                "exprLang": "jexl",
                 "qos": 0,
                 "retain": true,
                 "topic": "orion",

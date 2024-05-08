@@ -192,7 +192,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 917
+Content-Length: 881
 
 [
     {
@@ -202,7 +202,6 @@ Content-Length: 917
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
-                "exprLang": "jexl",
                 "json": {
                     "A": "ns:${text}",
                     "B": "ns:${number}",
@@ -239,7 +238,6 @@ Content-Length: 917
             "attrsFormat": "normalized",
             "covered": false,
             "mqttCustom": {
-                "exprLang": "jexl",
                 "json": [
                     "ns:${text}",
                     "ns:${number}",

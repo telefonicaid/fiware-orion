@@ -317,7 +317,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 384
+Content-Length: 366
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -326,7 +326,6 @@ Content-Length: 384
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "passwd": "*****",
             "qos": 0,
             "retain": false,
@@ -372,7 +371,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 385
+Content-Length: 367
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -381,7 +380,6 @@ Content-Length: 385
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "passwd": "*****",
             "qos": 0,
             "retain": false,
@@ -427,7 +425,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 352
+Content-Length: 334
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -436,7 +434,6 @@ Content-Length: 352
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "qos": 0,
             "retain": false,
             "topic": "/orion",
@@ -480,7 +477,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 384
+Content-Length: 366
 
 {
     "id": "REGEX([0-9a-f\-]{24})",
@@ -489,7 +486,6 @@ Content-Length: 384
         "attrsFormat": "normalized",
         "covered": false,
         "mqttCustom": {
-            "exprLang": "jexl",
             "passwd": "*****",
             "qos": 0,
             "retain": false,
