@@ -316,15 +316,15 @@ static SenderThreadParams* buildSenderParamsCustom
   Entity&                             en      = notifyCerP->entity;
 
   // Used by several macroSubstitute() calls along this function
-  // FIXME PR: unhardwire basic == false
+  // FIXME PR: unhardwire basic == false depending on conditional compiling
   bool basic = false;
   ExprContextObject exprContext(basic);
 
-  // FIXME PR: jexl context (i.e. no basic) is now based in JsonHelper, which may mess with key repetition. Check this
   // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
-  // updated. In basic model, if the key already exists, the operation is ignored (so previous value is preserved). Taking
-  // into account that in the case of an attribute with name "service", "servicePath" and "authToken", must have precedence
-  // over macros comming from macros of the same name we conditionally add them depending the case
+  // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
+  // exists, the operation is ignored (in other words, the first added key is the one that takes precedence). Taking
+  // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
+  // over the ones comming from headers of the same name, we conditionally add them depending the case
   TIME_EXPR_CTXBLD_START();
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
