@@ -23,8 +23,8 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: ${{ secrets.DOCKERHUB_TEF_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TEF_TOKEN }}
 
     - name: Build Docker image
       #run: docker build -t telefonicaiot/fiware-orion:latest --build-arg GIT_REV_ORION=master --build-arg REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} --no-cache -f docker/Dockerfile .
