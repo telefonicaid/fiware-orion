@@ -1,13 +1,11 @@
 name: Publish Docker image (master)
 
-# The workflow will push images on every tag in the format x.y.z
-# FIXME PR: change label and branch before merging into master
+# The workflow will push images for master on every merge
 
 on:
   push:
     branches:
-      #- master
-      - feature/4004_jexl_expressions
+      - master      
 
 jobs:
   build-and-push:
@@ -27,9 +25,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TEF_TOKEN }}
 
     - name: Build Docker image
-      #run: docker build -t telefonicaiot/fiware-orion:latest --build-arg GIT_REV_ORION=master --build-arg REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} --no-cache -f docker/Dockerfile .
-      run: docker build -t telefonicaiot/fiware-orion:jexl --build-arg GIT_REV_ORION=feature/4004_jexl_expressions --build-arg REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} --no-cache -f docker/Dockerfile .
+      run: docker build -t telefonicaiot/fiware-orion:latest --build-arg GIT_REV_ORION=master --build-arg REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} --no-cache -f docker/Dockerfile .
 
     - name: Push Docker image
-      #run: docker push telefonicaiot/fiware-orion:latest
-      run: docker push telefonicaiot/fiware-orion:jexl
+      run: docker push telefonicaiot/fiware-orion:latest

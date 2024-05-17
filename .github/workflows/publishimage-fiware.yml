@@ -1,6 +1,6 @@
-name: Publish pre Image from master
+name: Publish pre Image from master in FIWARE dockerhub
 
-# The workflow will push PRE images from master on every merge. The images will be tagged with PRE and the next minor increase on the
+# The workflow will push PRE images from master on every merge to the fiware dockerhub organization. The images will be tagged with PRE and the next minor increase on the
 # semver(based on the github releases)
 # It will NOT produce releases and release images or the 'latest' tag from master. Both (releases and 'latest' tag) rely on the
 # dockerhub autobuild feature
