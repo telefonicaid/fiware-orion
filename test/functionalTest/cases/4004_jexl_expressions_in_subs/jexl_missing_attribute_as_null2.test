@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-JEXL expression in custom notification (missing attribute replaced as null)
+JEXL expression in custom notification (missing attribute replaced as null additional case)
 
 --SHELL-INIT--
 dbInit CB
@@ -31,17 +31,16 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub with custom expression B: A||'is null'
-# 02. Create entity E1 with A=1
-# 03. Create entity E2 with A=null
-# 04. Create entity E3 without A
-# 05. Dump accumulator and see three notifications (B: 1, B: is null, B: is null)
+# 01. Create custom sub with custom expression S: (A||0-1)+(B||0-2)
+# 02. Create entity E1 with A=1, B=2
+# 03. Create entity E2 with B=1
+# 04. Create entity E3 without A or B
+# 05. Dump accumulator and see three notifications (S: 3, S: 0, S: -3)
 #
 
 
-echo "01. Create custom sub with custom expression B: A||'is null'"
-echo "============================================================"
-# NOTE: '\'' is the way of scaping a ' in the payload variable below (see https://stackoverflow.com/a/1250279/1485926)
+echo "01. Create custom sub with custom expression S: (A||0-1)+(B||0-2)"
+echo "================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -55,13 +54,13 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "B": {
-          "value": "${A||'\''is null'\''}",
+        "S": {
+          "value": "${(A||0-1)+(B||0-2)}",
           "type": "Calculated"
         }
       }      
     },
-    "attrs": [ "B" ]
+    "attrs": [ "S" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -69,12 +68,31 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A=1"
-echo "============================="
+echo "02. Create entity E1 with A=1, B=2"
+echo "=================================="
 payload='{
   "id": "E1",
   "type": "T",
   "A": {
+    "value": 1,
+    "type": "Number"
+  },
+  "B": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E2 with B=1"
+echo "============================="
+payload='{
+  "id": "E2",
+  "type": "T",
+  "B": {
     "value": 1,
     "type": "Number"
   }
@@ -84,23 +102,8 @@ echo
 echo
 
 
-echo "03. Create entity E2 with A=null"
-echo "================================"
-payload='{
-  "id": "E2",
-  "type": "T",
-  "A": {
-    "value": null,
-    "type": "Number"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "04. Create entity E3 without A"
-echo "=============================="
+echo "04. Create entity E3 without A or B"
+echo "==================================="
 payload='{
   "id": "E3",
   "type": "T",
@@ -114,16 +117,16 @@ echo
 echo
 
 
-echo "05. Dump accumulator and see three notifications (B: 1, B: is null, B: is null)"
-echo "==============================================================================="
+echo "05. Dump accumulator and see three notifications (S: 3, S: 0, S: -3)"
+echo "===================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub with custom expression B: A||'is null'
-============================================================
+01. Create custom sub with custom expression S: (A||0-1)+(B||0-2)
+=================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -132,8 +135,8 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A=1
-=============================
+02. Create entity E1 with A=1, B=2
+==================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -142,8 +145,8 @@ Content-Length: 0
 
 
 
-03. Create entity E2 with A=null
-================================
+03. Create entity E2 with B=1
+=============================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -152,8 +155,8 @@ Content-Length: 0
 
 
 
-04. Create entity E3 without A
-==============================
+04. Create entity E3 without A or B
+===================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -162,8 +165,8 @@ Content-Length: 0
 
 
 
-05. Dump accumulator and see three notifications (B: 1, B: is null, B: is null)
-===============================================================================
+05. Dump accumulator and see three notifications (S: 3, S: 0, S: -3)
+====================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 127
@@ -177,10 +180,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "B": {
+            "S": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": 1
+                "value": 3
             },
             "id": "E1",
             "type": "T"
@@ -191,7 +194,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 135
+Content-Length: 127
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -202,10 +205,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "B": {
+            "S": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": "is null"
+                "value": 0
             },
             "id": "E2",
             "type": "T"
@@ -216,7 +219,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 135
+Content-Length: 128
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -227,10 +230,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "B": {
+            "S": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": "is null"
+                "value": -3
             },
             "id": "E3",
             "type": "T"
