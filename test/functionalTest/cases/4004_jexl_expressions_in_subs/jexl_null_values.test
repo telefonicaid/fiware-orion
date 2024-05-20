@@ -86,7 +86,7 @@ echo "03. Update entity E1 with A=null again (with forcedUpdate)"
 echo "=========================================================="
 payload='{
   "A": {
-    "value": "null",
+    "value": null,
     "type": "Text"
   }
 }'
