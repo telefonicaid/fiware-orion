@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
       - task/regression-test-basic-expressions
+  pull_request:
+    branches:      
       - master
       - '!checkvalgrind**'
 
