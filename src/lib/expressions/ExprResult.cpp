@@ -273,8 +273,6 @@ std::string ExprResult::toString(void)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    // FIXME PR: does this break the no legacy
-    //return "\"" + toJsonString(stringValue) + "\"";
     return "\"" + stringValue + "\"";
   }
   else if ((valueType == orion::ValueTypeObject)||(valueType == orion::ValueTypeVector))
