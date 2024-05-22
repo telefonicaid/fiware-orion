@@ -94,8 +94,18 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     std::map<std::string, std::string>::iterator iter = replacementsP->find(_expression);
     if (iter != replacementsP->end())
     {
-      r.valueType   = orion::ValueTypeString;
       r.stringValue = iter->second;
+
+      // To have the same behaviour than in JEXL case
+      if (r.stringValue == "null")
+      {
+        r.valueType   = orion::ValueTypeNull;
+      }
+      else
+      {
+        r.valueType   = orion::ValueTypeString;
+      }
+
       LM_T(LmtExpr, ("basic evaluation result: <%s>", r.stringValue.c_str()));
     }
     TIME_EXPR_BASIC_EVAL_STOP();
