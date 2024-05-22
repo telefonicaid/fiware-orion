@@ -1045,6 +1045,12 @@ int main(int argC, char* argV[])
 
   std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
 
+  #ifdef EXPR_BASIC
+  versionString += " flavours: basic-expr";
+  #else
+  versionString += " flavours: jexl-expr";
+  #endif
+
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);

@@ -19,6 +19,7 @@
 # iot_support at tid dot es
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
 JEXL expression in custom notification (missing attribute replaced as null)
