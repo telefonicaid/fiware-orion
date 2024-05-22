@@ -35,19 +35,19 @@ brokerStart CB 0-255 IPV4 -corsOrigin arrakis
 --SHELL--
 echo "01. GET Version (Access-Control-Allow-Origin header not included)"
 echo "================================================================="
-orionCurl --url /version --noPayloadCheck
+orionCurl --url /version?options=noLibVersions --noPayloadCheck
 echo
 echo
 
 echo "02. GET Version with arrakis origin (Access-Control-Allow-Origin header included)"
 echo "================================================================================="
-orionCurl --url /version -X GET --origin arrakis --noPayloadCheck
+orionCurl --url /version?options=noLibVersions -X GET --origin arrakis --noPayloadCheck
 echo
 echo
 
 echo "03. GET Version with caladan origin (Access-Control-Allow-Origin header not included)"
 echo "====================================================================================="
-orionCurl --url /version -X GET --origin caladan --noPayloadCheck
+orionCurl --url /version?options=noLibVersions -X GET --origin caladan --noPayloadCheck
 echo
 echo
 
@@ -88,17 +88,7 @@ Content-Length: REGEX(\d+)
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
   "machine" : "REGEX(.*)",
-  "doc" : "REGEX(.*)",
-  "libversions": {
-     "boost": "REGEX(.*)",
-     "libcurl": "REGEX(.*)",
-     "libmosquitto": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
-     "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)",
-     "mongoc": "REGEX(.*)",
-     "bson": "REGEX(.*)"
-  }
+  "doc" : "REGEX(.*)"
 }
 }
 
@@ -124,17 +114,7 @@ Content-Length: REGEX(\d+)
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
   "machine" : "REGEX(.*)",
-  "doc" : "REGEX(.*)",
-  "libversions": {
-     "boost": "REGEX(.*)",
-     "libcurl": "REGEX(.*)",
-     "libmosquitto": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
-     "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)",
-     "mongoc": "REGEX(.*)",
-     "bson": "REGEX(.*)"
-  }
+  "doc" : "REGEX(.*)"
 }
 }
 
@@ -158,17 +138,7 @@ Content-Length: REGEX(\d+)
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
   "machine" : "REGEX(.*)",
-  "doc" : "REGEX(.*)",
-  "libversions": {
-     "boost": "REGEX(.*)",
-     "libcurl": "REGEX(.*)",
-     "libmosquitto": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
-     "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)",
-     "mongoc": "REGEX(.*)",
-     "bson": "REGEX(.*)"
-  }
+  "doc" : "REGEX(.*)"
 }
 }
 

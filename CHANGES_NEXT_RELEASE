@@ -1,1 +1,2 @@
+- Add: GET /version?options=noLibVersions to simplify the response avoding the "libversions" field
 - Fix: lighter operation to get databases list from MongoDB (#4517)
