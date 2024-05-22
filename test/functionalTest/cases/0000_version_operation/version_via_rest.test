@@ -34,7 +34,7 @@ brokerStart CB
 #
 echo "01. Getting version via REST"
 echo "============================"
-orionCurl --url "/version?options=noLibVersions" --noPayloadCheck
+orionCurl --url "/version" --noPayloadCheck
 echo
 echo
 

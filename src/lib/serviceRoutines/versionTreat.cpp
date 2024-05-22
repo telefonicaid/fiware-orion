@@ -132,7 +132,7 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
-  bool noLibVersions = ciP->uriParamOptions[OPT_NO_LIB_VERSIONS];
+  bool showLibVersions = ciP->uriParamOptions[OPT_LIB_VERSIONS];
 
   if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
@@ -170,14 +170,14 @@ std::string versionTreat
   out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
   out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
   out += "  \"machine\" : \"" + std::string(MACHINE_ARCH) + "\",\n";
-  if (noLibVersions)
-  {
-    out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
-  }
-  else
+  if (showLibVersions)
   {
     out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
     out += "  }\n";
+  }
+  else
+  {
+    out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
   }  
   out += "}\n";
   out += "}\n";
