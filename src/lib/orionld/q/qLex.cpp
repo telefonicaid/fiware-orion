@@ -141,11 +141,12 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     int        colons   = 0;
     int        spaces   = 0;
     int        hyphens  = 0;
+    int        pluses   = 0;
     int        Ts       = 0;
     int        Zs       = 0;
     char*      sP       = term;
     bool       dateTime = false;
-    QNodeType  type;
+    QNodeType  type     = QNodeVoid;
 
     if (strcmp(sP, "true") == 0)
       type = QNodeTrueValue;
@@ -161,6 +162,8 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
           ++dots;
         else if (*sP == ' ')
           ++spaces;
+        else if (*sP == '+')
+          ++pluses;
         else if (*sP == '-')
           ++hyphens;
         else if (*sP == ':')
@@ -180,12 +183,22 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
         if ((hyphens > 0) && (term[4] == '-'))
           dateTime = true;             // MIGHT be a DateTime
 
-        if (dots == 0)
-          type = QNodeIntegerValue;    // no dots - its an Integer
-        else if (dots == 1)
-          type = QNodeFloatValue;      // one dot - its a Floating point
-        else
-          type = QNodeVariable;        // more than one dot ... probably an error
+        // DateTime can come with a space instead of a '+' - urlencode ...
+        if (pluses + spaces == 1)
+        {
+          if (((hyphens == 2) || (hyphens == 3)) && ((colons == 2) || (colons == 3)))
+            dateTime = true;
+        }
+
+        if (dateTime == false)
+        {
+          if (dots == 0)
+            type = QNodeIntegerValue;    // no dots - its an Integer NOT a Floating point. might be a dateTime
+          else if (dots == 1)
+            type = QNodeFloatValue;      // one dot - its a Floating point  or a dateTime, with millisecs
+          else
+            type = QNodeVariable;        // more than one dot ... probably an error
+        }
       }
       else
         type = QNodeVariable;

@@ -1,0 +1,218 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Entity query with q over modifiedAt with GT and timezone
+
+--SHELL-INIT--
+dbInit CB
+orionldStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity urn:E1
+# 02. Sleep 100 ms and create two timestamp strings, T1 w/o timezone, just Z, and T2 with timezone (+02:00)
+# 03. Create an entity urn:E2
+# 04. Create an entity urn:E3
+# 05. Query entities with q=modifiedAt>T1 - see urn:E2 and urn:E3
+# 06. Query entities with q=modifiedAt>T2 - see urn:E2 and urn:E3 (issue #1612 says we get all three)
+#
+
+echo "01. Create an entity urn:E1"
+echo "==========================="
+payload='{
+  "id": "urn:E1",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Sleep 100 ms and create two timestamp strings, T1 w/o timezone, just Z, and T2 with timezone (+02:00)"
+echo "========================================================================================================="
+sleep 1
+T=$(date +%s)
+T1=$(date --date="@$T" --utc --iso-8601=seconds)
+T2=$(date --date="@$T" --iso-8601=seconds)
+echo T1: $T1
+echo T2: $T2
+T1=$(echo $T1 | sed 's/+00:00//')
+T2=$(echo $T2 | sed 's/+02:00/%2B02:00/')
+echo T1: $T1
+echo T2: $T2
+sleep 1
+echo
+echo
+
+
+echo "03. Create an entity urn:E2"
+echo "==========================="
+payload='{
+  "id": "urn:E2",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create an entity urn:E3"
+echo "==========================="
+payload='{
+  "id": "urn:E3",
+  "type": "T",
+  "P1": 1
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Query entities with q=modifiedAt>T1 - see urn:E2 and urn:E3"
+echo "==============================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt>$T1&options=sysAttrs"
+echo
+echo
+
+
+echo "06. Query entities with q=modifiedAt>T2 - see urn:E2 and urn:E3 (issue #1612 says we get all three)"
+echo "==================================================================================================="
+orionCurl --url "/ngsi-ld/v1/entities?q=modifiedAt>$T2&options=sysAttrs"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity urn:E1
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+
+
+
+02. Sleep 100 ms and create two timestamp strings, T1 w/o timezone, just Z, and T2 with timezone (+02:00)
+=========================================================================================================
+T1: 202REGEX(.*)
+T2: 202REGEX(.*)
+T1: 202REGEX(.*)
+T2: 202REGEX(.*)
+
+
+03. Create an entity urn:E2
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E2
+
+
+
+04. Create an entity urn:E3
+===========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E3
+
+
+
+05. Query entities with q=modifiedAt>T1 - see urn:E2 and urn:E3
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 441
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "urn:E2",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "urn:E3",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T"
+    }
+]
+
+
+06. Query entities with q=modifiedAt>T2 - see urn:E2 and urn:E3 (issue #1612 says we get all three)
+===================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 441
+Content-Type: application/json
+Date: REGEX(.*)
+Link: <https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)
+
+[
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "urn:E2",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T"
+    },
+    {
+        "P1": {
+            "createdAt": "202REGEX(.*)Z",
+            "modifiedAt": "202REGEX(.*)Z",
+            "type": "Property",
+            "value": 1
+        },
+        "createdAt": "202REGEX(.*)Z",
+        "id": "urn:E3",
+        "modifiedAt": "202REGEX(.*)Z",
+        "type": "T"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

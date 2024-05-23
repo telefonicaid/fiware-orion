@@ -337,6 +337,7 @@ static bool timezoneParse(const char* dateTime, char* timezoneString, int* hourP
 
   if      (timezoneString[0] == '-') *signP = '-';
   else if (timezoneString[0] == '+') *signP = '+';
+  else if (timezoneString[0] == ' ') *signP = '+';
   else
   {
     snprintf(errorString, errorStringLen, "unsupported character in position 0 of TIMEZONE part '%s' of DateTime '%s'", timezoneString, dateTime);
@@ -415,6 +416,8 @@ static bool timezoneParse(const char* dateTime, char* timezoneString, int* hourP
 // - YYYY-MM-DD T HHmmSS Z
 // - YYYY-MM-DD T HH:mm:SS.mmm
 // - YYYY-MM-DD T HH:mm:SS.mmmZ
+// - YYYY-MM-DD T HH:mm:SS.mmm+HH:mm
+// - YYYY-MM-DD T HH:mm:SS.mmm-HH:mm
 // - YYYY-MM-DD T HHmmSS.mmm
 // - YYYY-MM-DD T HHmmSS.mmmZ
 //
@@ -488,6 +491,7 @@ double dateTimeFromString(const char* iso8601String, char* errorString, int erro
     char* tzStart = strchr(T, 'Z');
     if (tzStart == NULL) tzStart = strchr(T, '+');
     if (tzStart == NULL) tzStart = strchr(T, '-');
+    if (tzStart == NULL) tzStart = strchr(T, ' ');
 
     if (tzStart == NULL)
       strncpy(timeString, T, sizeof(timeString) - 1);
