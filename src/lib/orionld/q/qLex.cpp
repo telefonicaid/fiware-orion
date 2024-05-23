@@ -146,7 +146,7 @@ static QNode* qTermPush(QNode* prev, char* term, bool* lastTermIsTimestampP, cha
     int        Zs       = 0;
     char*      sP       = term;
     bool       dateTime = false;
-    QNodeType  type;
+    QNodeType  type     = QNodeVoid;
 
     if (strcmp(sP, "true") == 0)
       type = QNodeTrueValue;
