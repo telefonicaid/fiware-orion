@@ -1,1 +1,2 @@
+- Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
 - Fix: lighter operation to get databases list from MongoDB (#4517)
