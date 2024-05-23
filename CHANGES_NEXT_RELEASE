@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 - Add: expression context build and evaluation counter in timing section in GET /statistics (#4004)
 - Fix: lighter operation to get databases list from MongoDB (#4517)
+=======
+- Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
+- Fix: lighter operation to get databases list from MongoDB (#4517)
+>>>>>>> master

@@ -88,18 +88,7 @@ Content-Length: REGEX(\d+)
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
   "machine" : "REGEX(.*)",
-  "doc" : "REGEX(.*)",
-  "libversions": {
-     "boost": "REGEX(.*)",
-     "libcurl": "REGEX(.*)",
-     "libmosquitto": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
-     "libcjexl": "REGEX(.*)",
-     "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)",
-     "mongoc": "REGEX(.*)",
-     "bson": "REGEX(.*)"
-  }
+  "doc" : "REGEX(.*)"
 }
 }
 
@@ -125,18 +114,7 @@ Content-Length: REGEX(\d+)
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
   "machine" : "REGEX(.*)",
-  "doc" : "REGEX(.*)",
-  "libversions": {
-     "boost": "REGEX(.*)",
-     "libcurl": "REGEX(.*)",
-     "libmosquitto": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
-     "libcjexl": "REGEX(.*)",
-     "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)",
-     "mongoc": "REGEX(.*)",
-     "bson": "REGEX(.*)"
-  }
+  "doc" : "REGEX(.*)"
 }
 }
 
@@ -160,18 +138,7 @@ Content-Length: REGEX(\d+)
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
   "machine" : "REGEX(.*)",
-  "doc" : "REGEX(.*)",
-  "libversions": {
-     "boost": "REGEX(.*)",
-     "libcurl": "REGEX(.*)",
-     "libmosquitto": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
-     "libcjexl": "REGEX(.*)",
-     "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)",
-     "mongoc": "REGEX(.*)",
-     "bson": "REGEX(.*)"
-  }
+  "doc" : "REGEX(.*)"
 }
 }
 
