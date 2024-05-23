@@ -25,7 +25,7 @@ Entity query with q over modifiedAt with GT and timezone
 
 --SHELL-INIT--
 dbInit CB
-orionldStart CB
+orionldStart CB -experimental
 
 --SHELL--
 
