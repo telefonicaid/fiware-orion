@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - task/regression-test-basic-expressions2
   pull_request:
     branches:
       - master

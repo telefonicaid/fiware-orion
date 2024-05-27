@@ -231,13 +231,14 @@ SET (BOOST_MT
 find_package (mongoc-1.0 1.24.3 EXACT)
 
 # Is cjexl lib available?
-find_library (HAVE_CJEXL cjexl PATHS /usr/lib /usr/lib64 /usr/local/lib64 /usr/local/lib)
-if (HAVE_CJEXL)
-    message("Using cjexl")
-else (HAVE_CJEXL)
-    message("Not using cjexl")
-    add_definitions(-DEXPR_BASIC)
-endif (HAVE_CJEXL)
+#find_library (HAVE_CJEXL cjexl PATHS /usr/lib /usr/lib64 /usr/local/lib64 /usr/local/lib)
+#if (HAVE_CJEXL)
+#    message("Using cjexl")
+#else (HAVE_CJEXL)
+#    message("Not using cjexl")
+#    add_definitions(-DEXPR_BASIC)
+#endif (HAVE_CJEXL)
+add_definitions(-DEXPR_BASIC)
 
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
