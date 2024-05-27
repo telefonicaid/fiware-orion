@@ -67,7 +67,11 @@ payload='{
       "M",
       "N",
       "O",
-      "P"
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T"
     ],
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
@@ -135,6 +139,22 @@ payload='{
         "P": {
           "type": "Number",
           "value": "${P|len}"
+        },
+        "Q": {
+          "type": "Number",
+          "value": "${Q|log}"
+        },
+        "R": {
+          "type": "Number",
+          "value": "${R|log10}"
+        },
+        "S": {
+          "type": "Number",
+          "value": "${S|log2}"
+        },
+        "T": {
+          "type": "Number",
+          "value": "${T|sqrt}"
         }
       }
     }
@@ -218,6 +238,22 @@ payload='{
   "P": {
     "type": "Text",
     "value": "NA"
+  },
+  "Q": {
+    "type": "Number",
+    "value": 2.80
+  },
+  "R": {
+    "type": "Number",
+    "value": 100
+  },
+  "S": {
+    "type": "Number",
+    "value": 32
+  },
+  "T": {
+    "type": "Number",
+    "value": 25
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -257,7 +293,7 @@ Content-Length: 0
 ==================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 882
+Content-Length: 1076
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -350,6 +386,26 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Number",
                 "value": 2
+            },
+            "Q": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1.029619417
+            },
+            "R": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "S": {
+                "metadata": {},
+                "type": "Number",
+                "value": 5
+            },
+            "T": {
+                "metadata": {},
+                "type": "Number",
+                "value": 5
             },
             "id": "E1",
             "type": "T"
