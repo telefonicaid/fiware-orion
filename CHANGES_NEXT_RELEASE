@@ -1,7 +1,6 @@
-<<<<<<< HEAD
-- Add: expression context build and evaluation counter in timing section in GET /statistics (#4004)
-- Fix: lighter operation to get databases list from MongoDB (#4517)
-=======
+- Add: JEXL expression support in custom notification macro replacement (using cjexl 0.1.0) (#4004)
+- Add: expression context build and evaluation counters in timing section in GET /statistics (#4004)
+- Fix: use null for non existing attributes in custom covered notifications macro substitution (instead of empty string) to make behaviur more consistent
 - Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
 - Fix: lighter operation to get databases list from MongoDB (#4517)
->>>>>>> master
+

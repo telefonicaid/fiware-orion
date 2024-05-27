@@ -73,6 +73,32 @@
       - [NGSI payload patching](#ngsi-payload-patching)
       - [Omitting payload](#omitting-payload)
       - [Additional considerations](#additional-considerations)
+    - [JEXL Support](#jexl-support)
+      - [Available Transformations](#available-transformations)
+        - [`uppercase`](#uppercase)
+        - [`lowercase`](#lowercase)
+        - [`split`](#split)
+        - [`indexOf`](#indexOf)
+        - [`len`](#len)
+        - [`trim`](#trim)
+        - [`substring`](#substring)
+        - [`includes`](#includes)
+        - [`isNaN`](#isNaN)
+        - [`parseInt`](#parseInt)
+        - [`parseFloat`](#parseFloat)
+        - [`typeOf`](#typeOf)
+        - [`toString`](#toString)
+        - [`floor`](#floor)
+        - [`ceil`](#ceil)
+        - [`round`](#round)
+        - [`toFixed`](#toFixed)
+        - [`log`](#log)
+        - [`log10`](#log10)
+        - [`log2`](#log2)
+        - [`sqrt`](#sqrt)
+        - [`replaceStr`](#replaceStr)
+      - [Failsafe cases](#failsafe-cases)
+      - [Known limitations](#known-limitations)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
     - [Covered Subscriptions](#covered-subscriptions)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
@@ -2022,23 +2048,22 @@ In case of `mqttCustom`:
 * `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
 
-Macro substitution for templates is based on the syntax `${..}`. In particular:
+Macro substitution for templates is based on the syntax `${<JEXL expression>}`. The support to JEXL
+is explained in [JEXL Support](#jexl-support) section. The following identifiers are included in
+the context evaluated by the JEXL expression:
 
-* `${id}` is replaced by the `id` of the entity
-* `${type}` is replaced by the `type` of the entity
-* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
+* `id`: for the `id` of the entity
+* `type`: for the `type` of the entity
+* `service`: for the service (i.e. `fiware-service` header value) in the
   update request triggering the subscription.
-* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
+* `servicePath`: for the service path (i.e. `fiware-servicepath` header value) in the
   update request triggering the subscription.
-* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
+* `authToken: for the authorization token (i.e. `x-auth-token` header value) in the
   update request triggering the subscription.
-* Any other `${token}` is replaced by the value of the attribute whose name is `token` or with
-  an empty string if the attribute is not included in the notification. If the value is a number,
-  a bool or null then its string representation is used. If the value is a JSON array or object
-  then its JSON representation as string is used.
+* All the attributes in the entity triggering the notification (included in the update triggering the notification or not)
 
-In the rare case an attribute was named in the same way of the `${service}`, `${servicePath}` or
-`${authToken}` (e.g. an attribute which name is `service`) then the attribute value takes precedence.
+In the rare case an attribute was named in the same way of the `service`, `servicePath` or
+`authToken` (e.g. an attribute which name is `service`) then the attribute value takes precedence.
 
 Example:
 
@@ -2296,6 +2321,463 @@ Some considerations to take into account when using custom notifications:
   (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
   notification (given that the notification format is actually the same).
 
+## JEXL Support
+
+Orion Context Broker supports [JEXL expressions](https://github.com/TomFrost/Jexl) in custom notification [macro replacement](#macro-substitution). Thus, subscriptions like this can be defined:
+
+```
+"httpCustom": {
+   ...
+   "ngsi": {
+     "relativeHumidity": {
+       "value": "${humidity/100}",
+       "type": "Calculated"
+     }
+   }
+}
+```
+
+So, if a given update sets entity `humidity` attribute to `84.4` then the notification will include a `relativeHumidity` attribute with value `0.844`.
+
+A particular case of expressions are the ones in which the expression is a given context identifier, without an actual expression using it. For instance:
+
+```
+"httpCustom": {
+   ...
+   "ngsi": {
+     "originalHumidity": {
+       "value": "${humidity}",
+       "type": "Calculated"
+     }
+   }
+}
+```
+
+We also refers to this case as *basic replacement*.
+
+An useful resource to test JEXL expressions is the [JEXL playground](https://czosel.github.io/jexl-playground). However, take into account the differences between the original JEXL implementation in JavaScript and the one included in Orion, described in the [known limitations](#known-limitations) section.
+
+Orion relies on cjexl library to provide this functionality. If Orion binary is build without using cjexl, then only basic replacement functionality is available.
+
+### Available Transformations
+
+#### `uppercase`
+
+Convert a string into uppercase.
+
+Extra arguments: none
+
+Example (being context `{"c": "fooBAR"}`):
+
+```
+c|uppercase
+```
+
+results in
+
+```
+"FOOBAR"
+```
+
+#### lowercase
+
+Convert a string into lowercase.
+
+Extra arguments: none
+
+Example (being context `{"c": "fooBAR"}`):
+
+```
+c|lowercase
+```
+
+results in
+
+```
+"foobar"
+```
+
+#### split
+
+Split the input string into array items.
+
+Extra arguments: delimiter to use for the split.
+
+Example (being context `{"c": "foo,bar,zzz"}`):
+
+```
+c|split(',')
+```
+
+results in
+
+```
+[ "foo", "bar", "zzz" ]
+```
+
+#### indexOf
+
+Provides the position of a given string within the input string. In the string is not found, returns `null`.
+
+Extra arguments: the input string to search.
+
+Note this function doesn't work if the input is an array (it only works for strings).
+
+Example (being context `{"c": "fooxybar"}`):
+
+```
+c|indexOf('xy')
+```
+
+results in
+
+```
+3
+```
+
+#### len
+
+Provides the length of a string.
+
+Extra arguments: none.
+
+Note this function doesn't work if the input is an array (it only works for strings).
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|len
+```
+
+results in
+
+```
+6
+```
+
+#### trim
+
+Removes starting and trailing whitespaces.
+
+Extra arguments: none.
+
+Example (being context `{"c": "  foo  bar  "}`):
+
+```
+c|trim
+```
+
+results in
+
+```
+foo  bar
+```
+
+#### substring
+
+Returns a substring between two positions.
+
+Extra arguments:
+* Initial position
+* Final position
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|substring(3,5)
+```
+
+results in
+
+```
+ba
+```
+
+#### includes
+
+Returns `true` if a given string is contained in the input string, `false` otherwise.
+
+Extra arguments: the input string to search.
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|includes('ba')
+```
+
+results in
+
+```
+true
+```
+
+#### isNaN
+
+Returns `true` if the input is not a number, `false` otherwise.
+
+Extra arguments: none.
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|isNaN
+```
+
+results in
+
+```
+true
+```
+
+#### parseInt
+
+Parses a string and return the corresponding integer number.
+
+Extra arguments: none.
+
+Example (being context `{"c": "25"}`):
+
+```
+c|parseInt
+```
+
+results in
+
+```
+25
+```
+
+#### parseFloat
+
+Parses a string and return the corresponding float number
+
+Extra arguments: none.
+
+Example (being context `{"c": "25.33"}`):
+
+```
+c|parseFloat
+```
+
+results in
+
+```
+25.33
+```
+
+#### typeOf
+
+Return a string with the type of the input.
+
+Extra arguments: none.
+
+Example (being context `{"c": 23}`):
+
+```
+c|typeOf
+```
+
+results in
+
+```
+"Number"
+```
+
+#### toString
+
+Return a string representation of the input.
+
+Extra arguments: none.
+
+Example (being context `{"c": 23}`):
+
+```
+c|toString
+```
+
+results in
+
+```
+"23"
+```
+
+#### floor
+
+Return the closest lower integer of a given number.
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|floor
+```
+
+results in
+
+```
+3
+```
+
+#### ceil
+
+Return the closest upper integer of a given number.
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|ceil
+```
+
+results in
+
+```
+4
+```
+
+#### round
+
+Return the closest integer (either lower or upper) of a given number.
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|round
+```
+
+results in
+
+```
+3
+```
+
+#### toFixed
+
+Rounds a number to a number of decimal digits.
+
+Extra arguments: number of decimal digits.
+
+Example (being context `{"c": 3.18}`):
+
+```
+c|toFixed(1)
+```
+
+results in
+
+```
+3.2
+```
+
+#### log
+
+Return the natural logarithm of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|log
+```
+
+results in
+
+```
+1.144222799920162
+```
+
+#### log10
+
+Return the base 10 logarithm of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|log10
+```
+
+results in
+
+```
+0.49692964807321494
+```
+
+#### log2
+
+Return the base 2 logarithm of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|log2
+```
+
+results in
+
+```
+1.6507645591169025
+```
+
+#### sqrt
+
+Return the square root of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|sqrt
+```
+
+results in
+
+```
+1.772004514666935
+```
+
+#### replaceStr
+
+Replace occurrences of a string with another in the input string.
+
+Extra arguments:
+* Source string to replace
+* Destination string to replace
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|replaceStr('o','u')
+```
+
+results in
+
+```
+"fuubar"
+```
+
+### Failsafe cases
+
+As failsafe behaviour, evaluation returns `null` in the following cases:
+
+* Some of the transformation used in the expression is unknown
+* Operations with identifiers that are not defined in the context are used. For instance, `(A==null)?-1:A` will result in `null` (and not `-1`) if `A` is not in the context, due to `==` is an operation that cannot be done on undefined identifiers. However, `A||-1` will work (i.e. `-1` will result if `A` is not in the context), as `||` is not considered an operation on `A`.
+* Syntax error in the JEXL expression (e.g. `A[0|uppercase`)
+
+### Known limitations
+
+- The unitary minus operator is not working properly, e.g. the following expression doesn't work (it failsafes to `null`): `A||-1`. However, the following alternatives are working: `A||0-1` and `A||'-1'|parseInt)`
+- Negation operator `!` (supported in original JavaScript JEXL) is not supported
+
 ## Oneshot Subscriptions
 
 Oneshot subscription provides an option to subscribe an entity only for one time notification. When consumer creates a subscription
@@ -2394,10 +2876,6 @@ This default behaviour can be changed using the `covered` field set to `true` th
 in which case all attributes are included in the notification, no matter if they exist or not in the
 entity. For these attributes that don't exist (`brightness` in this example) the `null`
 value (of type `"None"`) is used.
-
-In the case of custom notifications, if `covered` is set to `true` then `null` will be used to replace `${...}`
-for non existing attributes (the default behavior when `covered` is not set to `true` is to replace by the
-empty string the non existing attributes).
 
 We use the term "covered" in the sense the notification "covers" completely all the attributes
 in the `notification.attrs` field. It can be useful for those notification endpoints that are
