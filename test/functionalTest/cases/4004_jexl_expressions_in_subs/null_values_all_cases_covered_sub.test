@@ -36,9 +36,9 @@ accumulatorStart
 # 03. Create custom sub with covered using json: "${A}" and "X:${A}:Y"
 # 04. Create custom sub with covered using ngsi: "${A}" and "X:${A}:Y"
 # 05. Create entity E1 with A=null
-# 06. Dump & reset accumulator and see 3 notifications (first sub lead to empty notification)
+# 06. Dump & reset accumulator and see 4 notifications
 # 07. Create entity E2 without A
-# 08. Dump & reset accumulator and see 3 notifications (first sub lead to empty notification)
+# 08. Dump & reset accumulator and see 4 notifications
 #
 
 
@@ -175,8 +175,8 @@ echo
 echo
 
 
-echo "06. Dump & reset accumulator and see notifications"
-echo "=================================================="
+echo "06. Dump & reset accumulator and see 4 notifications"
+echo "===================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -198,8 +198,8 @@ echo
 echo
 
 
-echo "08. Dump & reset accumulator and see notifications"
-echo "=================================================="
+echo "08. Dump & reset accumulator and see 4 notifications"
+echo "===================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -257,8 +257,9 @@ Content-Length: 0
 
 
 
-06. Dump & reset accumulator and see notifications
-==================================================
+06. Dump & reset accumulator and see 4 notifications
+====================================================
+#SORT_START
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 4
@@ -269,7 +270,18 @@ Accept: application/json
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
-X::Y=======================================
+null=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 8
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
+
+X:null:Y=======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 27
@@ -292,6 +304,7 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"T","B1":{"type":"Calculated","value":null,"metadata":{}},"B2":{"type":"Calculated","value":"X:null:Y","metadata":{}}}]}=======================================
+#SORT_END
 
 
 07. Create entity E2 without A
@@ -304,8 +317,9 @@ Content-Length: 0
 
 
 
-08. Dump & reset accumulator and see notifications
-==================================================
+08. Dump & reset accumulator and see 4 notifications
+====================================================
+#SORT_START
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 4
@@ -316,7 +330,18 @@ Accept: application/json
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
-X::Y=======================================
+null=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 8
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
+
+X:null:Y=======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 27
@@ -339,6 +364,7 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E2","type":"T","B1":{"type":"Calculated","value":null,"metadata":{}},"B2":{"type":"Calculated","value":"X:null:Y","metadata":{}}}]}=======================================
+#SORT_END
 
 
 --TEARDOWN--

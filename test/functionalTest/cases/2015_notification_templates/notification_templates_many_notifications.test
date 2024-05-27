@@ -280,7 +280,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 PUT http://127.0.0.1:REGEX(\d+)/notify?a1=true&id=E1&type=T1
 Fiware-Servicepath: /
 Entity-Id: E1
-Content-Length: 36
+Content-Length: 44
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -292,8 +292,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
     "A1": "true",
-    "A2": "",
-    "A3": ""
+    "A2": "null",
+    "A3": "null"
 }
 #SORT_END
 #SORT_START
@@ -351,7 +351,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 PUT http://127.0.0.1:REGEX(\d+)/notify?id=E1&type=T2
 Fiware-Servicepath: /
 Entity-Id: E1
-Content-Length: 32
+Content-Length: 44
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -361,9 +361,9 @@ Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
-    "A1": "",
-    "A2": "",
-    "A3": ""
+    "A1": "null",
+    "A2": "null",
+    "A3": "null"
 }
 #SORT_END
 #SORT_START
@@ -422,7 +422,7 @@ PUT http://127.0.0.1:REGEX(\d+)/notify?a3=3&id=E1&type=T3
 Fiware-Servicepath: /
 A3: 3
 Entity-Id: E1
-Content-Length: 33
+Content-Length: 41
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -432,8 +432,8 @@ Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
 
 {
-    "A1": "",
-    "A2": "",
+    "A1": "null",
+    "A2": "null",
     "A3": "3"
 }
 =======================================

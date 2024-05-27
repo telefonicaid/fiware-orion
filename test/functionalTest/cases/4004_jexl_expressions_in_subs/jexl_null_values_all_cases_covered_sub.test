@@ -37,7 +37,7 @@ accumulatorStart
 # 03. Create custom sub with covered using json: "${A|patata}" and "X:${A|patata}:Y"
 # 04. Create custom sub with covered using ngsi: "${A|patata}" and "X:${A|patata}:Y"
 # 05. Create entity E1 with A=1
-# 06. Dump & reset accumulator and see 3 notifications (first sub lead to empty notification)
+# 06. Dump & reset accumulator and see 4 notifications
 #
 
 
@@ -174,8 +174,8 @@ echo
 echo
 
 
-echo "06. Dump & reset accumulator and see 3 notifications (first sub lead to empty notification)"
-echo "==========================================================================================="
+echo "06. Dump & reset accumulator and see 4 notifications"
+echo "===================================================="
 accumulatorDump
 accumulatorReset
 echo
@@ -233,8 +233,9 @@ Content-Length: 0
 
 
 
-06. Dump & reset accumulator and see 3 notifications (first sub lead to empty notification)
-===========================================================================================
+06. Dump & reset accumulator and see 4 notifications
+====================================================
+#SORT_START
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 4
@@ -245,7 +246,18 @@ Accept: application/json
 Content-Type: text/plain
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
-X::Y=======================================
+null=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 8
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
+
+X:null:Y=======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 27
@@ -268,6 +280,7 @@ Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
 
 {"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"T","B1":{"type":"Calculated","value":null,"metadata":{}},"B2":{"type":"Calculated","value":"X:null:Y","metadata":{}}}]}=======================================
+#SORT_END
 
 
 --TEARDOWN--

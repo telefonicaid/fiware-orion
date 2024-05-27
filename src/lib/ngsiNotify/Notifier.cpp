@@ -170,7 +170,7 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, exprContextObjectP, "", true))
+    if (!macroSubstitute(payloadP, notifPayload, exprContextObjectP, "null", true))
     {
       return false;
     }
