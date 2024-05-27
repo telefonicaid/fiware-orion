@@ -455,6 +455,8 @@ In addition, the [General syntax restrictions](#general-syntax-restrictions) als
 
 In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
+Note that although `:` and `-` are allowed in identifiers, they are strongly discouraged, as they collide with the [JEXL syntax](#jexl-support). In particular, `-` is used for subtraction operation (e.g. `${A-B}`) and `:` is used in the ternary operator (eg. `A?'A is true':'A is false`). Thus, an attribute name `lower-temperature` in an expression `${lower-temperature}` would be interpreted as the value of `lower` attribute minus `temperature` attribute (and not as the value of an attribute named `lower-temperature`).
+
 ## Error Responses
 
 If present, the error payload is a JSON object including the following fields:
