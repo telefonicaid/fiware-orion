@@ -124,8 +124,11 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     // method to free it
     r.fill(result);
 
+#ifndef EXPR_BASIC
     // cjexl_eval() allocated memory for us. We have to release it in order to avoid a leak
+    // (disbled with EXPR_BASIC because in that case result is static memory)
     free((char*)result);
+#endif
 
     TIME_EXPR_JEXL_EVAL_STOP();
   }
