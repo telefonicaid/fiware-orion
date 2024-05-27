@@ -123,6 +123,10 @@ ExprResult ExprManager::evaluate(ExprContextObject* exprContextObjectP, const st
     // The ExprResult::fill() method allocates dynamic memory. So, the callers to evaluate() are supposed to invoke ExprResult::release()
     // method to free it
     r.fill(result);
+
+    // cjexl_eval() allocated memory for us. We have to release it in order to avoid a leak
+    free((char*)result);
+
     TIME_EXPR_JEXL_EVAL_STOP();
   }
 
