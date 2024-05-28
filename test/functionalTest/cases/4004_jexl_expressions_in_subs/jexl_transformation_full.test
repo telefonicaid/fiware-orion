@@ -33,7 +33,7 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create custom sub using all transformations
-# 02. Create entity E1 with A to P attributes
+# 02. Create entity E1 with A to V attributes
 # 03. Dump accumulator and see expected notification
 #
 
@@ -71,7 +71,9 @@ payload='{
       "Q",
       "R",
       "S",
-      "T"
+      "T",
+      "U",
+      "V"
     ],
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
@@ -155,6 +157,14 @@ payload='{
         "T": {
           "type": "Number",
           "value": "${T|sqrt}"
+        },
+        "U": {
+          "type": "Text",
+          "value": "${U|mapper(['\''es'\'','\''fr'\''],['\''Spain'\'','\''France'\''])}"
+        },
+        "V": {
+          "type": "Text",
+          "value": "${V|thMapper([1,2],['\''low'\'','\''medium'\'','\''high'\''])}"
         }
       }
     }
@@ -165,7 +175,7 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A to P attributes"
+echo "02. Create entity E1 with A to V attributes"
 echo "==========================================="
 payload='{
   "id": "E1",
@@ -254,6 +264,14 @@ payload='{
   "T": {
     "type": "Number",
     "value": 25
+  },
+  "U": {
+    "type": "Text",
+    "value": "fr"
+  },
+  "V": {
+    "type": "Number",
+    "value": 1.5
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -279,7 +297,7 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A to P attributes
+02. Create entity E1 with A to V attributes
 ===========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -293,7 +311,7 @@ Content-Length: 0
 ==================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 1076
+Content-Length: 1178
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -406,6 +424,16 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Number",
                 "value": 5
+            },
+            "U": {
+                "metadata": {},
+                "type": "Text",
+                "value": "France"
+            },
+            "V": {
+                "metadata": {},
+                "type": "Text",
+                "value": "medium"
             },
             "id": "E1",
             "type": "T"

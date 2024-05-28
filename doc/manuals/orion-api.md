@@ -97,6 +97,8 @@
         - [`log2`](#log2)
         - [`sqrt`](#sqrt)
         - [`replaceStr`](#replaceStr)
+        - [`mapper`](#mapper)
+        - [`thMapper`](#thmapper)
       - [Failsafe cases](#failsafe-cases)
       - [Known limitations](#known-limitations)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
@@ -2765,6 +2767,50 @@ results in
 
 ```
 "fuubar"
+```
+
+#### mapper
+
+Returns a value among several choices based in one to one mapping. This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
+
+This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, the input is not an string, etc.)
+
+Extra arguments:
+* values array
+* choices array
+
+Example (being context `{"c": "fr", "values": ["es", "fr", "de"], "choices": ["Spain", "France", "Germany"]}`):
+
+```
+c|mapper(values,choices)
+```
+
+results in
+
+```
+"France"
+```
+
+#### thMapper
+
+Returns a value among several choices based in threshold values. This function is based in an array of *values* and an array of *choices* (which length is exactly the same as values plus one). Thus, if the input value is between the *i*-th and the *i+1*-th item of *values*, then *i*+1-th item of *choices* is returned.
+
+This transformation returns `null` if some problem with the arguments is found (i.e. choices length is not exacly the same as values plus one, some of the items in the values array is not a number, etc.)
+
+Extra arguments:
+* values array
+* choices array
+
+Example (being context `{"c": 0.5, "values": [-1, 1], "choices": ["low", "medium", "high"]}`):
+
+```
+c|thMapper(values,choices)
+```
+
+results in
+
+```
+"medium"
 ```
 
 ### Failsafe cases
