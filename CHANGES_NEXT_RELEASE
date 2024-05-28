@@ -1,2 +1,3 @@
 - Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
 - Fix: lighter operation to get databases list from MongoDB (#4517)
+- Fix: wrong date values should not allowed in subscription's expires field (#4541)

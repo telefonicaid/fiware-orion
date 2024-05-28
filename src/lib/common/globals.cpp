@@ -606,6 +606,25 @@ double parse8601Time(const std::string& ss)
   time.tm_min  = m;        // 0-59
   time.tm_sec  = (int) s;  // 0-61 (0-60 in C++11)
 
+  const int minYear = 0;
+  const int minMonth = 0;
+  const int maxMonth = 11;
+  const int minDay = 1;
+  const int maxDay = 31;
+  const int minHour = 0;
+  const int maxHour = 23;
+  const int minMinute = 0;
+  const int maxMinute = 59;
+  const int minSecond = 0;
+  const int maxSecond = 59;
+
+  if (time.tm_year < minYear || time.tm_mon < minMonth || time.tm_mon > maxMonth || time.tm_mday < minDay ||
+      time.tm_mday > maxDay || time.tm_hour < minHour || time.tm_hour > maxHour || time.tm_min < minMinute ||
+      time.tm_min > maxMinute || time.tm_sec < minSecond || time.tm_sec > maxSecond)
+  {
+    return -1;
+  }
+
   int64_t  totalSecs  = timegm(&time) - offset;
   float    millis     = s - (int) s;
   double   timestamp  = totalSecs;
