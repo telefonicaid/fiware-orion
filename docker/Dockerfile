@@ -104,7 +104,7 @@ RUN \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
-    bash get_cjexl.sh 0.1.0 ${REPO_ACCESS_TOKEN} && \
+    bash get_cjexl.sh 0.2.0 ${REPO_ACCESS_TOKEN} && \
     make && \
     make install && \
     # reduce size of installed binaries
