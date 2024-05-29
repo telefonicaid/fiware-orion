@@ -2988,7 +2988,7 @@ results in
 As failsafe behaviour, evaluation returns `null` in the following cases:
 
 * Some of the transformation used in the expression is unknown
-* Operations with identifiers that are not defined in the context are used. For instance, `(A==null)?-1:A` will result in `null` (and not `-1`) if `A` is not in the context, due to `==` is an operation that cannot be done on undefined identifiers. However, `A||-1` will work (i.e. `-1` will result if `A` is not in the context), as `||` is not considered an operation on `A`.
+* Operations with identifiers that are not defined in the context are used. For instance, `(A==null)?0:A` will result in `null` (and not `0`) if `A` is not in the context, due to `==` is an operation that cannot be done on undefined identifiers. However, `A||0` will work (i.e. `0` will result if `A` is not in the context), as `||` is not considered an operation on `A`.
 * Syntax error in the JEXL expression (e.g. `A[0|uppercase`)
 
 ### Known limitations
