@@ -74,6 +74,7 @@
       - [Omitting payload](#omitting-payload)
       - [Additional considerations](#additional-considerations)
     - [JEXL Support](#jexl-support)
+      - [JEXL usage example](#jexl-usage-example)
       - [Available Transformations](#available-transformations)
         - [`uppercase`](#uppercase)
         - [`lowercase`](#lowercase)
@@ -2331,13 +2332,13 @@ Orion Context Broker supports [JEXL expressions](https://github.com/TomFrost/Jex
 
 ```
 "httpCustom": {
-   ...
-   "ngsi": {
-     "relativeHumidity": {
-       "value": "${humidity/100}",
-       "type": "Calculated"
-     }
-   }
+  ...
+  "ngsi": {
+    "relativeHumidity": {
+      "value": "${humidity/100}",
+      "type": "Calculated"
+    }
+  }
 }
 ```
 
@@ -2347,13 +2348,13 @@ A particular case of expressions are the ones in which the expression is a given
 
 ```
 "httpCustom": {
-   ...
-   "ngsi": {
-     "originalHumidity": {
-       "value": "${humidity}",
-       "type": "Calculated"
-     }
-   }
+  ...
+  "ngsi": {
+    "originalHumidity": {
+      "value": "${humidity}",
+      "type": "Calculated"
+    }
+  }
 }
 ```
 
@@ -2362,6 +2363,175 @@ We also refers to this case as *basic replacement*.
 An useful resource to test JEXL expressions is the [JEXL playground](https://czosel.github.io/jexl-playground). However, take into account the differences between the original JEXL implementation in JavaScript and the one included in Orion, described in the [known limitations](#known-limitations) section.
 
 Orion relies on cjexl library to provide this functionality. If Orion binary is build without using cjexl, then only basic replacement functionality is available.
+
+### JEXL usage example
+
+As example, let's consider a subscription like this:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "speed": {
+      "value": "${(speed|split('\'' '\''))[0]|parseInt}",
+      "type": "Calculated"
+    },
+    "ratio": {
+      "value": "${count.sum/count.count}",
+      "type": "Calculated"
+    },
+    "code": {
+      "value": "${code||'\''invalid'\''}",
+      "type": "Calculated"
+    },
+    "alert": {
+      "value": "${(value>max)?'\''nok'\'':'\''ok'\''}",
+      "type": "Calculated"
+    },
+    "count": {
+      "value": "${{count:count.count+1, sum:count.sum+((speed|split('\'' '\''))[0]|parseInt)}}",
+      "type": "Calculated"
+    }
+}
+```
+
+A entity update like this:
+
+```
+{
+  ...
+  "speed": {
+    "value": "10 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 100
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": null,
+    "type": "Number"
+  },
+  "value": {
+    "value": 14,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}
+```
+
+will trigger a notification like this:
+
+```
+"data": [
+  {
+    ...
+    "speed": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 10
+    },
+    "ratio": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 20
+    },
+    "code": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "invalid"
+    },
+    "alert": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "ok"
+    },
+    "count": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": {
+        "count": 6,
+        "sum": 110
+      }
+    }
+  }
+]
+```
+
+A new entity update like this:
+
+```
+{
+  ...
+  "speed": {
+    "value": "30 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 500
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": 456,
+    "type": "Number"
+  },
+  "value": {
+    "value": 75,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}
+```
+
+will trigger a notification like this:
+
+```
+"data": [
+  {
+    ...
+    "speed": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 30
+    },
+    "ratio": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 100
+    },
+    "code": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 456
+    },
+    "alert": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "nok"
+    },
+    "count": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": {
+        "count": 6,
+        "sum": 530
+      }
+    }
+  }
+]
+```
 
 ### Available Transformations
 
