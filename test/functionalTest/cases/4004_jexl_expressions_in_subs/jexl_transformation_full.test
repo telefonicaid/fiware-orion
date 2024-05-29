@@ -128,7 +128,7 @@ payload='{
         },
         "M": {
           "type": "Number",
-          "value": "${M|round(2)}"
+          "value": "${M|round}"
         },
         "N": {
           "type": "Text",
