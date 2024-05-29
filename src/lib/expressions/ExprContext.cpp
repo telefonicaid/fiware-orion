@@ -217,7 +217,6 @@ std::string ExprContextList::get(void)
 */
 void ExprContextList::add(const std::string &_value)
 {
-
   LM_T(LmtExpr, ("adding to JEXL expression context list (string): %s", _value.c_str()));
   jh.addString(_value);
 }
@@ -279,7 +278,6 @@ void ExprContextList::add(ExprContextObject exprContextObject)
 */
 void ExprContextList::add(ExprContextList exprContextList)
 {
-
   std::string s = exprContextList.get();
   LM_T(LmtExpr, ("adding to JEXL expression context list (list): %s", s.c_str()));
   jh.addRaw(s);

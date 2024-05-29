@@ -1,6 +1,7 @@
 name: Publish Docker image (master)
 
 # The workflow will push images for master on every merge
+# Ideally, this should be done at dockerhub, but it doesn't support secrets (see https://stackoverflow.com/questions/78446824/use-environment-variables-with-sensible-information-in-docker-hub-autobuild)
 
 on:
   push:

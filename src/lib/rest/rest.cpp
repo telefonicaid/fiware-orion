@@ -618,8 +618,8 @@ static void requestCompleted
     clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
     clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
     clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
-    clock_addtime(&accTimeStat.exprBasicCtxBldTime,  &threadLastTimeStat.exprBasicCtxBldTime);
-    clock_addtime(&accTimeStat.exprBasicEvalTime,    &threadLastTimeStat.exprBasicEvalTime);
+    clock_addtime(&accTimeStat.exprBasicCtxBldTime,   &threadLastTimeStat.exprBasicCtxBldTime);
+    clock_addtime(&accTimeStat.exprBasicEvalTime,     &threadLastTimeStat.exprBasicEvalTime);
     clock_addtime(&accTimeStat.exprJexlCtxBldTime,    &threadLastTimeStat.exprJexlCtxBldTime);
     clock_addtime(&accTimeStat.exprJexlEvalTime,      &threadLastTimeStat.exprJexlEvalTime);
     clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);

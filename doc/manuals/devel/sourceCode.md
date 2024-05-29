@@ -24,7 +24,7 @@
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
 * [src/lib/logSummary/](#srcliblogsummary) (Log Summary implementation)
 * [src/lib/metricsMgr/](#srclibmetricsmgr) (Metrics Manager implementation)
-* [src/lib/expressions/](#seribexpressions) (Custom notification expressions support)
+* [src/lib/expressions/](#srclibexpressions) (Custom notification expressions support)
 
 ## src/app/contextBroker/
 The main program is found in `contextBroker.cpp` and its purpose it to:

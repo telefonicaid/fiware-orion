@@ -46,7 +46,7 @@ static const char* cjexl_eval(void* ptr, const char* script_ptr, const char* con
   return "";
 }
 #else
-// Interface to use libcjexl.a
+// Interface to use libcjexl
 extern "C" {
     void* cjexl_new_engine();
 }
@@ -69,7 +69,6 @@ void ExprManager::init(void)
 {
   jexlEngine = cjexl_new_engine();
 }
-
 
 
 

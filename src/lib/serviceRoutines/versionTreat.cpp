@@ -48,7 +48,7 @@
 #include <mosquitto.h>
 
 #ifndef EXPR_BASIC
-// Interface to use libcjexl.a
+// Interface to use libcjexl
 extern "C" {
     const char* cjexl_version();
 }
