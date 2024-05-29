@@ -2373,7 +2373,7 @@ As example, let's consider a subscription like this:
   ...
   "ngsi": {
     "speed": {
-      "value": "${(speed|split('\'' '\''))[0]|parseInt}",
+      "value": "${(speed|split(' '))[0]|parseInt}",
       "type": "Calculated"
     },
     "ratio": {
@@ -2381,15 +2381,15 @@ As example, let's consider a subscription like this:
       "type": "Calculated"
     },
     "code": {
-      "value": "${code||'\''invalid'\''}",
+      "value": "${code||'invalid'}",
       "type": "Calculated"
     },
     "alert": {
-      "value": "${(value>max)?'\''nok'\'':'\''ok'\''}",
+      "value": "${(value>max)?'nok':'ok'}",
       "type": "Calculated"
     },
     "count": {
-      "value": "${{count:count.count+1, sum:count.sum+((speed|split('\'' '\''))[0]|parseInt)}}",
+      "value": "${{count:count.count+1, sum:count.sum+((speed|split(' '))[0]|parseInt)}}",
       "type": "Calculated"
     }
 }
