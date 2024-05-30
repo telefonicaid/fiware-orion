@@ -6,6 +6,7 @@
   * #1583:  If a 'q' contains an ampersand, that ampersand needs to be forwarded as a semicolon
   * #1593:  Modify the type of an entity in a Replace operation (only working in legacy mode)
   * #1612:  Support for ISO8601 timezones expressed in +/- HH:mm in 'q' for entity query
+  * #1615:  Crash in HTTPS notifications with a notification endpoint with empty URL PATH
   * SOF:    https://stackoverflow.com/questions/77911109/fiware-to-payload-too-large
   * Fixed a possible crash for TRoE and attributes of type Vocab/Json/Language
   * Forbidden to DELETE the Core Context !!!  (it can be reloaded)

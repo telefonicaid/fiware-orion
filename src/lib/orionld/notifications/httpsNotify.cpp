@@ -132,8 +132,8 @@ int httpsNotify(CachedSubscription* cSubP, struct iovec* ioVec, int ioVecLen, do
   char  url[512];  // FIXME: DON'T Create the URL over and over - store it in the CachedSubscription
   char* rest = cSubP->rest;
 
-  if (rest[0] == '/')
-    rest = &rest[1];
+  if      (rest    == NULL)  rest = (char*) "";   // If NULL, point to empty string (so that the later snprintf works)
+  else if (rest[0] == '/')   rest = &rest[1];     // if the first char ia a slash ('/'), step over it
 
   if (cSubP->port > 0)
     snprintf(url, sizeof(url), "%s://%s:%d/%s", cSubP->protocolString, cSubP->ip, cSubP->port, rest);
