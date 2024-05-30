@@ -1,0 +1,160 @@
+# Copyright 2024 FIWARE Foundation e.V.
+#
+# This file is part of Orion-LD Context Broker.
+#
+# Orion-LD Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion-LD Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion-LD Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# orionld at fiware dot org
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Crash with HTTPS Subscription with empty PATH in URL for the notification - issue #1615
+
+--SHELL-INIT--
+${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+dbInit CB
+dbInit CB x
+orionldStart CB -mongocOnly -multiservice
+accumulatorStart --pretty-print --https --key /tmp/harnessTest.key --cert /tmp/harnessTest.pem
+
+--SHELL--
+
+#
+# 01. Create an HTTPS subscription, according to issue #1516
+# 02. Create a matching entity urn:E1 of type WasteContainer
+# 03. Update the attribute 'name' - provoke a notification (the broker crashes here according to the issue)
+#
+# As the accumulator is unable to treat empty URL PATH, we cannot query the accumulator.
+# But, we can make sure the broker is still alive
+#
+# 04. Ping the broker to make sure it's still alive
+#
+
+echo "01. Create an HTTPS subscription, according to issue #1516"
+echo "=========================================================="
+payload='{
+  "description": "Notify me when name changes",
+  "type": "Subscription",
+  "entities": [{"type": "WasteContainer"}],
+  "watchedAttributes": ["name"],
+  "notification": {
+    "attributes": ["name"],
+    "format": "keyValues",
+    "endpoint": {
+      "uri": "https://127.0.0.1:'${LISTENER_PORT}'/"
+    }
+  },
+  "@context": "https://raw.githubusercontent.com/smart-data-models/dataModel.WasteManagement/master/context.jsonld"
+}'
+orionCurl --url /ngsi-ld/v1/subscriptions --payload "$payload" -H "NGSILD-Tenant: X" --in jsonld
+echo
+echo
+
+
+echo "02. Create a matching entity urn:E1 of type WasteContainer"
+echo "=========================================================="
+payload='{
+  "id": "urn:E1",
+  "type": "WasteContainer",
+  "name": "abc"
+}'
+orionCurl --url /ngsi-ld/v1/entities --payload "$payload"  -H "NGSILD-Tenant: X" -H 'Link: <https://raw.githubusercontent.com/smart-data-models/dataModel.WasteManagement/master/context.jsonld>'
+echo
+echo
+
+
+echo "03. Update the attribute 'name' - provoke a notification (the broker crashes here according to the issue)"
+echo "========================================================================================================="
+payload='{
+  "type": "Property",
+  "value": "def"
+}'
+orionCurl --url /ngsi-ld/v1/entities/urn:E1/attrs/name --payload "$payload" -X PATCH -H "NGSILD-Tenant: X" -H 'Link: <https://raw.githubusercontent.com/smart-data-models/dataModel.WasteManagement/master/context.jsonld>'
+echo
+echo
+
+
+echo "04. Ping the broker to make sure it's still alive"
+echo "================================================="
+orionCurl --url /ngsi-ld/ex/v1/version
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an HTTPS subscription, according to issue #1516
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/subscriptions/urn:ngsi-ld:subscription:REGEX(.*)
+NGSILD-Tenant: x
+
+
+
+02. Create a matching entity urn:E1 of type WasteContainer
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Date: REGEX(.*)
+Location: /ngsi-ld/v1/entities/urn:E1
+NGSILD-Tenant: x
+
+
+
+03. Update the attribute 'name' - provoke a notification (the broker crashes here according to the issue)
+=========================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+
+
+
+04. Ping the broker to make sure it's still alive
+=================================================
+HTTP/1.1 200 OK
+Content-Length: REGEX(.*)
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "Core Context": "https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-contextREGEX(.*)",
+    "Next File Descriptor": REGEX(.*),
+    "Orion-LD version": "REGEX(.*)",
+    "based on orion": "REGEX(.*)",
+    "boost version": "REGEX(.*)",
+    "branch": "REGEX(.*)",
+    "bson version": "REGEX(.*)",
+    "cached subscriptions": 1,
+    "kalloc version": "REGEX(.*)",
+    "kbase version": "REGEX(.*)",
+    "khash version": "REGEX(.*)",
+    "kjson version": "REGEX(.*)",
+    "libcurl version": "REGEX(.*)",
+    "libuuid version": "UNKNOWN",
+    "microhttpd version": "REGEX(.*)",
+    "mongoc version": "REGEX(.*)",
+    "mongocpp version": "REGEX(.*)",
+    "mongodb server version": "REGEX(.*)",
+    "openssl version": "REGEX(.*)",
+    "rapidjson version": "REGEX(.*)"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+dbDrop CB x
+accumulatorStop
