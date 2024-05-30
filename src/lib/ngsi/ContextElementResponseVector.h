@@ -31,6 +31,7 @@
 #include "ngsi/ContextElementResponse.h"
 #include "apiTypesV2/EntityVector.h"
 #include "common/RenderFormat.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -60,7 +61,7 @@ typedef struct ContextElementResponseVector
                                   const std::vector<std::string>&      attrsFilter,
                                   bool                                 blacklist,
                                   const std::vector<std::string>&      metadataFilter,
-                                  std::map<std::string, std::string>*  replacementsP);
+                                  ExprContextObject*                   exprContextObjectP);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);

@@ -137,7 +137,7 @@ payload='{
     "type": "irrelevant"
   },
   "A4": {
-    "value": { "z": 10, "w": "ttt"},
+    "value": { "w": "ttt", "z": 10},
     "type": "irrelevant"
   },
   "A5": {
@@ -273,7 +273,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A4": {
                 "metadata": {},
                 "type": "Text",
-                "value": "this is A4: {\"z\":10,\"w\":\"ttt\"}"
+                "value": "this is A4: {\"w\":\"ttt\",\"z\":10}"
             },
             "A5": {
                 "metadata": {},

@@ -29,11 +29,13 @@ ARG GITHUB_REPOSITORY=fiware-orion
 ARG GIT_NAME
 ARG GIT_REV_ORION
 ARG CLEAN_DEV_TOOLS
+ARG REPO_ACCESS_TOKEN
 
 ENV ORION_USER ${ORION_USER:-orion}
 ENV GIT_NAME ${GIT_NAME:-telefonicaid}
 ENV GIT_REV_ORION ${GIT_REV_ORION:-master}
 ENV CLEAN_DEV_TOOLS ${CLEAN_DEV_TOOLS:-1}
+ENV REPO_ACCESS_TOKEN ${REPO_ACCESS_TOKEN:-""}
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -102,6 +104,7 @@ RUN \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
+    bash get_cjexl.sh 0.2.0 ${REPO_ACCESS_TOKEN} && \
     make && \
     make install && \
     # reduce size of installed binaries
@@ -125,6 +128,7 @@ RUN \
            /opt/mongo-c-driver-1.24.3 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
+           /usr/local/lib/libcjexl.a \
            /opt/rapidjson-1.1.0 \
            /opt/v1.1.0.tar.gz \
            /usr/local/include/rapidjson \

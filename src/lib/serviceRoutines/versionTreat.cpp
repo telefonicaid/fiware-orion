@@ -47,6 +47,13 @@
 #include <bson/bson.h>
 #include <mosquitto.h>
 
+#ifndef EXPR_BASIC
+// Interface to use libcjexl
+extern "C" {
+    const char* cjexl_version();
+}
+#endif
+
 /* ****************************************************************************
 *
 * version -
@@ -70,6 +77,7 @@ std::string libVersions(void)
   std::string  mhd    = "     \"libmicrohttpd\": ";
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
+  std::string  cjexl  = "     \"libcjexl\": ";
   std::string  mongo  = "     \"mongoc\": ";
   std::string  bson   = "     \"bson\": ";
 
@@ -88,6 +96,9 @@ std::string libVersions(void)
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
   total += mosq    + "\"" + mosqVersion + "\"" + ",\n";
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
+#ifndef EXPR_BASIC
+  total += cjexl   + "\"" + cjexl_version() + "\"" + ",\n";
+#endif
 #ifdef OLD_SSL_VERSION_FORMAT
   // Needed by openssl 1.1.1n in Debian 11 and before
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
@@ -132,6 +143,8 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
+  bool showLibVersions = ciP->uriParamOptions[OPT_LIB_VERSIONS];
+
   if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
     ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_ORIGIN);
@@ -168,8 +181,15 @@ std::string versionTreat
   out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
   out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
   out += "  \"machine\" : \"" + std::string(MACHINE_ARCH) + "\",\n";
-  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
-  out += "  }\n";
+  if (showLibVersions)
+  {
+    out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
+    out += "  }\n";
+  }
+  else
+  {
+    out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
+  }  
   out += "}\n";
   out += "}\n";
 

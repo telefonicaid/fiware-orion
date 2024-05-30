@@ -105,6 +105,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "mqtt/mqttMgr.h"
 #include "metricsMgr/metricsMgr.h"
+#include "expressions/exprMgr.h"
 #include "logSummary/logSummary.h"
 
 #include "contextBroker/orionRestServices.h"
@@ -597,6 +598,8 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
+  exprMgr.release();
+
 #ifdef DEBUG
   // valgrind pass is done using DEBUG compilation, so we have to take care with
   // the cache releasing to avoid false positives. In production this is not really
@@ -1042,6 +1045,12 @@ int main(int argC, char* argV[])
 
   std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
 
+  #ifdef EXPR_BASIC
+  versionString += " flavours: basic-expr";
+  #else
+  versionString += " flavours: jexl-expr";
+  #endif
+
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
@@ -1219,6 +1228,7 @@ int main(int argC, char* argV[])
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
   mqttMgr.init(mqttTimeout);
+  exprMgr.init();
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
   mongoInit(dbURI, dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);

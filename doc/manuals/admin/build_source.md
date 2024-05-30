@@ -4,6 +4,8 @@ Orion Context Broker reference distribution is Debian 12. This doesn't mean that
 
 You can also have a look to [3.1 Building in not official distributions](../../../docker/README.md#31-building-in-not-official-distributions) section in the Docker documentation to check how to build Docker containers images in distributions other than the official one.
 
+*NOTE:* the build process described in this document does not include the cjexl library, as it is considered optional from the point of view of the basic building process.
+
 ## Debian 12 (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:

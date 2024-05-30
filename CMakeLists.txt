@@ -208,6 +208,7 @@ SET (ORION_LIBS
     common
     alarmMgr
     metricsMgr
+    expressions
     logSummary
     lm
     pa
@@ -233,10 +234,20 @@ SET (BOOST_MT
 # SET for common static libs. We use 1.24.3 as reference version.
 find_package (mongoc-1.0 1.24.3 EXACT)
 
+# Is cjexl lib available?
+find_library (HAVE_CJEXL cjexl PATHS /usr/lib /usr/lib64 /usr/local/lib64 /usr/local/lib)
+if (HAVE_CJEXL)
+    message("Using cjexl")
+else (HAVE_CJEXL)
+    message("Not using cjexl")
+    add_definitions(-DEXPR_BASIC)
+endif (HAVE_CJEXL)
+
 # Static libs common to contextBroker and unitTest binaries
 SET (COMMON_STATIC_LIBS
     microhttpd.a
     mosquitto.a
+    ${HAVE_CJEXL}
     mongo::mongoc_static
 )
 
@@ -267,7 +278,6 @@ endif (UNIT_TEST)
 # Common include
 #
 include_directories("/usr/include")
-
 
 # Needed for the new C driver
 include_directories("/usr/local/include/libmongoc-1.0")
@@ -323,6 +333,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)
+  ADD_SUBDIRECTORY(src/lib/expressions)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/lib/mqtt)
   ADD_SUBDIRECTORY(src/app/contextBroker)

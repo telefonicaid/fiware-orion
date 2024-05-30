@@ -128,6 +128,7 @@
 #define OPT_OVERRIDEMETADATA            "overrideMetadata"
 #define OPT_SKIPFORWARDING              "skipForwarding"
 #define OPT_FULL_COUNTERS               "fullCounters"
+#define OPT_LIB_VERSIONS                "libVersions"  // used in GET /version operation
 
 
 /* ****************************************************************************

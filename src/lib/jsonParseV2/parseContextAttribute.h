@@ -42,7 +42,8 @@ extern std::string parseContextAttribute
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
   ContextAttribute*                             caP,
-  bool                                          checkAttrSpecialTypes
+  bool                                          checkAttrSpecialTypes,
+  bool                                          relaxForbiddenCheck = false
 );
 
 
