@@ -26,6 +26,10 @@ PROJECT(contextBroker)
 # find_package() for mongo driver doesn't work with cmake 2
 cmake_minimum_required(VERSION 3.0)
 
+# set C++14 standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 #
 # DEBUG or RELEASE build ?
 #
