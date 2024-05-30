@@ -234,18 +234,24 @@ find_package (mongoc-1.0 1.24.3 EXACT)
 find_library (HAVE_CJEXL cjexl PATHS /usr/lib /usr/lib64 /usr/local/lib64 /usr/local/lib)
 if (HAVE_CJEXL)
     message("Using cjexl")
+    SET (COMMON_STATIC_LIBS
+        microhttpd.a
+        mosquitto.a
+        ${HAVE_CJEXL}
+        mongo::mongoc_static
+    )
 else (HAVE_CJEXL)
     message("Not using cjexl")
     add_definitions(-DEXPR_BASIC)
+    SET (COMMON_STATIC_LIBS
+        microhttpd.a
+        mosquitto.a
+        mongo::mongoc_static
+    )
 endif (HAVE_CJEXL)
 
 # Static libs common to contextBroker and unitTest binaries
-SET (COMMON_STATIC_LIBS
-    microhttpd.a
-    mosquitto.a
-    ${HAVE_CJEXL}
-    mongo::mongoc_static
-)
+
 
 SET (DYNAMIC_LIBS
     curl
