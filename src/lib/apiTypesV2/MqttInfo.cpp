@@ -143,7 +143,7 @@ void MqttInfo::fill(const orion::BSONObj& bo)
     if (bo.hasField(CSUB_NGSI))    n++;
     if (n > 1)
     {
-      LM_E(("custom notification must not have more than one payload related field"));
+      LM_E(("Runtime Error (custom notification must not have more than one payload related field)"));
       return;
     }
 

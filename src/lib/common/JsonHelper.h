@@ -50,6 +50,7 @@ public:
 private:
  std::string  ss;
  bool         empty;
+ bool         closed;
 };
 
 
@@ -64,6 +65,7 @@ public:
   void        addNumber(double value);
   void        addDate(double timestamp);
   void        addBool(bool b);
+  void        addNull(void);
 
 
   std::string str();
@@ -71,6 +73,7 @@ public:
 private:
  std::string  ss;
  bool         empty;
+ bool         closed;
 };
 
 

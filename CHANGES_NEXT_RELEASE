@@ -1,2 +1,6 @@
+- Add: JEXL expression support in custom notification macro replacement (using cjexl 0.2.0) (#4004)
+- Add: expression context build and evaluation counters in timing section in GET /statistics (#4004)
+- Fix: use null for non existing attributes in custom covered notifications macro substitution (instead of empty string) to make behaviour more consistent (#4004)
+- Fix: use null for non existing attributes in macro substitution applied to "paylaod" field (instead of empty string) to make behaviour more consistent (#4004)
 - Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
 - Fix: lighter operation to get databases list from MongoDB (#4517)

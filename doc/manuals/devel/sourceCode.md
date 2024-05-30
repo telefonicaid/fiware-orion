@@ -24,6 +24,7 @@
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
 * [src/lib/logSummary/](#srcliblogsummary) (Log Summary implementation)
 * [src/lib/metricsMgr/](#srclibmetricsmgr) (Metrics Manager implementation)
+* [src/lib/expressions/](#srclibexpressions) (Custom notification expressions support)
 
 ## src/app/contextBroker/
 The main program is found in `contextBroker.cpp` and its purpose it to:
@@ -549,5 +550,10 @@ What it does is basically to compile a summary of the current state of the Alara
 To have similar metrics throughout the platform, a common set of metrics were invented and in the case of Orion, a manager was implemented for this purpose.
 This Metrics Manager resides in the library **metricsMgr**.
 For information about the metrics, please refer to [this document](../admin/metrics_api.md).
+
+[Top](#top)
+
+## src/lib/expressions/
+Provides support to the [macro substition logic used by custom notifications](../orion-api.md#macro-substitution). This library provides an abstraction for expression evaluation, providing two implementations: JEXL based and basic replacement based (the implementation to use is choosen at building time, based on the availability of the cjex library).
 
 [Top](#top)
