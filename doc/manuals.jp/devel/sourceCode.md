@@ -24,6 +24,7 @@
 * [src/lib/cache/](#srclibcache) (サブスクリプション・キャッシュの実装)
 * [src/lib/logSummary/](#srcliblogsummary) (ログ・サマリの実装)
 * [src/lib/metricsMgr/](#srclibmetricsmgr) (メトリック・マネージャの実装)
+* [src/lib/expressions/](#srclibexpressions) (カスタム通知式のサポート)
 
 <a name="srcappcontextbroker"></a>
 ## src/app/contextBroker/
@@ -538,5 +539,11 @@ NGSIv2 GET サブスクリプションのリクエストはサブスクリプシ
 ## src/lib/metricsMgr/
 <a name="srclibmetricsmgr"></a>
 プラットフォーム全体で同様のメトリックを使用するには、一般的なメトリックが考案され、Orion の場合は、この目的のためにマネージャが実装されました。この メトリック・マネージャは、ライブラリ **metricsMgr** にあります。メトリックについては、[このドキュメント](../admin/metrics_api.md)を参照してください。
+
+[トップ](#top)
+
+## src/lib/expressions/
+<a name="srclibexpressions"></a>
+[カスタム通知で使用されるマクロ置換ロジック](../orion-api.md#macro-substitution) のサポートを提供します。このライブラリは、式評価の抽象化を提供し、JEXL ベースと基本置換ベースの 2 つの実装を提供します (使用する実装は、cjex ライブラリの可用性に基づいて、ビルド時に選択されます)。
 
 [トップ](#top)

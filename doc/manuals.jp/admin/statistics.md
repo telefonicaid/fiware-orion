@@ -115,20 +115,22 @@ SemWait ブロックは、メインの内部セマフォの累積待ち時間を
   "timing": {
     "accumulated": {
       "jsonV1Parse": 7.860908311,
-      "mongoBackend": 416.796091597,
-      "mongoReadWait": 4656.924425628,
-      "mongoWriteWait": 259.347915990,
-      "mongoCommandWait": 0.514811318,
-      "render": 108.162782114,
-      "total": 6476.593504743
-     },
+      "jsonV2Parse": 120.680244446,
+      "mongoBackend": 12778.52734375,
+      "mongoReadWait": 7532.301757812,
+      "mongoWriteWait": 3619.282226562,
+      "mongoCommandWait": 0.120559767,
+      "exprJexlCtxBld": 27.092681885,
+      "exprJexlEval": 124.217208862,
+      "render": 44.540554047,
+      "total": 25051.384765625
+    },
     "last": {
-      "mongoBackend": 0.014752309,
-      "mongoReadWait": 0.012018445,
-      "mongoWriteWait": 0.000574611,
-      "render": 0.000019136,
-      "total": 0.015148915
-     }
+      "mongoBackend": 0.003775352,
+      "mongoReadWait": 0.0013743,
+      "render": 0.000286864,
+      "total": 0.00440685
+    }
   }
   ...
 }
@@ -147,8 +149,13 @@ SemWait ブロックは、メインの内部セマフォの累積待ち時間を
 * `mongoBackend` : mongoBackend モジュールで渡された時間です (疑似セルフタイム)
 * `render` : レンダリングモジュールに渡された時間です (擬似セルフタイム)
 * `mongo*Wait``Read`, `Write` または `Cmd` オペレーションのために MongoDB を待っている時間です。与えられた要求が MongoDB への複数の read/write/cmd の呼び出しを含む場合、`last` 下の `mongo*Wait` に示された時間は、それらすべてのための蓄積を含むことに注意してください。mongoReadWait の場合、結果カーソルを取得するために使用された時間のみが考慮されますが、カーソル結果を処理する時間 (mongoBackend カウンタに属する時間) は考慮されません
+* `exprJexlCtxBld`: カスタム通知式の評価のためのコンテキストの構築にかかった時間 ([マクロ置換](../orion-api.md#macro-substitution) および [JEXL サポート](../orion-api.md#jexl-support) を参照)
+* `exprJexlEval`: カスタム通知式の評価にかかった時間 ([マクロ置換](../orion-api.md#macro-substitution) および [JEXL サポート](../orion-api.md#jexl-support) を参照)
 
-時間は、特定のスレッド・リクエストがモジュールの使用を開始し、使用を終了するまでの時間から測定されます。したがって、何らかの理由でスレッドが停止した場合 (カーネルがそのスケジューリングポリシーに基づいて別のスレッドに優先順位を与えることを決定した場合)、スレッドがスリープしていた時間が再び実行を待っている時間が測定に含まれているため、正確ではありません。このため、擬似 selt/end-to-end 時間と言っています。しかし、低負荷条件下では、この状況は重大な影響を及ぼさないと予想されます
+*注*: Orion バイナリが cjexl を使用せずにビルドされ、基本的な置換のみが使用可能な場合、`exprJexlCtxBld` および `exprJexlEval` の代わりに
+`exprBasicCtxtBld` フィールドと `exprBasicEval` フィールドが表示されます。
+
+時間は、特定のスレッド・リクエストがモジュールの使用を開始し、使用を終了するまでの時間から測定されます。したがって、何らかの理由でスレッドが停止した場合 (カーネルがそのスケジューリングポリシーに基づいて別のスレッドに優先順位を与えることを決定した場合)、スレッドがスリープしていた時間が再び実行を待っている時間が測定に含まれているため、正確ではありません。このため、擬似 self/end-to-end 時間と言っています。しかし、低負荷条件下では、この状況は重大な影響を及ぼさないと予想されます
 
 ### NotifQueue ブロック
 
