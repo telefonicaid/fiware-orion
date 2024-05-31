@@ -4,6 +4,8 @@ Orion Context Broker のリファレンス配布は Debian 12 です。これは
 
 公式以外のディストリビューションで Docker コンテナ・イメージをビルドする方法は、Docker ドキュメントの [3.1 非公式ディストリビューションでのビルド](../../../docker/README.jp.md#31-building-in-not-official-distributions)・セクションで確認できます。
 
+*注:* このドキュメントで説明されているビルド プロセスには cjexl ライブラリは含まれていません。これは、基本的なビルド プロセスの観点からはオプションであると見なされているためです。
+
 ## Debian 12 (正式サポート)
 
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
