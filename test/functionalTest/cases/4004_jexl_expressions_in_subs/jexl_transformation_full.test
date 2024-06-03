@@ -33,7 +33,7 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create custom sub using all transformations
-# 02. Create entity E1 with A to V attributes
+# 02. Create entity E1 with A to AD attributes
 # 03. Dump accumulator and see expected notification
 #
 
@@ -73,7 +73,15 @@ payload='{
       "S",
       "T",
       "U",
-      "V"
+      "V",
+      "W",
+      "X",
+      "Y",
+      "Z",
+      "AA",
+      "AB",
+      "AC",
+      "AD"
     ],
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
@@ -136,7 +144,7 @@ payload='{
         },
         "O": {
           "type": "Text",
-          "value": "${Z||'\''Is null'\''}"
+          "value": "${ZZ||'\''Is null'\''}"
         },
         "P": {
           "type": "Number",
@@ -165,6 +173,38 @@ payload='{
         "V": {
           "type": "Text",
           "value": "${V|thMapper([1,2],['\''low'\'','\''medium'\'','\''high'\''])}"
+        },
+        "W": {
+          "type": "StructuredValue",
+          "value": "${W|toJson}"
+        },
+        "X": {
+          "type": "Text",
+          "value": "${X|replaceRegex('\''[0-9]+'\'','\''x'\'')}"
+        },
+        "Y": {
+          "type": "Text",
+          "value": "${Y|matchRegex('\''[0-9]+'\'')}"
+        },
+        "Z": {
+          "type": "StructuredValue",
+          "value": "${Z|values}"
+        },
+        "AA": {
+          "type": "StructuredValue",
+          "value": "${AA|keys}"
+        },                                
+        "AB": {
+          "type": "Number",
+          "value": "${AB|arrSum}"
+        },
+        "AC": {
+          "type": "Number",
+          "value": "${AC|arrAvg}"
+        },
+        "AD": {
+          "type": "Number",
+          "value": "${AD|len}"
         }
       }
     }
@@ -175,8 +215,8 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A to V attributes"
-echo "==========================================="
+echo "02. Create entity E1 with A to AD attributes"
+echo "============================================"
 payload='{
   "id": "E1",
   "type": "T",
@@ -272,6 +312,38 @@ payload='{
   "V": {
     "type": "Number",
     "value": 1.5
+  },
+  "W": {
+    "type": "Text",
+    "value": "[1,2,3]"
+  },
+  "X": {
+    "type": "Text",
+    "value": "aba1234aba782"
+  },
+  "Y": {
+    "type": "Text",
+    "value": "aba1234aba782"
+  },
+  "Z": {
+    "type": "StructuredValue",
+    "value": {"x": 1, "y": {"y1": 2, "y2": 3}}
+  },
+  "AA": {
+    "type": "StructuredValue",
+    "value": {"x": 1, "y": {"y1": 2, "y2": 3}}
+  },
+  "AB": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
+  },
+  "AC": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
+  },
+  "AD": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -297,8 +369,8 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A to V attributes
-===========================================
+02. Create entity E1 with A to AD attributes
+============================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -311,7 +383,7 @@ Content-Length: 0
 ==================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 1178
+Content-Length: 1627
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -326,6 +398,29 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Text",
                 "value": "NA3"
+            },
+            "AA": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    "x",
+                    "y"
+                ]
+            },
+            "AB": {
+                "metadata": {},
+                "type": "Number",
+                "value": 6
+            },
+            "AC": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "AD": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
             },
             "B": {
                 "metadata": {},
@@ -434,6 +529,39 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Text",
                 "value": "medium"
+            },
+            "W": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            "X": {
+                "metadata": {},
+                "type": "Text",
+                "value": "abaxabax"
+            },
+            "Y": {
+                "metadata": {},
+                "type": "Text",
+                "value": [
+                    "1234",
+                    "782"
+                ]
+            },
+            "Z": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    {
+                        "y1": 2,
+                        "y2": 3
+                    }
+                ]
             },
             "id": "E1",
             "type": "T"

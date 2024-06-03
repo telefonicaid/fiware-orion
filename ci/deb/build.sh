@@ -175,7 +175,7 @@ rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
 if [ -z "${REPO_ACCESS_TOKEN}" ]; then
     echo "Builder: no REPO_ACCESS_TOKEN, skipping cjexl lib download"
 else
-    bash /opt/fiware-orion/get_cjexl.sh 0.2.0 $REPO_ACCESS_TOKEN
+    bash /opt/fiware-orion/get_cjexl.sh 0.3.0 $REPO_ACCESS_TOKEN
 fi
 
 if [ -n "${branch}" ]; then
