@@ -79,27 +79,34 @@
         - [`uppercase`](#uppercase)
         - [`lowercase`](#lowercase)
         - [`split`](#split)
-        - [`indexOf`](#indexOf)
+        - [`indexOf`](#indexof)
         - [`len`](#len)
         - [`trim`](#trim)
         - [`substring`](#substring)
         - [`includes`](#includes)
         - [`isNaN`](#isNaN)
-        - [`parseInt`](#parseInt)
-        - [`parseFloat`](#parseFloat)
+        - [`parseInt`](#parseint)
+        - [`parseFloat`](#parsefloat)
         - [`typeOf`](#typeOf)
-        - [`toString`](#toString)
+        - [`toString`](#tostring)
+        - [`toJson`](#tojson)
         - [`floor`](#floor)
         - [`ceil`](#ceil)
         - [`round`](#round)
-        - [`toFixed`](#toFixed)
+        - [`toFixed`](#tofixed)
         - [`log`](#log)
         - [`log10`](#log10)
         - [`log2`](#log2)
         - [`sqrt`](#sqrt)
-        - [`replaceStr`](#replaceStr)
+        - [`replaceStr`](#replacestr)
+        - [`replaceRegex`](#replaceregex)
+        - [`matchRegex`](#matchregex)
         - [`mapper`](#mapper)
         - [`thMapper`](#thmapper)
+        - [`values`](#values)
+        - [`keys`](#keys)
+        - [`arrSum`](#arrsum)
+        - [`arrAvg`](#arravg)
       - [Failsafe cases](#failsafe-cases)
       - [Known limitations](#known-limitations)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
@@ -2775,6 +2782,24 @@ results in
 "23"
 ```
 
+#### toJson
+
+Convert the input string to a JSON document. If the string is not a valid JSON, it returns `null`.
+
+Extra arguments: none.
+
+Example (being context `{"c": "[1,2]"}`):
+
+```
+c|toJson
+```
+
+results in
+
+```
+[1, 2]
+```
+
 #### floor
 
 Return the closest lower integer of a given number.
@@ -2939,6 +2964,44 @@ results in
 "fuubar"
 ```
 
+#### replaceRegex
+
+Replace tokens matching a given regex in an input string by another string.
+
+Extra arguments:
+* Regex to match tokens to replace
+* Destination string to replace
+
+Example (being context `{"c": "aba1234aba786aba"}`):
+
+```
+c|replaceRegex('\d+','X')
+```
+
+results in
+
+```
+"abaXabaXaba"
+```
+
+#### matchRegex
+
+Returns an array of tokens matching a given regular expression in input string. In the case of invalid regex, it returns `null`. If no matches are found, it returns the empty array (`[]`).
+
+Extra arguments: regular expression.
+
+Example (being context `{"c": "abc1234fgh897hyt"}`):
+
+```
+c|matchRegex('\d+`)
+```
+
+results in
+
+```
+["1234, "897"]]
+```
+
 #### mapper
 
 Returns a value among several choices based in one to one mapping. This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
@@ -2981,6 +3044,78 @@ results in
 
 ```
 "medium"
+```
+
+#### values
+
+Returns an array with the values of the keys of a given object (or `null` if input is not an object).
+
+Extra arguments: none
+
+Example (being context `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|values
+```
+
+results in
+
+```
+[1,"foo"]
+```
+
+#### keys
+
+Returns an array with the keys of a given object (or `null` if input is not an object).
+
+Extra arguments: none
+
+Example (being context `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|keys
+```
+
+results in
+
+```
+["x","y"]
+```
+
+#### arrSum
+
+Returns the sum of the elements of an array (or `null` if the input in an array or the array containts some not numberic item).
+
+Extra arguments: none
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrSum
+```
+
+results in
+
+```
+6
+```
+
+#### arrAvg
+
+Returns the average of the elements of an array (or `null` if the input in an array or the array containts some not numberic item).
+
+Extra arguments: none
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrAvg
+```
+
+results in
+
+```
+3
 ```
 
 ### Failsafe cases
