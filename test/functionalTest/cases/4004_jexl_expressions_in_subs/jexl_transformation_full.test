@@ -574,5 +574,5 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
 accumulatorStop
