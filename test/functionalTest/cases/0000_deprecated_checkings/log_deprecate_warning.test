@@ -331,14 +331,10 @@ Deprecated usage of geo:point detected in attribute location at entity update, p
 Deprecated usage of legacyForwarding mode in registration creation (regId: REG_ID)
 Deprecated usage of legacyForwarding mode detected in existing registration (regId: REG_ID)
 Deprecated usage of legacyForwarding mode in query forwarding operation (regId: REG_ID)
-Notification (regId: REG_ID) response NOT OK, http code: 400
-Raising alarm BadInput 127.0.0.1: JSON Parse Error: unknown field: /error
-Raising alarm ForwardingError localhost:9801/v2/queryContext: error parsing reply from prov app: {"error":"BadRequest","description":"JSON Parse Error: unknown field: /error"}
-Releasing alarm BadInput 127.0.0.1
+Raising alarm ForwardingError localhost:9801/v2/queryContext: forwarding failure for sender-thread: Couldn't connect to server
 Deprecated usage of legacyForwarding mode in update forwarding operation (regId: REG_ID)
-Notification (regId: REG_ID) response NOT OK, http code: 400
-Raising alarm BadInput 127.0.0.1: JSON Parse Error: unknown field: /error
-Raising alarm ForwardingError localhost:9801/v2/updateContext: error parsing reply from prov app: {"error":"BadRequest","description":"JSON Parse Error: unknown field: /error"}
+Raising alarm ForwardingError localhost:9801/v2/updateContext: forwarding failure for sender-thread: Couldn't connect to server
+Raising alarm BadInput 127.0.0.1: The requested entity has not been found. Check type and id
 
 
 10. Get statistics and see deprecatedFeatures counters
