@@ -31,4 +31,4 @@ jobs:
 
       - name: Run unit tests
         run: |
-          docker run  --network host -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit
+          docker run  --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit

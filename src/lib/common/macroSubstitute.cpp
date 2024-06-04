@@ -32,6 +32,7 @@
 #include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
 
+#include "expressions/exprMgr.h"
 
 
 /* ****************************************************************************
@@ -39,37 +40,50 @@
 * smartStringValue -
 *
 * Returns the effective string value, taking into account replacements
+*
 */
-std::string smartStringValue(const std::string stringValue, std::map<std::string, std::string>* replacementsP, const std::string notFoundDefault)
+std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault)
 {
   // This code is pretty similar to the one in CompoundValueNode::toJson()
   // The program logic branching is the same, but the result at the end of each if-else
   // is different, which makes difficult to unify both them
-  if ((replacementsP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
+  if ((exprContextObjectP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
   {
     // "Full replacement" case. In this case, the result is not always a string
     // len("${") + len("}") = 3
     std::string macroName = stringValue.substr(2, stringValue.size() - 3);
-    std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
-    if (iter == replacementsP->end())
+
+    ExprResult r = exprMgr.evaluate(exprContextObjectP, macroName);
+    std::string result;
+    if (r.valueType == orion::ValueTypeNull)
     {
-      // macro doesn't exist in the replacement map, so we use null as failsafe
-      return notFoundDefault;
+      result = notFoundDefault;
     }
     else
     {
-      return iter->second;
+      // in basic mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
+      if (exprContextObjectP->isBasic())
+      {
+        result = removeQuotes(r.toString());
+      }
+      else
+      {
+        result = r.toString();
+      }
     }
+    r.release();
+    return result;
   }
-  else if (replacementsP != NULL)
+  else if (exprContextObjectP != NULL)
   {
     // "Partial replacement" case. In this case, the result is always a string
     std::string effectiveValue;
-    if (!macroSubstitute(&effectiveValue, stringValue, replacementsP, "null"))
+    if (!macroSubstitute(&effectiveValue, stringValue, exprContextObjectP, "null", true))
     {
       // error already logged in macroSubstitute, using stringValue itself as failsafe
       effectiveValue = stringValue;
     }
+
     // toJsonString will stringfly JSON values in macros
     return '"' + toJsonString(effectiveValue) + '"';
   }
@@ -84,58 +98,42 @@ std::string smartStringValue(const std::string stringValue, std::map<std::string
 
 /* ****************************************************************************
 *
-* buildReplacementMap -
-*
-*/
-void buildReplacementsMap
-(
-  const Entity&                        en,
-  const std::string&                   service,
-  const std::string&                   token,
-  std::map<std::string, std::string>*  replacementsP
-)
-{
-  replacementsP->insert(std::pair<std::string, std::string>("id", "\"" + en.id + "\""));
-  replacementsP->insert(std::pair<std::string, std::string>("type", "\"" + en.type + "\""));
-  replacementsP->insert(std::pair<std::string, std::string>("service", "\"" + service + "\""));
-  replacementsP->insert(std::pair<std::string, std::string>("servicePath", "\"" + en.servicePath + "\""));
-  replacementsP->insert(std::pair<std::string, std::string>("authToken", "\"" + token + "\""));
-  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    // Note that if some attribute is named service, servicePath or authToken (although it would be
-    // an anti-pattern), the attribute takes precedence
-    (*replacementsP)[en.attributeVector[ix]->name] = en.attributeVector[ix]->toJsonValue();
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * stringValueOrNothing -
+*
 */
-static std::string stringValueOrNothing(std::map<std::string, std::string>* replacementsP, const std::string key, const std::string& notFoundDefault)
+static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, const std::string key, const std::string& notFoundDefault, bool raw)
 {
-  std::map<std::string, std::string>::iterator iter = replacementsP->find(key);
-  if (iter == replacementsP->end())
+  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
+  std::string result;
+
+  if (r.valueType == orion::ValueTypeNull)
   {
-    return notFoundDefault;
+    result = notFoundDefault;
   }
   else
   {
-    // replacementP contents are prepared for "full replacement" case, so string values use
-    // double quotes. But in this case we are in a "partial replacement" case, so we have
-    // to remove them if we find them
-    std::string value = iter->second;
-    if (value[0] == '"')
+    std::string s = r.toString();
+
+    // in basic mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
+    if (exprContextObjectP->isBasic())
     {
-      return value.substr(1, value.size()-2);
+      s = removeQuotes(s);
+    }
+
+    if (raw)
+    {
+      // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
+      // so double quotes have to be be removed
+      result = removeQuotes(s);
     }
     else
     {
-      return value;
+      result = s;
     }
   }
+
+  r.release();
+  return result;
 }
 
 
@@ -165,7 +163,7 @@ static std::string stringValueOrNothing(std::map<std::string, std::string>* repl
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, std::map<std::string, std::string>* replacementsP, const std::string& notFoundDefault)
+bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -228,7 +226,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNothing(replacementsP, macroName, notFoundDefault).length() * times;
+    toAdd += stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
@@ -246,7 +244,7 @@ bool macroSubstitute(std::string* to, const std::string& from, std::map<std::str
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNothing(replacementsP, macroName, notFoundDefault);
+    std::string value = stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

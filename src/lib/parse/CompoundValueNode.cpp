@@ -612,7 +612,7 @@ bool CompoundValueNode::equal(const orion::BSONElement& be)
 * CompoundValueNode:toJson
 *
 */
-std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replacementsP)
+std::string CompoundValueNode::toJson(ExprContextObject* exprContextObjectP)
 {
   std::string      out;
   JsonVectorHelper jvh;
@@ -621,7 +621,7 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   switch (valueType)
   {
   case orion::ValueTypeString:
-    return smartStringValue(stringValue, replacementsP, "null");
+    return smartStringValue(stringValue, exprContextObjectP, "null");
 
   case orion::ValueTypeNumber:
     return double2string(numberValue);
@@ -635,14 +635,14 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   case orion::ValueTypeVector:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      jvh.addRaw(childV[ix]->toJson(replacementsP));
+      jvh.addRaw(childV[ix]->toJson(exprContextObjectP));
     }
     return jvh.str();
 
   case orion::ValueTypeObject:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      joh.addRaw(childV[ix]->name, childV[ix]->toJson(replacementsP));
+      joh.addRaw(childV[ix]->name, childV[ix]->toJson(exprContextObjectP));
     }
     return joh.str();
 
@@ -654,6 +654,106 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
     LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
     return "";
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode:toExprContextObject
+*
+*/
+ExprContextObject CompoundValueNode::toExprContextObject(void)
+{
+  ExprContextObject co;
+  for (uint64_t ix = 0; ix < childV.size(); ++ix)
+  {
+    CompoundValueNode* child = childV[ix];
+    switch (child->valueType)
+    {
+    case orion::ValueTypeString:
+      co.add(child->name, child->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      co.add(child->name, child->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      co.add(child->name, child->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      co.add(child->name);
+      break;
+
+    case orion::ValueTypeVector:
+      co.add(child->name, child->toExprContextList());
+      break;
+
+    case orion::ValueTypeObject:
+      co.add(child->name, child->toExprContextObject());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value type not given (%s))", name.c_str()));
+      break;
+
+    default:
+      LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
+    }
+  }
+  return co;
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode:toExprContextList
+*
+*/
+ExprContextList CompoundValueNode::toExprContextList(void)
+{
+  ExprContextList cl;
+  for (uint64_t ix = 0; ix < childV.size(); ++ix)
+  {
+    CompoundValueNode* child = childV[ix];
+    switch (child->valueType)
+    {
+    case orion::ValueTypeString:
+      cl.add(child->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      cl.add(child->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      cl.add(child->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      cl.add();
+      break;
+
+    case orion::ValueTypeVector:
+      cl.add(child->toExprContextList());
+      break;
+
+    case orion::ValueTypeObject:
+      cl.add(child->toExprContextObject());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value type not given)"));
+      break;
+
+    default:
+      LM_E(("Runtime Error (value type unknown)"));
+    }
+  }
+  return cl;
 }
 
 

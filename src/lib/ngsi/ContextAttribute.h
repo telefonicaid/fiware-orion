@@ -37,6 +37,7 @@
 #include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoDriver/BSONObjBuilder.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -107,7 +108,7 @@ public:
 
   std::string  toJsonV1AsNameString(bool comma);
 
-  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, std::map<std::string, std::string>* replacementsP = NULL);
+  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonValue(void);
 
@@ -117,6 +118,8 @@ public:
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
+
+  void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 
   void         release(void);
   std::string  getName(void);
@@ -131,7 +134,7 @@ public:
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
+  std::string  check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck = false);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
