@@ -488,7 +488,6 @@ Content-Length: 566
         "deprecatedFeatures": {
             "geoFormat": 2,
             "ngsiv1Forwarding": 4,
-            "ngsiv1NotifFormat": 4,
             "ngsiv1Requests": 3
         },
         "jsonRequests": 8,

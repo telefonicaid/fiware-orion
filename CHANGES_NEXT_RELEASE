@@ -5,3 +5,4 @@
 - Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
 - Fix: lighter operation to get databases list from MongoDB (#4517)
 - Hardening: compile code using C++14 standard
+- Remove: legacy subscription format

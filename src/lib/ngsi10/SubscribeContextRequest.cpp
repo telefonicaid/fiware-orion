@@ -180,7 +180,7 @@ void SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
   // description and expression are not touched, so default empty string provided by constructor will be used
   sub->status                         = STATUS_ACTIVE;
   sub->descriptionProvided            = false;
-  sub->attrsFormat                    = NGSI_V1_LEGACY;
+  sub->attrsFormat                    = NGSI_V2_NORMALIZED;
   sub->notification.blacklist         = false;
   sub->notification.httpInfo.custom   = false;
 
