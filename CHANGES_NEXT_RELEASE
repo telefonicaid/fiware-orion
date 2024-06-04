@@ -5,3 +5,11 @@
 - Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
 - Fix: lighter operation to get databases list from MongoDB (#4517)
 - Hardening: compile code using C++14 standard
+- Remove: all the remaining NGSIv1 operations
+  - PUT /v1/contextEntities/{id}
+  - DELETE /v1/contextEntities/{id}
+  - GET /v1/contextEntities/{id}/attributes/{name}
+  - POST /v1/updateContext
+  - POST /NGSI10/updateContext
+  - POST /v1/queryContext
+  - POST /NGSI10/queryContext
