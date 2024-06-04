@@ -1,0 +1,1 @@
+After 6 years without touching this directory, we are purging it for Orion 4.0.0 release. If you want to get its content check [the previous version GitHub tree](https://github.com/telefonicaid/fiware-orion/tree/3.12.0/archive).
