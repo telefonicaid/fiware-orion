@@ -17,7 +17,7 @@ A list of deprecated features and the version in which they were deprecated foll
 
 * CLI parameters (and associated env vars): `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
   `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` in Orion 3.12.0. Use `dbURI` instead,
-  checking [this section](#mapping-to-mongouri-from-old-cli-parameters) if you need to know hot to build the MongoDB URI (removed in Orion 3.13.0).
+  checking [this section](#mapping-to-mongouri-from-old-cli-parameters) if you need to know hot to build the MongoDB URI (removed in Orion 4.0.0).
 * `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types in Orion 3.10.0. Use `geo:json` instead.
 * `GET /v2` operation in Orion 3.8.0. This operation is pretty useless and not actually used.
 * Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
