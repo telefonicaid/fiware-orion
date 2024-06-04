@@ -79,27 +79,34 @@
         - [`uppercase`](#uppercase)
         - [`lowercase`](#lowercase)
         - [`split`](#split)
-        - [`indexOf`](#indexOf)
+        - [`indexOf`](#indexof)
         - [`len`](#len)
         - [`trim`](#trim)
         - [`substring`](#substring)
         - [`includes`](#includes)
         - [`isNaN`](#isNaN)
-        - [`parseInt`](#parseInt)
-        - [`parseFloat`](#parseFloat)
+        - [`parseInt`](#parseint)
+        - [`parseFloat`](#parsefloat)
         - [`typeOf`](#typeOf)
-        - [`toString`](#toString)
+        - [`toString`](#tostring)
+        - [`toJson`](#tojson)
         - [`floor`](#floor)
         - [`ceil`](#ceil)
         - [`round`](#round)
-        - [`toFixed`](#toFixed)
+        - [`toFixed`](#tofixed)
         - [`log`](#log)
         - [`log10`](#log10)
         - [`log2`](#log2)
         - [`sqrt`](#sqrt)
-        - [`replaceStr`](#replaceStr)
+        - [`replaceStr`](#replacestr)
+        - [`replaceRegex`](#replaceregex)
+        - [`matchRegex`](#matchregex)
         - [`mapper`](#mapper)
         - [`thMapper`](#thmapper)
+        - [`values`](#values)
+        - [`keys`](#keys)
+        - [`arrSum`](#arrsum)
+        - [`arrAvg`](#arravg)
       - [フェイルセーフ・ケース (Failsafe cases)](#failsafe-cases)
       - [既知の制限 (Known limitations)](#known-limitations)
     - [Oneshot サブスクリプション (Oneshot Subscriptions)](#oneshot-subscriptions)
@@ -2600,7 +2607,7 @@ c|split(',')
 [ "foo", "bar", "zzz" ]
 ```
 
-<a name="indexOf"></a>
+<a name="indexof"></a>
 
 #### indexOf
 
@@ -2726,7 +2733,7 @@ c|isNaN
 true
 ```
 
-<a name="parseInt"></a>
+<a name="parseint"></a>
 
 #### parseInt
 
@@ -2746,7 +2753,7 @@ c|parseInt
 25
 ```
 
-<a name="parseFloat"></a>
+<a name="parsefloat"></a>
 
 #### parseFloat
 
@@ -2786,11 +2793,11 @@ c|typeOf
 "Number"
 ```
 
-<a name="toString"></a>
+<a name="tostring"></a>
 
 #### toString
 
-Return a string representation of the input.
+入力の文字列表現を返します。
 
 追加引数: なし
 
@@ -2804,6 +2811,26 @@ c|toString
 
 ```
 "23"
+```
+
+<a name="tojson"></a>
+
+#### toJson
+
+入力文字列を JSON ドキュメントに変換します。文字列が有効な JSON でない場合は、`null` を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "[1,2]"}`):
+
+```
+c|toJson
+```
+
+結果
+
+```
+[1, 2]
 ```
 
 <a name="floor"></a>
@@ -2866,7 +2893,7 @@ c|round
 3
 ```
 
-<a name="toFixed"></a>
+<a name="tofixed"></a>
 
 #### toFixed
 
@@ -2966,7 +2993,7 @@ c|sqrt
 1.772004514666935
 ```
 
-<a name="replaceStr"></a>
+<a name="replacestr"></a>
 
 #### replaceStr
 
@@ -2986,6 +3013,48 @@ c|replaceStr('o','u')
 
 ```
 "fuubar"
+```
+
+<a name="replaceregex"></a>
+
+#### replaceRegex
+
+入力文字列内の指定された正規表現に一致するトークンを別の文字列に置き換えます。
+
+追加引数:
+* 置換するトークンに一致する正規表現
+* 置換先の文字列
+
+例 (コンテキスト `{"c": "aba1234aba786aba"}`):
+
+```
+c|replaceRegex('\d+','X')
+```
+
+結果
+
+```
+"abaXabaXaba"
+```
+
+<a name="matchregex"></a>
+
+#### matchRegex
+
+入力文字列内の指定された正規表現に一致するトークンの配列を返します。無効な正規表現の場合は、`null` を返します。一致するものが見つからない場合は、空の配列 (`[]`) を返します。
+
+追加引数: 正規表現
+
+例 (コンテキスト `{"c": "abc1234fgh897hyt"}`):
+
+```
+c|matchRegex('\d+`)
+```
+
+結果
+
+```
+["1234, "897"]]
 ```
 
 <a name="mapper"></a>
@@ -3034,6 +3103,86 @@ c|thMapper(values,choices)
 
 ```
 "medium"
+```
+
+<a name="values"></a>
+
+#### values
+
+指定されたオブジェクトのキーの値を含む配列を返します (入力がオブジェクトでない場合は `null`)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|values
+```
+
+結果
+
+```
+[1,"foo"]
+```
+
+<a name="keys"></a>
+
+#### keys
+
+指定されたオブジェクトのキーを含む配列を返します (入力がオブジェクトでない場合は `null`)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|keys
+```
+
+結果
+
+```
+["x","y"]
+```
+
+<a name="arrsum"></a>
+
+#### arrSum
+
+配列の要素の合計を返します (配列内の入力または配列に数値以外の項目が含まれている場合は `null` を返します)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": [1, 5]}`):
+
+```
+c|arrSum
+```
+
+結果
+
+```
+6
+```
+
+<a name="arravg"></a>
+
+#### arrAvg
+
+配列の要素の平均を返します (配列内の入力または配列に数値以外の項目が含まれている場合は `null` を返します)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": [1, 5]}`):
+
+```
+c|arrAvg
+```
+
+結果
+
+```
+3
 ```
 
 <a name="failsafe-cases"></a>

@@ -3084,7 +3084,7 @@ results in
 
 #### arrSum
 
-Returns the sum of the elements of an array (or `null` if the input in an array or the array containts some not numberic item).
+Returns the sum of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
 
 Extra arguments: none
 
@@ -3102,7 +3102,7 @@ results in
 
 #### arrAvg
 
-Returns the average of the elements of an array (or `null` if the input in an array or the array containts some not numberic item).
+Returns the average of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
 
 Extra arguments: none
 
