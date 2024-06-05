@@ -198,15 +198,6 @@ std::string mongoCreateSubscription
     return "";
   }
 
-  if (sub.attrsFormat == NGSI_V1_LEGACY)
-  {
-    __sync_fetch_and_add(&noOfDprLegacyNotif, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated usage of notification legacy format in subscription creation (subId: %s)", subId.c_str()));
-    }
-  }
-
   reqSemGive(__FUNCTION__, "ngsiv2 create subscription request", reqSemTaken);
 
   return subId;

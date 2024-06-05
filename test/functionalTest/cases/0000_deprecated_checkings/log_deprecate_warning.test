@@ -41,12 +41,8 @@ brokerStart CB 0 IPV4 -logDeprecate -statCounters
 # 06. Retrieve registrations (which uses legacyForwarding mode)
 # 07. Forwarded query using legacyForwarding mode
 # 08. Update query using legacyForwarding mode
-# 09. Create subscription using attrsFormat legacy
-# 10. Retrieve subscriptions (which uses attrsFormat legacy)
-# 11. Update subscription using attrsFormat legacy
-# 12. Trigger notification using attrsFormat legacy
-# 13. Get WARNING trace in logs
-# 14. Get statistics and see deprecatedFeatures counters
+# 09. Get WARNING trace in logs
+# 10. Get statistics and see deprecatedFeatures counters
 #
 
 echo "01. Query E1-T1"
@@ -163,77 +159,14 @@ echo
 echo
 
 
-echo "09. Create subscription using attrsFormat legacy"
-echo "================================================"
-payload='{
-  "subject": {
-    "entities": [
-      {
-        "id": "E2",
-        "type": "T2"
-      }
-    ]
-  },
-  "notification": {
-    "http": {
-      "url": "http://localhost:1234"
-    },
-    "attrsFormat": "legacy"
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-
-SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
-
-
-echo "10. Retrieve subscriptions (which uses attrsFormat legacy)"
-echo "=========================================================="
-orionCurl --url /v2/subscriptions
-echo
-echo
-
-
-echo "11. Update subscription using attrsFormat legacy"
-echo "================================================"
-payload='{
-  "notification": {
-    "http": {
-      "url": "http://localhost:1234"
-    },
-    "attrsFormat": "legacy"
-  }
-}'
-orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "12. Trigger notification using attrsFormat legacy"
-echo "================================================="
-payload='{
-  "id": "E2",
-  "type": "T2",
-  "A": {
-    "value": 1,
-    "type": "Number"
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload"
-echo
-echo
-
-
-echo "13. Get WARNING trace in logs"
+echo "09. Get WARNING trace in logs"
 echo "============================="
-cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}' | sed -e "s/$REG_ID/REG_ID/g" | sed -e "s/$SUB_ID/SUB_ID/g"
+cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}' | sed -e "s/$REG_ID/REG_ID/g"
 echo
 echo
 
 
-echo "14. Get statistics and see deprecatedFeatures counters"
+echo "10. Get statistics and see deprecatedFeatures counters"
 echo "======================================================"
 orionCurl --url /statistics
 echo
@@ -388,72 +321,7 @@ Content-Length: 95
 }
 
 
-09. Create subscription using attrsFormat legacy
-================================================
-HTTP/1.1 201 Created
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Content-Length: 0
-
-
-
-10. Retrieve subscriptions (which uses attrsFormat legacy)
-==========================================================
-HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 288
-
-[
-    {
-        "id": "REGEX([0-9a-f\-]{24})",
-        "notification": {
-            "attrs": [],
-            "attrsFormat": "legacy",
-            "covered": false,
-            "http": {
-                "url": "http://localhost:1234"
-            },
-            "onlyChangedAttrs": false
-        },
-        "status": "active",
-        "subject": {
-            "condition": {
-                "attrs": [],
-                "notifyOnMetadataChange": true
-            },
-            "entities": [
-                {
-                    "id": "E2",
-                    "type": "T2"
-                }
-            ]
-        }
-    }
-]
-
-
-11. Update subscription using attrsFormat legacy
-================================================
-HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-
-
-12. Trigger notification using attrsFormat legacy
-=================================================
-HTTP/1.1 201 Created
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/E2?type=T2
-Content-Length: 0
-
-
-
-13. Get WARNING trace in logs
+09. Get WARNING trace in logs
 =============================
 Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
 Deprecated NGSIv1 request received: GET /v1/contextEntities/E/attributes/A, response code: 200
@@ -467,38 +335,31 @@ Raising alarm ForwardingError localhost:9801/v2/queryContext: forwarding failure
 Deprecated usage of legacyForwarding mode in update forwarding operation (regId: REG_ID)
 Raising alarm ForwardingError localhost:9801/v2/updateContext: forwarding failure for sender-thread: Couldn't connect to server
 Raising alarm BadInput 127.0.0.1: The requested entity has not been found. Check type and id
-Releasing alarm BadInput 127.0.0.1
-Deprecated usage of notification legacy format in subscription creation (subId: SUB_ID)
-Deprecated usage of notification legacy format detected in existing subscription (subId: SUB_ID)
-Deprecated usage of notification legacy format in subscription modification (subId: SUB_ID)
-Deprecated usage of notification legacy format in notification (subId: SUB_ID)
-Raising alarm NotificationError localhost:1234/: notification failure for queue worker: Couldn't connect to server
 
 
-14. Get statistics and see deprecatedFeatures counters
+10. Get statistics and see deprecatedFeatures counters
 ======================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 468
 
 {
     "counters": {
         "deprecatedFeatures": {
             "geoFormat": 2,
             "ngsiv1Forwarding": 4,
-            "ngsiv1NotifFormat": 4,
             "ngsiv1Requests": 3
         },
-        "jsonRequests": 8,
-        "noPayloadRequests": 5,
+        "jsonRequests": 5,
+        "noPayloadRequests": 4,
         "requests": {
             "/statistics": {
                 "GET": 1
             },
             "/v2/entities": {
-                "POST": 2
+                "POST": 1
             },
             "/v2/entities/{id}/attrs/{name}": {
                 "GET": 1,
@@ -507,13 +368,6 @@ Content-Length: 566
             "/v2/registrations": {
                 "GET": 1,
                 "POST": 1
-            },
-            "/v2/subscriptions": {
-                "GET": 1,
-                "POST": 1
-            },
-            "/v2/subscriptions/{id}": {
-                "PATCH": 1
             }
         },
         "requestsLegacy": {
