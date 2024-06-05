@@ -5,4 +5,5 @@
 - Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
 - Fix: lighter operation to get databases list from MongoDB (#4517)
 - Hardening: compile code using C++14 standard
+- Remove: `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` CLI parameters along with associated env vars, already deprecated in Orion 3.12.0 (use `-dbURI` instead`)
 - Remove: legacy subscription format
