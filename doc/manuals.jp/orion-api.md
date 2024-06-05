@@ -3168,6 +3168,7 @@ c|arrAvg
 
 - 単位マイナス演算子が正しく動作しません。たとえば、次の式は動作しません (`null` にフェイルセーフされます): `A||-1`。ただし、次の代替式は動作します: `A||0-1` および `A||'-1'|parseInt)`
 - 否定演算子 `!` (元の JavaScript JEXL でサポート) はサポートされていません
+- JEXL 演算子 (例: `:` または `-`) を使用する属性名とエンティティ識別子は、望ましくない式結果につながる可能性があります。たとえば、`temperature-basic` という名前の属性を式の一部として使用すると、属性 `temperature-basic` の値ではなく、属性 `basic` の値から属性 `temperature` の値 (または、`temperature` または `basic` が存在しない場合は `null`) を減算した結果になります
 
 <a name="oneshot-subscriptions"></a>
 
