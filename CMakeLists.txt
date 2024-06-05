@@ -187,8 +187,8 @@ ENDIF()
 
 SET (ORION_LIBS
     common
-    serviceRoutines
     serviceRoutinesV2
+    serviceRoutines
     ngsiNotify
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     jsonParse

@@ -40,6 +40,7 @@ A list of deprecated features and the version in which they were deprecated foll
         * `POST /v1/queryContext`
         * `POST /NGSI10/queryContext`
     * NGSIv1 format in subscription notifications (`notification.atttrsFormat` set to `legacy`) removed in Orion 4.0.0
+    * Finally, the last remaining NGSIv1 operations where removed in Orion 4.0.0
 * `attributes` field in `POST /v2/op/query` is in Orion 1.15.0. It is a combination of `attrs` (to select
   which attributes to include in the response to the query) and unary attribute filter in `q` within
   `expression` (to return only entities which have these attributes). Use them instead.
