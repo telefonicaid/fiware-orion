@@ -1,30 +1,18 @@
 FROM fiware/orion-ld-base AS build-stage
 
-ARG PATH_TO_SRC='opt/orion/'
-
-RUN echo "=================== /usr/local/lib/ =================================="
-RUN ls /usr/local/lib/*.so*
-RUN echo "======================================================================"
-
-RUN cp -a /usr/local/lib/. /usr/lib/x86_64-linux-gnu/
-RUN rm -r /usr/local/lib/
-
-RUN echo "=================== /usr/lib/x86_64-linux-gnu/=================================="
-RUN ls /usr/lib/x86_64-linux-gnu/*.so*
-RUN echo "================================================================================"
+ARG PATH_TO_SRC='/opt/orion/'
 
 COPY . ${PATH_TO_SRC}
+COPY ./docker/build.sh /tmp
 
 WORKDIR ${PATH_TO_SRC}
 
-RUN pwd
-RUN ls -l ../
+RUN /tmp/build.sh -b
 
-RUN PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH make release install
 
-RUN strip /usr/bin/orionld
+## --- Docker for deployment
 
-FROM registry.access.redhat.com/ubi8
+FROM registry.access.redhat.com/ubi8/ubi
 
 LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan.wiedemann@fiware.org" \
       description="Orion-LD is a Context Broker which supports both the NGSI-LD and the NGSI-v2 APIs." \
@@ -34,20 +22,25 @@ LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan
       name="FIWARE Orion-LD" \
       summary="Contains Orion-LD context broker."
 
-ENV LD_LIBRARY_PATH=/opt/paho.mqtt.c/build/output:/usr/local/lib64:/opt/prometheus-client-c/prom/build:/opt/prometheus-client-c/promhttp/build:/usr/lib/x86_64-linux-gnu
-RUN echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
-
-RUN mkdir /licenses
-COPY ./LICENSE /licenses/LICENSE
 
 COPY --from=build-stage /etc/ssl/ /etc/ssl/
+RUN true
+COPY --from=build-stage /usr/bin/orionld /usr/bin
+COPY --from=build-stage /usr/local/lib/* /usr/lib64/
+COPY --from=build-stage /usr/local/lib64/* /usr/lib64/
 COPY --from=build-stage /opt/orion/ldcontexts/ /opt/orion/ldcontexts/
-COPY --from=build-stage /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
-COPY --from=build-stage /usr/lib /usr/lib
-COPY --from=build-stage /usr/bin/ /usr/bin/
-COPY --from=build-stage /usr/lib64/ /usr/lib64/
-COPY --from=build-stage /usr/local/ /usr/local/
-COPY --from=build-stage /opt/paho.mqtt.c/build/output /opt/paho.mqtt.c/build/output
+
+COPY docker/other-places.repo /etc/yum.repos.d/
+COPY docker/ubi.repo /etc/yum.repos.d/
+
+
+RUN cd /etc/pki/rpm-gpg && \
+    curl -O https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux && \
+    yum -y --nogpgcheck install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+    dnf -y module disable postgresql && \
+    yum install -y libicu libpq5 boost && \
+    yum clean all
+
 
 ENTRYPOINT ["orionld", "-fg", "-multiservice", "-ngsiv1Autocast"]
 
