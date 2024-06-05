@@ -3097,7 +3097,7 @@ As failsafe behaviour, evaluation returns `null` in the following cases:
 
 - The unitary minus operator is not working properly, e.g. the following expression doesn't work (it failsafes to `null`): `A||-1`. However, the following alternatives are working: `A||0-1` and `A||'-1'|parseInt)`
 - Negation operator `!` (supported in original JavaScript JEXL) is not supported
-- Attributes names using JEXL operators (I.E: `:` or `-`) may lead to undesired expression results. For example, an atribute named `temperature-1`, when you use it as part of an expression, it would be the result uf substracting 1 to the value of the attribute `temperature`, if it is defined, or `null`, if the attribute `temperature` doesn't exist. 
+- Attribute names and entity identifiers using JEXL operators (eg. `:` or `-`) may lead to undesired expression results. For example, an attribute named `temperature-basic`, when you use it as part of an expression, it would be the result of subtracting the value of the attribute `basic` to the value of the attribute `temperature` (or `null`, if `temperature` or `basic` don't exist) instead the value of the attribute `temperature-basic`.
 
 ## Oneshot Subscriptions
 
