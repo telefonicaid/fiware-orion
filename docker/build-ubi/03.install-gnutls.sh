@@ -21,15 +21,14 @@
 # iot_support at tid dot es
 
 set -e
+yum makecache --refresh
 
-yum -y install --nogpgcheck http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm
-yum -y install --nogpgcheck boost-devel
-yum -y install --nogpgcheck scons
+#
+# gnutls-devel is not available in the ubi-repos, need to find it elsewhere
+#
+cd /etc/pki/rpm-gpg/
+wget https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux
 
-echo -e "\e[1;32m Builder: installing mongo cxx driver \e[0m"
-git clone https://github.com/FIWARE-Ops/mongo-cxx-driver ${ROOT_FOLDER}/mongo-cxx-driver
-cd ${ROOT_FOLDER}/mongo-cxx-driver
-scons --disable-warnings-as-errors --use-sasl-client --ssl
-scons install --disable-warnings-as-errors --prefix=/usr/local --use-sasl-client --ssl
-cd ${ROOT_FOLDER} && rm -Rf mongo-cxx-driver
+yum install -y epel-release
 
+yum install -y gnutls-devel

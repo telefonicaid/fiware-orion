@@ -19,34 +19,21 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
-
 set -e
 
-BUILD_DEPS=(
-  'libcurl-devel' \
-  'libgcrypt-devel' \
-  'gcc-c++' \
-  'zlib-devel' \
-  'openssl-devel' \
-  'libuuid-devel' \
-  'cyrus-sasl-devel' \
-  'libicu' \
-  'libicu-devel' \
-)
+echo "---------- Yum utils ----------"
+yum -y --nogpgcheck install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
-BUILD_TOOLS=(
- 'bzip2' \
- 'ca-certificates' \
- 'python3' \
- 'python2' \
- 'cmake' \
- 'curl' \
- 'wget' \
- 'dirmngr' \
- 'git' \
- 'make' \
-)
+yum -y install yum-utils perl-IO-Tty perl-IPC-Run perl-Test-Simple 
 
-yum -y --nogpgcheck  install \
-    ${BUILD_TOOLS[@]} \
-    ${BUILD_DEPS[@]}
+echo "---------- Add repo rpms ----------"
+yum -y install blas libdap SuperLU lapack armadillo hdf5 xerces-c gdal-libs 
+
+dnf -y module disable postgresql
+
+yum -y --nogpgcheck install postgresql12 postgresql12-contrib
+
+echo "---------- Install  postgres ----------"
+yum -y install libpqxx-devel postgresql12-devel postgresql12-libs
+
+echo "---------- install-postgres-client.sh is DONE ----------"

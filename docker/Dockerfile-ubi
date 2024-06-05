@@ -24,7 +24,7 @@ RUN PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconf
 
 RUN strip /usr/bin/orionld
 
-FROM registry.access.redhat.com/ubi8/ubi:8.4
+FROM registry.access.redhat.com/ubi8
 
 LABEL authors="Ken Zangelin - ken.zangelin@fiware.org, Stefan Wiedemann - stefan.wiedemann@fiware.org" \
       description="Orion-LD is a Context Broker which supports both the NGSI-LD and the NGSI-v2 APIs." \

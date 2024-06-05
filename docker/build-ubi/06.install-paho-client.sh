@@ -25,10 +25,9 @@ set -e
 
 echo
 echo -e "\e[1;32m Debian Builder: installing Paho MQTT C library \e[0m"
-yum install -y graphviz
-wget http://mirror.centos.org/centos/7/os/x86_64/Packages/doxygen-1.8.5-4.el7.x86_64.rpm
-yum install -y doxygen-1.8.5-4.el7.x86_64.rpm
 
+yum remove -y okay-release || true 
+yum install -y graphviz doxygen
 
 rm -f /usr/local/lib/libpaho*                                                 # OK
 git clone https://github.com/eclipse/paho.mqtt.c.git ${ROOT_FOLDER}/paho.mqtt.c      # OK

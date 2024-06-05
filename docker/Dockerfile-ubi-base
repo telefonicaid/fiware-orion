@@ -1,42 +1,25 @@
-FROM registry.access.redhat.com/ubi8/ubi:8.5
+FROM registry.access.redhat.com/ubi8/ubi
 
 ENV ROOT_FOLDER='/opt'
 ENV PAHO_VERSION='v1.3.1'
 
 COPY ./docker/subscription-manager.conf /etc/yum/pluginconf.d/subscription-manager.conf
 COPY ./docker/ubi.repo /etc/yum.repos.d/ubi.repo
+COPY ./docker/other-places.repo /etc/yum.repos.d/other-places.repo
 
 RUN mkdir /tmp/build
 
-COPY ./docker/build-ubi/install-build-dependencies.sh /tmp/build/install-build-dependencies.sh
-RUN /tmp/build/install-build-dependencies.sh
+COPY ./docker/build-ubi/*.sh /tmp/build/
 
-COPY ./docker/build-ubi/install-gnutls.sh /tmp/build/install-gnutls.sh
-RUN /tmp/build/install-gnutls.sh
 
-COPY ./docker/build-ubi/install-fastdds.sh /tmp/build/install-fastdds.sh
-RUN /tmp/build/install-fastdds.sh
-
-COPY ./docker/build-ubi/install-lib-microhttp.sh /tmp/build/install-lib-microhttp.sh
-RUN /tmp/build/install-lib-microhttp.sh
-
-COPY ./docker/build-ubi/install-paho-client.sh /tmp/build/install-paho-client.sh
-RUN /tmp/build/install-paho-client.sh
-
-COPY ./docker/build-ubi/install-k-libs.sh /tmp/build/install-k-libs.sh
-RUN /tmp/build/install-k-libs.sh
-
-COPY ./docker/build-ubi/install-mongo-driver.sh /tmp/build/install-mongo-driver.sh
-RUN /tmp/build/install-mongo-driver.sh
-
-COPY ./docker/build-ubi/install-mongoc-driver.sh /tmp/build/install-mongoc-driver.sh
-RUN /tmp/build/install-mongoc-driver.sh
-
-COPY ./docker/build-ubi/install-postgres-client.sh /tmp/build/install-postgres-client.sh
-RUN /tmp/build/install-postgres-client.sh
-
-COPY ./docker/build-ubi/install-rapid-json.sh /tmp/build/install-rapid-json.sh
-RUN /tmp/build/install-rapid-json.sh
-
-COPY ./docker/build-ubi/install-prometheus-client.sh /tmp/build/install-prometheus-client.sh
-RUN /tmp/build/install-prometheus-client.sh
+RUN /tmp/build/01.install-build-dependencies.sh
+RUN /tmp/build/02.install-mongo-driver.sh
+RUN /tmp/build/03.install-gnutls.sh
+RUN /tmp/build/04.install-fastdds.sh
+RUN /tmp/build/05.install-lib-microhttp.sh
+RUN /tmp/build/06.install-paho-client.sh
+RUN /tmp/build/07.install-k-libs.sh
+RUN /tmp/build/08.install-mongoc-driver.sh
+RUN /tmp/build/09.install-postgres-client.sh
+RUN /tmp/build/10.install-rapid-json.sh
+RUN /tmp/build/11.install-prometheus-client.sh

@@ -20,9 +20,9 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-yum -y --nogpgcheck install https://repo.almalinux.org/almalinux/8/PowerTools/x86_64/os/Packages/tinyxml2-6.0.0-3.el8.x86_64.rpm \
-          https://repo.almalinux.org/almalinux/8/PowerTools/x86_64/os/Packages/tinyxml2-devel-6.0.0-3.el8.x86_64.rpm 
+dnf config-manager --set-enabled powertools
 
+yum -y install tinyxml2-devel boost-devel
 yum -y --nogpgcheck install https://dl.fedoraproject.org/pub/fedora/linux/releases/39/Everything/x86_64/os/Packages/a/asio-devel-1.28.1-2.fc39.x86_64.rpm
 
 mkdir /opt/Fast-DDS
