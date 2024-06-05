@@ -225,7 +225,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **conditions** : 通知をトリガーする属性のリストです。
 -   **expression** : 更新が来たときに通知を送信するかどうかを評価するために使用される式です。 次のフィールドで構成されています : q, mq, georel, geometry and/or coords (オプション)
 -   **count** : サブスクリプションに関連付けられて送信された通知の数です
--   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues**, **values** (最後の5つは NGSIv2 形式で使用されます) です
+-   **format** : 通知を送信するために使用する形式。可能な値は、**normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues**, **values** です
 -   **status** : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)、
     または `oneshot` ([oneshot サブスクリプション](../orion-api.md#oneshot-subscriptions) の場合) のいずれか。Orion API
     は追加の状態 (`expired`など) を考慮しますが、DB にヒットすることはありません (Orion によって管理されます)
