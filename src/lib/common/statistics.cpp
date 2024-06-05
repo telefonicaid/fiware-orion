@@ -152,7 +152,6 @@ int noOfSimulatedNotifications   = -1;
 // Deprecated features
 int noOfDprNgsiv1Request         = -1;
 int noOfDprLegacyForwarding      = -1;
-int noOfDprLegacyNotif           = -1;
 int noOfDprGeoformat             = -1;
 
 

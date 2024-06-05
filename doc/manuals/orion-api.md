@@ -1993,40 +1993,7 @@ If `attrsFormat` is `values` then values partial entity representation mode is u
 }
 ```
 
-If `attrsFormat` is `legacy` then subscription representation follows  NGSIv1 format. This way, users
-can benefit from the enhancements of Orion subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
-
-Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
-
-```json
-{
-	"subscriptionId": "56e2ad4e8001ff5e0a5260ec",
-	"originator": "localhost",
-	"contextResponses": [{
-		"contextElement": {
-			"type": "Car",
-			"isPattern": "false",
-			"id": "Car1",
-			"attributes": [{
-				"name": "temperature",
-				"type": "centigrade",
-				"value": "26.5",
-				"metadatas": [{
-					"name": "TimeInstant",
-					"type": "recvTime",
-					"value": "2015-12-12 11:11:11.123"
-				}]
-			}]
-		},
-		"statusCode": {
-			"code": "200",
-			"reasonPhrase": "OK"
-		}
-	}]
-}
-```
-
-Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` is `legacy`)
+Notifications must include the `Ngsiv2-AttrsFormat`
 HTTP header with the value of the format of the associated subscription, so that notification receivers
 are aware of the format without needing to process the notification payload.
 
@@ -4712,7 +4679,7 @@ A `notification` object contains the following subfields:
 |--------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field. It must be a non-empty list.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
 | `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is omitted)) |
 | `covered`          | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |
