@@ -35,7 +35,7 @@ accumulatorStart --pretty-print
 # 01. Create custom sub with several attributes with transformations
 # 02. Create entity E1
 # 03. Update entity E1
-# 05. Dump accumulator and see two expected transformations
+# 05. Dump accumulator and see two expected notifications
 #
 
 
@@ -72,7 +72,6 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
-#"value": "${{count:count.count+1,sum:count.sum+speed|split('\'' '\'')[0]|parseInt}}",
 
 echo "02. Create entity E1"
 echo "===================="
@@ -114,8 +113,8 @@ echo
 echo
 
 
-echo "05. Dump accumulator and see two expected transformations"
-echo "========================================================="
+echo "05. Dump accumulator and see two expected notifications"
+echo "======================================================="
 accumulatorDump
 echo
 echo
@@ -150,8 +149,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-05. Dump accumulator and see two expected transformations
-=========================================================
+05. Dump accumulator and see two expected notifications
+=======================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 187
