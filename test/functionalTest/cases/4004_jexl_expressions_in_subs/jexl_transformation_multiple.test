@@ -84,7 +84,6 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
-#"value": "${{count:count.count+1,sum:count.sum+speed|split('\'' '\'')[0]|parseInt}}",
 
 echo "02. Create entity E1"
 echo "===================="
