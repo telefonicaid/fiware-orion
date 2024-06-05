@@ -346,13 +346,6 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 `-logDeprecate` CLI 設定 (または [ログ管理 REST API](management_api.md#log-configs-and-trace-levels) の `deprecate` パラメータ)
 が使用されている場合、次の WARN トレースが生成されます:
 
-* NGSIv1 リクエスト (ペイロードありとペイロードなしの両方)。例えば：
-
-```
-time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
-time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
-```
-
 * [`"legacyForwarding": true`](../orion-api.md#registrationprovider)) の使用。例えば：
 
 ```
