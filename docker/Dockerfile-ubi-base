@@ -4,22 +4,21 @@ ENV ROOT_FOLDER='/opt'
 ENV PAHO_VERSION='v1.3.1'
 
 COPY ./docker/subscription-manager.conf /etc/yum/pluginconf.d/subscription-manager.conf
-COPY ./docker/ubi.repo /etc/yum.repos.d/ubi.repo
-COPY ./docker/other-places.repo /etc/yum.repos.d/other-places.repo
+COPY ./docker/*.repo /etc/yum.repos.d/
 
-RUN mkdir /tmp/build
+# RUN mkdir /tmp/build
 
 COPY ./docker/build-ubi/*.sh /tmp/build/
 
-
-RUN /tmp/build/01.install-build-dependencies.sh
-RUN /tmp/build/02.install-mongo-driver.sh
-RUN /tmp/build/03.install-gnutls.sh
-RUN /tmp/build/04.install-fastdds.sh
-RUN /tmp/build/05.install-lib-microhttp.sh
-RUN /tmp/build/06.install-paho-client.sh
-RUN /tmp/build/07.install-k-libs.sh
-RUN /tmp/build/08.install-mongoc-driver.sh
-RUN /tmp/build/09.install-postgres-client.sh
-RUN /tmp/build/10.install-rapid-json.sh
-RUN /tmp/build/11.install-prometheus-client.sh
+RUN /tmp/build/01.install-build-dependencies.sh && \
+    /tmp/build/02.install-mongo-driver.sh && \
+    /tmp/build/03.install-gnutls.sh && \
+    /tmp/build/04.install-fastdds.sh && \
+    /tmp/build/05.install-lib-microhttp.sh && \
+    /tmp/build/06.install-paho-client.sh && \
+    /tmp/build/07.install-k-libs.sh && \
+    /tmp/build/08.install-mongoc-driver.sh && \
+    /tmp/build/09.install-postgres-client.sh && \
+    /tmp/build/10.install-rapid-json.sh && \
+    /tmp/build/11.install-prometheus-client.sh && \
+    yum clean all
