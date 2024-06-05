@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-NGSI10 subscription with invalid regex "*"
+Subscription with invalid regex "*"
 
 --SHELL-INIT--
 dbInit CB
@@ -37,38 +37,21 @@ echo "01. Create subscription with invalid regex"
 echo "=========================================="
 payload='
 {
+  "subject": {
     "entities": [
         {
             "type": "Patient",
-            "isPattern": "true",
-            "id": "*"
+            "idPattern": "*"
         }
-    ],
-    "attributes": [
-        "Blood glucose",
-        "Body temperature",
-        "Systolic blood pressure",
-        "Diastolic blood pressure",
-        "Respiration rate",
-        "Heart rate",
-        "Blood oxygen",
-        "timestamp"
-    ],
-    "reference": "http://A.B.C.D:5999/orion2mysql",
-    "duration": "P1Y",
-    "notifyConditions": [
-        {
-            "type": "ONCHANGE",
-            "condValues": [
-                "timestamp"
-            ]
-        }
-    ],
-    "throttling": "PT1S"
-}
-'
-
-orionCurl --url /v1/subscribeContext --payload "$payload"
+    ]
+  },
+  "notification": {
+    "http": {
+        "url": "http://A.B.C.D:5999/orion2mysql"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
@@ -76,20 +59,15 @@ echo
 --REGEXPECT--
 01. Create subscription with invalid regex
 ==========================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 141
+Content-Length: 73
 
 {
-    "subscribeError": {
-        "errorCode": {
-            "code": "400",
-            "details": "invalid payload: invalid regex for entity id pattern",
-            "reasonPhrase": "Bad Request"
-        }
-    }
+    "description": "Invalid regex for entity idPattern",
+    "error": "BadRequest"
 }
 
 
