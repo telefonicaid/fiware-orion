@@ -1,0 +1,282 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+Expression in custom notification (null values in all cases with JEXL expression fail)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create custom sub using payload: "${A|patata}"
+# 02. Create custom sub using payload: "X:${A|patata}:Y"
+# 03. Create custom sub using json: "${A|patata}" and "X:${A|patata}:Y"
+# 04. Create custom sub using ngsi: "${A|patata}" and "X:${A|patata}:Y"
+# 05. Create entity E1 with A=1
+# 06. Dump & reset accumulator and see 4 notifications
+#
+
+
+echo '01. Create custom sub using payload: "${A|patata}"'
+echo "=================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "headers": {
+        "content-type": "text/plain"
+      },     
+      "payload": "${A|patata}"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '02. Create custom sub using payload: "X:${A|patata}:Y"'
+echo "======================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "headers": {
+        "content-type": "text/plain"
+      },
+      "payload": "X:${A|patata}:Y"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. Create custom sub using json: "${A|patata}" and "X:${A|patata}:Y"'
+echo "====================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "json": {
+        "B1": "${A|patata}",
+        "B2": "X:${A|patata}:Y"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '04. Create custom sub with using ngsi: "${A|patata}" and "X:${A|patata}:Y"'
+echo "=========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "B1": {
+          "value": "${A|patata}",
+          "type": "Calculated"
+        },
+        "B2": {
+          "value": "X:${A|patata}:Y",
+          "type": "Calculated"
+        }
+      }      
+    },
+    "attrs": [ "B1", "B2" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity E1 with A=1"
+echo "============================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump & reset accumulator and see 4 notifications"
+echo "===================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub using payload: "${A|patata}"
+==================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create custom sub using payload: "X:${A|patata}:Y"
+======================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Create custom sub using json: "${A|patata}" and "X:${A|patata}:Y"
+=====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+04. Create custom sub with using ngsi: "${A|patata}" and "X:${A|patata}:Y"
+==========================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+05. Create entity E1 with A=1
+=============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+06. Dump & reset accumulator and see 4 notifications
+====================================================
+#SORT_START
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 4
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
+
+null=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 8
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
+
+X:null:Y=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 27
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
+
+{"B1":null,"B2":"X:null:Y"}=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 191
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
+
+{"subscriptionId":"REGEX([0-9a-f]{24})","data":[{"id":"E1","type":"T","B1":{"type":"Calculated","value":null,"metadata":{}},"B2":{"type":"Calculated","value":"X:null:Y","metadata":{}}}]}=======================================
+#SORT_END
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

@@ -1,3 +1,23 @@
+4.0.0 (June 6th, 2024)
+
+- Add: JEXL expression support in custom notification macro replacement (using cjexl 0.3.0) (#4004)
+- Add: expression context build and evaluation counters in timing section in GET /statistics (#4004)
+- Fix: use null for non existing attributes in custom covered notifications macro substitution (instead of empty string) to make behaviour more consistent (#4004)
+- Fix: use null for non existing attributes in macro substitution applied to "paylaod" field (instead of empty string) to make behaviour more consistent (#4004)
+- Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
+- Fix: lighter operation to get databases list from MongoDB (#4517)
+- Hardening: compile code using C++14 standard
+- Remove: `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` CLI parameters along with associated env vars, already deprecated in Orion 3.12.0 (use `-dbURI` instead`)
+- Remove: legacy subscription format
+- Remove: all the remaining NGSIv1 operations
+  - PUT /v1/contextEntities/{id}
+  - DELETE /v1/contextEntities/{id}
+  - GET /v1/contextEntities/{id}/attributes/{name}
+  - POST /v1/updateContext
+  - POST /NGSI10/updateContext
+  - POST /v1/queryContext
+  - POST /NGSI10/queryContext
+
 3.12.0 (February 29th, 2024)
 
 - Fix: service path levels with 0 length should not be allowed (#4495)

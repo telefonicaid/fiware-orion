@@ -254,7 +254,8 @@ std::string parseContextAttribute
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
   ContextAttribute*                             caP,
-  bool                                          checkAttrSpecialTypes
+  bool                                          checkAttrSpecialTypes,
+  bool                                          relaxForbiddenCheck
 )
 {
   std::string  name           = iter->name.GetString();
@@ -383,7 +384,7 @@ std::string parseContextAttribute
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  std::string r = caP->check(ciP->apiVersion, ciP->requestType);
+  std::string r = caP->check(ciP->apiVersion, ciP->requestType, relaxForbiddenCheck);
   if (r != "OK")
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error", r);

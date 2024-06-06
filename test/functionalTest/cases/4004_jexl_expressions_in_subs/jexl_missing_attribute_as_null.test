@@ -1,0 +1,343 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+JEXL expression in custom notification (missing attribute replaced as null)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub with custom expression B0: (A==null)?-1:A, B1: A||'is null', B2: A||-1, B3: A||0-1||, B4: A||('-1'|parseInt), B5: A||0
+# 02. Create entity E1 with A=1
+# 03. Create entity E2 with A=null
+# 04. Create entity E3 without A
+# 05. Dump accumulator and see three notifications (<1, 1, null, 1, 1, 1>, <'is null', 'is null', null, -1, -1, 0>, <null, 'is null', null, -1, -1, 0>)
+#
+
+
+echo "01. Create custom sub with custom expression B0: (A==null)?-1:A, B1: A||'is null', B2: A||-1, B3: A||0-1||, B4: A||'-1'||parseInt, B5: A||0"
+echo "==========================================================================================================================================="
+# NOTE: '\'' is the way of scaping a ' in the payload variable below (see https://stackoverflow.com/a/1250279/1485926)
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "B0": {
+          "value": "${(A==null)?'\''is null'\'':A}",
+          "type": "Calculated"
+        },
+        "B1": {
+          "value": "${A||'\''is null'\''}",
+          "type": "Calculated"
+        },
+        "B2": {
+          "value": "${A||-1}",
+          "type": "Calculated"
+        },
+        "B3": {
+          "value": "${A||0-1}",
+          "type": "Calculated"
+        },
+        "B4": {
+          "value": "${A||('\''-1'\''|parseInt)}",
+          "type": "Calculated"
+        },
+        "B5": {
+          "value": "${A||0}",
+          "type": "Calculated"
+        }
+      }      
+    },
+    "attrs": [ "B0", "B1", "B2", "B3", "B4", "B5" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with A=1"
+echo "============================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E2 with A=null"
+echo "================================"
+payload='{
+  "id": "E2",
+  "type": "T",
+  "A": {
+    "value": null,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E3 without A"
+echo "=============================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "C": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator and see three notifications (<1, 1, null, 1, 1, 1>, <'is null', 'is null', null, -1, -1, 0>, <null, 'is null', null, -1, -1, 0>)"
+echo "====================================================================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub with custom expression B0: (A==null)?-1:A, B1: A||'is null', B2: A||-1, B3: A||0-1||, B4: A||'-1'||parseInt, B5: A||0
+===========================================================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1 with A=1
+=============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Create entity E2 with A=null
+================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
+
+
+
+04. Create entity E3 without A
+==============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
+
+
+
+05. Dump accumulator and see three notifications (<1, 1, null, 1, 1, 1>, <'is null', 'is null', null, -1, -1, 0>, <null, 'is null', null, -1, -1, 0>)
+=====================================================================================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 386
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "B0": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 1
+            },
+            "B1": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 1
+            },
+            "B2": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "B3": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 1
+            },
+            "B4": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 1
+            },
+            "B5": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 1
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 404
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "B0": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": "is null"
+            },
+            "B1": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": "is null"
+            },
+            "B2": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "B3": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": -1
+            },
+            "B4": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": -1
+            },
+            "B5": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 0
+            },
+            "id": "E2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 399
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "B0": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "B1": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": "is null"
+            },
+            "B2": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "B3": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": -1
+            },
+            "B4": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": -1
+            },
+            "B5": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 0
+            },
+            "id": "E3",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

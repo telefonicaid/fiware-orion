@@ -1052,7 +1052,7 @@ void ContextAttribute::filterAndOrderMetadata
 * renderNgsiField true is used in custom notification payloads, which have some small differences
 * with regards to conventional rendering
 */
-std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, std::map<std::string, std::string>* replacementsP)
+std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, ExprContextObject* exprContextObjectP)
 {
   JsonObjectHelper jh;
 
@@ -1085,7 +1085,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     // of DB entities) may lead to NULL, so the check is needed
     if (childToRenderP != NULL)
     {
-      jh.addRaw("value", childToRenderP->toJson(replacementsP));
+      jh.addRaw("value", childToRenderP->toJson(exprContextObjectP));
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -1101,7 +1101,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jh.addRaw("value", smartStringValue(stringValue, replacementsP, "null"));
+    jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -1292,9 +1292,78 @@ std::string ContextAttribute::toJsonAsValue
 
 /* ****************************************************************************
 *
+* addToContext -
+*
+* Pretty similar in structure to toJsonValue
+*/
+void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP, bool legacy)
+{
+  if (compoundValueP != NULL)
+  {
+    // In legacy expression, objects are vector are strings to be stored in a std::map<std::string,std::string>
+    if (valueType == orion::ValueTypeObject)
+    {
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextObject());
+      }
+    }
+    else  // valueType == orion::ValueTypeVector
+    {
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextList());
+      }
+    }
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      exprContextObjectP->add(name, toJsonString(isodate2str(numberValue)));
+    }
+    else // regular number
+    {
+      exprContextObjectP->add(name, numberValue);
+    }
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    exprContextObjectP->add(name, toJsonString(stringValue));
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    exprContextObjectP->add(name, boolValue);
+  }
+  else if (valueType == orion::ValueTypeNull)
+  {
+    exprContextObjectP->add(name);
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_E(("Runtime Error (value not given for attribute %s)", name.c_str()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType)
+std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck)
 {
   size_t len;
   char errorMsg[128];
@@ -1345,14 +1414,14 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return "Invalid characters in attribute type";
   }
 
-  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
+  if ((!relaxForbiddenCheck) && (compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
   {
     return compoundValueP->check("");
   }
 
   if (valueType == orion::ValueTypeString)
   {
-    if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
+    if ((!relaxForbiddenCheck) && (type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
     {
       alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";

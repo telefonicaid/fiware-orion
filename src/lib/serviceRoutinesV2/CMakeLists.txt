@@ -55,12 +55,12 @@ getRegistrations.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
 postRegistration.cpp
-optionsGetDeleteOnly
-optionsAllNotDelete
-optionsGetPutOnly
-optionsGetPutDeleteOnly
-optionsGetDeletePatchOnly
-optionsPostOnly
+optionsGetDeleteOnly.cpp
+optionsAllNotDelete.cpp
+optionsGetPutOnly.cpp
+optionsGetPutDeleteOnly.cpp
+optionsGetDeletePatchOnly.cpp
+optionsPostOnly.cpp
 serviceRoutinesCommon.cpp
 )
 
