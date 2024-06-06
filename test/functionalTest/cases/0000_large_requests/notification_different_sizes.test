@@ -294,9 +294,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 08. Check notification sizes
 ============================
-Sending message 1 to HTTP server: sending message of REGEX((19400|19401|19405|19406)) bytes to HTTP server
-Sending message 2 to HTTP server: sending message of REGEX((21400|21401|21405|21406)) bytes to HTTP server
-Sending message 3 to HTTP server: sending message of REGEX((8100402|8100403|8100407|8100408)) bytes to HTTP server
+Sending message 1 to HTTP server: sending message of REGEX((19394|19399|19395|19400)) bytes to HTTP server
+Sending message 2 to HTTP server: sending message of REGEX((21394|21399|21395|21400)) bytes to HTTP server
+Sending message 3 to HTTP server: sending message of REGEX((8100396|8100401|8100397|8100402)) bytes to HTTP server
 
 
 --TEARDOWN--
