@@ -536,6 +536,52 @@ static int timezoneOffset(const char* tz)
 
 /*****************************************************************************
 *
+* isLeapYear -
+*
+* This code will check, if the given year is a leap year or not.
+*
+*/
+bool isLeapYear(int year)
+{
+  if (year % 4 != 0)
+  {
+    return false;
+  }
+  if (year % 100 == 0 && year % 400 != 0)
+  {
+    return false;
+  }
+  return true;
+}
+
+
+
+/*****************************************************************************
+*
+* daysInMonth -
+*
+* This code will check correct number of days in given month.
+*
+*/
+int daysInMonth(int year, int month)
+{
+  if (month == 1) //february
+  {
+    return isLeapYear(year) ? 29 : 28;
+  }
+  // for April, June, September, November
+  if (month == 3 || month == 5 || month == 8 || month == 10)
+  {
+    return 30;
+  }
+  // For all other months (Jan, March, May, July, Aug, October, December)
+  return 31;
+}
+
+
+
+/*****************************************************************************
+*
 * parse8601Time -
 *
 * This is common code for Duration and Throttling (at least).
@@ -610,7 +656,7 @@ double parse8601Time(const std::string& ss)
   const int minMonth = 0;
   const int maxMonth = 11;
   const int minDay = 1;
-  const int maxDay = 31;
+  const int maxDay = daysInMonth(y, time.tm_mon);;
   const int minHour = 0;
   const int maxHour = 23;
   const int minMinute = 0;
