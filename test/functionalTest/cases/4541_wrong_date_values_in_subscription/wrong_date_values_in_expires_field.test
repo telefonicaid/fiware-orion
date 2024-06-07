@@ -219,7 +219,7 @@ payload='{
       "pressure"
     ]
   },
-  "expires": "1822-12-21T17:16:23.00Z"
+  "expires": "1899-12-21T17:16:23.00Z"
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
 echo
