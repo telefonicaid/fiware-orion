@@ -1,0 +1,1 @@
+- Fix: wrong date values should not allowed in subscription's expires field (#4541)
