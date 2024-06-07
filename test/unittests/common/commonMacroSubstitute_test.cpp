@@ -49,7 +49,7 @@ TEST(commonMacroSubstitute, simple)
   const char* correct = "Entity E1/T1, attribute 'attr1'";
   std::string result;
 
-  ExprContextObject exprContext;
+  ExprContextObject exprContext(true);
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
   exprContext.add(caP->name, caP->stringValue);
@@ -91,7 +91,7 @@ TEST(commonMacroSubstitute, withRealloc)
   std::string correct = std::string(base) + "Now, finally something to substitute: Entity E1/T1, attribute 'attr1'";
   std::string result;
 
-  ExprContextObject exprContext;
+  ExprContextObject exprContext(true);
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
   exprContext.add(caP->name, caP->stringValue);
@@ -167,7 +167,7 @@ TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
   //          correct = std::string(base) + "EntityId000001/EntityType000001"; // > 8MB after substitutions
   std::string result;
 
-  ExprContextObject exprContext;
+  ExprContextObject exprContext(true);
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
   exprContext.add(caP->name, caP->stringValue);
