@@ -47,6 +47,7 @@ SET (HEADERS
     OID.h
     DBConnection.h
     DBCursor.h
+    DBErrors.h
     safeMongo.h
     connectionOperations.h
     mongoConnectionPool.h

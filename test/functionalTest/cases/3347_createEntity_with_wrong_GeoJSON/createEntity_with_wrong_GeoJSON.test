@@ -34,6 +34,7 @@ brokerStart CB 0
 # 02. GET /v2/entities/K
 # 03. Create entity with WRONG GeoJSON1
 # 04. Create entity with WRONG GeoJSON2
+# 05. Ensure no DatabaseError alarm is raised
 #
 
 echo "01. Create entity with correct GeoJSON"
@@ -102,6 +103,12 @@ orionCurl --url '/v2/entities' --payload "${payload}"
 echo
 echo
 
+echo "05. Ensure no DatabaseError alarm is raised"
+echo "==========================================="
+cat /tmp/contextBroker.log | grep DatabaseError | wc -l
+echo
+echo
+
 
 --REGEXPECT--
 01. Create entity with correct GeoJSON
@@ -165,6 +172,11 @@ Content-Length: 52
     "description": "Wrong GeoJson",
     "error": "BadRequest"
 }
+
+
+05. Ensure no DatabaseError alarm is raised
+===========================================
+0
 
 
 --TEARDOWN--

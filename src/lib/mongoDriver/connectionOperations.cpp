@@ -37,6 +37,7 @@
 #include "mongoDriver/BSONArrayBuilder.h"
 #include "mongoDriver/mongoConnectionPool.h"
 #include "mongoDriver/safeMongo.h"
+#include "mongoDriver/DBErrors.h"
 
 
 
@@ -507,7 +508,12 @@ bool orion::collectionInsert
       " - exception: " + error.message;
 
     *err = "Database Error (" + msg + ")";
-    alarmMgr.dbError(msg);
+
+    // MONGODB_ERROR_WRONGJSON doesn't raise alarm (responses 400 Bad Request in this situation)
+    if (!(msg.find(MONGODB_ERROR_WRONGJSON) != std::string::npos))
+    {
+      alarmMgr.dbError(msg);
+    }
   }
 
   bson_free(bsonStr);
