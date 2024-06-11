@@ -42,7 +42,7 @@ accumulatorStart --pretty-print
 # 09. With subscription in place, create entity E3 inside area A (notif)
 # 10. Update subscription using a micro-area centered at E4
 # 11. With subscription in place, create entity E4 outside area A (notif)
-# 12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)
+# 12. Dump acumulator (6 notifs: E1, E2, E1, E1, E3, E4)
 #
 # Area (100 km max distance to Madrid):
 #
@@ -290,7 +290,7 @@ echo
 echo
 
 
-echo "12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)"
+echo "12. Dump acumulator (6 notifs: E1, E2, E1, E1, E3, E4)"
 echo "======================================================"
 accumulatorDump
 echo
@@ -301,102 +301,102 @@ echo
 01. Create subscription covering A
 ==================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity E1 inside area A (notif)
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 03. Create entity E2 outise area A (not notif)
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 04. Modify E2 location to another point outside A (not notif)
 =============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Modify E2 location to point inside A (notif)
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Modify E1 location to point outise A (not notif)
 ====================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. Modify E1 location to point inside A (notif)
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Modify E1 location to another point inside A (notif)
 ========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. With subscription in place, create entity E3 inside area A (notif)
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 10. Update subscription using a micro-area centered at E4
 =========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 11. With subscription in place, create entity E4 outside area A (notif)
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T
+Content-Length: 0
 
 
 
-12. Dump acumulator (4 notifs: E1, E2, E1, E1, E3, E4)
+12. Dump acumulator (6 notifs: E1, E2, E1, E1, E3, E4)
 ======================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /

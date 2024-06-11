@@ -1,0 +1,608 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification MQTT with NGSI basic CRUD with partial payloads
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create custom sub1 with ngsi field
+# 02. Get sub1 to see it
+# 03. Update sub1 to remove ngsi field
+# 04. Get sub1 to see changes
+# 05. Update sub1 to add ngsi field back again
+# 06. Get sub1 to see changes
+# 07. Update sub1 to modify ngsi field
+# 08. Get sub1 to see changes
+# 09. Update sub1 to remove ngsi field
+# 10. Get sub1 to see changes
+# 11. Create custom sub2 without ngsi field
+# 12. Get sub2 to see it
+# 13. Update custom sub2 to add ngsi field
+# 14. Get sub2 to see changes
+#
+
+
+echo "01. Create custom sub1 with ngsi field"
+echo "======================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "id": "E1",
+        "A": {
+          "value": 1
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Get sub1 to see it"
+echo "======================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03. Update sub1 to remove ngsi field"
+echo "===================================="
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "payload": "foo"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Get sub1 to see changes"
+echo "==========================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "05. Update sub1 to add ngsi field back again"
+echo "============================================"
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "B": {
+          "value": 2,
+          "type": "Number"
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. Get sub1 to see changes"
+echo "==========================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "07. Update sub1 to modify ngsi field"
+echo "===================================="
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "id": "E3",
+        "type": "T3"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. Get sub1 to see changes"
+echo "==========================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Update sub1 to remove ngsi field"
+echo "===================================="
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "payload": "bar"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "10. Get sub1 to see changes"
+echo "==========================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "11. Create custom sub2 without ngsi field"
+echo "========================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E2",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "payload": "zzz"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "12. Get sub2 to see it"
+echo "======================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "13. Update custom sub2 to add ngsi field"
+echo "========================================"
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "type": "T4",
+        "D": {
+          "value": 4,
+          "type": "Number"
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "14. Get sub1 to see changes"
+echo "==========================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub1 with ngsi field
+======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Get sub1 to see it
+======================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 386
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "ngsi": {
+                "A": {
+                    "type": "Number",
+                    "value": 1
+                },
+                "id": "E1"
+            },
+            "qos": 0,
+            "retain": false,
+            "topic": "topic1",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Update sub1 to remove ngsi field
+====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Get sub1 to see changes
+===========================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "payload": "foo",
+            "qos": 0,
+            "retain": false,
+            "topic": "topic1",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Update sub1 to add ngsi field back again
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Get sub1 to see changes
+===========================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 376
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "ngsi": {
+                "B": {
+                    "type": "Number",
+                    "value": 2
+                }
+            },
+            "qos": 0,
+            "retain": false,
+            "topic": "topic1",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+07. Update sub1 to modify ngsi field
+====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Get sub1 to see changes
+===========================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 366
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "ngsi": {
+                "id": "E3",
+                "type": "T3"
+            },
+            "qos": 0,
+            "retain": false,
+            "topic": "topic1",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+09. Update sub1 to remove ngsi field
+====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Get sub1 to see changes
+===========================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "payload": "bar",
+            "qos": 0,
+            "retain": false,
+            "topic": "topic1",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+11. Create custom sub2 without ngsi field
+=========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+12. Get sub2 to see it
+======================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "payload": "zzz",
+            "qos": 0,
+            "retain": false,
+            "topic": "topic1",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E2",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+13. Update custom sub2 to add ngsi field
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+14. Get sub1 to see changes
+===========================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 388
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "ngsi": {
+                "D": {
+                    "type": "Number",
+                    "value": 4
+                },
+                "type": "T4"
+            },
+            "qos": 0,
+            "retain": false,
+            "topic": "topic1",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E2",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -1,0 +1,428 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Append attributes with operators to existing entity
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E with A=1
+# 02. Update/append E with B={$inc:3}
+# 03. Get entity, see A=1, B=3
+# 04. Update/append E with A=4, B={$inc:3}
+# 05. Get entity, see A=4, B=6
+# 06. Update/append E with A={$inc:2}, B={$inc:3}, C={$inc:2}
+# 07. Get entity, see A=6, B=9, C=2
+# 08. Update/append E with A=0, C={$inc:2}, D={$inc:5}, E=10 with batch operation
+# 09. Get entity, see A=0, B=9, C=4, D=5, E=10
+# 10. Update/append E with B=0, D={$inc:5}, F={$inc:-1}, G=8 with upsert operation
+# 11. Get entity, see A=0, B=0, C=4, D=10, E=10, F=-1, G=8
+#
+
+
+echo '01. Create entity E with A=1'
+echo '============================'
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Update/append E with B={$inc:3}'
+echo '==================================='
+payload='{
+  "B": {
+    "value": { "$inc": 3 },
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '03. Get entity, see A=1, B=3'
+echo '============================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '04. Update/append E with A=4, B={$inc:3}'
+echo '========================================'
+payload='{
+  "A": {
+    "value": 4,
+    "type": "Number"
+  },
+  "B": {
+    "value": { "$inc": 3 },
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '05. Get entity, see A=4, B=6'
+echo '============================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '06. Update/append E with A={$inc:2}, B={$inc:3}, C={$inc:2}'
+echo '==========================================================='
+payload='{
+  "A": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  },
+  "B": {
+    "value": { "$inc": 3 },
+    "type": "Number"
+  },
+  "C": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '07. Get entity, see A=6, B=9, C=2'
+echo '================================='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '08. Update/append E with A=0, C={$inc:2}, D={$inc:5}, E=10 with batch operation'
+echo '==============================================================================='
+payload='{
+  "actionType": "append",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {
+        "value": 0,
+        "type": "Number"
+      },
+      "C": {
+        "value": { "$inc": 2 },
+        "type": "Number"
+      },
+      "D": {
+        "value": { "$inc": 5 },
+        "type": "Number"
+      },
+      "E": {
+        "value": 10,
+        "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo '09. Get entity, see A=0, B=9, C=4, D=5, E=10'
+echo '============================================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '10. Update/append E with B=0, D={$inc:5}, F={$inc:-1}, G=8 with upsert operation'
+echo '================================================================================'
+payload='{
+  "id": "E",
+  "type": "T",
+  "B": {
+    "value": 0,
+    "type": "Number"
+  },
+  "D": {
+    "value": { "$inc": 5 },
+    "type": "Number"
+  },
+  "F": {
+    "value": { "$inc": -1 },
+    "type": "Number"
+  },
+  "G": {
+    "value": 8,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert --payload "$payload"
+echo
+echo
+echo
+
+
+echo '11. Get entity, see A=0, B=0, C=4, D=10, E=10, F=-1, G=8'
+echo '========================================================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with A=1
+============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. Update/append E with B={$inc:3}
+===================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+03. Get entity, see A=1, B=3
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 3
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+04. Update/append E with A=4, B={$inc:3}
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Get entity, see A=4, B=6
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 4
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 6
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+06. Update/append E with A={$inc:2}, B={$inc:3}, C={$inc:2}
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. Get entity, see A=6, B=9, C=2
+=================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 159
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 6
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 9
+    },
+    "C": {
+        "metadata": {},
+        "type": "Number",
+        "value": 2
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+08. Update/append E with A=0, C={$inc:2}, D={$inc:5}, E=10 with batch operation
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09. Get entity, see A=0, B=9, C=4, D=5, E=10
+============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 252
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 9
+    },
+    "C": {
+        "metadata": {},
+        "type": "Number",
+        "value": 4
+    },
+    "D": {
+        "metadata": {},
+        "type": "Number",
+        "value": 5
+    },
+    "E": {
+        "metadata": {},
+        "type": "Number",
+        "value": 10
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+10. Update/append E with B=0, D={$inc:5}, F={$inc:-1}, G=8 with upsert operation
+================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+
+11. Get entity, see A=0, B=0, C=4, D=10, E=10, F=-1, G=8
+========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 346
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "B": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "C": {
+        "metadata": {},
+        "type": "Number",
+        "value": 4
+    },
+    "D": {
+        "metadata": {},
+        "type": "Number",
+        "value": 10
+    },
+    "E": {
+        "metadata": {},
+        "type": "Number",
+        "value": 10
+    },
+    "F": {
+        "metadata": {},
+        "type": "Number",
+        "value": -1
+    },
+    "G": {
+        "metadata": {},
+        "type": "Number",
+        "value": 8
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -22,7 +22,7 @@
 
 --NAME--
 Check "location" metadata is not wrongly included in NGSIv2 notifications
-triggered by a NGSIV2 subscription creation, update or attribute update 
+triggered by a NGSIV2 subscription creation, update or attribute update
 
 --SHELL-INIT--
 dbInit CB
@@ -121,28 +121,28 @@ echo
 01. Create NGSIv2 subscription for E
 ====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create E with type: T
 =========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. Trigger notification by updating value of name attribute (in NGSIV2)
 ========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -161,48 +161,48 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "id": "E", 
+            "id": "E",
             "name": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "SD3"
-            }, 
+            },
             "perimeter": {
-                "metadata": {}, 
-                "type": "geo:json", 
+                "metadata": {},
+                "type": "geo:json",
                 "value": {
                     "coordinates": [
                         [
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806708, 
-                                33.467234, 
+                                -13.806708,
+                                33.467234,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806864, 
-                                33.467206, 
+                                -13.806864,
+                                33.467206,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.807017, 
-                                33.467191, 
+                                -13.807017,
+                                33.467191,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
                             ]
                         ]
-                    ], 
+                    ],
                     "type": "Polygon"
                 }
-            }, 
+            },
             "type": "T"
         }
     ],
@@ -222,48 +222,48 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "id": "E", 
+            "id": "E",
             "name": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "SD1"
-            }, 
+            },
             "perimeter": {
-                "metadata": {}, 
-                "type": "geo:json", 
+                "metadata": {},
+                "type": "geo:json",
                 "value": {
                     "coordinates": [
                         [
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806708, 
-                                33.467234, 
+                                -13.806708,
+                                33.467234,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806864, 
-                                33.467206, 
+                                -13.806864,
+                                33.467206,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.807017, 
-                                33.467191, 
+                                -13.807017,
+                                33.467191,
                                 0
-                            ], 
+                            ],
                             [
-                                -13.806455, 
-                                33.467278, 
+                                -13.806455,
+                                33.467278,
                                 0
                             ]
                         ]
-                    ], 
+                    ],
                     "type": "Polygon"
                 }
-            }, 
+            },
             "type": "T"
         }
     ],

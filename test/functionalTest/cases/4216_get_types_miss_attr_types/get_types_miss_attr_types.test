@@ -1,0 +1,203 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity Type misses attribute types
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 100
+
+--SHELL--
+
+#
+# 01. Create E11/ET1/A-AT1
+# 02. Create E12/ET1/A-AT2
+# 03. Create E21/ET2/A-AT3
+# 04. Create E22/ET2/A-AT4
+# 05. GET /v2/types and get AT1 and AT2 attribute types in ET1 and AT3 and AT4 in ET2
+# 06. GET /v2/types/ET1 and get AT1 and AT2 attribute types
+#
+
+echo "01. Create E11/ET1/A-AT1"
+echo "========================"
+payload='{
+  "type": "ET1",
+  "id":   "E11",
+  "A": { "type": "AT1", "value": "irrelevant" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E12/ET1/A-AT2"
+echo "========================"
+payload='{
+  "type": "ET1",
+  "id":   "E12",
+  "A": { "type": "AT2", "value": "irrelevant" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create E21/ET2/A-AT3"
+echo "========================"
+payload='{
+  "type": "ET2",
+  "id":   "E21",
+  "A": { "type": "AT3", "value": "irrelevant" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create E22/ET2/A-AT4"
+echo "======================="
+payload='{
+  "type": "ET2",
+  "id":   "E22",
+  "A": { "type": "AT4", "value": "irrelevant" }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. GET /v2/types and get AT1 and AT2 attribute types in ET1 and AT3 and AT4 in ET2"
+echo "==================================================================================="
+orionCurl --url /v2/types
+echo
+echo
+
+
+echo "06. GET /v2/types/ET1 and get AT1 and AT2 attribute types"
+echo "========================================================="
+orionCurl --url /v2/types/ET1
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E11/ET1/A-AT1
+========================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E11?type=ET1
+Content-Length: 0
+
+
+
+02. Create E12/ET1/A-AT2
+========================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E12?type=ET1
+Content-Length: 0
+
+
+
+03. Create E21/ET2/A-AT3
+========================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E21?type=ET2
+Content-Length: 0
+
+
+
+04. Create E22/ET2/A-AT4
+=======================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E22?type=ET2
+Content-Length: 0
+
+
+
+05. GET /v2/types and get AT1 and AT2 attribute types in ET1 and AT3 and AT4 in ET2
+===================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 127
+
+[
+    {
+        "attrs": {
+            "A": {
+                "types": [
+                    "AT1",
+                    "AT2"
+                ]
+            }
+        },
+        "count": 2,
+        "type": "ET1"
+    },
+    {
+        "attrs": {
+            "A": {
+                "types": [
+                    "AT3",
+                    "AT4"
+                ]
+            }
+        },
+        "count": 2,
+        "type": "ET2"
+    }
+]
+
+
+06. GET /v2/types/ET1 and get AT1 and AT2 attribute types
+=========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 49
+
+{
+    "attrs": {
+        "A": {
+            "types": [
+                "AT1",
+                "AT2"
+            ]
+        }
+    },
+    "count": 2
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

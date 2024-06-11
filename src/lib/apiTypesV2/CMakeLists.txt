@@ -18,7 +18,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET (SOURCES
     Entity.cpp
@@ -31,7 +31,7 @@ SET (SOURCES
     BatchQuery.cpp
     BatchUpdate.cpp
     HttpInfo.cpp
-    ngsiWrappers.cpp
+    MqttInfo.cpp
 )
 
 SET (HEADERS
@@ -44,8 +44,9 @@ SET (HEADERS
     EntID.h
     BatchQuery.h
     BatchUpdate.h
+    CustomPayloadType.h
     HttpInfo.h
-    ngsiWrappers.h
+    MqttInfo.h
 )
 
 

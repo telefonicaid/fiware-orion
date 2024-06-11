@@ -74,20 +74,20 @@ echo
 01. Create entity with attribute without type
 =============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Check attribute has type Number
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 {
     "A1": {
@@ -103,10 +103,10 @@ Date: REGEX(.*)
 03. Create entity with attribute with type empty string
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 88
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
 
 {
     "description": "attribute type length: 0, min length supported: 1",

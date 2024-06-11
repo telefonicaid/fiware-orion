@@ -57,15 +57,15 @@ public:
                 const std::vector<int>&          serviceNumThreadV);
   ~QueueNotifier(void);
 
-  void sendNotifyContextRequest(NotifyContextRequest&            ncr,
-                                const ngsiv2::HttpInfo&          httpInfo,
-                                const std::string&               tenant,
-                                const std::string&               xauthToken,
-                                const std::string&               fiwareCorrelator,
-                                unsigned int                     correlatorCounter,
+  void sendNotifyContextRequest(ContextElementResponse*          notifyCerP,
+                                const ngsiv2::Notification&      notification,
+                                const notifStaticFields&         nsf,
+                                long long                        maxFailsLimit,
+                                long long                        failsCounter,
                                 RenderFormat                     renderFormat,
                                 const std::vector<std::string>&  attrsFilter,
                                 bool                             blacklist,
+                                bool                             covered,
                                 const std::vector<std::string>&  metadataFilter);
   int start();
   size_t queueSize(const std::string& service);

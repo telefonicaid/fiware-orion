@@ -33,6 +33,7 @@
 #include "ngsi/StringList.h"
 #include "ngsi/ContextAttribute.h"
 #include "apiTypesV2/Entity.h"
+#include "expressions/ExprContext.h"
 
 #include "mongoDriver/BSONObj.h"
 
@@ -61,9 +62,7 @@ typedef struct ContextElementResponse
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const orion::BSONObj&  entityDoc,
-                         const StringList&      attrL,
-                         bool                   includeEmpty = true,
-                         ApiVersion             apiVersion   = V1);
+                         const StringList&      attrL);
   ContextElementResponse(Entity* eP, bool useDefaultType = false);
 
   std::string  toJsonV1(bool                             asJsonObject,
@@ -74,10 +73,19 @@ typedef struct ContextElementResponse
                         bool                             comma               = false,
                         bool                             omitAttributeValues = false);
 
-  std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      bool                             blacklist,
-                      const std::vector<std::string>&  metadataFilter);
+  std::string  toJsonV1(bool                             asJsonObject,
+                        RequestType                      requestType,
+                        bool                             blacklist,
+                        bool                             comma               = false,
+                        bool                             omitAttributeValues = false);
+
+  std::string  toJson(RenderFormat                         renderFormat,
+                      const std::vector<std::string>&      attrsFilter,
+                      bool                                 blacklist,
+                      const std::vector<std::string>&      metadataFilter,
+                      ExprContextObject*                   exprContextObjectP);
+
+  void         applyUpdateOperators(void);
 
   void         release(void);
 

@@ -565,7 +565,7 @@ payload='{
     ],
     "attrs": [ "A1", "A2" ]
   },
-  "provider": 7  
+  "provider": 7
 }'
 orionCurl --url /v2/registrations --payload "$payload"
 echo
@@ -892,10 +892,10 @@ echo
 01. Invalid JSON in payload
 ===========================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
@@ -906,10 +906,10 @@ Date: REGEX(.*)
 02. Payload is not a JSON object
 ================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 56
 
 {
     "description": "not a JSON object",
@@ -920,10 +920,10 @@ Date: REGEX(.*)
 03. Payload is an empty object
 ==============================
 HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 52
 
 {
     "description": "empty payload",
@@ -934,10 +934,10 @@ Date: REGEX(.*)
 04. description is not a string
 ===============================
 HTTP/1.1 400 Bad Request
-Content-Length: 58
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 58
 
 {
     "description": "invalid description",
@@ -948,10 +948,10 @@ Date: REGEX(.*)
 05. description too long
 ========================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "max description length exceeded",
@@ -962,10 +962,10 @@ Date: REGEX(.*)
 06. forbidden characters in description
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 74
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
 
 {
     "description": "forbidden characters in description",
@@ -976,10 +976,10 @@ Date: REGEX(.*)
 07. dataProvided missing
 ========================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "the field /dataProvided/ is missing in payload",
@@ -990,10 +990,10 @@ Date: REGEX(.*)
 08. dataProvided not a JSON object
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "/dataProvided/ must be a JSON object",
@@ -1004,10 +1004,10 @@ Date: REGEX(.*)
 09. dataProvided empty
 ======================
 HTTP/1.1 400 Bad Request
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "description": "/dataProvided/ is empty",
@@ -1018,10 +1018,10 @@ Date: REGEX(.*)
 10. dataProvided:entities not an array
 ======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "/entities/ is not an array",
@@ -1032,10 +1032,10 @@ Date: REGEX(.*)
 11. dataProvided:entities:entity not an object
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 78
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 78
 
 {
     "description": "/entities/ vector item is not an object",
@@ -1046,10 +1046,10 @@ Date: REGEX(.*)
 12. dataProvided:entities:entity without id and idPattern
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 96
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 96
 
 {
     "description": "/entities/ vector item does not have /id/ nor /idPattern/",
@@ -1060,10 +1060,10 @@ Date: REGEX(.*)
 13. dataProvided:entities:entity with both id and idPattern
 ===========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 {
     "description": "/entities/ vector item has both /id/ and /idPattern/",
@@ -1074,10 +1074,10 @@ Date: REGEX(.*)
 14. dataProvided:entities:entity:id not a string
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "/entities/ vector item /id/ is not a string",
@@ -1088,10 +1088,10 @@ Date: REGEX(.*)
 15. dataProvided:entities:entity:id given but empty
 ===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "/entities/ element id is empty",
@@ -1102,10 +1102,10 @@ Date: REGEX(.*)
 16. dataProvided:entities:entity:id with forbidden characters
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 90
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
 
 {
     "description": "forbidden characters in /entities/ vector item /id/",
@@ -1116,10 +1116,10 @@ Date: REGEX(.*)
 17. dataProvided:entities:entity:id too long
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "max id length exceeded in /entities/ vector item /id/",
@@ -1130,10 +1130,10 @@ Date: REGEX(.*)
 18. dataProvided:entities:entity:idPattern not a string
 =======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
 
 {
     "description": "/entities/ vector item /idPattern/ is not a string",
@@ -1144,10 +1144,10 @@ Date: REGEX(.*)
 19. dataProvided:entities:entity:idPattern given but empty
 ==========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "/entities/ vector item /idPattern/ is empty",
@@ -1158,10 +1158,10 @@ Date: REGEX(.*)
 20. dataProvided:entities:entity with both type and typePattern
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 {
     "description": "/entities/ element has both /type/ and /typePattern/",
@@ -1172,10 +1172,10 @@ Date: REGEX(.*)
 21. dataProvided:entities:entity:type not a string
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "/entities/ vector item type is not a string",
@@ -1186,10 +1186,10 @@ Date: REGEX(.*)
 22. dataProvided:entities:entity:type given but empty
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "entity type length: 0, min length supported: 1",
@@ -1200,10 +1200,10 @@ Date: REGEX(.*)
 23. dataProvided:entities:entity:type with forbidden characters
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "forbidden characters in /entities/ vector item /type/",
@@ -1214,10 +1214,10 @@ Date: REGEX(.*)
 24. dataProvided:entities:entity:type too long
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 96
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 96
 
 {
     "description": "max type length exceeded in /entities/ vector item /type/",
@@ -1228,10 +1228,10 @@ Date: REGEX(.*)
 25. dataProvided:entities:entity:typePattern not a string
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 {
     "description": "/entities/ vector item /typePattern/ is not a string",
@@ -1242,10 +1242,10 @@ Date: REGEX(.*)
 26. dataProvided:entities:entity:typePattern given but empty
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "description": "/entities/ vector item /typePattern/ is empty",
@@ -1256,10 +1256,10 @@ Date: REGEX(.*)
 27. dataProvided:entities:attrs not an array
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "the field /attrs/ must be a JSON array",
@@ -1270,10 +1270,10 @@ Date: REGEX(.*)
 28. dataProvided:entities:attrs item not a string
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
 
 {
     "description": "only JSON Strings allowed in string vector /attrs/",
@@ -1284,10 +1284,10 @@ Date: REGEX(.*)
 29. dataProvided:entities:attrs item empty string
 =================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "empty string found in string vector /attrs/",
@@ -1298,10 +1298,10 @@ Date: REGEX(.*)
 30. provider missing
 ====================
 HTTP/1.1 400 Bad Request
-Content-Length: 81
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 81
 
 {
     "description": "the field /provider/ is missing in payload",
@@ -1312,10 +1312,10 @@ Date: REGEX(.*)
 31. provider empty
 ==================
 HTTP/1.1 400 Bad Request
-Content-Length: 55
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 55
 
 {
     "description": "/provider/ empty",
@@ -1326,10 +1326,10 @@ Date: REGEX(.*)
 32. provider not a JSON object
 ==============================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "description": "/provider/ must be a JSON object",
@@ -1340,10 +1340,10 @@ Date: REGEX(.*)
 33. provider has no http field
 ==============================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "/provider/ must contain a field /http/",
@@ -1354,10 +1354,10 @@ Date: REGEX(.*)
 34. supportedForwardingMode not a string
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "description": "/supportedForwardingMode/ must be a JSON string",
@@ -1368,10 +1368,10 @@ Date: REGEX(.*)
 35. invalid supportedForwardingMode
 ===================================
 HTTP/1.1 400 Bad Request
-Content-Length: 81
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 81
 
 {
     "description": "invalid value of /supportedForwardingMode/",
@@ -1382,10 +1382,10 @@ Date: REGEX(.*)
 36. provider/http not a JSON object
 ===================================
 HTTP/1.1 400 Bad Request
-Content-Length: 67
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 67
 
 {
     "description": "/http/ must be a JSON object",
@@ -1396,10 +1396,10 @@ Date: REGEX(.*)
 37. provider/http/url missing
 =============================
 HTTP/1.1 400 Bad Request
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 {
     "description": "/http/ must contain a field /url/",
@@ -1410,10 +1410,10 @@ Date: REGEX(.*)
 38. provider/http/url not a string
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 82
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
 
 {
     "description": "/url/ field of /http/ must be a JSON string",
@@ -1424,10 +1424,10 @@ Date: REGEX(.*)
 39. provider/http/url is the empty string
 =========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "description": "/url/ field of /http/ cannot be the empty string",
@@ -1438,10 +1438,10 @@ Date: REGEX(.*)
 40. provider/http/url invalid
 =============================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "description": "/url/ field of /http/ is invalid",
@@ -1452,10 +1452,10 @@ Date: REGEX(.*)
 41. status is not a string
 ==========================
 HTTP/1.1 400 Bad Request
-Content-Length: 64
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 64
 
 {
     "description": "/status/ must be a string",
@@ -1466,10 +1466,10 @@ Date: REGEX(.*)
 42. invalid value for status
 ============================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "invalid value for /status/",
@@ -1480,10 +1480,10 @@ Date: REGEX(.*)
 43. legacyForwarding not a boolean
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 85
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
 
 {
     "description": "the field /legacyForwarding/ must be a boolean",
@@ -1494,10 +1494,10 @@ Date: REGEX(.*)
 44. dataProvided:entities:entity:idPattern too complex
 ======================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 64
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 64
 
 {
     "description": "Unsupported idPattern",
@@ -1508,13 +1508,13 @@ Date: REGEX(.*)
 45. dataProvided:entities:entity:typePattern is used (it's not supported)
 =========================================================================
 HTTP/1.1 501 Not Implemented
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
-    "description": "typePattern is not supported", 
+    "description": "typePattern is not supported",
     "error": "NotImplemented"
 }
 

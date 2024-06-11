@@ -35,7 +35,7 @@
 #include "jsonParseV2/parseStringList.h"
 #include "jsonParseV2/parseBatchQuery.h"
 #include "jsonParseV2/parseExpression.h"
-
+#include "jsonParseV2/utilsParse.h"
 
 
 /* ****************************************************************************
@@ -51,7 +51,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
 
   if (document.HasParseError())
   {
-    alarmMgr.badInput(clientIp, "JSON Parse Error");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", parseErrorString(document.GetParseError()));
     oe.fill(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -68,7 +68,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   }
   else if (document.ObjectEmpty())
   {
-    alarmMgr.badInput(clientIp, "Empty JSON payload");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "Empty JSON payload");
     oe.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_PAYLOAD, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
@@ -77,8 +77,8 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
   else if (!document.HasMember("entities") && !document.HasMember("attributes")
            && !document.HasMember("attrs") && !document.HasMember("expression"))
   {
-    alarmMgr.badInput(clientIp, "Invalid JSON payload, no relevant fields found");
-    oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", "BadRequest");
+    alarmMgr.badInput(clientIp, "JSON Parse Error", "Invalid JSON payload, no relevant fields found");
+    oe.fill(SccBadRequest, "Invalid JSON payload, no relevant fields found", ERROR_BAD_REQUEST);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -97,7 +97,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, r);
-        oe.fill(SccBadRequest, r, "BadRequest");
+        oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
         return oe.toJson();
@@ -111,7 +111,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, r);
-        oe.fill(SccBadRequest, r, "BadRequest");
+        oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
         return oe.toJson();
@@ -124,7 +124,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, r);
-        oe.fill(SccBadRequest, r, "BadRequest");
+        oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
         return oe.toJson();
@@ -137,7 +137,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, r);
-        oe.fill(SccBadRequest, r, "BadRequest");
+        oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
         return oe.toJson();
@@ -150,7 +150,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       if (r != "OK")
       {
         alarmMgr.badInput(clientIp, r);
-        oe.fill(SccBadRequest, r, "BadRequest");
+        oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
         return oe.toJson();
@@ -161,7 +161,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string  description = std::string("Unrecognized field in JSON payload: /") + name + "/";
 
       alarmMgr.badInput(clientIp, description);
-      oe.fill(SccBadRequest, description, "BadRequest");
+      oe.fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 
       return oe.toJson();

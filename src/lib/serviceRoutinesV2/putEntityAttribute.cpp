@@ -34,8 +34,10 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttribute.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
+#include "alarmMgr/alarmMgr.h"
 
 
 
@@ -83,11 +85,15 @@ std::string putEntityAttribute
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  // Adjust error code if needed
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), true);
+
   // 03. Check error
   std::string  answer = "";
   if (parseDataP->upcrs.res.oe.code != SccNone )
   {
     TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
+    alarmMgr.badInput(clientIp, parseDataP->upcrs.res.oe.description);
     ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
   }
   else

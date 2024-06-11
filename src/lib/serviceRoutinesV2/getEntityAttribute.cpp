@@ -105,11 +105,11 @@ std::string getEntityAttribute
     TIMED_RENDER(answer = oe.toJson());
   }
 
-  if (oe.reasonPhrase == ERROR_TOO_MANY)
+  if (oe.error == ERROR_TOO_MANY)
   {
     ciP->httpStatusCode = SccConflict;
   }
-  else if (oe.reasonPhrase == ERROR_NOT_FOUND)
+  else if (oe.error == ERROR_NOT_FOUND)
   {
     ciP->httpStatusCode = SccContextElementNotFound;  // Attribute to be precise!
   }

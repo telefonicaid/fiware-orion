@@ -124,38 +124,38 @@ echo
 01. POST /v2/entities/E1 T1
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. POST /v2/entities/E1 T2
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T2
+Content-Length: 0
 
 
 
 03. POST /v2/entities/E1/attrs T1 (update attribute A1)
 =======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. GET /v2/entities (updated attribute A1 in E1/T1, not updated in E1/T2)
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 225
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 225
 
 [
     {
@@ -187,18 +187,18 @@ Date: REGEX(.*)
 05. POST/v2/entities/E1/attrs T2 (append attribute A3)
 ======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET /v2/entities (added attribute A3 in E1/T2, not added in E1/T1
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 285
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 285
 
 [
     {
@@ -234,14 +234,14 @@ Date: REGEX(.*)
 
 07. POST/v2/entities/E1/attrs T2 (append attribute A3, error already exists)
 ============================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 108
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
 
 {
-    "description": "one or more of the attributes in the request already exist: [ A3 ]",
+    "description": "one or more of the attributes in the request already exist: E1/T2 - [ A3 ]",
     "error": "Unprocessable"
 }
 

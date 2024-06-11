@@ -40,7 +40,7 @@ accumulatorStart --pretty-print
 # 04. String/GE: Create subscription 4 for q=A1.s>=fest_string
 # 05. Create E1 with A1 with compound value containing String, Integer and Float
 # 16. Dump  accumulator, see 4 notifications
-# 
+#
 
 
 echo "01. Integer/GT: Create subscription 1 for q=A1.i>9"
@@ -180,50 +180,50 @@ echo
 01. Integer/GT: Create subscription 1 for q=A1.i>9
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Float/LT: Create subscription 2 for q=A1.f<4.0
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. String/LE: Create subscription 3 for q=A1.s<=test_string
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 04. String/GE: Create subscription 4 for q=A1.s>=fest_string
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Create E1 with A1 with compound value containing String, Integer and Float
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
@@ -243,8 +243,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "f": 3.14,
                     "i": 10,
@@ -252,7 +252,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
                     "s": "test_string"
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -273,8 +273,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "f": 3.14,
                     "i": 10,
@@ -282,7 +282,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
                     "s": "test_string"
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -303,8 +303,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "f": 3.14,
                     "i": 10,
@@ -312,7 +312,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
                     "s": "test_string"
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -333,8 +333,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "f": 3.14,
                     "i": 10,
@@ -342,7 +342,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1234])
                     "s": "test_string"
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],

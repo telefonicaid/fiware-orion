@@ -33,6 +33,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttributeValue.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
 
@@ -81,7 +82,7 @@ std::string putEntityAttributeValue
   std::string err = parseDataP->av.attribute.check(ciP->apiVersion, ciP->requestType);
   if (err != "OK")
   {
-    OrionError oe(SccBadRequest, err, "BadRequest");
+    OrionError oe(SccBadRequest, err, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
@@ -90,6 +91,9 @@ std::string putEntityAttributeValue
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
+
+  // Adjust error code if needed
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), true);
 
   // 03. Check output from mongoBackend
   std::string answer = "";

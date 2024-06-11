@@ -133,60 +133,60 @@ echo
 01. Create entity Barcelona
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Barcelona?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Barcelona?type=City
+Content-Length: 0
 
 
 
 02. Create entity Guadalajara
 =============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Guadalajara?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Guadalajara?type=City
+Content-Length: 0
 
 
 
 03. Create entity Lleida
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Lleida?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Lleida?type=City
+Content-Length: 0
 
 
 
 04. Create entity Madrid
 ========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Madrid?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Madrid?type=City
+Content-Length: 0
 
 
 
 05. Create entity Zaragoza
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Zaragoza?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Zaragoza?type=City
+Content-Length: 0
 
 
 
 06. Get entities sorted by proximity to Spain center: Madrid, Guadalajara, Zaragora, Lleida, Barcelona
 ======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 538
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 538
 
 [
     {

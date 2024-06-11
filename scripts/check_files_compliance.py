@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: latin-1 -*-
 # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright( \(c\))? 20[1|2][3|4|5|6|7|8|9|0|1] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 20[1|2][1|2|3|4|5|6|7|8|9|0] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -51,12 +51,12 @@ verbose = True
 
 # check_file returns an error string in the case of error or empty string if everything goes ok
 def check_file(file):
-    # The license header doesn't necessarily starts in the first line, e.g. due to a #define in a .h file
+    # The license header doesn't necessarily start in the first line, e.g. due to a #define in a .h file
     # or a hashbang (#!/usr/bin/python...). Thus, we locate the starting line and start the comparison from
     # that line
 
     searching_first_line = True
-    with open(file) as f:
+    with open(file, encoding='latin-1') as f:
         for line in f:
             line = line.rstrip()
             if searching_first_line:
@@ -85,8 +85,8 @@ def ignore(root, file):
     if ('manuals' in root or 'functionalTest' in root or 'apiary' in root) and (file.endswith('.png') or file.endswith('.ico')):
         return True
 
-    # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
-    if 'SRPMS' in root or 'SOURCES' in root or 'RPMS' in root:
+    # Files in etc directories are not processed
+    if 'etc' in root:
         return True
 
     # Files in the test/valdring directory ending with .out are not processed
@@ -106,7 +106,7 @@ def ignore(root, file):
         return True
 
     # Some files in docker/ directory are not processed
-    if 'docker' in root and file in ['Dockerfile', 'docker-compose.yml']:
+    if 'docker' in root and file in ['Dockerfile', 'Dockerfile.alpine', 'docker-compose.yml']:
         return True
     if 'hooks' in root and file in ['build']:
         return True
@@ -129,21 +129,24 @@ def ignore(root, file):
         return True
 
     # Apib files have an "inline" license, so they are ignored
-    extensions_to_ignore = [ 'apib', 'md' ]
+    extensions_to_ignore = [ 'apib', 'md', 'patch']
     if os.path.splitext(file)[1][1:] in extensions_to_ignore:
         return True
 
     # Particular cases of files that are also ignored
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
-                   'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
+                   'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'Changelog', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
-                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.readthedocs.yml' ]
+                   'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.readthedocs.yml', 'uncrustify.cfg',
+                   'requirements.txt']
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
                                       or file == 'cmake2junit.xsl'):
         return True
-    if 'acceptance' in root and (file.endswith('.txt') or file.endswith('.json')):
+    
+    # For several requirements.txt files we have in this repo
+    if ('acceptance' in root or 'doc' in root) and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
     return False
@@ -156,8 +159,8 @@ def supported_extension(root, file):
     :param file:
     :return:
     """
-    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go']
+    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'cfg', 'DISABLED', 'xtest',
+                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'go', 'conf']
     names = ['makefile', 'Makefile']
 
     # Check extensions
@@ -173,13 +176,13 @@ def supported_extension(root, file):
         return True
 
     filename = os.path.join(root, file)
-    print 'not supported extension: {filename}'.format(filename=filename)
+    print('not supported extension: {filename}'.format(filename=filename))
     return False
 
 if len(argv) > 1:
     dir = argv[1]
 else:
-    print 'Usage:   ./check_files_compliance.py <directory>'
+    print('Usage:   ./check_files_compliance.py <directory>')
     exit(1)
 
 good = 0
@@ -202,18 +205,18 @@ for root, dirs, files in os.walk(dir):
         filename = os.path.join(root, file)
         error = check_file(filename)
         if len(error) > 0:
-            print filename + ': ' + error
+            print(filename + ': ' + error)
             bad += 1
         else:
             # DEBUG
             # print filename + ': OK'
             good += 1
 
-print '--------------'
-print 'Summary:'
-print '   good:    {good}'.format(good=str(good))
-print '   bad:     {bad}'.format(bad=str(bad))
-print 'Total: {total}'.format(total=str(good + bad))
+print('--------------')
+print('Summary:')
+print('   good:    {good}'.format(good=str(good)))
+print('   bad:     {bad}'.format(bad=str(bad)))
+print('Total: {total}'.format(total=str(good + bad)))
 
 if bad > 0:
     exit(1)

@@ -117,69 +117,69 @@ echo
 01. POST /v2/entities, creating E1/T1
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. POST /v2/entities, creating E2/T2
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T2
+Content-Length: 0
 
 
 
 03. POST /v2/entities, creating E3/T3
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T3
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T3
+Content-Length: 0
 
 
 
 04. POST /v2/entities, creating E4/T4
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=T4
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=T4
+Content-Length: 0
 
 
 
 05. POST /v2/entities, creating E5/T5
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=T5
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=T5
+Content-Length: 0
 
 
 
 06. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&options=count
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 49
-Content-Type: application/json
-Fiware-Total-Count: 5
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 5
+Content-Type: application/json
+Content-Length: 49
 
 [
     {
-        "id": "E1", 
+        "id": "E1",
         "type": "T1"
-    }, 
+    },
     {
-        "id": "E2", 
+        "id": "E2",
         "type": "T2"
     }
 ]
@@ -188,22 +188,22 @@ Date: REGEX(.*)
 07. GET /v2/entities?id=E1,E2,E3,E4,E5&offset=2
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 [
     {
-        "id": "E3", 
+        "id": "E3",
         "type": "T3"
-    }, 
+    },
     {
-        "id": "E4", 
+        "id": "E4",
         "type": "T4"
-    }, 
+    },
     {
-        "id": "E5", 
+        "id": "E5",
         "type": "T5"
     }
 ]

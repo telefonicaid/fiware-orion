@@ -204,20 +204,20 @@ echo
 01. Create E1/A1/M1, no type, value of A1/M1 is a string
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. GET E1, see that the type of A1/M1 is 'Text' and the type of E1 is 'Thing'
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 127
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 127
 
 {
     "A1": {
@@ -238,20 +238,20 @@ Date: REGEX(.*)
 03. Create E2/A1/M1, no type, value of A1/M1 is a number
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 04. GET E2, see that the type of A1/M1 is 'Number' and the type of E2 is 'Thing'
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 126
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 126
 
 {
     "A1": {
@@ -272,20 +272,20 @@ Date: REGEX(.*)
 05. Create E3/A1/M1, no type, value of A1/M1 is a boolean
 =========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 06. GET E3, see that the type of A1/M1 is 'Boolean' and the type of E3 is 'Thing'
 =================================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 129
 
 {
     "A1": {
@@ -306,20 +306,20 @@ Date: REGEX(.*)
 07. Create E4/A1/M1, no type, value of A1/M1 is null
 ====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Thing
+Content-Length: 0
 
 
 
 08. GET E4, see that the type of A1/M1 is 'None' and the type of E4 is 'Thing'
 ==============================================================================
 HTTP/1.1 200 OK
-Content-Length: 126
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 126
 
 {
     "A1": {
@@ -340,20 +340,20 @@ Date: REGEX(.*)
 09. Create E5/A1/M1, no type, value of A1/M1 is a compound vector
 =================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=Thing
+Content-Length: 0
 
 
 
 10. GET E5, see that the type of A1/M1 is 'Array' and the type of E5 is 'Thing'
 ===============================================================================
 HTTP/1.1 200 OK
-Content-Length: 140
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 140
 
 {
     "A1": {
@@ -378,20 +378,20 @@ Date: REGEX(.*)
 11. Create E6/A1/M1, no type, value of A1/M1 is a compound object
 =================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E6?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=Thing
+Content-Length: 0
 
 
 
 12. GET E6, see that the type of A1/M1 is 'Object' and the type of E6 is 'Thing'
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 146
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 146
 
 {
     "A1": {

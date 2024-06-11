@@ -1,0 +1,126 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification MQTT with json field using service, servicePath and authToken macros
+
+--SHELL-INIT--
+dbInit CB s1
+brokerStart CB 0 IPV4 -multiservice
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
+
+--SHELL--
+
+#
+# 01. Create custom subscription with json field using service, servicePath and authToken macros
+# 02. Create E1 entity with specific service, servicePath and authToken to trigger sub
+# 03. Dump accumulator, see 1 notifications
+#
+
+echo "01. Create custom subscription with json field using service, servicePath and authToken macros"
+echo "=============================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "${service}${servicePath}/${authToken}",
+      "json": {
+        "id": "${id}",
+        "S": "${service}",
+        "SS": "${servicePath}",
+        "token": "${authToken}"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant s1
+echo
+echo
+
+
+echo "02. Create E1 entity with specific service, servicePath and authToken to trigger sub"
+echo "===================================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": "trigger!",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --tenant s1 --servicePath "/subservA" --xauthToken fgm
+echo
+echo
+
+
+echo "03. Dump accumulator, see 1 notification"
+echo "========================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom subscription with json field using service, servicePath and authToken macros
+==============================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create E1 entity with specific service, servicePath and authToken to trigger sub
+====================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Dump accumulator, see 1 notification
+========================================
+MQTT message at topic s1/subservA/fgm:
+{
+    "S": "s1",
+    "SS": "/subservA",
+    "id": "E1",
+    "token": "fgm"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB s1
+accumulatorStop

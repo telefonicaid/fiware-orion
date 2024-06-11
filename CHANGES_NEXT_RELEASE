@@ -1,3 +1,2 @@
+- Fix: wrong date values should not allowed in subscription's expires field (#4541)
 - Fix: extend loop protection to any request (not only custom notifications) to cover potential update loops due to CEP integration
-- Hardening: Improve notification pool worker thread termination logic (#3877)
-- Remove: deprecated feature initial notification upon subscription creation or update

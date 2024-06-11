@@ -1,0 +1,598 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+
+--NAME--
+Per custom subscrition timeout CRUD
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+
+--SHELL--
+
+#
+# 01. Create a subscrition with a correct timeout field, get 204
+# 02. GET /v2/subscriptions/ID
+# 03. Modify the subscription changing timeout, get 204
+# 04. GET /v2/subscriptions/ID
+# 05. Modify the subscription removing timeout, get 204
+# 06. GET /v2/subscriptions/ID and see no timeout is field is foud
+# 07. Modify the subscription to include again a timeout
+# 08. GET /v2/subscriptions/ID and see the added timeout
+# 09. Delete the subscription, get 204
+# 10. Create a subscrition without timeout field, get 201
+# 11. GET /v2/subscriptions/ID
+# 12. Create a subscrition with a negative timeout field, get 400
+# 13. Create a subscrition with a overranged timeout field, get 400
+# 14. Create a subscrition with a text timeout field, get 400
+
+
+
+echo "01. Create a subscrition with a correct timeout field, get 201"
+echo "=============================================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "timeout":1000,
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. GET /v2/subscriptions/ID see timeout field"
+echo "=============================================="
+orionCurl --url "/v2/subscriptions/${idSubscription}"
+echo
+echo
+
+
+echo "03. Modify the subscription changing timeout, get 204"
+echo "====================================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "timeout":2000,
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
+echo
+echo
+
+
+
+echo "04. GET /v2/subscriptions/ID and see timeout changed"
+echo "===================================================="
+orionCurl --url "/v2/subscriptions/${idSubscription}"
+echo
+echo
+
+
+
+echo "05. Modify the subscription removing timeout, get 204"
+echo "====================================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
+echo
+echo
+
+
+
+echo "06. GET /v2/subscriptions/ID and see no timeout is field is foud"
+echo "================================================================"
+orionCurl --url "/v2/subscriptions/${idSubscription}"
+echo
+echo
+
+
+
+echo "07. Modify the subscription to include again a timeout"
+echo "======================================================"
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "timeout":1000,
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X PATCH
+echo
+echo
+
+echo "08. GET /v2/subscriptions/ID and see the added timeout"
+echo "======================================================"
+orionCurl --url "/v2/subscriptions/${idSubscription}"
+echo
+echo
+
+
+
+echo "09. Delete the subscription, get 204"
+echo "===================================="
+orionCurl --url "/v2/subscriptions/${idSubscription}" --payload "$payload" -X DELETE
+echo
+echo
+
+
+echo "10. Create a subscrition without timeout field, get 201"
+echo "======================================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+idSubscription=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+
+echo "11. GET /v2/subscriptions/ID and check no timeout field"
+echo "======================================================="
+orionCurl --url "/v2/subscriptions/${idSubscription}"
+echo
+echo
+
+
+echo "12. Create a subscrition with a negative timeout field, get 400"
+echo "==============================================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "timeout":-1000,
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "13. Create a subscrition with a overranged timeout field, get 400"
+echo "================================================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "timeout":999999999,
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+echo "14. Create a subscrition with a text timeout field, get 400"
+echo "==========================================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:1234",
+      "timeout":"textvalue",
+      "payload": "Custom payload"
+    }
+  }
+}'
+
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscrition with a correct timeout field, get 201
+==============================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. GET /v2/subscriptions/ID see timeout field
+==============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 361
+
+{
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "payload": "Custom payload",
+            "timeout": 1000,
+            "url": "http://localhost:1234"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Modify the subscription changing timeout, get 204
+=====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. GET /v2/subscriptions/ID and see timeout changed
+====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 361
+
+{
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "payload": "Custom payload",
+            "timeout": 2000,
+            "url": "http://localhost:1234"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Modify the subscription removing timeout, get 204
+=====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. GET /v2/subscriptions/ID and see no timeout is field is foud
+================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 346
+
+{
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "payload": "Custom payload",
+            "url": "http://localhost:1234"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+07. Modify the subscription to include again a timeout
+======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. GET /v2/subscriptions/ID and see the added timeout
+======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 361
+
+{
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "payload": "Custom payload",
+            "timeout": 1000,
+            "url": "http://localhost:1234"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+09. Delete the subscription, get 204
+====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Create a subscrition without timeout field, get 201
+=======================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+11. GET /v2/subscriptions/ID and check no timeout field
+=======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 346
+
+{
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "payload": "Custom payload",
+            "url": "http://localhost:1234"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+12. Create a subscrition with a negative timeout field, get 400
+===============================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
+
+{
+    "description": "timeout field must be an integer between 0 and 1800000",
+    "error": "BadRequest"
+}
+
+
+13. Create a subscrition with a overranged timeout field, get 400
+=================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
+
+{
+    "description": "timeout field must be an integer between 0 and 1800000",
+    "error": "BadRequest"
+}
+
+
+14. Create a subscrition with a text timeout field, get 400
+===========================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 60
+
+{
+    "description": "timeout is not an int",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

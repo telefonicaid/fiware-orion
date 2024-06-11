@@ -1,0 +1,251 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+JSON values are lost in notifications in custom subscriptions in the second subscription
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create entity E1 with location attribute (JSON value)
+# 02. Create custom sub sub1 covering E1
+# 03. Create custom sub sub2 covering E1
+# 04. Trigger subs updating E1
+# 05. Dump accumulator and see two notifications with location in both of them
+#
+
+
+echo "01. Create entity E1 with location attribute (JSON value)"
+echo "========================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "type": "Number",
+    "value": 45
+  },
+  "location": {
+    "type": "geo:json",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        -0.210062,
+        46.124448
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create custom sub sub1 covering E1"
+echo "======================================"
+payload='{
+  "description": "Sub 1",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create custom sub sub2 covering E1"
+echo "======================================"
+payload='{
+  "description": "Sub 2",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Trigger subs updating E1"
+echo "============================"
+payload='{
+  "A": {
+    "type": "Number",
+    "value": 46
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator and see two notifications with location in both of them"
+echo "============================================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with location attribute (JSON value)
+=========================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+02. Create custom sub sub1 covering E1
+======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Create custom sub sub2 covering E1
+======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+04. Trigger subs updating E1
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Dump accumulator and see two notifications with location in both of them
+============================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 230
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 46
+            },
+            "id": "E1",
+            "location": {
+                "metadata": {},
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        -0.210062,
+                        46.124448
+                    ],
+                    "type": "Point"
+                }
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 230
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 46
+            },
+            "id": "E1",
+            "location": {
+                "metadata": {},
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        -0.210062,
+                        46.124448
+                    ],
+                    "type": "Point"
+                }
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

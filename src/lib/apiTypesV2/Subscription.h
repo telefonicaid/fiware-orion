@@ -32,12 +32,40 @@
 #include "ngsi/Throttling.h"
 #include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/Restriction.h"
 #include "common/RenderFormat.h"
 
 namespace ngsiv2
 {
+/* ****************************************************************************
+*
+* NotificationType -
+*/
+typedef enum NotificationType
+{
+  HttpNotification,
+  MqttNotification
+} NotificationType;
+
+
+
+/* ****************************************************************************
+*
+* SubAltType -
+*/
+typedef enum SubAltType
+{
+  EntityChange,
+  EntityUpdate,
+  EntityCreate,
+  EntityDelete,
+  Unknown
+} SubAltType;
+
+
+
 /* ****************************************************************************
 *
 * Notification -
@@ -48,23 +76,34 @@ struct Notification
   std::vector<std::string> metadata;
   bool                     blacklist;
   bool                     onlyChanged;
+  bool                     covered;
   long long                timesSent;
+  long long                failsCounter;
+  long long                maxFailsLimit;
   long long                lastNotification;
-  HttpInfo                 httpInfo;
-  int                      lastFailure;  // FIXME P4: should be long long, like lastNotification
-  int                      lastSuccess;  // FIXME P4: should be long long, like lastNotification
+  HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
+  MqttInfo                 mqttInfo;
+  NotificationType         type;
+  long long                lastFailure;
+  long long                lastSuccess;
   std::string              lastFailureReason;
   long long                lastSuccessCode;
 
   std::string              toJson(const std::string& attrsFormat);
+  void                     release();
 
   Notification():
     attributes(),
     blacklist(false),
     onlyChanged(false),
+    covered(false),
     timesSent(0),
+    failsCounter(0),
+    maxFailsLimit(-1),
     lastNotification(-1),
     httpInfo(),
+    mqttInfo(),
+    type(HttpNotification),
     lastFailure(-1),
     lastSuccess(-1),
     lastFailureReason(""),
@@ -82,7 +121,13 @@ struct Condition
 {
   std::vector<std::string>  attributes;
   SubscriptionExpression    expression;
+  std::vector<SubAltType>   altTypes;
+  bool                      notifyOnMetadataChange;
   std::string               toJson();
+
+  Condition():
+    notifyOnMetadataChange(true)
+  {}
 };
 
 
@@ -104,8 +149,9 @@ struct Subject
 *
 * Subscription -
 */
-struct Subscription
+class Subscription
 {
+public:
   std::string   id;
   std::string   description;
   bool          descriptionProvided;
@@ -117,10 +163,33 @@ struct Subscription
   RenderFormat  attrsFormat;
   Restriction   restriction;
   std::string   toJson();
+  void          release();
+
+  Subscription():
+    attrsFormat(NGSI_V2_NORMALIZED)
+  {}
 
   ~Subscription();
 };
 
 }  // end namespace
+
+
+
+/* ****************************************************************************
+*
+* parseAlterationType -
+*/
+extern ngsiv2::SubAltType parseAlterationType(const std::string& altType);
+
+
+
+/* ****************************************************************************
+*
+* subAltType2string -
+*/
+extern std::string subAltType2string(ngsiv2::SubAltType altType);
+
+
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTION_H_

@@ -58,17 +58,17 @@ payload='{
         },
        "A2" :{
           "value": "E1/T1/A2",
-          "type": "AT2" 
+          "type": "AT2"
         },
        "A3" :{
           "type": "a",
           "value": "E1/T1/A3/M1",
           "metadata": {
-            "m1": 
+            "m1":
               {
                 "value": "M1"
               }
-          }     
+          }
         },
         "A4" : {
           "type": "a4",
@@ -78,7 +78,7 @@ payload='{
               {
                 "value": "M1"
               },
-             "m2" : 
+             "m2" :
               {
                 "type": "tm2",
                 "value": "M2"
@@ -114,7 +114,7 @@ echo "==================================================="
 payload='{
   "id":   "E2",
   "type": "T1",
-  "A0": 
+  "A0":
   {
     "value" : { "i1": "1", "s1": "s" }
   }
@@ -135,10 +135,10 @@ echo
 01. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -146,20 +146,20 @@ Date: REGEX(.*)
 02. POST /v2/entities
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 428
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 428
 
 [
     {
@@ -215,11 +215,11 @@ Date: REGEX(.*)
 04. GET /v2/entities?options=count,keyValues
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 108
-Content-Type: application/json
-Fiware-Total-Count: 1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
+Content-Type: application/json
+Content-Length: 108
 
 [
     {
@@ -237,20 +237,20 @@ Date: REGEX(.*)
 05. POST /v2/entities with compound attribute value
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T1
+Content-Length: 0
 
 
 
 06. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 526
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 526
 
 [
     {

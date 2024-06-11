@@ -105,10 +105,10 @@ echo
 01. Create subscription with template
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
@@ -119,33 +119,33 @@ Date: REGEX(.*)
 03. Create entity to trigger the subscription
 =============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 04. Dump accumulator to see the notification
 ============================================
-PATCH http://127.0.0.1:REGEX(\d+)/notify?a1=a1&a3=13&a2=a2&type=Thing&id=E1
+PATCH http://127.0.0.1:REGEX(\d+)/notify?a1=a1&a2=a2&a3=13&id=E1&type=Thing
 Fiware-Servicepath: /
-A3: 13
-Entity-Id: E1
 Content-Length: 38
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
-A2: a2
-A1: a1
-Entity-Type: Thing
 Content-Type: text/plain; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+A1: a1
+A2: a2
+A3: 13
+Entity-Id: E1
+Entity-Type: Thing
 
 {
-    "A1": "a1", 
-    "A2": "a2", 
+    "A1": "a1",
+    "A2": "a2",
     "A3": "13"
 }
 =======================================
@@ -154,10 +154,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. GET the subscription
 ========================
 HTTP/1.1 200 OK
-Content-Length: 649
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 695
 
 [
     {
@@ -165,6 +165,7 @@ Date: REGEX(.*)
         "notification": {
             "attrs": [],
             "attrsFormat": "normalized",
+            "covered": false,
             "httpCustom": {
                 "headers": {
                     "A1": "${A1}",
@@ -193,7 +194,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

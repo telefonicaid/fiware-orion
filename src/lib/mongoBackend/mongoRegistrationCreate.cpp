@@ -229,6 +229,16 @@ void mongoRegistrationCreate
   setForwardingMode(regP->provider.supportedForwardingMode, &bob);
 
   std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
+
+  if (format == "JSON")
+  {
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode in registration creation (regId: %s)", regIdP->c_str()));
+    }
+  }
+
   setFormat(format, &bob);
 
   //

@@ -45,6 +45,14 @@
 #include <boost/version.hpp>
 #include <mongoc/mongoc.h>
 #include <bson/bson.h>
+#include <mosquitto.h>
+
+#ifndef EXPR_BASIC
+// Interface to use libcjexl
+extern "C" {
+    const char* cjexl_version();
+}
+#endif
 
 /* ****************************************************************************
 *
@@ -65,18 +73,38 @@ std::string libVersions(void)
   std::string  total  = "\"libversions\": {\n";
   std::string  boost  = "     \"boost\": ";
   std::string  curl   = "     \"libcurl\": ";
+  std::string  mosq   = "     \"libmosquitto\": ";
   std::string  mhd    = "     \"libmicrohttpd\": ";
   std::string  ssl    = "     \"openssl\": ";
   std::string  rjson  = "     \"rapidjson\": ";
+  std::string  cjexl  = "     \"libcjexl\": ";
   std::string  mongo  = "     \"mongoc\": ";
   std::string  bson   = "     \"bson\": ";
 
   char*        curlVersion = curl_version();
 
+  int mosqMayor;
+  int mosqMinor;
+  int mosqRevision;
+  mosquitto_lib_version(&mosqMayor, &mosqMinor, &mosqRevision);
+
+  // XX.XX.XX -> 8 chars << 16 chars
+  char  mosqVersion[16];
+  snprintf(mosqVersion, sizeof(mosqVersion), "%d.%d.%d", mosqMayor, mosqMinor, mosqRevision);
+
   total += boost   + "\"" + BOOST_LIB_VERSION "\"" + ",\n";
   total += curl    + "\"" + curlVersion   +   "\"" + ",\n";
+  total += mosq    + "\"" + mosqVersion + "\"" + ",\n";
   total += mhd     + "\"" + MHD_get_version()    +   "\"" + ",\n";
+#ifndef EXPR_BASIC
+  total += cjexl   + "\"" + cjexl_version() + "\"" + ",\n";
+#endif
+#ifdef OLD_SSL_VERSION_FORMAT
+  // Needed by openssl 1.1.1n in Debian 11 and before
   total += ssl     + "\"" + SHLIB_VERSION_NUMBER  "\"" + ",\n";
+#else
+  total += ssl     + "\"" + OPENSSL_FULL_VERSION_STR  "\"" + ",\n";
+#endif
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
   total += mongo   + "\"" + MONGOC_VERSION_S "\"" + ",\n";
   total += bson    + "\"" + BSON_VERSION_S "\"" + "\n";
@@ -115,6 +143,8 @@ std::string versionTreat
   ParseData*                 parseDataP
 )
 {
+  bool showLibVersions = ciP->uriParamOptions[OPT_LIB_VERSIONS];
+
   if (isOriginAllowedForCORS(ciP->httpHeaders.origin))
   {
     ciP->httpHeader.push_back(HTTP_ACCESS_CONTROL_ALLOW_ORIGIN);
@@ -151,8 +181,15 @@ std::string versionTreat
   out += "  \"compiled_in\" : \"" + std::string(COMPILED_IN) + "\",\n";
   out += "  \"release_date\" : \"" + std::string(RELEASE_DATE) + "\",\n";
   out += "  \"machine\" : \"" + std::string(MACHINE_ARCH) + "\",\n";
-  out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
-  out += "  }\n";
+  if (showLibVersions)
+  {
+    out += "  \"doc\" : \"" + std::string(API_DOC) + "\"," "\n" + "  " + libVersions();
+    out += "  }\n";
+  }
+  else
+  {
+    out += "  \"doc\" : \"" + std::string(API_DOC) + "\"\n";
+  }  
   out += "}\n";
   out += "}\n";
 

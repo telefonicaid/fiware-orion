@@ -49,7 +49,7 @@ echo
 echo "02. POST /v2/entities (E1)"
 echo "=========================="
 payload='{
-    
+
       "id":   "E1",
       "type": "Car",
       "model" : {
@@ -110,11 +110,11 @@ echo
 01. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Total-Count: 0
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 0
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -122,21 +122,21 @@ Date: REGEX(.*)
 02. POST /v2/entities (E1)
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Car
+Content-Length: 0
 
 
 
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 87
-Content-Type: application/json
-Fiware-Total-Count: 1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 1
+Content-Type: application/json
+Content-Length: 87
 
 [
     {
@@ -154,41 +154,41 @@ Date: REGEX(.*)
 04. POST /v2/entities (E2)
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Car
+Content-Length: 0
 
 
 
 05. POST /v2/entities (E3)
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Car
+Content-Length: 0
 
 
 
 06. POST /v2/entities (E4)
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=Car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Car
+Content-Length: 0
 
 
 
 07. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 162
-Content-Type: application/json
-Fiware-Total-Count: 4
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Fiware-Total-Count: 4
+Content-Type: application/json
+Content-Length: 162
 
 [
     {

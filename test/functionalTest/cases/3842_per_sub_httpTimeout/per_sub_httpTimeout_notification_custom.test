@@ -1,0 +1,260 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+
+--NAME--
+Per custom subscrition timeout
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart --pretty-print
+
+--SHELL--
+
+# FIXME This test is using /noresponse path on accumulator for delaying the notification's response (10 seconds). This may enlarge
+# the testing time. Implementing a new accumulator route with a shorter delay would improve it
+
+#
+# 01. Create a sub with timeout=12000
+# 02. Create a sub with timeout=8000
+# 03. Create an entity (notification triggered)
+# 04. Wait 12 seconds
+# 05. Check if 1st sub notification succeed
+# 06. Check if 2nd sub notification has failsCounter: 1
+#
+
+
+
+echo "01. Create a sub with timeout=12000"
+echo "======================================="
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/noresponse",
+      "timeout":12000,
+      "payload": "Custom payload"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+idSubscription1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+
+echo "02. Create a sub with timeout=8000"
+echo "======================================"
+payload='
+{
+  "description": "HTTP sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/noresponse",
+      "timeout":8000,
+      "payload": "Custom payload"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+idSubscription2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+
+echo '03. Create an entity (notification triggered)'
+echo '============================================='
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+echo '04. Wait 12 seconds'
+echo '==================='
+sleep 12
+echo
+echo
+
+echo "05. Check if 1st sub notification succeed"
+echo "========================================="
+orionCurl --url "/v2/subscriptions/${idSubscription1}"
+echo
+echo
+
+
+echo "06. Check if 2nd sub notification has failsCounter: 1"
+echo "====================================================="
+orionCurl --url "/v2/subscriptions/${idSubscription2}"
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create a sub with timeout=12000
+=======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create a sub with timeout=8000
+======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Create an entity (notification triggered)
+=============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+04. Wait 12 seconds
+===================
+
+
+05. Check if 1st sub notification succeed
+=========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 496
+
+{
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "payload": "Custom payload",
+            "timeout": 12000,
+            "url": "http://localhost:9997/noresponse"
+        },
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+06. Check if 2nd sub notification has failsCounter: 1
+=====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 532
+
+{
+    "description": "HTTP sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 1,
+        "httpCustom": {
+            "payload": "Custom payload",
+            "timeout": 8000,
+            "url": "http://localhost:9997/noresponse"
+        },
+        "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastFailureReason": "Timeout was reached",
+        "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

@@ -1,0 +1,390 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+statistics with counters
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -statCounters
+
+--SHELL--
+
+#
+# This test is special and doesn't follow the typical steps pattern
+# Instead of that, we just stimulate all possible API rute (without output)
+# and do GET /statistics after that
+#
+# Comparing with statistics_with_full_counter.test (diff wise) you can check
+# that every possible counter is included in "request" and "requestsLegacy"
+# except the following ones:
+#
+# - /exit[/*]": used only in DEBUG code
+# - /leak[/*]": used only in DEBUG code
+# - /statistics DELETE: as using it will ruin all statistics :)
+#
+# All counters has 1 hit.
+#
+# As a kind of checksum note there are 60 orionCurl ocurrences in this file
+# (it can be checked with grep) and that:
+#
+# - jsonRequests:        16
+# - noPayloadRequests:   42
+# - textRequest:          1
+# - (comented orionCurl)  1
+#
+# which sum 131
+
+# Not legacy
+
+orionCurl --url /admin/log                     > /dev/null
+
+orionCurl --url /admin/log?level=DEBUG -X PUT  > /dev/null
+
+orionCurl --url /admin/metrics            > /dev/null
+orionCurl --url /admin/metrics -X DELETE  > /dev/null
+
+orionCurl --url /admin/sem  > /dev/null
+
+orionCurl --url /cache/statistics            > /dev/null
+orionCurl --url /cache/statistics -X DELETE  > /dev/null
+
+orionCurl --url /log/trace                > /dev/null
+orionCurl --url /log/trace/100 -X PUT     > /dev/null
+orionCurl --url /log/trace/100 -X DELETE  > /dev/null
+
+orionCurl --url /v2             > /dev/null
+orionCurl --url /v2 -X OPTIONS  > /dev/null
+
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {"value": 1, "type": "Number"}
+}'
+orionCurl --url /v2/entities                               > /dev/null
+orionCurl --url /v2/entities -X OPTIONS                    > /dev/null
+orionCurl --url /v2/entities -X POST --payload "$payload"  > /dev/null
+
+payload='{"value": 1, "type": "Number"}'
+orionCurl --url /v2/entities/E/attrs/A                                 > /dev/null
+orionCurl --url /v2/entities/E/attrs/A -X OPTIONS                      > /dev/null
+orionCurl --url /v2/entities/E/attrs/A -X DELETE                       > /dev/null
+orionCurl --url /v2/entities/E/attrs/A -X PUT    --payload "$payload"  > /dev/null
+
+payload='0'
+orionCurl --url /v2/entities/E/attrs/A/value                                                            > /dev/null
+orionCurl --url /v2/entities/E/attrs/A/value -X OPTIONS                                                 > /dev/null
+orionCurl --url /v2/entities/E/attrs/A/value -X PUT    --payload "$payload" --in text/plain --out json  > /dev/null
+
+payload='{
+  "A": {"value": 1, "type": "Number"}
+}'
+orionCurl --url /v2/entities/E/attrs                                 > /dev/null
+orionCurl --url /v2/entities/E/attrs -X OPTIONS                      > /dev/null
+orionCurl --url /v2/entities/E/attrs -X DELETE                       > /dev/null
+orionCurl --url /v2/entities/E/attrs -X POST   --payload "$payload"  > /dev/null
+orionCurl --url /v2/entities/E/attrs -X PATCH  --payload "$payload"  > /dev/null
+orionCurl --url /v2/entities/E/attrs -X PUT    --payload "$payload"  > /dev/null
+
+payload='{
+  "entities": [
+    {
+      "id": "E",
+      "type": "T"
+    }
+  ],
+  "attrs": [
+    "A"
+  ]
+}'
+orionCurl --url /v2/op/query -X OPTIONS                      > /dev/null
+orionCurl --url /v2/op/query -X POST   --payload "$payload"  > /dev/null
+
+payload='{
+  "entities": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {"value": 1, "type": "Number"}
+    }
+  ],
+  "actionType": "append"
+}'
+orionCurl --url /v2/op/update -X OPTIONS                      > /dev/null
+orionCurl --url /v2/op/update -X POST   --payload "$payload"  > /dev/null
+
+
+payload='{
+  "subscriptionId": "1231",
+  "data": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {"value": 1, "type": "Number"}
+    }
+  ]
+}'
+# FIXME #4261. Once the issue gets solved, this line should be uncommented
+# The REGEXPECT part would need a little adapation after that
+#orionCurl --url /v2/op/notify -X POST   --payload "$payload"  > /dev/null
+
+
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "id": "room2",
+        "type": "Room"
+      }
+    ],
+    "attrs": [
+      "relativeHumidity"
+    ]
+  },
+  "provider": {
+    "http":{
+      "url": "http://localhost:1234"
+    }
+  }
+}'
+orionCurl --url /v2/registrations                                  > /dev/null
+orionCurl --url /v2/registrations -X OPTIONS                       > /dev/null
+orionCurl --url /v2/registrations -X POST    --payload "$payload"  > /dev/null
+
+orionCurl --url /v2/registrations/123                          > /dev/null
+orionCurl --url /v2/registrations/123 -X OPTIONS               > /dev/null
+orionCurl --url /v2/registrations/123 -X DELETE                > /dev/null
+orionCurl --url /v2/registrations/123 -X PATCH  --payload "$payload" > /dev/null
+
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions                                  > /dev/null
+orionCurl --url /v2/subscriptions -X OPTIONS                       > /dev/null
+orionCurl --url /v2/subscriptions -X POST    --payload "$payload"  > /dev/null
+
+orionCurl --url /v2/subscriptions/123                          > /dev/null
+orionCurl --url /v2/subscriptions/123 -X OPTIONS               > /dev/null
+orionCurl --url /v2/subscriptions/123 -X DELETE                > /dev/null
+orionCurl --url /v2/subscriptions/123 -X PATCH  --payload "$payload" > /dev/null
+
+orionCurl --url /v2/types             > /dev/null
+orionCurl --url /v2/types -X OPTIONS  > /dev/null
+
+orionCurl --url /v2/types/T             > /dev/null
+orionCurl --url /v2/types/T -X OPTIONS  > /dev/null
+
+orionCurl --url /version                > /dev/null
+
+# Legacy
+
+payload='{}'
+orionCurl --url /v1/contextEntities/E -X DELETE                     > /dev/null
+orionCurl --url /v1/contextEntities/E -X PUT        --payload "$payload"  > /dev/null
+
+orionCurl --url /v1/contextEntities/E/attributes/A                           > /dev/null
+
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E"
+    }
+  ]
+}'
+orionCurl --url /ngsi10/queryContext -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/queryContext -X POST --payload "$payload"  > /dev/null
+
+payload='{
+  "contextElements": [
+  {
+    "type": "T",
+    "isPattern": "false",
+    "id": "E",
+    "attributes": [
+    {
+      "name": "A",
+      "type": "Text",
+      "value": "foo"
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /ngsi10/updateContext            -X POST --payload "$payload"  > /dev/null
+orionCurl --url /v1/updateContext                -X POST --payload "$payload"  > /dev/null
+
+# Get statistics
+
+orionCurl --url /statistics
+
+--REGEXPECT--
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "counters": {
+        "deprecatedFeatures": {
+            "ngsiv1Requests": 7
+        },
+        "jsonRequests": 16,
+        "noPayloadRequests": 42,
+        "requests": {
+            "/admin/log": {
+                "GET": 1,
+                "PUT": 1
+            },
+            "/admin/metrics": {
+                "DELETE": 1,
+                "GET": 1
+            },
+            "/admin/sem": {
+                "GET": 1
+            },
+            "/cache/statistics": {
+                "DELETE": 1,
+                "GET": 1
+            },
+            "/log/trace[/{level}]": {
+                "DELETE": 1,
+                "GET": 1,
+                "PUT": 1
+            },
+            "/statistics": {
+                "GET": 1
+            },
+            "/v2": {
+                "GET": 1,
+                "OPTIONS": 1
+            },
+            "/v2/entities": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/entities/{id}/attrs/{name}": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PUT": 1
+            },
+            "/v2/entities/{id}/attrs/{name}/value": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "PUT": 1
+            },
+            "/v2/entities/{id}[/attrs]": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PATCH": 1,
+                "POST": 1,
+                "PUT": 1
+            },
+            "/v2/op/query": {
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/op/update": {
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/registrations": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/registrations/{id}": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PATCH": 1
+            },
+            "/v2/subscriptions": {
+                "GET": 1,
+                "OPTIONS": 1,
+                "POST": 1
+            },
+            "/v2/subscriptions/{id}": {
+                "DELETE": 1,
+                "GET": 1,
+                "OPTIONS": 1,
+                "PATCH": 1
+            },
+            "/v2/types": {
+                "GET": 1,
+                "OPTIONS": 1
+            },
+            "/v2/types/{type}": {
+                "GET": 1,
+                "OPTIONS": 1
+            },
+            "/version": {
+                "GET": 1
+            }
+        },
+        "requestsLegacy": {
+            "/ngsi10/queryContext": {
+                "POST": 1
+            },
+            "/ngsi10/updateContext": {
+                "POST": 1
+            },
+            "/v1/contextEntities/{id}": {
+                "DELETE": 1,
+                "PUT": 1
+            },
+            "/v1/contextEntities/{id}/attributes/{name}": {
+                "GET": 1
+            },
+            "/v1/queryContext": {
+                "POST": 1
+            },
+            "/v1/updateContext": {
+                "POST": 1
+            }
+        },
+        "textRequests": 1
+    },
+    "measuring_interval_in_secs": REGEX(\d+),
+    "uptime_in_secs": REGEX(\d+)
+}
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

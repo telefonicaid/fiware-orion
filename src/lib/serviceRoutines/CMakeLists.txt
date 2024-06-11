@@ -18,7 +18,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET (SOURCES
 versionTreat.cpp
@@ -128,7 +128,9 @@ badVerbGetDeleteOnly.h
 badVerbPutDeleteOnly.h
 badVerbGetPutDeleteOnly.h
 badVerbPutOnly.h
-badNgsi9Request.h
+# FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
+# (along with badNgsi9Request.h|cpp files themselves)
+#badNgsi9Request.h
 badNgsi10Request.h
 badRequest.h
 postNotifyContext.h

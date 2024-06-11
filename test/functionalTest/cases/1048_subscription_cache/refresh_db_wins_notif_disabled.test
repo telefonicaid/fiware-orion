@@ -1,0 +1,382 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Cache refresh takes newer information from DB in disabled notification scenario
+
+--SHELL-INIT--
+dbInit CB
+
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("61960a51596aa2623032357d"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:9997/notify",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 2524644000,
+        "entities" : [
+                {
+                        "id" : "E",
+                        "isPattern" : "false",
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "maxFailsLimit": NumberLong(1)
+})'
+
+# t 100 -> MongoDB interactions
+# t 212 -> Cache sync each 5 seconds
+brokerStart CB 100,212 IPv4 -subCacheIval 5 --cache
+
+--SHELL--
+
+#
+# Relevant fields in step 00
+# - maxFailsLimit 1
+# - status:       active (last changed: 2050-01-01T10:00:00Z)
+#
+# 00. (Done before starting Context Broker) Insert crafted subscription in DB with maxFailsLimit 1 and status active changed in a far future
+# 01. GET /v2/subscriptions and see maxFailsLimit 1, status active
+# 02. Upsert entity E twice to trigger notifications to overpass maxFailsLimit
+# 03. Upsert entity E to trigger notification which would be blocked as status in cache is inactive
+# 04. GET /v2/subscriptions and see status active (as cache data is older), timesSent 2, failsCounter 2
+# 05. Get doc in DB before cache refresh and see status active changed in a far future and without count and without failsCounter
+# 06. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
+# 07. Get doc in DB after cache refresh and see status active changed in a far future and count 2, failsCounter 2
+#
+
+echo "00. (Done before starting Context Broker) Insert crafted subscription in DB with maxFailsLimit 1 and status active changed in a far future"
+echo "=========================================================================================================================================="
+echo
+echo
+
+
+echo "01. GET /v2/subscriptions and see maxFailsLimit 1, status active"
+echo "================================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "02. Upsert entity E twice to trigger notifications to overpass maxFailsLimit"
+echo "============================================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload"
+echo
+echo
+orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload"
+echo
+echo
+
+
+echo "03. Upsert entity E to trigger notification which would be blocked as status in cache is inactive"
+echo "================================================================================================="
+orionCurl --url '/v2/entities?options=upsert,forcedUpdate' --payload "$payload"
+echo
+echo
+
+
+echo "04. GET /v2/subscriptions and see status active (as cache data is older), timesSent 2, failsCounter 2"
+echo "====================================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "05. Get doc in DB before cache refresh and see status active changed in a far future and without count and without failsCounter"
+echo "==============================================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+echo "06. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same"
+echo "==============================================================================================="
+sleep 5.5s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "07. Get doc in DB after cache refresh and see status active changed in a far future and count 2, failsCounter 2"
+echo "==============================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+--REGEXPECT--
+00. (Done before starting Context Broker) Insert crafted subscription in DB with maxFailsLimit 1 and status active changed in a far future
+==========================================================================================================================================
+
+
+01. GET /v2/subscriptions and see maxFailsLimit 1, status active
+================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 315
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "maxFailsLimit": 1,
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+02. Upsert entity E twice to trigger notifications to overpass maxFailsLimit
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+03. Upsert entity E to trigger notification which would be blocked as status in cache is inactive
+=================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+04. GET /v2/subscriptions and see status active (as cache data is older), timesSent 2, failsCounter 2
+=====================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 482
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 2,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
+            "lastNotification": "REGEX(.*)",
+            "maxFailsLimit": 1,
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+05. Get doc in DB before cache refresh and see status active changed in a far future and without count and without failsCounter
+===============================================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": "false",
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "maxFailsLimit": 1,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 2524644000,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+06. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
+===============================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 482
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 2,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastFailureReason": "Couldn't connect to server",
+            "lastNotification": "REGEX(.*)",
+            "maxFailsLimit": 1,
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+07. Get doc in DB after cache refresh and see status active changed in a far future and count 2, failsCounter 2
+===============================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "count": 2,
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": "false",
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "failsCounter": 2,
+    "format": "normalized",
+    "lastFailure": REGEX(\d+),
+    "lastFailureReason": "Couldn't connect to server",
+    "lastNotification": REGEX(\d+),
+    "maxFailsLimit": 1,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 2524644000,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

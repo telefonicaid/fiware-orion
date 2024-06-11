@@ -34,10 +34,10 @@ brokerStart CB 0 IPv4
 # 01. Create sub
 # 02. Get subscription (no last* field)
 # 03. Create entity  (triggering notification)
-# 04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
+# 04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server
 # 05. Start endpoint
 # 06. Update entity (triggering notification)
-# 07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
+# 07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)
 #
 
 echo "01. Create sub"
@@ -83,8 +83,8 @@ echo
 echo
 
 
-echo "04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server"
-echo "======================================================================================"
+echo "04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server"
+echo "======================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
@@ -113,8 +113,8 @@ echo
 echo
 
 
-echo "07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)"
-echo "================================================================================================"
+echo "07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)"
+echo "====================================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
@@ -124,20 +124,20 @@ echo
 01. Create sub
 ==============
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Get subscription (no last* field)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 277
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 323
 
 {
     "description": "The sub",
@@ -145,6 +145,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
@@ -153,7 +154,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -168,20 +170,20 @@ Date: REGEX(.*)
 03. Create entity  (triggering notification)
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 
 
-04. Get subscription see status: failed, lastFailureReason: Couldn't connect to server
-======================================================================================
+04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server
+=======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 427
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 490
 
 {
     "description": "The sub",
@@ -189,6 +191,8 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 1,
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
@@ -198,10 +202,11 @@ Date: REGEX(.*)
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
-    "status": "failed",
+    "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -221,18 +226,18 @@ accumulator running as PID REGEX(\d+)
 06. Update entity (triggering notification)
 ===========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-07. Get subscription see status: active, lastSuccessCode: 200 (and also old lastFailure fields*)
-================================================================================================
+07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)
+=====================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 490
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 536
 
 {
     "description": "The sub",
@@ -240,6 +245,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
@@ -254,7 +260,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

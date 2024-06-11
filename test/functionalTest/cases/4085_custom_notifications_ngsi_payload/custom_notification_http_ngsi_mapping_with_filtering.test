@@ -1,0 +1,277 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification HTTP with NGSI payload mapping attribute with filtering
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub1 with ngsi attributes covering all JSON types with filtering
+# 02. Create entity E1
+# 03. Update entity E1
+# 04. Dump accumulator and see two notifications with replaced values
+#
+
+
+echo "01. Create custom sub1 with ngsi attributes covering all JSON types with filtering"
+echo "=================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "A1": {
+          "value": "${A6}",
+          "type": "None"
+        },
+        "A2": {
+          "value": "${A5}",
+          "type": "Array"
+        },
+        "A3": {
+          "value": "${A4}",
+          "type": "Object"
+        },
+        "A4": {
+          "value": "${A3}",
+          "type": "Boolean"
+        },
+        "A5": {
+          "value": "${A2}",
+          "type": "Number"
+        },
+        "A6": {
+          "value": "${A1}",
+          "type": "Text"
+        }
+      }
+    },
+    "attrs": [ "A3", "A4", "A5" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A1": {
+    "value": "foo",
+    "type": "irrelevant"
+  },
+  "A2": {
+    "value": 1,
+    "type": "irrelevant"
+  },
+  "A3": {
+    "value": true,
+    "type": "irrelevant"
+  },
+  "A4": {
+    "value": { "x": 1, "y": 2},
+    "type": "irrelevant"
+  },
+  "A5": {
+    "value": [ 1, true, "zzz" ],
+    "type": "irrelevant"
+  },
+  "A6": {
+    "value": null,
+    "type": "irrelevant"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update entity E1"
+echo "===================="
+payload='{
+  "A1": {
+    "value": "bar",
+    "type": "irrelevant"
+  },
+  "A2": {
+    "value": 10,
+    "type": "irrelevant"
+  },
+  "A3": {
+    "value": false,
+    "type": "irrelevant"
+  },
+  "A4": {
+    "value": { "w": "ttt", "z": 10 },
+    "type": "irrelevant"
+  },
+  "A5": {
+    "value": [ 4, null, {"r": 2} ],
+    "type": "irrelevant"
+  },
+  "A6": {
+    "value": null,
+    "type": "irrelevant"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Dump accumulator and see two notifications with replaced values"
+echo "==================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub1 with ngsi attributes covering all JSON types with filtering
+==================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1
+====================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Update entity E1
+====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Dump accumulator and see two notifications with replaced values
+===================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 234
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A3": {
+                "metadata": {},
+                "type": "Object",
+                "value": {
+                    "x": 1,
+                    "y": 2
+                }
+            },
+            "A4": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": true
+            },
+            "A5": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 241
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A3": {
+                "metadata": {},
+                "type": "Object",
+                "value": {
+                    "w": "ttt",
+                    "z": 10
+                }
+            },
+            "A4": {
+                "metadata": {},
+                "type": "Boolean",
+                "value": false
+            },
+            "A5": {
+                "metadata": {},
+                "type": "Number",
+                "value": 10
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

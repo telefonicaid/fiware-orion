@@ -149,7 +149,7 @@ extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 * - NotifyCondtions MUST not be 0 (OMA spec cardinallity allows this, but for us is an error)
 * - Duration MUST be included (our policy is so)
 * - ONCHANGE condValues MUST be 1 or more
-* - Restiction MUST be ommited
+* - Restiction MUST be omitted
 *
 */
 
@@ -1737,7 +1737,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1836,7 +1836,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_C1_JSON)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1933,7 +1933,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2033,7 +2033,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_C1_disjoint)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2148,7 +2148,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2263,7 +2263,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_C1_disjoint)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2370,7 +2370,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2477,7 +2477,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_C1_disjoint)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2598,7 +2598,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2719,7 +2719,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_C1_disjoint)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2821,7 +2821,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2925,7 +2925,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CN_partial)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3030,7 +3030,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_CNbis)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3130,7 +3130,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_disjoint)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3234,7 +3234,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3338,7 +3338,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN_partial_disjoint)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3442,7 +3442,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CNbis)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3546,7 +3546,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_CN)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3663,7 +3663,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_C1)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3772,7 +3772,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_C1)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3887,7 +3887,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CN)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -4004,7 +4004,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_CNbis)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -4115,7 +4115,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CN)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);
@@ -4228,7 +4228,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_CNbis)
                                                         "",
                                                         "no correlator",
                                                         0,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         emptyV,
                                                         false,
                                                         emptyV)).Times(1);

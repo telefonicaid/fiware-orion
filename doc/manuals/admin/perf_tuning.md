@@ -20,7 +20,7 @@
 
 ##  MongoDB configuration
 
-From a performance point of view, it is recommended to use MongoDB 4.4 with WireTiger, especially
+From a performance point of view, it is recommended to use MongoDB 6.0 with WireTiger, especially
 in update-intensive scenarios.
 
 In addition, take into account the following information from the official MongoDB documentation, as it may have
@@ -49,6 +49,10 @@ read **and** write performance:
 * Collection [entities](database_model.md#entities-collection)
     * `{_id.servicePath: 1, _id.id: 1, _id.type: 1}` (note that this is a compound index and key order matters in this case)
     * `creDate`
+    * `_id.id`
+    * `_id.type`
+    * `_id.servicePath`
+    * `attrNames`
 
 In addition, depending on your queries, you may need *additional* indexes.
 
@@ -70,8 +74,8 @@ creation/modification date (e.g. `GET /v2/entities?dateModified<2019-01-01`), us
 The only indexes that Orion Context Broker actually ensure are the following ones. Both are ensured on 
 Orion startup or when entities are created.
 
-* A "2dsphere" index for the `location.coords` field in the entities collection, due to functional needs of the [geo-location functionality](../user/geolocation.md).
-* An index with `expireAfterSeconds: 0` for the `expDate` field in the entities collection, due to functional needs of the [transient entities functionality](../user/transient_entities.md).
+* A "2dsphere" index for the `location.coords` field in the entities collection, due to functional needs of the [geo-location functionality](../orion-api.md#geospatial-properties-of-entities).
+* An index with `expireAfterSeconds: 0` for the `expDate` field in the entities collection, due to functional needs of the [transient entities functionality](../orion-api.md#transient-entities).
 
 You can find an analysis about the effect of indexes in [this document](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/extra/indexes_analysis.md), although
 it is based on an old Orion version, so it is probably outdated. In addition, please find some useful references about [compound indexes](https://docs.mongodb.com/manual/core/index-compound/) and [sort results with indexes](https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/) from the MongoDB official documentation.
@@ -303,10 +307,12 @@ The other three parameters (`-reqTimeout`, `-maxConnections` and `-connectionMem
 Orion is a multithread process. With default starting parameters and in idle state (i.e. no load),
 Orion consumes 4 threads:
 
-* Main thread (the one that starts the broker, then sleeps forever)
+* Main thread (the one that starts the broker, then does some periodical processes, e.g. MQTT connections age checking)
 * Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
 * Listening thread for the IPv4 server (if `-ipv6` is used then this thread is not created)
 * Listening thread for the IPv6 server (if `-ipv4` is used then this thread is not created)
+
+An additional thread is created for printing [log summary traces](logs.md#summary-traces) if `-logSummary` is in use.
 
 In busy state, the number of threads will be higher. With default configuration, Orion creates a new thread
 for each incoming request and for each outgoing notification. These threads are destroyed once their
@@ -342,11 +348,13 @@ There are two pools that can be configured independently:
 
 Using both parameters, in any situation (either idle or busy) Orion consumes a fixed number of threads:
 
-* Main thread (the one that starts the broker, then sleeps forever)
+* Main thread (the one that starts the broker, then does some periodical processes, e.g. MQTT connections age checking)
 * Subscription cache synchronization thread (if `-noCache` is used then this thread is not created)
 * `c` listening threads for the IPv4 server (if `-ipv6` is used then these threads are not created)
 * `c` listening threads for the IPv6 server (if `-ipv4` is used then these threads are not created)
 * `n` threads corresponding to the workers in the notification thread pool.
+
+An additional thread is created for printing [log summary traces](logs.md#summary-traces) if `-logSummary` is in use.
 
 Apart from avoiding the thread exhaustion problem, there is a trade-off between using thread pools and
 not. On the one side, using thread pools is beneficial as it saves thread creation/destruction time.
@@ -467,8 +475,10 @@ In the second case, it means there are workers in the pool that cannot take on n
 In the case of queries/updates forwarded to context providers, the effect is that the original client will take a long time
 to get the answer. In fact, some clients may give up and close the connection.
 
-In this kind of situations, the `-httpTimeout` [CLI parameter](cli.md) may help to control how long Orion should wait for
-outgoing HTTP connections, overriding the default operating system timeout.
+In this kind of situations, the `-httpTimeout` [CLI parameter](cli.md) may help to control how long Orion 
+should wait for outgoing HTTP connections, overriding the default operating system timeout. Note that this 
+parameter can be defined individually for subscriptions. If `timeout` is defined on the subscription's 
+JSON, the default parameter would be ignored.
 
 [Top](#top)
 

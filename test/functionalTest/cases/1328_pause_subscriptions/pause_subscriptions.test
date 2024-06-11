@@ -232,20 +232,20 @@ echo
 01. POST /v2/subscriptions without status (creating csub ID1)
 =============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. GET /v2/subscriptions/ID1 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 428
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 474
 
 {
     "expires": "REGEX(.*)",
@@ -253,6 +253,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -269,7 +270,8 @@ Date: REGEX(.*)
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -285,18 +287,18 @@ Date: REGEX(.*)
 03. PATCH /v2/subscriptions/ID1 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. GET /v2/subscriptions/ID1 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 430
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 476
 
 {
     "expires": "REGEX(.*)",
@@ -304,6 +306,7 @@ Date: REGEX(.*)
     "notification": {
         "attrs": [],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -320,7 +323,8 @@ Date: REGEX(.*)
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -336,20 +340,20 @@ Date: REGEX(.*)
 05. POST /v2/subscriptions with status "inactive" (creating csub ID2)
 =====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 06. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 453
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 499
 
 {
     "expires": "REGEX(.*)",
@@ -360,6 +364,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -376,7 +381,8 @@ Date: REGEX(.*)
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -392,18 +398,18 @@ Date: REGEX(.*)
 07. PATCH /v2/subscriptions/ID2 to change status to "active"
 ============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. GET /v2/subscriptions/ID2 and see status "active"
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 451
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 497
 
 {
     "expires": "REGEX(.*)",
@@ -414,6 +420,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -430,7 +437,8 @@ Date: REGEX(.*)
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -446,18 +454,18 @@ Date: REGEX(.*)
 09. PATCH /v2/subscriptions/ID2 to change expiration time to make it to expire
 ==============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 452
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 498
 
 {
     "expires": "REGEX(.*)",
@@ -468,6 +476,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -484,7 +493,8 @@ Date: REGEX(.*)
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -500,18 +510,18 @@ Date: REGEX(.*)
 11. PATCH /v2/subscriptions/ID2 to change status to "inactive"
 ==============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 12. GET /v2/subscriptions/ID2 and see status "expired"
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 452
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 498
 
 {
     "expires": "REGEX(.*)",
@@ -522,6 +532,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -538,7 +549,8 @@ Date: REGEX(.*)
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -554,18 +566,18 @@ Date: REGEX(.*)
 13. PATCH /v2/subscriptions/ID2 to change expiration time to make it to un-expire
 =================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 14. GET /v2/subscriptions/ID2 and see status "inactive"
 =======================================================
 HTTP/1.1 200 OK
-Content-Length: 453
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 499
 
 {
     "expires": "REGEX(.*)",
@@ -576,6 +588,7 @@ Date: REGEX(.*)
             "humidity"
         ],
         "attrsFormat": "normalized",
+        "covered": false,
         "http": {
             "url": "http://localhost:1234"
         },
@@ -592,7 +605,8 @@ Date: REGEX(.*)
                 "geometry": "point",
                 "georel": "near;minDistance:5000",
                 "q": "temperature>40"
-            }
+            },
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

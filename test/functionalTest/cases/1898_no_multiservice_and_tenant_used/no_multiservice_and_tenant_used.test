@@ -110,40 +110,40 @@ echo
 01. Create a subcription to catch everything, for accumulator
 =============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity without tenant
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 03. Create entity with empty tenant
 ===================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 04. Create entity with tenant abc
 =================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Thing
+Content-Length: 0
 
 
 
@@ -188,14 +188,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A3": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 3
-            }, 
-            "id": "E3", 
+            },
+            "id": "E3",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -214,14 +214,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A4": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 4
-            }, 
-            "id": "E4", 
+            },
+            "id": "E4",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

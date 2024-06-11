@@ -61,7 +61,7 @@ echo
 
 echo "02. Get from Database, only 2 metadata"
 echo "======================================"
-mongoCmd ${CB_DB_NAME} "db.entities.find({}, {_id:0, \"attrs.temperature.mdNames\":1})"
+mongoCmd ${CB_DB_NAME} "db.entities.find({}, {_id:0, \"attrs.temperature.mdNames\":1}).toArray()"
 echo
 echo
 
@@ -88,7 +88,7 @@ echo
 
 echo "04. Get from Database, only 2 metadata"
 echo "======================================"
-mongoCmd ${CB_DB_NAME} "db.entities.find({}, {_id:0, \"attrs.temperature.mdNames\":1})"
+mongoCmd ${CB_DB_NAME} "db.entities.find({}, {_id:0, \"attrs.temperature.mdNames\":1}).toArray()"
 echo
 echo
 
@@ -97,29 +97,29 @@ echo
 01. Create E-temperature with metadata named 34.4E-34_1 and 34.4E-34_0
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=Thing
+Content-Length: 0
 
 
 
 02. Get from Database, only 2 metadata
 ======================================
-{ "attrs" : { "temperature" : { "mdNames" : [ "34.4E-34_1", "34.4E-34_0" ] } } }
+[{"attrs":{"temperature":{"mdNames":["34.4E-34_1","34.4E-34_0"]}}}]
 
 
 03. Update E-temperature, including metatata
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get from Database, only 2 metadata
 ======================================
-{ "attrs" : { "temperature" : { "mdNames" : [ "34.4E-34_1", "34.4E-34_0" ] } } }
+[{"attrs":{"temperature":{"mdNames":["34.4E-34_1","34.4E-34_0"]}}}]
 
 
 --TEARDOWN--

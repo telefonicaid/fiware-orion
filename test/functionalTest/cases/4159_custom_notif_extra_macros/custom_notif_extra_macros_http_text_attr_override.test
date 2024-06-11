@@ -1,0 +1,129 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification HTTP with payload field using service, servicePath and authToken macros with attribute override
+
+--SHELL-INIT--
+dbInit CB s1
+brokerStart CB 0 IPV4 -multiservice
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Create custom subscription with payload field using service, servicePath and authToken macros
+# 02. Create E1 entity with specific service, servicePath and authToken and some attribute overrides to trigger sub
+# 03. Dump accumulator, see 1 notifications
+#
+
+echo "01. Create custom subscription with payload field using service, servicePath and authToken macros"
+echo "================================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "qs": {
+        "S": "my-${service}",
+        "t": "my-${authToken}"
+      },
+      "payload": "id: ${id}, S: ${service}, SS: ${servicePath}, token: ${authToken}"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant s1
+echo
+echo
+
+
+echo "02. Create E1 entity with specific service, servicePath and authToken and some attribute overrides to trigger sub"
+echo "================================================================================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "service": {
+    "value": "OVERRIDE",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --tenant s1 --servicePath "/subservA" --xauthToken fgm
+echo
+echo
+
+
+echo "03. Dump accumulator, see 1 notification"
+echo "========================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom subscription with payload field using service, servicePath and authToken macros
+=================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create E1 entity with specific service, servicePath and authToken and some attribute overrides to trigger sub
+=================================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Dump accumulator, see 1 notification
+========================================
+POST http://127.0.0.1:REGEX(\d+)/notify?S=my-OVERRIDE&t=my-fgm
+Fiware-Servicepath: /subservA
+Content-Length: 46
+X-Auth-Token: fgm
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Fiware-Service: s1
+Content-Type: text/plain; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+id: E1, S: OVERRIDE, SS: /subservA, token: fgm=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB s1
+accumulatorStop

@@ -362,7 +362,6 @@ HttpStatusCode mongoQueryContext
                      requestP->restriction,
                      &rawCerV,
                      &err,
-                     true,
                      tenant,
                      servicePathV,
                      offset,
@@ -430,7 +429,7 @@ HttpStatusCode mongoQueryContext
 
   /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
    * the list needs to be completed. Note that in the case of having this request someContextElementNotFound() is always false
-   * so we efficient not invoking registrationQuery() too much times
+   * so we efficient not invoking registrationsQuery() too much times
    */
   if (requestP->attributeList.size() == 0)
   {

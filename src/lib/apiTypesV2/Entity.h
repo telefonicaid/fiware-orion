@@ -32,6 +32,7 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/EntityId.h"
 #include "rest/OrionError.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -80,14 +81,27 @@ class Entity
                         bool                             comma,
                         bool                             omitAttributeValues = false);
 
+  std::string  toJsonV1(bool                             asJsonObject,
+                        RequestType                      requestType,
+                        bool                             blacklist,
+                        bool                             comma,
+                        bool                             omitAttributeValues = false);
+
+  std::string  toJson(RenderFormat                         renderFormat,
+                      const std::vector<std::string>&      attrsFilter,
+                      bool                                 blacklist,
+                      const std::vector<std::string>&      metadataFilter,
+                      bool                                 renderNgsiField    = false,
+                      ExprContextObject*                   exprContextObjectP = NULL);
+
   std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      bool                             blacklist,
-                      const std::vector<std::string>&  metadataFilter);
+                      bool                             renderNgsiField = false);
 
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
 
   std::string  check(ApiVersion apiVersion, RequestType requestType);
+
+  void         applyUpdateOperators(void);
 
   void         release(void);
 
@@ -124,12 +138,15 @@ class Entity
                            bool                             blacklist,
                            std::vector<ContextAttribute*>*  orderedAttrs);
 
-  void addAllAttrsExceptShadowed(std::vector<ContextAttribute*>*  orderedAttrs);
+  void addAllAttrsExceptFiltered(std::vector<ContextAttribute*>*  orderedAttrs);
 
   std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
-  std::string toJsonNormalized(const std::vector<ContextAttribute*>& orderedAttrs, const std::vector<std::string>&  metadataFilter);
+  std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
+                               const std::vector<std::string>&        metadataFilter,
+                               bool                                   renderNgsiField   = false,
+                               ExprContextObject*                     exprContextObject = NULL);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

@@ -86,6 +86,39 @@ static char* jsonPayloadClean(const char* payload)
 
 
 
+/* ***************************************************************************
+*
+* getProviderCount -
+*
+* getProviderCount is created for extracting the 'Fiware-Total-Count' header value so that we can add the same into total count,
+* And we can get the actualTotalCount value that includes total Entities of CP+CB.
+*
+* FIXME: this functions relies in text-based processing of the HTTP response stream (which includes headers).
+* It would be smarted to parse all the response headers in the response (for instance in a std::map) in the part
+* of the code dealing with response processing, so in this part we can just access to 'fiware-total-count' easily
+* using something like reponseHeaders["fiware-total-count"]
+*/
+static void getProviderCount(std::string cpResponse, long long*  totalCount)
+{
+  std::string token1 = "Fiware-Total-Count", token2 = "\n", token3 = " ", cpCount, tempStr;
+  size_t pos1 = 0;
+
+  pos1 = cpResponse.find(token1);
+  cpCount = cpResponse.substr(0, pos1);
+  cpResponse.erase(0, cpCount.length());
+
+  pos1 = cpResponse.find(token2);
+  cpCount = cpResponse.substr(0, pos1);
+
+  pos1 = cpCount.find(token3);
+  tempStr = cpCount.substr(0, pos1);
+  cpCount.erase(0, tempStr.length());
+
+  *totalCount += std::stoll(cpCount.c_str());
+}
+
+
+
 /* ****************************************************************************
 *
 * queryForward -
@@ -107,6 +140,9 @@ static bool queryForward
   ConnectionInfo*        ciP,
   QueryContextRequest*   qcrP,
   const std::string&     regId,
+  int                    providerLimit,
+  int                    providerOffset,
+  long long*             totalCount,
   unsigned int           correlatorCounter,
   QueryContextResponse*  qcrsP
 )
@@ -149,6 +185,13 @@ static bool queryForward
   if (qcrP->providerFormat == PfJson)
   {
     op        = "/queryContext";
+
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode in query forwarding operation (regId: %s)", regId.c_str()));
+    }
+
     TIMED_RENDER(payload = qcrP->toJsonV1());
   }
   else
@@ -270,7 +313,10 @@ static bool queryForward
   snprintf(portV, sizeof(portV), "%d", port);
   url = ip + ":" + portV + resource;
 
-  r = httpRequestSend(fromIp,  // thread variable
+  // Note that pagination is activated only in the case of NGSIv2-based CPrs
+  r = httpRequestSend(NULL,
+                      "regId: " + regId,
+                      fromIp,  // thread variable
                       ip,
                       port,
                       protocol,
@@ -286,11 +332,13 @@ static bool queryForward
                       &out,
                       &statusCode,
                       noHeaders,
-                      mimeType);
+                      mimeType,
+                      -1,  // default timeout
+                      qcrP->providerFormat == PfJson? -1 : providerLimit,
+                      qcrP->providerFormat == PfJson? -1 : providerOffset);
   
   if (r != 0)
   {
-    LM_E(("Runtime Error (error '%s' forwarding 'Query' to providing application)", out.c_str()));
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
     alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
@@ -314,16 +362,20 @@ static bool queryForward
     // This is really an internal error in the Context Provider
     // It is not in the orion broker though, so 404 is returned
     //
-    LM_W(("Forwarding Error (context provider response to QueryContext is empty)"));
+    alarmMgr.forwardingError(url, "context provider response to QueryContext is empty");
     return false;
   }
 
   logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
+  if (ciP->apiVersion == V2 && strstr(out.c_str(), "Fiware-Total-Count"))
+  {
+    getProviderCount(out.c_str(), totalCount);
+  }
+
   if (qcrP->providerFormat == PfJson)
   {
     std::string  s;
-    std::string  errorMsg;
 
     //
     // NOTE
@@ -347,7 +399,7 @@ static bool queryForward
 
     if (s != "OK")
     {
-      LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
+      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
       parseData.qcr.res.release();
       parseData.qcrs.res.release();
       return false;
@@ -379,7 +431,7 @@ static bool queryForward
 
     if (b == false)
     {
-      LM_W(("Internal Error (error parsing reply from context provider: %s)", oe.details.c_str()));
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
       parseData.qcr.res.release();
       parseData.qcrs.res.release();
       return false;
@@ -484,19 +536,13 @@ std::string postQueryContext
   // For API version 1, if the URI parameter 'details' is set to 'on', then the total of local
   // entities is returned in the errorCode of the payload.
   //
-  // In API version 2, this has changed completely. Here, the total count of local entities is returned
-  // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header Fiware-Total-Count.
-  //
-  if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+  // In API version 2, this has changed completely. The total count is returned to client the HTTP header Fiware-Total-Count
+  // only when count option is enabled, but we enable internally the countP variable, as if CPrs are involved in the
+  // query execution we need it
+  if ((ciP->apiVersion == V2) || ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on")))
   {
     countP = &count;
   }
-  else if ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on"))
-  {
-    countP = &count;
-  }
-
-
 
   //
   // 01. Call mongoBackend/mongoQueryContext
@@ -524,20 +570,6 @@ std::string postQueryContext
 
 
   //
-  // If API version 2, add count, if asked for, in HTTP header Fiware-Total-Count
-  //
-  if ((ciP->apiVersion == V2) && (countP != NULL))
-  {
-    char cV[32];
-
-    snprintf(cV, sizeof(cV), "%llu", *countP);
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(cV);
-  }
-
-
-
-  //
   // 02. Normal case (no requests to be forwarded)
   //
   // If the result from mongoBackend is a 'simple' result without any forwarding needed (this is the
@@ -549,6 +581,14 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
+    if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+    {
+      char cV[32];
+
+      snprintf(cV, sizeof(cV), "%llu", *countP);
+      ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+      ciP->httpHeaderValue.push_back(cV);
+    }
     TIMED_RENDER(answer = qcrsP->toJsonV1(asJsonObject));
 
     qcrP->release();
@@ -671,6 +711,29 @@ std::string postQueryContext
     }
   }
 
+  // setting the pagination variables for forwarding the request to CP -
+
+  int providerLimit    	=  atoi(ciP->uriParam[URI_PARAM_PAGINATION_LIMIT].c_str());
+  int totalOffset   	=  atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int providerOffset    =  0;
+  int brokerCount       =  0;
+
+  if (ciP->apiVersion == V2)
+  {
+    brokerCount   =  *countP;
+    // Setting providerOffset
+    if (totalOffset >= (*countP))
+    {
+      providerOffset = totalOffset - (*countP);
+    }
+
+    // Setting providerLimit
+    if (localQcrsP->contextElementResponseVector.size() >= 0)
+    {
+      providerLimit = providerLimit - localQcrsP->contextElementResponseVector.size();
+    }
+  }
+
   //
   // Any local results in localQcrsP?
   //
@@ -700,7 +763,7 @@ std::string postQueryContext
     QueryContextResponse* qP;
 
     // Note that queryForward() (due to internal calls to httpRequestSend())
-    // change coordid= and transid= so we need to preserve them and restore once fowarding loop has ended
+    // change coordid= and transid= so we need to preserve them and restore once forwarding loop has ended
     // FIXME P5: maybe this is not the right place to store&recover old transaction.
     // What about inside httpRequestSend?
 
@@ -716,15 +779,29 @@ std::string postQueryContext
     {
       if (requestV[fIx]->contextProvider.empty())
       {
-        LM_E(("Internal Error (empty context provider string)"));
+        LM_E(("Runtime Error (empty context provider string)"));
         continue;
       }
 
       qP = new QueryContextResponse();
       qP->errorCode.fill(SccOk);
 
-      if (queryForward(ciP, requestV[fIx], regIdsV[fIx], fIx + 1, qP) == true)
+      if (queryForward(ciP, requestV[fIx], regIdsV[fIx], providerLimit, providerOffset, countP, fIx + 1, qP) == true)
       {
+        if (ciP->apiVersion == V2)
+        {
+          providerLimit = providerLimit - qP->contextElementResponseVector.size();
+
+          if (providerOffset > (*countP - brokerCount))
+          {
+            providerOffset -= (*countP - brokerCount);
+            brokerCount += (*countP - brokerCount);
+          }
+          else
+          {
+            providerOffset = 0;
+          }
+        }
         //
         // Each ContextElementResponse of qP should be tested to see whether there
         // is already an existing ContextElementResponse in responseV
@@ -779,6 +856,19 @@ std::string postQueryContext
         responseV[ix]->contextElementResponseVector.vec.erase(responseV[ix]->contextElementResponseVector.vec.begin() + ixToBeErased[jx]);
       }
     }
+  }
+
+  // Before implementing pagination for CPrs, this block of code was part of step 02.
+  // However, in that step we only have the count for CB entities. It is in the new location
+  // (after queryForward() invocation) when we have the total count CB+CPr
+  if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+  {
+    char cV[32];
+
+    snprintf(cV, sizeof(cV), "%llu", *countP);
+
+    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+    ciP->httpHeaderValue.push_back(cV);
   }
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];

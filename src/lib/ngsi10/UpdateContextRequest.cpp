@@ -74,11 +74,7 @@ std::string UpdateContextRequest::toJson(void)
 {
   JsonObjectHelper jh;
 
-  // FIXME P2: maybe we should have a toJson() wrapper for toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter),
-  // if this pattern is common in the code (not sure right now)
-  std::vector<std::string>  nullFilter;
-
-  jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED, nullFilter, false, nullFilter));
+  jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED));
 
   jh.addString("actionType", actionTypeString(V2, updateActionType));
 
@@ -336,16 +332,17 @@ ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::s
   {
     Entity* enP = entityVector[ceIx];
 
-    if ((enP->id != eP->id) || (enP->type != eP->type))
+    // empty type in request (enP) is always a match
+    if ((enP->id != eP->id) || ((enP->type != "") && (enP->type != eP->type)))
     {
       continue;
     }
 
-    Entity* eP = entityVector[ceIx];
+    Entity* eVItemP = entityVector[ceIx];
 
-    for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0; aIx < eVItemP->attributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP = eP->attributeVector[aIx];
+      ContextAttribute* aP = eVItemP->attributeVector[aIx];
 
       if (aP->name == attributeName)
       {

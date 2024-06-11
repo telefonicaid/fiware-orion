@@ -24,6 +24,7 @@ This document describes all the headers used by Orion, as defined in **src/lib/r
 20) [Fiware-Correlator](#20-fiware-correlator)                                     
 
 21) [X-Auth-Token](#21-x-auth-token)
+22) [Authorization](#22-authorization)
 
 
 
@@ -129,7 +130,7 @@ It is an optional header used in outgoing HTTP responses sent by Orion. Its oper
 It is used in outgoing HTTP responses sent by Orion.
 Its operation is related with CORS, see specific documentation [about CORS in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/cors.md#access-control-allow-headers).
 
-    Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token	
+    Access-Control-Allow-Headers: Authorization, Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token	
 									               								   
 [Top](#top)		
 		
@@ -208,7 +209,7 @@ Any attempt of doing so (e.g. `"httpCustom": { ... "headers": {"Ngsiv2-Attrsform
 ## 17. Fiware-Service
 
 Fiware-Service is used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion.
-When `-multiservice` is used Orion includes the `Fiware-Service` header in the notification requests associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present). See related documentation [about multitenancy in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/multitenancy.md).
+When `-multiservice` is used Orion includes the `Fiware-Service` header in the notification requests associated to subscriptions in the given tenant/service (except for the default service/tenant, in which case the header is not present). See related documentation [about multitenancy in the user manual](../orion-api.md#multi-tenancy).
 		
     POST http://127.0.0.1:9977/notify    
     Content-Length: 725    
@@ -226,7 +227,7 @@ When `-multiservice` is used Orion includes the `Fiware-Service` header in the n
 
 ## 18. Fiware-Servicepath
 
-Fiware-ServicePath is an optional header used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion. See specific documentation [about service_path in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/service_path.md).
+Fiware-ServicePath is an optional header used in any kind of HTTP transaction (incoming/outcoming requests and outcoming responses) managed in Orion. See specific documentation [about service_path in Orion API specification](../orion-api.md#service-path).
 
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1		
 
@@ -236,7 +237,7 @@ Fiware-ServicePath is an optional header used in any kind of HTTP transaction (i
 ## 19. Fiware-Total-Count
 
 It is an optional header used in outgoing HTTP responses sent by Orion.
-Its operation is related with pagination, see related documentation [about pagination in the user manual](https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/user/pagination.md#pagination).
+Its operation is related with pagination, see related documentation [about pagination in the user manual](../orion-api.md#pagination).
 	    
 [Top](#top)
 
@@ -256,5 +257,13 @@ Fiware-Correlator is a non-modifiable header in custom notifications. Any attemp
 X-Auth-Token is an optional HTTP header, which Orion received in requests and propagates transparently to other requests (notifications and forwarded queries/updated) associated with the original one. It is supposed to be used by security enforcement proxies integrated with Orion [such as PEP Steelskin](https://github.com/telefonicaid/fiware-pep-steelskin).
 	
     "X-Auth-Token": "fff0f4af447f4b589c835f805fe4be29"
+
+[Top](#top)
+
+## 22. Authorization
+
+Authorization is an optional HTTP header, which Orion received in requests and propagates transparently to other requests (notifications and forwarded queries/updated) associated with the original one. It is supposed to be used by security enforcement proxies integrated with Orion [such as PEP Steelskin](https://github.com/telefonicaid/fiware-pep-steelskin).
+	
+    "Authorization": "Bearer fff0f4af447f4b589c835f805fe4be29"
 
 [Top](#top)

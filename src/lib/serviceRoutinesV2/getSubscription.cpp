@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "apiTypesV2/Subscription.h"
 #include "common/JsonHelper.h"
@@ -65,20 +66,25 @@ std::string getSubscription
 
   if ((err = idCheck(idSub)) != "OK")
   {
-    oe.fill(SccBadRequest, "Invalid subscription ID: " + err, "BadRequest");
+    oe.fill(SccBadRequest, "Invalid subscription ID: " + err, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
 
-  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->uriParam, ciP->tenant));
+  TIMED_MONGO(mongoGetSubscription(&sub, &oe, idSub, ciP->servicePathV[0], ciP->tenant));
 
   if (oe.code != SccOk)
   {
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
-    return out;
+  }
+  else  // oe.code == SccOk
+  {
+    TIMED_RENDER(out = sub.toJson());
   }
 
-  TIMED_RENDER(out = sub.toJson());
+  // free sub memory associated to subscriptions
+  sub.release();
+
   return out;
 }

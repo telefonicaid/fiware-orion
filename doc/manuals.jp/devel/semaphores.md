@@ -9,6 +9,7 @@ Orion は、以下のような繊細なデータやリソースを保護する�
 * [Mongo コネクション・プール](#mongo-connection-pool-semaphores) (Mongo connection pool)
 * [メトリック・マネージャ](#metrics-manager-semaphore) (Metrics Manager)
 * [アラーム・マネージャ](#alarm-manager-semaphore) (Alarm Manager)
+* [MQTT 接続マネージャ](#mqtt-connection-manager-semaphore)
 * [ログ・ファイル](#log-file-semaphore) (Log file)
 * [通知キュー](#notification-queue-semaphore) (Notification queue)
 * [通知キュー統計情報](#notification-queue-statistics-semaphore) (Notification queue statistics)
@@ -147,6 +148,20 @@ Orion はデータベースへのコネクション用のプールを実装し�
 * `badInputReset()`
 
 **注意** : アラーム・マネージャのセマフォは `AlarmManager` クラスの中でプライベートです、しかし、`semTake()` および `semGive()` メソッドは、**パブリック** です。これは間違いですが、メソッドもプライベートである必要があります。それらは `AlarmManager` のメソッドの中から呼び出されるだけなので、メソッドをプライベートにすることに問題はありません。
+
+[トップ](#top)
+
+<a name="mqtt-connection-manager-semaphore"></a>
+## MQTT 接続マネージャ・セマフォ
+MQTT 接続マネージャは MetricsManager と非常によく似ており、そのセマフォは同じパターンに従います。クラス `MqttConnectionManager` には、`sem`と 呼ばれるプライベート・フィールドとメソッドがあります:
+
+* `MqttConnectionManager::semTake()`
+* `MqttConnectionManager::semGive()`
+
+セマフォは接続ハッシュ・マップへのアクセスを保護し、次の方法でアクセスします:
+
+* `sendMqttNotification()`
+* `cleanup()`
 
 [トップ](#top)
 

@@ -62,7 +62,7 @@ payload='{
     ],
     "condition": {
       "attrs": [
-        
+
       ]
     }
   },
@@ -277,20 +277,20 @@ echo
 01. POST /v2/subscriptions, to create subscription for Room1 with cond attrs: [] notify attrs: [B, C, D], onlyChangedAttrs: true.
 =================================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. POST /v2/entities, create Room1 entity with A, B, C, D and E attributes.
 ============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Room1?type=Room
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Room1?type=Room
+Content-Length: 0
 
 
 
@@ -310,24 +310,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "B": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 20
-            }, 
+            },
             "C": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 30
-            }, 
+            },
             "D": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 40
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -336,8 +336,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. PATCH /v2/entities/Room1/attrs, update the value of A and B attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -357,14 +357,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "B": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 22
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -373,8 +373,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 06. PATCH /v2/entities/Room1/attrs, update the value of B and C attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -394,19 +394,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "B": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 24
             },
             "C": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 32
-            },			
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -415,8 +415,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. PATCH /v2/entities/Room1/attrs, update the value of C and D attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -436,19 +436,19 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "C": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 34
-            }, 
+            },
             "D": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 42
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -457,8 +457,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 10. PATCH /v2/entities/Room1/attrs, update the value of A, B, C and D attribute.
 ================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -478,24 +478,24 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "B": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 30
-            }, 
+            },
             "C": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 20
-            }, 
+            },
             "D": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 10
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -504,8 +504,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 12. PATCH /v2/entities/Room1/attrs, update the value of D and E attribute.
 ==========================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -525,14 +525,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "D": {
-                "metadata": {}, 
-                "type": "Integer", 
+                "metadata": {},
+                "type": "Integer",
                 "value": 40
-            }, 
-            "id": "Room1", 
+            },
+            "id": "Room1",
             "type": "Room"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -541,8 +541,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 14. PATCH /v2/entities/Room1/attrs, update the value of E attribute.
 ====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

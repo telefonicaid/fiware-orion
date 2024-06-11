@@ -27,18 +27,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/globals.h"
-#include "common/clockFunctions.h"
-#include "common/statistics.h"
-#include "common/limits.h"
-#include "common/logTracing.h"
-#include "alarmMgr/alarmMgr.h"
-
-#include "cache/subCache.h"
-#include "ngsi10/NotifyContextRequest.h"
-#include "rest/httpRequestSend.h"
-#include "ngsiNotify/QueueStatistics.h"
 #include "ngsiNotify/QueueWorkers.h"
+
+#include "ngsiNotify/doNotify.h"
 
 
 
@@ -63,7 +54,7 @@ int QueueWorkers::start()
 
     if (rc != 0)
     {
-      LM_E(("Internal Error (pthread_create: %s)", strerror(errno)));
+      LM_E(("Runtime Error (pthread_create: %s)", strerror(errno)));
       return rc;
     }
     threadIds.push_back(tid);
@@ -83,13 +74,10 @@ int QueueWorkers::stop()
   // Put in the queue as many kill messages as threads we have
   for (unsigned int ix = 0; ix < threadIds.size(); ++ix)
   {
-    std::vector<SenderThreadParams*>* paramsV = new std::vector<SenderThreadParams*>();
+    SenderThreadParams*  paramsP = new SenderThreadParams();
+    paramsP->type = QUEUE_MSG_KILL;
 
-    SenderThreadParams*  params = new SenderThreadParams();
-    params->type = QUEUE_MSG_KILL;
-    paramsV->push_back(params);
-
-    if (!pQueue->try_push(paramsV, true))
+    if (!pQueue->try_push(paramsP, true))
     {
       LM_E(("Runtime Error (thread kill message cannot be sent due to push in queue failed)"));
     }
@@ -113,8 +101,8 @@ int QueueWorkers::stop()
 */
 static void* workerFunc(void* pSyncQ)
 {
-  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue = (SyncQOverflow<std::vector<SenderThreadParams*>*> *) pSyncQ;
-  CURL*                                              curl;
+  SyncQOverflow<SenderThreadParams*>*  queue = (SyncQOverflow<SenderThreadParams*> *) pSyncQ;
+  CURL*                                curl;
 
   // Initialize curl context
   curl = curl_easy_init();
@@ -127,130 +115,21 @@ static void* workerFunc(void* pSyncQ)
 
   for (;;)
   {
-    std::vector<SenderThreadParams*>* paramsV = queue->pop();
+    SenderThreadParams* paramsP = queue->pop();
 
-    // The "protocol" to signal thread termination is to find a kill msg in the first
-    // element of the paramsV vector (note that by construction in QueueWorkers::stop()
-    // this vector will have only one item in this case)
-    if ((paramsV->size() == 1) && ((*paramsV)[0]->type == QUEUE_MSG_KILL))
+    // The "protocol" to signal thread termination is to find a kill msg
+    if (paramsP->type == QUEUE_MSG_KILL)
     {
       LM_T(LmtThreadpool, ("Thread %x receiving termination signal...", pthread_self()));
 
-      delete (*paramsV)[0];
-      delete paramsV;
+      delete paramsP;
       curl_easy_cleanup((CURL*) curl);
 
       pthread_exit(NULL);
     }
 
-    for (unsigned ix = 0; ix < paramsV->size(); ix++)
-    {
-      struct timespec     now;
-      struct timespec     howlong;
-      size_t              estimatedQSize;
-
-      SenderThreadParams* params = (*paramsV)[ix];
-
-      QueueStatistics::incOut();
-      clock_gettime(CLOCK_REALTIME, &now);
-      clock_difftime(&now, &params->timeStamp, &howlong);
-      estimatedQSize = queue->size();
-      QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
-
-      strncpy(transactionId, params->transactionId, sizeof(transactionId));
-
-      LM_T(LmtNotifier, ("worker sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-                         params->ip.c_str(),
-                         params->port,
-                         params->verb.c_str(),
-                         params->tenant.c_str(),
-                         params->servicePath.c_str(),
-                         params->xauthToken.c_str(),
-                         params->resource.c_str(),
-                         params->content_type.c_str()));
-
-      char                portV[STRING_SIZE_FOR_INT];
-      std::string         url;
-
-      snprintf(portV, sizeof(portV), "%d", params->port);
-      url = params->ip + ":" + portV + params->resource;
-
-      long long    statusCode = -1;
-      std::string  out;
-
-      if (simulatedNotification)
-      {
-        LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
-        __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
-      }
-      else // we'll send the notification
-      {
-        int          r;
-
-        r =  httpRequestSendWithCurl(curl,
-                                     params->from,
-                                     params->ip,
-                                     params->port,
-                                     params->protocol,
-                                     params->verb,
-                                     params->tenant,
-                                     params->servicePath,
-                                     params->xauthToken,
-                                     params->resource,
-                                     params->content_type,
-                                     params->content,
-                                     params->fiwareCorrelator,
-                                     params->renderFormat,
-                                     &out,
-                                     &statusCode,
-                                     params->extraHeaders);
-
-        //
-        // FIXME: ok and error counter should be incremented in the other notification modes (generalizing the concept, i.e.
-        // not as member of QueueStatistics:: which seems to be tied to just the threadpool notification mode)
-        //
-        if (r == 0)
-        {
-          __sync_fetch_and_add(&noOfNotificationsSent, 1);
-          QueueStatistics::incSentOK();
-          alarmMgr.notificationErrorReset(url);
-
-          if (params->registration == false)
-          {
-            subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
-          }
-        }
-        else
-        {
-          QueueStatistics::incSentError();
-          alarmMgr.notificationError(url, "notification failure for queue worker: " + out);
-
-          if (params->registration == false)
-          {
-            subNotificationErrorStatus(params->tenant, params->subscriptionId, 1, -1, out);
-          }
-        }
-      }
-
-      // Add notificacion result summary in log INFO level
-      if (statusCode != -1)
-      {
-        logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode);
-      }
-      else
-      {
-        logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str());
-      }
-
-      // End transaction
-      lmTransactionEnd();
-
-      // Free params memory
-      delete params;
-    }
-
-    // Free params vector memory
-    delete paramsV;
+    // process paramV to send notification (freeing memory after use)
+    doNotify(paramsP, curl, queue, "worker");
 
     // Reset curl for next iteration
     curl_easy_reset(curl);

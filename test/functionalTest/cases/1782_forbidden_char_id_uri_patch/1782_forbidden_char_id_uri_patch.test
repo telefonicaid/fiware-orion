@@ -45,10 +45,10 @@ echo
 01. PATCH entity with forbidden char in ID
 ==========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "invalid character in URI",

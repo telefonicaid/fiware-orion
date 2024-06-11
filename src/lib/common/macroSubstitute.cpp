@@ -29,72 +29,118 @@
 #include "common/string.h"
 #include "common/limits.h"
 #include "common/globals.h"
+#include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
+
+#include "expressions/exprMgr.h"
 
 
 /* ****************************************************************************
 *
-* attributeValue - return value of attribute as a string
+* smartStringValue -
+*
+* Returns the effective string value, taking into account replacements
+*
 */
-static void attributeValue(std::string* valueP, const std::vector<ContextAttribute*>& vec, const char* attrName)
+std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault)
 {
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  // This code is pretty similar to the one in CompoundValueNode::toJson()
+  // The program logic branching is the same, but the result at the end of each if-else
+  // is different, which makes difficult to unify both them
+  if ((exprContextObjectP != NULL) && (stringValue.rfind("${") == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
   {
-    if (vec[ix]->name != attrName)
-    {
-      continue;
-    }
+    // "Full replacement" case. In this case, the result is not always a string
+    // len("${") + len("}") = 3
+    std::string macroName = stringValue.substr(2, stringValue.size() - 3);
 
-    if (vec[ix]->valueType == orion::ValueTypeString)
+    ExprResult r = exprMgr.evaluate(exprContextObjectP, macroName);
+    std::string result;
+    if (r.valueType == orion::ValueTypeNull)
     {
-      *valueP = vec[ix]->stringValue;
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeNumber)
-    {
-      *valueP = double2string(vec[ix]->numberValue);
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeBoolean)
-    {
-      *valueP = (vec[ix]->boolValue == true)? "true" : "false";
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeNull)
-    {
-      *valueP = "null";
-    }
-    else if (vec[ix]->valueType == orion::ValueTypeNotGiven)
-    {
-      LM_E(("Runtime Error (value not given for attribute)"));
-      *valueP = "";
-    }
-    else if ((vec[ix]->valueType == orion::ValueTypeObject) || (vec[ix]->valueType == orion::ValueTypeVector))
-    {
-      if (vec[ix]->compoundValueP)
-      {
-        *valueP = vec[ix]->compoundValueP->toJson();
-      }
-      else
-      {
-        LM_E(("Runtime Error (attribute is of object type but has no compound)"));
-        *valueP = "";
-      }
+      result = notFoundDefault;
     }
     else
     {
-      LM_E(("Runtime Error (unknown value type for attribute)"));
-      *valueP = "";
+      // in basic mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
+      if (exprContextObjectP->isBasic())
+      {
+        result = removeQuotes(r.toString());
+      }
+      else
+      {
+        result = r.toString();
+      }
+    }
+    r.release();
+    return result;
+  }
+  else if (exprContextObjectP != NULL)
+  {
+    // "Partial replacement" case. In this case, the result is always a string
+    std::string effectiveValue;
+    if (!macroSubstitute(&effectiveValue, stringValue, exprContextObjectP, "null", true))
+    {
+      // error already logged in macroSubstitute, using stringValue itself as failsafe
+      effectiveValue = stringValue;
     }
 
-    return;
+    // toJsonString will stringfly JSON values in macros
+    return '"' + toJsonString(effectiveValue) + '"';
   }
-
-  *valueP = "";
+  else
+  {
+    // No replacement applied, just return the original string
+    return '"' + toJsonString(stringValue) + '"';
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* macroSubstitute - 
+* stringValueOrNothing -
+*
+*/
+static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, const std::string key, const std::string& notFoundDefault, bool raw)
+{
+  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
+  std::string result;
+
+  if (r.valueType == orion::ValueTypeNull)
+  {
+    result = notFoundDefault;
+  }
+  else
+  {
+    std::string s = r.toString();
+
+    // in basic mode an extra remove quotes step is needed, to avoid "1" instead of 1 for number, etc.
+    if (exprContextObjectP->isBasic())
+    {
+      s = removeQuotes(s);
+    }
+
+    if (raw)
+    {
+      // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
+      // so double quotes have to be be removed
+      result = removeQuotes(s);
+    }
+    else
+    {
+      result = s;
+    }
+  }
+
+  r.release();
+  return result;
+}
+
+
+
+/* ****************************************************************************
+*
+* macroSubstitute -
 *
 * An old version of this function was based in char processing. However, we faced
 * weird crashing problems after fixing that implementation to support >1KB payloads.
@@ -111,13 +157,13 @@ static void attributeValue(std::string* valueP, const std::vector<ContextAttribu
 *    bug with the current implementation.
 *
 * However, the old version is still available at git repository, for the records.
-* It can be found checking out the following commit (the last one before chaning implementation):
+* It can be found checking out the following commit (the last one before changing implementation):
 *
 *   commit f8c91bf16e192388824c3786a76b203b83354d13
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
+bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -136,7 +182,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
   //
   if (from.size() > outReqMsgMaxSize)
   {
-    LM_W(("Runtime Error (too large initial string, before substitution)"));
+    LM_E(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
     return false;
   }
@@ -151,7 +197,7 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 
     if (macroEnd == std::string::npos)
     {
-      LM_W(("Runtime Error (macro end not found, syntax error, aborting substitution)"));
+      LM_W(("macro end not found, syntax error, aborting substitution"));
       *to = "";
       return false;
     }
@@ -180,27 +226,12 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-
-    if (macroName == "id")
-    {
-      toAdd += en.id.length() * times;
-    }
-    else if (macroName == "type")
-    {
-      toAdd += en.type.length() * times;
-    }
-    else
-    {
-      std::string value;
-
-      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
-      toAdd += value.length() * times;
-    }
+    toAdd += stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw).length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
-    LM_W(("Runtime Error (too large final string, after substitution)"));
+    LM_E(("Runtime Error (too large final string, after substitution)"));
     *to = "";
     return false;
   }
@@ -212,21 +243,8 @@ bool macroSubstitute(std::string* to, const std::string& from, const Entity& en)
     std::string macroName = it->first;
     unsigned int times    = it->second;
 
-    std::string macro = "${" + it->first + "}";
-    std::string value;
-
-    if (macroName == "id")
-    {
-      value = en.id;
-    }
-    else if (macroName == "type")
-    {
-      value = en.type;
-    }
-    else
-    {
-      attributeValue(&value, en.attributeVector.vec, macroName.c_str());
-    }
+    std::string macro = "${" + macroName + "}";
+    std::string value = stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)

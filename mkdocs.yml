@@ -10,37 +10,25 @@ use_directory_urls: false
 theme: readthedocs
 extra_css: ["https://www.fiware.org/style/fiware_readthedocs.css", "https://www.fiware.org/style/fiware_readthedocs_core.css"]
 google_analytics: ['UA-83236805-1', 'fiware-orion.readthedocs.io']
-pages:
+nav:
   - Home: index.md
   - 'Getting Started': 'quick_start_guide.md'
   - 'User & Programmers Manual':
       - 'Introduction': 'user/index.md'
       - 'API Walkthrough': 'user/walkthrough_apiv2.md'
-      - 'Pagination': 'user/pagination.md'
       - 'CORS': 'user/cors.md'
-      - 'Geolocation': 'user/geolocation.md'
-      - 'Transient Entities': 'user/transient_entities.md'
-      - 'Structured values for attributes': 'user/structured_attribute_valued.md'
+      - 'MQTT notifications': 'user/mqtt_notifications.md'
+      - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
-      - 'Attribute Metadata': 'user/metadata.md'
-      - 'Filtering': 'user/filtering.md'
-      - 'Multi tenancy': 'user/multitenancy.md'
-      - 'Entity service paths': 'user/service_path.md'
-      - 'Update action types': 'user/update_action_types.md'
       - 'Context Broker federation': 'user/federation.md'
-      - 'Forbidden characters': 'user/forbidden_characters.md'
-      - 'Using regular expressions in payloads': 'user/regex_in_payload.md'
-      - 'Oneshot Subscription': 'user/oneshot_subscription.md'
+      - 'Using regular expressions': 'user/regex.md'
       - 'Security considerations': 'user/security.md'
       - 'Known limitations': 'user/known_limitations.md'      
       - 'Docker': 'user/docker.md'
-      - 'NGSIv2 Implementation Notes': 'user/ngsiv2_implementation_notes.md'
   - 'Installation & Administration Manual':
       - 'Introduction': 'admin/index.md'
       - 'Installing Orion': 'admin/install.md'
-      - 'Using Yum repositories': 'admin/yum.md'
       - 'Building from Sources': 'admin/build_source.md'
-      - 'Running Orion as system service': 'admin/running.md'
       - 'Running Orion from command line': 'admin/cli.md'
       - 'Database administration': 'admin/database_admin.md'
       - 'Data model': 'admin/database_model.md'

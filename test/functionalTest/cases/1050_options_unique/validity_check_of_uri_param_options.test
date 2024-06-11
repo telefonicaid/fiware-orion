@@ -61,10 +61,10 @@ echo
 01. URI param options with both 'keyValues' and 'values', see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "Invalid value for URI param /options/",
@@ -75,10 +75,10 @@ Date: REGEX(.*)
 02. URI param options with both 'keyValues' and 'unique', see error
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "Invalid value for URI param /options/",
@@ -89,10 +89,10 @@ Date: REGEX(.*)
 03. URI param options with both 'values' and 'unique', see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "Invalid value for URI param /options/",

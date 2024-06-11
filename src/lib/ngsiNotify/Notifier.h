@@ -28,13 +28,30 @@
 #include <map>
 #include <pthread.h>
 
-#include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/Subscription.h"
 #include "common/RenderFormat.h"
 #include "ngsi10/NotifyContextRequest.h"
 
 #include "ngsiNotify/senderThread.h"
 
 
+
+/* ****************************************************************************
+*
+* notifStaticFields -
+*
+* Helper type to avoid having too many parameters in sendNotifyContextRequest
+* and related functions (by the way, more than 10 parameters are not mockeable by our
+* unit testing library, see https://stackoverflow.com/questions/15539169/mock-method-with-11-parameters-with-gmock
+*/
+struct notifStaticFields
+{
+  std::string   subId;
+  std::string   tenant;
+  std::string   xauthToken;
+  std::string   fiwareCorrelator;
+  unsigned int  correlatorCounter;
+} typedef notifStaticFields;
 
 /* ****************************************************************************
 *
@@ -45,28 +62,32 @@ class Notifier
 public:
   virtual ~Notifier(void);
 
-  virtual void sendNotifyContextRequest(NotifyContextRequest&            ncr,
-                                        const ngsiv2::HttpInfo&          httpInfo,
-                                        const std::string&               tenant,
-                                        const std::string&               xauthToken,
-                                        const std::string&               fiwareCorrelator,
-                                        unsigned int                     correlatorCounter,
+  virtual void sendNotifyContextRequest(ContextElementResponse*          notifyCerP,
+                                        const ngsiv2::Notification&      notification,
+                                        const notifStaticFields&         nsf,
+                                        long long                        maxFailsLimit,
+                                        long long                        failsCounter,
                                         RenderFormat                     renderFormat,
                                         const std::vector<std::string>&  attrsFilter,
                                         bool                             blacklist,
+                                        bool                             covered,
                                         const std::vector<std::string>&  metadataFilter);
 
 protected:
-  static std::vector<SenderThreadParams*>* buildSenderParams(NotifyContextRequest&            ncr,
-                                                             const ngsiv2::HttpInfo&          httpInfo,
-                                                             const std::string&               tenant,
-                                                             const std::string&               xauthToken,
-                                                             const std::string&               fiwareCorrelator,
-                                                             unsigned int                     correlatorCounter,
-                                                             RenderFormat                     renderFormat,
-                                                             const std::vector<std::string>&  attrsFilter,
-                                                             bool                             blacklist,
-                                                             const std::vector<std::string>&  metadataFilter);
+  static SenderThreadParams* buildSenderParams(ContextElementResponse*          notifyCerP,
+                                               const std::string&               subId,
+                                               const ngsiv2::Notification&      notification,
+                                               const std::string&               tenant,
+                                               long long                        maxFailsLimit,
+                                               long long                        failsCounter,
+                                               const std::string&               xauthToken,
+                                               const std::string&               fiwareCorrelator,
+                                               unsigned int                     correlatorCounter,
+                                               RenderFormat                     renderFormat,
+                                               const std::vector<std::string>&  attrsFilter,
+                                               bool                             blacklist,
+                                               bool                             covered,
+                                               const std::vector<std::string>&  metadataFilter);
 };
 
 #endif  // SRC_LIB_NGSINOTIFY_NOTIFIER_H_

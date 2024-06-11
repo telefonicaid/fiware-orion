@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/MqttInfo.h"
 #include "common/RenderFormat.h"
 #include "ngsi/StringList.h"
 #include "rest/StringFilter.h"
@@ -39,7 +40,7 @@
 *
 * TriggeredSubscription -
 *
-* This class is thought to store the information about an ONCHANGE subscription
+* This class is thought to store the information about a subscription
 * triggered by an updateContext in order to notify, avoding a double-query on
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-
@@ -53,15 +54,19 @@ class TriggeredSubscription
 {
  public:
   long long                 throttling;
+  long long                 maxFailsLimit;
+  long long                 failsCounter;
   long long                 lastNotification;
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
+  ngsiv2::MqttInfo          mqttInfo;
   StringList                attrL;
   std::string               cacheSubId;
   std::string               tenant;
   StringFilter*             stringFilterP;
   StringFilter*             mdStringFilterP;
   bool                      blacklist;
+  bool                      covered;
   std::vector<std::string>  metadata;
 
   // FIXME P5: This entire struct will be removed once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
@@ -72,16 +77,16 @@ class TriggeredSubscription
   }                        expression;      // Only used by NGSIv2 subscription
 
   TriggeredSubscription(long long                _throttling,
+                        long long                _maxFailsLimit,
+                        long long                _failsCounter,
                         long long                _lastNotification,
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
+                        const ngsiv2::MqttInfo&  _mqttInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
-                        const char*              _tenant);
-
-  TriggeredSubscription(RenderFormat             _renderFormat,
-                        const ngsiv2::HttpInfo&  _httpInfo,
-                        const StringList&        _attrL);
+                        const char*              _tenant,
+                        bool                     _covered);
 
   ~TriggeredSubscription();
 

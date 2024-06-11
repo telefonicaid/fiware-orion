@@ -28,6 +28,7 @@
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
 #include "common/string.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
@@ -97,7 +98,7 @@ std::string getEntities
 
   if ((!idPattern.empty()) && (!id.empty()))
   {
-    OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern", "BadRequest");
+    OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern", ERROR_BAD_REQUEST);
 
     TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -134,7 +135,7 @@ std::string getEntities
 
   if ((!typePattern.empty()) && (!type.empty()))
   {
-    OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", "BadRequest");
+    OrionError oe(SccBadRequest, "Incompatible parameters: type, typePattern", ERROR_BAD_REQUEST);
 
     TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -146,7 +147,7 @@ std::string getEntities
   //
   if ((!coords.empty()) && (geometry.empty()))
   {
-    OrionError oe(SccBadRequest, "Invalid query: URI param /coords/ used without /geometry/", "BadRequest");
+    OrionError oe(SccBadRequest, "Invalid query: URI param /coords/ used without /geometry/", ERROR_BAD_REQUEST);
 
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -154,7 +155,7 @@ std::string getEntities
   }
   else if ((!geometry.empty()) && (coords.empty()))
   {
-    OrionError oe(SccBadRequest, "Invalid query: URI param /geometry/ used without /coords/", "BadRequest");
+    OrionError oe(SccBadRequest, "Invalid query: URI param /geometry/ used without /coords/", ERROR_BAD_REQUEST);
 
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -163,7 +164,7 @@ std::string getEntities
 
   if ((!georel.empty()) && (geometry.empty()))
   {
-    OrionError oe(SccBadRequest, "Invalid query: URI param /georel/ used without /geometry/", "BadRequest");
+    OrionError oe(SccBadRequest, "Invalid query: URI param /georel/ used without /geometry/", ERROR_BAD_REQUEST);
 
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -185,7 +186,7 @@ std::string getEntities
 
     if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
     {
-      OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, "BadRequest");
+      OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, ERROR_BAD_REQUEST);
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;
@@ -215,9 +216,9 @@ std::string getEntities
     scopeP->stringFilterP = new StringFilter(SftQ);
     if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
     {
-      OrionError oe(SccBadRequest, errorString, "BadRequest");
+      OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
-      alarmMgr.badInput(clientIp, errorString);
+      alarmMgr.badInput(clientIp, errorString, q);
       scopeP->release();
       delete scopeP;
 
@@ -244,9 +245,9 @@ std::string getEntities
     scopeP->mdStringFilterP = new StringFilter(SftMq);
     if (scopeP->mdStringFilterP->parse(mq.c_str(), &errorString) == false)
     {
-      OrionError oe(SccBadRequest, errorString, "BadRequest");
+      OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
-      alarmMgr.badInput(clientIp, errorString);
+      alarmMgr.badInput(clientIp, errorString, mq);
       scopeP->release();
       delete scopeP;
 
@@ -314,7 +315,7 @@ std::string getEntities
   {
     OrionError oe;
     entities.fill(parseDataP->qcrs.res, &oe);
-    TIMED_RENDER(answer = oe.toJson());
+    TIMED_RENDER(answer = oe.smartRender(V2));
     ciP->httpStatusCode = oe.code;
   }
   // 04. Render Entities response

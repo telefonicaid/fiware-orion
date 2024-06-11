@@ -35,6 +35,8 @@
 #include "parse/CompoundValueNode.h"
 
 #include "mongoDriver/BSONObj.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 
@@ -44,7 +46,7 @@
 *
 * Metadata interpreted by Orion Context Broker, i.e. not custom metadata
 */
-#define NGSI_MD_LOCATION           "location"
+#define NGSI_MD_IGNORE_TYPE        "ignoreType"
 #define NGSI_MD_PREVIOUSVALUE      "previousValue"   // Special metadata
 #define NGSI_MD_ACTIONTYPE         "actionType"      // Special metadata
 #define NGSI_MD_DATECREATED        "dateCreated"     // Special metadata
@@ -53,11 +55,6 @@
 #define NGSI_MD_ACTIONTYPE_UPDATE  "update"
 #define NGSI_MD_ACTIONTYPE_APPEND  "append"
 #define NGSI_MD_ACTIONTYPE_DELETE  "delete"          // FIXME #1494: reserved for future use
-
-#if 0
-// FIXME #920: disabled by the moment, maybe removed at the end
-#define NGSI_MD_NOTIF_ONSUBCHANGE  "ngsi:onSubscriptionChange"
-#endif
 
 
 
@@ -97,6 +94,8 @@ typedef struct Metadata
   void         fill(const struct Metadata& md);
   std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
+
+  void         appendToBsoN(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);
 
   std::string  check(ApiVersion apiVersion);
 } Metadata;

@@ -55,7 +55,7 @@ std::string getAllSubscriptions
   ParseData*                 parseDataP
 )
 {
-  std::vector<ngsiv2::Subscription> subs;
+  std::vector<ngsiv2::Subscription*> subs;
   OrionError                        oe;
   long long                         count  = 0;
   int                               offset = atoi(ciP->uriParam[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -70,24 +70,29 @@ std::string getAllSubscriptions
                                      offset,
                                      &count));
 
+  std::string out;
   if (oe.code != SccOk)
   {
-    std::string out;
-
     TIMED_RENDER(out = oe.toJson());
     ciP->httpStatusCode = oe.code;
-
-    return out;
   }
-
-  if ((ciP->uriParamOptions["count"]))
+  else  // oe.code == SccOk
   {
-    ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
-    ciP->httpHeaderValue.push_back(double2string(count));
+    if ((ciP->uriParamOptions["count"]))
+    {
+      ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
+      ciP->httpHeaderValue.push_back(double2string(count));
+    }
+
+    TIMED_RENDER(out = vectorToJson(subs));
   }
 
-  std::string out;
-  TIMED_RENDER(out = vectorToJson(subs));
+  // free sub memory associated to subscriptions
+  for (unsigned int ix = 0; ix < subs.size(); ix++)
+  {
+    subs[ix]->release();
+    delete subs[ix];
+  }
 
   return out;
 }

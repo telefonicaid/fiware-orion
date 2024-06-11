@@ -1,0 +1,176 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification HTTP with JSON with content-type header override
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription with json payload and content-type text/plain
+# 02. Create entity to trigger notification
+# 03. Dump accumulator, see notification with content-type
+#
+
+echo "01. Create subscription with json payload and content-type text/plain"
+echo "====================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "headers": {
+        "content-type": "text/plain"
+      },
+      "json": {
+        "text": "foo",
+        "number": 10,
+        "bool": true,
+        "null": null,
+        "array": [
+          "22",
+          {
+            "x" : [ "x1", "x2" ],
+            "y" : 3
+          },
+          [ "z1", "z2" ]
+        ],
+        "object": {
+          "x": {
+            "x1": "a",
+            "x2": "b"
+          },
+          "y": [ "y1", "y2" ]
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity to trigger notification"
+echo "========================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": "trigger!",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator, see notification with content-type"
+echo "========================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with json payload and content-type text/plain
+=====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity to trigger notification
+=========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Dump accumulator, see notification with content-type
+========================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 152
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12])
+
+{
+    "array": [
+        "22",
+        {
+            "x": [
+                "x1",
+                "x2"
+            ],
+            "y": 3
+        },
+        [
+            "z1",
+            "z2"
+        ]
+    ],
+    "bool": true,
+    "null": null,
+    "number": 10,
+    "object": {
+        "x": {
+            "x1": "a",
+            "x2": "b"
+        },
+        "y": [
+            "y1",
+            "y2"
+        ]
+    },
+    "text": "foo"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

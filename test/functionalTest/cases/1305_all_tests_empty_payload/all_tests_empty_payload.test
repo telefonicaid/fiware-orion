@@ -30,8 +30,8 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities (without payload) 
-# 02. POST /v2/entities (empty payload) 
+# 01. POST /v2/entities (without payload)
+# 02. POST /v2/entities (empty payload)
 # 03. POST /v2/entities to create E1/A1=0
 # 04. PUT /v2/entities/E1/attrs (without payload)
 # 05. PUT /v2/entities/E1/attrs (empty payload)
@@ -122,7 +122,7 @@ echo
 echo "10. PUT /v2/entities/E1/attrs/A1 (without payload)"
 echo "=================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -137,7 +137,7 @@ echo
 echo "12. PUT /v2/entities/E1/attrs/A1 (empty payload)"
 echo "================================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PUT
 echo
 echo
 
@@ -151,7 +151,7 @@ echo
 echo "14. PATCH /v2/entities/E1/attrs/A1 (without payload)"
 echo "===================================================="
 payload=''
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH
 echo
 echo
 
@@ -159,7 +159,7 @@ echo
 echo "15. PATCH /v2/entities/E1/attrs/A1 (empty payload)"
 echo "=================================================="
 payload='{}'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH 
+orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" -X PATCH
 echo
 echo
 
@@ -168,10 +168,10 @@ echo
 01. POST /v2/entities (without payload)
 =======================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -182,10 +182,10 @@ Date: REGEX(.*)
 02. POST /v2/entities (empty payload)
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "entity id length: 0, min length supported: 1",
@@ -196,20 +196,20 @@ Date: REGEX(.*)
 03. POST /v2/entities to create E1/A1=0
 =======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 04. PUT /v2/entities/E1/attrs (without payload)
 ===============================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -220,10 +220,10 @@ Date: REGEX(.*)
 05. PUT /v2/entities/E1/attrs (empty payload)
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 52
 
 {
     "description": "empty payload",
@@ -234,10 +234,10 @@ Date: REGEX(.*)
 06. PATCH /v2/entities/E1/attrs (without payload)
 =================================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -248,10 +248,10 @@ Date: REGEX(.*)
 07. PATCH /v2/entities/E1/attrs (empty payload)
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 52
 
 {
     "description": "empty payload",
@@ -262,10 +262,10 @@ Date: REGEX(.*)
 08. POST /v2/entities/E1/attrs (without payload)
 ================================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -276,10 +276,10 @@ Date: REGEX(.*)
 09. POST /v2/entities/E1/attrs (empty payload)
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 52
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 52
 
 {
     "description": "empty payload",
@@ -290,10 +290,10 @@ Date: REGEX(.*)
 10. PUT /v2/entities/E1/attrs/A1 (without payload)
 ==================================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -304,10 +304,10 @@ Date: REGEX(.*)
 11. GET /v2/entities/E1/attrs/A1
 =================================
 HTTP/1.1 200 OK
-Content-Length: 41
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 41
 
 {
     "metadata": {},
@@ -319,18 +319,18 @@ Date: REGEX(.*)
 12. PUT /v2/entities/E1/attrs/A1 (empty payload)
 =================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 13. GET /v2/entities/E1/attrs/A1 - A1 should be null
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 42
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 42
 
 {
     "metadata": {},
@@ -342,10 +342,10 @@ Date: REGEX(.*)
 14. PATCH /v2/entities/E1/attrs/A1 (without payload)
 ====================================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -356,11 +356,11 @@ Date: REGEX(.*)
 15. PATCH /v2/entities/E1/attrs/A1 (empty payload)
 ==================================================
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 63
-Content-Type: application/json
-Allow: GET, PUT, DELETE
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: GET, PUT, DELETE
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "method not allowed",

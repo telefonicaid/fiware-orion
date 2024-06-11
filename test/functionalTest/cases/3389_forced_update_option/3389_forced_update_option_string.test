@@ -225,20 +225,20 @@ echo
 01. POST /v2/subscriptions, to create subscription.
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. POST /v2/entities, to create Slot1 with availability set to "Avaliable".
 ============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Slot1?type=Slot
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Slot1?type=Slot
+Content-Length: 0
 
 
 
@@ -258,14 +258,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -274,8 +274,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. POST /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 ================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -295,14 +295,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -311,8 +311,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 06. POST /v2/entities/Slot1/attrs?options=append,forcedUpdate, update entity with same value.
 =============================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -323,8 +323,8 @@ Date: REGEX(.*)
 08. PUT /v2/entities/Slot1?options=forcedUpdate, update entity with same value.
 ===============================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -344,14 +344,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -360,8 +360,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 10. PUT /v2/entities/Slot1/attrs/availability?options=forcedUpdate, update entity with same value.
 ==================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -381,14 +381,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -397,8 +397,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 12. PUT /v2/entities/Slot1/attrs/availability/value?options=forcedUpdate, update entity with same value.
 ========================================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -418,14 +418,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -434,8 +434,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 14. PATCH /v2/entities/Slot1/attrs?options=forcedUpdate, update entity with same value.
 =======================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -455,14 +455,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "availability": {
-                "metadata": {}, 
-                "type": "Text", 
+                "metadata": {},
+                "type": "Text",
                 "value": "Avaliable"
-            }, 
-            "id": "Slot1", 
+            },
+            "id": "Slot1",
             "type": "Slot"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

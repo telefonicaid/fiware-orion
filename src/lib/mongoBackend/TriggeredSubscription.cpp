@@ -40,53 +40,33 @@
 TriggeredSubscription::TriggeredSubscription
 (
   long long                _throttling,
+  long long                _maxFailsLimit,
+  long long                _failsCounter,
   long long                _lastNotification,
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
+  const ngsiv2::MqttInfo&  _mqttInfo,
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
-  const char*              _tenant
+  const char*              _tenant,
+  bool                     _covered
 )
 :
   throttling(_throttling),
+  maxFailsLimit(_maxFailsLimit),
+  failsCounter(_failsCounter),
   lastNotification(_lastNotification),
   renderFormat(_renderFormat),
-  httpInfo(_httpInfo),
   attrL(_attrL),
   cacheSubId(_cacheSubId),
   tenant((_tenant == NULL)? "" : _tenant),
   stringFilterP(NULL),
   mdStringFilterP(NULL),
-  blacklist(false)
+  blacklist(false),
+  covered(_covered)
 {
-}
-
-
-
-/* ****************************************************************************
-*
-* TriggeredSubscription::TriggeredSubscription -
-*
-* Constructor without throttling (for NGSI9 subscriptions)
-*/
-TriggeredSubscription::TriggeredSubscription
-(
-  RenderFormat             _renderFormat,
-  const ngsiv2::HttpInfo&  _httpInfo,
-  const StringList&        _attrL
-)
-:
-  throttling(-1),
-  lastNotification(-1),
-  renderFormat(_renderFormat),
-  httpInfo(_httpInfo),
-  attrL(_attrL),
-  cacheSubId(""),
-  tenant(""),
-  stringFilterP(NULL),
-  mdStringFilterP(NULL),
-  blacklist(false)
-{
+  httpInfo.fill(_httpInfo);
+  mqttInfo.fill(_mqttInfo);
 }
 
 
@@ -108,6 +88,10 @@ TriggeredSubscription::~TriggeredSubscription()
     delete mdStringFilterP;
     mdStringFilterP = NULL;
   }
+
+  // Only one of the release operations will actually do something
+  httpInfo.release();
+  mqttInfo.release();
 }
 
 

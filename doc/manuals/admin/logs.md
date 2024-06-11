@@ -6,8 +6,9 @@
 * [Alarms](#alarms)
 * [Summary traces](#summary-traces)
 * [Log rotation](#log-rotation)
-* [Log examples for notification transactions](#log-examples-for-notification-transactions)
-* [Command line options related with logs](#command-line-options-related-with-logs)
+* [Log examples for HTTP notification transactions](#log-examples-for-http-notification-transactions)
+* [Log deprecated usages](#log-deprecated-usages)
+* [Other options related with logs](#other-options-related-with-logs)
 
 ## Log file
 
@@ -29,7 +30,7 @@ The `-logLevel` option allows to choose which error messages are printed in the 
 
 When Orion runs in foreground (i.e. with the `-fg` [CLI argument](cli.md)), it also prints the same log traces on the standard output.
 
-The log level can be changed (and retrieved) in run-time, using the [admin API](management_api.md) exposed by Orion.
+Note that `-logLevel` sets the *initial* log level. The log level can be changed (and retrieved) in run-time, using the [admin API](management_api.md) exposed by Orion.
 
 [Top](#top)
 
@@ -169,7 +170,13 @@ time=2020-10-26T10:32:41.724Z | lvl=INFO | corr=93bdc5b4-1776-11eb-954d-000c29df
   different value for the correlator.
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: 200
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f914177334436ea590f6edb","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 200
+```
+
+* In the case of MQTT notifications the `msg` field of the above trace is slightly different:
+
+```
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoMqttNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2, payload (123 bytes): {"subscriptionId":"60ffea6c1bca454f9a64c96c","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}
 ```
 
 * For each forwarded request to a [Context Provider](../user/context_providers.md) (either queries or updates),
@@ -184,15 +191,16 @@ time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 
 Some additional considerations:
 
-* The `-logInfoPayloadMaxSize` setting is used to specify the maximum size that the payloads in the
-  above traces may have. If the payload overpasses this limit, then only the first `-logInfoPayloadMaxSize`
+* The `-logInfoPayloadMaxSize` CLI setting (or `infoPayloadMaxSize` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels))
+  is used to specify the maximum size that the payloads in the
+  above traces may have. If the payload overpasses this limit, then only the first info payload max size
   bytes are printed (and an ellipsis in the form of `(...)` is shown in traces). Default value: 5 Kbytes.
 * The response code in notifications and forwarding traces can be either a number (corresponding to the
   HTTP response code of the notification or forwarded request) or a string when some connectivity problem
   occurs. For instance:
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: Couldn't connect to server
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f914177334436ea590f6edb","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't connect to server
 ```
 
 * When a client request triggers forwarding to Context Providers, a `Starting forwarding for <client request URL>`
@@ -222,8 +230,9 @@ Alarm conditions:
 | 2          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Runtime Error (`<detail>`)"                                 | N/A                                                                                                                                                                                                                                       | Runtime Error. The `<detail>` text containts the detailed information.                                        | Restart Orion Context Broker. If it persists (e.g. new Runtime Errors appear within the next hour), scale up the problem to development team.
 | 3          | CRITICAL   | The following ERROR text appears in the 'msg' field: "Raising alarm DatabaseError: `<detail>`"                    | The following ERROR text appears in the 'msg' field: "Releasing alarm DatabaseError". Orion prints this trace when it detects that DB is ok again."                                                                                       | Database Error. The `<detail>` text contains the detailed information.                                        | Orion is unable to access MongoDB database and/or MongoDB database is not working properly. Check database connection and database status. Once the database is repaired and/or its connection to Orion, the problem should disappear (Orion service restart is not needed). No specific action has to be performed at Orion Context Broker service.
 | 4          | WARNING    | The following WARN text appear in the 'msg' field: "Raising alarm BadInput `<ip>`: `<detail>`".                   | The following WARN text appears in the 'msg' field: "Releasing alarm BadInput `<ip>`", where `<ip>` is the same one that triggered the alarm. Orion prints this trace when it receives a correct request from that client.                 | Bad Input. The `<detail>` text contains the detailed information.                                             | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific action has to be performed at Orion Context Broker service.
-| 5          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".        | The following WARN text appears in the 'msg' field: "Releasing alarm NotificationError `<url>`", where `<url>` is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.        | Notification Failure. The `<detail>`text contains the detailed information.                                   | Orion is trying to send the notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
+| 5          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm NotificationError `<url>`: `<detail>`".        | The following WARN text appears in the 'msg' field: "Releasing alarm NotificationError `<url>`", where `<url>` is the same one that triggered the alarm. Orion prints this trace when it successfully sent a notification to that URL.        | Notification Failure. The `<detail>`text contains the detailed information.                                   | Orion is trying to send the HTTP notification to a given receiver and some problem has occurred. It could be due to a problem with the network connectivity or on the receiver, e.g. the receiver is down. In the second case, the owner of the receiver of the notification should be reported. No specific action has to be performed at Orion Context Broker service.
 | 6          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm ForwardingError `<url>`": `<detail>`".         | The following WARN text appears in the 'msg' field: "Releasing alarm ForwardingError `<url>`", where `<url>` is the same one that triggered the alarm. Orion prints this trace when it successfully interact with ContextProvider to that URL.| Forwarding Error. The `<detail>`text contains the detailed information.                                       | Orion is trying to interact with ContextProvider and some problem has occurred. It may be due to context provider response for forwarded query or update is empty. No specific action has to be performed at Orion Context Broker service.
+| 7          | WARNING    | The following WARN text appears in the 'msg' field: "Raising alarm MqttConnectionError `<endpoint>`": `<detail>`". | The following WARN text appears in the 'msg' field: "Releasing alarm MqttConnectionError `<endpoint>`", where `<endpoint>` is the same one that triggered the alarm. Orion prints this trace when it successfully interact with ContextProvider to that URL.| Error connection to MQTT broker. The `<detail>`text contains the detailed information.         | Orion is trying to connecto to an MQTT broker (associated to a subscription) and some problem has occurred. It may be due to several reasons: MQTT broker in unreachable, user/pass is wrong, etc. No specific action has to be performed at Orion Context Broker service, but maybe in the MQTT broker configuration or in the associated subscription.
 
 By default, Orion only traces the origin (i.e. raising) and end (i.e. releasing) of an alarm, e.g:
 
@@ -235,9 +244,14 @@ time=... | lvl=ERROR | ... Releasing alarm DatabaseError
 time=... | lvl=WARN  | ... Raising alarm BadInput 10.0.0.1: JSON Parse Error: <unspecified file>(1): expected object or array
 time=... | lvl=WARN  | ... Releasing alarm BadInput 10.0.0.1
 ...
-
 time=... | lvl=WARN  | ... Raising alarm NotificationError localhost:1028/accumulate: (curl_easy_perform failed: Couldn't connect to server)
 time=... | lvl=WARN  | ... Releasing alarm NotificationError localhost:1028/accumulate
+...
+time=... | lvl=WARN  | ... Raising alarm ForwardingError localhost:9999/cpr/op/update: forwarding failure for sender-thread: Couldn't connect to server
+time=... | lvl=WARN  | ... Releasing alarm ForwardingError localhost:9999/v2/op/update
+...
+time=... | lvl=WARN  | ... Raising alarm MqttConnectionError localhost:1883: Connection Refused: not authorised.
+time=... | lvl=WARN  | ... Releasing alarm MqttConnectionError localhost:1883
 ```
 
 This means that if the condition that triggered the alarm (e.g. a new invalid request from the 10.0.0.1 client) occurs again between the raising
@@ -256,6 +270,7 @@ Log traces between "Raising" and "Releasing" messages use "Repeated" in the mess
 in all traces, so re-logging alarms could be a means to get extra information when debugging problems. In the example above, it could correspond to a client
 that after fixing the problem with the JSON payload now has a new problem with the URL of the Orion API operation.
 
+Note that even when `-relogAlarms` is not used, repeat alarm errors may appear in some DEBUG tracelevel (but never in WARN or ERROR levels).
 
 [Top](#top)
 
@@ -264,31 +279,39 @@ that after fixing the problem with the JSON payload now has a new problem with t
 You can enable log summary traces with the `-logSummary` [CLI parameter](cli.md) which value is the summary reporting period in seconds. For
 example `-logSummary 5` involves that summary traces will be print each 5 seconds (no matter which log level has been set with `-logLevel`).
 
-Four traces are printed each time, as follows (the lines have been abbreviated, omitting some fields, for the sake of clarity):
+Six traces are printed each time, as follows (the lines have been abbreviated, omitting some fields, for the sake of clarity):
 
 ```
 time=... | lvl=SUMMARY | ... Transactions: 2345 (new: 45)
 time=... | lvl=SUMMARY | ... DB status: ok, raised: (total: 0, new: 0), released: (total: 0, new: 0)
 time=... | lvl=SUMMARY | ... Notification failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+time=... | lvl=SUMMARY | ... Forwarding failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+time=... | lvl=SUMMARY | ... MQTT connection failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
 time=... | lvl=SUMMARY | ... Bad input active alarms: 5, raised: (total: 12, new: 1), released: (total: 7, new: 2)
 ```
 
 * First line (Transactions) shows the current number of transactions and the new ones in the last summary reporting period.
 * Second line is about [DB alarms](#alarms). It shows the current DB status (either "ok" or "erroneous"), the number of raised DB alarms (both total
   since Orion started and in the last summary reporting period) and the number of released DB alarms (both total since Orion started and in the last summary reporting period).
-* Third line is about [notification failure alarms](#alarms). It shows the current number of active notification failure alarms, the number of
-  raised notification failure alarms (both total since Orion started and in the last summary reporting period) and the number of released notification failure alarms
+* Third line is about [HTTP notification failure alarms](#alarms). It shows the current number of active HTTP notification failure alarms, the number of
+  raised HTTP notification failure alarms (both total since Orion started and in the last summary reporting period) and the number of released notification failure alarms
   (both total since Orion started and in the last summary reporting period).
-* Fourth line is about [bad input alarms](#alarms). It shows the current number of bad input alarms, the number of raised bad input alarms (both total since Orion
+* Fourth line is about [forwarding failure alarms](#alarms). It shows the current number of active forwarding failure alarms, the number of
+  raised forwarding failure alarms (both total since Orion started and in the last summary reporting period) and the number of released notification failure alarms
+  (both total since Orion started and in the last summary reporting period).
+* Fifth line is about [MQTT connection failure alarms](#alarms). It shows the current number of active MQTT connection failure alarms, the number of
+  raised MQTT connection failure alarms (both total since Orion started and in the last summary reporting period) and the number of released MQTT connection failure alarms
+  (both total since Orion started and in the last summary reporting period).
+* Sixth line is about [bad input alarms](#alarms). It shows the current number of bad input alarms, the number of raised bad input alarms (both total since Orion
   started and in the last summary reporting period) and the number of released bad input alarms (both total since Orion started and in the last summary reporting period).
 
 [Top](#top)
 
 ## Log rotation
 
-Logrotate is installed as an RPM dependency along with the contextBroker.
-The system is configured to rotate once a day, or more, in case the log file size
-exceeds 100MB (checked very 30 minutes by default):
+Log rotate recommendations is to rotate once a day, or more, in case the log file size
+exceeds 100MB (checked very 30 minutes by default). You have some sample files in
+`etc/` directory:
 
 -   For daily rotation: `/etc/logrotate.d/logrotate-contextBroker-daily`:
     which enables daily log rotation
@@ -308,7 +331,7 @@ per second.
 
 [Top](#top)
 
-## Log examples for notification transactions
+## Log examples for HTTP notification transactions
 
 This section illustrates some log examples corresponding to notification transactions.
 Note this has been generated with Orion 2.5.0 release and although no big changes are
@@ -323,66 +346,95 @@ contextBroker -fg -httpTimeout 10000 -logLevel INFO -notificationMode threadpool
 Successful sent (response code 200):
 
 ```
-time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e174b14e7532482ac794): POST localhost:1028/accumulate, response code: 200
+time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e174b14e7532482ac794): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f96e174b14e7532482ac794","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 200
 ```
 
 Notification endpoint response with 400 (a WARN trace is printed):
 
 ```
-time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 400
-time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, response code: 400
+time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e1fdb14e7532482ac795) response NOT OK, http code: 400
+time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, payload (123 bytes): {"subscriptionId":"5f96e1fdb14e7532482ac795","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 400
 ```
 
 Notification endpoint response with 404 (a WARN trace is printed):
 
 ```
-time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 404
-time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, response code: 404
+time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e27cb14e7532482ac796) response NOT OK, http code: 404
+time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, payload (123 bytes): {"subscriptionId":"5f96e27cb14e7532482ac796","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 404
 ```
 
 Notification endpoint response with 500 (a WARN trace is printed)
 
 ```
-time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSendWithCurl | msg=Notification response NOT OK, http code: 500
-time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, response code: 500
+time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e2cfb14e7532482ac797) response NOT OK, http code: 500
+time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, payload (123 bytes): {"subscriptionId":"5f96e2cfb14e7532482ac797","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 500
 ```
 
 Endpoint not responding within 10 seconds timeout or some other connection error (alarm is raised in WARN level):
 
 ```
 time=2020-10-26T14:54:15.996Z | lvl=WARN | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
-time=2020-10-26T14:54:15.996Z | lvl=INFO | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, response code: Timeout was reached
+time=2020-10-26T14:54:15.996Z | lvl=INFO | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, payload (123 bytes): {"subscriptionId":"5f96e30db14e7532482ac798","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Timeout was reached
 ```
 
 Endpoint in not responding port, e.g. localhost:9999 (alarm is raised in WARN log level):
 
 ```
 time=2020-10-26T15:01:50.659Z | lvl=WARN | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
-time=2020-10-26T15:01:50.659Z | lvl=INFO | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, response code: Couldn't connect to server
+time=2020-10-26T15:01:50.659Z | lvl=INFO | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e4deb14e7532482ac79c","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't connect to server
 ```
 
 Endpoint in unresolvable name, e.g. foo.bar.bar.com (alarm is raised in WARN log level):
 
 ```
 time=2020-10-26T15:03:54.258Z | lvl=WARN | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
-time=2020-10-26T15:03:54.258Z | lvl=INFO | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, response code: Couldn't resolve host name
+time=2020-10-26T15:03:54.258Z | lvl=INFO | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e559b14e7532482ac79d","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't resolve host name
 ```
 
 Endpoint in unreachable IP, e.g. 12.34.56.87 (alarm is raised in WARN log level):
 
 ```
 time=2020-10-26T15:06:14.642Z | lvl=WARN | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
-time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoNotification | msg=Notif delivered (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, response code: Timeout was reached
+time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e5dbb14e7532482ac79e","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Timeout was reached
 ```
 
 [Top](#top)
 
-## Command line options related with logs
 
-Apart from the ones already described in this document (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-relogAlarms` and `-logSummary`), the following command line options are related with logs:
+## Log deprecated usages
+
+If `-logDeprecate` CLI setting is used (or `deprecate` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels)) the
+following WARN traces are generated:
+
+* Usages of [`"legacyForwarding": true`](../orion-api.md#registrationprovider)). For instance:
+
+```
+time=2024-01-11T13:57:13.537Z | lvl=WARN | corr=527378d8-b089-11ee-875d-080027cd35f1 | trans=1704981432-655-00000000006 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationCreate.cpp[235]:mongoRegistrationCreate | msg=Deprecated usage of legacyForwarding mode in registration creation (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.565Z | lvl=WARN | corr=52778eaa-b089-11ee-861c-080027cd35f1 | trans=1704981432-655-00000000007 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationGet.cpp[93]:setProvider | msg=Deprecated usage of legacyForwarding mode detected in existing registration (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.595Z | lvl=WARN | corr=527c0912-b089-11ee-bb8c-080027cd35f1 | trans=1704981432-655-00000000008 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postQueryContext.cpp[191]:queryForward | msg=Deprecated usage of legacyForwarding mode in query forwarding operation (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.624Z | lvl=WARN | corr=52808938-b089-11ee-9835-080027cd35f1 | trans=1704981432-655-00000000010 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postUpdateContext.cpp[163]:updateForward | msg=Deprecated usage of legacyForwarding mode in update forwarding operation (regId: 659ff3b9691855f16d00ec5a)
+```
+
+* Usages of `geo:point`, `geo:line`, `geo:box` or `geo:line`.
+
+```
+time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
+```
+
+Deprecated features usage is tracked in `deprecatedFeature` object in the [counters block of the statistics API](statistics#counter-block),
+even when `-logDeprecate` CLI (or equivalent `deprecate` parameter in the log admin REST API) is not used.
+
+Get more information about deprecated features and how to overcome them in the [deprecation documentation](../deprecated.md).
+
+[Top](#top)
+
+
+## Other options related with logs
+
+Apart from the ones already described in this document (`-logDir`, `-logAppend`, `-logLevel`, `-t`, `-logInfoPayloadMaxSize`, `-logDeprecate`, `-relogAlarms` and `-logSummary`), the following command line options are related with logs:
 
 * `-logForHumans`
-* `-logLineMaxSize`
+* `-logLineMaxSize` (or `lineMaxSize` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels))
 
 Please have a look to the [command line options documentation](cli.md) for more information about them.
 

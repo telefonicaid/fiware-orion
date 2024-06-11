@@ -37,7 +37,7 @@ accumulatorStart --pretty-print
 # 04. No match: Create subscription 4 for mq=A1.M1.s~=fest_string
 # 05. Create E1 with A1 with metadata M1 with compound value containing String, Integer and Float
 # 06. Dump and reset accumulator, see 3 notifications (steps 01, 02 and 03)
-# 
+#
 
 echo "01. Beginning: Create subscription 1 for mq=A1.M1.s~=test"
 echo "========================================================="
@@ -182,50 +182,50 @@ echo
 01. Beginning: Create subscription 1 for mq=A1.M1.s~=test
 =========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. End: Create subscription 2 for mq=A1.M1.s~=ing
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Single-char: Create subscription 3 for mq=A1.M1.s~=_
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 04. No match: Create subscription 4 for mq=A1.M1.s~=fest_string
 ===============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Create E1 with A1 with metadata M1 with compound value containing String, Integer and Float
 ===============================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
@@ -255,11 +255,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
                             "s": "test_string"
                         }
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "modified"
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -290,11 +290,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
                             "s": "test_string"
                         }
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "modified"
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -325,11 +325,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
                             "s": "test_string"
                         }
                     }
-                }, 
-                "type": "Text", 
+                },
+                "type": "Text",
                 "value": "modified"
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],

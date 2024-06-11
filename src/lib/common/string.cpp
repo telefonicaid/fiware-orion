@@ -362,8 +362,9 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   //
   // Ensuring the scheme is present
+  // Note that although mqtt:// is not officially supported it is used de facto (see for instance https://github.com/mqtt/mqtt.org/wiki/URI-Scheme)
   //
-  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:")))
+  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:")))
   {
     return false;
   }
@@ -582,7 +583,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if ((str2double(number1, &newLatitude) == false) || (newLatitude > 90) || (newLatitude < -90))
   {
     std::string details = std::string("bad latitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, s);
 
     free(initial);
     return false;
@@ -591,7 +592,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if ((str2double(number2, &newLongitude) == false) || (newLongitude > 180) || (newLongitude < -180))
   {
     std::string details = std::string("bad longitude value in coordinate string '") + initial + "'";
-    alarmMgr.badInput(clientIp, details);
+    alarmMgr.badInput(clientIp, details, s);
 
     free(initial);
     return false;
@@ -873,7 +874,7 @@ std::string servicePathCheck(const char* servicePath)
     else
     {
       std::string details = std::string("Invalid character '") + *servicePath + "' in Service-Path";
-      alarmMgr.badInput(clientIp, details);
+      alarmMgr.badInput(clientIp, details, servicePath);
 
       return "Bad Character in Service-Path";
     }
@@ -995,6 +996,14 @@ std::string double2string(double f)
     }
   }
 
+  /* At this point a value like 7.999999999536117 ends as "8." in buf
+   * which is not a legal JSON (see issue #4346). This check will remove
+   * the trailing dot in this case */
+  if (buf[strlen(buf) - 1] == '.')
+  {
+    buf[strlen(buf) - 1] = 0;
+  }
+
   return std::string(buf);
 }
 
@@ -1103,4 +1112,30 @@ std::string offuscatePassword(const std::string& uri, const std::string& pwd)
   std::string s(uri);  // replace cannot be called in const std::string&
   s.replace(uri.find(pwd), pwd.length(), "******");
   return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* regComp -
+*
+* Wrapper or standard regcomp() from regex.h, including some advanced features
+* (e.g. error logging)
+*/
+bool regComp(regex_t* re, const char* pattern, int flags)
+{
+  int r = regcomp(re, pattern, flags);
+  if (r == 0)
+  {
+    return true;
+  }
+
+  // Log error in corresponding tracelevel (see example at
+  // https://www.ibm.com/docs/en/i/7.1?topic=functions-regerror-return-error-message-regular-expression)
+  char    buffer[100];
+  regerror(r, re, buffer, 100);
+  LM_T(LmtRegexError, ("regcomp() failed for pattern '%s': %s", pattern, buffer));
+
+  return false;
 }

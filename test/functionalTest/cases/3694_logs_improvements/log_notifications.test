@@ -35,7 +35,7 @@ accumulatorStart --pretty-print localhost $LISTENER_PORT
 # 02. Create subscription SUB2 for E (to nowhere)
 # 03. Create E entity (triggering 2 notifications)
 # 04. POST /v2/op/update updating twice E (triggering 4 notifications)
-# 05. Check notification logs (sorted by url)
+# 05. Check notification logs (sorted by sub id)
 # 06. Check notification correlators (two blocks, corresponding to each update)
 #
 
@@ -61,6 +61,7 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+SUB_ID1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 echo "02. Create subscription SUB2 for E (to nowhere)"
 echo "==============================================="
@@ -83,6 +84,7 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+SUB_ID2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 echo "03. Create E entity (triggering 2 notifications)"
 echo "================================================"
@@ -130,14 +132,9 @@ echo
 echo
 
 
-# Example log trace for notifications (to help understanding the awk/cut stuff :)
-#
-# msg=Notif delivered (subId: 5f904fb3e970f217bde75f98): POST localhost:9997/notify, response code: 200
-
-
-echo "05. Check notification logs (sorted by url)"
-echo "==========================================="
-cat /tmp/contextBroker.log | grep INFO | grep 'Notif' | awk -F '|' '{print $10}' | cut -c 57- | sort
+echo "05. Check notification logs (sorted by sub id)"
+echo "=============================================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Notif' | awk -F '|' '{print $10}' | sed -e "s/$SUB_ID1/SUB_ID1/g" | sed -e "s/$SUB_ID2/SUB_ID2/g" | sort
 echo
 echo
 
@@ -153,49 +150,49 @@ echo
 01. Create subscription SUB1 for E (to the accumulator)
 =======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Create subscription SUB2 for E (to nowhere)
 ===============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Create E entity (triggering 2 notifications)
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 04. POST /v2/op/update updating twice E (triggering 4 notifications)
 ====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-05. Check notification logs (sorted by url)
-===========================================
-POST localhost:12345/notify, response code: Couldn't connect to server
-POST localhost:12345/notify, response code: Couldn't connect to server
-POST localhost:12345/notify, response code: Couldn't connect to server
-POST localhost:9997/notify, response code: 200
-POST localhost:9997/notify, response code: 200
-POST localhost:9997/notify, response code: 200
+05. Check notification logs (sorted by sub id)
+==============================================
+ msg=Notif delivered (subId: SUB_ID1): POST localhost:9997/notify, payload (125 bytes): {"subscriptionId":"SUB_ID1","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: 200
+ msg=Notif delivered (subId: SUB_ID1): POST localhost:9997/notify, payload (173 bytes): {"subscriptionId":"SUB_ID1","data":[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{}},"A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: 200
+ msg=Notif delivered (subId: SUB_ID1): POST localhost:9997/notify, payload (173 bytes): {"subscriptionId":"SUB_ID1","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}},"A":{"type":"Text","value":"foo","metadata":{}}}]}, response code: 200
+ msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (125 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Couldn't connect to server
+ msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (173 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{}},"A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Couldn't connect to server
+ msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (173 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}},"A":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Couldn't connect to server
 
 
 06. Check notification correlators (two blocks, corresponding to each update)

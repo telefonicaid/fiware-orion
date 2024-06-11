@@ -447,7 +447,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch)
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -521,7 +521,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch)
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -591,7 +591,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_type
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -660,7 +660,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_idAn
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -729,7 +729,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch)
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -805,7 +805,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noTy
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -816,7 +816,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_noTy
                                                         "",
                                                         "",
                                                         2,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -894,7 +894,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -905,7 +905,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_noTy
                                                         "",
                                                         "",
                                                         2,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -978,7 +978,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noTy
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -989,7 +989,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_noTy
                                                         "",
                                                         "",
                                                         2,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1060,7 +1060,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1132,7 +1132,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1200,7 +1200,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1270,7 +1270,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatch_patt
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1342,7 +1342,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatch_patt
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1410,7 +1410,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatch_patt
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1480,7 +1480,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMatchDisjo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1550,7 +1550,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMatchDisjo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1620,7 +1620,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMatchDisjo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1858,7 +1858,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_updateMixMatchNo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -1932,7 +1932,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_appendMixMatchNo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2002,7 +2002,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_deleteMixMatchNo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2074,7 +2074,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_update2Matches1N
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2148,7 +2148,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_append2Matches1N
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2218,7 +2218,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, Cond1_delete2Matches1N
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2288,7 +2288,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatch)
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2361,7 +2361,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatch)
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2429,7 +2429,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatch)
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2499,7 +2499,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMatchDisjo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2569,7 +2569,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMatchDisjo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2639,7 +2639,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMatchDisjo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2877,7 +2877,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_updateMixMatchNo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -2951,7 +2951,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_appendMixMatchNo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3021,7 +3021,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_deleteMixMatchNo
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3093,7 +3093,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_update2Matches1N
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3167,7 +3167,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_append2Matches1N
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);
@@ -3237,7 +3237,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptionsNoCache, CondN_delete2Matches1N
                                                         "",
                                                         "",
                                                         1,
-                                                        NGSI_V1_LEGACY,
+                                                        NGSI_V2_NORMALIZED,
                                                         attrsFilter,
                                                         false,
                                                         emptyV)).Times(1);

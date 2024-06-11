@@ -33,8 +33,9 @@
 #include "common/defaultValues.h"
 
 #include "mongoBackend/dbConstants.h"
-#include "mongoBackend/MongoGlobal.h"  // processConditionVector
+#include "mongoBackend/compoundValueBson.h"
 
+#include "mongoDriver/BSONObjBuilder.h"
 #include "mongoDriver/BSONArrayBuilder.h"
 
 
@@ -120,15 +121,67 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
     LM_T(LmtMongo, ("Subscription qs: %s", qsObj.toString().c_str()));
   }
 
-  if (!httpInfo.includePayload)
+  if (httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
   {
-    b->appendNull(CSUB_PAYLOAD);
-    LM_T(LmtMongo, ("Subscription payload: null"));
+    if (!httpInfo.includePayload)
+    {
+      b->appendNull(CSUB_PAYLOAD);
+      LM_T(LmtMongo, ("Subscription payload: null"));
+    }
+    else if (!httpInfo.payload.empty())
+    {
+      b->append(CSUB_PAYLOAD, httpInfo.payload);
+      LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
+    }
   }
-  else if (!httpInfo.payload.empty())
+  else if (httpInfo.payloadType == ngsiv2::CustomPayloadType::Json)
   {
-    b->append(CSUB_PAYLOAD, httpInfo.payload);
-    LM_T(LmtMongo, ("Subscription payload: %s", httpInfo.payload.c_str()));
+    if (httpInfo.json != NULL)
+    {
+      std::string logStr;
+      if (httpInfo.json->isObject())
+      {
+        orion::BSONObjBuilder jsonBuilder;
+        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
+        logStr = jsonBuilderObj.toString();
+        b->append(CSUB_JSON, jsonBuilderObj);
+      }
+      else  // httpInfo.json->isVector();
+      {
+        orion::BSONArrayBuilder jsonBuilder;
+        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
+        logStr = jsonBuilderArr.toString();
+        b->append(CSUB_JSON, jsonBuilderArr);
+      }
+      LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+    }
+  }
+  else  // httpInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi
+  {
+    // id and type (both optional in this case)
+    orion::BSONObjBuilder bob;
+    if (!httpInfo.ngsi.id.empty())
+    {
+      bob.append(ENT_ENTITY_ID, httpInfo.ngsi.id);
+    }
+    if (!httpInfo.ngsi.type.empty())
+    {
+      bob.append(ENT_ENTITY_TYPE, httpInfo.ngsi.type);
+    }
+
+    // attributes
+    // (-1 as date as creDate and modDate are not used in this case)
+    orion::BSONObjBuilder    attrsToAdd;  // not actually used
+    orion::BSONArrayBuilder  attrNamesToAdd;
+    httpInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+
+    // note that although metadata is not needed in the ngsi field logic,
+    // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
+    bob.append(ENT_ATTRS, attrsToAdd.obj());
+
+    b->append(CSUB_NGSI, bob.obj());
   }
 }
 
@@ -136,19 +189,124 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
 
 /* ****************************************************************************
 *
-* setHttpInfo -
+* setCustomMqttInfo -
 */
-void setHttpInfo(const Subscription& sub, orion::BSONObjBuilder* b)
+static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBuilder* b)
 {
-  b->append(CSUB_REFERENCE, sub.notification.httpInfo.url);
-  b->append(CSUB_CUSTOM,    sub.notification.httpInfo.custom);
-
-  LM_T(LmtMongo, ("Subscription reference: %s", sub.notification.httpInfo.url.c_str()));
-  LM_T(LmtMongo, ("Subscription custom:    %s", sub.notification.httpInfo.custom? "true" : "false"));
-
-  if (sub.notification.httpInfo.custom)
+  if (mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
   {
-    setCustomHttpInfo(sub.notification.httpInfo, b);
+    if (!mqttInfo.includePayload)
+    {
+      b->appendNull(CSUB_PAYLOAD);
+      LM_T(LmtMongo, ("Subscription payload: null"));
+    }
+    else if (!mqttInfo.payload.empty())
+    {
+      b->append(CSUB_PAYLOAD, mqttInfo.payload);
+      LM_T(LmtMongo, ("Subscription payload: %s", mqttInfo.payload.c_str()));
+    }
+  }
+  else if (mqttInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+  {
+    if (mqttInfo.json != NULL)
+    {
+      std::string logStr;
+      if (mqttInfo.json->isObject())
+      {
+        orion::BSONObjBuilder jsonBuilder;
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
+        logStr = jsonBuilderObj.toString();
+        b->append(CSUB_JSON, jsonBuilderObj);
+      }
+      else  // httpInfo.json->isVector();
+      {
+        orion::BSONArrayBuilder jsonBuilder;
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
+        logStr = jsonBuilderArr.toString();
+        b->append(CSUB_JSON, jsonBuilderArr);
+      }
+      LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+    }
+  }
+  else  // mqttInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi
+  {
+    // id and type (both optional in this case)
+    orion::BSONObjBuilder bob;
+    if (!mqttInfo.ngsi.id.empty())
+    {
+      bob.append(ENT_ENTITY_ID, mqttInfo.ngsi.id);
+    }
+    if (!mqttInfo.ngsi.type.empty())
+    {
+      bob.append(ENT_ENTITY_TYPE, mqttInfo.ngsi.type);
+    }
+
+    // attributes
+    // (-1 as date as creDate and modDate are not used in this case)
+    orion::BSONObjBuilder    attrsToAdd;  // not actually used
+    orion::BSONArrayBuilder  attrNamesToAdd;
+    mqttInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+
+    // note that although metadata is not needed in the ngsi field logic,
+    // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
+    bob.append(ENT_ATTRS, attrsToAdd.obj());
+
+    b->append(CSUB_NGSI, bob.obj());
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setNotificationInfo -
+*/
+void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  if (sub.notification.type == ngsiv2::HttpNotification)
+  {
+    b->append(CSUB_REFERENCE,     sub.notification.httpInfo.url);
+    b->append(CSUB_CUSTOM,        sub.notification.httpInfo.custom);
+    b->append(CSUB_TIMEOUT,   sub.notification.httpInfo.timeout);
+
+    LM_T(LmtMongo, ("Subscription reference:   %s", sub.notification.httpInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription custom:      %s", sub.notification.httpInfo.custom? "true" : "false"));
+    LM_T(LmtMongo, ("Subscription timeout: %d", sub.notification.httpInfo.timeout));
+
+
+    if (sub.notification.httpInfo.custom)
+    {
+      setCustomHttpInfo(sub.notification.httpInfo, b);
+    }
+  }
+  else  // MqttNotification
+  {
+    b->append(CSUB_REFERENCE, sub.notification.mqttInfo.url);
+    b->append(CSUB_MQTTTOPIC, sub.notification.mqttInfo.topic);
+    b->append(CSUB_MQTTQOS,   (int) sub.notification.mqttInfo.qos);
+    b->append(CSUB_MQTTRETAIN, sub.notification.mqttInfo.retain);
+    b->append(CSUB_CUSTOM,    sub.notification.mqttInfo.custom);
+
+    LM_T(LmtMongo, ("Subscription reference:  %s", sub.notification.mqttInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttTopic:  %s", sub.notification.mqttInfo.topic.c_str()));
+    LM_T(LmtMongo, ("Subscription mqttQos:    %d", sub.notification.mqttInfo.qos));
+    LM_T(LmtMongo, ("Subscription mqttRetain: %s", sub.notification.mqttInfo.retain? "true": "false"));
+    LM_T(LmtMongo, ("Subscription custom:     %s", sub.notification.mqttInfo.custom? "true" : "false"));
+
+    if (sub.notification.mqttInfo.providedAuth)
+    {
+      b->append(CSUB_USER,   sub.notification.mqttInfo.user);
+      b->append(CSUB_PASSWD, sub.notification.mqttInfo.passwd);
+      LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.mqttInfo.user.c_str()));
+      LM_T(LmtMongo, ("Subscription passwd: *****"));
+    }
+
+    if (sub.notification.mqttInfo.custom)
+    {
+      setCustomMqttInfo(sub.notification.mqttInfo, b);
+    }
   }
 }
 
@@ -162,6 +320,30 @@ void setThrottling(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   b->append(CSUB_THROTTLING, sub.throttling);
   LM_T(LmtMongo, ("Subscription throttling: %lu", sub.throttling));
+}
+
+
+
+/* ****************************************************************************
+*
+* setMaxfailsLimit -
+*/
+void setMaxFailsLimit(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_MAXFAILSLIMIT, sub.notification.maxFailsLimit);
+  LM_T(LmtMongo, ("Subscription maxFailsLimit: %lu", sub.notification.maxFailsLimit));
+}
+
+
+
+/* ****************************************************************************
+*
+* setFailsCounter -
+*/
+void setFailsCounter(long long failedCounter, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_FAILSCOUNTER, failedCounter);
+  LM_T(LmtMongo, ("Subscription failsCounter: %lu", failedCounter));
 }
 
 
@@ -184,11 +366,8 @@ void setServicePath(const std::string& servicePath, orion::BSONObjBuilder* b)
 */
 void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 {
-  if (!sub.description.empty())
-  {
-    b->append(CSUB_DESCRIPTION, sub.description);
-    LM_T(LmtMongo, ("Subscription description: %s", sub.description.c_str()));
-  }
+  b->append(CSUB_DESCRIPTION, sub.description);
+  LM_T(LmtMongo, ("Subscription description: %s", sub.description.c_str()));
 }
 
 
@@ -197,12 +376,14 @@ void setDescription(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setStatus -
 */
-void setStatus(const Subscription& sub, orion::BSONObjBuilder* b)
+void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now)
 {
-  std::string  status = (sub.status.empty())? STATUS_ACTIVE : sub.status;
+  std::string  status = (_status.empty())? STATUS_ACTIVE : _status;
 
   b->append(CSUB_STATUS, status);
+  b->append(CSUB_STATUS_LAST_CHANGE, now);
   LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
+  LM_T(LmtMongo, ("Subscription status last change: %f", now));
 }
 
 
@@ -211,7 +392,7 @@ void setStatus(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setEntities -
 */
-void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
+void setEntities(const Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1)
 {
   orion::BSONArrayBuilder entities;
 
@@ -260,6 +441,15 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
     entities.append(bob.obj());
   }
 
+  if ((fromNgsiv1) && (entities.arrSize() == 0))
+  {
+    // Special case: in NGSIv1 entities and condition attributes are not
+    // part of the same field (subject, in NGSIv2) so it may happen that
+    // subject only contains condition attributes and entities has to be
+    // left untouched in this case
+    return;
+  }
+
   orion::BSONArray entitiesArr = entities.arr();
 
   b->append(CSUB_ENTITIES, entitiesArr);
@@ -294,25 +484,20 @@ void setAttrs(const Subscription& sub, orion::BSONObjBuilder* b)
 */
 void setConds
 (
-  const Subscription&              sub,
-  const std::vector<std::string>&  notifAttributesV,
-  orion::BSONObjBuilder*           b
+  const Subscription&     sub,
+  orion::BSONObjBuilder*  b
 )
 {
-  //
-  // Note that we cannot use status, url and attrsFormat from sub.status, as sub object
-  // could correspond to an update and the fields be missing (in which case the one from
-  // the original subscription has to be taken; the caller deal with that)
-  //
+  orion::BSONArrayBuilder conds;
 
-  /* Conds vector */
+  for (unsigned int ix = 0; ix < sub.subject.condition.attributes.size(); ++ix)
+  {
+    conds.append(sub.subject.condition.attributes[ix]);
+  }
 
-  orion::BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
-                                            sub.subject.entities,
-                                            notifAttributesV);
-
-  b->append(CSUB_CONDITIONS, conds);
-  LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
+  orion::BSONArray condsArr = conds.arr();
+  b->append(CSUB_CONDITIONS, condsArr);
+  LM_T(LmtMongo, ("Subscription conditions: %s", condsArr.toString().c_str()));
 }
 
 
@@ -438,6 +623,51 @@ void setOnlyChanged(const Subscription& sub, orion::BSONObjBuilder* b)
 
   b->append(CSUB_ONLYCHANGED, bl);
   LM_T(LmtMongo, ("Subscription onlyChanged: %s", bl ? "true" : "false"));
+}
+
+
+/* ****************************************************************************
+*
+* setCovered -
+*/
+void setCovered(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  bool bl = sub.notification.covered;
+
+  b->append(CSUB_COVERED, bl);
+  LM_T(LmtMongo, ("Subscription covered: %s", bl ? "true" : "false"));
+}
+
+
+/* ****************************************************************************
+*
+* setNotifyOnMetadataChange -
+*/
+void setNotifyOnMetadataChange(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  bool bl = sub.subject.condition.notifyOnMetadataChange;
+  b->append(CSUB_NOTIFYONMETADATACHANGE, bl);
+  LM_T(LmtMongo, ("Subscription notifyOnMetadataChange: %s", bl ? "true" : "false"));
+}
+
+
+/* ****************************************************************************
+*
+* setOperations -
+*/
+void setOperations(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  orion::BSONArrayBuilder operations;
+
+  for (unsigned int ix = 0; ix < sub.subject.condition.altTypes.size(); ++ix)
+  {
+    operations.append(subAltType2string(sub.subject.condition.altTypes[ix]));
+  }
+
+  orion::BSONArray operationsArr = operations.arr();
+
+  b->append(CSUB_ALTTYPES, operationsArr);
+  LM_T(LmtMongo, ("Subscription operations: %s", operationsArr.toString().c_str()));
 }
 
 

@@ -1,0 +1,235 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription alterationType entityChange
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription for entity type T with entityUpdate
+# 02. Create entity E/T (no notif)
+# 03. Update entity E/T without actual change (notif)
+# 04. Update entity E/T with actual change (notif)
+# 05. Delete entity E/T (no notif)
+# 06. Dump accumulator: see two E/T notifications (A=1 and A=2) with alterationType entityUpdate and entityChange
+#
+
+echo "01. Create subscription for entity type T with entityUpdate"
+echo "==========================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ],
+    "condition": {
+      "alterationTypes": [ "entityUpdate" ]
+    }
+  },  
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "attrs": [ "alterationType", "*" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E/T (no notif)"
+echo "================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "03. Update entity E/T without actual change (notif)"
+echo "==================================================="
+payload='{
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "04. Update entity E/T with actual change (notif)"
+echo "================================================"
+payload='{
+  "A": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "05. Delete entity E/T (no notif)"
+echo "================================"
+orionCurl --url /v2/entities/E -X DELETE
+echo
+echo
+
+
+echo "06. Dump accumulator: see two E/T notifications (A=1 and A=2) with alterationType entityUpdate and entityChange"
+echo "==============================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for entity type T with entityUpdate
+===========================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E/T (no notif)
+================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. Update entity E/T without actual change (notif)
+===================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Update entity E/T with actual change (notif)
+================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Delete entity E/T (no notif)
+================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Dump accumulator: see two E/T notifications (A=1 and A=2) with alterationType entityUpdate and entityChange
+===============================================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 192
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "alterationType": {
+                "metadata": {},
+                "type": "Text",
+                "value": "entityUpdate"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 192
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "alterationType": {
+                "metadata": {},
+                "type": "Text",
+                "value": "entityChange"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

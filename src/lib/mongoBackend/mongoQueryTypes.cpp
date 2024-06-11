@@ -72,7 +72,7 @@ static void getAttributeTypes
 {
   orion::BSONObjBuilder bob;
 
-  if (entityType.empty())
+  if (!entityType.empty())
   {
     std::string idType = std::string("_id.") + ENT_ENTITY_TYPE;
 
@@ -572,7 +572,8 @@ HttpStatusCode mongoEntityTypes
   unsigned int docs = 0;
   while (cursor.next(&resultItem))
   {
-    if ((docs < offset) || (docs > offset + limit - 1))
+    // Note limit == 0 has to be checked individually given doc > offset + limit - 1 doesn't work if offset == 0 with unsigned int */
+    if ((limit == 0) || (docs < offset) || (docs > offset + limit - 1))
     {
       docs++;
       continue;
@@ -596,17 +597,26 @@ HttpStatusCode mongoEntityTypes
         continue;
       }
 
+      std::string attrName = attrsArray[jx].String();
+
+      // dateExpires shouldn't not be included in the response, as it is a built in attribute
+      // (see issue #4451)
+      if (attrName == DATE_EXPIRES)
+      {
+        continue;
+      }
+
       /* Note that we need and extra query() in the database (inside attributeType() function) to get each attribute type.
          * This could be inefficient, especially if the number of attributes is large */
       if (!noAttrDetail)
       {
         std::vector<std::string> attrTypes;
 
-        getAttributeTypes(tenant, servicePathV, entityType->type , attrsArray[jx].String(), &attrTypes);
+        getAttributeTypes(tenant, servicePathV, entityType->type , attrName, &attrTypes);
 
         for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
         {
-          ContextAttribute* ca = new ContextAttribute(attrsArray[jx].String(), attrTypes[kx], "");
+          ContextAttribute* ca = new ContextAttribute(attrName, attrTypes[kx], "");
 
           entityType->contextAttributeVector.push_back(ca);
 
@@ -623,13 +633,14 @@ HttpStatusCode mongoEntityTypes
         // NOTE: here we add a ContextAttribute with empty type, as a marker for
         //       this special condition of 'No Attribute Detail'
         //
-        ContextAttribute* caP = new ContextAttribute(attrsArray[jx].String(), "", "");
+        ContextAttribute* caP = new ContextAttribute(attrName, "", "");
         entityType->contextAttributeVector.push_back(caP);
       }
     }
 
     responseP->entityTypeVector.push_back(entityType);
   }
+
   orion::releaseMongoConnection(connection);
 
   // Get count if user requested (i.e. if totalTypesP is not NULL)
@@ -818,17 +829,26 @@ HttpStatusCode mongoAttributesForEntityType
 
     alarmMgr.dbErrorReset();
 
+    std::string attrName = idField.String();
+
+    // dateExpires shouldn't not be included in the response, as it is a built in attribute
+    // (see issue #4451)
+    if (attrName == DATE_EXPIRES)
+    {
+      continue;
+    }
+
     /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
      * This could be unefficient, specially if the number of attributes is large */
     if (!noAttrDetail)
     {
       std::vector<std::string> attrTypes;
 
-      getAttributeTypes(tenant, servicePathV, entityType , idField.String(), &attrTypes);
+      getAttributeTypes(tenant, servicePathV, entityType , attrName, &attrTypes);
 
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
-        ContextAttribute*  ca = new ContextAttribute(idField.String(), attrTypes[kx], "");
+        ContextAttribute*  ca = new ContextAttribute(attrName, attrTypes[kx], "");
 
         responseP->entityType.contextAttributeVector.push_back(ca);
 
@@ -845,7 +865,7 @@ HttpStatusCode mongoAttributesForEntityType
       // NOTE: here we add a ContextAttribute with empty type, as a marker for
       //       this special condition of 'No Attribute Detail'
       //
-      ContextAttribute* caP = new ContextAttribute(idField.String(), "", "");
+      ContextAttribute* caP = new ContextAttribute(attrName, "", "");
       responseP->entityType.contextAttributeVector.push_back(caP);
     }
   }

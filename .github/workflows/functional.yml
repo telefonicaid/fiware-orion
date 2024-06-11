@@ -2,75 +2,62 @@ name: Functional Tests
 
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
+      - '!checkvalgrind**'
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-   TEST_IMAGE_NAME: fiware/orion-ci:rpm8
+   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
 
 jobs:
-  functional-1:
-    runs-on: ubuntu-18.04
+  functional:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
 
     services:
       mongodb:
-        image: mongo:4.4
+        image: mongo:6.0
         ports:
           - 27017:27017
+
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.15
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.15
+        ports:
+        - 1884:1883
+
+    name: functional - ${{ matrix.payload.name }}
+
+    strategy:
+      matrix:
+        payload:
+          - { name: 'batch 1 - cache', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - cache', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - cache', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - cache', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - cache', range: '-e FT_FROM_IX=1201' }
+          - { name: 'batch 1 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300' }
+          - { name: 'batch 2 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600' }
+          - { name: 'batch 3 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900' }
+          - { name: 'batch 4 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200' }
+          - { name: 'batch 5 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201' }
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Run functional test
         run: |
-          docker run  --network host -t --rm -e FT_FROM_IX=0 -e FT_TO_IX=300 -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional
-
-  functional-2:
-    runs-on: ubuntu-18.04
-
-    services:
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Run functional test
-        run: |
-          docker run  --network host -t --rm -e FT_FROM_IX=301 -e FT_TO_IX=600 -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional
-
-  functional-3:
-    runs-on: ubuntu-18.04
-
-    services:
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Run functional test
-        run: |
-          docker run  --network host -t --rm -e FT_FROM_IX=601 -e FT_TO_IX=900 -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional
-
-  functional-4:
-    runs-on: ubuntu-18.04
-
-    services:
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Run functional test
-        # we dont set an upper index here, so that no test is left out(currently there are 1169, if a lot of them will be added an additional stage might make sense)
-        run: |
-          docker run  --network host -t --rm -e FT_FROM_IX=901 -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional
+          docker run  --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional

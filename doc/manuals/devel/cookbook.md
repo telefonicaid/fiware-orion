@@ -20,7 +20,7 @@ You basically need to implement two things:
 * a **new item** in the `PaArgument` vector `paArgs`
 
 If the new CLI parameter is a boolean one, like `-v` (verbose), a `bool` variable is needed,
-if it's a text parameter, like `-dbHost <host name>`, a char-vector is used, and so on.
+if it's a text parameter, like `-dbURI <MongoDB URI>`, a char-vector is used, and so on.
 
 The easiest way is to simply copy an older CLI parameter of the same type.
 
@@ -118,8 +118,7 @@ typedef struct RestService
 {  
   RequestType   request;          // The type of the request  
   int           components;       // Number of components in the URL path  
-  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }  
-  std::string   payloadWord;      // No longer used, should be removed ... ?  
+  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }   
   RestTreat     treat;            // service function pointer  
 } RestService;
 ```
@@ -138,7 +137,7 @@ NOTE:
 
 Note also that in `orionRestServices.cpp`, these `RestService` vector lines are really long, and our style guide is against too long lines. However, making the lines shorter by using definitions just make the code more difficult to understand and we don't want that.
 
-> Side-note: The [style guide](../contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars.
+> Side-note: The [style guide](contribution_guidelines.md#s9-line-length) says a source code line **shouldn't** be longer than 120 chars.
 
 The service routine `putMetadata()` should reside in `src/lib/serviceRoutinesV2/putMetadata.h/cpp` and its signature must be as follows:  
 ```
@@ -187,7 +186,7 @@ A functional test file contains six sections:
 2. NAME section
 3. SHELL-INIT section
 4. SHELL section
-5. EXPECT/REGEXPECT section
+5. REGEXPECT section
 6. TEARDOWN section
 
 Each section (except the Copyright preamble, that starts at the beginning of the file) must have a header, that tells the functional test harness where every section starts/ends:
@@ -195,10 +194,8 @@ Each section (except the Copyright preamble, that starts at the beginning of the
 * `--NAME--`
 * `--SHELL-INIT--`
 * `--SHELL--`
-* `--REGEXPECT--` / `--EXPECT--`
+* `--REGEXPECT--`
 * `--TEARDOWN--`
-
-If `--REGEXPECT--` is used (and not `--EXPECT--`), then the expected section permits regular expressions. That is the only different between these two.
 
 ### Copyright section
 This section is simply for the Copyright header. Copy an old one. Try to remember to change the year, if necessary.
@@ -275,7 +272,7 @@ echo "0x. description of test step 0x"
 echo "==============================="  
 ```
 
-and the steps end with two calls to `echo`, to separate the current step from the next in the output. This is pretty important as it makes it **so much** easier to read the output, which must match what is in the section that follows, the **EXPECT/REGEXPECT** section.
+and the steps end with two calls to `echo`, to separate the current step from the next in the output. This is pretty important as it makes it **so much** easier to read the output, which must match what is in the section that follows, the **REGEXPECT** section.
 
 A typical step (e.g. to create an entity) looks like this:  
 
@@ -300,22 +297,16 @@ echo
 echo
 ```
 
-### EXPECT/REGEXPECT Section
+### REGEXPECT Section
 First of all, the test harness (`test/functionalTest/testHarness.sh`) admits two types of 'expect sections'. Either
 
 ```
---EXPECT--
+--REGEXPECT--
 ```
 
-or
+It permits to add regular expressions using the `REGEX()` syntax, which is very important for the comparison of dates, or IDs created by Orion and returned in the response, like a registration id or a correlator or a simple timestamp. An important limitation is that there can only be **one REGEX** per line in the REGEXPECT section.
 
-```
---REG-EXPECT--
-```
-
-You have to **pick one**. Pretty much **all** current functests use the `--REG-EXPECT--` type. The advantage with --REG-EXPECT-- is that it permits to add regular expressions using the `REGEX()` syntax, which is very important for the comparison of dates, or IDs created by Orion and returned in the response, like a registration id or a correlator or a simple timestamp. An important limitation is that there can only be **one REGEX** per line in the REG-EXPECT section.
-
-That said, in the REG-EXPECT section, just add what is the expected output from the test step in question. For example, the example "01. Create entity E1 with attribute A1" from the above sub-chapter about the SHELL section would
+That said, just add what is the expected output from the test step in question. For example, the example "01. Create entity E1 with attribute A1" from the above sub-chapter about the SHELL section would
 have this corresponding piece in the --REGEXPECT-- section:  
 
 ```
@@ -338,6 +329,8 @@ Note the two occurrences of `REGEX()`, for the correlator and the date:
 * The correlator is a string of 36 characters, that is a hex number with hyphens. This regex could be made better, now that we know exactly
 where each hyphen must come, however, it's not really necesary.  
 * The second REGEX, for the `Date` HTTP header could also be more elaborated. Also not necessary.
+
+You can include comments in the REGEXPECT section. Any line starting with `##` in the `--REGEXPECT--` section is ignored.
 
 ### TEARDOWN Section
 This is where processes are killed and databases are removed, so that the following test case will start with a clean slate. The most typical commands used are:

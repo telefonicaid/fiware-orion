@@ -160,10 +160,10 @@ echo
 01. Attempt to create sub with expires date of wrong JSON data type, see error
 ==============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 62
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
 
 {
     "description": "expires is not a string",
@@ -174,10 +174,10 @@ Date: REGEX(.*)
 02. Attempt to create sub with invalid expires date (SSS), see error
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 {
     "description": "expires has an invalid format",
@@ -188,10 +188,10 @@ Date: REGEX(.*)
 03. Attempt to create sub with expires date as valid ISO8601, but with a trailing '.,00L', see error
 ====================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 {
     "description": "expires has an invalid format",
@@ -202,20 +202,20 @@ Date: REGEX(.*)
 04. Create a sub with correct expires 2016-04-05T14:10:00.000+01.00
 ===================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 05. GET /v2/subscriptions, see only the sub from step 04
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 428
-Content-Type: application/json 
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 474
 
 [
     {
@@ -227,6 +227,7 @@ Date: REGEX(.*)
                 "temperature"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:1234"
             },
@@ -239,7 +240,8 @@ Date: REGEX(.*)
                     "temperature_0",
                     "temperature_1",
                     "temperature_2"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

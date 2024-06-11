@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Patch Erroneous Service Patch 
+Patch Erroneous Service Patch
 
 --SHELL-INIT--
 dbInit CB
@@ -32,14 +32,14 @@ brokerStart CB
 #
 # 01. PATCH /v2/ent=ities/E1 (invalid URI)
 # 02. PATCH /v2/entities/E1 (incorrect service path)
-# 03. PATCH /v2/entities/E1 (service path without /) 
+# 03. PATCH /v2/entities/E1 (service path without /)
 # 04. PATCH /v2/entities/E1 (unrecognized content type)
 
 
 echo "01. PATCH /v2/ent=ities/E1 (invalid URI)"
 echo "========================================"
 payload='{ "A1": 1 }'
-orionCurl --url /v2/ent=ities/E1 --payload "$payload" -X PATCH 
+orionCurl --url /v2/ent=ities/E1 --payload "$payload" -X PATCH
 echo
 echo
 
@@ -71,10 +71,10 @@ echo
 01. PATCH /v2/ent=ities/E1 (invalid URI)
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "invalid character in URI",
@@ -85,10 +85,10 @@ Date: REGEX(.*)
 02. PATCH /v2/entities/E1/attrs (incorrect service path)
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "a component of ServicePath contains an illegal character",
@@ -99,10 +99,10 @@ Date: REGEX(.*)
 03. PATCH /v2/entities/E1/attrs (service path without /)
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 111
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
 
 {
     "description": "Only /absolute/ Service Paths allowed [a service path must begin with /]",
@@ -113,10 +113,10 @@ Date: REGEX(.*)
 04. PATCH /v2/entities/E1/attrs (unrecognized content type)
 ===========================================================
 HTTP/1.1 415 Unsupported Media Type
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "description": "not supported content type: text/plain",

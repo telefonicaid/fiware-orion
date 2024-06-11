@@ -56,10 +56,10 @@ echo
 01. Update with empty entities list
 ===================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 60
 
 {
     "description": "empty entities vector",
@@ -70,10 +70,10 @@ Date: REGEX(.*)
 02. Get entities to check the broker is alive
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

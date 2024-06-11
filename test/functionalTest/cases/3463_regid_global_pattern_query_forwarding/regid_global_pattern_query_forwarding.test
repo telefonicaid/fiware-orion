@@ -151,50 +151,50 @@ echo
 01. Create E1 A1/A2 in CP1
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 02. Create E2 A2/A3 in CP1
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 03. Create E3 A3 in CP1
 =======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 04. Register idPattern: .*, attrs: {null}, provApp: CP1, in CB
 ==============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Query .*, attrs = {null} at CB, see E1 A1/A2 and E2 A2/A3 and E3 A3
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 360
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 360
 
 [
     {
@@ -240,10 +240,10 @@ Date: REGEX(.*)
 06. Query .*, attrs = [ A2 ] at CB, see E1 A2 and E2 A2 and E3 {null}
 =====================================================================
 HTTP/1.1 200 OK
-Content-Length: 186
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 186
 
 [
     {
@@ -274,10 +274,10 @@ Date: REGEX(.*)
 07. Query E1, attrs = {null} at CB, see E1 A1/A2
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 138
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 138
 
 {
     "A1": {
@@ -298,10 +298,10 @@ Date: REGEX(.*)
 08. Query E1, attrs = [ A2 ] at CB, see E1 A2
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 {
     "A2": {

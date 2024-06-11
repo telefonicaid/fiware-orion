@@ -50,6 +50,7 @@ public:
 private:
  std::string  ss;
  bool         empty;
+ bool         closed;
 };
 
 
@@ -64,6 +65,7 @@ public:
   void        addNumber(double value);
   void        addDate(double timestamp);
   void        addBool(bool b);
+  void        addNull(void);
 
 
   std::string str();
@@ -71,6 +73,7 @@ public:
 private:
  std::string  ss;
  bool         empty;
+ bool         closed;
 };
 
 
@@ -105,6 +108,35 @@ std::string vectorToJson(std::vector<T> &list)
   {
     ss += ',';
     ss += list[i].toJson();
+  }
+  ss += ']';
+  return ss;
+}
+
+/* ****************************************************************************
+*
+* vectorToJson -
+*
+* Similar to the former one but for pointer case
+*/
+template <class T>
+std::string vectorToJson(std::vector<T*> &list)
+{
+  typedef typename std::vector<T*>::size_type size_type;
+
+  if (list.empty())
+  {
+    return "[]";
+  }
+
+  std::string ss;
+
+  ss += '[';
+  ss += list[0]->toJson();
+  for (size_type i = 1; i != list.size(); ++i)
+  {
+    ss += ',';
+    ss += list[i]->toJson();
   }
   ss += ']';
   return ss;

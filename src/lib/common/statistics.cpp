@@ -55,41 +55,104 @@ int noOfRequestsWithoutPayload = -1;
 // we can live with it...
 UrlCounter noOfRequestCounters[] =
 {
-  //                                                      GET    POST   PATCH  PUT    DELET  OPT
-  {EntryPointsRequest,            -1, -1, -1, -1, -1, -1, true,  false, false, false ,false, true},
-  {EntitiesRequest,               -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
-  {EntityRequest,                 -1, -1, -1, -1, -1, -1, true,  true,  true,  true,  true,  true},
-  {EntityAttributeRequest,        -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  true},
-  {EntityAttributeValueRequest,   -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, true},
-  {EntityAllTypesRequest,         -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
-  {EntityTypes,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
-  {SubscriptionsRequest,          -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
-  {IndividualSubscriptionRequest, -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
-  {RegistrationsRequest,          -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
-  {RegistrationRequest,           -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
-  {BatchQueryRequest,             -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
-  {BatchUpdateRequest,            -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
-  // FIXME P5: NotifyContext is shared for v1 and v2, both use postNotifyContext(). Weird...
-  {NotifyContext,                 -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  // v2                                                         GET    POST   PATCH  PUT    DELET  OPT
+  {EntryPointsRequest,            "v2", -1, -1, -1, -1, -1, -1, true,  false, false, false ,false, true},
+  {EntitiesRequest,               "v2", -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {EntityRequest,                 "v2", -1, -1, -1, -1, -1, -1, true,  true,  true,  true,  true,  true},
+  {EntityAttributeRequest,        "v2", -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  true},
+  {EntityAttributeValueRequest,   "v2", -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, true},
+  {EntityAllTypesRequest,         "v2", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {EntityTypeRequest,             "v2", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, true},
+  {SubscriptionsRequest,          "v2", -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {SubscriptionRequest,           "v2", -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
+  {RegistrationsRequest,          "v2", -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, true},
+  {RegistrationRequest,           "v2", -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
+  {BatchQueryRequest,             "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
+  {BatchUpdateRequest,            "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
+  {NotifyContext,                 "v2",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
 
-  {LogTraceRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
-  {StatisticsRequest,             -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
-  {LogLevelRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, false},
-  {SemStateRequest,               -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  {MetricsRequest,                -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
-  {ExitRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  {LeakRequest,                   -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false}
+  {LogTraceRequest,               "log", -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
+  {StatisticsRequest,             "statistics", -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
+  {StatisticsRequest,             "cache", -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
+  {LogLevelRequest,               "admin", -1, -1, -1, -1, -1, -1, true,  false, false, true,  false, false},
+  {SemStateRequest,               "admin", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {VersionRequest,                "version", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {MetricsRequest,                "admin", -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
+
+  // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
+  // v1 and ngsi10 legacy                                                           GET    POST   PATCH  PUT    DELET  OPT
+  //{ContextEntitiesByEntityId,                     "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+  //{ContextEntityAttributes,                       "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+  //{EntityByIdAttributeByName,                     "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+  //{ContextEntityTypes,                            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+  //{ContextEntityTypeAttributeContainer,           "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+  //{ContextEntityTypeAttribute,                    "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+
+  //{IndividualContextEntity,                       "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
+  //{IndividualContextEntity,                       "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
+  {IndividualContextEntity,                       "v1",     -1, -1, -1, -1, -1, -1, false,  false,  false, true,  true,  false},
+
+  //{IndividualContextEntityAttributes,             "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
+  //{IndividualContextEntityAttributes,             "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},ç
+
+  //{IndividualContextEntityAttribute,              "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
+  //{IndividualContextEntityAttribute,              "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
+  {IndividualContextEntityAttribute,              "v1",     -1, -1, -1, -1, -1, -1, true,  false,  false, false,  false,  false},
+
+  //{Ngsi10ContextEntityTypes,                      "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  //{Ngsi10ContextEntityTypes,                      "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+
+  //{Ngsi10ContextEntityTypesAttributeContainer,    "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  //{Ngsi10ContextEntityTypesAttributeContainer,    "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+
+  //{Ngsi10ContextEntityTypesAttribute,             "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  //{Ngsi10ContextEntityTypesAttribute,             "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+
+  //{Ngsi10SubscriptionsConvOp,                     "v1",     -1, -1, -1, -1, -1, -1, false,  false, false, true, true,  false},
+  //{Ngsi10SubscriptionsConvOp,                     "ngsi10", -1, -1, -1, -1, -1, -1, false,  false, false, true, true,  false},
+
+  //{EntityTypes,                                   "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  //{AttributesForEntityType,                       "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  //{AllContextEntities,                            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+  //{AllEntitiesWithTypeAndId,                      "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
+  //{IndividualContextEntityAttributeWithTypeAndId, "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
+  //{ContextEntitiesByEntityIdAndType,              "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+  //{EntityByIdAttributeByNameIdAndType,            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
+
+  //{RegisterContext,                               "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  //{DiscoverContextAvailability,                   "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+
+  {UpdateContext,                                 "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  {UpdateContext,                                 "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  {QueryContext,                                  "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  {QueryContext,                                  "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  //{SubscribeContext,                              "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // two URLs: subscribeContext and contextSubscriptions
+  //{SubscribeContext,                              "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // two URLs: subscribeContext and contextSubscriptions
+  //{UpdateContextSubscription,                     "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  //{UpdateContextSubscription,                     "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  //{UnsubscribeContext,                            "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  //{UnsubscribeContext,                            "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+
+  //{NotifyContext,                                 "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // also in v2
+  //{NotifyContext,                                 "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // also in v2
+
+  // Special ones (LeakRequest MUST be always the last one in the array. See statisticsUpdate() and resetStatistics() comments
+  {ExitRequest,                   "exit", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
+  {LeakRequest,                   "leak", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false}
 };
 
 // Special
-int noOfVersionRequests          = -1;
-int noOfLegacyNgsiv1Requests     = -1;
 int noOfInvalidRequests          = -1;
 int noOfMissedVerb               = -1;
 int noOfRegistrationUpdateErrors = -1;
 int noOfDiscoveryErrors          = -1;
 int noOfNotificationsSent        = -1;
 int noOfSimulatedNotifications   = -1;
+
+// Deprecated features
+int noOfDprNgsiv1Request         = -1;
+int noOfDprLegacyForwarding      = -1;
+int noOfDprGeoformat             = -1;
 
 
 /* ****************************************************************************
@@ -131,6 +194,10 @@ std::string renderTimingStatistics(void)
   bool accMongoReadWaitTime    = (accTimeStat.mongoReadWaitTime.tv_sec != 0)      || (accTimeStat.mongoReadWaitTime.tv_nsec != 0);
   bool accMongoWriteWaitTime   = (accTimeStat.mongoWriteWaitTime.tv_sec != 0)     || (accTimeStat.mongoWriteWaitTime.tv_nsec != 0);
   bool accMongoCommandWaitTime = (accTimeStat.mongoCommandWaitTime.tv_sec != 0)   || (accTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool accExprBasicCtxBldTime  = (accTimeStat.exprBasicCtxBldTime.tv_sec != 0)    || (accTimeStat.exprBasicCtxBldTime.tv_nsec != 0);
+  bool accExprBasicEvalTime    = (accTimeStat.exprBasicEvalTime.tv_sec != 0)      || (accTimeStat.exprBasicEvalTime.tv_nsec != 0);
+  bool accExprJexlCtxBldTime   = (accTimeStat.exprJexlCtxBldTime.tv_sec != 0)     || (accTimeStat.exprJexlCtxBldTime.tv_nsec != 0);
+  bool accExprJexlEvalTime     = (accTimeStat.exprJexlEvalTime.tv_sec != 0)       || (accTimeStat.exprJexlEvalTime.tv_nsec != 0);
   bool accRenderTime           = (accTimeStat.renderTime.tv_sec != 0)             || (accTimeStat.renderTime.tv_nsec != 0);
   bool accReqTime              = (accTimeStat.reqTime.tv_sec != 0)                || (accTimeStat.reqTime.tv_nsec != 0);
 
@@ -140,6 +207,10 @@ std::string renderTimingStatistics(void)
   bool lastMongoReadWaitTime    = (lastTimeStat.mongoReadWaitTime.tv_sec != 0)    || (lastTimeStat.mongoReadWaitTime.tv_nsec != 0);
   bool lastMongoWriteWaitTime   = (lastTimeStat.mongoWriteWaitTime.tv_sec != 0)   || (lastTimeStat.mongoWriteWaitTime.tv_nsec != 0);
   bool lastMongoCommandWaitTime = (lastTimeStat.mongoCommandWaitTime.tv_sec != 0) || (lastTimeStat.mongoCommandWaitTime.tv_nsec != 0);
+  bool lastExprBasicCtxBldTime  = (lastTimeStat.exprBasicCtxBldTime.tv_sec != 0)  || (lastTimeStat.exprBasicCtxBldTime.tv_nsec != 0);
+  bool lastExprBasicEvalTime    = (lastTimeStat.exprBasicEvalTime.tv_sec != 0)    || (lastTimeStat.exprBasicEvalTime.tv_nsec != 0);
+  bool lastExprJexlCtxBldTime   = (lastTimeStat.exprJexlCtxBldTime.tv_sec != 0)   || (lastTimeStat.exprJexlCtxBldTime.tv_nsec != 0);
+  bool lastExprJexlEvalTime     = (lastTimeStat.exprJexlEvalTime.tv_sec != 0)     || (lastTimeStat.exprJexlEvalTime.tv_nsec != 0);
   bool lastRenderTime           = (lastTimeStat.renderTime.tv_sec != 0)           || (lastTimeStat.renderTime.tv_nsec != 0);
   bool lastReqTime              = (lastTimeStat.reqTime.tv_sec != 0)              || (lastTimeStat.reqTime.tv_nsec != 0);
 
@@ -164,6 +235,10 @@ std::string renderTimingStatistics(void)
     if (accMongoReadWaitTime)    accJh.addNumber("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
     if (accMongoWriteWaitTime)   accJh.addNumber("mongoWriteWait",   timeSpecToFloat(accTimeStat.mongoWriteWaitTime));
     if (accMongoCommandWaitTime) accJh.addNumber("mongoCommandWait", timeSpecToFloat(accTimeStat.mongoCommandWaitTime));
+    if (accExprBasicCtxBldTime)  accJh.addNumber("exprBasicCtxBld",  timeSpecToFloat(accTimeStat.exprBasicCtxBldTime));
+    if (accExprBasicEvalTime)    accJh.addNumber("exprBasicEval",    timeSpecToFloat(accTimeStat.exprBasicEvalTime));
+    if (accExprJexlCtxBldTime)   accJh.addNumber("exprJexlCtxBld",   timeSpecToFloat(accTimeStat.exprJexlCtxBldTime));
+    if (accExprJexlEvalTime)     accJh.addNumber("exprJexlEval",     timeSpecToFloat(accTimeStat.exprJexlEvalTime));
     if (accRenderTime)           accJh.addNumber("render",           timeSpecToFloat(accTimeStat.renderTime));
     if (accReqTime)              accJh.addNumber("total",            timeSpecToFloat(accTimeStat.reqTime));
 
@@ -179,6 +254,10 @@ std::string renderTimingStatistics(void)
     if (lastMongoReadWaitTime)    lastJh.addNumber("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
     if (lastMongoWriteWaitTime)   lastJh.addNumber("mongoWriteWait",   timeSpecToFloat(lastTimeStat.mongoWriteWaitTime));
     if (lastMongoCommandWaitTime) lastJh.addNumber("mongoCommandWait", timeSpecToFloat(lastTimeStat.mongoCommandWaitTime));
+    if (lastExprBasicCtxBldTime)  lastJh.addNumber("exprBasicCtxBld",  timeSpecToFloat(lastTimeStat.exprBasicCtxBldTime));
+    if (lastExprBasicEvalTime)    lastJh.addNumber("exprBasicEval",    timeSpecToFloat(lastTimeStat.exprBasicEvalTime));
+    if (lastExprJexlCtxBldTime)   lastJh.addNumber("exprJexlCtxBld",   timeSpecToFloat(lastTimeStat.exprJexlCtxBldTime));
+    if (lastExprJexlEvalTime)     lastJh.addNumber("exprJexlEval",     timeSpecToFloat(lastTimeStat.exprJexlEvalTime));
     if (lastRenderTime)           lastJh.addNumber("render",           timeSpecToFloat(lastTimeStat.renderTime));
     if (lastReqTime)              lastJh.addNumber("total",            timeSpecToFloat(lastTimeStat.reqTime));
 
@@ -200,43 +279,6 @@ void timingStatisticsReset(void)
   memset(&accTimeStat, 0, sizeof(accTimeStat));
 }
 
-bool isLegacyNgsiv1(RequestType request)
-{
-  switch(request)
-  {
-  case AllContextEntities:
-  case AllEntitiesWithTypeAndId:
-  case AttributesForEntityType:
-  case ContextEntitiesByEntityId:
-  case ContextEntitiesByEntityIdAndType:
-  case ContextEntityAttributes:
-  case ContextEntityTypeAttribute:
-  case ContextEntityTypeAttributeContainer:
-  case ContextEntityTypes:
-  case DiscoverContextAvailability:
-  case EntityByIdAttributeByName:
-  case EntityByIdAttributeByNameIdAndType:
-  case EntityTypes:
-  case IndividualContextEntity:
-  case IndividualContextEntityAttribute:
-  case IndividualContextEntityAttributes:
-  case IndividualContextEntityAttributeWithTypeAndId:
-  case Ngsi10ContextEntityTypes:
-  case Ngsi10ContextEntityTypesAttribute:
-  case Ngsi10ContextEntityTypesAttributeContainer:
-  case Ngsi10SubscriptionsConvOp:
-  //case NotifyContext:  //FIXME: this is also used for v2. Weird...
-  case QueryContext:
-  case RegisterContext:
-  case SubscribeContext:
-  case UnsubscribeContext:
-  case UpdateContext:
-  case UpdateContextSubscription:
-    return true;
-  default:
-    return false;
-  }
-}
 
 
 /* ****************************************************************************
@@ -254,7 +296,7 @@ bool isLegacyNgsiv1(RequestType request)
 * - noOfNotificationsSent
 * - noOfSimulatedNotifications (this one not in renderStatCountersU(), but in statisticsTreat() directly)
 */
-void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
+void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb, const char* urlPrefix)
 {
   // If statistics are not enabled at CLI, then there is no point of recording anything
   // Performance will be increased in this case
@@ -279,7 +321,8 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
   bool requestFound = false;
   for (unsigned int ix = 0; ; ++ix)
   {
-    if (noOfRequestCounters[ix].request == request)
+    if ((noOfRequestCounters[ix].request == request) &&
+        (strncasecmp(noOfRequestCounters[ix].prefix, urlPrefix, strlen(urlPrefix))) == 0)
     {
       requestFound = true;
       switch(verb)
@@ -365,13 +408,6 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb)
   // If it is not a NGSIv2 request it has to be NGSIv1 or invalid
   if (!requestFound)
   {
-    if (isLegacyNgsiv1(request))
-    {
-      ++noOfLegacyNgsiv1Requests;
-    }
-    else
-    {
-      ++noOfInvalidRequests;
-    }
+    ++noOfInvalidRequests;
   }
 }

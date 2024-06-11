@@ -32,6 +32,9 @@
 
 #include "ngsi/Metadata.h"
 
+#include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/BSONObjBuilder.h"
+
 
 
 /* ****************************************************************************
@@ -51,12 +54,13 @@ public:
 
   void            push_back(Metadata* item);
   unsigned int    size(void) const;
-  Metadata*       lookupByName(const std::string& _name);
+  Metadata*       lookupByName(const std::string& _name) const;
   void            release(void);
   void            fill(MetadataVector* mV);
- 
-  
+
   Metadata* operator[](unsigned int ix) const;
+
+  void            toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);
 
 private:
   bool matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter);

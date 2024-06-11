@@ -2,17 +2,20 @@ name: Compliance Tests
 
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
+      - '!checkvalgrind**'
 
 jobs:
   compliance:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Run Test
         run: |
-          ci/rpm8/build.sh -s compliance -tp $(pwd)
+          ci/deb/build.sh -s compliance -tp $(pwd)

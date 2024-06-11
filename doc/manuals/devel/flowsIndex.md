@@ -106,9 +106,13 @@ Related to mongoBackend logic (MB and MD prefixes):
 
 Related to notifications (NF prefix):
 
-* [NF-01: Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01)
+* [NF-01: HTTP Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01)
   * Continues from MD-01
-* [NF-03: Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03)
+* [NF-01b: MQTT Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01b)
+  * Continues from MD-01
+* [NF-03: HTTP Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03)
+  * Continues from MD-01
+* [NF-03b: MQTT Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03b)
   * Continues from MD-01
 
 Related to the subscription cache (SC prefix):

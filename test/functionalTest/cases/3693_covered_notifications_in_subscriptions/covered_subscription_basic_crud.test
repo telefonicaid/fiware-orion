@@ -1,0 +1,604 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Covered subscription basic CRUD
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription without covered
+# 02. GET subscription and see covered=false
+# 03. Update subscription with covered=true
+# 04. GET subscription and see covered=true
+# 05. Update subscrption without touching covered
+# 06. GET subscription and see covered=true
+# 07. Update subscription with covered=false
+# 08. GET subscription and see covered=false
+# 09. Update subscription without covered
+# 10. GET subscriptions and see covered=false
+# 11. Update subscription with covered=true and without attributes and see fail
+# 12. Update subscription with covered=foo and see error
+# 13. Create subscription with covered=foo and see error
+# 14. Create subscription with covered=false and without attributes and see ok
+# 15. Create subscription with covered=true and without attributes and see fail
+#
+
+echo '01. Create subscription without covered'
+echo '======================================='
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature",
+      "humudity",
+      "brightness"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo '02. GET subscription and see covered=false'
+echo '=========================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '03. Update subscription with covered=true'
+echo '========================================='
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature",
+      "humudity",
+      "brightness"
+    ],
+    "covered": true
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '04. GET subscription and see covered=true'
+echo '========================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '05. Update subscrption without touching covered'
+echo '==============================================='
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T2"
+      }
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '06. GET subscription and see covered=true'
+echo '========================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '07. Update subscription with covered=false'
+echo '=========================================='
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature",
+      "humudity",
+      "brightness"
+    ],
+    "covered": false
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '08. GET subscription and see covered=false'
+echo '=========================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '09. Update subscription without covered'
+echo '======================================='
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature",
+      "humudity",
+      "brightness"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '10. GET subscription and see covered=false'
+echo '=========================================='
+orionCurl --url /v2/subscriptions/${subId}
+echo
+echo
+
+
+echo '11. Update subscription with covered=true and without attributes and see fail'
+echo '============================================================================='
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "covered": true
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '12. Update subscription with covered=foo and see error'
+echo '======================================================'
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature",
+      "humudity",
+      "brightness"
+    ],
+    "covered": "foo"
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '13. Create subscription with covered=foo and see error'
+echo '======================================================'
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "temperature",
+      "temp1",
+      "temp2"
+    ],
+    "covered": "foo"
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '14. Create subscription with covered=false and without attributes and see ok'
+echo '============================================================================'
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "covered": false
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '15. Create subscription with covered=true and without attributes and see fail'
+echo '============================================================================='
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "covered": true
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription without covered
+=======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. GET subscription and see covered=false
+==========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 332
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Update subscription with covered=true
+=========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. GET subscription and see covered=true
+=========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 331
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "covered": true,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Update subscrption without touching covered
+===============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. GET subscription and see covered=true
+=========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 332
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "covered": true,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T2"
+            }
+        ]
+    }
+}
+
+
+07. Update subscription with covered=false
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. GET subscription and see covered=false
+==========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 333
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T2"
+            }
+        ]
+    }
+}
+
+
+09. Update subscription without covered
+=======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. GET subscription and see covered=false
+==========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 333
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [
+            "temperature",
+            "humudity",
+            "brightness"
+        ],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T2"
+            }
+        ]
+    }
+}
+
+
+11. Update subscription with covered=true and without attributes and see fail
+=============================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 107
+
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+
+
+12. Update subscription with covered=foo and see error
+======================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 60
+
+{
+    "description": "covered is not a bool",
+    "error": "BadRequest"
+}
+
+
+13. Create subscription with covered=foo and see error
+======================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 60
+
+{
+    "description": "covered is not a bool",
+    "error": "BadRequest"
+}
+
+
+14. Create subscription with covered=false and without attributes and see ok
+============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+15. Create subscription with covered=true and without attributes and see fail
+=============================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 107
+
+{
+    "description": "covered true cannot be used if notification attributes list is empty",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

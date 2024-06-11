@@ -64,18 +64,19 @@ typedef enum TraceLevels
   LmtParsedPayload,
   LmtParseCheck,
   LmtNew,
-  LmtTreat = 45,
-  LmtDump,
+  LmtTreat,
+  LmtDump = 45,
   LmtNullNode,
   LmtCompoundValue,
   LmtCompoundValueAdd,
-  LmtCompoundValueLookup = 50,
-  LmtCompoundValueRender,
+  LmtCompoundValueLookup,
+  LmtCompoundValueRender = 50,
   LmtCompoundValueRaw,
   LmtCompoundValueContainer,
   LmtCompoundValueStep,
-  LmtCompoundValueShow = 55,
-  LmtJsonAttributes,
+  LmtCompoundValueShow,
+  LmtJsonAttributes = 55,
+  LmtRegexError,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,
@@ -100,6 +101,7 @@ typedef enum TraceLevels
   LmtNotifier = 160,
   LmtNotificationRequestPayload,
   LmtNotificationResponsePayload,
+  LmtMqttNotif,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,
@@ -129,6 +131,7 @@ typedef enum TraceLevels
   LmtNotImplemented,
   LmtCurlContext,
   LmtThreadpool,
+  LmtExpr,
 
   LmtOldInfo = 240,   // old INFO traces moved to DEBUG in Orion 2.5.0
 

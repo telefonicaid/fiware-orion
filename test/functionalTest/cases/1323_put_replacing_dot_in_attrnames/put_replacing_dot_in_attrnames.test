@@ -117,7 +117,7 @@ echo
 
 echo "07. Check attributes in DB"
 echo "=========================="
-mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "E1",  "type": "Thing", "servicePath" : "/" } }, {_id:0, attrNames: 1})'
+mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "E1",  "type": "Thing", "servicePath" : "/" } }, {_id:0, attrNames: 1})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -126,20 +126,20 @@ echo
 01. Create E1/A1+A2
 ===================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 125
 
 {
     "A1.X": {
@@ -160,10 +160,10 @@ Date: REGEX(.*)
 02b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 45
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 45
 
 {
     "A1.X": 1,
@@ -176,18 +176,18 @@ Date: REGEX(.*)
 03. Modify E1 to E1/A2+A3
 =========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 125
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 125
 
 {
     "A2..y": {
@@ -208,10 +208,10 @@ Date: REGEX(.*)
 04b. Now look at E1 with options=keyValues
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 45
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 45
 
 {
     "A2..y": 2,
@@ -224,10 +224,10 @@ Date: REGEX(.*)
 05. GET attribute A2..y
 =======================
 HTTP/1.1 200 OK
-Content-Length: 41
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 41
 
 {
     "metadata": {},
@@ -239,10 +239,10 @@ Date: REGEX(.*)
 05b. GET attribute A2..y using options=keyValues
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 11
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 11
 
 {
     "A2..y": 2
@@ -252,10 +252,10 @@ Date: REGEX(.*)
 06. GET attribute A3.Z
 ======================
 HTTP/1.1 200 OK
-Content-Length: 41
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 41
 
 {
     "metadata": {},
@@ -267,10 +267,10 @@ Date: REGEX(.*)
 06b. GET attribute A3.Z using options=keyValues
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 10
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 10
 
 {
     "A3.Z": 3
@@ -279,7 +279,12 @@ Date: REGEX(.*)
 
 07. Check attributes in DB
 ==========================
-{ "attrNames" : [ "A2..y", "A3.Z" ] }
+{
+    "attrNames": [
+        "A2..y",
+        "A3.Z"
+    ]
+}
 
 
 --TEARDOWN--

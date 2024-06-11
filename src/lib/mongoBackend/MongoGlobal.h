@@ -71,17 +71,10 @@ extern bool mongoMultitenant(void);
 */
 void mongoInit
 (
-  const char*  dbHost,
-  const char*  rplSet,
+  const char*  dbURI,
   std::string  dbName,
-  const char*  user,
   const char*  pwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
@@ -214,7 +207,7 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 * processAreaScopeV2 -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsasge = false);
+extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
 
 
 
@@ -229,7 +222,6 @@ extern bool entitiesQuery
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
-  bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,
@@ -302,13 +294,10 @@ extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 */
 void subToNotifyList
 (
-  const std::vector<std::string>&  modifiedAttrs,
-  const std::vector<std::string>&  conditionVector,
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist,
-  bool&                            op
+  const bool&                      blacklist
 );
 
 
@@ -322,11 +311,8 @@ void subToNotifyList
 extern StringList subToAttributeList
 (
   const orion::BSONObj&           attrL,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  modifiedAttrs,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 );
 
 
@@ -338,21 +324,6 @@ extern StringList subToAttributeList
 * Extract the attribute list from a BSON document (in the format of the csubs collection)
 */
 extern StringList subToAttributeList(const orion::BSONObj& attrL);
-
-
-
-/* ****************************************************************************
-*
-* processConditionVector -
-*
-* NGSIv2 wrapper
-*/
-extern orion::BSONArray processConditionVector
-(
-  const std::vector<std::string>&    condAttributesV,
-  const std::vector<ngsiv2::EntID>&  entitiesV,
-  const std::vector<std::string>&    notifAttributesV
-);
 
 
 
@@ -432,6 +403,6 @@ extern void cprLookupByAttribute
 * addBuiltins -
 *
 */
-extern void addBuiltins(ContextElementResponse* cerP);
+extern void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType);
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOGLOBAL_H_

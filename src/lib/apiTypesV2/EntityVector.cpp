@@ -71,6 +71,30 @@ std::string EntityVector::toJson
 }
 
 
+/* ****************************************************************************
+*
+* EntityVector::toJson -
+*/
+std::string EntityVector::toJson(RenderFormat renderFormat)
+{
+  JsonVectorHelper jh;
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    // This is to avoid spurious entities like '{"id": "E", "type": "T"}'
+    // typically generated when CPrs are in use. These entities have
+    // creation date equal to 0 and no attributes
+    if ((vec[ix]->creDate == 0) && (vec[ix]->attributeVector.size() == 0))
+    {
+      continue;
+    }
+    jh.addRaw(vec[ix]->toJson(renderFormat));
+  }
+
+  return jh.str();
+}
+
+
 
 /* ****************************************************************************
 *
@@ -94,12 +118,9 @@ std::string EntityVector::toJsonV1
 
   out += startTag("contextElements", true);
 
-  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
-  std::vector<std::string> emptyV;
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->toJsonV1(asJsonObject, requestType, emptyV, false, emptyV, ix != vec.size() - 1);
+    out += vec[ix]->toJsonV1(asJsonObject, requestType, false, ix != vec.size() - 1);
   }
 
   out += endTag(comma, true);
@@ -131,7 +152,7 @@ std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
     {
       if (apiVersion == V2)
       {
-        alarmMgr.badInput(clientIp, "invalid vector of Entity");
+        alarmMgr.badInput(clientIp, "invalid vector of Entity", res);
       }
       return res;
     }

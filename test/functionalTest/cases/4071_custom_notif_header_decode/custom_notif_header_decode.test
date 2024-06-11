@@ -1,0 +1,159 @@
+# Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification header decode
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription with template in header
+# 02. Create entity to trigger the subscription
+# 03. Dump accumulator to see the notification
+#
+
+echo "01. Create subscription with template in header"
+echo "==============================================="
+payload='{
+  "description": "A subscription to get info about myEntity",
+  "subject": {
+    "entities": [
+      {
+        "id": "myEntity",
+        "type": "myType"
+      }
+    ],
+    "condition": {
+      "attrs": [ ]
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "headers": {
+        "Authorization": "Basic ABC...ABC%3D%3D"
+      },
+      "qs": {
+        "data": "${id}",
+        "EntityType": "${type}"
+      }
+    },
+    "attrs": [
+      "temperature"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity to trigger the subscription"
+echo "============================================="
+payload='{
+        "id": "myEntity",
+        "type": "myType",
+        "description": {
+                "value": "My happy entity",
+                "type": "Text"
+        },
+        "online": {
+                "value": true,
+                "type": "Boolean"
+        },
+        "temperature": {
+                "value": 42.3,
+                "type": "Number"
+        }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator to see the notification"
+echo "============================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with template in header
+===============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity to trigger the subscription
+=============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/myEntity?type=myType
+Content-Length: 0
+
+
+
+03. Dump accumulator to see the notification
+============================================
+POST http://127.0.0.1:9997/notify?EntityType=myType&data=myEntity
+Fiware-Servicepath: /
+Content-Length: 147
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:9997
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+Authorization: Basic ABC...ABC==
+
+{
+    "data": [
+        {
+            "id": "myEntity",
+            "temperature": {
+                "metadata": {},
+                "type": "Number",
+                "value": 42.3
+            },
+            "type": "myType"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

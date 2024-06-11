@@ -40,7 +40,7 @@ brokerStart CB 0-255
 # 08. PUT /v2/entities/E1/attrs/A1/value with TEXT String payload
 # 09. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 # 10. GET /v2/entities/E1/attrs/A1/value as text: OK
-# 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload 
+# 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload
 # 12. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 # 13. GET /v2/entities/E1/attrs/A1/value as text: OK
 # 14. PUT /v2/entities/E1/attrs/A1/value with TEXT Integer payload 123
@@ -245,28 +245,28 @@ echo
 01. POST /v2/entities creating E1 A1=1
 ======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. PUT /v2/entities/E1/attrs/A1/value with JSON object as payload
 ==================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. GET /v2/entities/E1/attrs/A1/value as application/json: OK
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 15
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 15
 
 {
     "a": "1",
@@ -277,10 +277,10 @@ Date: REGEX(.*)
 04. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 15
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 15
 
 {"a":"1","b":2}
 
@@ -288,18 +288,18 @@ Date: REGEX(.*)
 05. PUT /v2/entities/E1/attrs/A1/value with JSON array as payload
 =================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. GET /v2/entities/E1/attrs/A1/value as application/json: OK
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 13
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 13
 
 [
     "a",
@@ -311,10 +311,10 @@ Date: REGEX(.*)
 07. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 13
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 13
 
 ["a","b","c"]
 
@@ -322,18 +322,18 @@ Date: REGEX(.*)
 08. PUT /v2/entities/E1/attrs/A1/value with TEXT String payload
 ===============================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 09. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 =================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "accepted MIME types: text/plain",
@@ -344,10 +344,10 @@ Date: REGEX(.*)
 10. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 8
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 8
 
 "STRING"
 
@@ -355,18 +355,18 @@ Date: REGEX(.*)
 11. PUT /v2/entities/E1/attrs/A1/value with TEXT Boolean payload
 ================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 12. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 =================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "accepted MIME types: text/plain",
@@ -377,10 +377,10 @@ Date: REGEX(.*)
 13. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 4
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 4
 
 true
 
@@ -388,18 +388,18 @@ true
 14. PUT /v2/entities/E1/attrs/A1/value with TEXT Integer payload 123
 ====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 15. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 =================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "accepted MIME types: text/plain",
@@ -410,10 +410,10 @@ Date: REGEX(.*)
 16. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 123
 
@@ -421,18 +421,18 @@ Date: REGEX(.*)
 17. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.14
 ===================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 18. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 =================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "accepted MIME types: text/plain",
@@ -443,10 +443,10 @@ Date: REGEX(.*)
 19. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 4
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 4
 
 3.14
 
@@ -454,18 +454,18 @@ Date: REGEX(.*)
 20. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload -12.1
 ====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 21. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 =================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "accepted MIME types: text/plain",
@@ -476,10 +476,10 @@ Date: REGEX(.*)
 22. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 5
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 5
 
 -12.1
 
@@ -487,18 +487,18 @@ Date: REGEX(.*)
 23. PUT /v2/entities/E1/attrs/A1/value with TEXT Float payload 3.2e2
 ====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 24. GET /v2/entities/E1/attrs/A1/value as application/json: ERROR
 =================================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "accepted MIME types: text/plain",
@@ -509,10 +509,10 @@ Date: REGEX(.*)
 25. GET /v2/entities/E1/attrs/A1/value as text: OK
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 320
 

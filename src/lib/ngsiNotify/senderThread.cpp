@@ -20,17 +20,10 @@
 *
 * Author: Fermín Galán Márquez
 */
-#include "logMsg/traceLevels.h"
-#include "logMsg/logMsg.h"
 
-#include "common/statistics.h"
-#include "common/limits.h"
-#include "common/globals.h"
-#include "common/logTracing.h"
-#include "alarmMgr/alarmMgr.h"
-#include "rest/httpRequestSend.h"
 #include "ngsiNotify/senderThread.h"
-#include "cache/subCache.h"
+#include "ngsiNotify/doNotify.h"
+
 
 /* ****************************************************************************
 *
@@ -38,101 +31,11 @@
 */
 void* startSenderThread(void* p)
 {
-  std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
+  SenderThreadParams* paramsV = (SenderThreadParams*) p;
 
-  for (unsigned ix = 0; ix < paramsV->size(); ix++)
-  {
-    SenderThreadParams* params = (SenderThreadParams*) (*paramsV)[ix];
-    char                portV[STRING_SIZE_FOR_INT];
-    std::string         url;
-
-    snprintf(portV, sizeof(portV), "%d", params->port);
-    url = params->ip + ":" + portV + params->resource;
-
-    strncpy(transactionId, params->transactionId, sizeof(transactionId));
-
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s",
-                       params->ip.c_str(),
-                       params->port,
-                       params->verb.c_str(),
-                       params->tenant.c_str(),
-                       params->servicePath.c_str(),
-                       params->xauthToken.c_str(),
-                       params->resource.c_str(),
-                       params->content_type.c_str()));
-
-    long long    statusCode = -1;
-    std::string  out;
-    LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
-
-    if (!simulatedNotification)
-    {
-      int          r;
-
-      r = httpRequestSend(params->from,
-                          params->ip,
-                          params->port,
-                          params->protocol,
-                          params->verb,
-                          params->tenant,
-                          params->servicePath,
-                          params->xauthToken,
-                          params->resource,
-                          params->content_type,
-                          params->content,
-                          params->fiwareCorrelator,
-                          params->renderFormat,
-                          &out,
-                          &statusCode,
-                          params->extraHeaders);
-
-      LM_T(LmtNotificationResponsePayload, ("notification response: %s", out.c_str()));
-
-      if (r == 0)
-      {
-        __sync_fetch_and_add(&noOfNotificationsSent, 1);
-        alarmMgr.notificationErrorReset(url);
-
-        if (params->registration == false)
-        {
-          subNotificationErrorStatus(params->tenant, params->subscriptionId, 0, statusCode, "");
-        }
-      }
-      else
-      {
-        alarmMgr.notificationError(url, "notification failure for sender-thread: " + out);
-
-        if (params->registration == false)
-        {
-          subNotificationErrorStatus(params->tenant, params->subscriptionId, -1, -1, out);
-        }
-      }
-    }
-    else
-    {
-      LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
-      __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
-    }
-
-    // Add notificacion result summary in log INFO level
-    if (statusCode != -1)
-    {
-      logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), statusCode);
-    }
-    else
-    {
-      logInfoNotification(params->subscriptionId.c_str(), params->verb.c_str(), url.c_str(), out.c_str());
-    }
-
-    // End transaction
-    lmTransactionEnd();
-
-    /* Delete the parameters after using them */
-    delete params;
-  }
-
-  /* Delete the parameters vector after using it */
-  delete paramsV;
+  // process paramV to send notification (freeing memory after use)
+  // note NULL in queue statistics (it doesn't make sense in this case) and curl object (will be generated internally in doNotify)
+  doNotify(paramsV, NULL, NULL, "sender-thread");
 
   pthread_exit(NULL);
   return NULL;

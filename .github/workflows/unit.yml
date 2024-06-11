@@ -2,20 +2,27 @@ name: Unit Tests
 
 on:
   push:
+     branches:
+      - master
   pull_request:
     branches:
       - master
+      - '!checkvalgrind**'
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  TEST_IMAGE_NAME: fiware/orion-ci:rpm8
+  TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
 
 jobs:
   unit:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     services:
       mongodb:
-        image: mongo:4.4
+        image: mongo:6.0
         ports:
           - 27017:27017
 
@@ -24,4 +31,4 @@ jobs:
 
       - name: Run unit tests
         run: |
-          docker run  --network host -t --rm -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit
+          docker run  --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit

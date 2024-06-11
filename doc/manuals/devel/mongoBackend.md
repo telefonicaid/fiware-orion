@@ -202,8 +202,8 @@ During the update process, either in the case of creating new entities or updati
 
 _MD-01: `processSubscriptions()` function detail_
 
-* `processSubscriptions()` is invoked (step 1) from a number of places. See diagrams [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) and [MB-05](#flow-mb-05). Each individual triggered subscription is handled in a loop by calling `processOnChangeConditionForUpdateContext()`.
-* `processOnChangeConditionForUpdateContext()` is called (step 2), which in its turn uses the `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library) in order to send the notification (step 3). The detail is described in diagrams [NF-01](sourceCode.md#flow-nf-01) and [NF-03](sourceCode.md#flow-nf-03).
+* `processSubscriptions()` is invoked (step 1) from a number of places. See diagrams [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) and [MB-05](#flow-mb-05). Each individual triggered subscription is handled in a loop by calling `processNotification()`.
+* `processNotification()` is called (step 2), which in its turn uses the `Notifier` object (from [ngsiNotify](sourceCode.md#srclibngsinotify) library) in order to send the notification (step 3). The detail is described in diagrams [NF-01](sourceCode.md#flow-nf-01) and [NF-03](sourceCode.md#flow-nf-03).
 * The next steps are done only in case a notification was actually sent. Depending on cache usage:
     * If subscription cache is not being used, then the last notification time and count in the database are updated in the database, using `collectionUpdate()` in the `connectionOperations` module (steps 4 and 5).
     * If subscription cache is being used, then the subscription is retrieved from the subscription cache calling `subCacheItemLookup()` (step 7). Next, last notification time and count are modified in the subscription cache (they will be consolidated in the database in the next subscription cache refresh, see details in [this document](subscriptionCache.md#subscription-cache-refresh)). The access to the subscription cache is protected by the subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)), which is taken and released in steps 6 and 8 respectively.
@@ -361,12 +361,9 @@ _MB-12: mongoUpdateSubscription_
 
 * `mongoUpdateSubscription()` is invoked from a service routine (step 1). This can be from either `patchSubscription()` (which resides in `lib/serviceRoutinesV2/patchSubscription.cpp`) or `mongoUpdateContextSubscription()` (which resides in `lib/mongoBackend/mongoUpdateContextSubscription.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* The subscription to be updated is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
-* If the subscription cache is enabled (i.e. `noCache` set to `false`) the subscription cache object is also retrieved from the subscription cache using `subCacheItemLoopkup()` in the `cache` module (step 5).
-* The BSON object of the final subscription is built, based on the BSON object of the original subscription, using different `set*()` functions similar to the ones in the create subscription case (`setExpiration()`, `setHttpInfo()`, etc.). (step 6).
-* The BSON object corresponding to the updated subscription is updated in the database using `collectionUpdate()` in the `connectionOperations` module (steps 7 and 8).
-* In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the new subscription is updated in the subscription cache (step 9). `updateInCache()` uses the subscription cache semaphore internally.
-* If the request semaphore was taken in step 2, then it is released before returning (step 10).
+* The subscription is updated in DB using MongoDB `$set`/`$unset` operators. This operation is done in the function `colletionFindAndModify()` in the `connectionOperations` module (steps 3 and 4).
+* In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the subscription is updated in the subscription cache based in the result from `collectionFindAndModify()` in the previous step (step 5). `updateInCache()` uses the subscription cache semaphore internally.
+* If the request semaphore was taken in step 2, then it is released before returning (step 6).
 
 Note that potential notifications are sent before updating the subscription in the database/cache, so the correct information regarding last notification times and count is taken into account.
 

@@ -32,13 +32,15 @@
 
 /* ****************************************************************************
 *
-* logInfoNotification - rc as int
+* logInfoHttpNotification - rc as int
 */
-extern void logInfoNotification
+extern void logInfoHttpNotification
 (
   const char*  subId,
+  const char*  endpoint,
   const char*  verb,
-  const char*  url,
+  const char*  resource,
+  const char*  payload,
   int          rc
 );
 
@@ -46,14 +48,30 @@ extern void logInfoNotification
 
 /* ****************************************************************************
 *
-* logInfoNotification - rc as string
+* logInfoHttpNotification - rc as string
 */
-extern void logInfoNotification
+extern void logInfoHttpNotification
 (
   const char*  subId,
+  const char*  endpoint,
   const char*  verb,
-  const char*  url,
+  const char*  resource,
+  const char*  payload,
   const char*  rc
+);
+
+
+
+/* ****************************************************************************
+*
+* logInfoMqttNotification
+*/
+extern void logInfoMqttNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  resource,
+  const char*  payload
 );
 
 

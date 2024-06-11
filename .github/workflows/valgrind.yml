@@ -1,0 +1,58 @@
+# Valgrind action is a heavy process that can take arround 50 minutes to finish. Thus, we don't want
+# this to be executed in every pull request but only intentionally on specific branches. In particular,
+# the action is configured so it will run in branches starting with 'checkvalgrind'
+
+name: Valgrind Tests
+
+on:
+  push:
+    branches:
+      - checkvalgrind**
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
+
+jobs:
+  valgrind:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+      mosquitto:
+        # Needed by MQTT notification tests
+        image: eclipse-mosquitto:1.6.15
+        ports:
+        - 1883:1883
+
+      mosquitto-extra:
+        # Needed by MQTT notification tests (multi broker)
+        image: eclipse-mosquitto:1.6.15
+        ports:
+        - 1884:1883
+    
+    name: valgrind - ${{ matrix.payload.name }}
+    
+    strategy:
+      matrix:
+        payload:
+          - { name: 'batch 1 - cache', range: '-e FT_FROM_IX=0 -e FT_TO_IX=300'}
+          - { name: 'batch 2 - cache', range: '-e FT_FROM_IX=301 -e FT_TO_IX=600'}
+          - { name: 'batch 3 - cache', range: '-e FT_FROM_IX=601 -e FT_TO_IX=900'}
+          - { name: 'batch 4 - cache', range: '-e FT_FROM_IX=901 -e FT_TO_IX=1200'}
+          - { name: 'batch 5 - cache', range: '-e FT_FROM_IX=1201'}
+          
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run valgrind test
+        run: |
+          docker run  --privileged --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts valgrind

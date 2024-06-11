@@ -24,6 +24,9 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/RenderFormat.h"
@@ -73,26 +76,56 @@ std::string NotifyContextRequest::toJsonV1
 */
 std::string NotifyContextRequest::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter    
+  RenderFormat                        renderFormat,
+  const std::vector<std::string>&     attrsFilter,
+  bool                                blacklist,
+  const std::vector<std::string>&     metadataFilter,
+  ExprContextObject*                  exprContextObjectP
 )
 {
-  if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES))
+  if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES) && (renderFormat != NGSI_V2_SIMPLIFIEDKEYVALUES) && (renderFormat != NGSI_V2_SIMPLIFIEDNORMALIZED))
   {
     OrionError oe(SccBadRequest, "Invalid notification format");
     alarmMgr.badInput(clientIp, "Invalid notification format");
 
     return oe.toJson();
-  }  
+  }
+  else if (renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED)
+  {
+    if (contextElementResponseVector.size() == 0)
+    {
+      LM_E(("Runtime Error (contextElementResponser MUST NOT be zero length)"));
+      return "{}";
+    }
+    else
+    {
+      std::string out;
+      out += contextElementResponseVector[0]->toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+      return out;
+    }
+  }
+  else if (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES)
+  {
+    if (contextElementResponseVector.size() == 0)
+    {
+      LM_E(("Runtime Error (contextElementResponser MUST NOT be zero length)"));
+      return "{}";
+    }
+    else
+    {
+      std::string out;
+      out += contextElementResponseVector[0]->toJson(NGSI_V2_KEYVALUES, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+      return out;
+    }
+  }
+  else
+  {
+    JsonObjectHelper jh;
 
-  JsonObjectHelper jh;
-
-  jh.addString("subscriptionId", subscriptionId.get());
-  jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
-
-  return jh.str();
+    jh.addString("subscriptionId", subscriptionId.get());
+    jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP));
+    return jh.str();
+  }
 }
 
 

@@ -145,7 +145,7 @@ function dbInit()
   fi
 
   dMsg "database to drop: <$db>" 
-  echo 'db.dropDatabase()' | mongo mongodb://$host:$port/$db --quiet
+  mongosh mongodb://$host:$port/$db --eval 'db.dropDatabase()' --quiet
 }
 
 
@@ -186,9 +186,9 @@ function dbList
 
   if [ "$name" != "" ]
   then
-    echo show dbs | mongo mongodb://$host:$port --quiet | grep "$name" | awk '{ print $1 }'
+    mongosh mongodb://$host:$port --eval 'show dbs' --quiet | grep "$name" | awk '{ print $1 }'
   else
-    echo show dbs | mongo mongodb://$host:$port --quiet | awk '{ print $1 }'
+    mongosh mongodb://$host:$port --eval 'show dbs' --quiet | awk '{ print $1 }'
   fi
 }
 
@@ -212,7 +212,7 @@ function dbResetAll()
     port="27017"
   fi
   
-  all=$(echo show dbs | mongo mongodb://$host:$port --quiet | grep ftest | awk '{ print $1 }')
+  all=$(mongosh mongodb://$host:$port --eval 'show dbs' --quiet | grep ftest | awk '{ print $1 }')
   for db in $all
   do
     dbDrop $db
@@ -377,32 +377,38 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
-    CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CB_PORT  -pidpath $CB_PID_FILE  -dbURI mongodb://$dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
+  elif [ "$role" == "CBHA" ]
+  then
+    # CB-HA broker uses same database than main CB
+    mkdir -p $CBHA_LOG_DIR
+    port=$CBHA_PORT
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CBHA_PORT  -pidpath $CBHA_PID_FILE  -dbURI mongodb://$dbHost:$dbPort -db $CB_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CBHA_LOG_DIR $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
     port=$CP1_PORT
-    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP1_PORT -pidpath $CP1_PID_FILE -dbhost $dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP1_PORT -pidpath $CP1_PID_FILE -dbURI mongodb://$dbHost:$dbPort -db $CP1_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
   elif [ "$role" == "CP2" ]
   then
     mkdir -p $CP2_LOG_DIR
     port=$CP2_PORT
-    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP2_PORT -pidpath $CP2_PID_FILE -dbhost $dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP2_PORT -pidpath $CP2_PID_FILE -dbURI mongodb://$dbHost:$dbPort -db $CP2_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
   elif [ "$role" == "CP3" ]
   then
     mkdir -p $CP3_LOG_DIR
     port=$CP3_PORT
-    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP3_PORT -pidpath $CP3_PID_FILE -dbhost $dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP3_PORT -pidpath $CP3_PID_FILE -dbURI mongodb://$dbHost:$dbPort -db $CP3_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
   elif [ "$role" == "CP4" ]
   then
     mkdir -p $CP4_LOG_DIR
     port=$CP4_PORT
-    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP4_PORT -pidpath $CP4_PID_FILE -dbhost $dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP4_PORT -pidpath $CP4_PID_FILE -dbURI mongodb://$dbHost:$dbPort -db $CP4_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
   elif [ "$role" == "CP5" ]
   then
     mkdir -p $CP5_LOG_DIR
     port=$CP5_PORT
-    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
+    CB_START_CMD="$CB_START_CMD_PREFIX -port $CP5_PORT -pidpath $CP5_PID_FILE -dbURI mongodb://$dbHost:$dbPort -db $CP5_DB_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
 
@@ -470,6 +476,9 @@ function localBrokerStop
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
+  elif [ "$role" == "CBHA" ]
+  then
+    port=$CBHA_PORT
   elif [ "$role" == "CP1" ]
   then
     port=$CP1_PORT
@@ -623,6 +632,10 @@ function brokerStop
   then
     pidFile=$CB_PID_FILE
     port=$CB_PORT
+  elif [ "$role" == "CBHA" ]
+  then
+    pidFile=$CBHA_PID_FILE
+    port=$CBHA_PORT
   elif [ "$role" == "CP1" ]
   then
     pidFile=$CP1_PID_FILE
@@ -652,7 +665,10 @@ function brokerStop
     vMsg "should be dead"
     rm -f /tmp/orion_${port}.pid 2> /dev/null
   else
-    curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
+    # harakiri exit is problematic in modern OS. See https://github.com/telefonicaid/fiware-orion/issues/3809
+    #curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
+    kill $(cat $pidFile 2> /dev/null) 2> /dev/null
+    rm -f /tmp/orion_${port}.pid 2> /dev/null
     # Waiting for valgrind to terminate (sleep a max of 10)
     brokerStopAwait $port
   fi
@@ -685,6 +701,7 @@ function accumulatorStop()
     rm -f /tmp/accumulator.$port.pid
   fi
 }
+
 
 
 # ------------------------------------------------------------------------------
@@ -730,6 +747,27 @@ function accumulatorStart()
     shift
   fi
 
+  if [ "$1" = "--mqttHost" ]
+  then
+    mqttHost="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--mqttPort" ]
+  then
+    mqttPort="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--mqttTopic" ]
+  then
+    mqttPort="$1 $2"
+    shift
+    shift
+  fi
+
   bindIp=$1
   port=$2
 
@@ -746,8 +784,16 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-  echo accumulator running as PID $$
+  if [ -z "$mqttHost" ]
+  then
+    # Start without MQTT
+    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+    echo accumulator running as PID $$
+  else
+    # Start with MQTT
+    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+    echo accumulator running as PID $$
+  fi
 
   # Wait until accumulator has started or we have waited a given maximum time
   port_not_ok=1
@@ -767,6 +813,67 @@ function accumulatorStart()
    nc -zv $bindIp $port &>/dev/null </dev/null
    port_not_ok=$?
   done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# debugMqttBrokerStop -
+#
+function debugMqttBrokerStop()
+{
+  pid=$(cat /tmp/debugMqttBroker.cbtests.pid 2> /dev/null)
+  if [ "$pid" != "" ]
+  then
+    kill -15 $pid 2> /dev/null
+    sleep .1
+    kill -2 $pid 2> /dev/null
+    sleep .1
+    kill -9 $pid 2> /dev/null
+    rm -f /tmp/debugMqttBroker.cbtests.pid /tmp/debugMqttBroker.cbtests.*.conf
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# debugMmqttBrokerStart -
+#
+# Starts a Python-based MQTT broker used in some tests (eg. the mqtt* ones in cases/4085). Note that
+# in MQTT tests in general we use the system MQTT broker (usually mosquitto), but in that case we need
+# a "debug" MQTT broker that we can start/stop the broker at some points during the test script,
+# so we use this one
+#
+function debugMmqttBrokerStart()
+{
+  # Just in case a previous tests not finished cleanly and some broker instance is there
+  debugMqttBrokerStop
+
+  amqtt_tmp="$(mktemp -u /tmp/debugMqttBroker.cbtests.XXXX)"
+  amqtt_conf_file="$amqtt_tmp.conf"
+
+  echo "listeners:"                                >  $amqtt_conf_file
+  echo "  default:"                                >> $amqtt_conf_file
+  echo "      max-connections: 50000"              >> $amqtt_conf_file
+  echo "      type: tcp"                           >> $amqtt_conf_file
+  echo "  my-tcp-1:"                               >> $amqtt_conf_file
+  echo "      bind: 127.0.0.1:${MQTT_DEBUG_PORT}"  >> $amqtt_conf_file
+
+  amqtt -c $amqtt_conf_file >$amqtt_tmp.log 2>&1 &
+
+  # Small delay before attemping to grab the PID file. Empirically we have found that
+  # in some cases it is needed (eg. GitAction ftest pass within CI docker container)
+  sleep 0.5s
+
+  # $$ env var gives a wrong PID (maybe due to some process double-fork or something similar, that
+  # causes the actual amqtt server to be spawned into a different process at OS level), so
+  # we use ps + grep. As we are using the conf file in the grep statement, this seems to be strong
+  # enough (i.e. we cannot get the PID of another amqtt process)
+  ps ax | grep $amqtt_conf_file | grep -v grep | awk -F ' ' '{print $1}' > /tmp/debugMqttBroker.cbtests.pid
+
+  echo "MQTT broker running as PID $(cat /tmp/debugMqttBroker.cbtests.pid)"
 }
 
 
@@ -933,12 +1040,7 @@ function valgrindSleep()
 
 # ------------------------------------------------------------------------------
 #
-# mongoCmd - 
-#
-# This functions is needed due to some problems with jenkins that seems to avoid
-# the usage of 'mongo --quiet ...' directly. Thus, we need to use mongo without
-# --quiet, but we need to get rid of some preamble lines about mongo version and
-# connection information and a final 'bye' line
+# mongoCmd -
 #
 function mongoCmd()
 {
@@ -954,35 +1056,12 @@ function mongoCmd()
     port="27017"
   fi
 
-  db=$1
-  cmd=$2
-  echo $cmd | mongo mongodb://$host:$port/$db | tail -n 2 | head -n 1
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# mongoCmdLong - like mongoCmd but showing all the output, not just the last line.
-#                Meant to be used in conjunction with 'grep'
-#
-function mongoCmdLong()
-{
-  host="${CB_DATABASE_HOST}"
-  if [ "$host" == "" ]
-  then
-    host="localhost"
-  fi
-
-  port="${CB_DATABASE_PORT}"
-  if [ "$port" == "" ]
-  then
-    port="27017"
-  fi
+  # Why to use EJSON.stringfiy() instead of JSON.stringfly()?
+  # See https://stackoverflow.com/q/77678898/1485926
 
   db=$1
-  cmd=$2
-  echo $cmd | mongo mongodb://$host:$port/$db
+  cmd="EJSON.stringify($2)"
+  mongosh mongodb://$host:$port/$db --eval "$cmd" --quiet
 }
 
 
@@ -1046,7 +1125,7 @@ function dbInsertEntity()
     port="27017"
   fi
 
-  echo "$jsCode ; $ent ; $doc ; $cmd" | mongo mongodb://$host:$port/$db
+  mongosh mongodb://$host:$port/$db --eval "$jsCode ; $ent ; $doc ; $cmd" --quiet
 }
 
 
@@ -1280,7 +1359,7 @@ function orionCurl()
         # The self-made tool is able to detect duplicate JSON keys. We cannot use standard mjson.tool, as it
         # is unable to do so
         #
-        _response=$(echo $_response | python $SCRIPT_HOME/testJson.py)
+        _response=$(echo $_response | PYTHONIOENCODING=utf8 python $SCRIPT_HOME/jsonBeautifier.py)
         echo "$_response"
       else
         dMsg Unknown payloadCheckFormat
@@ -1300,6 +1379,8 @@ export -f localBrokerStart
 export -f brokerStop
 export -f accumulatorStart
 export -f accumulatorStop
+export -f debugMmqttBrokerStart
+export -f debugMqttBrokerStop
 export -f accumulatorDump
 export -f accumulator2Dump
 export -f accumulator3Dump
@@ -1312,7 +1393,6 @@ export -f accumulator3Reset
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
-export -f mongoCmdLong
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep

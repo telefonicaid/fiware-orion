@@ -27,10 +27,15 @@
 */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "common/globals.h"
 
 #include "orionTypes/OrionValueType.h"
+
+#include "mongoDriver/BSONElement.h"
+
+#include "expressions/ExprContext.h"
 
 
 namespace orion
@@ -111,9 +116,13 @@ class CompoundValueNode
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, double _value);
   CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   std::string         check(const std::string& path);
+  bool                equal(const orion::BSONElement& be);
   std::string         finish(void);
 
-  std::string         toJson(void);
+  std::string         toJson(ExprContextObject* exprContextObjectP = NULL);
+
+  ExprContextObject   toExprContextObject(void);
+  ExprContextList     toExprContextList(void);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

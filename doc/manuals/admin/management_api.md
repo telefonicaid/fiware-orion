@@ -1,17 +1,20 @@
 # Management REST interface
 
-## Log and Trace levels
+## Log configs and Trace levels
 Apart from the NGSI interface, Orion Context Broker exposes a REST
-API for management that allows to change the log level and the trace levels
+API for management that allows to change the log config and the trace levels
 (whose initial value is set using `-t` and `-logLevel` command line options).
 
-To change the log level:
+To change the log config:
 
 ```
 curl -X PUT <host>:<port>/admin/log?level=<NONE|FATAL|ERROR|WARN|INFO|DEBUG>
+curl -X PUT <host>:<port>/admin/log?infoPayloadMaxSize=<logPayloadSizeValue>
+curl -X PUT <host>:<port>/admin/log?lineMaxSize=<logLineSizeValue>
+curl -X PUT <host>:<port>/admin/log?deprecate=true|false
 ```
 
-To retrieve the log level:
+To retrieve the log config:
 
 ```
 curl <host>:<port>:/admin/log
@@ -21,7 +24,10 @@ which response follows the following pattern:
 
 ```
 {
-   "level": "INFO"
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768,
+    "deprecate": false
 }
 ```
 
@@ -101,6 +107,9 @@ The response is a listing of information of all the broker's semaphores:
     "metrics": {
         "status": "free"
      },
+    "mqttMgr": {
+        "status": "free"
+     },
     "request": {
         "status": "free"
     },
@@ -124,6 +133,7 @@ Short explanation of the semaphores:
 * **dbConnection**, protects the set of connections of the mongo connection pool
 * **logMsg**, makes sure that not two messages are written simultaneously to the log-file
 * **metrics**, protects internal data of the Metrics Manager
+* **mqttMgr**, protects the data of MTTQ connections manager
 * **request**, makes sure there are not two simultaneous requests to mongodb 
 * **subCache**, protects the Subscription Cache
 * **timeStat**, protects the data for timing statistics

@@ -1,0 +1,434 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Status inactive was not working in HA scenario when cache is used
+
+--SHELL-INIT--
+dbInit CB
+
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("620e0d04219c8378695c822b"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:1234",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "maxFailsLimit" : NumberLong(-1),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 1645784154.0885115,
+        "entities" : [
+                {
+                        "id" : ".*",
+                        "isPattern" : "true",
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "count" : NumberLong(71),
+        "failsCounter" : NumberLong(1),
+        "lastNotification" : NumberLong(1645784610),
+        "lastSuccess" : NumberLong(1645784610),
+        "lastSuccessCode" : NumberLong(404)
+})'
+
+brokerStart CB 0 IPv4 -subCacheIval 5
+brokerStart CBHA 0 IPv4 -subCacheIval 5
+
+--SHELL--
+
+#
+# 00. (Done before starting both context brokers) Insert crafted subscription in DB
+# 01. Update E in CB: notif is sent
+# 02. Update E in CB-HA: notif is sent
+# 03. Wait for a cache cycle and check sub shows count 73 and failsCounter 3
+# 04. Update sub to inactive and wait for a cache cycle
+# 05. Update E in CB: notif is not sent
+# 06. Update E in CB-HA: notif is not sent
+# 07. Wait for a cache cycle and check sub shows same count 73 and failsCounter 3
+# 08. Update sub to active and wait for a cache cycle
+# 09. Update E in CB: notif is sent
+# 10. Update E in CB-HA: notif is sent
+# 11. Wait for a cache cycle and check sub shows count 75 and failsCounter 5
+#
+
+echo "00. (Done before starting both context brokers) Insert crafted subscription in DB"
+echo "================================================================================="
+echo
+echo
+
+
+echo "01. Update E in CB: notif is sent"
+echo "================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "${payload}"
+echo
+echo
+
+
+echo "02. Update E in CB-HA: notif is sent"
+echo "===================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "${payload}" --port $CBHA_PORT
+echo
+echo
+
+
+echo "03. Wait for a cache cycle and check sub shows count 73 and failsCounter 3"
+echo "=========================================================================="
+sleep 5.5s
+orionCurl --url /v2/subscriptions/620e0d04219c8378695c822b
+echo
+echo
+
+
+echo "04. Update sub to inactive and wait for a cache cycle"
+echo "====================================================="
+payload='{
+    "status": "inactive"
+}'
+orionCurl --url /v2/subscriptions/620e0d04219c8378695c822b -X PATCH --payload "$payload"
+sleep 5.5s
+echo
+echo
+
+
+echo "05. Update E in CB: notif is not sent"
+echo "====================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "${payload}"
+echo
+echo
+
+
+echo "06. Update E in CB-HA: notif is not sent"
+echo "========================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "${payload}" --port $CBHA_PORT
+echo
+echo
+
+
+echo "07. Wait for a cache cycle and check sub shows same count 73 and failsCounter 3"
+echo "==============================================================================="
+sleep 5.5s
+orionCurl --url /v2/subscriptions/620e0d04219c8378695c822b
+echo
+echo
+
+
+echo "08.Update sub to active and wait for a cache cycle"
+echo "=================================================="
+payload='{
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions/620e0d04219c8378695c822b -X PATCH --payload "$payload"
+sleep 5.5s
+echo
+echo
+
+
+echo "09. Update E in CB: notif is sent"
+echo "================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "${payload}"
+echo
+echo
+
+
+echo "10. Update E in CB-HA: notif is sent"
+echo "===================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities?options=upsert,forcedUpdate --payload "${payload}" --port $CBHA_PORT
+echo
+echo
+
+
+echo "11. Wait for a cache cycle and check sub shows count 75 and failsCounter 5"
+echo "=========================================================================="
+sleep 5.5s
+orionCurl --url /v2/subscriptions/620e0d04219c8378695c822b
+echo
+echo
+
+
+--REGEXPECT--
+00. (Done before starting both context brokers) Insert crafted subscription in DB
+=================================================================================
+
+
+01. Update E in CB: notif is sent
+=================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+02. Update E in CB-HA: notif is sent
+====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+03. Wait for a cache cycle and check sub shows count 73 and failsCounter 3
+==========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 527
+
+{
+    "id": "620e0d04219c8378695c822b",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 3,
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "2022-02-25T10:23:30.000Z",
+        "lastSuccessCode": 404,
+        "onlyChangedAttrs": false,
+        "timesSent": 73
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+04. Update sub to inactive and wait for a cache cycle
+=====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Update E in CB: notif is not sent
+=====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+06. Update E in CB-HA: notif is not sent
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+07. Wait for a cache cycle and check sub shows same count 73 and failsCounter 3
+===============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 529
+
+{
+    "id": "620e0d04219c8378695c822b",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 3,
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "2022-02-25T10:23:30.000Z",
+        "lastSuccessCode": 404,
+        "onlyChangedAttrs": false,
+        "timesSent": 73
+    },
+    "status": "inactive",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+08.Update sub to active and wait for a cache cycle
+==================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09. Update E in CB: notif is sent
+=================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+10. Update E in CB-HA: notif is sent
+====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+11. Wait for a cache cycle and check sub shows count 75 and failsCounter 5
+==========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 527
+
+{
+    "id": "620e0d04219c8378695c822b",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "failsCounter": 5,
+        "http": {
+            "url": "http://localhost:1234"
+        },
+        "lastFailure": "REGEX(.*)",
+        "lastFailureReason": "Couldn't connect to server",
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "2022-02-25T10:23:30.000Z",
+        "lastSuccessCode": 404,
+        "onlyChangedAttrs": false,
+        "timesSent": 75
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CBHA
+dbDrop CB

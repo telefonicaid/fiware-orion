@@ -166,6 +166,7 @@ public:
   std::string               metadataName;   // Used for metadata filters
   std::string               compoundPath;
   bool                      compiledPattern;
+  bool                      nullInList;     // Used only in the case of list, to mark that null is one of its elements
   StringFilterType          type;
 
   StringFilterItem();

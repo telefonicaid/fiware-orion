@@ -1,0 +1,430 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Cache refresh takes newer information from DB in failed notification scenario with sub update in the middle
+
+--SHELL-INIT--
+dbInit CB
+
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("61960a51596aa2623032357d"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:9997/notify",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 2524644000,
+        "entities" : [
+                {
+                        "id" : "E",
+                        "isPattern" : "false",
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "lastNotification" : NumberLong(2524644000),
+        "lastFailure" : NumberLong(2524644000),
+        "lastFailureReason": "some reason"
+})'
+
+# t 100 -> MongoDB interactions
+# t 212 -> Cache sync each 5 seconds
+brokerStart CB 100,212 IPv4 -subCacheIval 5 --cache
+
+--SHELL--
+
+#
+# Relevant fields in step 00
+# - lastNotification:   2050-01-01T10:00:00Z (2524644000)
+# - lastFailure:        2050-01-01T10:00:00Z (2524644000)
+# - lastFailureReason:  some reason
+# - status:             active (last changed: 2050-01-01T10:00:00Z)
+#
+# 00. (Done before starting Context Broker) Insert crafted subscription in DB with lastNotification/Failure in a far future and reason 'some reason'
+# 01. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' and without timeSent
+# 02. Create entity E to trigger notification
+# 03. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' (as cache data is older), timesSent 1, failsCounter 1
+# 04. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter
+# 05. PATCH /v2/subscription to add a description
+# 06. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter + description
+# 07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
+# 08. Get doc in DB after cache refresh and see lastNotification/Failure in a far future and reason 'some reason' and count 1 and failsCounter 1 + description
+#
+
+echo "00. (Done before starting Context Broker) Insert crafted subscription in DB with lastNotification/Failure in a far future and reason 'some reason'"
+echo "=================================================================================================================================================="
+echo
+echo
+
+
+echo "01. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' and without timeSent"
+echo "========================================================================================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "02. Create entity E to trigger notification"
+echo "==========================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' (as cache data is older), timesSent 1, failsCounter 1"
+echo "========================================================================================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter"
+echo "================================================================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+echo "05. PATCH /v2/subscription to add a description"
+echo "==============================================="
+payload='{
+  "description": "A little description"
+}'
+orionCurl --url /v2/subscriptions/61960a51596aa2623032357d --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter + description"
+echo "==============================================================================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+echo "07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description"
+echo "============================================================================================================="
+sleep 5.5s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "08. Get doc in DB after cache refresh and see lastNotification/Failure in a far future and reason 'some reason' and count 1 and failsCounter 1 + description"
+echo "============================================================================================================================================================"
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+--REGEXPECT--
+00. (Done before starting Context Broker) Insert crafted subscription in DB with lastNotification/Failure in a far future and reason 'some reason'
+==================================================================================================================================================
+
+
+01. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' and without timeSent
+========================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 418
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastFailure": "2050-01-01T10:00:00.000Z",
+            "lastFailureReason": "some reason",
+            "lastNotification": "2050-01-01T10:00:00.000Z",
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+02. Create entity E to trigger notification
+===========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. GET /v2/subscriptions and see lastNotification/Failure in a far future and reason 'some reason' (as cache data is older), timesSent 1, failsCounter 1
+=========================================================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 449
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 1,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastFailure": "2050-01-01T10:00:00.000Z",
+            "lastFailureReason": "some reason",
+            "lastNotification": "2050-01-01T10:00:00.000Z",
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter
+=================================================================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": "false",
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "lastFailure": 2524644000,
+    "lastFailureReason": "some reason",
+    "lastNotification": 2524644000,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 2524644000,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+05. PATCH /v2/subscription to add a description
+===============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter + description
+===============================================================================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "custom": false,
+    "description": "A little description",
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": "false",
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "lastFailure": 2524644000,
+    "lastFailureReason": "some reason",
+    "lastNotification": 2524644000,
+    "metadata": [],
+    "notifyOnMetadataChange": true,
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/#",
+    "status": "active",
+    "statusLastChange": 2524644000,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
+=============================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 486
+
+[
+    {
+        "description": "A little description",
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 1,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastFailure": "2050-01-01T10:00:00.000Z",
+            "lastFailureReason": "some reason",
+            "lastNotification": "2050-01-01T10:00:00.000Z",
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+08. Get doc in DB after cache refresh and see lastNotification/Failure in a far future and reason 'some reason' and count 1 and failsCounter 1 + description
+============================================================================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "count": 1,
+    "custom": false,
+    "description": "A little description",
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": "false",
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "failsCounter": 1,
+    "format": "normalized",
+    "lastFailure": 2524644000,
+    "lastFailureReason": "some reason",
+    "lastNotification": 2524644000,
+    "metadata": [],
+    "notifyOnMetadataChange": true,
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/#",
+    "status": "active",
+    "statusLastChange": 2524644000,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

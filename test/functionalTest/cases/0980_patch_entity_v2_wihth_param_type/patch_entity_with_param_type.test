@@ -103,38 +103,38 @@ echo
 01. POST /v2/entities/E1 T1
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. POST /v2/entities/E1 T2
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T2
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T2
+Content-Length: 0
 
 
 
 03. PATCH /v2/entities/E1 T1
 ============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. GET /v2/entities (updated attribute A1 in E1/T1, not updated in E1/T2)
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 225
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 225
 
 [
     {
@@ -165,15 +165,15 @@ Date: REGEX(.*)
 
 05. PATCH /v2/entities/E1 T1 (error, attribute not exist)
 =========================================================
-HTTP/1.1 404 Not Found
-Content-Length: 79
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
-    "description": "The entity does not have such an attribute",
-    "error": "NotFound"
+    "description": "do not exist: E1/T1 - [ A2 ]",
+    "error": "Unprocessable"
 }
 
 

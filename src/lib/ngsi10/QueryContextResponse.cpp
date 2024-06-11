@@ -126,12 +126,9 @@ std::string QueryContextResponse::toJsonV1(bool asJsonObject)
   //
   out += startTag();
 
-  // No attribute or metadata filter in this case, an empty vector is used to fulfil method signature
-  std::vector<std::string> emptyV;
-
   if (contextElementResponseVector.size() > 0)
   {
-    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, emptyV, false, emptyV, errorCodeRendered);
+    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, false, errorCodeRendered);
   }
 
   if (errorCodeRendered == true)
@@ -148,7 +145,7 @@ std::string QueryContextResponse::toJsonV1(bool asJsonObject)
   //
   if ((errorCode.code == SccNone) && (contextElementResponseVector.size() == 0))
   {
-    LM_W(("Internal Error (Both error-code and response vector empty)"));
+    LM_E(("Runtime Error (Both error-code and response vector empty)"));
     errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
     out += errorCode.toJsonV1(false);
   }

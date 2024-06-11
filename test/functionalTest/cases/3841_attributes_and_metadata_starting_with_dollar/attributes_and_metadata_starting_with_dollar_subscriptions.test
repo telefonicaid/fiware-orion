@@ -128,28 +128,28 @@ echo
 01. Create subscription covering the entity
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity E with attribute $temperature=22 with metadata $avg=23
 ========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. Update $temperature=32 $avg=33 (triggers new notif)
 =======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -220,10 +220,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Get subscription
 ====================
 HTTP/1.1 200 OK
-Content-Length: 402
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 448
 
 [
     {
@@ -233,6 +233,7 @@ Date: REGEX(.*)
                 "$temperature"
             ],
             "attrsFormat": "normalized",
+            "covered": false,
             "http": {
                 "url": "http://localhost:9997/notify"
             },
@@ -247,7 +248,8 @@ Date: REGEX(.*)
             "condition": {
                 "attrs": [
                     "$temperature"
-                ]
+                ],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

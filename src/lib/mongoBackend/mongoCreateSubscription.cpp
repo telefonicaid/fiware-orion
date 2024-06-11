@@ -31,6 +31,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
 #include "apiTypesV2/Subscription.h"
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
@@ -60,7 +61,8 @@ static void insertInCache
   const Subscription&  sub,
   const std::string&   subId,
   const std::string&   tenant,
-  const std::string&   servicePath
+  const std::string&   servicePath,
+  double               now
 )
 {
   //
@@ -86,31 +88,40 @@ static void insertInCache
   }
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
+
+  // Note that -1 is the value that Notification constructor used as default in Subscription.h for
+  // lastNotification, lastFailure, lastSuccess and lastSuccessCode
   subCacheItemInsert(tenant.c_str(),
                      servicePath.c_str(),
                      sub.notification.httpInfo,
+                     sub.notification.mqttInfo,
                      sub.subject.entities,
                      sub.notification.attributes,
                      sub.notification.metadata,
                      sub.subject.condition.attributes,
+                     sub.subject.condition.altTypes,
                      subId.c_str(),
                      sub.expires,
+                     sub.notification.maxFailsLimit,
                      sub.throttling,
                      sub.attrsFormat,
-                     0,
-                     0,
-                     0,
+                     -1,
+                     -1,
+                     -1,
                      -1,
                      "",
                      stringFilterP,
                      mdStringFilterP,
                      sub.status,
+                     now,
                      sub.subject.condition.expression.q,
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
                      sub.subject.condition.expression.georel,
                      sub.notification.blacklist,
-                     sub.notification.onlyChanged);
+                     sub.notification.onlyChanged,
+                     sub.notification.covered,
+                     sub.subject.condition.notifyOnMetadataChange);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 }
@@ -141,28 +152,37 @@ std::string mongoCreateSubscription
   orion::BSONObjBuilder  b;
   std::string            servicePath      = servicePathV[0].empty()  ? SERVICE_PATH_ALL : servicePathV[0];
   const std::string      subId            = setNewSubscriptionId(&b);
+  double                 now              = getCurrentTime();
 
   // Build the BSON object to insert
   setExpiration(sub, &b);
-  setHttpInfo(sub, &b);
+  setNotificationInfo(sub, &b);
   setThrottling(sub, &b);
+  setMaxFailsLimit(sub, &b);
   setServicePath(servicePath, &b);
-  setDescription(sub, &b);
-  setStatus(sub, &b);
+  setStatus(sub.status, &b, now);
   setEntities(sub, &b);
   setAttrs(sub, &b);
   setMetadata(sub, &b);
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
+  setCovered(sub, &b);
+  setNotifyOnMetadataChange(sub, &b);
+
+  if (!sub.description.empty())
+  {
+    setDescription(sub, &b);
+  }
 
   if (!noCache)
   {
-    insertInCache(sub, subId, tenant, servicePath);
+    insertInCache(sub, subId, tenant, servicePath, now);
   }
 
-  setConds(sub, sub.notification.attributes, &b);
+  setConds(sub, &b);
 
   setExpression(sub, &b);
+  setOperations(sub, &b);
   setFormat(sub, &b);
 
   orion::BSONObj doc = b.obj();

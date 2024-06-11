@@ -89,7 +89,7 @@ HttpStatusCode mongoUnsubscribeContext
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+    responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
     return SccOk;
   }
@@ -119,7 +119,7 @@ HttpStatusCode mongoUnsubscribeContext
     reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
 
     responseP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalError");
+    responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
     return SccOk;
   }
@@ -127,20 +127,24 @@ HttpStatusCode mongoUnsubscribeContext
   //
   // Removing subscription from mongo subscription cache
   //
-  LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
-                     requestP->subscriptionId.get().c_str(),
-                     tenant.c_str()));
-
-  cacheSemTake(__FUNCTION__, "Removing subscription from cache");
-
-  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
-
-  if (cSubP != NULL)
+  if (!noCache)
   {
-    subCacheItemRemove(cSubP);
+    LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
+                       requestP->subscriptionId.get().c_str(),
+                       tenant.c_str()));
+
+    cacheSemTake(__FUNCTION__, "Removing subscription from cache");
+
+    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+
+    if (cSubP != NULL)
+    {
+      subCacheItemRemove(cSubP);
+    }
+
+    cacheSemGive(__FUNCTION__, "Removing subscription from cache");
   }
 
-  cacheSemGive(__FUNCTION__, "Removing subscription from cache");
   reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
   responseP->statusCode.fill(SccOk);
 

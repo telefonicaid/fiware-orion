@@ -19,10 +19,12 @@
 * [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
 * [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI notifications)
+* [src/lib/mqtt/](#srclibmqtt) (MQTT notifications)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (Alarm Manager implementation)
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
 * [src/lib/logSummary/](#srcliblogsummary) (Log Summary implementation)
 * [src/lib/metricsMgr/](#srclibmetricsmgr) (Metrics Manager implementation)
+* [src/lib/expressions/](#srclibexpressions) (Custom notification expressions support)
 
 ## src/app/contextBroker/
 The main program is found in `contextBroker.cpp` and its purpose it to:
@@ -445,38 +447,74 @@ of the driver and simplify our codebase. [Issue #3789](https://github.com/telefo
 ## src/lib/ngsiNotify/
 The **ngsiNotify** library is where notifications to subscriptions are implemented.
 When an entity is created or modified or when a subscription is created or modified, in case there is an active subscription/entity, the subscriber will be sent a notification, and it is the task of this library to make sure that that happens.
-[**mongoBackend**](#srclibmongobackend) decides when to notify and **ngsiNotify** executes the notification, with the help of the external library [libcurl](https://curl.haxx.se/libcurl/).
-Actually, a function from the [**rest** library](#srclibrest) is used: `httpRequestSend()`. Another important aspect of this library is that the notifications are sent by separate threads, using a thread pool if desired.
+[**mongoBackend**](#srclibmongobackend) decides when to notify and **ngsiNotify** executes the notification, with the help of an external library, depending the case:
+
+* For HTTP notifications, [libcurl](https://curl.haxx.se/libcurl/) is used. Actually, a function from
+  the [**rest** library](#srclibrest) is used: `httpRequestSend()`.
+* For MQTT notifications, [mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) is used. Actually, a function from
+  the [**mqtt** library](#srclibmqtt) is used: `sendMqttNotification()`
+
+Another important aspect of this library is that the notifications are sent by separate threads, using a thread pool if desired.
 
 Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads await new items in the notification queue and when an item becomes present, it is taken from the queue and processed, sending the notification in question. If the thread pool is not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient", which gives this behaviour). More information on notification modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
 
-This module is always invoked from `processOnChangeConditionForUpdateContext()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
+This module is always invoked from `processNotification()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
 
-The following two images demonstrate the program flow for context entity notifications without and with thread pool.
+The following four images demonstrate the program flow for context entity notifications without and with thread pool, both in the case
+of HTTP and MQTT notifications.
 
 <a name="flow-nf-01"></a>
-![Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01.png)
+![HTTP Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01.png)
 
-_NF-01: Notification on entity-attribute Update/Creation without thread pool_
+_NF-01: HTTP Notification on entity-attribute Update/Creation without thread pool_
 
-* A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
 * `pthread_create()` is called to create a new thread for sending of the notifications and without awaiting any result, the control is returned to mongoBackend (step 2).
 * `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 3).
-* `startSenderThread()` loops over the `SenderThreadParams` vector and sends a notification per item (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
+* `startSenderThread()` calls to `doNotify()` function, which sends the notification corresponding to the `SenderThreadParams` object (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout).
+
+<a name="flow-nf-01b"></a>
+![MQTT Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
+
+_NF-01b: MQTT Notification on entity-attribute Update/Creation without thread pool_
+
+* Step 1 to 4 are the same a in the previous diagram. The difference is in steps 5 and 6, which use MQTT library to publish the notification in
+  the corresponding MQTT broker. If the connection to the MQTT broker don't exist previously, then it is created as part as the notification
+  process (there is a keepalive time configured with the `-mqttMaxAge` CLI so idle connectiona periodically cleaned up).
 
 <a name="flow-nf-03"></a>
-![Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03.png)
+![HTTP Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03.png)
 
-_NF-03: Notification on entity-attribute Update/Creation with thread pool_
+_NF-03: HTTP Notification on entity-attribute Update/Creation with thread pool_
 
-* A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
 * A `ServiceQueue` is selected depending the service associated to the notification. If no queue exists for the service
   associated to the notification, then the default `ServiceQueue` is used. The `try_push()` method in the selected
   `ServiceQueue` is used to put the notification in the right queue (step 2).
-* The vector is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
+* The object is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
 * One of the worker threads in the thread pool pops an item from the message queue (step 4). This is done using `SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
-* The worker thread loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
+* The worker thread calls to `doNotify()` function, which takes the `SenderThreadParam` object of the popped queue item and sends the corresponding notification (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout).
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
+
+<a name="flow-nf-03b"></a>
+![MQTT Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
+
+_NF-03b: MQTT Notification on entity-attribute Update/Creation with thread pool_
+
+* Step 1 to 5 are the same as in the previous diagram. The difference is in steps 6 and 7, which use MQTT library to publish the notification in
+  the corresponding MQTT broker. If the connection to the MQTT broker don't exist previously, then it is created as part as the notification
+  process (there is a keepalive time configured with the `-mqttMaxAge` CLI so idle connectiona periodically cleaned up).
+
+[Top](#top)
+
+## src/lib/mqtt/
+
+This library deals with MQTT notifications, based on [mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) external library. There is
+a connection manager implemented as a singleton of the `MqttConnectionManager` class that keeps control of opened MQTT connections
+(cleaning up idle connections based in the `-maxMqttAge` keepalive) and provides the `sendMqttNotification` used by
+the [**ngsiNotify** library](#srclibngsinotify).
+
+[Top](#top)
 
 ## src/lib/alarmMgr/
 [Alarms](../admin/logs.md#alarms) are special log messages inserted into the log file. However, to record the number of consecutive alarms of the same type, and to not repeat them when they're already active, etc. a manager has been implemented. This *Alarm Manager* resides in the library **alarmMgr**.
@@ -486,9 +524,6 @@ _NF-03: Notification on entity-attribute Update/Creation with thread pool_
 
 ## src/lib/cache/
 To gain efficiency, Orion keeps its subscriptions in RAM, and a Subscription Cache Manager has been implemented for this purpose (more detail on the subscription cache in [this section of the Orion administration manual](../admin/perf_tuning.md#subscription-cache)).
-
-One of the main reasons for this cache is that when performing subscription matching at DB level, the operator `$where` must be used in MongoDB, and this
-is not at all recommended (it involves JavaScript execution at DB level, which has both performance and security problems).
 
 When the broker starts, the contents of the [csubs collection](../admin/database_model.md#csubs-collection) is extracted from the database and the subscription cache is populated.
 When a subscription is updated/created, the subscription cache is modified, but also the database. In this sense, the subscription cache is "write-through".
@@ -515,5 +550,10 @@ What it does is basically to compile a summary of the current state of the Alara
 To have similar metrics throughout the platform, a common set of metrics were invented and in the case of Orion, a manager was implemented for this purpose.
 This Metrics Manager resides in the library **metricsMgr**.
 For information about the metrics, please refer to [this document](../admin/metrics_api.md).
+
+[Top](#top)
+
+## src/lib/expressions/
+Provides support to the [macro substition logic used by custom notifications](../orion-api.md#macro-substitution). This library provides an abstraction for expression evaluation, providing two implementations: JEXL based and basic replacement based (the implementation to use is choosen at building time, based on the availability of the cjex library).
 
 [Top](#top)

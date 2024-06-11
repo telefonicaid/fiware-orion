@@ -9,7 +9,7 @@
     * [メモリ枯渇問題を診断](#diagnose-memory-exhaustion-problem)
     * [自発的なバイナリの破損の問題を診断](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O フロー](#io-flows)
-    * [通知受信の問題を診断](#diagnose-notification-reception-problems)
+    * [HTTP 通知受信の問題を診断](#diagnose-http-notification-reception-problems)
     * [データベース接続の問題を診断](#diagnose-database-connection-problems)
 
 診断手順は、システム管理者が Orion のエラーの原因を特定するための最初の手順です。これらのテストでエラーの元が特定されると、システム管理者は、正確な障害箇所と可能な解決策を特定するために、より具体的で具体的なテストに頼らなければならないことがよくあります。このような特定のテストは、このセクションの範囲外です。
@@ -125,14 +125,14 @@ contextBr 7100      orion    7u  IPv4 6749373      0t0  TCP *:1026 (LISTEN)
 
 -   Orion Context Broker は、REST リクエストに空のレスポンスを送信します。たとえば、メッセージは一般的に "empty response from server" です。一部の URL のリクエストが正常に動作する場合、たとえば /version では、症状が現れることがあります
 -   "md5sum /usr/bin/contextBroker" で取得できる /usr/bin/contextBroker バイナリの MD5SUM は正しいものでありません。(このセクションの最後にある特定のバージョンのチェックリスト)
--   prelink パッケージがインストールされています。これは "rpm -qa | grep prelink" コマンドを実行して確認できます
+-   prelink パッケージがインストールされています
 
 この問題の原因は、[prelink](http://en.wikipedia.org/wiki/Prelink)です。これは、バイナリを高速に起動するように変更するプログラムです。contextBroker などの長時間実行するサービスを実装するバイナリにはあまり役に立ちませんが、一部のライブラリと互換性がないことが知られています。Context Broker で使用されているライブラリの一部と互換性がないようです。
 
 この問題の解決策は次のとおりです :
 
 -   事前リンクを無効にします。次のいずれかの方法を実装します :
-    -   prelink ソフトウェアを削除します。通常は root または sudo を使用して実行します : `rpm -e prelink`
+    -   prelink ソフトウェアを削除します
     -   contextBroker バイナリのプリリンク処理を無効にして、次の1行のみの内容の `/etc/prelink.conf.d/contextBroker.conf` ファイルを作成します
 
 ```
@@ -154,7 +154,8 @@ yum install contextBroker
 Orion Context Broker は、次のフローを使用します :
 
 -   クライアント・アプリケーションから broker へ : デフォルトで TCP ポート1026を使用します。これは "-port" オプションで上書きされます
--   broker からサブスクリプションされたアプリケーション : サブスクリプション作成時にコールバックでアプリケーションによって指定されたポートを使用します
+-   broker からサブスクリプションされたアプリケーション : サブスクリプション作成時にコールバックでアプリケーションによって指定された HTTP ポートを使用します
+-   Broker からMQTT brokers へ、MQTT ベースの通知用
 -   broker から MongoDB データベースへ : broker と同じホストで MongoDB を実行する場合、これは内部フロー、つまり、ループバックインタフェースを使用します。MongoDB の標準ポートは27017ですが、設定で変更することができます。Intra-MongoDB フロー、例えば、レプリカセット内のマスタとスレーブ間の同期は、このセクションの範囲外であり、図には示されていません
 -   broker からレジストレーションされたコンテキスト・プロバイダまで : クエリと更新リクエストをそれらに転送します
 
@@ -162,8 +163,8 @@ Orion Context Broker は、次のフローを使用します :
 
 ![](../../manuals/admin/Orion-ioflows.png "Orion-ioflows.png")
 
-<a name="diagnose-notification-reception-problems"></a>
-### 通知受信の問題を診断
+<a name="diagnose-http-notification-reception-problems"></a>
+### HTTP 通知受信の問題を診断
 
 起こりうる通知の問題を診断するには (つまり、通知が特定のエンドポイントに
 届いていても機能していないと予想します)、`GET /v2/subscriptions/<subId>`
@@ -189,8 +190,8 @@ Orion Context Broker は、次のフローを使用します :
   モードで実行されていない場合 (つまり、`-insecureNotif`
   [CLI パラメータ](cli.md)) に自己署名証明書が発行された場合に発生します。
 
-NGSIv2 仕様および NGSIv2 実装ノートのドキュメントの文書に、
-`status`, `lastFailureReason`, `lastSuccessCode` の詳細があります。
+[Orion API 仕様](../orion-api.md#subscription.notification)に `status`, `lastFailureReason`, `lastSuccessCode`
+の詳細があります。
 
 さらに、
 [管理マニュアルの対応するセクション](logs.md#log-examples-for-notification-transactions)
@@ -205,47 +206,21 @@ NGSIv2 仕様および NGSIv2 実装ノートのドキュメントの文書に�
 
 -   起動時に、broker が起動せず、ログ・ファイルに次のメッセージが表示されます :
 
-` X@08:04:45 main[313]: MongoDB error`
+```
+... msg=Database Startup Error (cannot connect to mongo - doing 100 retries with a 1000 millisecond interval)
+... msg=Fatal Error (MongoDB error)
+```
 
 -   broker 操作中、broker から送信されたレスポンスには、次のようなエラーメッセージが表示されます。
 
 ```
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: Null cursor"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [CONNECT_ERROR] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [FAILED_STATE] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: DBClientBase::findN: transport error: localhost:27017 ns: orion.$cmd query: { .. }"
-    }
-    ...
-
+{
+    "error": "InternalServerError",
+    "description": "Database Error ..."
+}
 ```
 
-どちらの場合も、MonogDB への接続が正しく構成されていることを確認してください。特に、Orion Context Broker を [サービスとして](running.md)実行している場合は BROKER_DATABASE_HOST、[コマンドラインから実行する](cli.md)場合は "-dbhost" オプションです。また、シャーディングを使用しているかどうかによって異なりますが、mongod/mongos プロセスが起動していることです。
+どちらの場合も、MonogDB への接続が正しく構成されていることを確認してください。特に、[コマンドラインから実行する](cli.md)場合は `-dbURI` オプションです。また、シャーディングを使用しているかどうかによって異なりますが、mongod/mongos プロセスが起動していることです。
 
 MongoDB が停止していることが問題の場合は、Orion Context Broker は、準備ができたらデータベースに再接続できることに注意してください。つまり、データベースに再接続するために broker を再起動する必要はありません。
 

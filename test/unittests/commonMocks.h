@@ -46,7 +46,7 @@
 * Note that _ is undeffed after usage
 *
 * Our style guide forbids the use of "using" in header files (see 
-* doc/manuals/contribution_guidelines.md) and we don't want to write out 
+* doc/manuals/devel/contribution_guidelines.md) and we don't want to write out 
 * the entire string "::testing::_", as the code gets difficult to read. Thanks 
 * to this temporary macro, we can use "_" but without using "using ::testing::_"
 */
@@ -226,38 +226,38 @@ class NotifierMock : public Notifier
      */
   }
 
-  MOCK_METHOD10(sendNotifyContextRequest, void(NotifyContextRequest&            ncr,
-                                              const ngsiv2::HttpInfo&          httpInfo,
-                                              const std::string&               tenant,
-                                              const std::string&               xauthToken,
-                                              const std::string&               fiwareCorrelator,
-                                              unsigned int                     correlatorCounter,
-                                              RenderFormat                     renderFormat,
-                                              const std::vector<std::string>&  attrsFilter,
-                                              bool                             blacklist,
-                                              const std::vector<std::string>&  metadataFilter));
+  MOCK_METHOD10(sendNotifyContextRequest, void(ContextElementResponse*          notifyCerP,
+                                               const ngsiv2::Notification&      notification,
+                                               const notifStaticFields&         nsf,
+                                               long long                        maxFailsLimit,
+                                               long long                        failsCounter,
+                                               RenderFormat                     renderFormat,
+                                               const std::vector<std::string>&  attrsFilter,
+                                               bool                             blacklist,
+                                               bool                             covered,
+                                               const std::vector<std::string>&  metadataFilter));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest&            ncr,
-                                         const ngsiv2::HttpInfo&          httpInfo,
-                                         const std::string&               tenant,
-                                         const std::string&               xauthToken,
-                                         const std::string&               fiwareCorrelator,
-                                         unsigned int                     correlatorCounter,
+    void parent_sendNotifyContextRequest(ContextElementResponse*          notifyCerP,
+                                         const ngsiv2::Notification&      notification,
+                                         const notifStaticFields&         nsf,
+                                         long long                        maxFailsLimit,
+                                         long long                        failsCounter,
                                          RenderFormat                     renderFormat,
                                          const std::vector<std::string>&  attrsFilter,
                                          bool                             blacklist,
+                                         bool                             covered,
                                          const std::vector<std::string>&  metadataFilter)
     {
-      Notifier::sendNotifyContextRequest(ncr,
-                                         httpInfo,
-                                         tenant,
-                                         xauthToken,
-                                         fiwareCorrelator,
-                                         correlatorCounter,
+      Notifier::sendNotifyContextRequest(notifyCerP,
+                                         notification,
+                                         nsf,
+                                         maxFailsLimit,
+                                         failsCounter,
                                          renderFormat,
                                          attrsFilter,
                                          blacklist,
+                                         covered,
                                          metadataFilter);
     }
 };

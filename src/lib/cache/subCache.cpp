@@ -34,12 +34,15 @@
 #include "common/sem.h"
 #include "common/string.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mongoBackend/dbConstants.h"
+#include "mongoDriver/connectionOperations.h"
 
 using std::map;
 
@@ -53,7 +56,7 @@ volatile SubCacheState subCacheState = ScsIdle;
 
 
 //
-// The subscription cache maintains in memory all subscriptions of type ONCHANGE.
+// The subscription cache maintains in memory all subscriptions.
 // The reason for this cache is to avoid a very slow mongo operation ... (Fermin)
 //
 // The 'mongo part' of the cache is implemented in mongoBackend/mongoSubCache.cpp/h and used in:
@@ -89,11 +92,9 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isPattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED))
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern");
+      alarmMgr.badInput(clientIp, "invalid regular expression for idPattern", _entityId);
       isPattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityIdPatternToBeFreed = false;
@@ -110,11 +111,9 @@ entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
 
   if (isTypePattern)
   {
-    // FIXME P5: recomp error should be captured? have a look to other usages of regcomp()
-    // in order to see how it works
-    if (regcomp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&entityTypePattern, _entityType.c_str(), REG_EXTENDED))
     {
-      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern");
+      alarmMgr.badInput(clientIp, "invalid regular expression for typePattern", _entityType);
       isTypePattern = false;  // FIXME P6: this entity should not be let into the system. Must be stopped before.
                           //           Right here, best thing to do is simply to say it is not a regex
       entityTypePatternToBeFreed = false;
@@ -292,6 +291,12 @@ int subCacheItems(void)
 */
 static bool attributeMatch(CachedSubscription* cSubP, const std::vector<std::string>& attrV)
 {
+  // If the list of attributes to check is empty, then no match
+  if (attrV.size() == 0)
+  {
+    return false;
+  }
+
   if (cSubP->notifyConditionV.size() == 0)
   {
     return true;
@@ -390,6 +395,48 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 
 /* ****************************************************************************
 *
+* matchAltType -
+*
+*/
+static bool matchAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAltType)
+{
+  // If subAltTypeV size == 0 default alteration types are update with change and create
+  if (cSubP->subAltTypeV.size() == 0)
+  {
+    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  for (unsigned int ix = 0; ix < cSubP->subAltTypeV.size(); ix++)
+  {
+    ngsiv2::SubAltType altType = cSubP->subAltTypeV[ix];
+
+    // EntityUpdate is special, it is a "sub-type" of EntityChange
+    if (targetAltType == ngsiv2::SubAltType::EntityChange)
+    {
+      if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
+      {
+        return true;
+      }
+    }
+    else if (altType == targetAltType)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * subMatch -
 */
 static bool subMatch
@@ -399,9 +446,18 @@ static bool subMatch
   const char*                      servicePath,
   const char*                      entityId,
   const char*                      entityType,
-  const std::vector<std::string>&  attrV
+  const std::vector<std::string>&  attributes,
+  const std::vector<std::string>&  attrsWithModifiedValue,
+  const std::vector<std::string>&  attrsWithModifiedMd,
+  ngsiv2::SubAltType               targetAltType
 )
 {
+  // Check alteration type
+  if (!matchAltType(cSubP, targetAltType))
+  {
+    return false;
+  }
+
   //
   // Check to filter out due to tenant - only valid if Broker has started with -multiservice option
   //
@@ -436,15 +492,29 @@ static bool subMatch
 
 
   //
-  // If ONCHANGE and one of the attribute names in the scope vector
+  // If one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
   // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
   // case of ONANYCHANGE subscriptions).
   //
-  if (!attributeMatch(cSubP, attrV))
+  // Depending of the alteration type, we use the list of attributes in the request or the list
+  // with effective modifications. Note that EntityDelete doesn't check the list
+  if (targetAltType == ngsiv2::EntityUpdate)
   {
-    LM_T(LmtSubCacheMatch, ("No match due to attributes"));
-    return false;
+    if (!attributeMatch(cSubP, attributes))
+    {
+      LM_T(LmtSubCacheMatch, ("No match due to attributes"));
+      return false;
+    }
+  }
+  else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
+  {
+    if (!attributeMatch(cSubP, attrsWithModifiedValue) &&
+        !(cSubP->notifyOnMetadataChange && attributeMatch(cSubP, attrsWithModifiedMd)))
+    {
+      LM_T(LmtSubCacheMatch, ("No match due to attributes"));
+      return false;
+    }
   }
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
@@ -474,6 +544,7 @@ void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const char*                        attr,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
 {
@@ -485,7 +556,7 @@ void subCacheMatch
 
     attrV.push_back(attr);
 
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV, attrV, attrV, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -508,7 +579,10 @@ void subCacheMatch
   const char*                        servicePath,
   const char*                        entityId,
   const char*                        entityType,
-  const std::vector<std::string>&    attrV,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    attrsWithModifiedValue,
+  const std::vector<std::string>&    attrsWithModifiedMd,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 )
 {
@@ -516,7 +590,7 @@ void subCacheMatch
 
   while (cSubP != NULL)
   {
-    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attrV))
+    if (subMatch(cSubP, tenant, servicePath, entityId, entityType, attributes, attrsWithModifiedValue, attrsWithModifiedMd, targetAltType))
     {
       subVecP->push_back(cSubP);
       LM_T(LmtSubCache, ("added subscription '%s': lastNotificationTime: %lu",
@@ -552,6 +626,9 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
     free(cSubP->subscriptionId);
     cSubP->subscriptionId = NULL;
   }
+
+  cSubP->httpInfo.release();
+  cSubP->mqttInfo.release();
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
@@ -615,6 +692,12 @@ void subCacheDestroy(void)
 */
 static bool tenantMatch(const char* tenant1, const char* tenant2)
 {
+  if (!subCacheMultitenant)
+  {
+    // If no multitenant is in use, then tenant match always
+    return true;
+  }
+
   //
   // Removing complications with NULL, giving NULL tenants the value of an empty string;
   //
@@ -721,37 +804,42 @@ void subCacheItemInsert(CachedSubscription* cSubP)
 *
 * subCacheItemInsert - create a new sub, fill it in, and add it to cache
 *
-* Note that 'count', which is the counter of how many times a notification has been
-* fired for a subscription is set to 0 or 1. It is set to 1 only if the subscription
-* has made a notification to be triggered/fired upon creation-time of the subscription.
+* Note that 'count' and 'failsCounter', which is the counter of how many times a notification has been
+* fired and has failed, are set to ZERO
 */
 void subCacheItemInsert
 (
-  const char*                        tenant,
-  const char*                        servicePath,
-  const ngsiv2::HttpInfo&            httpInfo,
-  const std::vector<ngsiv2::EntID>&  entIdVector,
-  const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    metadata,
-  const std::vector<std::string>&    conditionAttrs,
-  const char*                        subscriptionId,
-  int64_t                            expirationTime,
-  int64_t                            throttling,
-  RenderFormat                       renderFormat,
-  int64_t                            lastNotificationTime,
-  int64_t                            lastNotificationSuccessTime,
-  int64_t                            lastNotificationFailureTime,
-  int64_t                            lastSuccessCode,
-  const std::string&                 lastFailureReason,
-  StringFilter*                      stringFilterP,
-  StringFilter*                      mdStringFilterP,
-  const std::string&                 status,
-  const std::string&                 q,
-  const std::string&                 geometry,
-  const std::string&                 coords,
-  const std::string&                 georel,
-  bool                               blacklist,
-  bool                               onlyChanged
+  const char*                             tenant,
+  const char*                             servicePath,
+  const ngsiv2::HttpInfo&                 httpInfo,
+  const ngsiv2::MqttInfo&                 mqttInfo,
+  const std::vector<ngsiv2::EntID>&       entIdVector,
+  const std::vector<std::string>&         attributes,
+  const std::vector<std::string>&         metadata,
+  const std::vector<std::string>&         conditionAttrs,
+  const std::vector<ngsiv2::SubAltType>&  altTypes,
+  const char*                             subscriptionId,
+  int64_t                                 expirationTime,
+  int64_t                                 maxFailsLimit,
+  int64_t                                 throttling,
+  RenderFormat                            renderFormat,
+  int64_t                                 lastNotificationTime,
+  int64_t                                 lastNotificationSuccessTime,
+  int64_t                                 lastNotificationFailureTime,
+  int64_t                                 lastSuccessCode,
+  const std::string&                      lastFailureReason,
+  StringFilter*                           stringFilterP,
+  StringFilter*                           mdStringFilterP,
+  const std::string&                      status,
+  double                                  statusLastChange,
+  const std::string&                      q,
+  const std::string&                      geometry,
+  const std::string&                      coords,
+  const std::string&                      georel,
+  bool                                    blacklist,
+  bool                                    onlyChanged,
+  bool                                    covered,
+  bool                                    notifyOnMetadataChange
 )
 {
   //
@@ -769,6 +857,7 @@ void subCacheItemInsert
   cSubP->servicePath           = strdup(servicePath);
   cSubP->subscriptionId        = strdup(subscriptionId);
   cSubP->expirationTime        = expirationTime;
+  cSubP->maxFailsLimit         = maxFailsLimit;
   cSubP->throttling            = throttling;
   cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastNotificationFailureTime;
@@ -778,18 +867,29 @@ void subCacheItemInsert
   cSubP->renderFormat          = renderFormat;
   cSubP->next                  = NULL;
   cSubP->count                 = 0;
+  cSubP->failsCounter          = 0;
   cSubP->status                = status;
+  cSubP->statusLastChange      = statusLastChange;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;
   cSubP->expression.georel     = georel;
   cSubP->blacklist             = blacklist;
   cSubP->onlyChanged           = onlyChanged;
-  cSubP->httpInfo              = httpInfo;
+  cSubP->covered               = covered;
+  cSubP->notifyOnMetadataChange= notifyOnMetadataChange;
   cSubP->notifyConditionV      = conditionAttrs;
+  cSubP->subAltTypeV           = altTypes;
   cSubP->attributes            = attributes;
   cSubP->metadata              = metadata;
 
+  // empty cache entry, no relation with DB actually exists
+  // (thus validity flag set to false)
+  cSubP->failsCounterFromDb      = 0;
+  cSubP->failsCounterFromDbValid = false;
+
+  cSubP->httpInfo.fill(httpInfo);
+  cSubP->mqttInfo.fill(mqttInfo);
 
   //
   // String filters
@@ -1040,10 +1140,13 @@ typedef struct CachedSubSaved
 {
   int64_t      lastNotificationTime;
   int64_t      count;
+  int64_t      failsCounter;
   int64_t      lastFailure;
   int64_t      lastSuccess;
   std::string  lastFailureReason;
   int64_t      lastSuccessCode;
+  std::string  status;
+  double       statusLastChange;
 } CachedSubSaved;
 
 
@@ -1052,15 +1155,14 @@ typedef struct CachedSubSaved
 *
 * subCacheSync -
 *
-* 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache (savedSubV)
-* 2. Refresh cache (count set to 0)
-* 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents and:
-*    3.1 Update cache-items where 'saved lastNotificationTime' > 'cached lastNotificationTime'
-*    3.2 Remember this more correct lastNotificationTime (must be flushed to mongo) -
-*        by clearing out (set to 0) those lastNotificationTimes that are newer in cache
-*    Same same with lastFailure and lastSuccess.
-* 4. Update 'count' for each item in savedSubV where non-zero
-* 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
+* 1. Save subscriptionId, lastNotificationTime, count, failsCounter, lastFailure, and lastSuccess for all items in cache (savedSubV)
+* 2. Refresh cache (count and failsCounter set to 0)
+* 3. Compare lastNotificationTime/Failure/Success in savedSubV with the new cache-contents and:
+*    3.1 Update cache-items where 'saved lastNotificationTime/Failure/Success' > 'cached lastNotificationTime/Failure/Success'
+*    3.2 Remember this more correct lastNotificationTime/Failure/Success (must be flushed to mongo) -
+*        by clearing out (set to -1) those lastNotificationTimes/Failure/Success that are newer in cache
+* 4. Update 'count' and 'failsCounter' for each item in savedSubV where non-zero
+* 5. Update 'lastNotificationTime/Failure/Success' for each item in savedSubV where non -1
 * 6. Free the vector created in step 1 - savedSubV
 *
 * NOTE
@@ -1084,7 +1186,7 @@ void subCacheSync(void)
 
 
   //
-  // 1. Save subscriptionId, lastNotificationTime, count, lastFailure, and lastSuccess for all items in cache
+  // 1. Save subscriptionId, lastNotificationTime, count, failsCounter, lastFailure, and lastSuccess for all items in cache
   //
   CachedSubscription* cSubP = subCache.head;
 
@@ -1104,10 +1206,13 @@ void subCacheSync(void)
 
     cssP->lastNotificationTime = cSubP->lastNotificationTime;
     cssP->count                = cSubP->count;
+    cssP->failsCounter         = cSubP->failsCounter;
     cssP->lastFailure          = cSubP->lastFailure;
     cssP->lastSuccess          = cSubP->lastSuccess;
     cssP->lastFailureReason    = cSubP->lastFailureReason;
     cssP->lastSuccessCode      = cSubP->lastSuccessCode;
+    cssP->status               = cSubP->status;
+    cssP->statusLastChange     = cSubP->statusLastChange;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1117,79 +1222,89 @@ void subCacheSync(void)
 
 
   //
-  // 2. Refresh cache (count set to 0)
+  // 2. Refresh cache (count and failsCounter set to 0)
   //
   subCacheRefresh();
 
-
-  //
-  // 3. Compare lastNotificationTime/lastFailure/lastSuccess in savedSubV with the new cache-contents
-  //
+  // 3. Check if DB or local cache is newer, updating DB in the second case
   cSubP = subCache.head;
   while (cSubP != NULL)
   {
     CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
 
-    if (cssP != NULL)
-    {
-      if (cssP->lastNotificationTime <= cSubP->lastNotificationTime)
-      {
-        // cssP->lastNotificationTime is older than what's currently in DB => throw away
-        cssP->lastNotificationTime = 0;
-      }
-
-      if (cssP->lastFailure < cSubP->lastFailure)
-      {
-        // cssP->lastFailure is older than what's currently in DB => throw away
-        cssP->lastFailure = 0;
-      }
-
-      if (cssP->lastSuccess < cSubP->lastSuccess)
-      {
-        // cssP->lastSuccess is older than what's currently in DB => throw away
-        cssP->lastSuccess = 0;
-      }
-    }
-
-    cSubP = cSubP->next;
-  }
-
-
-  //
-  // 4. Update 'count' for each item in savedSubV where non-zero
-  // 5. Update 'lastNotificationTime/lastFailure/lastSuccess' for each item in savedSubV where non-zero
-  //
-  cSubP = subCache.head;
-  while (cSubP != NULL)
-  {
-    CachedSubSaved* cssP = savedSubV[cSubP->subscriptionId];
+    // Not-NULL in some of this means "dirty" data to update in DB at the end
+    // Note that count and failsCounter are special: they are update in DB
+    // using $inc and not $set and they are flushed during the cache refresh process.
+    // There aren't pointer for them
+    int64_t*      lastNotificationTimeP = NULL;
+    int64_t*      lastFailureP          = NULL;
+    int64_t*      lastSuccessP          = NULL;
+    std::string*  failureReasonP        = NULL;
+    int64_t*      statusCodeP           = NULL;
+    std::string*  statusP               = NULL;
+    double*       statusLastChangeP     = NULL;
 
     if (cssP != NULL)
     {
+      if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
+      {
+        // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
+        cSubP->lastNotificationTime = cssP->lastNotificationTime;
+        lastNotificationTimeP = &cSubP->lastNotificationTime;
+      }
+
+      if (cssP->lastFailure > cSubP->lastFailure)
+      {
+        // cssP->lastFailure is newers than what's currently in DB => update in cSubP and DB
+        cSubP->lastFailure       = cssP->lastFailure;
+        cSubP->lastFailureReason = cssP->lastFailureReason;
+        lastFailureP   = &cSubP->lastFailure;
+        failureReasonP = &cSubP->lastFailureReason;
+      }
+
+      if (cssP->lastSuccess > cSubP->lastSuccess)
+      {
+        // cssP->lastSuccess is newer than what's currently in DB => update in cSubP and DB
+        cSubP->lastSuccess     = cssP->lastSuccess;
+        cSubP->lastSuccessCode = cssP->lastSuccessCode;
+        lastSuccessP = &cSubP->lastSuccess;
+        statusCodeP  = &cSubP->lastSuccessCode;
+      }
+
+      if (cssP->statusLastChange > cSubP->statusLastChange)
+      {
+        // cssP->status is newer than what's currently in DB => update in cSubP and DB
+        cSubP->status           = cssP->status;
+        cSubP->statusLastChange = cssP->statusLastChange;
+        statusP           = &cSubP->status;
+        statusLastChangeP = &cSubP->statusLastChange;
+      }
+
       std::string tenant = (cSubP->tenant == NULL)? "" : cSubP->tenant;
 
-      mongoSubCountersUpdate(tenant,
-                             cSubP->subscriptionId,
-                             cssP->count,
-                             cssP->lastNotificationTime,
-                             cssP->lastFailure,
-                             cssP->lastSuccess,
-                             cssP->lastFailureReason,
-                             cssP->lastSuccessCode);
+      // Note that in step 2 subCacheRefresh() sets failsCounterFromDb from DB,
+      // but that is done *before* updating the counter with mongoSubUpdateOnCacheSync()
+      // Thus, we have to do a mirror increase in the cache
+      cSubP->failsCounterFromDb += cssP->failsCounter;
 
-      // Keeping lastFailure and lastSuccess in sub cache
-      cSubP->lastFailure       = cssP->lastFailure;
-      cSubP->lastSuccess       = cssP->lastSuccess;
-      cSubP->lastFailureReason = cssP->lastFailureReason;
-      cSubP->lastSuccessCode   = cssP->lastSuccessCode;
+      mongoSubUpdateOnCacheSync(tenant,
+                                cSubP->subscriptionId,
+                                cssP->count,
+                                cssP->failsCounter,
+                                lastNotificationTimeP,
+                                lastFailureP,
+                                lastSuccessP,
+                                failureReasonP,
+                                statusCodeP,
+                                statusP,
+                                statusLastChangeP);
     }
 
     cSubP = cSubP->next;
   }
 
-
   //
-  // 6. Free the vector savedSubV
+  // 5. Free the vector savedSubV
   //
   for (std::map<std::string, CachedSubSaved*>::iterator it = savedSubV.begin(); it != savedSubV.end(); ++it)
   {
@@ -1257,32 +1372,47 @@ extern bool noCache;
 * A timestamp for this last failure is set for the sub-item in the sub-cache  and
 * the consecutive number of notification errors for the subscription is incremented.
 *
-* If 'errors' == 0, then the subscription is marked as non-erroneous.
+* If error == true, then the subscription is marked as non-erroneous.
 */
 void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors,
+  bool                error,
   long long           statusCode,
-  const std::string&  failureReason
+  const std::string&  failureReason,
+  long long           failsCounter,
+  long long           maxFailsLimit
 )
 {
+  bool maxFailsReached = maxFailsLimit > 0 && failsCounter >= maxFailsLimit;
+
+  // FIXME P5: the noCache block is missplaced: subCache.cpp should contain only the
+  // logic related with cache
   if (noCache)
   {
-    // The field 'count' has already been taken care of. Set to 0 in the calls to mongoSubCountersUpdate()
+    // The field 'count' has already been taken care of (see processSubscriptions())
+    // It is not used taken into account in mongoSubUpdateOnNotif()
 
     time_t now = time(NULL);
 
-    if (errors == 0)
+    if (error)
     {
-      // count == 0 (inc is done in another part), lastFailure == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, -1, now, "", statusCode);
+      std::string status           = "";
+      double      statusLastChange = -1;
+      if (maxFailsReached)
+      {
+        LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
+        status           = STATUS_INACTIVE;
+        statusLastChange = getCurrentTime();
+      }
+      // fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 1, now, now, -1, failureReason, -1, status, statusLastChange);
     }
     else
     {
-      // count == 0 (inc is done in another part), lastSuccess == -1, failureReason == -1
-      mongoSubCountersUpdate(tenant, subscriptionId, 0, now, now, -1, failureReason, -1);
+      // fails = 0, lastFailure == -1, failureReason == "", status == ""
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, now, -1, now, "", statusCode, "", -1);
     }
 
     return;
@@ -1303,15 +1433,32 @@ void subNotificationErrorStatus
     return;
   }
 
-  if (errors == 0)
+  if (error)
   {
-    subP->lastSuccess     = now;
-    subP->lastSuccessCode = statusCode;
+    subP->failsCounter++;
+    subP->lastFailure       = now;
+    subP->lastFailureReason = failureReason;
+
+    if (maxFailsReached)
+    {
+      // update the status to inactive
+      LM_W(("Subscription %s automatically disabled due to failsCounter (%d) overpasses maxFailsLimit (%d)", subscriptionId.c_str(), failsCounter + 1, maxFailsLimit));
+
+      double now = getCurrentTime();
+      subP->status = STATUS_INACTIVE;
+      subP->statusLastChange = now;
+
+      LM_T(LmtSubCache, ("Update the status to %s (lastChange: %d)", subP->status.c_str(), now));
+    }
   }
   else
   {
-    subP->lastFailure       = now;
-    subP->lastFailureReason = failureReason;
+    // no fails mean notification ok, thus reseting the counter
+    // in addition, DB consolidated data is marked as invalid
+    subP->failsCounter            = 0;
+    subP->lastSuccess             = now;
+    subP->lastSuccessCode         = statusCode;
+    subP->failsCounterFromDbValid = false;
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

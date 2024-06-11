@@ -1,0 +1,646 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Metadata are not removed upon attribute value update
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription for entity E
+# 02. Create entity E with attribute A=foo and metadata MD1=1 and MD2=2
+# 03. GET entity E and see A=foo with metadata MD1=1 and MD2=2
+# 04. Dump&reset accumulator and see A=foo with metadata MD1=1 and MD2=2
+# 05. Update entity E with A=bar
+# 06. GET entity E and see A=bar with metadata MD1=1 and MD2=2
+# 07. Dump&reset accumulator and see A=bar with metadata MD1=1 and MD2=2
+# 08. Update entity E with A=zzz and metadata MD1=10
+# 09. GET entity E and see A=zzz and metadata MD1=10 and MD2=2
+# 10. Dump&reset accumulator and see A=zzz with metadata MD1=10 and MD2=2
+# 11. Update entity E with A=yyy and metadata MD3=30
+# 12. GET entity E and see A=yyy and metadata MD1=10, MD2=2 and MD3=30
+# 13. Dump&reset accumulator and see A=yyy with metadata MD1=10, MD2=2 and MD3=30
+# 14. Update entity E with A=www and metadata MD2=null
+# 15. GET entity E and see A=www and metadata MD1=10, MD2=null and MD3=30
+# 16. Dump&reset accumulator and see A=www with metadata MD1=10, MD2=null and MD3=30
+#
+
+echo "01. Create subscription for entity E"
+echo "===================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E with attribute A=foo and metadata MD1=1 and MD2=2"
+echo "====================================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": "foo",
+    "type": "Text",
+    "metadata": {
+      "MD1": {
+        "value": 1,
+        "type": "Number"
+      },
+      "MD2": {
+        "value": 2,
+        "type": "Number"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "03. GET entity E and see A=foo with metadata MD1=1 and MD2=2"
+echo "============================================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+
+echo "04. Dump&reset accumulator and see A=foo with metadata MD1=1 and MD2=2"
+echo "======================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05. Update entity E with A=bar"
+echo "=============================="
+payload='{
+  "A": {
+    "value": "bar",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "06. GET entity E and see A=bar with metadata MD1=1 and MD2=2"
+echo "============================================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "07. Dump&reset accumulator and see A=bar with metadata MD1=1 and MD2=2"
+echo "======================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Update entity E with A=zzz and metadata MD1=10"
+echo "=================================================="
+payload='{
+  "A": {
+    "value": "zzz",
+    "type": "Text",
+    "metadata": {
+      "MD1": {
+        "value": 10,
+        "type": "Number"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "09. GET entity E and see A=zzz and metadata MD1=10 and MD2=2"
+echo "============================================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "10. Dump&reset accumulator and see A=zzz with metadata MD1=1 and MD2=2"
+echo "======================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "11. Update entity E with A=yyy and metadata MD3=30"
+echo "=================================================="
+payload='{
+  "A": {
+    "value": "yyy",
+    "type": "Text",
+    "metadata": {
+      "MD3": {
+        "value": 30,
+        "type": "Number"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "12. GET entity E and see A=yyy and metadata MD1=10, MD2=2 and MD3=30"
+echo "===================================================================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "13. Dump&reset accumulator and see A=yyy with metadata MD1=1, MD2=2 and MD3=30"
+echo "=============================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "14. Update entity E with A=www and metadata MD2=null"
+echo "===================================================="
+payload='{
+  "A": {
+    "value": "www",
+    "type": "Text",
+    "metadata": {
+      "MD2": {
+        "value": null,
+        "type": "None"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "15. GET entity E and see A=www and metadata MD1=10, MD2=null and MD3=30"
+echo "======================================================================="
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "16. Dump&reset accumulator and see A=yyy with metadata MD1=1, MD2=null and MD3=30"
+echo "================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for entity E
+====================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E with attribute A=foo and metadata MD1=1 and MD2=2
+=====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. GET entity E and see A=foo with metadata MD1=1 and MD2=2
+============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
+
+{
+    "A": {
+        "metadata": {
+            "MD1": {
+                "type": "Number",
+                "value": 1
+            },
+            "MD2": {
+                "type": "Number",
+                "value": 2
+            }
+        },
+        "type": "Text",
+        "value": "foo"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+04. Dump&reset accumulator and see A=foo with metadata MD1=1 and MD2=2
+======================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 191
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "MD1": {
+                        "type": "Number",
+                        "value": 1
+                    },
+                    "MD2": {
+                        "type": "Number",
+                        "value": 2
+                    }
+                },
+                "type": "Text",
+                "value": "foo"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+05. Update entity E with A=bar
+==============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. GET entity E and see A=bar with metadata MD1=1 and MD2=2
+============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
+
+{
+    "A": {
+        "metadata": {
+            "MD1": {
+                "type": "Number",
+                "value": 1
+            },
+            "MD2": {
+                "type": "Number",
+                "value": 2
+            }
+        },
+        "type": "Text",
+        "value": "bar"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+07. Dump&reset accumulator and see A=bar with metadata MD1=1 and MD2=2
+======================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 191
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "MD1": {
+                        "type": "Number",
+                        "value": 1
+                    },
+                    "MD2": {
+                        "type": "Number",
+                        "value": 2
+                    }
+                },
+                "type": "Text",
+                "value": "bar"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+08. Update entity E with A=zzz and metadata MD1=10
+==================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09. GET entity E and see A=zzz and metadata MD1=10 and MD2=2
+============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 137
+
+{
+    "A": {
+        "metadata": {
+            "MD1": {
+                "type": "Number",
+                "value": 10
+            },
+            "MD2": {
+                "type": "Number",
+                "value": 2
+            }
+        },
+        "type": "Text",
+        "value": "zzz"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+10. Dump&reset accumulator and see A=zzz with metadata MD1=1 and MD2=2
+======================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 192
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "MD1": {
+                        "type": "Number",
+                        "value": 10
+                    },
+                    "MD2": {
+                        "type": "Number",
+                        "value": 2
+                    }
+                },
+                "type": "Text",
+                "value": "zzz"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+11. Update entity E with A=yyy and metadata MD3=30
+==================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+12. GET entity E and see A=yyy and metadata MD1=10, MD2=2 and MD3=30
+====================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 172
+
+{
+    "A": {
+        "metadata": {
+            "MD1": {
+                "type": "Number",
+                "value": 10
+            },
+            "MD2": {
+                "type": "Number",
+                "value": 2
+            },
+            "MD3": {
+                "type": "Number",
+                "value": 30
+            }
+        },
+        "type": "Text",
+        "value": "yyy"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+13. Dump&reset accumulator and see A=yyy with metadata MD1=1, MD2=2 and MD3=30
+==============================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 227
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "MD1": {
+                        "type": "Number",
+                        "value": 10
+                    },
+                    "MD2": {
+                        "type": "Number",
+                        "value": 2
+                    },
+                    "MD3": {
+                        "type": "Number",
+                        "value": 30
+                    }
+                },
+                "type": "Text",
+                "value": "yyy"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+14. Update entity E with A=www and metadata MD2=null
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+15. GET entity E and see A=www and metadata MD1=10, MD2=null and MD3=30
+=======================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 173
+
+{
+    "A": {
+        "metadata": {
+            "MD1": {
+                "type": "Number",
+                "value": 10
+            },
+            "MD2": {
+                "type": "None",
+                "value": null
+            },
+            "MD3": {
+                "type": "Number",
+                "value": 30
+            }
+        },
+        "type": "Text",
+        "value": "www"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+16. Dump&reset accumulator and see A=yyy with metadata MD1=1, MD2=null and MD3=30
+=================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 228
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {
+                    "MD1": {
+                        "type": "Number",
+                        "value": 10
+                    },
+                    "MD2": {
+                        "type": "None",
+                        "value": null
+                    },
+                    "MD3": {
+                        "type": "Number",
+                        "value": 30
+                    }
+                },
+                "type": "Text",
+                "value": "www"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

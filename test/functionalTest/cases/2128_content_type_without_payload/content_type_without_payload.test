@@ -63,23 +63,23 @@ echo "================================================================"
 orionCurl --url /v2/entities/E1 --in application/json
 echo
 echo
- 
+
 
 echo "05. Send a DELETE with Content-Type application/json, see error 400"
 echo "==================================================================="
 orionCurl --url /v2/entities/E1 --in application/json -X DELETE
 echo
 echo
- 
 
---REGEXPECT-- 
+
+--REGEXPECT--
 01. Send a PUT /v2/entities/E1 without payload, see error 411
 =============================================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -90,10 +90,10 @@ Date: REGEX(.*)
 02. Send a PATCH /v2/entities/E1 without payload, see error 411
 ===============================================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -104,10 +104,10 @@ Date: REGEX(.*)
 03. Send a POST /v2/entities/E1 without payload, see error 411
 ==============================================================
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -118,10 +118,10 @@ Date: REGEX(.*)
 04. Send a GET with Content-Type application/json, see error 400
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 131
 
 {
     "description": "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden",
@@ -132,10 +132,10 @@ Date: REGEX(.*)
 05. Send a DELETE with Content-Type application/json, see error 400
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 131
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 131
 
 {
     "description": "Orion accepts no payload for GET/DELETE requests. HTTP header Content-Type is thus forbidden",

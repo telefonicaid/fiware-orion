@@ -28,56 +28,19 @@
 #include <string.h>
 
 #include "logMsg/logMsg.h"
-
-/* ****************************************************************************
-*
-* logInfoNotification - rc as int
-*/
-void logInfoNotification
-(
-  const char*  subId,
-  const char*  verb,
-  const char*  url,
-  int          rc
-)
-{
-  char buffer[STRING_SIZE_FOR_INT];
-  snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoNotification(subId, verb, url, buffer);
-}
+#include "common/statistics.h"
 
 
 
 /* ****************************************************************************
 *
-* logInfoNotification - rc as string
+* isNgsiV1Url
 */
-void logInfoNotification
-(
-  const char*  subId,
-  const char*  verb,
-  const char*  url,
-  const char*  rc
-)
+inline bool isNgsiV1Url(const char* url)
 {
-  LM_I(("Notif delivered (subId: %s): %s %s, response code: %s", subId, verb, url, rc));
+  return (strstr(url, "/v1/") || strcasestr(url, "/ngsi10/") || strcasestr(url, "/ngsi9/"));
 }
 
-
-
-/* ****************************************************************************
-*
-* logInfoRequestWithoutPayload -
-*/
-void logInfoRequestWithoutPayload
-(
-  const char*  verb,
-  const char*  url,
-  int          rc
-)
-{
-  LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
-}
 
 
 /* ****************************************************************************
@@ -98,6 +61,124 @@ static char* truncatePayload(const char* payload)
   truncatedPayload[truncatedPayloadLengh - 1] = '\0';
 
   return truncatedPayload;
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoNotification - rc as int
+*/
+void logInfoHttpNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  verb,
+  const char*  resource,
+  const char*  payload,
+  int          rc
+)
+{
+  char buffer[STRING_SIZE_FOR_INT];
+  snprintf(buffer, sizeof(buffer), "%d", rc);
+  logInfoHttpNotification(subId, endpoint, verb, resource, payload, buffer);
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoHttpNotification - rc as string
+*/
+void logInfoHttpNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  verb,
+  const char*  resource,
+  const char*  payload,
+  const char*  rc
+)
+{
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc));
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoMqttNotification
+*/
+void logInfoMqttNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  resource,
+  const char*  payload
+)
+{
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s, payload (%d bytes): %s", subId, endpoint, resource, strlen(payload), effectivePayload));
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoRequestWithoutPayload -
+*/
+void logInfoRequestWithoutPayload
+(
+  const char*  verb,
+  const char*  url,
+  int          rc
+)
+{
+  LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
+
+  if (isNgsiV1Url(url))
+  {
+    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated NGSIv1 request received: %s %s, response code: %d", verb, url, rc));
+    }
+  }
 }
 
 
@@ -129,6 +210,15 @@ void logInfoRequestWithPayload
 
   LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
 
+  if (isNgsiV1Url(url))
+  {
+    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated NGSIv1 request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+    }
+  }
+
   if (cleanAfterUse)
   {
     free(effectivePayload);
@@ -143,6 +233,10 @@ void logInfoRequestWithPayload
 */
 void logInfoFwdStart(const char* verb, const char*  url)
 {
+  //
+  // WARNING:
+  //  This log line is used during functional tests, thus crucial. Please DO NOT modify nor delete it
+  //
   LM_I(("Starting forwarding for %s %s", verb, url));
 }
 

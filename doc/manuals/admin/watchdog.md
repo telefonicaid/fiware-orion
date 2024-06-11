@@ -13,13 +13,9 @@ and starts it again if is not working and/or send you a notification
 email) or use existing tools. This section includes a procedure using
 [Monit](http://mmonit.com/monit/).
 
-First of all, install the RPMs available at
-<http://rpmfind.net/linux/rpm2html/search.php?query=monit>. The
-following procedure has been prepared considering
-monit-5.1.1-4.el6.x86\_64.rpm, although it also should work with other
-versions of the RPM.
+First of all, install monit:
 
-    sudo rpm -i monit-5.2.5-1.el5.rf.x86_64.rpm
+    sudo apt-get install monit
 
 Create a directory for monit stuff, eg:
 
@@ -94,7 +90,7 @@ e.g.:
 
     # ps -ef | grep contextBroker
     500      27175     1  0 21:06 ?        00:00:00 monit -v -c /home/localadmin/monit_CB/monitBROKER.conf -d 10 -p /var/log/contextBroker/monit.pid
-    500      27205     1  0 21:06 ?        00:00:00 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion;
+    500      27205     1  0 21:06 ?        00:00:00 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbURI mongodb://localhost/ -db orion;
 
 Then, kill contextBroker, e.g.:
 

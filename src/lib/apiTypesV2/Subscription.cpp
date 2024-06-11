@@ -34,6 +34,67 @@
 
 
 
+/* ****************************************************************************
+*
+* parseAlterationType -
+*/
+ngsiv2::SubAltType parseAlterationType(const std::string& altType)
+{
+  if (altType == "entityChange")
+  {
+    return ngsiv2::SubAltType::EntityChange;
+  }
+  else if (altType == "entityUpdate")
+  {
+    return ngsiv2::SubAltType::EntityUpdate;
+  }
+  else if (altType == "entityCreate")
+  {
+    return ngsiv2::SubAltType::EntityCreate;
+  }
+  else if (altType == "entityDelete")
+  {
+    return ngsiv2::SubAltType::EntityDelete;
+  }
+  else
+  {
+    return ngsiv2::SubAltType::Unknown;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* subAltType2string -
+*/
+std::string subAltType2string(ngsiv2::SubAltType altType)
+{
+  if (altType == ngsiv2::SubAltType::EntityChange)
+  {
+    return "entityChange";
+  }
+  else if (altType == ngsiv2::SubAltType::EntityUpdate)
+  {
+    return "entityUpdate";
+  }
+  else if (altType == ngsiv2::SubAltType::EntityCreate)
+  {
+    return "entityCreate";
+  }
+  else if (altType == ngsiv2::SubAltType::EntityDelete)
+  {
+    return "entityDelete";
+  }
+  else
+  {
+    LM_E(("Runtime Error (unknown alteration type)"));
+    return "Unknown";
+  }
+}
+
+
+
 namespace ngsiv2
 {
 /* ****************************************************************************
@@ -80,14 +141,7 @@ std::string Subscription::toJson(void)
     jh.addDate("expires", this->expires);
   }
 
-  if ((this->notification.lastFailure > 0) && (this->notification.lastFailure > this->notification.lastSuccess))
-  {
-    jh.addString("status", "failed");
-  }
-  else
-  {
-    jh.addString("status", this->status);
-  }
+  jh.addString("status", this->status);
 
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
@@ -98,6 +152,19 @@ std::string Subscription::toJson(void)
   }
 
   return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* Subscription::release -
+*/
+void Subscription::release()
+{
+  // Should this be in the class destructor? If do so, problems found when
+  // Subscription is stored in std::vector in some points of the code...
+  notification.release();
 }
 
 
@@ -123,36 +190,39 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastNotification", this->lastNotification);
   }
 
-  if (!this->blacklist && !this->onlyChanged)
-  {
-    jh.addRaw("attrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", false);
-  }
-  else if (!this->blacklist && this->onlyChanged)
-  {
-    jh.addRaw("attrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", this->onlyChanged);
-  }
-  else if (this->blacklist && this->onlyChanged)
+  if (this->blacklist)
   {
     jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", this->onlyChanged);
   }
   else
   {
-    jh.addRaw("exceptAttrs", vectorToJson(this->attributes));
-    jh.addBool("onlyChangedAttrs", false);
+    jh.addRaw("attrs", vectorToJson(this->attributes));
   }
 
+  jh.addBool("onlyChangedAttrs", this->onlyChanged);
   jh.addString("attrsFormat", attrsFormat);
 
-  if (this->httpInfo.custom)
+  if (this->type == HttpNotification)
   {
-    jh.addRaw("httpCustom", this->httpInfo.toJson());
+    if (this->httpInfo.custom)
+    {
+      jh.addRaw("httpCustom", this->httpInfo.toJson());
+    }
+    else
+    {
+      jh.addRaw("http", this->httpInfo.toJson());
+    }
   }
-  else
+  else  // MqttNotification
   {
-    jh.addRaw("http", this->httpInfo.toJson());
+    if (this->mqttInfo.custom)
+    {
+      jh.addRaw("mqttCustom", this->mqttInfo.toJson());
+    }
+    else
+    {
+      jh.addRaw("mqtt", this->mqttInfo.toJson());
+    }
   }
 
   if (this->metadata.size() > 0)
@@ -180,7 +250,33 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addNumber("lastSuccessCode", this->lastSuccessCode);
   }
 
+  if (this->maxFailsLimit > 0)
+  {
+    jh.addNumber("maxFailsLimit", this->maxFailsLimit);
+  }
+
+  if (this->failsCounter > 0)
+  {
+    jh.addNumber("failsCounter", this->failsCounter);
+  }
+
+  jh.addBool("covered", this->covered);
+
   return jh.str();
+}
+
+
+
+/* ****************************************************************************
+*
+* Notification::release -
+*/
+void Notification::release()
+{
+  // Only one of the release operations will do something, but it is simpler (and safer)
+  // than using notification type
+  httpInfo.release();
+  mqttInfo.release();
 }
 
 
@@ -222,6 +318,19 @@ std::string Condition::toJson()
   std::string expressionString = jhe.str();
 
   if (expressionString != "{}")         jh.addRaw("expression", expressionString);
+
+  JsonVectorHelper jhv;
+
+  for (unsigned int ix = 0 ; ix < this->altTypes.size(); ix++)
+  {
+    jhv.addString(subAltType2string(this->altTypes[ix]));
+  }
+
+  std::string operationsString = jhv.str();
+
+  if (operationsString != "[]")         jh.addRaw("alterationTypes", operationsString);
+
+  jh.addBool("notifyOnMetadataChange", this->notifyOnMetadataChange);
 
   return jh.str();
 }

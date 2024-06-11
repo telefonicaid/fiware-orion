@@ -1,0 +1,689 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Basic CRUD for subscriptions retain field (mqttCustom variant)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+
+--SHELL--
+
+#
+# 01. Create subscription with invalid retain, see error
+# 02. Create subscription with retain true
+# 03a. Get subscription and see retain true
+# 03b. Get subscription (as a list) and see retain true
+# 04. Update subscription with retain false
+# 05a. Get subscription and see retain false
+# 05b. Get subscription (as a list) and see retain false
+# 06. Update subscription without retain
+# 07a. Get subscription and see retain false
+# 07b. Get subscription (as a list) and see retain false
+# 08. Update subscription with retain true
+# 09a. Get subscription and see retain true
+# 09b. Get subscription (as a list) and see retain true
+# 10. Update subscription with invalid retain, see error
+# 11a. Get subscription and see retain true
+# 11b. Get subscription (as a list) and see retain true
+#
+
+echo "01. Create subscription with invalid retain, see error"
+echo "======================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "orion",
+      "retain": "foo"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subscription with retain true"
+echo "========================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern" : ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "orion",
+      "retain": true
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03a. Get subscription and see retain true"
+echo "========================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03b. Get subscription (as a list) and see retain true"
+echo "====================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Update subscription with retain false"
+echo "========================================="
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "orion",
+      "retain": false
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05a. Get subscription and see retain false"
+echo "=========================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "05b. Get subscription (as a list) and see retain false"
+echo "======================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "06. Update subscription without retain"
+echo "======================================"
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "orion"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07a. Get subscription and see retain false"
+echo "=========================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "07b. Get subscription (as a list) and see retain false"
+echo "======================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "08. Update subscription with retain true"
+echo "========================================"
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "orion",
+      "retain": true
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "09a. Get subscription and see retain true"
+echo "========================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09b. Get subscription (as a list) and see retain true"
+echo "====================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "10. Update subscription with invalid retain, see error"
+echo "======================================================"
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "orion",
+      "retain": 42
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "11a. Get subscription and see retain true"
+echo "========================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "11b. Get subscription (as a list) and see retain true"
+echo "====================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+--REGEXPECT--
+01. Create subscription with invalid retain, see error
+======================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 59
+
+{
+    "description": "retain is not a bool",
+    "error": "BadRequest"
+}
+
+
+02. Create subscription with retain true
+========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03a. Get subscription and see retain true
+=========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 340
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "qos": 0,
+            "retain": true,
+            "topic": "orion",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03b. Get subscription (as a list) and see retain true
+=====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 342
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "mqttCustom": {
+                "qos": 0,
+                "retain": true,
+                "topic": "orion",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Update subscription with retain false
+=========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05a. Get subscription and see retain false
+==========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 341
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "qos": 0,
+            "retain": false,
+            "topic": "orion",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05b. Get subscription (as a list) and see retain false
+======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 343
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "mqttCustom": {
+                "qos": 0,
+                "retain": false,
+                "topic": "orion",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+06. Update subscription without retain
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07a. Get subscription and see retain false
+==========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 341
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "qos": 0,
+            "retain": false,
+            "topic": "orion",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+07b. Get subscription (as a list) and see retain false
+======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 343
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "mqttCustom": {
+                "qos": 0,
+                "retain": false,
+                "topic": "orion",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+08. Update subscription with retain true
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09a. Get subscription and see retain true
+=========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 340
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "qos": 0,
+            "retain": true,
+            "topic": "orion",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+09b. Get subscription (as a list) and see retain true
+=====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 342
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "mqttCustom": {
+                "qos": 0,
+                "retain": true,
+                "topic": "orion",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+10. Update subscription with invalid retain, see error
+======================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 59
+
+{
+    "description": "retain is not a bool",
+    "error": "BadRequest"
+}
+
+
+11a. Get subscription and see retain true
+=========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 340
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "qos": 0,
+            "retain": true,
+            "topic": "orion",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+11b. Get subscription (as a list) and see retain true
+=====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 342
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "mqttCustom": {
+                "qos": 0,
+                "retain": true,
+                "topic": "orion",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

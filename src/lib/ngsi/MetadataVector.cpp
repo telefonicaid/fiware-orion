@@ -217,7 +217,7 @@ void MetadataVector::fill(MetadataVector* mvP)
 *
 * MetadataVector::lookupByName - 
 */
-Metadata* MetadataVector::lookupByName(const std::string& _name)
+Metadata* MetadataVector::lookupByName(const std::string& _name) const
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -228,4 +228,21 @@ Metadata* MetadataVector::lookupByName(const std::string& _name)
   }
 
   return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* MetadataVector::toBson -
+*/
+void MetadataVector::toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType)
+{
+  for (unsigned int ix = 0; ix < this->vec.size(); ++ix)
+  {
+    this->vec[ix]->appendToBsoN(md, mdNames, useDefaultType);
+
+    LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
+                      this->vec[ix]->name.c_str(), this->vec[ix]->type.c_str(), this->vec[ix]->toStringValue().c_str()));
+  }
 }

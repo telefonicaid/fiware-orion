@@ -1814,11 +1814,11 @@ extern int lmLogLinesGet(void);
 */
 inline void lmTransactionReset()
 {
-  strncpy(transactionId, "N/A", sizeof(transactionId));
-  strncpy(correlatorId,  "N/A", sizeof(correlatorId));
-  strncpy(service,       "N/A", sizeof(service));
-  strncpy(subService,    "N/A", sizeof(subService));
-  strncpy(fromIp,        "N/A", sizeof(fromIp));
+  strncpy(transactionId, "N/A", sizeof(transactionId) - 1);
+  strncpy(correlatorId,  "N/A", sizeof(correlatorId) - 1);
+  strncpy(service,       "N/A", sizeof(service) - 1);
+  strncpy(subService,    "N/A", sizeof(subService) - 1);
+  strncpy(fromIp,        "N/A", sizeof(fromIp) - 1);
 }
 
 
@@ -1843,30 +1843,14 @@ inline void lmTransactionStart(
   const char* __service    = strlen(_service)    == 0? "<none>" : _service;
   const char* __subService = strlen(_subService) == 0? "<none>" : _subService;
 
-  strncpy(service,    __service,    sizeof(service));
-  strncpy(subService, __subService, sizeof(subService));
-  strncpy(fromIp,     _fromIp,      sizeof(fromIp));
+  strncpy(service,    __service,    sizeof(service) - 1);
+  strncpy(subService, __subService, sizeof(subService) - 1);
+  strncpy(fromIp,     _fromIp,      sizeof(fromIp) - 1);
+
+  fromIp[sizeof(fromIp) - 1] = 0;
+
   LM_T(LmtOldInfo, ("Starting transaction %s %s%s:%d%s", keyword, schema, ip, port, path));
 }
-
-
-
-#if 0
-
-// This piece of code seems not be in use. Maybe it is related with ONTIMENOTIFICATION
-// notifications... let's hold in until OTI (deprecated in 0.26.0) gets definitivealy
-// removed from code
-
-/* ****************************************************************************
-*
-* lmTransactionStart_URL -
-*/
-inline void lmTransactionStart_URL(const char* url)
-{
-  transactionIdSet();
-  LM_T(LmtOldInfo, ("Starting transaction from %s", url));
-}
-#endif
 
 
 

@@ -54,7 +54,6 @@
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
 #include "apiTypesV2/Subscription.h"
-#include "apiTypesV2/ngsiWrappers.h"
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"
@@ -105,17 +104,10 @@ bool mongoMultitenant(void)
 */
 void mongoInit
 (
-  const char*  dbHost,
-  const char*  rplSet,
+  const char*  dbURI,
   std::string  dbName,
-  const char*  user,
   const char*  pwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
@@ -124,17 +116,10 @@ void mongoInit
   // Set the global multitenant variable
   multitenant = mtenant;
 
-  if (orion::mongoConnectionPoolInit(dbHost,
+  if (orion::mongoConnectionPoolInit(dbURI,
                                      dbName.c_str(),
-                                     rplSet,
-                                     user,
                                      pwd,
-                                     mechanism,
-                                     authDb,
-                                     dbSSL,
-                                     dbDisableRetryWrites,
                                      mtenant,
-                                     timeout,
                                      writeConcern,
                                      dbPoolSize,
                                      mutexTimeStat) != 0)
@@ -231,6 +216,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
   orion::BSONObjBuilder bob;
   bob.append("listDatabases", 1);
+  bob.append("nameOnly", true);
 
   if (!orion::runDatabaseCommand("admin", bob.obj(), &result, &err))
   {
@@ -252,9 +238,17 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
     {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
-      dbsP->push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      // Check for size of database name
+      if (strlen(dbName.c_str()) <= DB_AND_SERVICE_NAME_MAX_LEN)
+      {
+        LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+        dbsP->push_back(dbName);
+        LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      }
+      else
+      {
+        LM_E(("Runtime Error (database name size should be smaller than %d characters: %s)", DB_AND_SERVICE_NAME_MAX_LEN, dbName.c_str()));
+      }
     }
   }
 
@@ -418,7 +412,7 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     regex_t regex;
 
     idMatch = false;
-    if (regcomp(&regex, en2->id.c_str(), REG_EXTENDED) != 0)
+    if (!regComp(&regex, en2->id.c_str(), REG_EXTENDED))
     {
       std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
       alarmMgr.badInput(clientIp, details);
@@ -829,6 +823,11 @@ static std::string sortCriteria(const std::string& sortToken)
     return ENT_MODIFICATION_DATE;
   }
 
+  if (sortToken == SERVICE_PATH)
+  {
+    return std::string("_id.") + ENT_SERVICE_PATH;
+  }
+
   if (sortToken == ENT_ENTITY_ID)
   {
     return std::string("_id.") + ENT_ENTITY_ID;
@@ -848,9 +847,19 @@ static std::string sortCriteria(const std::string& sortToken)
 *
 * processAreaScopeV2 -
 *
-* Returns true if areaQueryP was filled, false otherwise
+* Returns true if queryP/countQueryP were filled, false otherwise
+*
+* Most of the cases queryP and countQueryP are filled the same way. However, in the case of near georel they
+* are different. This is due to:
+*
+* - we need to use $near in the query used to search (queryP), due to the alternative using $geoWithin
+*   (described in https://stackoverflow.com/a/76416103/1485926) doesn't sort result by center proximity, so
+*   ?orderBy=distance will break
+* - we cannot use $near in the query used to count (countQueryP) as it doesn't work with modern count functions
+*   (see the aforementioned link).
+*
 */
-bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsage)
+bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -957,119 +966,115 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
   orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
-    if (avoidNearUsage)
+    // 1. query used for count (without $near)
+
+    // This works as far as we don't have any other $and field in the query, in which
+    // case the array for $and here needs to be combined with other items. Currently,
+    // users of processAreaScopesV2() doesn't do add any new $and clause.
+    //
+    // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
+    // at least minDistance or maxDistance are there. Check functional tests
+    //
+    // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
+    // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+
+    orion::BSONArrayBuilder andArray;
+
+    orion::BSONArrayBuilder coordsBuilder;
+    coordsBuilder.append(scoP->point.longitude());
+    coordsBuilder.append(scoP->point.latitude());
+    orion::BSONArray coords = coordsBuilder.arr();
+
+    if (scoP->georel.maxDistance >= 0)
     {
-      // $near operation is problematic in countDocument()
-      // operation (see https://stackoverflow.com/questions/66143435/countdocuments-with-geo-queries-using-mindistance-semantics)
-      // In abscence of a better alternative I have used a solution as the one
-      // described at https://jira.mongodb.org/browse/DOCS-12834
-      // This works as far as we don't have any other $and field in the query, in which
-      // case the array for $and here needs to be combined with other items
-      //
-      // Why don't use this query style without $near all the time? Because $near provides
-      // ordering of results based in distance to the center, so in regular find() is the one
-      // we want to use
-      //
-      // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
-      // at least minDistance or maxDistance are there. Check functional tests
-      //
-      // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
-      // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+      orion::BSONObjBuilder andToken;
 
-      orion::BSONArrayBuilder andArray;
+      orion::BSONObjBuilder geoWithinMax;
+      orion::BSONArrayBuilder centerMax;
+      centerMax.append(coords);
+      centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
+      geoWithinMax.append("$centerSphere", centerMax.arr());
 
-      orion::BSONArrayBuilder coordsBuilder;
-      coordsBuilder.append(scoP->point.longitude());
-      coordsBuilder.append(scoP->point.latitude());
-      orion::BSONArray coords = coordsBuilder.arr();
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMax.obj());
 
-      if (scoP->georel.maxDistance >= 0)
-      {
-        orion::BSONObjBuilder andToken;
+      andToken.append(keyLoc, loc.obj());
 
-        orion::BSONObjBuilder geoWithinMax;
-        orion::BSONArrayBuilder centerMax;
-        centerMax.append(coords);
-        centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
-        geoWithinMax.append("$centerSphere", centerMax.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMax.obj());
-
-        andToken.append(keyLoc, loc.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      if (scoP->georel.minDistance == 0)
-      {
-        // This is somehow a degenerate case, as any point in the space is
-        // more than 0 distance than any other point :). In this case we only
-        // check for existance of the location
-        orion::BSONObjBuilder existTrue;
-        existTrue.append("$exists", true);
-
-        orion::BSONObjBuilder andToken;
-        andToken.append(keyLoc, existTrue.obj());
-
-        andArray.append(andToken.obj());
-      }
-      else if (scoP->georel.minDistance > 0)
-      {
-        orion::BSONObjBuilder andToken;
-
-        orion::BSONObjBuilder geoWithinMin;
-        orion::BSONArrayBuilder centerMin;
-        centerMin.append(coords);
-        centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
-        geoWithinMin.append("$centerSphere", centerMin.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMin.obj());
-
-        orion::BSONObjBuilder notx;
-        notx.append("$not", loc.obj());
-
-        andToken.append(keyLoc, notx.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      queryP->append("$and", andArray.arr());
+      andArray.append(andToken.obj());
     }
-    else
+
+    if (scoP->georel.minDistance == 0)
     {
-      orion::BSONObjBuilder near;
+      // This is somehow a degenerate case, as any point in the space is
+      // more than 0 distance than any other point :). In this case we only
+      // check for existance of the location
+      orion::BSONObjBuilder existTrue;
+      existTrue.append("$exists", true);
 
-      near.append("$geometry", geometry);
+      orion::BSONObjBuilder andToken;
+      andToken.append(keyLoc, existTrue.obj());
 
-      if (scoP->georel.maxDistance >= 0)
-      {
-        near.append("$maxDistance", scoP->georel.maxDistance);
-      }
-
-      if (scoP->georel.minDistance >= 0)
-      {
-        near.append("$minDistance", scoP->georel.minDistance);
-      }
-
-      bobArea.append("$near", near.obj());
-      queryP->append(keyLoc, bobArea.obj());
+      andArray.append(andToken.obj());
     }
+    else if (scoP->georel.minDistance > 0)
+    {
+      orion::BSONObjBuilder andToken;
+
+      orion::BSONObjBuilder geoWithinMin;
+      orion::BSONArrayBuilder centerMin;
+      centerMin.append(coords);
+      centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
+      geoWithinMin.append("$centerSphere", centerMin.arr());
+
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMin.obj());
+
+      orion::BSONObjBuilder notx;
+      notx.append("$not", loc.obj());
+
+      andToken.append(keyLoc, notx.obj());
+
+      andArray.append(andToken.obj());
+    }
+
+    countQueryP->append("$and", andArray.arr());
+
+    // 2. Query used for count (with $near)
+
+    orion::BSONObjBuilder near;
+
+    near.append("$geometry", geometry);
+
+    if (scoP->georel.maxDistance >= 0)
+    {
+      near.append("$maxDistance", scoP->georel.maxDistance);
+    }
+
+    if (scoP->georel.minDistance >= 0)
+    {
+      near.append("$minDistance", scoP->georel.minDistance);
+    }
+
+    bobArea.append("$near", near.obj());
+    queryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "coveredBy")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoWithin", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "intersects")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoIntersects", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "disjoint")
   {
@@ -1081,10 +1086,12 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
     bobArea.append("$not", bobNot.obj());
 
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "equals")
   {
     queryP->append(keyLoc, geometry);
+    countQueryP->append(keyLoc, geometry);
   }
   else
   {
@@ -1099,7 +1106,7 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
 
 /* ****************************************************************************
 *
-* addIfNotPresentAttr -
+* addIfNotPresentAttr (for numbers) -
 *
 * If the attribute doesn't exist in the entity, then add it (shadowed, render will depend on filter)
 */
@@ -1109,6 +1116,30 @@ static void addIfNotPresentAttr
   const std::string&  name,
   const std::string&  type,
   double              value
+)
+{
+  if (eP->attributeVector.get(name) == -1)
+  {
+    ContextAttribute* caP = new ContextAttribute(name, type, value);
+    caP->shadowed = true;
+    eP->attributeVector.push_back(caP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* addIfNotPresentAttr (for strings) -
+*
+* If the attribute doesn't exist in the entity, then add it (shadowed, render will depend on filter)
+*/
+static void addIfNotPresentAttr
+(
+  Entity*             eP,
+  const std::string&  name,
+  const std::string&  type,
+  const std::string&  value
 )
 {
   if (eP->attributeVector.get(name) == -1)
@@ -1243,6 +1274,7 @@ static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
 * Attributes:
 * - dateCreated
 * - dateModified
+* - alterationType
 *
 * Metadata:
 * - dateModified
@@ -1253,7 +1285,7 @@ static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
 * Note that dateExpires it not added by this function, as it is implemented
 * as regular attribute, recoved from the DB in the "attrs" key-map.
 */
-void addBuiltins(ContextElementResponse* cerP)
+void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType)
 {
   // dateCreated attribute
   if (cerP->entity.creDate != 0)
@@ -1265,6 +1297,18 @@ void addBuiltins(ContextElementResponse* cerP)
   if (cerP->entity.modDate != 0)
   {
     addIfNotPresentAttr(&cerP->entity, DATE_MODIFIED, DATE_TYPE, cerP->entity.modDate);
+  }
+
+  // alterationType
+  if (!alterationType.empty())
+  {
+    addIfNotPresentAttr(&cerP->entity, ALTERATION_TYPE, DEFAULT_ATTR_STRING_TYPE, alterationType);
+  }
+
+  // servicePath
+  if (!cerP->entity.servicePath.empty())
+  {
+    addIfNotPresentAttr(&cerP->entity, SERVICE_PATH, DEFAULT_ATTR_STRING_TYPE, cerP->entity.servicePath);
   }
 
   for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ix++)
@@ -1323,15 +1367,9 @@ static bool isCustomAttr(std::string attrName)
 *
 * entitiesQuery -
 *
-* This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
-* a vector with entities and a vector with attributes as input and returns the corresponding
-* ContextElementResponseVector or error.
+* This method is used by queryContext. It takes a vector with entities and a vector
+* with attributes as input and returns the corresponding ContextElementResponseVector or error.
 *
-* Note the includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
-* subscribeContext case, as empty values can cause problems in the case of federating Context
-* Brokers (the notifyContext is processed as an updateContext and in the latter case, an
-* empty value causes an error)
 */
 bool entitiesQuery
 (
@@ -1340,7 +1378,6 @@ bool entitiesQuery
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
-  bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset,
@@ -1363,6 +1400,7 @@ bool entitiesQuery
    */
 
   orion::BSONObjBuilder    finalQuery;
+  orion::BSONObjBuilder    finalCountQuery;
   orion::BSONArrayBuilder  orEnt;
 
   /* Part 1: entities - avoid $or in the case of a single element */
@@ -1372,6 +1410,7 @@ bool entitiesQuery
     fillQueryEntity(&bob, enV[0]);
     orion::BSONObj entObj = bob.obj();
     finalQuery.appendElements(entObj);
+    finalCountQuery.appendElements(entObj);
 
     LM_T(LmtMongo, ("Entity single query token: '%s'", entObj.toString().c_str()));
   }
@@ -1387,12 +1426,14 @@ bool entitiesQuery
       LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
     }
     finalQuery.append("$or", orEnt.arr());
+    finalCountQuery.append("$or", orEnt.arr());
   }
 
   /* Part 2: service path */
   if (servicePathFilterNeeded(servicePath))
   {
     finalQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
+    finalCountQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
   }
 
   /* Part 3: attributes */
@@ -1426,6 +1467,7 @@ bool entitiesQuery
     orion::BSONObjBuilder bob;
     bob.append("$in", attrs.arr());
     finalQuery.append(ENT_ATTRNAMES, bob.obj());
+    finalCountQuery.append(ENT_ATTRNAMES, bob.obj());
   }
 
   /* Part 5: scopes */
@@ -1454,7 +1496,7 @@ bool entitiesQuery
       {
         if (scopeP->type == FIWARE_LOCATION_V2)
         {
-           processAreaScopeV2(scopeP, &finalQuery);
+           processAreaScopeV2(scopeP, &finalQuery, &finalCountQuery);
         }
         else  // FIWARE Location NGSIv1 (legacy)
         {
@@ -1469,6 +1511,7 @@ bool entitiesQuery
         for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
         {
           finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
+          finalCountQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
         }
       }
     }
@@ -1479,6 +1522,7 @@ bool entitiesQuery
         for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
         {
           finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
+          finalCountQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
         }
       }
     }
@@ -1492,6 +1536,7 @@ bool entitiesQuery
   for (unsigned int ix = 0; ix < filters.size(); ++ix)
   {
     finalQuery.appendElements(filters[ix]);
+    finalCountQuery.appendElements(filters[ix]);
   }
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
@@ -1500,6 +1545,7 @@ bool entitiesQuery
   orion::DBCursor  cursor;
 
   orion::BSONObj query = finalQuery.obj();
+  orion::BSONObj countQuery = finalCountQuery.obj();
   orion::BSONObj sort;
 
   if (sortOrderList.empty())
@@ -1546,7 +1592,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, sort, limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, countQuery, sort, limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1558,22 +1604,23 @@ bool entitiesQuery
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  int             errType;
+  int             errType = ON_NEXT_NO_ERROR;
   std::string     nextErr;
 
-  while (cursor.next(&r, &errType, &nextErr))
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
+  while ((limit != 0) && (cursor.next(&r, &errType, &nextErr)))
   {
     alarmMgr.dbErrorReset();
 
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL);
 
     // Add builtin attributes and metadata (only in NGSIv2)
     if (apiVersion == V2)
     {
-      addBuiltins(cer);
+      addBuiltins(cer, "");
     }
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
@@ -2074,7 +2121,7 @@ bool registrationsQuery
   orion::BSONObjBuilder bobSort;
   bobSort.append("_id", 1);
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, bobSort.obj(), limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, query, bobSort.obj(), limit, offset, &cursor, countP, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2158,6 +2205,12 @@ bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string
 {
   std::vector<orion::BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
 
+  // If the list of attributes to check is empty, then no match
+  if (modifiedAttrs.size() == 0)
+  {
+    return false;
+  }
+
   if (conds.size() == 0)
   {
     // ONANYCHANGE case: always match
@@ -2185,7 +2238,7 @@ bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string
 *
 * subToEntityIdVector -
 *
-* Extract the entity ID vector from a BSON document (in the format of the csubs/casub
+* Extract the entity ID vector from a BSON document (in the format of the csubs
 * collection)
 */
 EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
@@ -2213,34 +2266,26 @@ EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
 */
 static void getCommonAttributes
 (
-  const bool                        type,
   const std::vector<std::string>&   fVector,
   const std::vector<std::string>&   sVector,
   std::vector<std::string>&         resultVector
 )
 {
-  if (type)
+  for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
   {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    // some builtin attributes are always include (even when onlyChangedAttrs is true)
+    if ((sVector[avOc] == ALTERATION_TYPE) || (sVector[avOc] == DATE_CREATED) || (sVector[avOc] == DATE_MODIFIED))
     {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
-      {
+      resultVector.push_back(sVector[avOc]);
+    }
+    else 
+    {
+      for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+      {      
         if (fVector[cavOc] == sVector[avOc])
         {
-          resultVector.push_back(fVector[cavOc]);
-        }
-      }
-    }
-  }
-  else
-  {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
-    {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
-      {
-        if (fVector[cavOc] != sVector[avOc])
-        {
-          resultVector.push_back(fVector[cavOc]);
+          resultVector.push_back(sVector[avOc]);
+          break;          
         }
       }
     }
@@ -2248,66 +2293,70 @@ static void getCommonAttributes
 }
 
 
+/* ****************************************************************************
+*
+* getDifferenceAttributes -
+*/
+static void getDifferenceAttributes
+(
+  const std::vector<std::string>&   fVector,
+  const std::vector<std::string>&   sVector,
+  std::vector<std::string>&         resultVector
+)
+{
+  for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+  {
+    bool found = false;
+    for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+    {
+      if (fVector[cavOc] == sVector[avOc])
+      {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      resultVector.push_back(fVector[cavOc]);
+    }
+  }
+}
+
 
 /* ****************************************************************************
 *
 * subToNotifyList -
+*
 */
 void subToNotifyList
 (
-  const std::vector<std::string>&  modifiedAttrs,
-  const std::vector<std::string>&  conditionVector,
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist,
-  bool&                            op
+  const bool&                      blacklist
 )
 {
-    std::vector<std::string>  condAttrs;
     std::vector<std::string>  notifyAttrs;
 
-    if (!blacklist)
+    if (blacklist)
     {
-      if (conditionVector.size() == 0 && notificationVector.size() == 0)
-      {
-        attrL.fill(modifiedAttrs);
-      }
-      else if (conditionVector.size() == 0 && notificationVector.size() != 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
-      }
-      else if (conditionVector.size() != 0 && notificationVector.size() == 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, entityAttrsVector, notifyAttrs);
-      }
-      else
-      {
-        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
-      }
-      if (notifyAttrs.size() == 0 && (conditionVector.size() != 0 || notificationVector.size() != 0))
-      {
-        op = true;
-      }
+      // By definition, notificationVector cannot be empty in blacklist case
+      // (checked at parsing time)
+      getDifferenceAttributes(entityAttrsVector, notificationVector, notifyAttrs);
       attrL.fill(notifyAttrs);
     }
-    else if (blacklist)
+    else
     {
-      if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      if (notificationVector.size() == 0)
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, notifyAttrs);
+        // This means "all attributes"
+        attrL.fill(entityAttrsVector);
       }
       else
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, condAttrs);
-        getCommonAttributes(true, condAttrs, entityAttrsVector, notifyAttrs);
+        getCommonAttributes(entityAttrsVector, notificationVector, notifyAttrs);
+        attrL.fill(notifyAttrs);
       }
-
-      if (notifyAttrs.size() == 0)
-      {
-        op = true;
-      }
-      attrL.fill(notifyAttrs);
     }
 }
 
@@ -2317,39 +2366,25 @@ void subToNotifyList
 *
 * subToAttributeList -
 *
-* Extract the attribute list from a BSON document (in the format of the csubs/casub
+* Extract the attribute list from a BSON document (in the format of the csubs
 * collection)
 */
 StringList subToAttributeList
 (
   const orion::BSONObj&           sub,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  modifiedAttrs,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 )
 {
-  if (!onlyChanged)
-  {
-    return subToAttributeList(sub);
-  }
   StringList                       attrL;
   std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<orion::BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
-  std::vector<std::string>         conditionAttrs;
   std::vector<std::string>         notificationAttrs;
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
     std::string subAttr = subAttrs[ix].String();
     notificationAttrs.push_back(subAttr);
   }
-  for (unsigned int ix = 0; ix < condAttrs.size() ; ++ix)
-  {
-    std::string subAttr = condAttrs[ix].String();
-    conditionAttrs.push_back(subAttr);
-  }
-  subToNotifyList(modifiedAttrs, conditionAttrs, notificationAttrs, attributes, attrL, blacklist, op);
+  subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
   return attrL;
 }
 
@@ -2359,7 +2394,7 @@ StringList subToAttributeList
 *
 * subToAttributeList -
 *
-* Extract the attribute list from a BSON document (in the format of the csubs/casub
+* Extract the attribute list from a BSON document (in the format of the csubs
 * collection)
 */
 StringList subToAttributeList(const orion::BSONObj& sub)
@@ -2375,94 +2410,6 @@ StringList subToAttributeList(const orion::BSONObj& sub)
   }
 
   return attrL;
-}
-
-
-
-#if 0
-/* ****************************************************************************
-*
-* setOnSubscriptionMetadata -
-*
-* FIXME #920: disabled by the moment, maybe removed at the end
-*/
-static void setOnSubscriptionMetadata(ContextElementResponseVector* cerVP)
-{
-  for (unsigned int ix = 0; ix < cerVP->size(); ix++)
-  {
-    ContextElementResponse* cerP = (*cerVP)[ix];
-
-    for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); jx++)
-    {
-      ContextAttribute*  caP     = cerP->entity.attributeVector[jx];
-      Metadata*          newMdP  = new Metadata(NGSI_MD_NOTIF_ONSUBCHANGE, DEFAULT_ATTR_BOOL_TYPE, true);
-
-      caP->metadataVector.push_back(newMdP);
-    }
-  }
-}
-#endif
-
-
-
-/* ****************************************************************************
-*
-* processConditionVector -
-*/
-static orion::BSONArray processConditionVector(NotifyConditionVector* ncvP)
-{
-  orion::BSONArrayBuilder conds;
-
-  for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
-  {
-    NotifyCondition* nc = (*ncvP)[ix];
-
-    if (nc->type == ON_CHANGE_CONDITION)
-    {
-      for (unsigned int jx = 0; jx < nc->condValueList.size(); ++jx)
-      {
-        conds.append(nc->condValueList[jx]);
-      }
-    }
-    else
-    {
-      LM_E(("Runtime Error (unknown condition type: '%s')", nc->type.c_str()));
-    }
-  }
-
-  return conds.arr();
-}
-
-
-
-/* ****************************************************************************
-*
-* processConditionVector -
-*
-* This is a wrapper for the other vesion of processConditionVector(), for NGSIv2.
-* At the end, this version should be the actual one, once NGSIv1 is removed.
-*/
-orion::BSONArray processConditionVector
-(
-  const std::vector<std::string>&  condAttributesV,
-  const std::vector<EntID>&        entitiesV,
-  const std::vector<std::string>&  notifAttributesV
-)
-{
-  NotifyConditionVector ncV;
-  EntityIdVector        enV;
-  StringList            attrL;
-
-  attrsStdVector2NotifyConditionVector(condAttributesV, &ncV);
-  entIdStdVector2EntityIdVector(entitiesV, &enV);
-  attrL.fill(notifAttributesV);
-
-  orion::BSONArray arr = processConditionVector(&ncV);
-
-  enV.release();
-  ncV.release();
-
-  return arr;
 }
 
 

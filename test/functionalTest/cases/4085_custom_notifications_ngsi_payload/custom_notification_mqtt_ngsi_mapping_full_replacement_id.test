@@ -1,0 +1,179 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification MQTT with NGSI payload mapping id macro full replacement
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
+
+--SHELL--
+
+#
+# 01. Create custom sub1 with ngsi id with the value of A attribute
+# 02. Create entity E1
+# 03. Update entity E1
+# 04. Dump accumulator and see two notifications with id set to A attribute
+#
+
+
+echo "01. Create custom sub1 with ngsi id with the value of A attribute"
+echo "================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "topic": "topic1",
+      "url": "mqtt://localhost:1883",
+      "ngsi": {
+        "id": "${A}"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": "EA1",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update entity E1"
+echo "===================="
+payload='{
+  "A": {
+    "value": "EA2",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+# This delay before asking for accumulator dump was introduced when we
+# changed from ubuntu-18.04 to ubuntu-22.04 in GitActions
+# in PR https://github.com/telefonicaid/fiware-orion/pull/4302. For some
+# unknown reason in ubuntu-22.04 fails if we don't add this. It doesn't make
+# sense to me (both Orion and mosquitto runs in containers on top of ubuntu OS)
+# but it happens... (maybe some kind of networking effect in the docker host?)
+sleep 0.75s
+
+
+echo "04. Dump accumulator and see two notifications with id set to A attribute"
+echo "========================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub1 with ngsi id with the value of A attribute
+=================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1
+====================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Update entity E1
+====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Dump accumulator and see two notifications with id set to A attribute
+=========================================================================
+MQTT message at topic topic1:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "EA1"
+            },
+            "id": "EA1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+MQTT message at topic topic1:
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "EA2"
+            },
+            "id": "EA2",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

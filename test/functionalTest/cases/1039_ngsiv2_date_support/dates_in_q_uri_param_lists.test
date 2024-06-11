@@ -115,40 +115,40 @@ echo
 01. Create entity E24 with birthdate 2016-02-24T10:00:00.000Z
 =============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E24?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E24?type=Thing
+Content-Length: 0
 
 
 
 02. Create entity E23 with birthdate 2016-02-23T10:00:00.000Z
 =============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E23?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E23?type=Thing
+Content-Length: 0
 
 
 
 03. Create entity E22 with birthdate 2016-02-22T10:00:00.000Z
 =============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E22?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E22?type=Thing
+Content-Length: 0
 
 
 
 04. GET entities with birthdate IN LIST 2016-02-25T10:00:00.000Z,2016-02-26T10:00:00.000Z, see nothing
 ======================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -156,10 +156,10 @@ Date: REGEX(.*)
 05. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-26T10:00:00.000Z, see E22
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 68
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
 
 [
     {
@@ -173,10 +173,10 @@ Date: REGEX(.*)
 06. GET entities with birthdate IN LIST 2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see E23 and E24
 ==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 135
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 135
 
 [
     {
@@ -195,10 +195,10 @@ Date: REGEX(.*)
 07. GET entities with birthdate IN LIST 2016-02-22T10:00:00.000Z,2016-02-23T10:00:00.000Z,2016-02-24T10:00:00.000Z, see all three
 =================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 202
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 202
 
 [
     {

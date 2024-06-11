@@ -1,0 +1,219 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Subscription alterationType entityUpdate (extra case)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create entity
+# 02. Create subscription covering the entity with alterationTypes entityUpdate
+# 03. Update entity attribute using PUT with same value (notif)
+# 04. Update entity attribute using PATCH with same value (notif)
+# 05. Dump accumulator: see 2 notifications
+#
+
+echo "01. Create entity"
+echo "================="
+payload='{
+    "id":"Sensor:001",
+    "type":"Sensor",
+    "temperature":{"type":"Number", "value":50}
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "02. Create subscription covering the entity with alterationTypes entityUpdate"
+echo "============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "Sensor:001",
+        "type": "Sensor"
+      }
+    ],
+    "condition": {
+      "attrs": ["temperature"],
+      "alterationTypes": [ "entityUpdate" ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "attrs": [ "alterationType", "temperature" ]
+  },
+  "throttling": 0
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+
+echo "03. Update entity attribute using PUT with same value (notif)"
+echo "============================================================="
+payload='{
+  "temperature": {
+    "value": 50,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/Sensor:001/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "04. Update entity attribute using PATCH with same value (notif)"
+echo "==============================================================="
+payload='{
+  "temperature": {
+    "value": 50,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/Sensor:001/attrs -X PATCH --payload "${payload}"
+echo
+echo
+
+
+echo "05. Dump accumulator: see 2 notifications"
+echo "========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity
+=================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Sensor:001?type=Sensor
+Content-Length: 0
+
+
+
+02. Create subscription covering the entity with alterationTypes entityUpdate
+=============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Update entity attribute using PUT with same value (notif)
+=============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Update entity attribute using PATCH with same value (notif)
+===============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Dump accumulator: see 2 notifications
+=========================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 217
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "alterationType": {
+                "metadata": {},
+                "type": "Text",
+                "value": "entityUpdate"
+            },
+            "id": "Sensor:001",
+            "temperature": {
+                "metadata": {},
+                "type": "Number",
+                "value": 50
+            },
+            "type": "Sensor"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 217
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "alterationType": {
+                "metadata": {},
+                "type": "Text",
+                "value": "entityUpdate"
+            },
+            "id": "Sensor:001",
+            "temperature": {
+                "metadata": {},
+                "type": "Number",
+                "value": 50
+            },
+            "type": "Sensor"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

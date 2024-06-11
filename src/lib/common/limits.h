@@ -63,7 +63,7 @@
 *
 * Others -
 */
-#define IP_LENGTH_MAX           15     // Based on xxx.xxx.xxx.xxx
+#define IP_LENGTH_MAX           64     // Must put *some* limit on the hostname ...
 #define STRING_SIZE_FOR_INT     16     // Room enough for a 32 bit integer
 #define STRING_SIZE_FOR_LONG    20     // Room enough for a 64 bit integer
 #define STRING_SIZE_FOR_DOUBLE  64     // Room enough for a double
@@ -146,6 +146,15 @@
 */
 #define DEFAULT_TIMEOUT     5000
 
+
+
+/* ****************************************************************************
+*
+* MAX_HTTP_TIMEOUT - 1800000 milliseconds, 30 minutes
+* MAX_MQTT_TIMEOUT - 1800000 milliseconds, 30 minutes
+*/
+#define MAX_HTTP_TIMEOUT     1800000
+#define MAX_MQTT_TIMEOUT     1800000
 
 
 /* ****************************************************************************

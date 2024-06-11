@@ -60,11 +60,14 @@ AlarmManager::AlarmManager()
   notificationErrorResets(0),
   forwardingErrors(0),
   forwardingErrorResets(0),
+  mqttConnectionErrors(0),
+  mqttConnectionResets(0),
   dbErrors(0),
   dbErrorResets(0),
   dbOk(true),
   notificationErrorLogAlways(false),
   forwardingErrorLogAlways(false),
+  mqttConnectionErrorLogAlways(false),
   badInputLogAlways(false),
   dbErrorLogAlways(false)
 {
@@ -76,14 +79,15 @@ AlarmManager::AlarmManager()
 *
 * AlarmManager::init - 
 */
-int AlarmManager::init(bool logAlreadyRaisedAlarms)
+void AlarmManager::init(bool logAlreadyRaisedAlarms)
 {
-  notificationErrorLogAlways = logAlreadyRaisedAlarms;
-  badInputLogAlways          = logAlreadyRaisedAlarms;
-  dbErrorLogAlways           = logAlreadyRaisedAlarms;
-  forwardingErrorLogAlways   = logAlreadyRaisedAlarms;
+  notificationErrorLogAlways   = logAlreadyRaisedAlarms;
+  badInputLogAlways            = logAlreadyRaisedAlarms;
+  dbErrorLogAlways             = logAlreadyRaisedAlarms;
+  mqttConnectionErrorLogAlways = logAlreadyRaisedAlarms;
+  forwardingErrorLogAlways     = logAlreadyRaisedAlarms;
 
-  return semInit();
+  semInit();
 }
 
 
@@ -92,15 +96,12 @@ int AlarmManager::init(bool logAlreadyRaisedAlarms)
 *
 * AlarmManager::semInit - 
 */
-int AlarmManager::semInit(void)
+void AlarmManager::semInit(void)
 {
   if (sem_init(&sem, 0, 1) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'alarm mgr' semaphore: %s)", strerror(errno)));
-    return -1;
+    LM_X(1, ("Fatal Error (error initializing 'alarm mgr' semaphore: %s)", strerror(errno)));
   }
-
-  return 0;
 }
 
 
@@ -152,58 +153,6 @@ void AlarmManager::semGive(void)
 
 /* ****************************************************************************
 *
-* AlarmManager::notificationErrorLogAlwaysSet - 
-*/
-void AlarmManager::notificationErrorLogAlwaysSet(bool _notificationErrorLogAlways)
-{
-  semTake();
-  notificationErrorLogAlways = _notificationErrorLogAlways;
-  semGive();
-}
-
-
-
-/* ****************************************************************************
-*
-* AlarmManager::badInputLogAlwaysSet - 
-*/
-void AlarmManager::badInputLogAlwaysSet(bool _badInputLogAlways)
-{
-  semTake();
-  badInputLogAlways = _badInputLogAlways;
-  semGive();
-}
-
-
-
-/* ****************************************************************************
-*
-* AlarmManager::dbErrorLogAlwaysSet - 
-*/
-void AlarmManager::dbErrorLogAlwaysSet(bool _dbErrorLogAlways)
-{
-  semTake();
-  dbErrorLogAlways = _dbErrorLogAlways;
-  semGive();
-}
-
-
-
-/* ****************************************************************************
-*
-* AlarmManager::forwardingErrorLogAlwaysSet -
-*/
-void AlarmManager::forwardingErrorLogAlwaysSet(bool _forwardingErrorLogAlways)
-{
-  semTake();
-  forwardingErrorLogAlways = _forwardingErrorLogAlways;
-  semGive();
-}
-
-
-
-/* ****************************************************************************
-*
 * AlarmManager::dbError - 
 *
 * Returns false if no effective alarm transition occurs, otherwise, true is returned.
@@ -215,6 +164,11 @@ bool AlarmManager::dbError(const std::string& details)
     if (dbErrorLogAlways)
     {
       LM_E(("Repeated Database Error: %s", details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtMongo, ("Repeated Database Error: %s", details.c_str()));
     }
 
     return false;
@@ -324,6 +278,22 @@ void AlarmManager::badInputGet(int64_t* active, int64_t* raised, int64_t* releas
 
 /* ****************************************************************************
 *
+* AlarmManager::mqttConnectionErrorGet -
+*
+* NOTE
+*   To read values, no semaphore is used.
+*/
+void AlarmManager::mqttConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released)
+{
+  *active    = mqttConnectionErrorV.size();
+  *raised    = mqttConnectionErrors;
+  *released  = mqttConnectionResets;
+}
+
+
+
+/* ****************************************************************************
+*
 * AlarmManager::notificationError - 
 *
 * Returns false if no effective alarm transition occurs, otherwise, true is returned.
@@ -347,6 +317,11 @@ bool AlarmManager::notificationError(const std::string& url, const std::string& 
     if (notificationErrorLogAlways)
     {
       LM_W(("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtNotifier, ("Repeated NotificationError %s: %s", url.c_str(), details.c_str()));
     }
 
     semGive();
@@ -394,6 +369,82 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 
 /* ****************************************************************************
 *
+* AlarmManager::mqttConnectionError -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*
+* NOTE
+* The number of mqttConnectionErrors per endpoint is maintained in the map.
+* Right now that info is not used, but might be in the future.
+* To do so, we'd need another counter as well, to not forget the accumulated
+* number each time the notificationErrors are reset.
+*/
+bool AlarmManager::mqttConnectionError(const std::string& endpoint, const std::string& details)
+{
+  semTake();
+
+  std::map<std::string, int>::iterator iter = mqttConnectionErrorV.find(endpoint);
+
+  if (iter != mqttConnectionErrorV.end())  // Already exists - add to the 'url-specific' counter
+  {
+    iter->second += 1;
+
+    if (mqttConnectionErrorLogAlways)
+    {
+      LM_W(("Repeated MqttConnectionError %s: %s", endpoint.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtMqttNotif, ("Repeated MqttConnectionError %s: %s", endpoint.c_str(), details.c_str()));
+    }
+
+    semGive();
+    return false;
+  }
+
+  ++mqttConnectionErrors;
+
+  mqttConnectionErrorV[endpoint] = 1;
+  semGive();
+
+  LM_W(("Raising alarm MqttConnectionError %s: %s", endpoint.c_str(), details.c_str()));
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* AlarmManager::mqttConnectionReset -
+*
+* Returns false if no effective alarm transition occurs, otherwise, true is returned.
+*/
+bool AlarmManager::mqttConnectionReset(const std::string& endpoint)
+{
+  semTake();
+
+  if (mqttConnectionErrorV.find(endpoint) == mqttConnectionErrorV.end())  // Doesn't exist
+  {
+    semGive();
+    return false;
+  }
+
+  mqttConnectionErrorV.erase(endpoint);
+  ++mqttConnectionResets;
+  semGive();
+
+  LM_W(("Releasing alarm MqttConnectionError %s", endpoint.c_str()));
+
+  return true;
+}
+
+
+
+
+/* ****************************************************************************
+*
 * AlarmManager::badInput - 
 *
 * Returns false if no effective alarm transition occurs, otherwise, true is returned.
@@ -404,7 +455,7 @@ bool AlarmManager::notificationErrorReset(const std::string& url)
 * To do so, we'd need another counter as well, to not forget the accumulated 
 * number each time the badInputs are reset.
 */
-bool AlarmManager::badInput(const std::string& ip, const std::string& details)
+bool AlarmManager::badInput(const std::string& ip, const std::string& details, const std::string& extraInLog)
 {
   if (badInputSeen == true)
   {
@@ -423,7 +474,18 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
 
     if (badInputLogAlways)
     {
-      LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
+      if (extraInLog.empty())
+      {
+        LM_W(("Repeated BadInput %s: %s", ip.c_str(), details.c_str()));
+      }
+      else
+      {
+        LM_W(("Repeated BadInput %s: %s (%s)", ip.c_str(), details.c_str(), extraInLog.c_str()));
+      }
+    }
+    else
+    {
+      // in this case it is not clear which LM_T use... we leave this comment as placeholder
     }
 
     semGive();
@@ -435,7 +497,14 @@ bool AlarmManager::badInput(const std::string& ip, const std::string& details)
   badInputV[ip] = 1;
   semGive();
 
-  LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
+  if (extraInLog.empty())
+  {
+    LM_W(("Raising alarm BadInput %s: %s", ip.c_str(), details.c_str()));
+  }
+  else
+  {
+    LM_W(("Raising alarm BadInput %s: %s (%s)", ip.c_str(), details.c_str(), extraInLog.c_str()));
+  }
 
   return true;
 }
@@ -466,7 +535,12 @@ bool AlarmManager::forwardingError(const std::string& url, const std::string& de
 
     if (forwardingErrorLogAlways)
     {
-      LM_W(("Repeated forwardingError %s: %s", url.c_str(), details.c_str()));
+      LM_W(("Repeated ForwardingError %s: %s", url.c_str(), details.c_str()));
+    }
+    else
+    {
+      // even if repeat alarms is off, this is a relevant event in debug level
+      LM_T(LmtCPrForwardRequestPayload, ("Repeated ForwardingError %s: %s", url.c_str(), details.c_str()));
     }
 
     semGive();
@@ -478,7 +552,7 @@ bool AlarmManager::forwardingError(const std::string& url, const std::string& de
   forwardingErrorV[url] = 1;
   semGive();
 
-  LM_W(("Raising alarm forwardingError %s: %s", url.c_str(), details.c_str()));
+  LM_W(("Raising alarm ForwardingError %s: %s", url.c_str(), details.c_str()));
 
   return true;
 }

@@ -18,7 +18,8 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# FIXME #3924: temporarly disabled. See details in cited issue
+# VALGRINDX_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
 Direct HTTP notification (accepting self signed certs)
@@ -85,20 +86,20 @@ echo
 01. Create subscription to an HTTPS endpoint
 ============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create entity, triggering notification
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 

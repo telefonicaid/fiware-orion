@@ -220,117 +220,117 @@ echo
 01. Register entities of type T, with ID .*, and attribute A1, for CP1
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Register entities of type T, with ID .*, and attribute A2, for CP2
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Register entities of type T, with ID .*, and attribute A3, for CP3
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 04. Register entities of type U, with ID .*, and attribute A4, for CP4
 ======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 05. Create E1/T in CP1
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
 06. Create E1/T in CP2
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
 07. Create E1/T in CP3
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
 
 
 
 08. Create E4/U in CP4
 ======================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=U
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=U
+Content-Length: 0
 
 
 
 09. Query entities of type T - see E1, E2 and	E3
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 214
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 214
 
 [
     {
         "A1": {
-            "metadata": {}, 
-            "type": "Number", 
+            "metadata": {},
+            "type": "Number",
             "value": 11
-        }, 
-        "id": "E1", 
+        },
+        "id": "E1",
         "type": "T"
-    }, 
+    },
     {
         "A2": {
-            "metadata": {}, 
-            "type": "Number", 
+            "metadata": {},
+            "type": "Number",
             "value": 22
-        }, 
-        "id": "E2", 
+        },
+        "id": "E2",
         "type": "T"
-    }, 
+    },
     {
         "A3": {
-            "metadata": {}, 
-            "type": "Number", 
+            "metadata": {},
+            "type": "Number",
             "value": 33
-        }, 
-        "id": "E3", 
+        },
+        "id": "E3",
         "type": "T"
     }
 ]
@@ -339,19 +339,19 @@ Date: REGEX(.*)
 10. Query entities of type U - see E4
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 [
     {
         "A4": {
-            "metadata": {}, 
-            "type": "Number", 
+            "metadata": {},
+            "type": "Number",
             "value": 41
-        }, 
-        "id": "E4", 
+        },
+        "id": "E4",
         "type": "U"
     }
 ]
@@ -360,19 +360,19 @@ Date: REGEX(.*)
 11. Query entities of type T and with attr A1 - see E1 with A1
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 72
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
 
 [
     {
         "A1": {
-            "metadata": {}, 
-            "type": "Number", 
+            "metadata": {},
+            "type": "Number",
             "value": 11
-        }, 
-        "id": "E1", 
+        },
+        "id": "E1",
         "type": "T"
     }
 ]

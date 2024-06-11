@@ -4,9 +4,9 @@ Orion Context Broker は非常に安定していますが、失敗する可能�
 
 ウォッチドッグ・プログラムを自分で作成することもできます (例えば、定期的な基本で cron によって呼び出されたスクリプトは /etc/init.d/contextBroker の状態をチェックし、動作していない場合はそれを再起動し、通知メールを送信します) 。このセクションでは、[Monit](http://mmonit.com/monit/) を使用する手順について説明します。
 
-まず、<http://rpmfind.net/linux/rpm2html/search.php?query=monit> にある RPM をインストールします。次の手順は、他のバージョンの RPM でも動作するはずですが、monit-5.1.1-4.el6.x86\_64.rpm を考慮して準備されています。
+まず、monit をインストールします。
 
-    sudo rpm -i monit-5.2.5-1.el5.rf.x86_64.rpm
+    sudo apt-get install monit
 
 monit 用のディレクトリを作成します。例 :
 
@@ -72,7 +72,7 @@ monit が正常に動作していることを確認するには、プロセス�
 
     # ps -ef | grep contextBroker
     500      27175     1  0 21:06 ?        00:00:00 monit -v -c /home/localadmin/monit_CB/monitBROKER.conf -d 10 -p /var/log/contextBroker/monit.pid
-    500      27205     1  0 21:06 ?        00:00:00 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion;
+    500      27205     1  0 21:06 ?        00:00:00 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbURI mongodb://localhost/ -db orion;
 
 そして、contextBroker を kill します。例 :
 

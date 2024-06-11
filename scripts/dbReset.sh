@@ -32,11 +32,11 @@ then
     db=testharness
   fi
 
-  echo 'db.dropDatabase()' | mongo $db --quiet
+  mongosh $db --eval 'db.dropDatabase()' --quiet
 else
   while [ "$#" != 0 ]
   do
-    echo 'db.dropDatabase()' | mongo $1 --quiet
+    mongosh $1 --eval 'db.dropDatabase()' --quiet
     shift
   done
 fi

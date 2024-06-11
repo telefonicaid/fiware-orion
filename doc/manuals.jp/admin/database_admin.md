@@ -54,27 +54,28 @@ mongorestore --host <dbhost> --db <db> dump/<db>
 <a name="database-authorization"></a>
 ## データベースの認証
 
-MongoDB の認証は `-db, `-dbuser` と `-dbpwd` オプションで設定されます ([コマンドライン・オプションのセクション](cli.md)を参照)。考慮するいくつかの異なるケースがあります :
+MongoDB の認証は `-dbURI` および `-dbpwd` オプションを使用して設定されます ([コマンドライン・オプションのセクションを参照](cli.md))。考慮すべきいくつかの異なるケースがあります:
 
--   MongoDB インスタンス/クラスタが認証を使用していない場合は、`-dbuser` と `-dbpwd` オプションは使用しないでください
--  `-dbAuthMech` で認証メカニズムを指定できます
+-   MongoDB インスタンス/クラスタが認証を使用していない場合は、`-dbpwd` を使用せず、`username:${PWD}@` のパートを省略した `-dbURI` を使用してください
+-   `authMechanism` オプションを使用して、`-dbURI` 内で認証メカニズムを指定できます
 -   MongoDB インスタンス/クラスタが認可を使用している場合は、次のようになります :
-    -   Orion をシングルサービス/テナントモードで実行している場合 (つまり `-multiservice` でない場合)、1つのデータベース (-db オプションで指定されたもの) のみを使用しているので、認証は、そのデータベースで `-dbuser` と `-dbpwd` を使用して行われます
-    -   Orion をマルチサービス/テナントモードで実行している場合 (つまり `-multiservice` の場合)、認証は、`admin` データベースで `-dbuser` と `-dbpwd` を使用して行われます。[このドキュメントの後半](#multiservicemultitenant-database-separation)で説明するように、マルチサービス/テナントモードでは、Orion はいくつかのデータベース (潜在的にオンザフライで作成される可能性があります) を使用します。`admin` データベース上での認証は、それらの全てで許可します
-    -   とにかく、上記のデフォルトを `-dbAuthDb` でオーバーライドして、
+    -   `-dbURI` では、`username:${PWD}@` のパートを使用する必要があります。`${PWD}` は `dbpwd` パラメータの値に置き換えられます
+    -   Orion をシングルサービス/テナントモードで実行している場合 (つまり `-multiservice` でない場合)、1つのデータベース (`-db` オプションで指定されたもの) であり、認証は、`-dbURI` および `-dbpwd` で指定されたユーザ名を使用してそのデータベース内で行われます
+    -   Orion をマルチサービス/テナントモードで実行している場合 (つまり `-multiservice` の場合)、認証は、`admin` データベースで `-dbURI` で指定されたユーザー名と `-dbpwd` を使用して行われます。[このドキュメントの後半](#multiservicemultitenant-database-separation)で説明するように、マルチサービス/テナントモードでは、Orion はいくつかのデータベース (潜在的にオンザフライで作成される可能性があります) を使用します。`admin` データベース上での認証は、それらの全てで許可します
+    -   とにかく、上記のデフォルトを `-dbURI` の `defaultauthdb` でオーバーライドして、
         必要な認証 DB を指定できます
 
 次の例を考えてみましょう。 MongoDB の構成がそうである場合、通常は以下を使用してアクセスします :
 
 ```
-mongo "mongodb://example1.net:27017,example2.net:27017,example3.net:27017/orion?replicaSet=rs0" --ssl --authenticationDatabase admin --username orion --password orionrules
+mongosh mongodb://orion@orionrules:example1.net:27017,example2.net:27017,example3.net:27017/admin?replicaSet=rs0&tls=true&tlsAllowInvalidCertificates=true
 ```
 
 Context Broker CLI パラメーターの同等の接続は次のようになります :
 
 
 ```
--dbhost examples1.net:27017,example2.net:27017,example3.net:27017 -rplSet rs0 -dbSSL -dbAuthDb admin -dbuser orion -dbpwd orionrules
+-dbURI mongodb://orion@${PWD}:example1.net:27017,example2.net:27017,example3.net:27017/admin?replicaSet=rs0&tls=true&tlsAllowInvalidCertificates=true -dbpwd orionrules
 ```
 
      
@@ -128,7 +129,7 @@ Orion Context Broker には、`/usr/share/contextBroker` ディレクトリ内�
 
 NGSI は、レジストレーションとサブスクリプション (コンテキストとコンテキスト・アベイラビリティの両方のサブスクリプション) の有効期限を指定します。期限切れのレジストレーション/サブスクリプションはサブスクリプション更新リクエストを使用して "再アクティブ化" することができて、期間を変更するため、Orion Context Broker は期限切れのドキュメントを削除しません (無視されます)。
 
-ただし、有効期限が切れたレジストレーション/サブスクリプションはデータベース内の領域を消費するため、時々 "パージ" することができます。その作業を手助けするために、garbage- collector.py スクリプトが Orion Context Broker (RPM のインストール後に /usr/share/contextBroker/garbage-collector.py にあります) と一緒に提供されています。
+ただし、有効期限が切れたレジストレーション/サブスクリプションはデータベース内の領域を消費するため、時々 "パージ" することができます。その作業を手助けするために、[garbage-collector.py script](https://github.com/telefonicaid/fiware-orion/blob/master/scripts/managedb/garbage-collector.py) が Orion Context Broker と一緒に提供されています。
 
 
 garbage-collector.py は、registrations, csubs コレクション内の期限切れのドキュメントを探し、次のフィールドでそれらを "マーク (marking)" します :

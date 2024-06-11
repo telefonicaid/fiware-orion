@@ -1,0 +1,279 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Get subscription before and after cache refresh with status older in DB during refresh
+
+--SHELL-INIT--
+dbInit CB
+
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("61960a51596aa2623032357d"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:1028/accumulate",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "maxFailsLimit" : NumberLong(1),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 1577872800,
+        "entities" : [
+                {
+                        "id" : "E",
+                        "isPattern" : "false",
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "failsCounter" : NumberLong(4),
+        "count" : NumberLong(10),
+        "lastNotification" : NumberLong(1577872800),
+        "lastFailure" : NumberLong(1577872800),
+        "lastSuccess" : NumberLong(1577869200),
+        "lastFailureReason" : "Could not connect to server",
+        "lastSuccessCode": NumberLong(200),
+})'
+
+brokerStart CB 0 IPv4 -subCacheIval 2 --cache
+
+--SHELL--
+
+#
+# Same as get_subscription_before_and_after_cache_refresh.test but status
+# in dynamic fields set B has last changed 2020-01-01T09:00:00Z (1577869200)
+# which is older than the one in dynamic field set A, so that later one
+# wins and in step 03 and 04 we get "active" instead of "inactive"
+#
+# 00. (Done before starting context Broker) Insert crafted subscription in DB with specific dynamic fields set A
+# 01. GET /v2/subscriptions and see dynamic fields set A
+# 02. Set dynamic fields in DB to set B
+# 03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
+# 04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same, except failsCounter (see NOTE)
+#
+
+echo "00. (Done before starting context Broker) Insert crafted subscription in DB with specific dynamic fields set A"
+echo "=============================================================================================================="
+echo
+echo
+
+
+echo "01. GET /v2/subscriptions and see dynamic fields set A"
+echo "======================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "02. Set dynamic fields in DB to set B"
+echo "====================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa2623032357d")}, {
+  $set: {
+    lastNotification: NumberLong("1577876400"),
+    lastSuccess: NumberLong("1577876400"),
+    lastFailure: NumberLong("1577872800"),
+    lastSuccessCode: NumberLong("204"),
+    lastFailureReason: "Timeout",
+    count: NumberLong("25"),
+    failsCounter: NumberLong("8"),
+    status: "inactive",
+    statusLastChange: 1577869200
+  }
+})'
+echo
+echo
+
+
+echo "03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet"
+echo "=============================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+echo "04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same, except failsCounter (see NOTE)"
+echo "==============================================================================================================================="
+sleep 2.5s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+00. (Done before starting context Broker) Insert crafted subscription in DB with specific dynamic fields set A
+==============================================================================================================
+
+
+01. GET /v2/subscriptions and see dynamic fields set A
+======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 551
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 4,
+            "http": {
+                "url": "http://localhost:1028/accumulate"
+            },
+            "lastFailure": "2020-01-01T10:00:00.000Z",
+            "lastFailureReason": "Could not connect to server",
+            "lastNotification": "2020-01-01T10:00:00.000Z",
+            "lastSuccess": "2020-01-01T09:00:00.000Z",
+            "lastSuccessCode": 200,
+            "maxFailsLimit": 1,
+            "onlyChangedAttrs": false,
+            "timesSent": 10
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+02. Set dynamic fields in DB to set B
+=====================================
+{"acknowledged":true,"insertedId":null,"matchedCount":1,"modifiedCount":1,"upsertedCount":0}
+
+
+03. GET /v2/subscriptions and see dynamic fields set B although cache has not been synched yet
+==============================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 531
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 8,
+            "http": {
+                "url": "http://localhost:1028/accumulate"
+            },
+            "lastFailure": "2020-01-01T10:00:00.000Z",
+            "lastFailureReason": "Timeout",
+            "lastNotification": "2020-01-01T11:00:00.000Z",
+            "lastSuccess": "2020-01-01T11:00:00.000Z",
+            "lastSuccessCode": 204,
+            "maxFailsLimit": 1,
+            "onlyChangedAttrs": false,
+            "timesSent": 25
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Wait 2.5s for cache refresh and GET /v2/subscriptions again to check everything is the same, except failsCounter (see NOTE)
+===============================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 514
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:1028/accumulate"
+            },
+            "lastFailure": "2020-01-01T10:00:00.000Z",
+            "lastFailureReason": "Timeout",
+            "lastNotification": "2020-01-01T11:00:00.000Z",
+            "lastSuccess": "2020-01-01T11:00:00.000Z",
+            "lastSuccessCode": 204,
+            "maxFailsLimit": 1,
+            "onlyChangedAttrs": false,
+            "timesSent": 25
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

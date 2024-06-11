@@ -12,7 +12,7 @@ We recommend to use Python [virtualenv](https://virtualenv.pypa.io/en/latest) to
 
 ```
 pip install virtualenv  # if you don't have virtualenv itself previously installed
-virtualenv --python=/usr/bin/python2 /path/to/ft_env
+virtualenv --python=/usr/bin/python3 /path/to/ft_env
 ```
 
 Then activate the virtual env:
@@ -24,8 +24,10 @@ Then activate the virtual env:
 Next install accumulator-server.py depencencies:
 
 ```
-pip install Flask==1.0.2
-pip install pyOpenSSL==19.0.0
+pip install Flask==2.0.2
+pip install Werkzeug==2.0.2
+pip install paho-mqtt==1.6.1
+pip install amqtt==0.11.0b1  # Not actually an accumulator-server.py dependency, but needed by some tests
 ```
 
 Next, install the accumulator-server.py script itself:
@@ -42,6 +44,38 @@ accumulator-server.py -u
 
 **IMPORTANT:** remember to activate the virtual env (`. /path/to/ft_env/bin/activate`) before running functional tests
 
+#### Alternative installation using docker
+
+You can use the following Dockerfile to build the accumulator:
+
+```
+FROM debian:stable
+RUN apt-get update -y
+RUN apt-get install -y python3 python3-venv python3-pip
+
+# Create a virtual environment
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+# Install required packages within the virtual environment
+RUN pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1
+
+COPY . /app
+WORKDIR /app
+ENTRYPOINT [ "python3", "./accumulator-server.py"]
+CMD ["--port", "1028", "--url", "/accumulate", "--host", "0.0.0.0", "-v"]
+```
+
+**Important note**: copy the accumulator-server.py to the same directory in which Dockerfile is, before running your `docker build` command.
+
+Once build (let's say with name 'accum') you can run it with:
+
+```
+docker run -p 0.0.0.0:1028:1028/tcp accum
+```
+
+Note the `-p` arguments, so the accumulator listening port in the container gets mapped to the one in your host.
+
 ### Run functional tests
 
 The easiest way is running just:
@@ -49,6 +83,23 @@ The easiest way is running just:
 ```
 cd test/functionalTest
 ./testHarness.sh
+```
+
+In case you only want to run a single file or folder, you can also add the path to the file or folder like this:
+
+```
+./testHarness.sh cases/3949_upsert_with_wrong_geojson/
+```
+
+If you want to set the number of retries of the test you can use the env var `CB_MAX_TRIES` (e.g. you only want to run the test once when you know it is going 
+to fail but it is useful to see the output)
+
+Another useful env var is `CB_DIFF_TOOL`, that allows to set a tool to view diff of failing tests (e.g. [meld](https://meldmerge.org/))
+
+As an example of the usage of both env vars, the following line:
+
+```
+CB_MAX_TRIES=1 CB_DIFF_TOOL=meld ./testHarness.sh cases/3949_upsert_with_wrong_geojson/
 ```
 
 ## Known issues
@@ -71,3 +122,11 @@ comes with Python 2.6 (the testHarness.sh program typically uses `python -mjson.
 
 The solution is easy: don't use Python 2.6. The recommended version is Python 2.7. Note that CentOS 6 comes with Python 2.6 at
 system level, but you can use [virtualenv](https://virtualenv.pypa.io/en/stable/) to use Python 2.7 in an easy way.
+
+## Miscelanea
+
+Useful command to remove trailing whitespace in all .test files (it makes comparison less noisy in the case of failing tests):
+
+```
+find cases/ -name *.test -exec sed -i 's/[[:space:]]*$//' {} \;
+```

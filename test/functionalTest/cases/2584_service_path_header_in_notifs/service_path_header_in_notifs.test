@@ -106,20 +106,20 @@ echo
 01. Create a subscription
 =========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create Entity with Service-Path / to provoke notification
 =============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
@@ -139,14 +139,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 2
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "T"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -155,8 +155,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. Modify Entity, provoke notification
 =======================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -176,14 +176,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "Number", 
+                "metadata": {},
+                "type": "Number",
                 "value": 4
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "T"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

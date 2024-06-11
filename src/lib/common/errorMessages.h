@@ -43,7 +43,7 @@
  *
  * In addition, by the moment we are using this constants only for error payloads, but maybe they should be
  * also used for alarm error mensajes, e.g. alarmMgr.badInput(clientIp, ERROR_DESC_PARSE) instead of
- * alarmMgr.badInput(clientIp, "JSON parse error").
+ * alarmMgr.badInput(clientIp, "JSON Parse Error").
  */
 
 #define ERROR_PARSE                                   "ParseError"
@@ -62,7 +62,7 @@
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID    "Invalid JSON type for entity id"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE  "Invalid JSON type for entity type"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_SCOPE    "invalid JSON type for scope value: must be string"
-#define ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT    "invalid attrsFormat, accepted values: legacy, normalized, keyValues, values"
+#define ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT    "invalid attrsFormat, accepted values: normalized, simplifiedNormalized, keyValues, simplifiedkeyValues, values"
 #define ERROR_DESC_BAD_REQUEST_INVALID_STATUS         "status is not valid: it has to be either active, inactive or oneshot"
 #define ERROR_DESC_BAD_REQUEST_INVALID_RANGE          "ranges only valid for equal and not equal ops"
 #define ERROR_DESC_BAD_REQUEST_INVALID_LIST           "lists only valid for equal and not equal ops"
@@ -86,6 +86,8 @@
 #define ERROR_DESC_BAD_REQUEST_FORMAT_CUSTOM                  "attribute render format /custom/ not supported for notifications"
 #define ERROR_DESC_BAD_REQUEST_FORMAT_INVALID                 "invalid render format for notifications"
 #define ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND              "Service not found. Check your URL as probably it is wrong."
+#define ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON                  "Wrong GeoJson"
+#define ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF "metadata are not allowed in ngsi field in custom notifications"
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
@@ -94,6 +96,18 @@
 #define ERROR_DESC_NOT_FOUND_ATTRIBUTE                "The entity does not have such an attribute"
 #define ERROR_DESC_NOT_FOUND_SUBSCRIPTION             "The requested subscription has not been found. Check id"
 #define ERROR_DESC_NOT_FOUND_REGISTRATION             "The requested registration has not been found. Check id"
+
+#define ERROR_UNPROCESSABLE                           "Unprocessable"
+#define ERROR_PARTIAL_UPDATE                          "PartialUpdate"
+#define ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS       "Already Exists"
+#define ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS  "one or more of the attributes in the request already exist: "
+
+#define ERROR_DESC_DO_NOT_EXIT                        "do not exist: "
+
+#define ERROR_NO_RESOURCES_AVAILABLE                  "NoResourcesAvailable"
+#define ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC      "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations."
+
+#define ERROR_INTERNAL_ERROR                          "InternalError"
 
 #define ERROR_TOO_MANY                                "TooManyResults"
 #define ERROR_DESC_TOO_MANY_ENTITIES                  "More than one matching entity. Please refine your query"

@@ -207,8 +207,8 @@ _MB-06: エンティティを削除する mongoUpdate DELETE_
 
 _MD-01: `processSubscriptions()` 機能の詳細_
 
-* `processSubscriptions()` がいくつかの場所から呼び出されます(ステップ1)。図 [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) および [MB-05](#flow-mb-05) を参照してください。トリガされた個々のサブスクリプションは、`processOnChangeConditionForUpdateContext()`を呼び出すことでループで処理されます
-* `processOnChangeConditionForUpdateContext()` が呼び出され (ステップ2)、Notifierオブジェクト ([ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリ) を使用して通知を送信します (ステップ3)。詳細は図 [NF-01](sourceCode.md#flow-nf-01) と [NF-03](sourceCode.md#flow-nf-03) に記載されています
+* `processSubscriptions()` がいくつかの場所から呼び出されます(ステップ1)。図 [MB-01](#flow-mb-01), [MB-03](#flow-mb-03), [MB-04](#flow-mb-04) および [MB-05](#flow-mb-05) を参照してください。トリガされた個々のサブスクリプションは、`processNotification()`を呼び出すことでループで処理されます
+* `processNotification()` が呼び出され (ステップ2)、Notifierオブジェクト ([ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリ) を使用して通知を送信します (ステップ3)。詳細は図 [NF-01](sourceCode.md#flow-nf-01) と [NF-03](sourceCode.md#flow-nf-03) に記載されています
 * 次のステップは、通知が実際に送信された場合にのみ実行されます。キャッシュの使用状況に応じて：
     * サブスクリプション・キャッシュが使用されていない場合、データベースの最後の通知時間とカウントは `connectionOperations` モジュールの `collectionUpdate()` を使ってデータベース内で更新されます (ステップ4と5)
     * サブスクリプション・キャッシュが使用されている場合、サブスクリプションはサブスクリプション・キャッシュから  `subCacheItemLookup()` を呼び出して取得されます (ステップ7)。次に、最後の通知時間とカウントがサブスクリプション・キャッシュで変更されます。次のサブスクリプション・キャッシュの最新表示時にデータベースに統合されます。詳細は[このドキュメント](subscriptionCache.md#subscription-cache-refresh)を参照してください。サブスクリプション・キャッシュへのアクセスは、サブスクリプション・キャッシュ・セマフォによって保護されます。サブスクリプション・キャッシュ・セマフォは、それぞれステップ6と8で取得され、解放されます。[詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore)を参照してください。
@@ -370,12 +370,9 @@ _MB-12: mongoUpdateSubscription_
 
 * `mongoUpdateSubscription()` は、サービス・ルーチンから呼び出されます (ステップ1)。これは、 `lib/serviceRoutinesV2/patchSubscription.cpp` の `patchSubscription()` または ` lib/mongoBackend/mongoUpdateContextSubscription.cpp` の `mongoUpdateContextSubscription()` のいずれかです
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* 更新されるサブスクリプションは、`connectionOperations` モジュールの `collectionFindOne()` を使ってデータベースから取得されます (ステップ3と4)
-* サブスクリプション・キャッシュが有効な場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプション・キャッシュのオブジェクトは `cache` モジュールの `subCacheItemLoopkup()` を使用してサブスクリプション・キャッシュから取得されます (ステップ5)
-* 最終的なサブスクリプションの BSON オブジェクトは、元のサブスクリプションの BSON オブジェクトに基づいて、サブスクリプションの作成の場合 (`setExpiration()`, `setHttpInfo()`　等) と同様のさまざまな `set*()` 関数を使用して構築されます。(ステップ6)
-* 更新されたサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionUpdate()` を使用してデータベースで更新されます (ステップ7 および 8)
-* サブスクリプション・キャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、新しいサブスクリプションがサブスクリプション・キャッシュで更新されます (ステップ9)。`updateInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します
-* リクエスト・セマフォがステップ2 で取得された場合は、戻る前に解放されます (ステップ10)
+* サブスクリプションは、MongoDB の `$set`/`$unset` 演算子を使用して DB で更新されます。この操作は、`connectionOperations` モジュールの関数 `colletionFindAndModify()` で実行されます (ステップ3および4)
+* サブスクリプションキャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプションは、前のステップ (ステップ5) の `collectionFindAndModify()` の結果に基づいてサブスクリプション・キャッシュで更新されます。`updateInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します。
+* リクエスト・セマフォがステップ2で取得された場合、戻る前に解放されます (ステップ6)
 
 潜在的な通知は、データベース/キャッシュ内のサブスクリプションを更新する前に送信されるため、最後の通知時間とカウントに関する正しい情報が考慮されます。
 

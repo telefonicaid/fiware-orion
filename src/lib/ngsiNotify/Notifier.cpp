@@ -36,7 +36,8 @@
 #include "common/RenderFormat.h"
 #include "common/macroSubstitute.h"
 #include "alarmMgr/alarmMgr.h"
-#include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/Subscription.h"
+#include "apiTypesV2/CustomPayloadType.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
@@ -64,42 +65,42 @@ Notifier::~Notifier (void)
 */
 void Notifier::sendNotifyContextRequest
 (
-    NotifyContextRequest&            ncr,
-    const ngsiv2::HttpInfo&          httpInfo,
-    const std::string&               tenant,
-    const std::string&               xauthToken,
-    const std::string&               fiwareCorrelator,
-    unsigned int                     correlatorCounter,
+    ContextElementResponse*          notifyCerP,
+    const ngsiv2::Notification&      notification,
+    const notifStaticFields&         nsf,
+    long long                        maxFailsLimit,
+    long long                        failsCounter,
     RenderFormat                     renderFormat,
     const std::vector<std::string>&  attrsFilter,
     bool                             blacklist,
+    bool                             covered,
     const std::vector<std::string>&  metadataFilter
 )
 {
   pthread_t                         tid;
-  std::vector<SenderThreadParams*>* paramsV = Notifier::buildSenderParams(ncr,
-                                                                          httpInfo,
-                                                                          tenant,
-                                                                          xauthToken,
-                                                                          fiwareCorrelator,
-                                                                          correlatorCounter,
-                                                                          renderFormat,
-                                                                          attrsFilter,
-                                                                          blacklist,
-                                                                          metadataFilter);
+  SenderThreadParams* paramsP = Notifier::buildSenderParams(notifyCerP,
+                                                            nsf.subId,
+                                                            notification,
+                                                            nsf.tenant,
+                                                            maxFailsLimit,
+                                                            failsCounter,
+                                                            nsf.xauthToken,
+                                                            nsf.fiwareCorrelator,
+                                                            nsf.correlatorCounter,
+                                                            renderFormat,
+                                                            attrsFilter,
+                                                            blacklist,
+                                                            covered,
+                                                            metadataFilter);
 
-  if (!paramsV->empty()) // al least one param, an empty vector means an error occurred
+  if (paramsP != NULL)
   {
-    int ret = pthread_create(&tid, NULL, startSenderThread, paramsV);
+    int ret = pthread_create(&tid, NULL, startSenderThread, paramsP);
 
     if (ret != 0)
     {
       LM_E(("Runtime Error (error creating thread: %d)", ret));
-      for (unsigned ix = 0; ix < paramsV->size(); ix++)
-      {
-        delete (*paramsV)[ix];
-      }
-      delete paramsV;
+      delete paramsP;
       return;
     }
     pthread_detach(tid);
@@ -110,118 +111,311 @@ void Notifier::sendNotifyContextRequest
 
 /* ****************************************************************************
 *
-* buildSenderParamsCustom -
+* setPayload -
+*
+* Return false if some problem occur
 */
-static std::vector<SenderThreadParams*>* buildSenderParamsCustom
+static bool setPayload
 (
-    const SubscriptionId&                subscriptionId,
-    const ContextElementResponseVector&  cv,
-    const ngsiv2::HttpInfo&              httpInfo,
-    const std::string&                   tenant,
-    const std::string&                   xauthToken,
-    const std::string&                   fiwareCorrelator,
-    unsigned int                         correlatorCounter,
-    RenderFormat                         renderFormat,
-    const std::vector<std::string>&      attrsFilter,
-    bool                                 blacklist,
-    const std::vector<std::string>&      metadataFilter
+  bool                             includePayload,
+  const std::string&               notifPayload,
+  const SubscriptionId&            subscriptionId,
+  Entity&                          en,
+  ExprContextObject*               exprContextObjectP,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  std::string*                     payloadP,
+  std::string*                     mimeTypeP,
+  RenderFormat*                    renderFormatP
 )
 {
-  std::vector<SenderThreadParams*>*  paramsV;
-
-  paramsV = new std::vector<SenderThreadParams*>;
-
-  for (unsigned ix = 0; ix < cv.size(); ix++)
+  if (!includePayload)
   {
-    Verb                                verb    = httpInfo.verb;
-    std::string                         method;
-    std::string                         url;
-    std::string                         payload;
-    std::string                         mimeType;
-    std::map<std::string, std::string>  qs;
-    std::map<std::string, std::string>  headers;
-    Entity&                             en      = cv[ix]->entity;
+    *payloadP      = "";
+    *renderFormatP = NGSI_V2_CUSTOM;
+  }
+  else if (notifPayload.empty())
+  {
+    NotifyContextRequest   ncr;
+    ContextElementResponse cer;
 
-    //
-    // 1. Verb/Method
-    //
+    cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
+
+    // cloneCompount set to true. Otherwise nasty things as the one
+    // described in issue #4263 will happend
+    cer.entity.attributeVector.push_back(en.attributeVector, true);
+
+    cer.statusCode.code = SccOk;
+
+    ncr.subscriptionId  = subscriptionId;
+    ncr.contextElementResponseVector.push_back(&cer);
+
+    *payloadP = ncr.toJson(*renderFormatP, attrsFilter, blacklist, metadataFilter);
+
+    *mimeTypeP = "application/json";
+  }
+  else
+  {
+    if (!macroSubstitute(payloadP, notifPayload, exprContextObjectP, "null", true))
+    {
+      return false;
+    }
+
+    char* pload    = curl_unescape(payloadP->c_str(), payloadP->length());
+    *payloadP      = std::string(pload);
+    *renderFormatP = NGSI_V2_CUSTOM;
+    *mimeTypeP     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
+    curl_free(pload);
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* setJsonPayload -
+*/
+static bool setJsonPayload
+(
+  orion::CompoundValueNode*  json,
+  ExprContextObject*         exprContextObjectP,
+  std::string*               payloadP,
+  std::string*               mimeTypeP
+)
+{
+  *payloadP = json->toJson(exprContextObjectP);
+  *mimeTypeP = "application/json";  // this can be overriden by headers field
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* setNgsiPayload -
+*
+* Return false if some problem occur
+*/
+static bool setNgsiPayload
+(
+  const Entity&                    ngsi,
+  const SubscriptionId&            subscriptionId,
+  Entity&                          en,
+  ExprContextObject*               exprContextObjectP,
+  const std::vector<std::string>&  attrsFilter,
+  bool                             blacklist,
+  const std::vector<std::string>&  metadataFilter,
+  std::string*                     payloadP,
+  RenderFormat                     renderFormat
+)
+{
+  NotifyContextRequest   ncr;
+  ContextElementResponse cer;
+
+  std::string effectiveId;
+  if (ngsi.id.empty())
+  {
+    effectiveId = en.id;
+  }
+  else
+  {
+    // If id is not found in the replacements macro, we use en.id.
+    effectiveId = removeQuotes(smartStringValue(ngsi.id, exprContextObjectP, '"' + en.id + '"'));
+  }
+
+  std::string effectiveType;
+  if (ngsi.type.empty())
+  {
+    effectiveType = en.type;
+  }
+  else
+  {
+    // If type is not found in the replacements macro, we use en.type.
+    effectiveType = removeQuotes(smartStringValue(ngsi.type, exprContextObjectP, '"' + en.type + '"'));
+  }
+
+  cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
+
+  // First we add attributes in the ngsi field
+  for (unsigned int ix = 0; ix < ngsi.attributeVector.size(); ix++)
+  {
+    cer.entity.attributeVector.push_back(new ContextAttribute(ngsi.attributeVector[ix], false, true));
+  }
+  // Next, other attributes in the original entity not already added
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    if (cer.entity.attributeVector.get(en.attributeVector[ix]->name) < 0)
+    {
+      cer.entity.attributeVector.push_back(new ContextAttribute(en.attributeVector[ix], false, true));
+    }
+  }
+
+  cer.statusCode.code = SccOk;
+
+  ncr.subscriptionId  = subscriptionId;
+  ncr.contextElementResponseVector.push_back(&cer);
+
+  if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES))
+  {
+    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+  }
+  else
+  {
+    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* buildSenderParamsCustom -
+*/
+static SenderThreadParams* buildSenderParamsCustom
+(
+    const SubscriptionId&            subscriptionId,
+    ContextElementResponse*          notifyCerP,
+    const ngsiv2::Notification&      notification,
+    const std::string&               tenant,
+    long long                        maxFailsLimit,
+    long long                        failsCounter,
+    const std::string&               xauthToken,
+    const std::string&               fiwareCorrelator,
+    unsigned int                     correlatorCounter,
+    RenderFormat                     renderFormat,
+    const std::vector<std::string>&  attrsFilter,
+    bool                             blacklist,
+    const std::vector<std::string>&  metadataFilter
+)
+{
+  std::string                         method;
+  std::string                         url;
+  std::string                         payload;
+  std::string                         topic;
+  std::string                         mimeType;
+  std::map<std::string, std::string>  qs;
+  std::map<std::string, std::string>  headers;
+  Entity&                             en      = notifyCerP->entity;
+
+#ifdef EXPR_BASIC
+  bool basic = true;
+#else
+  bool basic = false;
+#endif
+
+  // Used by several macroSubstitute() calls along this function
+  ExprContextObject exprContext(basic);
+
+  // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
+  // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
+  // exists, the operation is ignored (in other words, the first added key is the one that takes precedence). Taking
+  // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
+  // over the ones comming from headers of the same name, we conditionally add them depending the case
+  TIME_EXPR_CTXBLD_START();
+  exprContext.add("id", en.id);
+  exprContext.add("type", en.type);
+  if (!basic)
+  {
+    exprContext.add("service", tenant);
+    exprContext.add("servicePath", en.servicePath);
+    exprContext.add("authToken", xauthToken);
+  }
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    en.attributeVector[ix]->addToContext(&exprContext, basic);
+  }
+  if (basic)
+  {
+    exprContext.add("service", tenant);
+    exprContext.add("servicePath", en.servicePath);
+    exprContext.add("authToken", xauthToken);
+  }
+  TIME_EXPR_CTXBLD_STOP();
+
+  //
+  // 1. Verb/Method
+  //
+  if (notification.type == ngsiv2::HttpNotification)
+  {
+    Verb  verb = notification.httpInfo.verb;
     if (verb == NOVERB)
     {
       // Default verb/method is POST
       verb = POST;
     }
     method = verbName(verb);
+  }
+  else  // MqttNotification
+  {
+    // Verb/method is irrelevant in this case
+    method = verbName(NOVERB);
+  }
 
 
-    //
-    // 2. URL
-    //
-    if (macroSubstitute(&url, httpInfo.url, en) == false)
+  //
+  // 2. URL
+  //
+  std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
+  if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
+  {
+    // Warning already logged in macroSubstitute()
+    return NULL;
+  }
+
+
+  //
+  // 3. Payload
+  //
+  ngsiv2::CustomPayloadType customPayloadType = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payloadType : notification.mqttInfo.payloadType);
+
+  if (customPayloadType == ngsiv2::CustomPayloadType::Text)
+  {
+    bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
+    std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
+    if (!setPayload(includePayload, notifPayload, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
-      return paramsV;  // empty vector
+      return NULL;
     }
-
-
-    //
-    // 3. Payload
-    //
-    if (!httpInfo.includePayload)
+  }
+  else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
+  {
+    orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
+    setJsonPayload(json, &exprContext, &payload, &mimeType);
+    renderFormat = NGSI_V2_CUSTOM;
+  }
+  else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
+  {
+    // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
+    const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
+    if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
     {
-      payload      = "";
-      renderFormat = NGSI_V2_CUSTOM;
+      // Warning already logged in macroSubstitute()
+      return NULL;
     }
-    else if (httpInfo.payload.empty())
-    {
-      NotifyContextRequest   ncr;
-      ContextElementResponse cer;
+    mimeType = "application/json";
+  }
 
-      cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
-      cer.entity.attributeVector.push_back(en.attributeVector);
 
-      cer.statusCode.code = SccOk;
-
-      ncr.subscriptionId  = subscriptionId;
-      ncr.contextElementResponseVector.push_back(&cer);
-
-      if (renderFormat == NGSI_V1_LEGACY)
-      {
-        payload = ncr.toJsonV1(false, attrsFilter, blacklist, metadataFilter);
-      }
-      else
-      {
-        payload  = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
-      }
-
-      mimeType = "application/json";
-    }
-    else
-    {
-      if (macroSubstitute(&payload, httpInfo.payload, en) == false)
-      {
-        // Warning already logged in macroSubstitute()
-        return paramsV;  // empty vector
-      }
-
-      char* pload  = curl_unescape(payload.c_str(), payload.length());
-      payload      = std::string(pload);
-      renderFormat = NGSI_V2_CUSTOM;
-      mimeType     = "text/plain";  // May be overridden by 'Content-Type' in 'headers'
-      curl_free(pload);
-    }
-
-    //
-    // 4. URI Params (Query Strings)
-    //
-    for (std::map<std::string, std::string>::const_iterator it = httpInfo.qs.begin(); it != httpInfo.qs.end(); ++it)
+  //
+  // 4. URI Params (Query Strings) (only in the case of HTTP notifications)
+  //
+  if (notification.type == ngsiv2::HttpNotification)
+  {
+    for (std::map<std::string, std::string>::const_iterator it = notification.httpInfo.qs.begin(); it != notification.httpInfo.qs.end(); ++it)
     {
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
+      if ((macroSubstitute(&key, it->first, &exprContext, "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
-        return paramsV;  // empty vector
+        return NULL;
       }
 
       if ((value.empty()) || (key.empty()))
@@ -231,20 +425,23 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
       }
       qs[key] = value;
     }
+  }
 
 
-    //
-    // 5. HTTP Headers
-    //
-    for (std::map<std::string, std::string>::const_iterator it = httpInfo.headers.begin(); it != httpInfo.headers.end(); ++it)
+  //
+  // 5. HTTP Headers (only in the case of HTTP notifications)
+  //
+  if (notification.type == ngsiv2::HttpNotification)
+  {
+    for (std::map<std::string, std::string>::const_iterator it = notification.httpInfo.headers.begin(); it != notification.httpInfo.headers.end(); ++it)
     {
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, en) == false) || (macroSubstitute(&value, it->second, en) == false))
+      if ((macroSubstitute(&key, it->first, &exprContext,  "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
       {
         // Warning already logged in macroSubstitute()
-        return paramsV;  // empty vector
+        return NULL;
       }
 
       if (key.empty())
@@ -253,76 +450,98 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
         continue;
       }
 
+      // Decode header value
+      char* pvalue = curl_unescape(value.c_str(), value.length());
+      value        = std::string(pvalue);
+      curl_free(pvalue);
+
       std::transform(key.begin(), key.end(), key.begin(), ::tolower);
       headers[key] = value;
     }
-
-
-    //
-    // 6. Split URI in protocol, host, port and path
-    //
-    std::string  protocol;
-    std::string  host;
-    int          port;
-    std::string  uriPath;
-
-    if (!parseUrl(url, host, port, uriPath, protocol))
-    {
-      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
-      return paramsV;  // empty vector
-    }
-
-
-    //
-    // 7. Add URI params from template to uriPath
-    //
-    std::string  uri = uriPath;
-
-    if (qs.size() != 0)
-    {
-      uri += "?";
-
-      int ix = 0;
-      for (std::map<std::string, std::string>::iterator it = qs.begin(); it != qs.end(); ++it)
-      {
-        if (ix != 0)
-        {
-          uri += "&";
-        }
-
-        uri += it->first + "=" + it->second;
-        ++ix;
-      }
-    }
-
-    SenderThreadParams*  params = new SenderThreadParams();
-
-    params->type             = QUEUE_MSG_NOTIF;
-    params->from             = fromIp;  // note fromIp is a thread variable
-    params->ip               = host;
-    params->port             = port;
-    params->protocol         = protocol;
-    params->verb             = method;
-    params->tenant           = tenant;
-    params->servicePath      = en.servicePath;
-    params->xauthToken       = xauthToken;
-    params->resource         = uri;
-    params->content_type     = mimeType;
-    params->content          = payload;
-    params->mimeType         = JSON;
-    params->renderFormat     = renderFormatToString(renderFormat);
-    params->extraHeaders     = headers;
-    params->registration     = false;
-    params->subscriptionId   = subscriptionId.get();
-
-    char suffix[STRING_SIZE_FOR_INT];
-    snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-    params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
-
-    paramsV->push_back(params);
   }
 
-  return paramsV;
+
+  //
+  // 6. Split URI in protocol, host, port and path
+  //
+  std::string  protocol;
+  std::string  host;
+  int          port;
+  std::string  uriPath;
+
+  if (!parseUrl(url, host, port, uriPath, protocol))
+  {
+    LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
+    return NULL;
+  }
+
+
+  //
+  // 7. Add URI params from template to uriPath
+  //
+  // Note qs.size() == 0 in the case of MQTT notificationa, as step 4 is not executed.
+  //
+  std::string  uri = uriPath;
+
+  if (qs.size() != 0)
+  {
+    uri += "?";
+
+    int ix = 0;
+    for (std::map<std::string, std::string>::iterator it = qs.begin(); it != qs.end(); ++it)
+    {
+      if (ix != 0)
+      {
+        uri += "&";
+      }
+
+      uri += it->first + "=" + it->second;
+      ++ix;
+    }
+  }
+
+  // 8. Topic (only in the case of MQTT notifications)
+  if (notification.type == ngsiv2::MqttNotification)
+  {
+    if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
+    {
+      // Warning already logged in macroSubstitute()
+      return NULL;
+    }
+  }
+
+  SenderThreadParams*  paramsP = new SenderThreadParams();
+
+  paramsP->type             = QUEUE_MSG_NOTIF;
+  paramsP->from             = fromIp;  // note fromIp is a thread variable
+  paramsP->ip               = host;
+  paramsP->port             = port;
+  paramsP->protocol         = protocol;
+  paramsP->verb             = method;
+  paramsP->tenant           = tenant;
+  paramsP->maxFailsLimit    = maxFailsLimit;
+  paramsP->failsCounter     = failsCounter;
+  paramsP->servicePath      = en.servicePath;
+  paramsP->xauthToken       = xauthToken;
+  paramsP->resource         = notification.type == ngsiv2::HttpNotification? uri : topic;
+  paramsP->content_type     = mimeType;
+  paramsP->content          = payload;
+  paramsP->mimeType         = JSON;
+  paramsP->renderFormat     = renderFormatToString(renderFormat);
+  paramsP->extraHeaders     = headers;
+  paramsP->registration     = false;
+  paramsP->subscriptionId   = subscriptionId.get();
+  paramsP->qos              = notification.mqttInfo.qos;     // unspecified in case of HTTP notifications
+  paramsP->retain           = notification.mqttInfo.retain;  // unspecified in case of HTTP notifications
+  paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
+  paramsP->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
+  paramsP->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
+
+  char suffix[STRING_SIZE_FOR_INT];
+  snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
+  paramsP->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
+
+  return paramsP;
 }
 
 
@@ -331,28 +550,55 @@ static std::vector<SenderThreadParams*>* buildSenderParamsCustom
 *
 * Notifier::buildSenderParams -
 */
-std::vector<SenderThreadParams*>* Notifier::buildSenderParams
+SenderThreadParams* Notifier::buildSenderParams
 (
-  NotifyContextRequest&            ncr,
-  const ngsiv2::HttpInfo&          httpInfo,
+  ContextElementResponse*          notifyCerP,
+  const std::string&               subId,
+  const ngsiv2::Notification&      notification,
   const std::string&               tenant,
+  long long                        maxFailsLimit,
+  long long                        failsCounter,
   const std::string&               xauthToken,
   const std::string&               fiwareCorrelator,
   unsigned int                     correlatorCounter,
   RenderFormat                     renderFormat,
   const std::vector<std::string>&  attrsFilter,
   bool                             blacklist,
+  bool                             covered,
   const std::vector<std::string>&  metadataFilter
 )
 {
-    ConnectionInfo                    ci;
-    Verb                              verb    = httpInfo.verb;
-    std::vector<SenderThreadParams*>* paramsV = NULL;
+    ConnectionInfo  ci;
 
-    if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
+    Verb verb;
+    if (notification.type == ngsiv2::HttpNotification)
     {
-      // Default verb/method (or the one in case of disabled custom notifications) is POST
-      verb = POST;
+      verb = notification.httpInfo.verb;
+      if ((verb == NOVERB) || (verb == UNKNOWNVERB) || disableCusNotif)
+      {
+        // Default verb/method (or the one in case of disabled custom notifications) is POST
+        verb = POST;
+      }
+    }
+    else  // MqttNotification
+    {
+      // Verb/methodd is irrelevant in this case
+      verb = NOVERB;
+    }
+
+    if (covered)
+    {
+      for (unsigned int ix = 0; ix < attrsFilter.size(); ix++)
+      {
+        // Aviod over-adding attribute, checking first that the attribute is not already added
+        std::string attrName = attrsFilter[ix];
+        if (notifyCerP->entity.attributeVector.get(attrName) < 0)
+        {
+          ContextAttribute* caP = new ContextAttribute(attrName, DEFAULT_ATTR_NULL_TYPE, "");
+          caP->valueType = orion::ValueTypeNull;
+          notifyCerP->entity.attributeVector.push_back(caP);
+        }
+      }
     }
 
     //
@@ -370,12 +616,15 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
-    if (httpInfo.custom && !disableCusNotif)
+    bool custom = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.custom : notification.mqttInfo.custom;
+    if (custom && !disableCusNotif)
     {
-      return buildSenderParamsCustom(ncr.subscriptionId,
-                                     ncr.contextElementResponseVector,
-                                     httpInfo,
+      return buildSenderParamsCustom(subId,
+                                     notifyCerP,
+                                     notification,
                                      tenant,
+                                     maxFailsLimit,
+                                     failsCounter,
                                      xauthToken,
                                      fiwareCorrelator,
                                      correlatorCounter,
@@ -385,7 +634,22 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
                                      metadataFilter);
     }
 
-    paramsV = new std::vector<SenderThreadParams*>();
+    NotifyContextRequest   ncr;
+    ContextElementResponse cer;
+
+    /* Note we use cloneCompound=true in cer.entity.fill(). This is due to
+     * cer.entity destructor does release() on the attrs vector */
+    cer.entity.fill(notifyCerP->entity, false, true);
+    cer.statusCode.fill(SccOk);
+
+    ncr.contextElementResponseVector.push_back(&cer);
+
+    /* Complete the fields in NotifyContextRequest */
+    ncr.subscriptionId.set(subId);
+    // FIXME: we use a proper origin name
+    ncr.originator.set("localhost");
+
+    ncr.subscriptionId.set(subId);
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
@@ -404,16 +668,7 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
 
     ci.outMimeType = JSON;
 
-    std::string payloadString;
-    if (renderFormat == NGSI_V1_LEGACY)
-    {
-      bool asJsonObject = (ci.uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ci.outMimeType == JSON);
-      payloadString = ncr.toJsonV1(asJsonObject, attrsFilter, blacklist, metadataFilter);
-    }
-    else
-    {
-      payloadString = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
-    }
+    std::string payloadString = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
 
     /* Parse URL */
     std::string  host;
@@ -421,39 +676,45 @@ std::vector<SenderThreadParams*>* Notifier::buildSenderParams
     std::string  uriPath;
     std::string  protocol;
 
-    if (!parseUrl(httpInfo.url, host, port, uriPath, protocol))
+    std::string url = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
+    if (!parseUrl(url, host, port, uriPath, protocol))
     {
-      LM_E(("Runtime Error (not sending NotifyContextRequest: malformed URL: '%s')", httpInfo.url.c_str()));
-      return paramsV;  //empty vector
+      LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
+      return NULL;
     }
 
     /* Set Content-Type */
     std::string content_type = "application/json";
 
+    SenderThreadParams* paramsP = new SenderThreadParams();
 
-    SenderThreadParams*  params = new SenderThreadParams();
-
-    params->type             = QUEUE_MSG_NOTIF;
-    params->from             = fromIp;  // note fromIp is a thread variable
-    params->ip               = host;
-    params->port             = port;
-    params->protocol         = protocol;
-    params->verb             = verbName(verb);
-    params->tenant           = tenant;
-    params->servicePath      = spath;
-    params->xauthToken       = xauthToken;
-    params->resource         = uriPath;
-    params->content_type     = content_type;
-    params->content          = payloadString;
-    params->mimeType         = JSON;
-    params->renderFormat     = renderFormatToString(renderFormat);
-    params->subscriptionId   = ncr.subscriptionId.get();
-    params->registration     = false;
+    paramsP->type             = QUEUE_MSG_NOTIF;
+    paramsP->from             = fromIp;  // note fromIp is a thread variable
+    paramsP->ip               = host;
+    paramsP->port             = port;
+    paramsP->protocol         = protocol;
+    paramsP->verb             = verbName(verb);
+    paramsP->tenant           = tenant;
+    paramsP->maxFailsLimit    = maxFailsLimit;
+    paramsP->failsCounter     = failsCounter;
+    paramsP->servicePath      = spath;
+    paramsP->xauthToken       = xauthToken;
+    paramsP->resource         = notification.type == ngsiv2::HttpNotification? uriPath : notification.mqttInfo.topic;
+    paramsP->content_type     = content_type;
+    paramsP->content          = payloadString;
+    paramsP->mimeType         = JSON;
+    paramsP->renderFormat     = renderFormatToString(renderFormat);
+    paramsP->subscriptionId   = ncr.subscriptionId.get();
+    paramsP->registration     = false;
+    paramsP->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
+    paramsP->retain           = notification.mqttInfo.retain; // unspecified in case of HTTP notifications
+    paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
+    paramsP->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
+    paramsP->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
-    params->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
+    paramsP->fiwareCorrelator = fiwareCorrelator + "; cbnotif=" + suffix;
 
-    paramsV->push_back(params);
-    return paramsV;
+    return paramsP;
 }

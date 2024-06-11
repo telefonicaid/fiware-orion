@@ -23,7 +23,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
      ```
      pip install -r requirements.txt --allow-all-external
      ```
-- Orion compiled and running (From code or RPM, its independent)
+- Orion compiled and running
 
 ### Tests execution:
 

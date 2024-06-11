@@ -31,6 +31,9 @@
 #include "rest/Verb.h"
 
 #include "mongoDriver/BSONObj.h"
+#include "parse/CompoundValueNode.h"
+#include "apiTypesV2/CustomPayloadType.h"
+#include "apiTypesV2/Entity.h"
 
 
 
@@ -44,17 +47,22 @@ struct HttpInfo
 {
   std::string                         url;
   Verb                                verb;
-  std::map<std::string, std::string>  qs;      // URI parameters
+  std::map<std::string, std::string>  qs;       // URI parameters
   std::map<std::string, std::string>  headers;
-  std::string                         payload;
+  std::string                         payload;  // either payload, json or ngsi is used (depending on payloadType)
+  orion::CompoundValueNode*           json;     // either payload, json or ngsi is used (depending on payloadType)
+  Entity                              ngsi;     // either payload, json or ngsi is used (depending on payloadType)
+  CustomPayloadType                   payloadType;
   bool                                custom;
   bool                                includePayload;
+  long long                           timeout;
 
   HttpInfo();
-  explicit HttpInfo(const std::string& _url);
 
   std::string  toJson();
   void         fill(const orion::BSONObj& bo);
+  void         fill(const HttpInfo& _httpInfo);
+  void         release();
 };
 }
 

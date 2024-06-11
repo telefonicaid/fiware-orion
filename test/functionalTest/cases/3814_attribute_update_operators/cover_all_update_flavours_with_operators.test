@@ -1,0 +1,276 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Cover all update cases using operators
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E with A1-6 set to 0
+# 02. POST /v2/op/update UPDATE - A1={$inc:1}
+# 03. POST /v2/op/update APPEND - A2={$inc:2}
+# 04. POST /v2/entity/E/attrs - A3={$inc:3}
+# 05. PATCH /v2/entity/E/attrs - A4={$inc:4}
+# 06. PUT /v2/entity/E/attrs/A5 {$inc:5}
+# 07. PUT /v2/entity/E/attrs/A6/value {$inc:6}
+# 08. Get entity, see A1=1...A6=6
+#
+
+
+echo '01. Create entity E with A1-6 set to 0'
+echo '======================================'
+payload='{
+  "id": "E",
+  "type": "T",
+  "A1": {
+    "value": 0,
+    "type": "Number"
+  },
+  "A2": {
+    "value": 0,
+    "type": "Number"
+  },
+  "A3": {
+    "value": 0,
+    "type": "Number"
+  },
+  "A4": {
+    "value": 0,
+    "type": "Number"
+  },
+  "A5": {
+    "value": 0,
+    "type": "Number"
+  },
+  "A6": {
+    "value": 0,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. POST /v2/op/update UPDATE - A1={$inc:1}'
+echo '==========================================='
+payload='{
+  "actionType": "update",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T",
+      "A1": {
+        "value": { "$inc": 1 },
+        "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo '03. POST /v2/op/update APPEND - A2={$inc:2}'
+echo '==========================================='
+payload='{
+  "actionType": "append",
+  "entities": [
+    {
+      "id": "E",
+      "type": "T",
+      "A2": {
+        "value": { "$inc": 2 },
+        "type": "Number"
+      }
+    }
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo '04. POST /v2/entity/E/attrs - A3={$inc:3}'
+echo '========================================='
+payload='{
+  "A3": {
+    "value": { "$inc": 3 },
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '05. PATCH /v2/entity/E/attrs - A4={$inc:4}'
+echo '=========================================='
+payload='{
+  "A4": {
+    "value": { "$inc": 4 },
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '06. PUT /v2/entity/E/attrs/A5 {$inc:5}'
+echo '======================================'
+payload='{
+  "value": { "$inc": 5 },
+  "type": "Number"
+}'
+orionCurl --url /v2/entities/E/attrs/A5 --payload "$payload" -X PUT
+echo
+echo
+
+
+echo '07. PUT /v2/entity/E/attrs/A6/value {$inc:6}'
+echo '============================================'
+payload='{ "$inc": 6 }'
+orionCurl --url /v2/entities/E/attrs/A6/value --payload "$payload" -X PUT
+echo
+echo
+
+
+echo '08. Get entity, see A1=1...A6=6'
+echo '==============================='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with A1-6 set to 0
+======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. POST /v2/op/update UPDATE - A1={$inc:1}
+===========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+03. POST /v2/op/update APPEND - A2={$inc:2}
+===========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. POST /v2/entity/E/attrs - A3={$inc:3}
+=========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. PATCH /v2/entity/E/attrs - A4={$inc:4}
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. PUT /v2/entity/E/attrs/A5 {$inc:5}
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. PUT /v2/entity/E/attrs/A6/value {$inc:6}
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Get entity, see A1=1...A6=6
+===============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 303
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "A2": {
+        "metadata": {},
+        "type": "Number",
+        "value": 2
+    },
+    "A3": {
+        "metadata": {},
+        "type": "Number",
+        "value": 3
+    },
+    "A4": {
+        "metadata": {},
+        "type": "Number",
+        "value": 4
+    },
+    "A5": {
+        "metadata": {},
+        "type": "Number",
+        "value": 5
+    },
+    "A6": {
+        "metadata": {},
+        "type": "Number",
+        "value": 6
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

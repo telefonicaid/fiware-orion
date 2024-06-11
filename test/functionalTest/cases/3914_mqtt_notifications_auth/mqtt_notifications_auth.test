@@ -1,0 +1,522 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+MQTT subcription auth parameters CRUD (user and password)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create mqtt sub only user, see error
+# 02. Create mqtt sub only pass, see error
+# 03. Create mqtt sub user and pass, but forbidden chars in user, see error
+# 04. Create mqtt sub with user user1 and passwd pass1
+# 05. GET subs checking user1 but password offuscated
+# 06. Get sub password pass1 from DB
+# 07. PATCH sub changing password to user10 and pass10
+# 08. GET subs checking user10 but password offuscated
+# 09. Get sub password pass10 from DB
+# 10. PATCH sub removing auth parameters
+# 11. GET subs checking user and password are not shown
+# 12. Get sub from DB and check to user and pass are not there
+# 13. PATCH sub adding back again user1 and pass1
+# 14. GET subs checking user1 but password offuscated
+# 15. Get sub password pass1 from DB
+#
+
+
+echo "01. Create mqtt sub only user, see error"
+echo "========================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion",
+      "user": "user1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create mqtt sub only pass, see error"
+echo "========================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion",
+      "passwd": "pass1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create mqtt sub user and pass, but forbidden chars in user, see error"
+echo "========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion",
+      "user": "forbidden;;",
+      "passwd": "passwd1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create mqtt sub with user user1 and passwd pass1"
+echo "===================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion",
+      "user": "user1",
+      "passwd": "pass1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "05. GET subs checking user1 but password offuscated"
+echo "==================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "06. Get sub password pass1 from DB"
+echo "=================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).user'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).passwd'
+echo
+echo
+
+
+echo "07. PATCH sub changing password to user10 and pass10"
+echo "===================================================="
+payload='{
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion",
+      "user": "user10",
+      "passwd": "pass10"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. GET subs checking user10 but password offuscated"
+echo "===================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Get sub password pass10 from DB"
+echo "==================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).user'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).passwd'
+echo
+echo
+
+
+echo "10. PATCH sub removing auth parameters"
+echo "======================================"
+payload='{
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. GET subs checking user and password are not shown"
+echo "====================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "12. Get sub from DB and check to user and pass are not there"
+echo "============================================================"
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).hasOwnProperty("user")'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).hasOwnProperty("passwd")'
+echo
+echo
+
+
+echo "13. PATCH sub adding back again user1 and pass1"
+echo "==============================================="
+payload='{
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://localhost:1883",
+      "topic": "/orion",
+      "user": "user1",
+      "passwd": "pass1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "14. GET subs checking user1 but password offuscated"
+echo "==================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "15. Get sub password pass1 from DB"
+echo "=================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).user'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).passwd'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create mqtt sub only user, see error
+========================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
+
+{
+    "description": "you must use user and passwd fields simultaneously",
+    "error": "BadRequest"
+}
+
+
+02. Create mqtt sub only pass, see error
+========================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
+
+{
+    "description": "you must use user and passwd fields simultaneously",
+    "error": "BadRequest"
+}
+
+
+03. Create mqtt sub user and pass, but forbidden chars in user, see error
+=========================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
+
+{
+    "description": "forbidden characters in mqtt /user/",
+    "error": "BadRequest"
+}
+
+
+04. Create mqtt sub with user user1 and passwd pass1
+====================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+05. GET subs checking user1 but password offuscated
+===================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 360
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqtt": {
+            "passwd": "*****",
+            "qos": 0,
+            "retain": false,
+            "topic": "/orion",
+            "url": "mqtt://localhost:1883",
+            "user": "user1"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+06. Get sub password pass1 from DB
+==================================
+"user1"
+"pass1"
+
+
+07. PATCH sub changing password to user10 and pass10
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. GET subs checking user10 but password offuscated
+====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 361
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqtt": {
+            "passwd": "*****",
+            "qos": 0,
+            "retain": false,
+            "topic": "/orion",
+            "url": "mqtt://localhost:1883",
+            "user": "user10"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+09. Get sub password pass10 from DB
+===================================
+"user10"
+"pass10"
+
+
+10. PATCH sub removing auth parameters
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+11. GET subs checking user and password are not shown
+=====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 328
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqtt": {
+            "qos": 0,
+            "retain": false,
+            "topic": "/orion",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+12. Get sub from DB and check to user and pass are not there
+============================================================
+false
+false
+
+
+13. PATCH sub adding back again user1 and pass1
+===============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+14. GET subs checking user1 but password offuscated
+===================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 360
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqtt": {
+            "passwd": "*****",
+            "qos": 0,
+            "retain": false,
+            "topic": "/orion",
+            "url": "mqtt://localhost:1883",
+            "user": "user1"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+15. Get sub password pass1 from DB
+==================================
+"user1"
+"pass1"
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

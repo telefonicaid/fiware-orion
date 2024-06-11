@@ -29,6 +29,7 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+#include <regex.h>
 
 #include "common/limits.h"
 
@@ -206,5 +207,34 @@ extern void toLowercase(char* s);
 * offuscatePassword -
 */
 extern std::string offuscatePassword(const std::string& uri, const std::string& pwd);
+
+
+
+/* ****************************************************************************
+*
+* regComp -
+*/
+extern bool regComp(regex_t* re, const char* pattern, int flags);
+
+
+
+/* ****************************************************************************
+*
+* removeQuotes -
+*
+*/
+inline std::string removeQuotes(std::string s)
+{
+  if (s[0] == '"')
+  {
+    return s.substr(1, s.size()-2);
+  }
+  else
+  {
+    return s;
+  }
+}
+
+
 
 #endif  // SRC_LIB_COMMON_STRING_H_

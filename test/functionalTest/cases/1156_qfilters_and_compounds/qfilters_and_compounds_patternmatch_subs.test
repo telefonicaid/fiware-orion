@@ -37,7 +37,7 @@ accumulatorStart --pretty-print
 # 04. No match: Create subscription 4 for q=A1.s~=fest_string
 # 05. Create E1 with A1 with compound value containing String, Integer and Float
 # 06. Dump accumulator, see 3 notifications (sub1, sub2, sub3)
-# 
+#
 
 
 echo "01. Beginning: Create subscription 1 for q=A1.s~=test"
@@ -178,50 +178,50 @@ echo
 01. Beginning: Create subscription 1 for q=A1.s~=test
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. End: Create subscription 2 for q=A1.s~=ing
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Single-char: Create subscription 3 for q=A1.s~=_
 ====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 04. No match: Create subscription 4 for q=A1.s~=fest_string
 ===========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 05. Create E1 with A1 with compound value containing String, Integer and Float
 ==============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
@@ -241,8 +241,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "f": 3.14,
                     "i": 10,
@@ -250,7 +250,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
                     "s": "test_string"
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -271,8 +271,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "f": 3.14,
                     "i": 10,
@@ -280,7 +280,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
                     "s": "test_string"
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],
@@ -301,8 +301,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
     "data": [
         {
             "A1": {
-                "metadata": {}, 
-                "type": "StructuredValue", 
+                "metadata": {},
+                "type": "StructuredValue",
                 "value": {
                     "f": 3.14,
                     "i": 10,
@@ -310,7 +310,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[123])
                     "s": "test_string"
                 }
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
     ],

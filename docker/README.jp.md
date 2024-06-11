@@ -23,23 +23,27 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 1. 作業するシステム上のディレクトリを作成します。たとえば `~/fiware` です
 2. ディレクトリ内に `docker-compose.yml` という名前の新しいファイルを次の内容で作成します :
-	
-		 mongo:
-		  image: mongo:4.4
-		  command: --nojournal
-		 orion:
-		  image: fiware/orion
-		  links:
-		    - mongo
-		  ports:
-		    - "1026:1026"
-		  command: -dbhost mongo
+
+		version: "3"
+
+		services:
+		  orion:
+		    image: fiware/orion
+		    ports:
+		      - "1026:1026"
+		    depends_on:
+		      - mongo
+		    command: -dbURI mongodb://mongo
+
+		  mongo:
+		    image: mongo:6.0
+		    command: --nojournal
 
 3. コマンドラインを使用して作成したディレクトリで、`sudo docker-compose up` を実行します
 
 > `--nojournal` に関しては、それはプロダクション利用では推奨されていませんが、Orion コンテナが高速で、DB が見つからず準備ができていない場合に、mongo コンテナの起動を高速化し、いくつかの競合状態の問題を回避します。
 
-数秒後に、Context broker を実行し、ポート1026でリッスンする必要があります。
+数秒後、Context Broker が実行され、ポート 1026 をリッスンします。
 
 以下を実行し、動作することを確認します。
 
@@ -71,11 +75,11 @@ Orion Context Broker を試してみたいし、データベースについて�
 ### 2B. MongoDB が別の Docker コンテナで動作している場合
 他のコンテナで MongoDB を実行したい場合は、次のように起動することができます
 
-	 sudo docker run --name mongodb -d mongo:4.4
+	 sudo docker run --name mongodb -d mongo:6.0
 
 そして、このコマンドで Orion を実行します
 
-	 sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbhost mongodb
+	 sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbURI mongodb://mongodb
 
 すべてが動作することを確認します。
 
@@ -87,7 +91,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 別の MongoDB インスタンスに接続する場合は、前のコマンドの**代わりに**、次のコマンドを実行します
 
-	 sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbhost <MongoDB Host>
+	 sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbURI mongodb://<MongoDB Host>
 
 すべてが動作することを確認します。
 
@@ -105,12 +109,12 @@ Orion Context Broker を試してみたいし、データベースについて�
 4. Orion を実行 ...
 	 * docker-compose で自動化されたシナリオを使用し、新しいイメージを構築する : `sudo docker-compose up`。必要に応じて、提供されている `docker-compose.yml` ファイルを変更することもできます
 	 * 手動で MongoDB を別のコンテナで実行します :
-                 1. `sudo docker run --name mongodb -d mongo:4.4`
+                 1. `sudo docker run --name mongodb -d mongo:6.0`
                  2. `sudo docker build -t orion .`
-                 3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
+                 3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbURI mongodb://mongodb`.
 	 * 手動で MongoDB ホストを見つける場所を指定します :
 		 1. `sudo docker build -t orion .`
-		 2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbhost <MongoDB Host>`.
+		 2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbURI mongodb://<MongoDB Host>`.
 
 すべてが動作することを確認します
 
@@ -118,16 +122,27 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 `docker build` コマンドのパラメータ `-t orion` は、イメージに名前を付けます。この名前は何でもかまいませんし、`-t org/fiware-orion` のような組織も含めています。この名前は後でイメージに基づいてコンテナを実行するために使用されます。
 
-`docker build` のパラメータ `--build-arg`i はビルド時の変数を設定できます。
+上記のステップ3には、2つの Dockerfile が用意されています: Debian ベースの公式のもの (`Dockefile` 自体) と、公式ではありませんが、[Alpine](https://www.alpinelinux.org/) をベース・ディストリビューションとして使用する場合の開始点として役立つ `Dockefile.alpine` です。
+
+`docker build` のパラメータ `--build-arg` はビルド時の変数を設定できます。
 
 | ARG             | 説明                                                           | 例                              |
 | --------------- | -------------------------------------------------------------- | ------------------------------- |
-| IMAGE_TAG       | ベース・イメージのタグを指定します                             | --build-arg IMAGE_TAG=centos7   |
+| IMAGE_NAME      | ベース・イメージの名前を指定します                             | --build-arg IMAGE_NAME=ubuntu   |
+| IMAGE_TAG       | ベース・イメージのタグを指定します                             | --build-arg IMAGE_TAG=22.04     |
 | GIT_NAME        | GitHub リポジトリのユーザ名を指定します                        | --build-arg GIT_NAME=fiware-ges |
 | GIT_REV_ORION   | ビルドする Orion バージョンを指定します                        | --build-arg GIT_REV_ORION=2.3.0 |
 | CLEAN_DEV_TOOLS | 開発ツールをクリアするかどうかを指定します。0 の場合は残ります | --build-arg CLEAN_DEV_TOOLS=0   |
 
 イメージとビルド・プロセスの詳細については、[Docker のドキュメント](https://docs.docker.com/userguide/dockerimages/)を参照してください。
+
+<a name="31-building-in-not-official-distributions"></a>
+### 3.1 非公式ディストリビューションでのビルド
+
+[インストール・ドキュメントの要件セクション](../doc/manuals.jp/admin/install.md#requirements)で説明されているように、Debian 12 は公式にサポートされている唯一のディストリビューションです。ただし、次のコマンドは、代替ディストリビューションをベースとする Docker コンテナを構築するためにテストされています。
+
+* Ubuntu 22.04 LTS: `docker build -t orion-ubuntu22.04 --build-arg IMAGE_NAME=ubuntu --build-arg IMAGE_TAG=22.04 --build-arg CLEAN_DEV_TOOLS=0 .`
+* Alpine 3.16.0: `docker build -t orion-alpine3.16 -f Dockerfile.alpine .`
 
 ## 4. その他の情報
 

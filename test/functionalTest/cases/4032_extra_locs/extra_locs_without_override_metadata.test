@@ -1,0 +1,436 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Extra locations feature (variant without overrideMetadata)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create subscription for entity E
+# 02. Create entity E with actual loc (L1) and 2 extra locs (L2, L3)
+# 03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)
+# 04. Dump & reset accumulator: see E with L1 (actual), L2 (extra), L3 (extra)
+# 05. GET geoquery near 1m around L1, to check this is the actual location of the entity
+# 06. Update E L2 without metadata: see success (as overrideMetadata is not used)
+# 07. Update E to add ignoreType metadata in L1 (effectively removing entity location): success
+# 08. GET geoquery near 1m around L1, to check there is no result
+# 09. Update E L2 without metadata: see success (as overrideMetadata is not used)
+# 10. GET geoquery near 1m around L2, to check there is no result
+#
+
+echo "01. Create subscription for entity E"
+echo "===================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E with actual loc (L1) and 2 extra locs (L2, L3)"
+echo "=================================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "L1": {
+    "value": { "type":"Point", "coordinates": [10,10] },
+    "type": "geo:json"
+  },
+  "L2": {
+    "value": { "type":"Point", "coordinates": [20,20] },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  },
+  "L3": {
+    "value": { "type":"Point", "coordinates": [30,30] },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)"
+echo "================================================================"
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo "04. Dump & reset accumulator: see E with L1 (actual), L2 (extra), L3 (extra)"
+echo "============================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05. GET geoquery near 1m around L1, to check this is the actual location of the entity"
+echo "======================================================================================"
+orionCurl --url '/v2/entities?georel=near;maxDistance:1&geometry=point&coords=10,10'
+echo
+echo
+
+
+echo "06. Update E L2 without metadata: see success (as overrideMetadata is not used)"
+echo "==============================================================================="
+payload='{
+  "L2": {
+    "value": { "type": "Point", "coordinates": [20,20] },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "07. Update E to add ignoreType metadata in L1 (effectively removing entity location): success"
+echo "============================================================================================="
+payload='{
+  "L1": {
+    "value": { "type": "Point", "coordinates": [10,10] },
+    "type": "geo:json",
+    "metadata": {
+      "ignoreType": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "08. GET geoquery near 1m around L1, to check there is no result"
+echo "==============================================================="
+orionCurl --url '/v2/entities?georel=near;maxDistance:1&geometry=point&coords=10,10'
+echo
+echo
+
+
+echo "09. Update E L2 without metadata: see success (as overrideMetadata is not used)"
+echo "==============================================================================="
+payload='{
+  "L2": {
+    "value": { "type": "Point", "coordinates": [20,20] },
+    "type": "geo:json"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "${payload}"
+echo
+echo
+
+
+echo "10. GET geoquery near 1m around L2, to check there is no result"
+echo "==============================================================="
+orionCurl --url '/v2/entities?georel=near;maxDistance:1&geometry=point&coords=20,20'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for entity E
+====================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E with actual loc (L1) and 2 extra locs (L2, L3)
+==================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. GET entity E: see actual L1 (actual), L2 (extra), L3 (extra)
+================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 367
+
+{
+    "L1": {
+        "metadata": {},
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                10,
+                10
+            ],
+            "type": "Point"
+        }
+    },
+    "L2": {
+        "metadata": {
+            "ignoreType": {
+                "type": "Boolean",
+                "value": true
+            }
+        },
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                20,
+                20
+            ],
+            "type": "Point"
+        }
+    },
+    "L3": {
+        "metadata": {
+            "ignoreType": {
+                "type": "Boolean",
+                "value": true
+            }
+        },
+        "type": "geo:json",
+        "value": {
+            "coordinates": [
+                30,
+                30
+            ],
+            "type": "Point"
+        }
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+04. Dump & reset accumulator: see E with L1 (actual), L2 (extra), L3 (extra)
+=============================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 422
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "L1": {
+                "metadata": {},
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        10,
+                        10
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L2": {
+                "metadata": {
+                    "ignoreType": {
+                        "type": "Boolean",
+                        "value": true
+                    }
+                },
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        20,
+                        20
+                    ],
+                    "type": "Point"
+                }
+            },
+            "L3": {
+                "metadata": {
+                    "ignoreType": {
+                        "type": "Boolean",
+                        "value": true
+                    }
+                },
+                "type": "geo:json",
+                "value": {
+                    "coordinates": [
+                        30,
+                        30
+                    ],
+                    "type": "Point"
+                }
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+05. GET geoquery near 1m around L1, to check this is the actual location of the entity
+======================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 369
+
+[
+    {
+        "L1": {
+            "metadata": {},
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    10,
+                    10
+                ],
+                "type": "Point"
+            }
+        },
+        "L2": {
+            "metadata": {
+                "ignoreType": {
+                    "type": "Boolean",
+                    "value": true
+                }
+            },
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    20,
+                    20
+                ],
+                "type": "Point"
+            }
+        },
+        "L3": {
+            "metadata": {
+                "ignoreType": {
+                    "type": "Boolean",
+                    "value": true
+                }
+            },
+            "type": "geo:json",
+            "value": {
+                "coordinates": [
+                    30,
+                    30
+                ],
+                "type": "Point"
+            }
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
+
+
+06. Update E L2 without metadata: see success (as overrideMetadata is not used)
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. Update E to add ignoreType metadata in L1 (effectively removing entity location): success
+=============================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. GET geoquery near 1m around L1, to check there is no result
+===============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+09. Update E L2 without metadata: see success (as overrideMetadata is not used)
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. GET geoquery near 1m around L2, to check there is no result
+===============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

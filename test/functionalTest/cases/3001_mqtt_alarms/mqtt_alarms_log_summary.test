@@ -1,0 +1,228 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# NOT VALGRIND READY ...
+# The log summary is heavily dependent on the timing, which is totally off under valgrind ...
+
+
+--NAME--
+MQTT alarms summary
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -logSummary 5
+
+--SHELL--
+
+#
+# FIXME: this test relies on an external service (mqtt.flespi.io) which we don't control
+# It would be better to use a MQTT broker running by us (docker?)
+#
+# 01. Sleep 6 and see 0-0 raised and 0-0 released
+# 02. Create MQTT sub with wrong user/pass
+# 03. Upsert to trigger first MQTT notification, which fails and raises alarm
+# 04. Sleep 5 and see 1-1 raised and 0-0 released
+# 05. Sleep 5 and see 1-0 raised and 0-0 released
+# 06. Update subscription to fix user/pass
+# 07. Upsert to trigger MQTT notification, which successes and release alarm
+# 08. Sleep 5 and see 1-0 raised and 1-1 released
+# 09. Sleep 5 and see 1-0 raised and 1-0 released
+#
+
+echo "01. Sleep 6 and see 0-0 raised and 0-0 released"
+echo "==============================================="
+sleep 6
+cat /tmp/contextBroker.log | grep SUMMARY | grep MQTT | tail -n 1 | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+echo "02. Create MQTT sub with wrong user/pass"
+echo "========================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://mqtt.flespi.io:1883",
+      "user": "user",
+      "passwd": "xxxx",
+      "topic": "sub1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Upsert to trigger MQTT notification, which fails but not re-raises alarm"
+echo "============================================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Float"
+  }
+}'
+orionCurl --url '/v2/entities?options=forcedUpdate,upsert' --payload "$payload"
+echo
+echo
+
+
+echo "04. Sleep 5 and see 1-1 raised and 0-0 released"
+echo "==============================================="
+sleep 5
+cat /tmp/contextBroker.log | grep SUMMARY | grep MQTT | tail -n 1 | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+echo "05. Sleep 5 and see 1-0 raised and 0-0 released"
+echo "==============================================="
+sleep 5
+cat /tmp/contextBroker.log | grep SUMMARY | grep MQTT | tail -n 1 | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+echo "06. Update subscription to fix user/pass"
+echo "========================================"
+payload='{
+  "notification": {
+    "mqtt": {
+      "url": "mqtt://mqtt.flespi.io:1883",
+      "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ",
+      "passwd": "xxxx",
+      "topic": "sub1"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "07. Upsert to trigger third MQTT notification, which is ok and releases alarm"
+echo "============================================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Float"
+  }
+}'
+orionCurl --url '/v2/entities?options=forcedUpdate,upsert' --payload "$payload"
+echo
+echo
+
+
+echo "08. Sleep 5 and see 1-0 raised and 1-1 released"
+echo "==============================================="
+sleep 5
+cat /tmp/contextBroker.log | grep SUMMARY | grep MQTT | tail -n 1 | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+echo "09. Sleep 5 and see 1-0 raised and 1-0 released"
+echo "==============================================="
+sleep 5
+cat /tmp/contextBroker.log | grep SUMMARY | grep MQTT | tail -n 1 | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+--REGEXPECT--
+01. Sleep 6 and see 0-0 raised and 0-0 released
+===============================================
+MQTT connection failure active alarms: 0, raised: (total: 0, new: 0), released: (total: 0, new: 0)
+
+
+02. Create MQTT sub with wrong user/pass
+========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+03. Upsert to trigger MQTT notification, which fails but not re-raises alarm
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+04. Sleep 5 and see 1-1 raised and 0-0 released
+===============================================
+MQTT connection failure active alarms: 1, raised: (total: 1, new: 1), released: (total: 0, new: 0)
+
+
+05. Sleep 5 and see 1-0 raised and 0-0 released
+===============================================
+MQTT connection failure active alarms: 1, raised: (total: 1, new: 0), released: (total: 0, new: 0)
+
+
+06. Update subscription to fix user/pass
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. Upsert to trigger third MQTT notification, which is ok and releases alarm
+=============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+08. Sleep 5 and see 1-0 raised and 1-1 released
+===============================================
+MQTT connection failure active alarms: 0, raised: (total: 1, new: 0), released: (total: 1, new: 1)
+
+
+09. Sleep 5 and see 1-0 raised and 1-0 released
+===============================================
+MQTT connection failure active alarms: 0, raised: (total: 1, new: 0), released: (total: 1, new: 0)
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

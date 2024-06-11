@@ -1,0 +1,365 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Cache refresh keeps newer information from cache in successfull notification scenario
+
+--SHELL-INIT--
+dbInit CB
+
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("61960a51596aa2623032357d"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:9997/notify",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 1546337410,
+        "entities" : [
+                {
+                        "id" : "E",
+                        "isPattern" : "false",
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "lastNotification" : NumberLong(1546337410),
+        "lastSuccess" : NumberLong(1546337410),
+        "lastSuccessCode": NumberLong(211),
+})'
+
+# t 100 -> MongoDB interactions
+# t 212 -> Cache sync each 5 seconds
+brokerStart CB 100,212 IPv4 -subCacheIval 5 --cache
+
+accumulatorStart
+
+--SHELL--
+
+#
+# FIXME: regex expression for "the present" dates use 202* pattern. Thus, this
+# test will be next a fix in January 1st, 2030 for the next ten years ;)
+#
+# Relevant fields in step 00
+# - lastNotification:   2019-01-01T10:10:10Z (1546337410)
+# - lastSuccess:        2019-01-01T10:10:10Z (1546337410)
+# - lastSuccessCode:    211
+# - status:             active (last changed: 2019-01-01T10:10:10Z)
+#
+# 00. (Done before starting Context Broker) Insert crafted subscription in DB with lastNotification/Success in a the past and status code 211
+# 01. GET /v2/subscriptions and see lastNotification/Success in a the past and status code 211 and without timeSent
+# 02. Create entity E to trigger notification
+# 03. GET /v2/subscriptions and see lastNotification/Success in the present and status code 200 (as cache data is newer), timesSent 1
+# 04. Get doc in DB before cache refresh and see lastNotification/Success in the past and status code 211 but no count
+# 05. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
+# 06. Get doc in DB after cache refresh and see lastNotification/Success in the present and status code 200 and count 1
+#
+
+echo "00. (Done before starting Context Broker) Insert crafted subscription in DB with lastNotification/Success in the past and status code 211"
+echo "========================================================================================================================================="
+echo
+echo
+
+
+echo "01. GET /v2/subscriptions and see lastNotification/Success in a the past and status code 211 and without timeSent"
+echo "================================================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "02. Create entity E to trigger notification"
+echo "==========================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET /v2/subscriptions and see lastNotification/Success in the present and status code 200 (as cache data is newer), timesSent 1"
+echo "==================================================================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Get doc in DB before cache refresh and see lastNotification/Success in the past and status code 211 but no count"
+echo "===================================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+echo "05. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same"
+echo "==============================================================================================="
+sleep 5.5s
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "06. Get doc in DB after cache refresh and see lastNotification/Success in the present and status code 200 and count 1"
+echo "====================================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+--REGEXPECT--
+00. (Done before starting Context Broker) Insert crafted subscription in DB with lastNotification/Success in the past and status code 211
+=========================================================================================================================================
+
+
+01. GET /v2/subscriptions and see lastNotification/Success in a the past and status code 211 and without timeSent
+=================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 406
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "2019-01-01T10:10:10.000Z",
+            "lastSuccess": "2019-01-01T10:10:10.000Z",
+            "lastSuccessCode": 211,
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+02. Create entity E to trigger notification
+===========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. GET /v2/subscriptions and see lastNotification/Success in the present and status code 200 (as cache data is newer), timesSent 1
+===================================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 420
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "202REGEX(.*)",
+            "lastSuccess": "202REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Get doc in DB before cache refresh and see lastNotification/Success in the past and status code 211 but no count
+====================================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": "false",
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "lastNotification": 1546337410,
+    "lastSuccess": 1546337410,
+    "lastSuccessCode": 211,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 1546337410,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+05. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same
+===============================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 420
+
+[
+    {
+        "id": "61960a51596aa2623032357d",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:9997/notify"
+            },
+            "lastNotification": "202REGEX(.*)",
+            "lastSuccess": "202REGEX(.*)",
+            "lastSuccessCode": 200,
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+06. Get doc in DB after cache refresh and see lastNotification/Success in the present and status code 200 and count 1
+=====================================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "count": 1,
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": "false",
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "failsCounter": 0,
+    "format": "normalized",
+    "lastNotification": REGEX(1[6-9]\d+),
+    "lastSuccess": REGEX(1[6-9]\d+),
+    "lastSuccessCode": 200,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 1546337410,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

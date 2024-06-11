@@ -32,7 +32,7 @@ brokerStart CP1 0
 --SHELL--
 
 #
-# 
+#
 # 01. Create entity with geodata and string object
 # 02. Check entity in CB
 # 03. Get entity from mongodb
@@ -86,8 +86,8 @@ echo
 
 echo "03. Get entity from mongodb"
 echo "==========================="
-m=$(mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
-echo $m | python -mjson.tool
+m=$(mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
+echo $m | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -128,8 +128,8 @@ echo
 
 echo "06. Get entity from mongodb"
 echo "==========================="
-m=$(mongoCmd ${CB_DB_NAME} 'db.entities.find({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
-echo $m | python -mjson.tool
+m=$(mongoCmd ${CB_DB_NAME} 'db.entities.findOne({ "_id" : { "id" : "urn:ngsi-ld:Store:004", "type": "Store", "servicePath" : "/" }})')
+echo $m | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -138,18 +138,18 @@ echo
 01. Create entity with geodata and string object
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 02. Check entity in CB
 ======================
 HTTP/1.1 200 OK
-Content-Length: 381
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 381
 
 {
     "address": {
@@ -249,20 +249,20 @@ Date: REGEX(.*)
 04. Register CP1 for Entity in step 01
 ======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 05. Check entity in CB
 ======================
 HTTP/1.1 200 OK
-Content-Length: 381
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 381
 
 {
     "address": {

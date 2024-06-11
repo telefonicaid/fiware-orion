@@ -31,12 +31,13 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
 #include "cache/subCache.h"
 
-#include "mongoBackend/MongoGlobal.h"  // processConditionVector
+#include "mongoBackend/MongoGlobal.h"  // composeDatabaseName
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "mongoBackend/mongoUpdateSubscription.h"
@@ -56,570 +57,80 @@ using ngsiv2::SubscriptionUpdate;
 using ngsiv2::EntID;
 
 
-
 /* ****************************************************************************
 *
-* setExpiration -
-*/
-static void setExpiration(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.expiresProvided)
-  {
-    setExpiration(subUp, b);
-  }
-  else
-  {
-    if (subOrig.hasField(CSUB_EXPIRATION))
-    {
-      int64_t expires = getIntOrLongFieldAsLongF(subOrig, CSUB_EXPIRATION);
-
-      b->append(CSUB_EXPIRATION, (long long) expires);
-      LM_T(LmtMongo, ("Subscription expiration: %lu", expires));
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
+* setNotificationInfo -
 *
-* setHttpInfo -
+* This function does the cleanup ($unset) corresponding to a potential change
+* of notification type. Then, it calls the setNotificationInfo() in MongoCommonSubscription.h/cpp
 */
-static void setHttpInfo(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
+void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, orion::BSONObjBuilder* unsetB)
 {
-  if (subUp.notificationProvided)
+  if (sub.notification.type == ngsiv2::HttpNotification)
   {
-    setHttpInfo(subUp, b);
-  }
-  else
-  {
-    // 'reference' is a mandatory field and 'custom' has a clear mapping to false in the case of missing field
-    std::string reference = getStringFieldF(subOrig, CSUB_REFERENCE);
-    bool        custom    = subOrig.hasField(CSUB_CUSTOM) ? getBoolFieldF(subOrig, CSUB_CUSTOM) : false;
+    unsetB->append(CSUB_MQTTTOPIC, 1);
+    unsetB->append(CSUB_MQTTQOS,   1);
+    unsetB->append(CSUB_MQTTRETAIN, 1);
+    unsetB->append(CSUB_USER,      1);
+    unsetB->append(CSUB_PASSWD,    1);
 
-    b->append(CSUB_REFERENCE, reference);
-    b->append(CSUB_CUSTOM,    custom);
-
-    LM_T(LmtMongo, ("Subscription reference: %s", reference.c_str()));
-    LM_T(LmtMongo, ("Subscription custom:    %s", custom? "true" : "false"));
-
-    if (subOrig.hasField(CSUB_METHOD))
+    if  (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
     {
-      std::string method = getStringFieldF(subOrig, CSUB_METHOD);
-
-      b->append(CSUB_METHOD, method);
-      LM_T(LmtMongo, ("Subscription method: %s", method.c_str()));
-    }
-
-    if (subOrig.hasField(CSUB_HEADERS))
-    {
-      orion::BSONObj headers = getObjectFieldF(subOrig, CSUB_HEADERS);
-
-      b->append(CSUB_HEADERS, headers);
-      LM_T(LmtMongo, ("Subscription headers: %s", headers.toString().c_str()));
-    }
-
-    if (subOrig.hasField(CSUB_QS))
-    {
-      orion::BSONObj qs = getObjectFieldF(subOrig, CSUB_QS);
-
-      b->append(CSUB_QS, qs);
-      LM_T(LmtMongo, ("Subscription qs: %s", qs.toString().c_str()));
-    }
-
-    if (subOrig.hasField(CSUB_PAYLOAD))
-    {
-      std::string payload = getStringFieldF(subOrig, CSUB_PAYLOAD);
-
-      b->append(CSUB_PAYLOAD, payload);
-      LM_T(LmtMongo, ("Subscription payload: %s", payload.c_str()));
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setThrottling -
-*/
-static void setThrottling(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.throttlingProvided)
-  {
-    setThrottling(subUp, b);
-  }
-  else
-  {
-    if (subOrig.hasField(CSUB_THROTTLING))
-    {
-      long long throttling = getIntOrLongFieldAsLongF(subOrig, CSUB_THROTTLING);
-
-      b->append(CSUB_THROTTLING, throttling);
-      LM_T(LmtMongo, ("Subscription throttling: %lu", throttling));
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDescription -
-*/
-static void setDescription(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.descriptionProvided)
-  {
-    setDescription(subUp, b);
-  }
-  else
-  {
-    if (subOrig.hasField(CSUB_DESCRIPTION))
-    {
-      std::string description = getStringFieldF(subOrig, CSUB_DESCRIPTION);
-
-      b->append(CSUB_DESCRIPTION, description);
-      LM_T(LmtMongo, ("Subscription description: %s", description.c_str()));
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setStatus -
-*/
-static void setStatus(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.statusProvided)
-  {
-    setStatus(subUp, b);
-  }
-  else
-  {
-    if (subOrig.hasField(CSUB_STATUS))
-    {
-      std::string status = getStringFieldF(subOrig, CSUB_STATUS);
-
-      b->append(CSUB_STATUS, status);
-      LM_T(LmtMongo, ("Subscription status: %s", status.c_str()));
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setEntities -
-*/
-static void setEntities(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.subjectProvided && !subUp.fromNgsiv1)
-  {
-    //
-    // NGSIv1 doesn't allow to change entities,
-    // see https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
-    //
-    setEntities(subUp, b);
-  }
-  else
-  {
-    orion::BSONArray entities = getArrayFieldF(subOrig, CSUB_ENTITIES);
-
-    b->append(CSUB_ENTITIES, entities);
-    LM_T(LmtMongo, ("Subscription entities: %s", entities.toString().c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setAttrs -
-*/
-static void setAttrs(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.notificationProvided)
-  {
-    setAttrs(subUp, b);
-  }
-  else
-  {
-    orion::BSONArray attrs = getArrayFieldF(subOrig, CSUB_ATTRS);
-
-    b->append(CSUB_ATTRS, attrs);
-    LM_T(LmtMongo, ("Subscription attrs: %s", attrs.toString().c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setCondsNgsiv1 -
-*
-* This method could be removed along with the rest of NGSIv1 stuff
-*/
-static void setCondsNgsiv1
-(
-  const Subscription&              sub,
-  const orion::BSONObj&            subOrig,
-  orion::BSONObjBuilder*           b
-)
-{
-  //
-  // Similar to setConds() in MongoCommonSubscripion.cpp, but
-  // entities and notifications attributes are not taken from sub but from subOrig
-  //
-  // Most of the following code is copied from mongoGetSubscription logic but, given
-  // that this function is temporal, I don't worry too much about DRY-ness here
-
-  std::vector<EntID>        entities;
-  std::vector<orion::BSONElement>  ents = getFieldF(subOrig, CSUB_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < ents.size(); ++ix)
-  {
-    orion::BSONObj  ent       = ents[ix].embeddedObject();
-    std::string     id        = getStringFieldF(ent, CSUB_ENTITY_ID);
-    std::string     type      = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string     isPattern = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
-    EntID           en;
-
-    if (isFalse(isPattern))
-    {
-      en.id = id;
-    }
-    else
-    {
-      en.idPattern = id;
-    }
-    en.type = type;
-
-    entities.push_back(en);
-  }
-
-  std::vector<std::string> attributes;
-  std::vector<std::string> metadata;
-
-  setStringVectorF(subOrig, CSUB_ATTRS, &attributes);
-
-  if (subOrig.hasField(CSUB_METADATA))
-  {
-    setStringVectorF(subOrig, CSUB_METADATA, &metadata);
-  }
-
-  /* Conds vector */
-  orion::BSONArray  conds = processConditionVector(sub.subject.condition.attributes,
-                                            entities,
-                                            attributes);
-
-  b->append(CSUB_CONDITIONS, conds);
-  LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
-}
-
-
-
-/* ****************************************************************************
-*
-* setConds
-*/
-static void setConds
-(
-  const SubscriptionUpdate&        subUp,
-  const orion::BSONObj&            subOrig,
-  orion::BSONObjBuilder*           b
-)
-{
-  if (subUp.subjectProvided)
-  {
-    std::string               status;
-    HttpInfo                  httpInfo;
-    std::vector<std::string>  notifAttributesV;
-    std::vector<std::string>  metadataV;
-
-    if (subUp.statusProvided)
-    {
-      status = subUp.status;
-    }
-    else
-    {
-      status = subOrig.hasField(CSUB_STATUS)? getStringFieldF(subOrig, CSUB_STATUS) : STATUS_ACTIVE;
-    }
-
-    if (subUp.notificationProvided)
-    {
-      httpInfo         = subUp.notification.httpInfo;
-      metadataV        = subUp.notification.metadata;
-      notifAttributesV = subUp.notification.attributes;
-    }
-    else
-    {
-      httpInfo.fill(subOrig);
-      setStringVectorF(subOrig, CSUB_ATTRS, &notifAttributesV);
-
-      if (subOrig.hasField(CSUB_METADATA))
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
       {
-        setStringVectorF(subOrig, CSUB_METADATA, &metadataV);
+        unsetB->append(CSUB_PAYLOAD, 1);
       }
     }
-
-    if (subUp.fromNgsiv1)
+    else if (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Json)
     {
-      //
-      // In NGSIv1 is legal updating conditions without updating entities, which is not possible
-      // in NGSIv2 (as both entities and coditions are part of 'subject' and they are updated as
-      // a whole). In addition, NGSIv1 doesn't allow to update notification attributes. Both
-      // (entities and notification attributes) are passed in subOrig.
-      //
-      // See: https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html
-      //
-      setCondsNgsiv1(subUp, subOrig, b);
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
     }
-    else
+    else  // (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
     {
-      setConds(subUp, notifAttributesV, b);
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_JSON, 1);
     }
   }
-  else
+  else  // MqttNotification
   {
-    orion::BSONArray conds = getArrayFieldF(subOrig, CSUB_CONDITIONS);
+    unsetB->append(CSUB_TIMEOUT, 1);
+    unsetB->append(CSUB_METHOD,  1);
+    unsetB->append(CSUB_HEADERS, 1);
+    unsetB->append(CSUB_QS,      1);
 
-    b->append(CSUB_CONDITIONS, conds);
-    LM_T(LmtMongo, ("Subscription conditions: %s", conds.toString().c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setCount -
-*/
-static void setCount(const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subOrig.hasField(CSUB_COUNT))
-  {
-    long long count = getIntOrLongFieldAsLongF(subOrig, CSUB_COUNT);
-    setCount(count, b);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setLastNotification -
-*
-*/
-static void setLastNotification(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
-{
-  //
-  // FIXME P1: if CSUB_LASTNOTIFICATION is not in the original doc, it will also not be in the new doc.
-  //           Is this necessary?
-  //           The implementation would get a lot simpler if we ALWAYS add CSUB_LASTNOTIFICATION and CSUB_COUNT
-  //           to 'newSub'
-  //
-  if (!subOrig.hasField(CSUB_LASTNOTIFICATION))
-  {
-    return;
-  }
-
-  long long lastNotification = getIntOrLongFieldAsLongF(subOrig, CSUB_LASTNOTIFICATION);
-
-  //
-  // Compare with 'lastNotificationTime', that might come from the sub-cache.
-  // If the cached value of lastNotificationTime is higher, then use it.
-  //
-  if (subCacheP != NULL && (subCacheP->lastNotificationTime > lastNotification))
-  {
-    lastNotification = subCacheP->lastNotificationTime;
-  }
-
-  setLastNotification(lastNotification, b);
-}
-
-
-
-/* ****************************************************************************
-*
-* setLastFailure -
-*/
-static void setLastFailure(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
-{
-  long long   lastFailure       = subOrig.hasField(CSUB_LASTFAILURE)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTFAILURE) : -1;
-  std::string lastFailureReason = subOrig.hasField(CSUB_LASTFAILUREASON) ? getStringFieldF(subOrig, CSUB_LASTFAILUREASON)      : "";
-
-  //
-  // Compare with 'lastFailure' from the sub-cache.
-  // If the cached value of lastFailure is higher, then use it.
-  //
-  if ((subCacheP != NULL) && (subCacheP->lastFailure > lastFailure))
-  {
-    lastFailure       = subCacheP->lastFailure;
-    lastFailureReason = subCacheP->lastFailureReason;
-  }
-
-  setLastFailure(lastFailure, lastFailureReason, b);
-}
-
-
-
-/* ****************************************************************************
-*
-* setLastSuccess -
-*/
-static void setLastSuccess(const orion::BSONObj& subOrig, CachedSubscription* subCacheP, orion::BSONObjBuilder* b)
-{
-  long long lastSuccess     = subOrig.hasField(CSUB_LASTSUCCESS)     ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESS)     : -1;
-  long long lastSuccessCode = subOrig.hasField(CSUB_LASTSUCCESSCODE) ? getIntOrLongFieldAsLongF(subOrig, CSUB_LASTSUCCESSCODE) : -1;
-
-  //
-  // Compare with 'lastSuccess' from the sub-cache.
-  // If the cached value of lastSuccess is higher, then use it.
-  //
-  if ((subCacheP != NULL) && (subCacheP->lastSuccess > lastSuccess))
-  {
-    lastSuccess     = subCacheP->lastSuccess;
-    lastSuccessCode = subCacheP->lastSuccessCode;
-  }
-
-  setLastSuccess(lastSuccess, lastSuccessCode, b);
-}
-
-
-
-/* ****************************************************************************
-*
-* setExpression -
-*/
-static void setExpression(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.subjectProvided)
-  {
-    setExpression(subUp, b);
-  }
-  else
-  {
-    orion::BSONObj expression;
-
-    if (subOrig.hasField(CSUB_EXPR))
+    if (!sub.notification.mqttInfo.providedAuth)
     {
-      expression = getObjectFieldF(subOrig, CSUB_EXPR);
-    }
-    else
-    {
-      /* This part of the if clause corresponds to csub that were created before expression was invented
-       * (using an old Orion version) which are now being updated. In this case, we introduce an empty
-       * expression, but with all the expected fiedls */
-      orion::BSONObjBuilder bob;
-
-      bob.append(CSUB_EXPR_Q, "");
-      bob.append(CSUB_EXPR_MQ, "");
-      bob.append(CSUB_EXPR_GEOM, "");
-      bob.append(CSUB_EXPR_COORDS, "");
-      bob.append(CSUB_EXPR_GEOREL, "");
-
-      expression = bob.obj();
-    }
-    b->append(CSUB_EXPR, expression);
-    LM_T(LmtMongo, ("Subscription expression: %s", expression.toString().c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setFormat -
-*/
-static void setFormat(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.attrsFormatProvided)
-  {
-    setFormat(subUp, b);
-  }
-  else
-  {
-    std::string format = getStringFieldF(subOrig, CSUB_FORMAT);
-
-    b->append(CSUB_FORMAT, format);
-    LM_T(LmtMongo, ("Subscription format: %s", format.c_str()));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setBlacklist -
-*/
-static void setBlacklist(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.blacklistProvided)
-  {
-    setBlacklist(subUp, b);
-  }
-  else
-  {
-    bool bList = subOrig.hasField(CSUB_BLACKLIST)? getBoolFieldF(subOrig, CSUB_BLACKLIST) : false;
-
-    b->append(CSUB_BLACKLIST, bList);
-    LM_T(LmtMongo, ("Subscription blacklist: %s", bList? "true" : "false"));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setOnlyChanged -
-*/
-static void setOnlyChanged(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.onlyChangedProvided)
-  {
-    setOnlyChanged(subUp, b);
-  }
-  else
-  {
-    bool oList = subOrig.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(subOrig, CSUB_ONLYCHANGED) : false;
-
-    b->append(CSUB_ONLYCHANGED, oList);
-    LM_T(LmtMongo, ("Subscription onlyChanged: %s", oList? "true" : "false"));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setMetadata -
-*/
-static void setMetadata(const SubscriptionUpdate& subUp, const orion::BSONObj& subOrig, orion::BSONObjBuilder* b)
-{
-  if (subUp.notificationProvided)
-  {
-    setMetadata(subUp, b);
-  }
-  else
-  {
-    //
-    // Note that if subOrig doesn't have CSUB_METADATA (e.g. old subscription in the DB created before
-    // this feature) BSONArray constructor ensures an empty array
-    //
-    orion::BSONArray metadata;
-
-    if (subOrig.hasField(CSUB_METADATA))
-    {
-      metadata = getArrayFieldF(subOrig, CSUB_METADATA);
+      unsetB->append(CSUB_USER,   1);
+      unsetB->append(CSUB_PASSWD, 1);
     }
 
-    b->append(CSUB_METADATA, metadata);
-    LM_T(LmtMongo, ("Subscription metadata: %s", metadata.toString().c_str()));
+    if  (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
+    }
+    else if (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+    {
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else  // (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_PAYLOAD, 1);
+    }
   }
+
+  setNotificationInfo(sub, setB);
 }
 
 
@@ -632,8 +143,7 @@ static void updateInCache
 (
   const orion::BSONObj&      doc,
   const SubscriptionUpdate&  subUp,
-  const std::string&         tenant,
-  long long                  lastNotification
+  const std::string&         tenant
 )
 {
   //
@@ -683,19 +193,6 @@ static void updateInCache
   // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
   //
 
-
-  // 0. Lookup matching subscription in subscription-cache
-
-  cacheSemTake(__FUNCTION__, "Updating cached subscription");
-
-  //
-  // Second lookup for the same in the mongo update subscription process.
-  // However, we have to do it, as the item in the cache could have been changed in the meanwhile.
-  //
-  LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
-
-  CachedSubscription* subCacheP        = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
-  char*               servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
   std::string         q;
   std::string         mq;
   std::string         geom;
@@ -703,6 +200,7 @@ static void updateInCache
   std::string         georel;
   RenderFormat        renderFormat = NGSI_V2_NORMALIZED;  // Default value
 
+  // 0. Field extraction from doc is done before cacheSemTake() to save some small time
   if (doc.hasField(CSUB_FORMAT))
   {
     renderFormat = stringToRenderFormat(getStringFieldF(doc, CSUB_FORMAT));
@@ -719,14 +217,80 @@ static void updateInCache
     georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
   }
 
+  // 1. Lookup matching subscription in subscription-cache
+
+  cacheSemTake(__FUNCTION__, "Updating cached subscription");
+
+  CachedSubscription* subCacheP        = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
+  char*               servicePathCache = (char*) ((subCacheP == NULL)? "" : subCacheP->servicePath);
+
+  LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
+
+  long long    lastNotificationTime;
+  long long    lastFailure;
+  std::string  lastFailureReason;
+  long long    lastSuccess;
+  long long    lastSuccessCode;
+  long long    count;
+  long long    failsCounter;
+  long long    failsCounterFromDb;
+  bool         failsCounterFromDbValid;
+  std::string  status;
+  double       statusLastChange;
+
+  if (subCacheP != NULL)
+  {
+    lastNotificationTime = subCacheP->lastNotificationTime;
+    lastFailure          = subCacheP->lastFailure;
+    lastFailureReason    = subCacheP->lastFailureReason;
+    lastSuccess          = subCacheP->lastSuccess;
+    lastSuccessCode      = subCacheP->lastSuccessCode;
+    count                = subCacheP->count;
+    failsCounter         = subCacheP->failsCounter;
+    failsCounterFromDb   = subCacheP->failsCounterFromDb;
+    failsCounterFromDbValid = subCacheP->failsCounterFromDbValid;
+    status               = subCacheP->status;
+    statusLastChange     = subCacheP->statusLastChange;
+  }
+  else
+  {
+    lastNotificationTime = -1;
+    lastFailure          = -1;
+    lastFailureReason    = "";
+    lastSuccess          = -1;
+    lastSuccessCode      = -1;
+    count                = 0;
+    failsCounter         = 0;
+    failsCounterFromDb   = 0;
+    failsCounterFromDbValid = false;
+    status               = "";
+    statusLastChange     = -1;
+  }
+
+  // different for other fields grabbed from the cache, status could be included in the sub update
+  // thus, effective status is the newest one in cache or in DB
+  double statusLastChangeAtDb = doc.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(doc, CSUB_STATUS_LAST_CHANGE) : -1;
+  std::string statusAtDb      = doc.hasField(CSUB_STATUS)?             getStringFieldF(doc, CSUB_STATUS)             : "";
+
+  std::string effectiveStatus      = statusLastChange > statusLastChangeAtDb ? status           : statusAtDb;
+  double effectiveStatusLastChante = statusLastChange > statusLastChangeAtDb ? statusLastChange : statusLastChangeAtDb;
 
   int mscInsert = mongoSubCacheItemInsert(tenant.c_str(),
                                           doc,
                                           subUp.id.c_str(),
                                           servicePathCache,
-                                          lastNotification,
+                                          lastNotificationTime,
+                                          lastFailure,
+                                          lastFailureReason,
+                                          lastSuccess,
+                                          lastSuccessCode,
+                                          count,
+                                          failsCounter,
+                                          failsCounterFromDb,
+                                          failsCounterFromDbValid,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
-                                          doc.hasField(CSUB_STATUS)? getStringFieldF(doc, CSUB_STATUS) : STATUS_ACTIVE,
+                                          effectiveStatus,
+                                          effectiveStatusLastChante,
                                           q,
                                           mq,
                                           geom,
@@ -751,7 +315,6 @@ static void updateInCache
 }
 
 
-
 /* ****************************************************************************
 *
 * mongoUpdateSubscription -
@@ -773,16 +336,70 @@ std::string mongoUpdateSubscription
 
   reqSemTake(__FUNCTION__, "ngsiv2 update subscription request", SemWriteOp, &reqSemTaken);
 
-  // Get subscription from DB
-  SubscriptionId  subId(subUp.id);
-  orion::BSONObj  subOrig;
+  std::string      servicePath = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
+  double           now         = getCurrentTime();
 
-  orion::OID      id = orion::OID(subId.get());
+  // Previous versions of the sub up logic calculate the final document mixing the
+  // existing one in DB plus the additions from cache. However, this is complex and involve
+  // more operations on MongoDB that the current approach, based in findAndModify and
+  // in $set and $unset operations
+  //
+  // Note also that "dynamic fields" that cannot be updated with PATCH subscription
+  // (count, lastNotification, etc.) are not touched: they have their own
+  // updating logic in other places of the code (in cache sync logic)
+
+  orion::BSONObjBuilder setB;
+  orion::BSONObjBuilder unsetB;
+
+  setServicePath(servicePath, &setB);
+
+  if (subUp.subjectProvided)       setEntities(subUp, &setB, subUp.fromNgsiv1);
+  if (subUp.subjectProvided)       setConds(subUp, &setB);
+  if (subUp.subjectProvided)       setOperations(subUp, &setB);
+  if (subUp.subjectProvided)       setExpression(subUp, &setB);
+  if (subUp.notificationProvided)  setNotificationInfo(subUp, &setB, &unsetB);
+  if (subUp.notificationProvided)  setAttrs(subUp, &setB);
+  if (subUp.notificationProvided)  setMetadata(subUp, &setB);
+  if (subUp.notificationProvided)  setMaxFailsLimit(subUp, &setB);
+  if (subUp.expiresProvided)       setExpiration(subUp, &setB);
+  if (subUp.throttlingProvided)    setThrottling(subUp, &setB);
+  if (subUp.statusProvided)        setStatus(subUp.status, &setB, now);
+  if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
+  if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
+  if (subUp.coveredProvided)       setCovered(subUp, &setB);
+  if (subUp.notifyOnMetadataChangeProvided) setNotifyOnMetadataChange(subUp, &setB);
+  if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
+
+  // Description is special, as "" value removes the field
+  if (subUp.descriptionProvided)
+  {
+    if (subUp.description.empty())
+    {
+      setDescription(subUp, &unsetB);
+    }
+    else
+    {
+      setDescription(subUp, &setB);
+    }
+  }
+
+  orion::BSONObjBuilder update;
+  if (setB.nFields() > 0)
+  {
+    update.append("$set", setB.obj());
+  }
+  if (unsetB.nFields() > 0)
+  {
+    update.append("$unset", unsetB.obj());
+  }
+
+  // Update in DB
+  orion::BSONObjBuilder id;
+  id.append("_id", orion::OID(subUp.id));
 
   std::string err;
-  orion::BSONObjBuilder bob;
-  bob.append("_id", id);
-  if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, bob.obj(), &subOrig, &err) && (err != ""))
+  orion::BSONObj result;
+  if (!collectionFindAndModify(composeDatabaseName(tenant), COL_CSUBS, id.obj(), update.obj(), true, &result, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
@@ -790,7 +407,10 @@ std::string mongoUpdateSubscription
     return "";
   }
 
-  if (subOrig.isEmpty())
+  // Note the actual value is not in reply itself, but in the key "value", see
+  // https://jira.mongodb.org/browse/CDRIVER-4173
+  // If value is null then it means that findAndModify didn't find any matching document
+  if (getFieldF(result, "value").isNull())
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (no subscriptions found)", reqSemTaken);
     oe->fill(SccContextElementNotFound, "subscription id not found");
@@ -798,63 +418,10 @@ std::string mongoUpdateSubscription
     return "";
   }
 
-  // Build the BSON object (using subOrig as starting point plus some info from cache)
-  orion::BSONObjBuilder  b;
-  std::string            servicePath      = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
-  long long              lastNotification = 0;
-  CachedSubscription*    subCacheP        = NULL;
-
-  if (!noCache)
-  {
-    cacheSemTake(__FUNCTION__, "Looking for subscription in cache subscription");
-
-    subCacheP = subCacheItemLookup(tenant.c_str(), subUp.id.c_str());
-
-    cacheSemGive(__FUNCTION__, "Looking for subscription in cache subscription");
-  }
-
-  setExpiration(subUp, subOrig, &b);
-  setHttpInfo(subUp, subOrig, &b);
-  setThrottling(subUp, subOrig, &b);
-  setServicePath(servicePath, &b);
-  setDescription(subUp, subOrig, &b);
-  setStatus(subUp, subOrig, &b);
-  setEntities(subUp, subOrig, &b);
-  setAttrs(subUp, subOrig, &b);
-  setMetadata(subUp, subOrig, &b);
-  setBlacklist(subUp, subOrig, &b);
-  setOnlyChanged(subUp, subOrig, &b);
-
-  setConds(subUp, subOrig, &b);
-
-  setCount(subOrig, &b);
-
-  setExpression(subUp, subOrig, &b);
-  setFormat(subUp, subOrig, &b);
-
-  // last* field take into account potenatially newer information in the cache
-  setLastNotification(subOrig, subCacheP, &b);
-  setLastFailure(subOrig, subCacheP, &b);
-  setLastSuccess(subOrig, subCacheP, &b);
-
-  orion::BSONObj doc = b.obj();
-
-  // Update in DB
-  orion::BSONObjBuilder bobb;
-  bobb.append("_id", orion::OID(subUp.id));
-
-  if (!orion::collectionUpdate(composeDatabaseName(tenant), COL_CSUBS, bobb.obj(), doc, false, &err))
-  {
-    reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
-    oe->fill(SccReceiverInternalError, err);
-
-    return "";
-  }
-
   // Update in cache
   if (!noCache)
   {
-    updateInCache(doc, subUp, tenant, lastNotification);
+    updateInCache(getObjectFieldF(result, "value"), subUp, tenant);
   }
 
   reqSemGive(__FUNCTION__, "ngsiv2 update subscription request", reqSemTaken);

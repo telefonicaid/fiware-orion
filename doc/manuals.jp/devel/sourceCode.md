@@ -19,10 +19,12 @@
 * [src/lib/mongoBackend/](#srclibmongobackend) (データベース操作の実装)
 * [src/lib/mongoDriver/](#srclibmongodriver) (MongoDB へのデータベース・インターフェース)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI 通知)
+* [src/lib/mqtt/](#srclibmqtt) (MQTT 通知)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (アラーム管理の実装)
 * [src/lib/cache/](#srclibcache) (サブスクリプション・キャッシュの実装)
 * [src/lib/logSummary/](#srcliblogsummary) (ログ・サマリの実装)
 * [src/lib/metricsMgr/](#srclibmetricsmgr) (メトリック・マネージャの実装)
+* [src/lib/expressions/](#srclibexpressions) (カスタム通知式のサポート)
 
 <a name="srcappcontextbroker"></a>
 ## src/app/contextBroker/
@@ -430,43 +432,81 @@ typedef struct MongoConnection
 
 <a name="srclibngsinotify"></a>
 ## src/lib/ngsiNotify/
-**ngsiNotify** ライブラリは、サブスクリプションへの通知が実装される場所です。エンティティが作成または変更されたとき、またはサブスクリプションが作成または変更されたときに、アクティブなサブスクリプション/エンティティがある場合、サブスクライバに通知が送信され、そのことを確認するのはこのライブラリのタスクです。[**mongoBackend**](#srclibmongobackend) は通知するタイミングを決定し、**ngsiNotify** は外部ライブラリ [libcurl](https://curl.haxx.se/libcurl/) の助けを借りて通知を実行します。実際には、[**rest** ライブラリ](#srclibrest)からの関数が使用されます : `httpRequestSend()`。このライブラリのもう1つの重要な側面は、必要に応じてスレッド・プールを使用して別々のスレッドによって通知が送信されることです。
+**ngsiNotify** ライブラリは、サブスクリプションへの通知が実装される場所です。エンティティが作成または変更されたとき、またはサブスクリプションが作成または変更されたときに、アクティブなサブスクリプション/エンティティがある場合、サブスクライバに通知が送信され、そのことを確認するのはこのライブラリのタスクです。
+[**mongoBackend**](#srclibmongobackend) はいつ通知するかを決定し、**ngsiNotify** は、場合に応じて、外部ライブラリの助けを借りて通知を実行します:
+
+* HTTP 通知の場合、[libcurl](https://curl.haxx.se/libcurl/) が使用されます。実際には、
+  [**rest**ライブラリ](#srclibrest) の関数 `httpRequestSend()` が使用されます
+* MQTT 通知には、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) が使用されます。
+  実際には、[**mqtt** ライブラリ](#srclibmqtt) の関数が使用されます: `sendMqttNotification()`
+
+このライブラリのもう1つの重要な側面は、必要に応じてスレッド・プールを使用して、通知が個別のスレッドによって送信されることです。
 
 Orionは、[CLI パラメータ](../admin/cli.md) `-notificationMode` を使用して、Orion は、通知を送信するためのスレッド・プール (`-notificationMode threadpool`) で開始することができます。その場合、Orion の起動中にスレッド・プールが作成され、これらのスレッドは通知キュー内の新しいアイテムを待機し、アイテムが存在するとキューから取り出して処理し、問題の通知を送信します。スレッド・プールが使用されない場合、通知が送信されるたびにスレッドが作成されます。`-notificationMode` のデフォルト値は "transient" です。 通知モードの詳細については、[Orion 管理マニュアルのこのセクション](../admin/perf_tuning.md#notification-modes-and-performance) を参照してください。
 
-このモジュールは、属性の更新/作成により、常に `processOnChangeConditionForUpdateContext()` から呼び出されます (図 [MD-01](mongoBackend.md#flow-md-01) を参照)。
+このモジュールは、属性の更新/作成により、常に `processNotification()` から呼び出されます (図 [MD-01](mongoBackend.md#flow-md-01) を参照)。
 
-次の2つの図は、スレッド・プールの有無によるコンテキスト・エンティティ通知のプログラム・フローを示しています。
+次の4つの図は、HTTP 通知とMQTT 通知の両方の場合に、スレッド・プールがある場合とない場合の
+コンテキスト・エンティティ通知のプログラム・フローを示しています。
 
 <a name="flow-nf-01"></a>
-![Notification on entity-attribute Update/Creation without thread pool](../../manuals/devel/images/Flow-NF-01.png)
+![HTTP Notification on entity-attribute Update/Creation without thread pool](../../manuals/devel/images/Flow-NF-01.png)
 
-_NF-01: スレッド・プールなしのエンティティ属性更新/作成に関する通知_
+_NF-01: スレッド・プールなしのエンティティ属性更新/作成に関する HTTP 通知_
 
-* `SenderThreadParams` のベクトルが構築され、このベクトルの各項目は1つの通知に対応します (ステップ1)
+* `SenderThreadParams` オブジェクトは、通知に対応するパラメータで構築されます (ステップ 1)
 * `pthread_create()` は、通知を送信するための新しいスレッドを作成するために呼び出され、結果を待たずに、mongoBackend に戻ります (ステップ2)
 * `pthread_create()`は、startSenderThread() を起点とする新しいスレッドを生成します (ステップ3)
-* `startSenderThread()` は `SenderThreadParams` ベクトルをループし、項目ごとに通知を送信します (ステップ4,5,6)。通知の受信者からのレスポンスは (タイムアウトとともに) 待機され、すべての通知はシリアル化された方法で行われます
+* `startSenderThread()` は、`SenderThreadParams` オブジェクトに対応する通知を送信する `doNotify()` 関数を呼び出します (ステップ4,5および6)。通知の受信者からのレスポンスが待機されます (タイムアウトあり)。
+
+<a name="flow-nf-01b"></a>
+![MQTT Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
+
+_NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT 通知_
+
+* 手順1から4は、前の図と同じです。違いはステップ5と6にあり、MQTT ライブラリを使用して対応する MQTT broker に通知を公開します。MQTT broker への接続が
+  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
+  接続は定期的にクリーンアップされます)
 
 <a name="flow-nf-03"></a>
 ![Notification on entity-attribute Update/Creation with thread pool](../../manuals/devel/images/Flow-NF-03.png)
 
-_NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する通知_
+_NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する HTTP 通知_
 
-* `SenderThreadParams` のベクトルが構築され、このベクトルの各項目は1つの通知に対応します (ステップ1)
+* `SenderThreadParams` オブジェクトは、通知に対応するパラメータで構築されます (ステップ 1)
 * 通知に関連付けられているサービスに応じて、 `ServiceQueue` が選択されます。通知に関連付けられたサービスのキューが
   存在しない場合は、デフォルトの `ServiceQueue` が使用されます。選択した `ServiceQueue` の `try_push()` メソッドを
   使用して、通知を適切なキューに入れます (ステップ2)
-* ベクターは通知メッセージ・キューにプッシュされます (ステップ3)。これは、通知キュー・セマフォを使用してキューへの
-  アクセスを同期する `SyncQOverflow::try_push()` を使用して実行されます
-  ([詳細については、このドキュメント](semaphores.md#notification-queue-semaphore) を参照)。キューから受信する
-  スレッドは、通知をできるだけ早く送信します
+* オブジェクトが通知メッセージ・キューにプッシュされます (ステップ3)。これは、通知キュー・セマフォを使用してキュー
+  へのアクセスを同期する `SyncQOverflow::try_push()` を使用して行われます
+  ([詳細については、このドキュメント](semaphores.md#notification-queue-semaphore) を参照してください)。
+  キューから受信したスレッドは、できるだけ早く通知を送信します
 * スレッド・プール内のワーカー・スレッドの1つがメッセージ・キューから項目をポップします (ステップ4)。これは、
   通知キュー・セマフォを使用してキューへのアクセスを同期する `SyncQOverflow::pop()` を使用して行われます。
-* ワーカー・スレッドは、ポップされたキュー・アイテムの `SenderThreadParams` ベクターをループし、ベクター内の
-  `SenderThreadParams` アイテムごとに1つの通知を送信します (ステップ5, 6, 7)。通知の受信者からのレスポンスは
-  (タイムアウトで) 待機され、すべての通知はシリアル化された方法で実行されます
+* ワーカー・スレッドは `doNotify()` 関数を呼び出します。この関数は、ポップされたキュー・アイテムの `SenderThreadParam`
+  オブジェクトを取得し、対応する通知を送信します (ステップ5, 6および7)。通知の受信者からのレスポンスが待機されます
+  (タイムアウトあり)
 * その後、ワーカー・スレッドはスリープして、キュー内の新しい項目を処理する必要があるときに起きるのを待っています
+
+<a name="flow-nf-03b"></a>
+![MQTT Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
+
+_NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT 通知_
+
+* 手順1から5は、前の図と同じです。違いはステップ6と7にあり、MQTT ライブラリを使用して対応する MQTT broker に通知を公開します。MQTT broker への接続が
+  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
+  接続は定期的にクリーンアップされます)
+
+[Top](#top)
+
+<a name="srclibmqtt"></a>
+## src/lib/mqtt/
+
+このライブラリは、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) 外部ライブラリに基づいて MQTT 通知を処理します。 開いている MQTT
+接続の制御を維持し (`-maxMqttAge` キープ・アライブに基づいてアイドル状態の接続をクリーンアップ)、[**ngsiNotify** ライブラリ](#srclibngsinotify)
+で使用される `sendMqttNotification` を提供する `MqttConnectionManager` クラスのシングルトンとして実装された接続マネージャがあります。
+
+[トップ](#top)
 
 <a name="srclibalarmmgr"></a>
 ## src/lib/alarmMgr/
@@ -477,8 +517,6 @@ _NF-03: スレッド・プールによるエンティティ属性の更新/作�
 <a name="srclibcache"></a>
 ## src/lib/cache/
 効率をあげるげるために、Orion はそのサブスクリプションを RAM に保持し、この目的のためにサブスクリプション・キャッシュ・マネージャが実装されています。サブスクリプション・キャッシュの詳細は、[Orion 管理マニュアルのこのセクション](../admin/perf_tuning.md#subscription-cache)を参照ください。
-
-このキャッシュの主な理由の1つは、DB レベルでサブスクリプション・マッチングを実行する場合、MongoDB で `$where` 演算子を使用する必要があり、これはすべて推奨されているわけではありません。DB レベルでの JavaScript の実行にはパフォーマンスとセキュリティの両方の問題があります。
 
 Broker が起動すると、[csubs collection](../admin/database_model.md#csubs-collection) の内容がデータベースから抽出され、サブスクリプション・キャッシュにデータが格納されます。サブスクリプションが更新または作成されると、サブスクリプション・キャッシュが変更されますが、データベースも変更されます。この意味で、サブスクリプション・キャッシュは "ライト・スルー (write-through)" です。
 
@@ -501,5 +539,11 @@ NGSIv2 GET サブスクリプションのリクエストはサブスクリプシ
 ## src/lib/metricsMgr/
 <a name="srclibmetricsmgr"></a>
 プラットフォーム全体で同様のメトリックを使用するには、一般的なメトリックが考案され、Orion の場合は、この目的のためにマネージャが実装されました。この メトリック・マネージャは、ライブラリ **metricsMgr** にあります。メトリックについては、[このドキュメント](../admin/metrics_api.md)を参照してください。
+
+[トップ](#top)
+
+## src/lib/expressions/
+<a name="srclibexpressions"></a>
+[カスタム通知で使用されるマクロ置換ロジック](../orion-api.md#macro-substitution) のサポートを提供します。このライブラリは、式評価の抽象化を提供し、JEXL ベースと基本置換ベースの 2 つの実装を提供します (使用する実装は、cjex ライブラリの可用性に基づいて、ビルド時に選択されます)。
 
 [トップ](#top)

@@ -109,7 +109,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::id differs in URL and payload";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(clientIp, error, "url: " + entityIdFromURL + ", payload: " + entityIdFromPayload);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));
@@ -122,7 +122,7 @@ std::string postIndividualContextEntity
   {
     std::string error = "entityId::type differs in URL and payload";
 
-    alarmMgr.badInput(clientIp, error);
+    alarmMgr.badInput(clientIp, error, "url: " + entityTypeFromURL + ", payload: " + entityTypeFromPayload);
     response.errorCode.fill(SccBadRequest, error);
 
     TIMED_RENDER(out = response.toJsonV1(asJsonObject, IndividualContextEntity));

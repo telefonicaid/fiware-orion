@@ -120,6 +120,27 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
   // Condition
   setStringVectorF(r, CSUB_CONDITIONS, &(s->subject.condition.attributes));
 
+  // Operations
+  if (r.hasField(CSUB_ALTTYPES))
+  {
+    std::vector<std::string> altTypeStrings;
+    setStringVectorF(r, CSUB_ALTTYPES, &altTypeStrings);
+
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      ngsiv2::SubAltType altType = parseAlterationType(altTypeStrings[ix]);
+      if (altType == ngsiv2::SubAltType::Unknown)
+      {
+        LM_E(("Runtime Error (unknown alterationType found in database)"));
+      }
+      else
+      {
+        s->subject.condition.altTypes.push_back(altType);
+      }
+    }
+  }
+
+  // Expression
   if (r.hasField(CSUB_EXPR))
   {
     orion::BSONObj expression = getObjectFieldF(r, CSUB_EXPR);
@@ -136,6 +157,12 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
     s->subject.condition.expression.coords   = coords;
     s->subject.condition.expression.georel   = georel;
   }
+
+  // notifyOnMetadataChange
+  if (r.hasField(CSUB_NOTIFYONMETADATACHANGE))
+  {
+    s->subject.condition.notifyOnMetadataChange = r.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(r, CSUB_NOTIFYONMETADATACHANGE) : true;
+  }
 }
 
 
@@ -145,6 +172,19 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
 */
 static void setNotification(Subscription* subP, const orion::BSONObj& r, const std::string& tenant)
 {
+  // Type check is based in the existence of mqttTopic in the DB document. Alternativelly, any
+  // other mandatory field in MQTT subs could be used (i.e. mqttQoS)
+  if (r.hasField(CSUB_MQTTTOPIC))
+  {
+    subP->notification.type = ngsiv2::MqttNotification;
+    subP->notification.mqttInfo.fill(r);
+  }
+  else
+  {
+    subP->notification.type = ngsiv2::HttpNotification;
+    subP->notification.httpInfo.fill(r);
+  }
+
   // Attributes
   setStringVectorF(r, CSUB_ATTRS, &(subP->notification.attributes));
 
@@ -154,49 +194,49 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
     setStringVectorF(r, CSUB_METADATA, &(subP->notification.metadata));
   }
 
-  subP->notification.httpInfo.fill(r);
-
   ngsiv2::Notification* nP = &subP->notification;
 
   subP->throttling      = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
   nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
-  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : -1;
+  nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : 0;
+  nP->failsCounter      = r.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(r, CSUB_FAILSCOUNTER)     : 0;
+  nP->maxFailsLimit     = r.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(r, CSUB_MAXFAILSLIMIT)    : -1;
   nP->blacklist         = r.hasField(CSUB_BLACKLIST)?        getBoolFieldF(r, CSUB_BLACKLIST)                   : false;
   nP->onlyChanged       = r.hasField(CSUB_ONLYCHANGED)?      getBoolFieldF(r, CSUB_ONLYCHANGED)                 : false;
+  nP->covered           = r.hasField(CSUB_COVERED)?          getBoolFieldF(r, CSUB_COVERED)                     : false;
   nP->lastFailure       = r.hasField(CSUB_LASTFAILURE)?      getIntOrLongFieldAsLongF(r, CSUB_LASTFAILURE)      : -1;
   nP->lastSuccess       = r.hasField(CSUB_LASTSUCCESS)?      getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESS)      : -1;
   nP->lastFailureReason = r.hasField(CSUB_LASTFAILUREASON)?  getStringFieldF(r, CSUB_LASTFAILUREASON)           : "";
   nP->lastSuccessCode   = r.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESSCODE)  : -1;
 
   // Attributes format
-  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
-
+  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V2_NORMALIZED;
 
   //
   // Check values from subscription cache, update object from cache-values if necessary
   //
-  // NOTE: only 'lastNotificationTime' and 'count'
-  //
-  cacheSemTake(__FUNCTION__, "get lastNotification and count");
+  cacheSemTake(__FUNCTION__, "get notification info");
   CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subP->id.c_str());
   if (cSubP)
   {
+    subP->notification.timesSent    += cSubP->count;
+
+    if (cSubP->lastSuccess > subP->notification.lastFailure)
+    {
+      // this means that the lastFailure in the DB is stale, so the failsCounter at DB
+      // cannot be use and we enterely rely on the one in local cache
+      subP->notification.failsCounter = cSubP->failsCounter;
+    }
+    else
+    {
+      // in this case, the failsCounter at DB is valid and we can rely on it. We
+      // sum any local failsCounter to that
+      subP->notification.failsCounter += cSubP->failsCounter;
+    }
+
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)
     {
       subP->notification.lastNotification = cSubP->lastNotificationTime;
-    }
-
-    if (cSubP->count != 0)
-    {
-      //
-      // First, compensate for -1 in 'timesSent'
-      //
-      if (subP->notification.timesSent == -1)
-      {
-        subP->notification.timesSent = 0;
-      }
-
-      subP->notification.timesSent += cSubP->count;
     }
 
     if (cSubP->lastFailure > subP->notification.lastFailure)
@@ -211,7 +251,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
       subP->notification.lastSuccessCode = cSubP->lastSuccessCode;
     }
   }
-  cacheSemGive(__FUNCTION__, "get lastNotification and count");
+  cacheSemGive(__FUNCTION__, "get notification info");
 }
 
 
@@ -220,23 +260,31 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
 *
 * setStatus -
 */
-static void setStatus(Subscription* s, const orion::BSONObj& r)
+static void setStatus(Subscription* s, const orion::BSONObj& r, const std::string& tenant)
 {
-  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : -1;
+  // Status
+  s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
+
+  double statusLastChangeAtDb = r.hasField(CSUB_STATUS_LAST_CHANGE) ? getNumberFieldF(r, CSUB_STATUS_LAST_CHANGE) : -1;
 
   //
-  // Status
-  // FIXME P10: use an enum for active/inactive/expired
+  // Check values from subscription cache, update object from cache-values if necessary
   //
-  // NOTE:
-  //   if the field CSUB_EXPIRATION is not present in the subscription, then the default
-  //   value of "-1 == never expires" is used.
+  // FIXME P3: maybe all the code accessing to the cache (see see setNotification())
+  // could be unified in mongoGetSubscription()/mongoGetSubscriptions()
   //
-  if ((s->expires > getCurrentTime()) || (s->expires == -1))
+  cacheSemTake(__FUNCTION__, "get status");
+  CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), s->id.c_str());
+  if ((cSubP) && (cSubP->statusLastChange > statusLastChangeAtDb))
   {
-    s->status = r.hasField(CSUB_STATUS) ? getStringFieldF(r, CSUB_STATUS) : STATUS_ACTIVE;
+    s->status = cSubP->status.empty() ? STATUS_ACTIVE : cSubP->status;
   }
-  else
+  cacheSemGive(__FUNCTION__, "get status");
+
+  // if the field CSUB_EXPIRATION is not present in the subscription, then the default
+  // value PERMANENT_EXPIRES_DATETIME is used
+  s->expires = r.hasField(CSUB_EXPIRATION)? getIntOrLongFieldAsLongF(r, CSUB_EXPIRATION) : PERMANENT_EXPIRES_DATETIME;
+  if (s->expires < getCurrentTime())
   {
     s->status = "expired";
   }
@@ -250,7 +298,7 @@ static void setStatus(Subscription* s, const orion::BSONObj& r)
 */
 void mongoListSubscriptions
 (
-  std::vector<Subscription>*           subs,
+  std::vector<Subscription*>*          subs,
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
@@ -290,6 +338,7 @@ void mongoListSubscriptions
                                     composeDatabaseName(tenant),
                                     COL_CSUBS,
                                     q,
+                                    q,
                                     sortBy.obj(),
                                     limit,
                                     offset,
@@ -306,23 +355,28 @@ void mongoListSubscriptions
   TIME_STAT_MONGO_READ_WAIT_STOP();
 
   /* Process query result */
+  /* Note limit != 0 will cause skipping the while loop in case request didn't actually ask for any result */
   unsigned int docs = 0;
 
   orion::BSONObj  r;
-  while (cursor.next(&r))
+  while ((limit != 0) && (cursor.next(&r)))
   {
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    Subscription  s;
+    // Dynamic memory to be freed by the caller of mongoListSubscriptions()
+    // Former versions of this code were using Subscription instead of Subscription*
+    // but some obscure problem occurs when httpInfo/mqttInfo classes were expanded
+    // with the ngsi field of type Entity
+    Subscription*  sP = new Subscription();
 
-    setNewSubscriptionId(&s, r);
-    setDescription(&s, r);
-    setSubject(&s, r);
-    setStatus(&s, r);
-    setNotification(&s, r, tenant);
+    setNewSubscriptionId(sP, r);
+    setDescription(sP, r);
+    setSubject(sP, r);
+    setStatus(sP, r, tenant);
+    setNotification(sP, r, tenant);
 
-    subs->push_back(s);
+    subs->push_back(sP);
   }
 
   orion::releaseMongoConnection(connection);
@@ -339,11 +393,11 @@ void mongoListSubscriptions
 */
 void mongoGetSubscription
 (
-  ngsiv2::Subscription*               sub,
-  OrionError*                         oe,
-  const std::string&                  idSub,
-  std::map<std::string, std::string>& uriParam,
-  const std::string&                  tenant
+  ngsiv2::Subscription*  sub,
+  OrionError*            oe,
+  const std::string&     idSub,
+  const std::string&     servicePath,
+  const std::string&     tenant
 )
 {
   bool         reqSemTaken = false;
@@ -358,6 +412,10 @@ void mongoGetSubscription
   orion::BSONObjBuilder  qB;
 
   qB.append("_id", oid);
+  if (!servicePath.empty())
+  {
+    qB.append(CSUB_SERVICE_PATH, servicePath);
+  }
   orion::BSONObj q = qB.obj();
 
   TIME_STAT_MONGO_READ_WAIT_START();
@@ -382,7 +440,7 @@ void mongoGetSubscription
     setDescription(sub, r);
     setSubject(sub, r);
     setNotification(sub, r, tenant);
-    setStatus(sub, r);
+    setStatus(sub, r, tenant);
   }
   else
   {

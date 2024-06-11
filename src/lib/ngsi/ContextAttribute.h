@@ -37,6 +37,7 @@
 #include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoDriver/BSONObjBuilder.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -78,7 +79,7 @@ public:
                                                       // ContextAttribute field in the ContextAttribute type declaration)
 
 
-  bool                      onlyValue;                // Used when ony the value is meaningful in v2 updates of value, without regarding metadata
+  bool                      onlyValue;                // Used when only the value is meaningful in v2 updates of value, without regarding metadata
   bool                      shadowed;                 // shadowed true means that the attribute is rendered only if explicitly required
                                                       // in attrs filter (typically for builtin attributes)
 
@@ -91,8 +92,8 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, bool _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
-  /* Grabbers for metadata to which CB gives a special semantic */
-  std::string  getLocation(ApiVersion apiVersion = V1) const;
+  /* Check if attribute means a location  */
+  bool  getLocation(orion::BSONObj* attrsP) const;
 
   std::string  toJsonV1(bool                             asJsonObject,
                         RequestType                      request,
@@ -107,7 +108,7 @@ public:
 
   std::string  toJsonV1AsNameString(bool comma);
 
-  std::string  toJson(const std::vector<std::string>&  metadataFilter);
+  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonValue(void);
 
@@ -118,16 +119,22 @@ public:
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
 
+  void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
+
   void         release(void);
   std::string  getName(void);
 
   /* Used to render attribute value to BSON */
-  void valueBson(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast, bool strings2numbers = false) const;
+  bool valueBson(const std::string&      valueKey,
+                 orion::BSONObjBuilder*  bsonAttr,
+                 const std::string&      attrType,
+                 bool                    autocast,
+                 bool                    strings2numbers = false) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
+  std::string  check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck = false);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
@@ -135,7 +142,17 @@ private:
   void filterAndOrderMetadata(const std::vector<std::string>&  metadataFilter,
                               std::vector<Metadata*>*          orderedMetadata);
 
-  void bsonAppendAttrValue(orion::BSONObjBuilder& bsonAttr, const std::string& attrType, bool autocast) const;
+  void bsonAppendAttrValue(const std::string&      valueKey,
+                           orion::BSONObjBuilder*  bsonAttr,
+                           const std::string&      attrType,
+                           bool                    autocast) const;
+
+  bool hasIgnoreType(void) const;
+
+  bool calculateOperator(const std::string&         valueKey,
+                         orion::CompoundValueNode*  upOp,
+                         orion::BSONObjBuilder*     bsonAttr,
+                         bool                       strings2numbers) const;
 
 } ContextAttribute;
 

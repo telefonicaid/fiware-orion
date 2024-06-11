@@ -163,20 +163,20 @@ echo
 01. Create subscription for E1/A1
 =================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create E1/A1
 ================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
@@ -201,14 +201,14 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                         "type": "Text",
                         "value": "append"
                     }
-                }, 
-                "type": "a1", 
+                },
+                "type": "a1",
                 "value": 1
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -217,8 +217,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 04. Update A1 using PUT /v2/entities/E1/attrs/A1/value
 ======================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -240,17 +240,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A1": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "update"
                     }
-                }, 
-                "type": "a1", 
+                },
+                "type": "a1",
                 "value": 4
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -259,8 +259,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 06. Update A1 using POST /v2/entities/E1/attrs
 ==============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -282,17 +282,17 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "A1": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "update"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 6
-            }, 
-            "id": "E1", 
+            },
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -301,8 +301,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 08. Add A2 using POST /v2/entities/E1/attrs
 ===========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -323,23 +323,23 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "A1": {
                 "metadata": {},
-                "type": "Number", 
+                "type": "Number",
                 "value": 6
-            }, 
+            },
             "A2": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "append"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 8
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
@@ -348,8 +348,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 10. Add A3 and update A2 using POST /v2/entities/E1/attrs
 =========================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -370,33 +370,33 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "A1": {
                 "metadata": {},
-                "type": "Number", 
+                "type": "Number",
                 "value": 6
-            }, 
+            },
             "A2": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "update"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 10
             },
             "A3": {
                 "metadata": {
                     "actionType": {
-                        "type": "Text", 
+                        "type": "Text",
                         "value": "append"
                     }
-                }, 
-                "type": "Number", 
+                },
+                "type": "Number",
                 "value": 11
             },
-            "id": "E1", 
+            "id": "E1",
             "type": "Thing"
         }
-    ], 
+    ],
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================

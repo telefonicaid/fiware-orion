@@ -9,7 +9,7 @@
     * [Diagnose memory exhaustion problem](#diagnose-memory-exhaustion-problem)
     * [Diagnose spontaneous binary corruption problem](#diagnose-spontaneous-binary-corruption-problem)
 * [I/O Flows](#io-flows)
-    * [Diagnose notification reception problems](#diagnose-notification-reception-problems)
+    * [Diagnose HTTP notification reception problems](#diagnose-http-notification-reception-problems)
     * [Diagnose database connection problems](#diagnose-database-connection-problems)
 
 The Diagnosis Procedures are the first steps that a System Administrator
@@ -173,8 +173,7 @@ The symptoms of this problem are:
 -   The MD5SUM of /usr/bin/contextBroker binary (that can be obtained with
     "md5sum /usr/bin/contextBroker" is not the right one (check list for
     particular versions at the end of this section).
--   The prelink package is installed (this can be checked running the
-    command "rpm -qa | grep prelink")
+-   The prelink package is installed
 
 The cause of this problem is
 [prelink](http://en.wikipedia.org/wiki/Prelink), a program that modifies
@@ -187,8 +186,7 @@ The solution for this problems is:
 
 -   Disable prelink, either implementing one of the following
     alternatives:
-    -   Remove the prelink software, typically running (as root or using
-        sudo): `rpm -e prelink`
+    -   Remove the prelink software
     -   Disable the prelink processing of contextBroker binary, creating
         the /etc/prelink.conf.d/contextBroker.conf file with the
         following content (just one line)
@@ -213,8 +211,9 @@ The Orion Context Broker uses the following flows:
 
 -   From client applications to the broker, using TCP port 1026 by
     default (this is overridden with "-port" option).
--   From the broker to subscribed applications, using the port specified
+-   From the broker to subscribed applications, using the HTTP port specified
     by the application in the callback at subscription creation time.
+-   From the broker to MQTT brokers, for MQTT-based notifications
 -   From the broker to MongoDB database. In the case of running MongoDB
     in the same host as the broker, this is an internal flow (i.e. using
     the loopback interface). The standard port in MongoDB is 27017
@@ -232,7 +231,7 @@ consumers/producers.
 
 ![](Orion-ioflows.png "Orion-ioflows.png")
 
-### Diagnose notification reception problems
+### Diagnose HTTP notification reception problems
 
 In order to diagnose possible notification problems (i.e. you expect notifications
 arriving to a given endpoint but it is not working) have a look to the information
@@ -258,8 +257,7 @@ Some possible values for `lastFailureReason` (non exahustive list):
   doesn't run in insecure mode (i.e. without `-insecureNotif` [CLI parameters](cli.md)).
 
 More detail about `status`, `lastFailureReason` and `lastSuccessCode` in the
-[NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/) and
-in the [NGSIv2 implementation notes document](../user/ngsiv2_implementation_notes.md).
+[Orion API specification](../orion-api.md#subscription.notification).
 
 In addition, you may find useful the notification log examples shown in
 [the corresponding section of the administration manual](logs.md#log-examples-for-notification-transactions).
@@ -273,51 +271,24 @@ The symptoms of a database connection problem are the following:
 -   At startup time. The broker doesn't start and the following message
     appears in the log file:
 
-` X@08:04:45 main[313]: MongoDB error`
+```
+... msg=Database Startup Error (cannot connect to mongo - doing 100 retries with a 1000 millisecond interval)
+... msg=Fatal Error (MongoDB error)
+
+```
 
 -   During broker operation. Error message like the following ones
     appear in the responses sent by the broker.
 
 ```
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: Null cursor"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [CONNECT_ERROR] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [FAILED_STATE] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: DBClientBase::findN: transport error: localhost:27017 ns: orion.$cmd query: { .. }"
-    }
-    ...
-
+{
+    "error": "InternalServerError",
+    "description": "Database Error ..."
+}
 ```
 
 In both cases, check that the connection to MonogDB is correctly
-configured (in particular, the BROKER\_DATABASE\_HOST if you are running
-Orion Context Broker [as a service](../../../README.md#as-system-service) or
-the "-dbhost" option if you are running it [from the command
+configured (in particular, the `-dbURI` option [from the command
 line](cli.md)) and that the mongod/mongos
 process (depending if you are using sharding or not) is up and running.
 

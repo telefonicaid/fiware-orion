@@ -1,0 +1,384 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Several operators in the same update operation
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create entity
+# 02. Create sub for entity E
+# 03. Update entity using all the operators
+# 04. Get entity
+# 05. Dump accumulator
+#
+
+
+echo '01. Create entity'
+echo '================='
+payload='{
+  "id": "E",
+  "type": "T",
+  "A01": {
+    "value": 1,
+    "type": "Number"
+  },
+  "A02": {
+    "value": 5,
+    "type": "Number"
+  },
+  "A03": {
+    "value": 5,
+    "type": "Number"
+  },
+  "A04": {
+    "value": 3,
+    "type": "Number"
+  },
+  "A05": {
+    "value": [ "foo" ],
+    "type": "StructuredValue"
+  },
+  "A06": {
+    "value": [ "foo" ],
+    "type": "StructuredValue"
+  },
+  "A07": {
+    "value": [ 1, 2, 3, 4],
+    "type": "StructuredValue"
+  },
+  "A08": {
+    "value": [ 1, 2, 3, 4],
+    "type": "StructuredValue"
+  },
+  "A09": {
+    "value": {"X": 1, "Y": 2},
+    "type": "StructuredValue"
+  },
+  "A10": {
+    "value": {"X": 1, "Y": 2},
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Create sub for entity E'
+echo '==========================='
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+   },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. Update entity using all the operators'
+echo '========================================='
+payload='{
+  "A01": {
+    "value": { "$inc": 2 },
+    "type": "Number"
+  },
+  "A02": {
+    "value": { "$min": 0 },
+    "type": "Number"
+  },
+  "A03": {
+    "value": { "$max": 8 },
+    "type": "Number"
+  },
+  "A04": {
+    "value": { "$mul": 5 },
+    "type": "Number"
+  },
+  "A05": {
+    "value": { "$push": "bar" },
+    "type": "StructuredValue"
+  },
+  "A06": {
+    "value": { "$addToSet": "foo" },
+    "type": "StructuredValue"
+  },
+  "A07": {
+    "value": { "$pull": 2 },
+    "type": "StructuredValue"
+  },
+  "A08": {
+    "value": { "$pullAll": [2, 4] },
+    "type": "StructuredValue"
+  },
+  "A09": {
+    "value": { "$set": {"Y": 20, "Z": 30} },
+    "type": "StructuredValue"
+  },
+  "A10": {
+    "value": { "$unset": {"Y": 1} },
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '04. Get entity'
+echo '=============='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '05. Dump accumulator'
+echo '===================='
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity
+=================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. Create sub for entity E
+===========================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+03. Update entity using all the operators
+=========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Get entity
+==============
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 610
+
+{
+    "A01": {
+        "metadata": {},
+        "type": "Number",
+        "value": 3
+    },
+    "A02": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "A03": {
+        "metadata": {},
+        "type": "Number",
+        "value": 8
+    },
+    "A04": {
+        "metadata": {},
+        "type": "Number",
+        "value": 15
+    },
+    "A05": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            "foo",
+            "bar"
+        ]
+    },
+    "A06": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            "foo"
+        ]
+    },
+    "A07": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            1,
+            3,
+            4
+        ]
+    },
+    "A08": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            1,
+            3
+        ]
+    },
+    "A09": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": {
+            "X": 1,
+            "Y": 20,
+            "Z": 30
+        }
+    },
+    "A10": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": {
+            "X": 1
+        }
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+05. Dump accumulator
+====================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 665
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A01": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "A02": {
+                "metadata": {},
+                "type": "Number",
+                "value": 0
+            },
+            "A03": {
+                "metadata": {},
+                "type": "Number",
+                "value": 8
+            },
+            "A04": {
+                "metadata": {},
+                "type": "Number",
+                "value": 15
+            },
+            "A05": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    "foo",
+                    "bar"
+                ]
+            },
+            "A06": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    "foo"
+                ]
+            },
+            "A07": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    3,
+                    4
+                ]
+            },
+            "A08": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    3
+                ]
+            },
+            "A09": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": {
+                    "X": 1,
+                    "Y": 20,
+                    "Z": 30
+                }
+            },
+            "A10": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": {
+                    "X": 1
+                }
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

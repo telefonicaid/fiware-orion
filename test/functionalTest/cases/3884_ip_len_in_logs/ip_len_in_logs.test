@@ -1,0 +1,168 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Service path is not ignored in GET registrations operations
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-1 IPV4
+brokerStart CP1
+
+--SHELL--
+#
+# 01. Register entity E1 for CP1 in CB
+# 02. Create E1 in CP1
+# 03. GET /entities/E1 from CB to provoke a forwarded request to CP1, to provoke the bug
+# 04. Extracting a piece of the logfile to make sure the FROM_IP field is A-OK
+# 05. GET /entities/E1 from CP1 to make sure it-s still alive
+#
+
+echo "01. Register entity E1 for CP1 in CB"
+echo "===================================="
+payload='{
+  "description": "Reg1",
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "T1",
+        "id": "E1"
+      }
+    ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 in CP1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": {
+    "type": "X",
+    "value": "12"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "03. GET /entities/E1 on CB to provoke a forwarded request to CP1, to provoke the bug"
+echo "===================================================================================="
+orionCurl --url /v2/entities/E1 -H "X-Forwarded-For: www.qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq.com"
+echo
+echo
+
+
+echo "04. Extracting a piece of the logfile to make sure the FROM_IP field is A-OK"
+echo "============================================================================"
+cat /tmp/contextBroker.log | grep "Starting forwarding for" | awk -F \| '{ print $5 }'
+echo
+echo
+
+
+echo "05. GET /entities/E1 from CP1 to make sure it-s still alive"
+echo "==========================================================="
+orionCurl --url /v2/entities/E1 --port $CP1_PORT
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Register entity E1 for CP1 in CB
+====================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX(.*)
+Content-Length: 0
+
+
+
+02. Create E1 in CP1
+====================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
+
+
+
+03. GET /entities/E1 on CB to provoke a forwarded request to CP1, to provoke the bug
+====================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "X",
+        "value": "12"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+04. Extracting a piece of the logfile to make sure the FROM_IP field is A-OK
+============================================================================
+ from=www.qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+
+
+05. GET /entities/E1 from CP1 to make sure it-s still alive
+===========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "X",
+        "value": "12"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-supportedFowardingMode with five CPrs (update scenario)
+supportedForwardingMode with five CPrs (update scenario)
 
 --SHELL-INIT--
 dbInit CB
@@ -40,7 +40,7 @@ brokerStart CP5
 --SHELL--
 
 # This test is based on cases/0787_cprs_full_functional_v2/ngsiv2_update_five_different_cprs_in_one_query.test
-# with some of the CPrs using fowarding mode "update" and others using "none" or "query". All operations
+# with some of the CPrs using forwarding mode "update" and others using "none" or "query". All operations
 # using NGSIv2 (original test has some of them using NGSIv1)
 
 #
@@ -336,110 +336,110 @@ echo
 01. Create E1/T1/A1 in CP1
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. Create E1/T1/A2 in CP2
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. Create E1/T1/A3 in CP3
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 04. Create E1/T1/A4 in CP4
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 05. Create E1/T1/A5 in CP5
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 06. Register E1/T1/A1 in CB, mode update, provApp: CP1
 ======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 07. Register E1/T1/A2 in CB, mode none, provApp: CP2
 ====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 08. Register E1/T1/A3 in CB, mode update, provApp: CP3
 ======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 09. Register E1/T1/A4 in CB, mode query, provApp: CP4
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 10. Register E1/T1/A5 in CB, mode update, provApp: CP5
 ======================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 11. Update E1/T1/A1+A2+A3+A4+A5 in CB
 =====================================
 HTTP/1.1 404 Not Found
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 {
     "description": "Some of the following attributes were not updated: { E1-T1 : [A2, A4] }",
@@ -450,10 +450,10 @@ Date: REGEX(.*)
 12. Query E1/T1 in CP1 - see A1 via CB
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 {
     "A1": {
@@ -469,10 +469,10 @@ Date: REGEX(.*)
 13. Query E1/T1 in CP2 - see A2 in CP2
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 {
     "A2": {
@@ -488,10 +488,10 @@ Date: REGEX(.*)
 14. Query E1/T1 in CP3 - see A3 via CB
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 {
     "A3": {
@@ -507,10 +507,10 @@ Date: REGEX(.*)
 15. Query E1/T1 in CP4 - see A4 in CP4
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 {
     "A4": {
@@ -526,10 +526,10 @@ Date: REGEX(.*)
 16. Query E1/T1 in CP5 - see A5 via CB
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 {
     "A5": {

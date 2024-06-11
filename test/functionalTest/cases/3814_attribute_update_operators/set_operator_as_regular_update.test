@@ -1,0 +1,520 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Attribute update operator: set (as regular update)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# Note there is no case for object type. Object type has the special
+# behaviour shown in set_operator.test and set_operator_all_types.test
+#
+# 01. Create entity E with A={X:1, Y:2}
+# 02. Create sub for entity E
+# 03. Update A with $set: "foo"
+# 04. Get entity, see E-A="foo"
+# 05. Update A with $set: 10
+# 06. Get entity, see E-A=10
+# 07. Update A with $set: true
+# 08. Get entity, see E-A=true
+# 09. Update A with $set: null
+# 10. Get entity, see E-A=null
+# 11. Update A with $set: <array>
+# 12. Get entity, see E-A=<array>
+# 13. Dump accumulator, see 5 notifications E-A-X being a string, number, boolean, null and array
+#
+
+
+echo '01. Create entity E with A={X:1, Y:2}'
+echo '====================================='
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": {"X": 1, "Y": 2},
+    "type": "Object"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Create sub for entity E'
+echo '==========================='
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+   },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo '03. Update A with $set:"foo"'
+echo '============================'
+payload='{
+  "A": {
+    "value": { "$set": "foo" },
+    "type": "Object"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '04. Get entity, see E-A="foo"'
+echo '============================='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '05. Update A with $set: 10'
+echo '=========================='
+payload='{
+  "A": {
+    "value": { "$set": 10 },
+    "type": "Object"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '06. Get entity, see E-A=10'
+echo '=========================='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '07. Update A with $set: true'
+echo '============================'
+payload='{
+  "A": {
+    "value": { "$set": true },
+    "type": "Object"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '08. Get entity, see E-A=true'
+echo '============================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '09. Update A with $set: null'
+echo '============================'
+payload='{
+  "A": {
+    "value": { "$set": null },
+    "type": "Object"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '10. Get entity, see E-A=null'
+echo '============================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '11. Update A with $set: <array>'
+echo '==============================='
+payload='{
+  "A": {
+    "value": {
+      "$set": [
+        "22",
+        {
+          "x" : [ "x1", "x2" ],
+          "y" : 3
+        },
+        [ "z1", "z2" ]
+      ]
+    },
+    "type": "Object"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '12. Get entity, see E-A=<array>'
+echo '==============================='
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '13. Dump accumulator, see 6 notifications E-A-X being a string, number, boolean, null, array and object'
+echo '======================================================================================================='
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with A={X:1, Y:2}
+=====================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. Create sub for entity E
+===========================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+03. Update A with $set:"foo"
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Get entity, see E-A="foo"
+=============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Object",
+        "value": "foo"
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+05. Update A with $set: 10
+==========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Get entity, see E-A=10
+==========================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Object",
+        "value": 10
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+07. Update A with $set: true
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Get entity, see E-A=true
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Object",
+        "value": true
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+09. Update A with $set: null
+============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Get entity, see E-A=null
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Object",
+        "value": null
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+11. Update A with $set: <array>
+===============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+12. Get entity, see E-A=<array>
+===============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 108
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Object",
+        "value": [
+            "22",
+            {
+                "x": [
+                    "x1",
+                    "x2"
+                ],
+                "y": 3
+            },
+            [
+                "z1",
+                "z2"
+            ]
+        ]
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+13. Dump accumulator, see 6 notifications E-A-X being a string, number, boolean, null, array and object
+=======================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 126
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Object",
+                "value": "foo"
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 123
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Object",
+                "value": 10
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Object",
+                "value": true
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 125
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Object",
+                "value": null
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 163
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Object",
+                "value": [
+                    "22",
+                    {
+                        "x": [
+                            "x1",
+                            "x2"
+                        ],
+                        "y": 3
+                    },
+                    [
+                        "z1",
+                        "z2"
+                    ]
+                ]
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop $LISTENER_PORT
+dbDrop CB

@@ -44,10 +44,10 @@ echo
 01. Ask for Metrics, see 'error', as broker is started without metrics
 ======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 60
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 60
 
 {
     "description": "metrics desactivated",

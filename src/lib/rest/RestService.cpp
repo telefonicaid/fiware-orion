@@ -209,7 +209,7 @@ std::string payloadParse
   }
   else
   {
-    alarmMgr.badInput(clientIp, "payload mime-type is not JSON");
+    alarmMgr.badInput(clientIp, "payload mime-type is not JSON or TEXT");
     return "Bad inMimeType";
   }
 
@@ -247,8 +247,8 @@ std::string tenantCheck(const std::string& tenant)
     snprintf(numV1, sizeof(numV1), "%d",  SERVICE_NAME_MAX_LEN);
     snprintf(numV2, sizeof(numV2), "%lu", strlen(name));
 
-    std::string details = std::string("a tenant name can be max ") + numV1 + " characters long. Length: " + numV2;
-    alarmMgr.badInput(clientIp, details);
+    std::string details = std::string("a tenant name can be max ") + numV1 + " characters long";
+    alarmMgr.badInput(clientIp, details, std::string("tenant length: ") + numV2);
 
     return "bad length - a tenant name can be max " SERVICE_NAME_MAX_LEN_STRING " characters long";
   }
@@ -520,7 +520,7 @@ static bool compErrorDetect
 * This function is called with the appropriate RestService vector, depending on the VERB used in the request.
 * If no matching service is found in this RestService vector, then a recursive call in made, using the "badVerb RestService vector",
 * to see if we have a matching bad-verb-service-routine.
-* If there is no badVerb RestService vector, then the "default error service routine "badRequest" is used.
+* If there is no badVerb RestService vector, then the default error service routine (BadRequest) is used.
 * And lastly, if there is a badVerb RestService vector, but still no service routine is found, then we create a "service not recognized"
 * response. See comments incrusted in the function as well.
 */
@@ -556,7 +556,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     if (compErrorDetect(ciP->apiVersion, components, compV, &oe))
     {
-      alarmMgr.badInput(clientIp, oe.details);
+      alarmMgr.badInput(clientIp, oe.description);
       ciP->httpStatusCode = SccBadRequest;
       restReply(ciP, oe.smartRender(ciP->apiVersion));
       return "URL PATH component error";
@@ -647,7 +647,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       ciP->inMimeType = NOMIMETYPE;
     }
-    statisticsUpdate(serviceV[ix].request, ciP->inMimeType, ciP->verb);
+    statisticsUpdate(serviceV[ix].request, ciP->inMimeType, ciP->verb, compV.size() > 0 ? compV[0].c_str() : "");
 
     // Tenant to connectionInfo
     ciP->tenant = ciP->tenantFromHttpHeader;

@@ -34,6 +34,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"
+#include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "apiTypesV2/Subscription.h"
 
@@ -91,28 +92,37 @@ struct EntityInfo
 */
 struct CachedSubscription
 {
-  std::vector<EntityInfo*>    entityIdInfos;
-  std::vector<std::string>    attributes;
-  std::vector<std::string>    metadata;
-  std::vector<std::string>    notifyConditionV;
-  char*                       tenant;
-  char*                       servicePath;
-  char*                       subscriptionId;
-  int64_t                     throttling;
-  int64_t                     expirationTime;
-  int64_t                     lastNotificationTime;
-  std::string                 status;
-  int64_t                     count;
-  RenderFormat                renderFormat;
-  SubscriptionExpression      expression;
-  bool                        blacklist;
-  bool                        onlyChanged;
-  ngsiv2::HttpInfo            httpInfo;
-  int64_t                     lastFailure;  // timestamp of last notification failure
-  int64_t                     lastSuccess;  // timestamp of last successful notification
-  std::string                 lastFailureReason;
-  int64_t                     lastSuccessCode;
-  struct CachedSubscription*  next;
+  std::vector<EntityInfo*>         entityIdInfos;
+  std::vector<std::string>         attributes;
+  std::vector<std::string>         metadata;
+  std::vector<std::string>         notifyConditionV;
+  std::vector<ngsiv2::SubAltType>  subAltTypeV;
+  char*                            tenant;
+  char*                            servicePath;
+  char*                            subscriptionId;
+  int64_t                          failsCounter;
+  int64_t                          failsCounterFromDb;
+  bool                             failsCounterFromDbValid;
+  int64_t                          maxFailsLimit;
+  int64_t                          throttling;
+  int64_t                          expirationTime;
+  int64_t                          lastNotificationTime;
+  std::string                      status;
+  double                           statusLastChange;
+  int64_t                          count;
+  RenderFormat                     renderFormat;
+  SubscriptionExpression           expression;
+  bool                             blacklist;
+  bool                             onlyChanged;
+  bool                             covered;
+  bool                             notifyOnMetadataChange;
+  ngsiv2::HttpInfo                 httpInfo;
+  ngsiv2::MqttInfo                 mqttInfo;
+  int64_t                          lastFailure;  // timestamp of last notification failure
+  int64_t                          lastSuccess;  // timestamp of last successful notification
+  std::string                      lastFailureReason;
+  int64_t                          lastSuccessCode;
+  struct CachedSubscription*       next;
 };
 
 
@@ -186,12 +196,15 @@ extern void subCacheItemInsert
   const char*                        tenant,
   const char*                        servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
+  const ngsiv2::MqttInfo&            mqttInfo,
   const std::vector<ngsiv2::EntID>&  entities,
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
+  const std::vector<ngsiv2::SubAltType>&  altType,
   const char*                        subscriptionId,
   int64_t                            expiration,
+  int64_t                            maxFailsLimit,
   int64_t                            throttling,
   RenderFormat                       renderFormat,
   int64_t                            lastNotificationTime,
@@ -202,12 +215,15 @@ extern void subCacheItemInsert
   StringFilter*                      stringFilterP,
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
+  double                             statusLastChange,
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,
   const std::string&                 georel,
   bool                               blacklist,
-  bool                               onlyChanged
+  bool                               onlyChanged,
+  bool                               covered,
+  bool                               notifyOnMetadataChange
 );
 
 
@@ -263,6 +279,7 @@ extern void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const char*                        attr,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );
 
@@ -278,7 +295,10 @@ extern void subCacheMatch
   const char*                        servicePath,
   const char*                        entityId,
   const char*                        entityType,
-  const std::vector<std::string>&    attrV,
+  const std::vector<std::string>&    attributes,
+  const std::vector<std::string>&    attrsWithModifiedValue,
+  const std::vector<std::string>&    attrsWithModifiedMd,
+  ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );
 
@@ -325,9 +345,11 @@ extern void subNotificationErrorStatus
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
-  int                 errors,
+  bool                error,
   long long           statusCode,
-  const std::string&  failureReason
+  const std::string&  failureReason,
+  long long           failsCounter = -1,
+  long long           maxFailsLimit = -1
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

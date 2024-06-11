@@ -52,9 +52,9 @@ extern void setExpiration(const ngsiv2::Subscription& sub, orion::BSONObjBuilder
 
 /* ****************************************************************************
 *
-* setHttpInfo -
+* setNotificationInfo -
 */
-extern void setHttpInfo(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setNotificationInfo(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -64,6 +64,21 @@ extern void setHttpInfo(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* 
 */
 extern void setThrottling(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
+
+
+/* ****************************************************************************
+*
+* setMaxFailsLimit -
+*/
+extern void setMaxFailsLimit(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
+* setFailsCounter -
+*/
+extern void setFailsCounter(long long failedCounter, orion::BSONObjBuilder* b);
 
 
 /* ****************************************************************************
@@ -86,7 +101,7 @@ extern void setDescription(const ngsiv2::Subscription& sub, orion::BSONObjBuilde
 *
 * setStatus -
 */
-extern void setStatus(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now);
 
 
 
@@ -94,7 +109,7 @@ extern void setStatus(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setEntities -
 */
-extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1 = false);
 
 
 
@@ -112,9 +127,8 @@ extern void setAttrs(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 */
 extern void setConds
 (
-  const ngsiv2::Subscription&      sub,
-  const std::vector<std::string>&  notifAttributesV,
-  orion::BSONObjBuilder*           b
+  const ngsiv2::Subscription&  sub,
+  orion::BSONObjBuilder*       b
 );
 
 
@@ -180,6 +194,27 @@ extern void setBlacklist(const ngsiv2::Subscription& sub, orion::BSONObjBuilder*
 * setOnlyChanged -
 */
 extern void setOnlyChanged(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
+/* ****************************************************************************
+*
+* setCovered -
+*/
+extern void setCovered(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
+/* ****************************************************************************
+*
+* setNotifyOnMetadataChange -
+*/
+extern void setNotifyOnMetadataChange(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
+/* ****************************************************************************
+*
+* setOperations -
+*/
+extern void setOperations(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
