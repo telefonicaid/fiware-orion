@@ -64,6 +64,7 @@
 #include "mongoDriver/safeMongo.h"
 #include "mongoDriver/BSONObjBuilder.h"
 #include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/DBErrors.h"
 
 
 /* ****************************************************************************

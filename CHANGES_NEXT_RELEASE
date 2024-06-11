@@ -1,2 +1,3 @@
 - Fix: wrong date values should not allowed in subscription's expires field (#4541)
+- Fix: do not raise DB alarm in case of wrong GeoJSON in client request
 - Fix: extend loop protection to any request (not only custom notifications) to cover potential update loops due to CEP integration
