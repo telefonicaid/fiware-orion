@@ -2993,7 +2993,7 @@ results in
 
 #### thMapper
 
-Returns a value among several choices based in threshold values. This function is based in an array of *values* and an array of *choices* (which length is exactly the same as values plus one). Thus, if the input value is between the *i*-th and the *i+1*-th item of *values*, then *i*+1-th item of *choices* is returned.
+Returns a value among several choices based in threshold values. This function is based in an array of *values* and an array of *choices* (which length is exactly the same as values plus one). Thus, if the input value is greater than or equal to the *i*-th and less than the *i+1*-th item of *values*, then *i*+1-th item of *choices* is returned.
 
 This transformation returns `null` if some problem with the arguments is found (i.e. choices length is not exacly the same as values plus one, some of the items in the values array is not a number, etc.)
 
