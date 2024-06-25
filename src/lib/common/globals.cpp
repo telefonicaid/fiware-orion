@@ -609,6 +609,17 @@ double parse8601Time(const std::string& ss)
     return -1;
   }
 
+  // The following 'for' loop is implemented to handle a specific datetime case where the datetime string
+  // is '2016-04-05T14:10:0x.00Z'. This particular case is being incorrectly PASS through the
+  // sscanf() function i.e. used next to this 'for' loop.
+  for (char c : ss)
+  {
+    if (std::isalpha(c) && c != 'T' && c != 'Z')
+    {
+      return -1;
+    }
+  }
+
   // According to https://en.wikipedia.org/wiki/ISO_8601#Times, the following formats have to be supported
   //
   // hh:mm:ss.sss or  hhmmss.sss
