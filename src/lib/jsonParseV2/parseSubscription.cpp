@@ -554,10 +554,19 @@ static std::string parseCustomPayload
           return badInput(ciP, r);
         }
 
-        // metadadata are now allowed in this case
-        if (caP->metadataVector.size() > 0)
+        // only evalPriority metadadata is allowed in this case
+        for (unsigned ix = 0; ix < caP->metadataVector.size(); ix++)
         {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF);
+          if (caP->metadataVector[ix]->name != NGSI_MD_EVAL_PRIORITY)
+          {
+            return badInput(ciP, ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF);
+          }
+          else
+          {
+            // priority must be a number
+            // priority must be between MIX_PRIORITY and MAX_PRIORITY
+            // FIXME: PR (include a .test to asses the checkings works)
+          }
         }
       }
     }

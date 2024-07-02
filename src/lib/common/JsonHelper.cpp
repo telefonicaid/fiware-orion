@@ -138,7 +138,7 @@ std::string objectToJson(std::map<std::string, std::string>& list)
 *
 * JsonObjectHelper -
 */
-JsonObjectHelper::JsonObjectHelper(): empty(true), closed(false)
+JsonObjectHelper::JsonObjectHelper(): empty(true)
 {
   ss += '{';
 }
@@ -280,15 +280,17 @@ void JsonObjectHelper::addNull(const std::string& key)
 *
 * JsonObjectHelper::str -
 */
-std::string JsonObjectHelper::str()
+std::string JsonObjectHelper::str(bool closed)
 {
-  // This check allows to call str() several times (needed when this is used in ExprContext)
-  if (!closed)
+  // closed == false used in ExprContext logic
+  if (closed)
   {
-    ss += '}';
-    closed = true;
+    return ss + '}';
   }
-  return ss;
+  else
+  {
+    return ss;
+  }
 }
 
 
@@ -297,7 +299,7 @@ std::string JsonObjectHelper::str()
 *
 * JsonVectorHelper -
 */
-JsonVectorHelper::JsonVectorHelper(): empty(true), closed(false)
+JsonVectorHelper::JsonVectorHelper(): empty(true)
 {
   ss += '[';
 }
@@ -425,14 +427,17 @@ void JsonVectorHelper::addNull(void)
 /* ****************************************************************************
 *
 * JsonVectorHelper::str -
+* FIXME PR: bool closed probably unneded in vectors
 */
-std::string JsonVectorHelper::str()
+std::string JsonVectorHelper::str(bool closed)
 {
-  // This check allows to call str() several times (needed when this is used in ExprContext)
-  if (!closed)
+  // closed == false used in ExprContext logic
+  if (closed)
   {
-    ss += ']';
-    closed = true;
+    return ss + ']';
   }
-  return ss;
+  else
+  {
+    return ss;
+  }
 }
