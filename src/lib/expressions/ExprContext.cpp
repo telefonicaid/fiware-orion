@@ -47,7 +47,7 @@ ExprContextObject::ExprContextObject(bool _basic)
 */
 std::string ExprContextObject::getJexlContext(void)
 {
-  return jh.str();
+  return jh.str(false) + '}';
 }
 
 
@@ -83,7 +83,14 @@ void ExprContextObject::add(const std::string &key, const std::string &_value, b
   else
   {
     LM_T(LmtExpr, ("adding to JEXL expression context object (string): %s=%s", key.c_str(), _value.c_str()));
-    jh.addString(key, _value);
+    if (raw)
+    {
+      jh.addRaw(key, _value);
+    }
+    else
+    {
+      jh.addString(key, _value);
+    }
   }
 }
 
