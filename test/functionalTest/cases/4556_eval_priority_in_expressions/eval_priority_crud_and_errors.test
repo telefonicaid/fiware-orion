@@ -575,7 +575,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 369
+Content-Length: 355
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -586,7 +586,6 @@ Content-Length: 369
         "httpCustom": {
             "ngsi": {
                 "S": {
-                    "metadata": {},
                     "type": "Calculated",
                     "value": "${Z1+1}"
                 }
