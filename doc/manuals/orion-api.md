@@ -2533,7 +2533,7 @@ Thus, if we have this:
 }
 ```
 
-`B` could be set to the desired `0.04` (if `A` is evaluated before `B`) or to the underised `null` (if `B` is evaluated before `A`), randomly.
+in the resulting notification `B` could be set to the desired `0.04` (if `A` is evaluated before `B`) or to the underised `null` (if `B` is evaluated before `A`), randomly.
 
 In order to overcome this problem, the `evalPriority` metadata can be used to define the evaluation order. It works this way:
 
@@ -2541,7 +2541,7 @@ In order to overcome this problem, the `evalPriority` metadata can be used to de
 * Expressions are evaluated in incresing order of priority
 * In case of ties, Orion does not guarantee a particular evaluation order. Thus, expressions in the same priority level must be considered independent or bad things would happen
 * If no `evalPriority` is set, default 100000 is used
-* `evalPriority` only has a meaning in `notification.httpCustom.ngsi` in subscriptions. As metadata in regular entities (e.g. an entity created with `POST /v2/entities`) Orion doesn't implements any semantic.
+* `evalPriority` only has a meaning in `notification.httpCustom.ngsi` in subscriptions. As metadata in regular entities (e.g. an entity created with `POST /v2/entities`) Orion doesn't implements any semantic for it
 
 Using `evalPriority` the above example could be reformuled this way:
 

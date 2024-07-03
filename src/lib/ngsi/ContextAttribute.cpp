@@ -1144,11 +1144,11 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
 
   //
-  // metadata (note that ngsi field in custom notifications avoids empety metadata array, i.e. "metadata": {})
+  // metadata (note that ngsi field in custom notifications avoids empty metadata array, i.e. "metadata": {})
   //
   if ((!renderNgsiField) || (metadataVector.size() > 0))
   {
-      jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
+    jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
   }
 
   return jh.str();
@@ -1185,9 +1185,6 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    //std::string out = "\"";
-    //out += toJsonString(stringValue);
-    //out += '"';
     return smartStringValue(stringValue, exprContextObjectP, "null");
   }
   else if (valueType == orion::ValueTypeBoolean)
