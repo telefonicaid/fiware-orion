@@ -249,10 +249,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 101
+Content-Length: 114
 
 {
-    "description": "metadata are not allowed in ngsi field in custom notifications",
+    "description": "only evalPriority metadata is allowed in ngsi field in custom notifications",
     "error": "BadRequest"
 }
 

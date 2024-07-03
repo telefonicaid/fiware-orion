@@ -46,6 +46,7 @@
 *
 * Metadata interpreted by Orion Context Broker, i.e. not custom metadata
 */
+#define NGSI_MD_EVAL_PRIORITY      "evalPriority"
 #define NGSI_MD_IGNORE_TYPE        "ignoreType"
 #define NGSI_MD_PREVIOUSVALUE      "previousValue"   // Special metadata
 #define NGSI_MD_ACTIONTYPE         "actionType"      // Special metadata

@@ -765,6 +765,26 @@ bool ContextAttribute::getLocation(orion::BSONObj* attrsP) const
 
 /* ****************************************************************************
 *
+* getEvalPriority -
+*/
+double ContextAttribute::getEvalPriority(void)
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ix++)
+  {
+    if (metadataVector[ix]->name == NGSI_MD_EVAL_PRIORITY)
+    {
+      return metadataVector[ix]->numberValue;
+    }
+  }
+
+  // if the attribute doesn't have evalPriority metadata, then max priority is assumed
+  return MAX_PRIORITY;
+}
+
+
+
+/* ****************************************************************************
+*
 * toJsonV1AsObject -
 */
 std::string ContextAttribute::toJsonV1AsObject
@@ -1124,9 +1144,9 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
 
   //
-  // metadata (note that ngsi field in custom notifications doesn't include metadata)
+  // metadata (note that ngsi field in custom notifications avoids empty metadata array, i.e. "metadata": {})
   //
-  if (!renderNgsiField)
+  if ((!renderNgsiField) || (metadataVector.size() > 0))
   {
     jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
   }
@@ -1140,9 +1160,10 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
 * toJsonValue -
 *
 * To be used by options=values and options=unique renderings
+* Also used by the ngsi expression logic
 *
 */
-std::string ContextAttribute::toJsonValue(void)
+std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
 {
   if (compoundValueP != NULL)
   {
@@ -1164,10 +1185,7 @@ std::string ContextAttribute::toJsonValue(void)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    std::string out = "\"";
-    out += toJsonString(stringValue);
-    out += '"';
-    return out;
+    return smartStringValue(stringValue, exprContextObjectP, "null");
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
