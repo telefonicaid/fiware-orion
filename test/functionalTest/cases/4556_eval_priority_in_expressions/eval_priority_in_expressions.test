@@ -32,14 +32,14 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub with expressions P1=A+1, P2=P1+1, P3=P2+1, S=P3+1 (P3 not notified)
+# 01. Create custom sub with expressions Z1=A+1, Y2=Z1+1, X3=Y2+1, S=X3+1 (X3 not notified)
 # 02. Create entity E1 with A=1
 # 03. Update entity E1 with A=2.1
-# 04. Dump accumulator and see two notifications (P1:2, P2:3, S:5) (P1:3.1, P2:4.1, S:6.1)
+# 04. Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)
 #
 
 
-echo "01. Create custom sub with expressions P1=A+1, P2=P1+1, P3=P2+1, S=P3+1 (P3 not notified)"
+echo "01. Create custom sub with expressions Z1=A+1, Y2=Z1+1, X3=Y2+1, S=X3+1 (X3 not notified)"
 echo "========================================================================================="
 payload='{
   "subject": {
@@ -54,8 +54,8 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "P2": {
-          "value": "${P1+1}",
+        "Y2": {
+          "value": "${Z1+1}",
           "type": "Calculated",
           "metadata": {
             "evalPriority": {
@@ -64,7 +64,7 @@ payload='{
             }
           }
         },
-        "P1": {
+        "Z1": {
           "value": "${A+1}",
           "type": "Calculated",
           "metadata": {
@@ -74,8 +74,8 @@ payload='{
             }
           }
         },
-        "P3": {
-          "value": "${P2+1}",
+        "X3": {
+          "value": "${Y2+1}",
           "type": "Calculated",
           "metadata": {
             "evalPriority": {
@@ -85,12 +85,12 @@ payload='{
           }
         },
         "S": {
-          "value": "${P3+1}",
+          "value": "${X3+1}",
           "type": "Calculated"
         }
       }
     },
-    "attrs": [ "P1", "P2", "S" ]
+    "attrs": [ "Z1", "Y2", "S" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -126,7 +126,7 @@ echo
 echo
 
 
-echo "Dump accumulator and see two notifications (P1:2, P2:3, S:5) (P1:3.1, P2:4.1, S:6.1)"
+echo "Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)"
 echo "===================================================================================="
 accumulatorDump
 echo
@@ -134,7 +134,7 @@ echo
 
 
 --REGEXPECT--
-01. Create custom sub with expressions P1=A+1, P2=P1+1, P3=P2+1, S=P3+1 (P3 not notified)
+01. Create custom sub with expressions Z1=A+1, Y2=Z1+1, X3=Y2+1, S=X3+1 (X3 not notified)
 =========================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -162,7 +162,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-Dump accumulator and see two notifications (P1:2, P2:3, S:5) (P1:3.1, P2:4.1, S:6.1)
+Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)
 ====================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
@@ -177,17 +177,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "P1": {
-                "metadata": {
-                    "evalPriority": {
-                        "type": "Number",
-                        "value": 1
-                    }
-                },
+            "S": {
+                "metadata": {},
                 "type": "Calculated",
-                "value": 2
+                "value": 5
             },
-            "P2": {
+            "Y2": {
                 "metadata": {
                     "evalPriority": {
                         "type": "Number",
@@ -197,10 +192,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "type": "Calculated",
                 "value": 3
             },
-            "S": {
-                "metadata": {},
+            "Z1": {
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 1
+                    }
+                },
                 "type": "Calculated",
-                "value": 5
+                "value": 2
             },
             "id": "E1",
             "type": "T"
@@ -222,17 +222,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "P1": {
-                "metadata": {
-                    "evalPriority": {
-                        "type": "Number",
-                        "value": 1
-                    }
-                },
+            "S": {
+                "metadata": {},
                 "type": "Calculated",
-                "value": 3.1
+                "value": 6.1
             },
-            "P2": {
+            "Y2": {
                 "metadata": {
                     "evalPriority": {
                         "type": "Number",
@@ -242,10 +237,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "type": "Calculated",
                 "value": 4.1
             },
-            "S": {
-                "metadata": {},
+            "Z1": {
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 1
+                    }
+                },
                 "type": "Calculated",
-                "value": 6.1
+                "value": 3.1
             },
             "id": "E1",
             "type": "T"
