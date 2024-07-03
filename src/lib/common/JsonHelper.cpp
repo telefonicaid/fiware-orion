@@ -424,20 +424,13 @@ void JsonVectorHelper::addNull(void)
 
 
 
+
 /* ****************************************************************************
 *
 * JsonVectorHelper::str -
-* FIXME PR: bool closed probably unneded in vectors
 */
-std::string JsonVectorHelper::str(bool closed)
+std::string JsonVectorHelper::str(void)
 {
-  // closed == false used in ExprContext logic
-  if (closed)
-  {
-    return ss + ']';
-  }
-  else
-  {
-    return ss;
-  }
+  ss += ']';
+  return ss;
 }

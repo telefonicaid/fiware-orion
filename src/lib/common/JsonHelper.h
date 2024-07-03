@@ -67,7 +67,7 @@ public:
   void        addNull(void);
 
 
-  std::string str(bool closed = true);
+  std::string str(void);
 
 private:
  std::string  ss;
