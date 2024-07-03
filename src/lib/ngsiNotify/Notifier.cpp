@@ -291,15 +291,15 @@ static bool setNgsiPayload
 
   for (unsigned int ix = 0; ix < orderedNgsiAttrs.size(); ix++)
   {
-    cer.entity.attributeVector.push_back(new ContextAttribute(orderedNgsiAttrs[ix], false, true));
-
     // Avoid to add context if an attribute with the same name exists in the entity
-    if (cer.entity.attributeVector.get(orderedNgsiAttrs[ix]->name) < 0)
+    if (en.attributeVector.get(orderedNgsiAttrs[ix]->name) < 0)
     {
       TIME_EXPR_CTXBLD_START();
       exprContextObjectP->add(orderedNgsiAttrs[ix]->name, orderedNgsiAttrs[ix]->toJsonValue(exprContextObjectP), true);
       TIME_EXPR_CTXBLD_STOP();
     }
+
+    cer.entity.attributeVector.push_back(new ContextAttribute(orderedNgsiAttrs[ix], false, true));
   }
   // Next, other attributes in the original entity not already added
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
