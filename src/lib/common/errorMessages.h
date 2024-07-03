@@ -89,6 +89,10 @@
 #define ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON                  "Wrong GeoJson"
 #define ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF "only evalPriority metadata is allowed in ngsi field in custom notifications"
 
+#define ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MUST_BE_A_NUMBER  "evalPriority metadata must be a number"
+#define ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MIN_ERROR         "evalPriority metadata minimum priority is " STR(MIN_PRIORITY)
+#define ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MAX_ERROR         "evalPriority metadata maximum priority is "  STR(MAX_PRIORITY)
+
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
 #define ERROR_DESC_NOT_FOUND_ENTITY_TYPE              "Entity type not found"

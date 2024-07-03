@@ -1146,10 +1146,11 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   // metadata (note that ngsi field in custom notifications doesn't include metadata)
   //
-  if (!renderNgsiField)
-  {
+  // FIXME PR: cleanup this
+  //if (!renderNgsiField)
+  //{
     jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
-  }
+  //}
 
   return jh.str();
 }

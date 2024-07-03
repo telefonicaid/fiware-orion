@@ -563,9 +563,18 @@ static std::string parseCustomPayload
           }
           else
           {
-            // priority must be a number
-            // priority must be between MIX_PRIORITY and MAX_PRIORITY
-            // FIXME: PR (include a .test to asses the checkings works)
+            if (caP->metadataVector[ix]->valueType != orion::ValueTypeNumber)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MUST_BE_A_NUMBER);
+            }
+            if (caP->metadataVector[ix]->numberValue < MIN_PRIORITY)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MIN_ERROR);
+            }
+            if (caP->metadataVector[ix]->numberValue > MAX_PRIORITY)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MAX_ERROR);
+            }
           }
         }
       }

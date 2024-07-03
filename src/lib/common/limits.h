@@ -235,7 +235,7 @@
 *
 */
 #define MIN_PRIORITY  1
-#define MAX_PRIORITY  LLONG_MAX
+#define MAX_PRIORITY  100000
 
 
 
