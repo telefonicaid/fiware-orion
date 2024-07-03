@@ -75,6 +75,7 @@
       - [Additional considerations](#additional-considerations)
     - [JEXL Support](#jexl-support)
       - [JEXL usage example](#jexl-usage-example)
+      - [Evaluation priority](#evaluation-priority)
       - [Available Transformations](#available-transformations)
         - [`uppercase`](#uppercase)
         - [`lowercase`](#lowercase)
@@ -745,6 +746,8 @@ this metadata is not needed most of the cases, but there are two cases in which 
 type has an special semantic for Orion:
    * `DateTime`
    * `geo:json`
+
+* `evalPriority`: used by expression evaluation. Have a look to [this specific section](#evaluation-priority) for details.
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
@@ -2505,6 +2508,64 @@ will trigger a notification like this:
     }
   }
 ]
+```
+
+### Evaluation priority
+
+Each time an expression is evaluated, it is added to the expression context, so it can be reused by other expressions. However, by default Orion does not guarantee a given evaluation other.
+
+Thus, if we have this:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated"
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
+`B` could be set to the desired `0.04` (if `A` is evaluated before `B`) or to the underised `null` (if `B` is evaluated before `A`), randomly.
+
+In order to overcome this problem, the `evalPriority` metadata can be used to define the evaluation order. It works this way:
+
+* `evalPriority` metadata is a number from 1 (first evaluation) to 100000 (last evaluation)
+* Expressions are evaluated in incresing order of priority
+* In case of ties, Orion does not guarantee a particular evaluation order. Thus, expressions in the same priority level must be considered independent or bad things would happen
+* If no `evalPriority` is set, default 100000 is used
+* `evalPriority` only has a meaning in `notification.httpCustom.ngsi` in subscriptions. As metadata in regular entities (e.g. an entity created with `POST /v2/entities`) Orion doesn't implements any semantic.
+
+Using `evalPriority` the above example could be reformuled this way:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated",
+      "metadata": {
+        "evalPriority": {
+          "value": 1,
+          "type": "Number"
+        }
+      }
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
 ```
 
 ### Available Transformations
