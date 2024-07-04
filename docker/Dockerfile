@@ -29,19 +29,17 @@ ARG GITHUB_REPOSITORY=fiware-orion
 ARG GIT_NAME
 ARG GIT_REV_ORION
 ARG CLEAN_DEV_TOOLS
-ARG REPO_ACCESS_TOKEN
 
 ENV ORION_USER ${ORION_USER:-orion}
 ENV GIT_NAME ${GIT_NAME:-telefonicaid}
 ENV GIT_REV_ORION ${GIT_REV_ORION:-master}
 ENV CLEAN_DEV_TOOLS ${CLEAN_DEV_TOOLS:-1}
-ENV REPO_ACCESS_TOKEN ${REPO_ACCESS_TOKEN:-""}
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR /opt
 
-RUN \
+RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # Install security updates
     apt-get -y update && \
     apt-get -y upgrade && \
@@ -104,7 +102,7 @@ RUN \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
-    bash get_cjexl.sh 0.3.0 ${REPO_ACCESS_TOKEN} && \
+    bash get_cjexl.sh 0.3.0 $(cat /run/secrets/repo_token) && \
     make && \
     make install && \
     # reduce size of installed binaries
