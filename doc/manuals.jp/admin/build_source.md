@@ -13,7 +13,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (ソースから)
 * libcurl: 7.88.1
-* openssl: 3.0.9
+* openssl: 3.0.13
 * libuuid: 2.38.1
 * libmosquitto: 2.0.15 (ソースから)
 * Mongo C driver: 1.24.3 (ソースから)
