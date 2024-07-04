@@ -75,6 +75,7 @@
       - [その他の考慮事項](#additional-considerations)
     - [JEXL サポート (JEXL Support)](#jexl-support)
       - [JEXL 使用例 (JEXL usage example)](#jexl-usage-example)
+      - [評価の優先順位](#evaluation-priority)
       - [利用可能な変換 (Available Transformations)](#available-transformations)
         - [`uppercase`](#uppercase)
         - [`lowercase`](#lowercase)
@@ -715,6 +716,9 @@ Orion は階層スコープをサポートしているため、エンティテ�
     Orion の特別なセマンティックを持つ 2 つのケースがあることに注意してください:
     -   `DateTime`
     -   `geo:json`
+
+- `evalPriority`: 式の評価で使用されます。詳細については、[この特定のセクション](#evaluation-priority)を参照してください
+
 
 現時点では、'ignoreType' は地理位置情報タイプに対してのみサポートされており、この方法により、エンティティごとに1つの
 地理位置情報のみという制限を克服するメカニズムが可能になります
@@ -2508,6 +2512,66 @@ Orion は、この機能を提供するために cjexl ライブラリに依存�
     }
   }
 ]
+```
+
+<a name="evaluation-priority"></a>
+
+### 評価の優先順位
+
+式が評価されるたびに、その式は式のコンテキストに追加され、他の式で再利用できるようになります。ただし、デフォルトでは、Orion は特定の評価を保証しません。
+
+したがって、次の式があるとします:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated"
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
+結果の通知では、`B` は、希望する `0.04` (`A` が `B` の前に評価される場合) または、過小評価された `null` (`B` が `A` の前に評価される場合) にランダムに設定される可能性があります。
+
+この問題を克服するために、`evalPriority` メタデータを使用して評価順序を定義できます。これは次のように機能します:
+
+- `evalPriority` メタデータは、1 (最初の評価) から 100000 (最後の評価) までの数値です
+- 式は優先度の昇順で評価されます
+- 同順位の場合、Orion は特定の評価順序を保証しません。したがって、同じ優先度レベルの式は独立していると見なす必要があり、同じまたはより低い優先度の他の属性を使用する式は予期しない値になります
+- `evalPriority` が設定されていない場合は、デフォルトの 100000 が使用されます
+- `evalPriority` は、サブスクリプションの `notification.httpCustom.ngsi` でのみ意味を持ちます。通常のエンティティのメタデータ (`POST /v2/entities` で作成されたエンティティなど) として、Orion はそれに対するセマンティクスを実装しません
+
+`evalPriority` を使用すると、上記の例は次のように書き直すことができます:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated",
+      "metadata": {
+        "evalPriority": {
+          "value": 1,
+          "type": "Number"
+        }
+      }
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
 ```
 
 <a name="available-transformations"></a>
