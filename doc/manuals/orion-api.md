@@ -2684,7 +2684,7 @@ foo  bar
 
 #### substring
 
-Returns a substring between two positions.
+Returns a substring between two positions or `null` in case of wrong parameters (eg. final position is longer than string, final position is leeser than initial position, etc.)
 
 Extra arguments:
 * Initial position
