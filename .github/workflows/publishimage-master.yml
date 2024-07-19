@@ -27,7 +27,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TEF_TOKEN }}
 
     - name: Build Docker image
-      run: 
+      run: |
         export TOKEN=${{ secrets.REPO_ACCESS_TOKEN }}
         docker build -t telefonicaiot/fiware-orion:latest --build-arg GIT_REV_ORION=master --secret id=repo_token,env=TOKEN --no-cache -f docker/Dockerfile .
 
