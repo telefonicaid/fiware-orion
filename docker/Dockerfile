@@ -102,7 +102,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
-    bash get_cjexl.sh 0.3.0 $(cat /run/secrets/repo_token) && \
+    bash get_cjexl.sh 0.4.0 $(cat /run/secrets/repo_token) && \
     make && \
     make install && \
     # reduce size of installed binaries

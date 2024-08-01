@@ -81,7 +81,10 @@ payload='{
       "AA",
       "AB",
       "AC",
-      "AD"
+      "AD",
+      "AE",
+      "AF",
+      "AG"
     ],
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
@@ -205,6 +208,18 @@ payload='{
         "AD": {
           "type": "Number",
           "value": "${AD|len}"
+        },
+        "AE": {
+          "type": "Number",
+          "value": "${AE|now}"
+        },
+        "AF": {
+          "type": "Text",
+          "value": "${AF|toIsoString}"
+        },
+        "AG": {
+          "type": "Number",
+          "value": "${AG|getTime}"
         }
       }
     }
@@ -344,6 +359,18 @@ payload='{
   "AD": {
     "type": "StructuredValue",
     "value": [1, 2, 3]
+  },
+  "AE": {
+    "type": "Number",
+    "value": 0
+  },
+  "AF": {
+    "type": "Number",
+    "value": 1722500129
+  },
+  "AG": {
+    "type": "Number",
+    "value": "1979-11-13T18:01:14+00:00"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -383,7 +410,7 @@ Content-Length: 0
 ==================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 1627
+Content-Length: 1809
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -421,6 +448,21 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Number",
                 "value": 3
+            },
+            "AE": {
+                "metadata": {},
+                "type": "Number",
+                "value": REGEX(\d+)
+            },
+            "AF": {
+                "metadata": {},
+                "type": "Text",
+                "value": "2024-08-01T08:15:29+00:00"
+            },
+            "AG": {
+                "metadata": {},
+                "type": "Number",
+                "value": 311364074
             },
             "B": {
                 "metadata": {},

@@ -108,6 +108,9 @@
         - [`keys`](#keys)
         - [`arrSum`](#arrsum)
         - [`arrAvg`](#arravg)
+        - [`now`](#now)
+        - [`toIsoString`](#toisostring)
+        - [`getTime`](#gettime)
       - [Failsafe cases](#failsafe-cases)
       - [Known limitations](#known-limitations)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
@@ -2684,7 +2687,7 @@ foo  bar
 
 #### substring
 
-Returns a substring between two positions.
+Returns a substring between two positions or `null` in case of wrong parameters (eg. final position is longer than string, final position is leeser than initial position, etc.)
 
 Extra arguments:
 * Initial position
@@ -3145,6 +3148,67 @@ results in
 ```
 3
 ```
+
+#### now
+
+Returns the current time (plus a number of seconds specified as argument) as seconds since Unix epoch time.
+
+Extra arguments: none
+
+Example (being current time August 1st, 2024 at 9:31:02):
+
+```
+0|now
+```
+
+results in
+
+```
+1722504662
+```
+
+It can be checked at https://www.epochconverter.com that time corresponds to August 1st, 2024 at 9:31:02
+
+#### toIsoString
+
+Returns the [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) corresponding to a given timestamp (as seconds since Unix epoch time) passed as argument.
+
+Extra arguments: none
+
+Example (being context `{"c": 1720606949}`):
+
+```
+c|toIsoString
+```
+
+results in
+
+```
+"2024-07-10T10:22:29+00:00"
+```
+
+It can be checked at https://www.epochconverter.com that 1720606949 corresponds to 2024-07-10T10:22:29+00:00
+
+
+#### getTime
+
+Returns the timestamp (as seconds since Unix epoch time) correspoding to the [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) passed as argument.
+
+Extra arguments: none
+
+Example (being context `{"c": "2024-07-10T10:22:29+00:00"}`):
+
+```
+c|getTime
+```
+
+results in
+
+```
+1720606949
+```
+
+It can be checked at https://www.epochconverter.com that 1720606949 corresponds to 2024-07-10T10:22:29+00:00
 
 ### Failsafe cases
 
