@@ -1332,7 +1332,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$max`
 
@@ -1360,7 +1360,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$push`
 
