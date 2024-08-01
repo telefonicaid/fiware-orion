@@ -218,16 +218,42 @@ static std::string parseContextAttributeObject
   // Is it a (not null) date?
   if (checkAttrSpecialTypes && ((caP->type == DATE_TYPE) || (caP->type == DATE_TYPE_ALT)) && (caP->valueType != orion::ValueTypeNull))
   {
-    caP->numberValue =  parse8601Time(caP->stringValue);
-
-    if (caP->numberValue == -1)
+    if (caP->valueType == orion::ValueTypeObject)
     {
-      return "date has invalid format";
-    }
+      // check if $max or $min operators are being used. Other usages of object values result in parsing error
+      if ((caP->compoundValueP != NULL) && (caP->compoundValueP->valueType == orion::ValueTypeObject)
+          && (caP->compoundValueP->childV.size() == 1) && ((caP->compoundValueP->childV[0]->name == "$max") || (caP->compoundValueP->childV[0]->name == "$min")))
+      {
+        orion::CompoundValueNode* upOp = caP->compoundValueP->childV[0];
+        upOp->numberValue = parse8601Time(upOp->stringValue);
 
-    // Probably reseting stringValue is not needed, but let's do it for cleanliness
-    caP->stringValue = "";
-    caP->valueType   = orion::ValueTypeNumber;
+        if (upOp->numberValue == -1)
+        {
+          return "date has invalid format";
+        }
+
+        // Probably reseting stringValue is not needed, but let's do it for cleanliness
+        upOp->stringValue = "";
+        upOp->valueType   = orion::ValueTypeNumber;                
+      }
+      else
+      {
+        return "date has invalid format";
+      }
+    }
+    else
+    {
+      caP->numberValue =  parse8601Time(caP->stringValue);
+
+      if (caP->numberValue == -1)
+      {
+        return "date has invalid format";
+      }
+
+      // Probably reseting stringValue is not needed, but let's do it for cleanliness
+      caP->stringValue = "";
+      caP->valueType   = orion::ValueTypeNumber;
+    }
   }
 
   // It is a safe GeoJSON?

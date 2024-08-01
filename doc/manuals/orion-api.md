@@ -1332,7 +1332,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$max`
 
@@ -1360,7 +1360,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$push`
 
@@ -1618,7 +1618,8 @@ The only exception to "use only one operator" rule is the case of `$set` and
 Update operators can be used in entity creation or replace operations. In particular:
 
 * Numeric operators takes 0 as reference. For instance, `{"$inc": 4}` results in 4,
-  `{$mul: 1000}` results in 0, etc.
+  `{"$mul": 1000}` results in 0, etc.
+* Epoch time (`"1970-01-01T00:00:00Z"`) is used as reference for `DateTime` when `$min` or `$max` are used.
 * `$set` takes the empty object (`{}`) as reference. For instance, `"$set": {"X": 1}` results in just `{"X": 1}`
 * `$push` and `$addToSet` take the empty array (`[]`) as reference. For instance, `{"$push": 4}`
   results in `[ 4 ]`.

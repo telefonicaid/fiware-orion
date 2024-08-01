@@ -1,0 +1,253 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+DateTime with min and max operators
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 with DateTime T=2024-04-15T10:59:59.000Z
+# 02. Update entity with {$min: 2025-04-15T10:59:59.000Z}
+# 03. Get entity see T=2024-04-15T10:59:59.000Z
+# 04. Update entity with {$min: 2023-04-15T10:59:59.000Z}
+# 05. Get entity see T=2023-04-15T10:59:59.000Z
+# 06. Update entity with {$max: 2022-04-15T10:59:59.000Z}
+# 07. Get entity see T=2023-04-15T10:59:59.000Z
+# 08. Update entity with {$max: 2026-04-15T10:59:59.000Z}
+# 09. Get entity see T=2026-04-15T10:59:59.000Z
+#
+
+
+echo '01. Create entity E1 with DateTime T=2024-04-15T10:59:59.000Z'
+echo '============================================================='
+payload='{
+  "id": "E1",
+  "type": "T",
+  "T": {
+    "value": "2024-04-15T10:59:59.000Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Update entity with {$min: 2025-04-15T10:59:59.000Z}'
+echo "======================================================="
+payload='{
+  "T": {
+    "value": {"$min": "2025-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03. Get entity see T=2024-04-15T10:59:59.000Z"
+echo "============================================="
+orionCurl --url /v2/entities/E1/attrs
+echo
+echo
+
+
+echo '04. Update entity with {$min: 2023-04-15T10:59:59.000Z}'
+echo "======================================================="
+payload='{
+  "T": {
+    "value": {"$min": "2023-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. Get entity see T=2023-04-15T10:59:59.000Z"
+echo "============================================="
+orionCurl --url /v2/entities/E1/attrs
+echo
+echo
+
+
+echo '06. Update entity with {$max: 2022-04-15T10:59:59.000Z}'
+echo "======================================================="
+payload='{
+  "T": {
+    "value": {"$max": "2022-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. Get entity see T=2023-04-15T10:59:59.000Z"
+echo "============================================="
+orionCurl --url /v2/entities/E1/attrs
+echo
+echo
+
+
+echo '08. Update entity with {$max: 2026-04-15T10:59:59.000Z}'
+echo "======================================================="
+payload='{
+  "T": {
+    "value": {"$max": "2026-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "09. Get entity see T=2026-04-15T10:59:59.000Z"
+echo "============================================="
+orionCurl --url /v2/entities/E1/attrs
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E1 with DateTime T=2024-04-15T10:59:59.000Z
+=============================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+02. Update entity with {$min: 2025-04-15T10:59:59.000Z}
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+03. Get entity see T=2024-04-15T10:59:59.000Z
+=============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
+
+{
+    "T": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2024-04-15T10:59:59.000Z"
+    }
+}
+
+
+04. Update entity with {$min: 2023-04-15T10:59:59.000Z}
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Get entity see T=2023-04-15T10:59:59.000Z
+=============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
+
+{
+    "T": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2023-04-15T10:59:59.000Z"
+    }
+}
+
+
+06. Update entity with {$max: 2022-04-15T10:59:59.000Z}
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. Get entity see T=2023-04-15T10:59:59.000Z
+=============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
+
+{
+    "T": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2023-04-15T10:59:59.000Z"
+    }
+}
+
+
+08. Update entity with {$max: 2026-04-15T10:59:59.000Z}
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09. Get entity see T=2026-04-15T10:59:59.000Z
+=============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
+
+{
+    "T": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2026-04-15T10:59:59.000Z"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
