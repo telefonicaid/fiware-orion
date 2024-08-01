@@ -3158,7 +3158,7 @@ Extra arguments: none
 Example (being current time August 1st, 2024 at 9:31:02):
 
 ```
-0|new
+0|now
 ```
 
 results in
