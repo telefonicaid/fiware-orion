@@ -1,5 +1,3 @@
-- Upgrade cjexl version from 0.3.0 to 0.4.0 (new transformations: now, getTime and toIsoString)
-
 4.0.0 (June 6th, 2024)
 
 - Add: JEXL expression support in custom notification macro replacement (using cjexl 0.3.0) (#4004)
