@@ -110,7 +110,7 @@
         - [`arrAvg`](#arravg)
         - [`now`](#now)
         - [`toIsoString`](#toisostring)
-        - [`getTime](#gettime)
+        - [`getTime`](#gettime)
       - [Failsafe cases](#failsafe-cases)
       - [Known limitations](#known-limitations)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
