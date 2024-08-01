@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-JEXL expression substring specific cases
+JEXL expression time transformation specific cases
 
 --SHELL-INIT--
 dbInit CB
@@ -31,16 +31,17 @@ accumulatorStart --pretty-print
 
 --SHELL--
 
+# Same test as jexl_transformation_time_transformations but using "DateTime" instead of "Text" for A attribute
 #
-# 01. Create custom sub with custom expression A=S|substring(0,2), B=S|substring(3,5), C=S|substring(3,50), D=S|substring(5,3)
-# 02. Create entity E with S=X1:X2
-# 03. Update entity E with S=Y1:Y2
-# 04. Dump accumulator and see notifications (A=X1,B=X2,C=null,D=null) (A=Y1,B=Y2,C=null,D=null)
+# 01. Create custom sub with custom expression S=A|getTime|toIsoString, T=B|toIsoString|getTime
+# 02. Create entity E with A=2060-02-04T23:28:10+00:00, B=1722501038
+# 03. Update entity E with A=2040-03-12T21:04:13+00:00, B=122501038
+# 04. Dump accumulator and see notifications (S=2060-02-04T23:28:10+00:00, T=1722501038) (S=2040-03-12T21:04:13+00:00, T=122501038)
 #
 
 
-echo "01. Create custom sub with custom expression A=S|substring(0,2), B=S|substring(3,5), C=S|substring(3,50), D=S|substring(5,3)"
-echo "============================================================================================================================"
+echo "01. Create custom sub with custom expression S=A|getTime|toIsoString, T=B|toIsoString|getTime"
+echo "============================================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -54,25 +55,17 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "A": {
-          "value": "${S|substring(0,2)}",
+        "S": {
+          "value": "${A|getTime|toIsoString}",
           "type": "Calculated"
         },
-        "B": {
-          "value": "${S|substring(3,5)}",
-          "type": "Calculated"
-        },
-        "C": {
-          "value": "${S|substring(3,50)}",
-          "type": "Calculated"
-        },
-        "D": {
-          "value": "${S|substring(5,3)}",
+        "T": {
+          "value": "${B|toIsoString|getTime}",
           "type": "Calculated"
         }
       }      
     },
-    "attrs": [ "A", "B", "C", "D" ]
+    "attrs": [ "S", "T" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -80,14 +73,18 @@ echo
 echo
 
 
-echo "02. Create entity E with S=X1:X2"
-echo "================================"
+echo "02. Create entity E with A=2060-02-04T23:28:10+00:00, B=1722501038"
+echo "=================================================================="
 payload='{
   "id": "E",
   "type": "T",
-  "S": {
-    "value": "X1:X2",
-    "type": "Text"
+  "A": {
+    "value": "2060-02-04T23:28:10+00:00",
+    "type": "DateTime"
+  },
+  "B": {
+    "value": 1722501038,
+    "type": "Number"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -95,12 +92,16 @@ echo
 echo
 
 
-echo "03. Update entity E with S=Y1:Y2"
-echo "================================"
+echo "03. Update entity E with A=2040-03-12T21:04:13+00:00, B=122501038"
+echo "================================================================="
 payload='{
-  "S": {
-    "value": "Y1:Y2",
-    "type": "Text"
+  "A": {
+    "value": "2040-03-12T21:04:13+00:00",
+    "type": "DateTime"
+  },
+  "B": {
+    "value": 122501038,
+    "type": "Number"
   }
 }'
 orionCurl --url /v2/entities/E/attrs --payload "$payload"
@@ -108,16 +109,16 @@ echo
 echo
 
 
-echo "04. Dump accumulator and see notifications (E1/T1 A:1, E2/T2 A:2)"
-echo "================================================================="
+echo "04. Dump accumulator and see notifications (S=2060-02-04T23:28:10+00:00, T=1722501038) (S=2040-03-12T21:04:13+00:00, T=122501038)"
+echo "================================================================================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub with custom expression A=S|substring(0,2), B=S|substring(3,5), C=S|substring(3,50), D=S|substring(5,3)
-============================================================================================================================
+01. Create custom sub with custom expression S=A|getTime|toIsoString, T=B|toIsoString|getTime
+=============================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -126,8 +127,8 @@ Content-Length: 0
 
 
 
-02. Create entity E with S=X1:X2
-================================
+02. Create entity E with A=2060-02-04T23:28:10+00:00, B=1722501038
+==================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -136,19 +137,19 @@ Content-Length: 0
 
 
 
-03. Update entity E with S=Y1:Y2
-================================
+03. Update entity E with A=2040-03-12T21:04:13+00:00, B=122501038
+=================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Dump accumulator and see notifications (E1/T1 A:1, E2/T2 A:2)
-=================================================================
+04. Dump accumulator and see notifications (S=2060-02-04T23:28:10+00:00, T=1722501038) (S=2040-03-12T21:04:13+00:00, T=122501038)
+=================================================================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 288
+Content-Length: 211
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -159,25 +160,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "A": {
+            "S": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": "X1"
+                "value": "2060-02-04T23:28:10+00:00"
             },
-            "B": {
+            "T": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": "X2"
-            },
-            "C": {
-                "metadata": {},
-                "type": "Calculated",
-                "value": null
-            },
-            "D": {
-                "metadata": {},
-                "type": "Calculated",
-                "value": null
+                "value": 1722501038
             },
             "id": "E",
             "type": "T"
@@ -188,7 +179,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 288
+Content-Length: 210
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -199,25 +190,15 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "A": {
+            "S": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": "Y1"
+                "value": "2040-03-12T21:04:13+00:00"
             },
-            "B": {
+            "T": {
                 "metadata": {},
                 "type": "Calculated",
-                "value": "Y2"
-            },
-            "C": {
-                "metadata": {},
-                "type": "Calculated",
-                "value": null
-            },
-            "D": {
-                "metadata": {},
-                "type": "Calculated",
-                "value": null
+                "value": 122501038
             },
             "id": "E",
             "type": "T"
