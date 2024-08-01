@@ -108,6 +108,9 @@
         - [`keys`](#keys)
         - [`arrSum`](#arrsum)
         - [`arrAvg`](#arravg)
+        - [`now`](#now)
+        - [`toIsoString`](#toisostring)
+        - [`getTime`](#gettime)
       - [フェイルセーフ・ケース (Failsafe cases)](#failsafe-cases)
       - [既知の制限 (Known limitations)](#known-limitations)
     - [Oneshot サブスクリプション (Oneshot Subscriptions)](#oneshot-subscriptions)
@@ -2706,7 +2709,7 @@ foo  bar
 
 #### substring
 
-2つの位置の間の部分文字列を返します。
+2つの位置の間の部分文字列を返します。パラメータが間違っている場合は `null` を返します (例: 最終位置が文字列より長い、最終位置が初期位置より短いなど)。
 
 追加引数:
 * 開始位置
@@ -3215,6 +3218,72 @@ c|arrAvg
 ```
 3
 ```
+
+<a name="now"></a>
+
+#### now
+
+現在の時刻（引数として指定された秒数を加えたもの）を Unix エポック時間からの秒数として返します。
+
+追加の引数: なし
+
+例 (現在の時刻が 2024 年 8 月 1 日 9:31:02 の場合):
+
+```
+0|now
+```
+
+結果
+
+```
+1722504662
+```
+
+https://www.epochconverter.com で確認すると、その時間は 2024 年 8 月 1 日 9:31:02 に相当します。
+
+<a name="toisostring"></a>
+
+#### toIsoString
+
+引数として渡された特定のタイムスタンプ (Unix エポック時間からの秒数) に対応する [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) を返します。
+
+追加の引数: なし
+
+例 (コンテキスト `{"c": 1720606949}`):
+
+```
+c|toIsoString
+```
+
+結果
+
+```
+"2024-07-10T10:22:29+00:00"
+```
+
+https://www.epochconverter.com で、1720606949 が 2024-07-10T10:22:29+00:00 に対応していることを確認できます。
+
+<a name="gettime"></a>
+
+#### getTime
+
+引数として渡された [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) に対応するタイムスタンプ (Unix エポック時間からの秒数) を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "2024-07-10T10:22:29+00:00"}`):
+
+```
+c|getTime
+```
+
+結果
+
+```
+1720606949
+```
+
+https://www.epochconverter.com で、1720606949 が 2024-07-10T10:22:29+00:00 に対応していることを確認できます。
 
 <a name="failsafe-cases"></a>
 
