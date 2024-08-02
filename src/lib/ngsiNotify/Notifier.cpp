@@ -367,6 +367,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
+  ExprContextObject exprMetadataContext(basic);
 
   // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
   // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
@@ -376,16 +377,31 @@ static SenderThreadParams* buildSenderParamsCustom
   TIME_EXPR_CTXBLD_START();
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
+
   if (!basic)
   {
     exprContext.add("service", tenant);
     exprContext.add("servicePath", en.servicePath);
     exprContext.add("authToken", xauthToken);
   }
+
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
     en.attributeVector[ix]->addToContext(&exprContext, basic);
+
+    // Add attribute metadata to context
+    ExprContextObject exprAttrMetadataContext(basic);
+    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
+    {
+      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
+    }
+    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
   }
+
+  // Add all metadata under the "metadata" context key
+  // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
+  exprContext.add("metadata", exprMetadataContext);
+
   if (basic)
   {
     exprContext.add("service", tenant);

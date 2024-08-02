@@ -98,6 +98,8 @@ typedef struct Metadata
 
   void         appendToBsoN(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);
 
+  void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
+
   std::string  check(ApiVersion apiVersion);
 } Metadata;
 
