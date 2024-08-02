@@ -75,6 +75,7 @@
       - [Additional considerations](#additional-considerations)
     - [JEXL Support](#jexl-support)
       - [JEXL usage example](#jexl-usage-example)
+      - [Metadata support](#metadata-support)
       - [Evaluation priority](#evaluation-priority)
       - [Available Transformations](#available-transformations)
         - [`uppercase`](#uppercase)
@@ -2513,6 +2514,19 @@ will trigger a notification like this:
   }
 ]
 ```
+
+### Metadata support
+
+Attribute metadata is also included in the JEXL evaluation context, along with the actual attributes. This is done using a special context key named `metadata` which value is an object with the following structure:
+
+* keys are the name of the attributes
+* values are object with a key-map of the metadata values of the given attribute
+
+For instance, the expression `${metadata.A.MD1}` will result in the value of the metadata `MD1` belonging to the attribute `A`.
+
+Note that [builtin metadata](#builtin-metadata) are automatically added to the `metadata` context key. For instance, the `${A-metadata.A.previousValue}` expression will provide the difference between the current value of `A` (in the update request) and the previous one (before the update request).
+
+Finally, note that in the rare case an attribute named `metadata` is used (which is an anti-pattern strongly discouraged) it will not be added to the context, as the `metadata` with metadata values will take precedence.
 
 ### Evaluation priority
 

@@ -1,4 +1,5 @@
 - Add: custom notification ngsi patching evaluation priority based in evalPriority builtin metadata (#4556)
+- Add: attribute metadata to JEXL context (#4594)
 - Fix: $max and $min operators were not supported with DateTime attributes (#4585)
 - Fix: wrong date values should not allowed in subscription's expires field (#4541)
 - Fix: do not raise DB alarm in case of wrong GeoJSON in client request
