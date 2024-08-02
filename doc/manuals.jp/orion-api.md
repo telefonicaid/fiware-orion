@@ -75,6 +75,7 @@
       - [その他の考慮事項](#additional-considerations)
     - [JEXL サポート (JEXL Support)](#jexl-support)
       - [JEXL 使用例 (JEXL usage example)](#jexl-usage-example)
+      - [メタデータのサポート (Metadata support)](#metadata-support)
       - [評価の優先順位](#evaluation-priority)
       - [利用可能な変換 (Available Transformations)](#available-transformations)
         - [`uppercase`](#uppercase)
@@ -2517,6 +2518,21 @@ Orion は、この機能を提供するために cjexl ライブラリに依存�
   }
 ]
 ```
+
+<a name="metadata-support"></a>
+
+### メタデータのサポート (Metadata support)
+
+属性メタデータも、実際の属性とともに JEXL 評価コンテキストに含まれています。これは、`metadata` という特別なコンテキスト・キーを使用して行われます。このキーの値は、次の構造を持つオブジェクトです:
+
+* キーは属性の名前
+* 値は、指定された属性のメタデータ値のキー マップを持つオブジェクト
+
+たとえば、式 `${metadata.A.MD1}` は、属性 `A` に属するメタデータ `MD1` の値になります。
+
+[組み込みメタデータ](#builtin-metadata) は、`metadata` コンテキスト キーに自動的に追加されることに注意してください。たとえば、`${A-metadata.A.previousValue}` 式は、`A` の現在の値 (更新要求内) と以前の値 (更新要求前) の差を提供します。
+
+最後に、まれに `metadata` という名前の属性が使用される場合 (これはアンチパターンであり、強く推奨されません)、メタデータ値を持つ `metadata` が優先されるため、コンテキストに追加されないことに注意してください。
 
 <a name="evaluation-priority"></a>
 
