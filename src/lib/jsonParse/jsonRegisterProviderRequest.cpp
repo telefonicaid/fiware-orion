@@ -123,5 +123,5 @@ void jsonRprRelease(ParseData* reqData)
 */
 std::string jsonRprCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rpr.res.check(ciP->apiVersion, ContextEntitiesByEntityId, reqData->errorString);
+  return reqData->rpr.res.check(ContextEntitiesByEntityId, reqData->errorString);
 }

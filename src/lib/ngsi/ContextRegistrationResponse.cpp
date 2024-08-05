@@ -73,13 +73,12 @@ std::string ContextRegistrationResponse::toJsonV1(bool comma)
 */
 std::string ContextRegistrationResponse::check
 (
-  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  predetectedError,
   int                 counter
 )
 {
-  return contextRegistration.check(apiVersion, requestType, predetectedError, counter);
+  return contextRegistration.check(requestType, predetectedError, counter);
 }
 
 

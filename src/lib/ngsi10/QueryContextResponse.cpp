@@ -161,7 +161,7 @@ std::string QueryContextResponse::toJsonV1(bool asJsonObject)
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
+std::string QueryContextResponse::check(bool asJsonObject, const std::string& predetectedError)
 {
   std::string  res;
 
@@ -169,7 +169,7 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK")
+  else if ((res = contextElementResponseVector.check(QueryContext, predetectedError, 0)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);

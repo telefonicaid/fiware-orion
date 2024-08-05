@@ -48,8 +48,7 @@ typedef struct ContextRegistrationResponseVector
   ContextRegistrationResponse*  operator[](unsigned int ix) const;
 
 
-  std::string                   check(ApiVersion          apiVersion,
-                                      RequestType         requestType,
+  std::string                   check(RequestType         requestType,
                                       const std::string&  predetectedError,
                                       int                 counter);
 

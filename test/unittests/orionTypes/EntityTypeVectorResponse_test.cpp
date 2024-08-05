@@ -46,11 +46,11 @@ TEST(EntityTypeVectorResponse, check)
   EntityTypeVectorResponse etRV2;
   etRV2.entityTypeVector.push_back((&et2));
 
-  EXPECT_EQ("OK", etRV1.check(V1, false, false, false, ""));
+  EXPECT_EQ("OK", etRV1.check(false, false, false, ""));
 
-  EXPECT_NE("OK", etRV1.check(V1, false, false, false, "foo"));
+  EXPECT_NE("OK", etRV1.check(false, false, false, "foo"));
 
-  EXPECT_NE("OK", etRV2.check(V1, false, false, false, ""));
+  EXPECT_NE("OK", etRV2.check(false, false, false, ""));
 
   utExit();
 }

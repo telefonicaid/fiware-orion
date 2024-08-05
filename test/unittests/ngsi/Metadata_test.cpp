@@ -91,13 +91,13 @@ TEST(Metadata, check)
 
   utInit();
 
-  checked = m1.check(V1);
-  EXPECT_STREQ("missing metadata name", checked.c_str());
+  checked = m1.check();
+  EXPECT_STREQ("metadata name length: 0, min length supported: 1", checked.c_str());
 
-  checked = m2.check(V1);
-  EXPECT_STREQ("missing metadata value", checked.c_str());
+  checked = m2.check();
+  EXPECT_STREQ("OK", checked.c_str());
 
-  checked = m3.check(V1);
+  checked = m3.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

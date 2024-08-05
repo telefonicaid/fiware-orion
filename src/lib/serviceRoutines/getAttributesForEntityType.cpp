@@ -72,7 +72,7 @@ std::string getAttributesForEntityType
   //   set to true (meaning to skip the attribute detail) for NGSIv1 requests.
   //   The parameter is only used for NGSIv2.
   //
-  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, true, ciP->apiVersion));
+  TIMED_MONGO(mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, true));
 
   std::string rendered;
   TIMED_RENDER(rendered = response.toJsonV1(asJsonObject,

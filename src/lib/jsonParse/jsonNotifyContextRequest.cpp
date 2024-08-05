@@ -348,5 +348,5 @@ void jsonNcrRelease(ParseData* parseDataP)
 */
 std::string jsonNcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncr.res.check(ciP->apiVersion, parseDataP->errorString);
+  return parseDataP->ncr.res.check(parseDataP->errorString);
 }

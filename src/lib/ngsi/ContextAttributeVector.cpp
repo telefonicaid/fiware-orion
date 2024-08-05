@@ -194,13 +194,13 @@ std::string ContextAttributeVector::toJsonV1
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(ApiVersion apiVersion, RequestType requestType)
+std::string ContextAttributeVector::check(RequestType requestType)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
+    if ((res = vec[ix]->check(requestType)) != "OK")
       return res;
   }
 
@@ -465,8 +465,7 @@ void ContextAttributeVector::toBson
 (
   double                    now,
   orion::BSONObjBuilder*    attrsToAdd,
-  orion::BSONArrayBuilder*  attrNamesToAdd,
-  ApiVersion                apiVersion
+  orion::BSONArrayBuilder*  attrNamesToAdd
 ) const
 {
   for (unsigned int ix = 0; ix < this->vec.size(); ++ix)
@@ -475,7 +474,7 @@ void ContextAttributeVector::toBson
 
     std::string attrType;
 
-    if (!this->vec[ix]->typeGiven && (apiVersion == V2))
+    if (!this->vec[ix]->typeGiven)
     {
       if ((this->vec[ix]->compoundValueP == NULL) || (this->vec[ix]->compoundValueP->valueType != orion::ValueTypeVector))
       {
@@ -502,7 +501,7 @@ void ContextAttributeVector::toBson
     }
 
     // FIXME P7: boolean return value should be managed?
-    this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
+    this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, false);
 
     std::string effectiveName = dbEncode(this->vec[ix]->name);
 
@@ -515,7 +514,7 @@ void ContextAttributeVector::toBson
     orion::BSONObjBuilder    md;
     orion::BSONArrayBuilder  mdNames;
 
-    this->vec[ix]->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    this->vec[ix]->metadataVector.toBson(&md, &mdNames, true);
     if (mdNames.arrSize())
     {
       bsonAttr.append(ENT_ATTRS_MD, md.obj());

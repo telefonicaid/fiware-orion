@@ -58,7 +58,7 @@ static RestService badVerbV[] =
 TEST(badVerbGetOnly, ok)
 {
   ConnectionInfo  ci("/version",  "PUT", "1.1");
-  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   std::string     out;
   RestService     restService = { VersionRequest, 1, { "version", }, NULL };
 

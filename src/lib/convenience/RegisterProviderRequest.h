@@ -48,7 +48,7 @@ typedef struct RegisterProviderRequest
   RegisterProviderRequest();
 
   std::string  toJsonV1(void);
-  std::string  check(ApiVersion apiVersion, RequestType requestType, const std::string& preError);
+  std::string  check(RequestType requestType, const std::string& preError);
 
 } RegisterProviderRequest;
 

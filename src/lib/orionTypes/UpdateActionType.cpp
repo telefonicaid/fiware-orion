@@ -35,31 +35,16 @@
 *
 * actionTypeString -
 */
-std::string actionTypeString(ApiVersion apiVersion, ActionType action)
+std::string actionTypeString(ActionType action)
 {
-  if (apiVersion == V2)
+  switch (action)
   {
-    switch (action)
-    {
-    case ActionTypeUpdate:       return "update";
-    case ActionTypeAppend:       return "append";
-    case ActionTypeAppendStrict: return "appendStrict";
-    case ActionTypeDelete:       return "delete";
-    case ActionTypeReplace:      return "replace";
-    default:                     return "unknownAction";
-    }
-  }
-  else
-  {
-    switch (action)
-    {
-    case ActionTypeUpdate:       return "UPDATE";
-    case ActionTypeAppend:       return "APPEND";
-    case ActionTypeAppendStrict: return "APPEND_STRICT";
-    case ActionTypeDelete:       return "DELETE";
-    case ActionTypeReplace:      return "REPLACE";
-    default:                     return "UNKNOWN_ACTION";
-    }
+  case ActionTypeUpdate:       return "update";
+  case ActionTypeAppend:       return "append";
+  case ActionTypeAppendStrict: return "appendStrict";
+  case ActionTypeDelete:       return "delete";
+  case ActionTypeReplace:      return "replace";
+  default:                     return "unknownAction";
   }
 }
 

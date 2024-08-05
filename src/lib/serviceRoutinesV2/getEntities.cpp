@@ -184,7 +184,7 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
+    if (scopeP->fill(geometry, coords, georel, &errorString) != 0)
     {
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, ERROR_BAD_REQUEST);
 
@@ -315,7 +315,7 @@ std::string getEntities
   {
     OrionError oe;
     entities.fill(parseDataP->qcrs.res, &oe);
-    TIMED_RENDER(answer = oe.smartRender(V2));
+    TIMED_RENDER(answer = oe.smartRender());
     ciP->httpStatusCode = oe.code;
   }
   // 04. Render Entities response

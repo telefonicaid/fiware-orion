@@ -82,7 +82,7 @@ std::string Entities::toJson
 */
 std::string Entities::check(RequestType requestType)
 {
-  return vec.check(V2, requestType);
+  return vec.check(requestType);
 }
 
 

@@ -58,6 +58,7 @@ TEST(putSubscriptionConvOp, put)
 {
   ConnectionInfo  ci1("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
   std::string     out;
+  std::string     expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   RestService     restService =
     {
       VersionRequest,
@@ -78,7 +79,7 @@ TEST(putSubscriptionConvOp, put)
 
   EXPECT_EQ("Allow",       ci1.httpHeader[0]);
   EXPECT_EQ("PUT, DELETE", ci1.httpHeaderValue[0]);
-  EXPECT_EQ("", out);
+  EXPECT_EQ(expected, out);
 
   utExit();
 }

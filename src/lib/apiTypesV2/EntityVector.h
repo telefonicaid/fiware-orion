@@ -50,7 +50,7 @@ typedef struct EntityVector
 
   std::string   toJsonV1(bool asJsonObject, RequestType requestType, bool comma);
 
-  std::string   check(ApiVersion apiVersion, RequestType requestType);
+  std::string   check(RequestType requestType);
   void          push_back(Entity* item);
   unsigned int  size(void);
   Entity*       lookup(const std::string& name, const std::string& type);

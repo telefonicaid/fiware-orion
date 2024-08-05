@@ -70,7 +70,7 @@ std::string postRegistration
 
   if (oe.code != SccOk)
   {
-    TIMED_RENDER(answer = oe.smartRender(ciP->apiVersion));
+    TIMED_RENDER(answer = oe.smartRender());
   }
   else
   {

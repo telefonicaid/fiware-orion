@@ -57,8 +57,8 @@ std::string badVerbGetPutOnly
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
   std::string headerValue = "GET, PUT";
-  // OPTIONS verb is only available for V2 API
-  if ((corsEnabled == true) && (ciP->apiVersion == V2))
+  //OPTIONS verb is only available for V2 API, e.g. not available for GET /version
+  if ((corsEnabled == true) && (ciP->url.compare(0, 3, "/v2") == 0))
   {
     headerValue = headerValue + ", OPTIONS";
   }
@@ -67,5 +67,5 @@ std::string badVerbGetPutOnly
 
   alarmMgr.badInput(clientIp, details);
 
-  return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
+  return oe.smartRender();
 }

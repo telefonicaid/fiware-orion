@@ -38,14 +38,6 @@ extern bool forbiddenChars(const char* s, const char* exceptions = NULL);
 
 /* ****************************************************************************
 *
-* forbiddenIdChars -
-*/
-extern bool forbiddenIdChars(int api, const char* s, const char* exceptions = NULL);
-
-
-
-/* ****************************************************************************
-*
 * forbiddenIdCharsV2 -
 */
 extern bool forbiddenIdCharsV2(const char* s, const char* exceptions = NULL);

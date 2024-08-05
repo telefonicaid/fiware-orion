@@ -77,10 +77,10 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntitiesRequest)) != "OK")
+    if ((answer = parseDataP->ent.res.check(EntitiesRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
     }
     break;
 
@@ -92,10 +92,10 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntityRequest)) != "OK")
+    if ((answer = parseDataP->ent.res.check(EntityRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
     }
     break;
 
@@ -108,10 +108,10 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->attr.attribute.check(ciP->apiVersion, EntityAttributeRequest)) != "OK")
+    if ((answer = parseDataP->attr.attribute.check(EntityAttributeRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
     }
     break;
 

@@ -48,8 +48,7 @@ extern HttpStatusCode mongoQueryContext
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
   std::map<std::string, bool>&          options,
-  long long*                            countP        = NULL,
-  ApiVersion                            apiVersion    = V1
+  long long*                            countP        = NULL  
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOQUERYCONTEXT_H_

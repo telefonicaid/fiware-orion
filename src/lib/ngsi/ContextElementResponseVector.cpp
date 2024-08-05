@@ -140,7 +140,6 @@ std::string ContextElementResponseVector::toJson
 */
 std::string ContextElementResponseVector::check
 (
-  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  predetectedError,
   int                 counter
@@ -150,7 +149,7 @@ std::string ContextElementResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
+    if ((res = vec[ix]->check(requestType, predetectedError, counter)) != "OK")
     {
       return res;
     }

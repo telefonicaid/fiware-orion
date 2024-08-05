@@ -50,7 +50,7 @@ public:
 
   std::string     toJsonV1(const std::vector<Metadata*>& orderedMetadata, bool comma);
   std::string     toJson(const std::vector<Metadata*>& orderedMetadata);
-  std::string     check(ApiVersion apiVersion);
+  std::string     check(void);
 
   void            push_back(Metadata* item);
   unsigned int    size(void) const;

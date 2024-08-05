@@ -129,17 +129,10 @@ void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetai
 *
 * OrionError::smartRender -
 */
-std::string OrionError::smartRender(ApiVersion apiVersion)
+std::string OrionError::smartRender(void)
 {
-  if (apiVersion == V1 || apiVersion == NO_VERSION)
-  {
-    return toJsonV1();
-  }
-  else // admin or v2
-  {
-    shrinkError();
-    return toJson();
-  }
+  shrinkError();
+  return toJson();
 }
 
 
@@ -148,14 +141,10 @@ std::string OrionError::smartRender(ApiVersion apiVersion)
 *
 * OrionError::setStatusCodeAndSmartRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP)
+std::string OrionError::setStatusCodeAndSmartRender(HttpStatusCode* scP)
 {
-  if ((apiVersion == V2) || (apiVersion == ADMIN_API))
-  {
-    *scP = code;
-  }
-
-  return smartRender(apiVersion);
+  *scP = code;
+  return smartRender();
 }
 
 

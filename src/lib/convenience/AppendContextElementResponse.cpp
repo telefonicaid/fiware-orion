@@ -89,7 +89,6 @@ std::string AppendContextElementResponse::toJsonV1
 */
 std::string AppendContextElementResponse::check
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  predetectedError
@@ -101,7 +100,7 @@ std::string AppendContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeResponseVector.check(apiVersion, asJsonObject, requestType, "")) != "OK")
+  else if ((res = contextAttributeResponseVector.check(asJsonObject, requestType, "")) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }

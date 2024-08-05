@@ -42,18 +42,18 @@ TEST(ContextElementResponse, check)
 
    utInit();
 
-   out = cer.check(V1, UpdateContext, "", 0);
-   EXPECT_STREQ("empty entityId:id", out.c_str());
+   out = cer.check(UpdateContext, "", 0);
+   EXPECT_STREQ("entity id length: 0, min length supported: 1", out.c_str());
 
    cer.entity.id         = "ID";
    cer.entity.type       = "Type";
    cer.entity.isPattern  = "false";
 
-   out = cer.check(V1, UpdateContext, "", 0);
+   out = cer.check(UpdateContext, "", 0);
    EXPECT_STREQ("no code", out.c_str());
 
    cer.statusCode.fill(SccOk, "details");
-   out = cer.check(V1, UpdateContext, "", 0);
+   out = cer.check(UpdateContext, "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
    utExit();

@@ -48,8 +48,7 @@ class EntityTypeVectorResponse
                              bool  asJsonOut,
                              bool  collapsed);
 
-  std::string       check(ApiVersion          apiVersion,
-                          bool                asJsonObject,
+  std::string       check(bool                asJsonObject,
                           bool                asJsonOut,
                           bool                collapsed,
                           const std::string&  predetectedError);

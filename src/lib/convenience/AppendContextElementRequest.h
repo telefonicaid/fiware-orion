@@ -55,8 +55,7 @@ typedef struct AppendContextElementRequest
 
   std::string  toJsonV1(bool asJsonObject, RequestType requestType);
   void         release();
-  std::string  check(ApiVersion          apiVersion,
-                     bool                asJsonObject,
+  std::string  check(bool                asJsonObject,
                      RequestType         requestType,
                      const std::string&  predetectedError);
 } AppendContextElementRequest;

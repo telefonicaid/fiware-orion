@@ -109,7 +109,7 @@ TEST(RestService, payloadParse)
   ci.payloadSize    = strlen(testBuf);
 
   out = payloadParse(&ci, &parseData, &postV[0], NULL, &jsonRelease, compV);
-  EXPECT_EQ("OK", out);
+  EXPECT_EQ("{\"orionError\":{\"code\":\"501\",\"reasonPhrase\":\"Not Implemented\",\"details\":\"Request Treat function not implemented\"}}", out);
 
 
   //

@@ -1,1 +1,1 @@
-{"statusCode":{"code":"400","reasonPhrase":"Bad Request","details":"missing metadata name"}}
+{"statusCode":{"code":"400","reasonPhrase":"Bad Request","details":"metadata name length: 0, min length supported: 1"}}

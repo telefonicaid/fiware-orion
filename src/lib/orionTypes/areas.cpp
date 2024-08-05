@@ -583,7 +583,7 @@ Geometry::Geometry(): areaType(""), radius(-1), external(false)
 *
 * Geometry::parse -
 */
-int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorString)
+int Geometry::parse(const char* in, std::string* errorString)
 {
   std::vector<std::string> items;
 
@@ -595,16 +595,7 @@ int Geometry::parse(ApiVersion apiVersion, const char* in, std::string* errorStr
 
   for (unsigned int ix = 0; ix < items.size(); ++ix)
   {
-    if ((apiVersion == V1) && ((items[ix] == "polygon") || (items[ix] == "circle")))
-    {
-      if (!areaType.empty())
-      {
-        *errorString = "polygon/circle present more than once";
-        return -1;
-      }
-      areaType = items[ix];
-    }
-    else if ((apiVersion == V2) && ((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
+    if (((items[ix] == "point") || (items[ix] == "line") || (items[ix] == "box") || (items[ix] == "polygon")))
     {
       if (!areaType.empty())
       {

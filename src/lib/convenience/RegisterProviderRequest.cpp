@@ -81,8 +81,7 @@ std::string RegisterProviderRequest::toJsonV1(void)
 * RegisterProviderRequest::check - 
 */
 std::string RegisterProviderRequest::check
-(
-  ApiVersion          apiVersion,
+(  
   RequestType         requestType,
   const std::string&  predetectedError
 )

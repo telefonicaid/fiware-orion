@@ -51,8 +51,7 @@ typedef struct ContextRegistration
   std::string  toJsonV1(bool comma, bool isInVector);
   void         release();
 
-  std::string  check(ApiVersion          apiVersion,
-                     RequestType         requestType,
+  std::string  check(RequestType         requestType,
                      const std::string&  predetectedError,
                      int                 counter);
 } ContextRegistration;

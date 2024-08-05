@@ -68,7 +68,7 @@ std::string RegisterContextRequest::toJsonV1(void)
 *
 * RegisterContextRequest::check -
 */
-std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -83,9 +83,9 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   } 
-  else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, predetectedError, counter)) != "OK") ||
-           ((res = duration.check())                                                                        != "OK") ||
-           ((res = registrationId.check())                                                                  != "OK"))
+  else if (((res = contextRegistrationVector.check(RegisterContext, predetectedError, counter)) != "OK") ||
+           ((res = duration.check())                                                            != "OK") ||
+           ((res = registrationId.check())                                                      != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);

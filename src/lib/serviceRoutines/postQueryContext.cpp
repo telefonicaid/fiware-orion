@@ -368,7 +368,7 @@ static bool queryForward
 
   logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
-  if (ciP->apiVersion == V2 && strstr(out.c_str(), "Fiware-Total-Count"))
+  if (strstr(out.c_str(), "Fiware-Total-Count"))
   {
     getProviderCount(out.c_str(), totalCount);
   }
@@ -533,16 +533,10 @@ std::string postQueryContext
   //
   // 00. Count or not count? That is the question ...
   //
-  // For API version 1, if the URI parameter 'details' is set to 'on', then the total of local
-  // entities is returned in the errorCode of the payload.
-  //
-  // In API version 2, this has changed completely. The total count is returned to client the HTTP header Fiware-Total-Count
+  // The total count is returned to client the HTTP header Fiware-Total-Count
   // only when count option is enabled, but we enable internally the countP variable, as if CPrs are involved in the
   // query execution we need it
-  if ((ciP->apiVersion == V2) || ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on")))
-  {
-    countP = &count;
-  }
+  countP = &count;
 
   //
   // 01. Call mongoBackend/mongoQueryContext
@@ -555,8 +549,7 @@ std::string postQueryContext
                                                       ciP->servicePathV,
                                                       ciP->uriParam,
                                                       ciP->uriParamOptions,
-                                                      countP,
-                                                      ciP->apiVersion));
+                                                      countP));
 
   if ((qcrsP->errorCode.code == SccBadRequest) || (qcrsP->errorCode.code == SccReceiverInternalError))
   {
@@ -581,7 +574,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+    if (ciP->uriParamOptions["count"])
     {
       char cV[32];
 
@@ -718,20 +711,17 @@ std::string postQueryContext
   int providerOffset    =  0;
   int brokerCount       =  0;
 
-  if (ciP->apiVersion == V2)
+  brokerCount = *countP;
+  // Setting providerOffset
+  if (totalOffset >= (*countP))
   {
-    brokerCount   =  *countP;
-    // Setting providerOffset
-    if (totalOffset >= (*countP))
-    {
-      providerOffset = totalOffset - (*countP);
-    }
+    providerOffset = totalOffset - (*countP);
+  }
 
-    // Setting providerLimit
-    if (localQcrsP->contextElementResponseVector.size() >= 0)
-    {
-      providerLimit = providerLimit - localQcrsP->contextElementResponseVector.size();
-    }
+  // Setting providerLimit
+  if (localQcrsP->contextElementResponseVector.size() >= 0)
+  {
+    providerLimit = providerLimit - localQcrsP->contextElementResponseVector.size();
   }
 
   //
@@ -788,20 +778,18 @@ std::string postQueryContext
 
       if (queryForward(ciP, requestV[fIx], regIdsV[fIx], providerLimit, providerOffset, countP, fIx + 1, qP) == true)
       {
-        if (ciP->apiVersion == V2)
-        {
-          providerLimit = providerLimit - qP->contextElementResponseVector.size();
+        providerLimit = providerLimit - qP->contextElementResponseVector.size();
 
-          if (providerOffset > (*countP - brokerCount))
-          {
-            providerOffset -= (*countP - brokerCount);
-            brokerCount += (*countP - brokerCount);
-          }
-          else
-          {
-            providerOffset = 0;
-          }
+        if (providerOffset > (*countP - brokerCount))
+        {
+          providerOffset -= (*countP - brokerCount);
+          brokerCount += (*countP - brokerCount);
         }
+        else
+        {
+          providerOffset = 0;
+        }
+
         //
         // Each ContextElementResponse of qP should be tested to see whether there
         // is already an existing ContextElementResponse in responseV
@@ -861,7 +849,7 @@ std::string postQueryContext
   // Before implementing pagination for CPrs, this block of code was part of step 02.
   // However, in that step we only have the count for CB entities. It is in the new location
   // (after queryForward() invocation) when we have the total count CB+CPr
-  if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+  if (ciP->uriParamOptions["count"])
   {
     char cV[32];
 

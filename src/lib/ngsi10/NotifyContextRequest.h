@@ -54,7 +54,7 @@ typedef struct NotifyContextRequest
                        bool                                 blacklist,
                        const std::vector<std::string>&      metadataFilter,
                        ExprContextObject*                   exprContextObjectP = NULL);
-  std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
+  std::string   check(const std::string& predetectedError);
   void          release(void);
   NotifyContextRequest* clone(void);
 } NotifyContextRequest;

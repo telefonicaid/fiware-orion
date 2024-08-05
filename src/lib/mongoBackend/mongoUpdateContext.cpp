@@ -115,7 +115,6 @@ HttpStatusCode mongoUpdateContext
   const std::string&                    ngsiV2AttrsFormat,
   const bool&                           forcedUpdate,
   const bool&                           overrideMetadata,
-  ApiVersion                            apiVersion,
   Ngsiv2Flavour                         ngsiv2Flavour,
   bool                                  flowControl
 )
@@ -166,7 +165,6 @@ HttpStatusCode mongoUpdateContext
                                          forcedUpdate,
                                          overrideMetadata,
                                          notifSent,
-                                         apiVersion,
                                          ngsiv2Flavour,
                                          &entityUpdateCoverage);
       switch(updateCoverage)

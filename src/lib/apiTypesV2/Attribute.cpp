@@ -65,8 +65,7 @@ std::string Attribute::toJson
 
   if (requestType == EntityAttributeValueRequest)
   {
-    out = contextAttributeP->toJsonAsValue(V2,
-                                           acceptedTextPlain,
+    out = contextAttributeP->toJsonAsValue(acceptedTextPlain,
                                            acceptedJson,
                                            outFormatSelection,
                                            outMimeTypeP,

@@ -70,7 +70,6 @@ std::string ContextAttributeResponse::toJsonV1
 */
 std::string ContextAttributeResponse::check
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  predetectedError
@@ -82,7 +81,7 @@ std::string ContextAttributeResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(apiVersion, requestType)) != "OK")
+  else if ((res = contextAttributeVector.check(requestType)) != "OK")
   {
     std::string details = std::string("contextAttributeVector: '") + res + "'";
     alarmMgr.badInput(clientIp, details);

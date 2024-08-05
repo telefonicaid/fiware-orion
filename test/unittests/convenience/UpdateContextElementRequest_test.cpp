@@ -77,18 +77,18 @@ TEST(UpdateContextElementRequest, check_json)
 
   // 1. predetectedError
   ucer.contextAttributeVector.push_back(&ca);
-  out = ucer.check(V1, false, UpdateContextElement, "PRE Error");
+  out = ucer.check(false, UpdateContextElement, "PRE Error");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. ok
-  out = ucer.check(V1, false, UpdateContextElement, "");
+  out = ucer.check(false, UpdateContextElement, "");
   EXPECT_STREQ("OK", out.c_str());
 
   // 3. bad contextAttributeVector
   ContextAttribute                ca2("", "caType", "caValue");
   ucer.contextAttributeVector.push_back(&ca2);
-  out = ucer.check(V1, false, UpdateContextElement, "");
+  out = ucer.check(false, UpdateContextElement, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -134,7 +134,7 @@ std::string NotifyContextRequest::toJson
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError)
+std::string NotifyContextRequest::check(const std::string& predetectedError)
 {
   std::string            res;
   NotifyContextResponse  response;
@@ -145,7 +145,7 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
   }
   else if (((res = subscriptionId.check())                    != "OK") ||
            ((res = originator.check())                        != "OK") ||
-           ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK"))
+           ((res = contextElementResponseVector.check(QueryContext, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }

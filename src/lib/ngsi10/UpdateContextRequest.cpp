@@ -76,7 +76,7 @@ std::string UpdateContextRequest::toJson(void)
 
   jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED));
 
-  jh.addString("actionType", actionTypeString(V2, updateActionType));
+  jh.addString("actionType", actionTypeString(updateActionType));
 
   return jh.str();
 }
@@ -97,7 +97,7 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
   //
   out += startTag();
   out += entityVector.toJsonV1(asJsonObject, UpdateContext, true);
-  out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
+  out += valueTag("updateAction", actionTypeString(updateActionType), false);
   out += endTag(false);
 
   return out;
@@ -109,7 +109,7 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 *
 * UpdateContextRequest::check -
 */
-std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
+std::string UpdateContextRequest::check(bool asJsonObject, const std::string& predetectedError)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -120,7 +120,7 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
     return response.toJsonV1(asJsonObject);
   }
 
-  if ((res = entityVector.check(apiVersion, UpdateContext)) != "OK")
+  if ((res = entityVector.check(UpdateContext)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
     return response.toJsonV1(asJsonObject);

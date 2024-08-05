@@ -82,13 +82,13 @@ std::string EntityTypeVector::toJsonV1
 *
 * EntityTypeVector::check -
 */
-std::string EntityTypeVector::check(ApiVersion apiVersion, const std::string& predetectedError)
+std::string EntityTypeVector::check(const std::string& predetectedError)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, predetectedError)) != "OK")
+    if ((res = vec[ix]->check(predetectedError)) != "OK")
     {
      return res;
     }

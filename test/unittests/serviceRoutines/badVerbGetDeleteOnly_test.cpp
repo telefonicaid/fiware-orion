@@ -64,11 +64,10 @@ static RestService badVerbV[] =
 TEST(badVerbGetDeleteOnly, ok)
 {
   ConnectionInfo  ci("/statistics",  "PUT", "1.1");
-  std::string     expected = "";  // Bad verb gives no payload, only HTTP headers
+  std::string     expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   std::string     out;
   RestService     restService = { StatisticsRequest, 1, { "statistics" }, NULL };
 
-  ci.apiVersion   = V1;
   ci.restServiceP = &restService;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, deleteV, NULL, badVerbV);

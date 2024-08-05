@@ -287,12 +287,12 @@ std::string Metadata::toJsonV1(bool comma)
 *
 * Metadata::check -
 */
-std::string Metadata::check(ApiVersion apiVersion)
+std::string Metadata::check(void)
 {
   size_t len;
   char   errorMsg[128];
 
-  if (apiVersion == V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
+  if ((len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -312,7 +312,7 @@ std::string Metadata::check(ApiVersion apiVersion)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(apiVersion , name.c_str()))
+  if (forbiddenIdCharsV2(name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata", name);
     return "Invalid characters in metadata name";
@@ -326,14 +326,14 @@ std::string Metadata::check(ApiVersion apiVersion)
   }
 
 
-  if (apiVersion == V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if ((len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(apiVersion, type.c_str()))
+  if (forbiddenIdCharsV2(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata", type);
     return "Invalid characters in metadata type";
@@ -345,12 +345,6 @@ std::string Metadata::check(ApiVersion apiVersion)
     {
       alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata", stringValue);
       return "Invalid characters in metadata value";
-    }
-
-    if (apiVersion == V1 && stringValue.empty())
-    {
-      alarmMgr.badInput(clientIp, "missing metadata value", name);
-      return "missing metadata value";
     }
   }
 

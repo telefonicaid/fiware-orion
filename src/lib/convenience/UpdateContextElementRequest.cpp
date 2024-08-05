@@ -63,7 +63,6 @@ std::string UpdateContextElementRequest::toJsonV1(bool asJsonObject, RequestType
 */
 std::string UpdateContextElementRequest::check
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         requestType,
   const std::string&  predetectedError     // Predetected Error, normally during parsing
@@ -76,7 +75,7 @@ std::string UpdateContextElementRequest::check
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }  
-  else if ((res = contextAttributeVector.check(apiVersion, UpdateContextElement)) != "OK")
+  else if ((res = contextAttributeVector.check(UpdateContextElement)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }

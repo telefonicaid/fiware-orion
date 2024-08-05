@@ -43,8 +43,7 @@ typedef struct UpdateContextElementRequest
 
   std::string  toJsonV1(bool asJsonObject, RequestType requestType);
   void         release(void);
-  std::string  check(ApiVersion          apiVersion,
-                     bool                asJsonObject,
+  std::string  check(bool                asJsonObject,
                      RequestType         requestType,
                      const std::string&  predetectedError);
 } UpdateContextElementRequest;

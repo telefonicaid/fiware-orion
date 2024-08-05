@@ -52,7 +52,6 @@ TEST(jsonRequest, jsonTreat)
   utInit();
 
   ci.outMimeType  = JSON;
-  ci.apiVersion   = V1;
   ci.restServiceP = &restService;
 
   out  = jsonTreat("non-empty content", &ci, &parseData, InvalidRequest, NULL);

@@ -268,9 +268,7 @@ static void sortStage(orion::BSONArrayBuilder* pipeline)
 * mongoEntityTypesValues -
 *
 * "Simplified" version of mongoEntityTypes(), using a simpler aggregation command
-* and the processing logic afterwards. Note that apiVersion is not included in this
-* operation as it can be used only in NGSIv2
-*
+* and the processing logic afterwards.
 */
 HttpStatusCode mongoEntityTypesValues
 (
@@ -432,7 +430,6 @@ HttpStatusCode mongoEntityTypes
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  ApiVersion                           apiVersion,
   unsigned int*                        totalTypesP,
   bool                                 noAttrDetail
 )
@@ -617,14 +614,7 @@ HttpStatusCode mongoEntityTypes
         for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
         {
           ContextAttribute* ca = new ContextAttribute(attrName, attrTypes[kx], "");
-
           entityType->contextAttributeVector.push_back(ca);
-
-          // For backward compability, NGSIv1 only accepts one element
-          if (apiVersion == V1)
-          {
-            break;
-          }
         }
       }
       else
@@ -693,22 +683,13 @@ HttpStatusCode mongoAttributesForEntityType
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
-  bool                                  noAttrDetail,
-  ApiVersion                            apiVersion
+  bool                                  noAttrDetail
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
   bool           count          = false;
-
-  // Count only makes sense for this operation in the case of NGSIv1
-  if (apiVersion == V1)
-  {
-    std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-
-    count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-  }
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
@@ -849,14 +830,7 @@ HttpStatusCode mongoAttributesForEntityType
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
         ContextAttribute*  ca = new ContextAttribute(attrName, attrTypes[kx], "");
-
         responseP->entityType.contextAttributeVector.push_back(ca);
-
-        // For backward compability, NGSIv1 only accepts one element
-        if (apiVersion == V1)
-        {
-          break;
-        }
       }
     }
     else

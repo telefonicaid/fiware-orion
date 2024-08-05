@@ -226,7 +226,7 @@ std::string parseExpression
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  err;
 
-    if (scopeP->fill(V2, geometry, coords, georel, &err) != 0)
+    if (scopeP->fill(geometry, coords, georel, &err) != 0)
     {
       delete scopeP;
       return "error parsing geo-query fields: " + err;

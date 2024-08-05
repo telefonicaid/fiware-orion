@@ -104,22 +104,18 @@ TEST(Convenience, shortPath)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
-  ci1.apiVersion   = V1;
   ci1.restServiceP = &restService1;
   out = orion::requestServe(&ci1);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci2.apiVersion   = V1;
   ci2.restServiceP = &restService2;
   out = orion::requestServe(&ci2);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci3.apiVersion   = V1;
   ci3.restServiceP = &restService3;
   out = orion::requestServe(&ci3);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci4.apiVersion   = V1;
   ci4.restServiceP = &restService4;
   out = orion::requestServe(&ci4);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -146,7 +142,6 @@ TEST(Convenience, badPathNgsi9)
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
-  ci.apiVersion   = V1;
   ci.restServiceP = &restService;
   out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -172,7 +167,6 @@ TEST(Convenience, badPathNgsi10)
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  ci.apiVersion   = V1;
   ci.restServiceP = &restService;
   out = orion::requestServe(&ci);
   EXPECT_STREQ(expectedBuf, out.c_str());

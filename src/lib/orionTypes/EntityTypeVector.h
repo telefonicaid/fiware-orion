@@ -46,7 +46,7 @@ class EntityTypeVector
   void          push_back(EntityType* item);
   unsigned int  size(void);
   void          release(void);
-  std::string   check(ApiVersion apiVersion, const std::string& predetectedError);
+  std::string   check(const std::string& predetectedError);
   std::string   toJsonV1(bool  asJsonObject,
                          bool  asJsonOut,
                          bool  collapsed,

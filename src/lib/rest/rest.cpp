@@ -118,17 +118,19 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
-    if (ciP->apiVersion == V2)
+    // FIXME PR: solve this
+    //if (ciP->apiVersion == V2)
     {
       OrionError error(SccBadRequest, errorString);
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.smartRender();
     }
-    else if (ciP->apiVersion == ADMIN_API)
+    // FIXME PR: solve this
+    /*else if (ciP->apiVersion == ADMIN_API)
     {
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
-    }
+    }*/
 
     return MHD_YES;
   }
@@ -143,7 +145,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       {
         OrionError error(SccBadRequest, std::string("Bad pagination offset: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = error.code;
-        ciP->answer         = error.smartRender(ciP->apiVersion);
+        ciP->answer         = error.smartRender();
         return MHD_YES;
       }
 
@@ -160,7 +162,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       {
         OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [must be a positive integer number]");
         ciP->httpStatusCode = error.code;
-        ciP->answer         = error.smartRender(ciP->apiVersion);
+        ciP->answer         = error.smartRender();
         return MHD_YES;
       }
 
@@ -172,7 +174,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [max: " + MAX_PAGINATION_LIMIT + "]");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.smartRender();
       return MHD_YES;
     }
   }
@@ -182,7 +184,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.smartRender();
       return MHD_YES;
     }
   }
@@ -204,7 +206,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender(ciP->apiVersion);
+      ciP->answer         = error.smartRender();
     }
   }
   else if (key == URI_PARAM_TYPE)
@@ -267,7 +269,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     alarmMgr.badInput(clientIp, details);
     ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender(ciP->apiVersion);
+    ciP->answer         = error.smartRender();
   }
 
   return MHD_YES;
@@ -479,7 +481,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
   {
     OrionError oe(ciP->httpStatusCode, ciP->acceptHeaderError);
 
-    ciP->answer = oe.smartRender(ciP->apiVersion);
+    ciP->answer = oe.smartRender();
   }
 }
 
@@ -704,14 +706,14 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (servicePath[0] != '/')
   {
     OrionError oe(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
-    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
     return 1;
   }
 
   if (servicePath[1] == '/')
   {
     OrionError oe(SccBadRequest, "empty component in ServicePath");
-    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
     return 1;
   }
 
@@ -720,13 +722,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     if (ciP->verb == PATCH)
     {
       OrionError oe(SccBadRequest, "more than one servicepath in patch update request is not allowed");
-      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
       return 1;
     }
     if (ciP->verb == DELETE)
     {
       OrionError oe(SccBadRequest, "more than one servicepath is not allowed in DELETE operation");
-      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
       return 1;
     }
   }
@@ -736,7 +738,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (components > SERVICE_PATH_MAX_LEVELS)
   {
     OrionError oe(SccBadRequest, "too many components in ServicePath");
-    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
     return 2;
   }
 
@@ -745,14 +747,14 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     if (strlen(compV[ix].c_str()) > SERVICE_PATH_MAX_COMPONENT_LEN)
     {
       OrionError oe(SccBadRequest, "component-name too long in ServicePath");
-      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
       return 3;
     }
 
     if (compV[ix].c_str()[0] == 0)
     {
       OrionError oe(SccBadRequest, "empty component in ServicePath");
-      ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
       return 3;
     }
 
@@ -764,13 +766,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (ciP->verb == PATCH)
       {
         OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in patch update request");
-        ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+        ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
         return 3;
       }
       else if (ciP->verb == DELETE)
       {
         OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in DELETE operation");
-        ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+        ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
         return 3;
       }
       else
@@ -786,7 +788,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
         OrionError oe(SccBadRequest, "a component of ServicePath contains an illegal character");
-        ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+        ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
         return 4;
       }
     }
@@ -990,18 +992,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   }
 
   // Case 3
-  if ((ciP->apiVersion == V1) && (ciP->httpHeaders.contentType != "application/json"))
-  {
-    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-    restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-    return 1;
-  }
-
-
-  // Case 4
-  if ((ciP->apiVersion == V2) && (ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
+  if ((ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -1029,7 +1020,7 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   {
     OrionError error(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI);
     ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender(ciP->apiVersion);
+    ciP->answer         = error.smartRender();
     return false;
   }
 
@@ -1043,56 +1034,6 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   }
 
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* apiVersionGet -
-*
-* This function returns the version of the API for the incoming message,
-* based on the URL according to:
-*
-*  V2:         for URLs in the /v2 path
-*  V1:         for URLs in the /v1 or with an equivalence (e.g. /ngi10, /log, etc.)
-*  ADMIN_API:  admin operations without /v1 alias
-*  NO_VERSION: others (invalid paths)
-*
-*/
-static ApiVersion apiVersionGet(const char* path)
-{
-  if ((path[1] == 'v') && (path[2] == '2'))
-  {
-    return V2;
-  }
-
-  // Unlike v2, v1 is case-insensitive (see case/2057 test)
-  if (((path[1] == 'v') || (path[1] == 'V')) && (path[2] == '1'))
-  {
-    return V1;
-  }
-
-  if ((strncasecmp("/ngsi9",      path, strlen("/ngsi9"))      == 0)  ||
-      (strncasecmp("/ngsi10",     path, strlen("/ngsi10"))     == 0))
-  {
-    return V1;
-  }
-
-  if ((strncasecmp("/log",        path, strlen("/log"))        == 0)  ||
-      (strncasecmp("/cache",      path, strlen("/cache"))      == 0)  ||
-      (strncasecmp("/statistics", path, strlen("/statistics")) == 0))
-  {
-    return V1;
-  }
-
-  if ((strncmp("/admin",   path, strlen("/admin"))   == 0) ||
-      (strncmp("/version", path, strlen("/version")) == 0))
-  {
-    return ADMIN_API;
-  }
-
-  return NO_VERSION;
 }
 
 
@@ -1307,14 +1248,6 @@ static MHD_Result connectionTreat
       return MHD_NO;
     }
 
-
-    // Get API version
-    // FIXME #3109-PR: this assignment will be removed in a subsequent PR, where the function apiVersionGet() is used instead
-    //
-    ciP->apiVersion = (url[2] == '2')? V2 : V1;  // If an APIv2 request, the URL starts with "/v2/". Only V2 requests.
-
-    // LM_TMP(("--------------------- Serving APIv%d request %s %s -----------------", ciP->apiVersion, method, url));
-
     // Lookup Rest Service
     bool badVerb = false;
     ciP->restServiceP = restServiceLookup(ciP, &badVerb);
@@ -1358,11 +1291,6 @@ static MHD_Result connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
 
-    // Note that we need to get API version before MHD_get_connection_values() as the later
-    // function may result in an error after processing Accept headers (and the
-    // render for the error depends on API version)
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
-
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 
     if (ciP->httpHeaders.accept.empty())  // No Accept: given, treated as */*
@@ -1383,7 +1311,7 @@ static MHD_Result connectionTreat
     ciP->httpHeader.push_back(HTTP_FIWARE_CORRELATOR);
     ciP->httpHeaderValue.push_back(ciP->httpHeaders.correlator);
 
-    if ((ciP->httpHeaders.contentLength > inReqPayloadMaxSize) && (ciP->apiVersion == V2))
+    if ((ciP->httpHeaders.contentLength > inReqPayloadMaxSize))
     {
       char details[256];
       snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, inReqPayloadMaxSize);
@@ -1392,7 +1320,7 @@ static MHD_Result connectionTreat
       OrionError oe(SccRequestEntityTooLarge, details);
 
       ciP->httpStatusCode = oe.code;
-      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      restReply(ciP, oe.smartRender());
       return MHD_YES;
     }
 
@@ -1551,7 +1479,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.smartRender());
     return MHD_YES;
   }
 
@@ -1575,7 +1503,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.description);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.smartRender());
     return MHD_YES;
   }
 
@@ -1601,7 +1529,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.description);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.smartRender());
     return MHD_YES;
   }
 
@@ -1616,7 +1544,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
-    restReply(ciP, oe.smartRender(ciP->apiVersion));
+    restReply(ciP, oe.smartRender());
     return MHD_YES;
   }
 

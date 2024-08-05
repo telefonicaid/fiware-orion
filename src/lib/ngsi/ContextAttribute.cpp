@@ -1217,7 +1217,6 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
 */
 std::string ContextAttribute::toJsonAsValue
 (
-  ApiVersion       apiVersion,          // in parameter
   bool             acceptedTextPlain,   // in parameter
   bool             acceptedJson,        // in parameter
   MimeType         outFormatSelection,  // in parameter
@@ -1238,14 +1237,7 @@ std::string ContextAttribute::toJsonAsValue
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (apiVersion == V2)
-        { 
-          out = '"' + stringValue + '"';
-        }
-        else
-        { 
-          out = stringValue;
-        }
+        out = '"' + stringValue + '"';
         break;
 
       case orion::ValueTypeNumber:
@@ -1381,12 +1373,12 @@ void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP, bool 
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck)
+std::string ContextAttribute::check(RequestType requestType, bool relaxForbiddenCheck)
 {
   size_t len;
   char errorMsg[128];
 
-  if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  if (((len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg, name);
@@ -1405,7 +1397,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(apiVersion, name.c_str()))
+  if (forbiddenIdCharsV2(name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute", name);
     return "Invalid characters in attribute name";
@@ -1419,14 +1411,14 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   }
 
 
-  if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if ((requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
-  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
+  if ((requestType != EntityAttributeValueRequest) && forbiddenIdCharsV2(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";
@@ -1446,7 +1438,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     }
   }
 
-  return metadataVector.check(apiVersion);
+  return metadataVector.check();
 }
 
 

@@ -83,7 +83,6 @@ std::string UpdateContextAttributeRequest::toJsonV1(void)
 */
 std::string UpdateContextAttributeRequest::check
 (
-  ApiVersion          apiVersion,
   const std::string&  predetectedError
 )
 {
@@ -94,7 +93,7 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = metadataVector.check(apiVersion)) != "OK")
+  else if ((res = metadataVector.check()) != "OK")
   {
     response.fill(SccBadRequest, res);
   }

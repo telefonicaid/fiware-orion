@@ -167,5 +167,5 @@ void jsonUpcarRelease(ParseData* reqData)
 */
 std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcar.res.check(ciP->apiVersion, reqData->errorString);
+  return reqData->upcar.res.check(reqData->errorString);
 }

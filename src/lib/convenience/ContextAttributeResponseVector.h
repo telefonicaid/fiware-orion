@@ -45,8 +45,7 @@ typedef struct ContextAttributeResponseVector
   void                       push_back(ContextAttributeResponse* item);
   unsigned int               size(void);
   void                       release(void);
-  std::string                check(ApiVersion          apiVersion,
-                                   bool                asJsonObject,
+  std::string                check(bool                asJsonObject,
                                    RequestType         requestType,
                                    const std::string&  predetectedError);
   void                       fill(const ContextAttributeVector& caV, const StatusCode& statusCode);

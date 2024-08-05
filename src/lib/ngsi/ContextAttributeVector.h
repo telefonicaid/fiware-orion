@@ -59,7 +59,7 @@ typedef struct ContextAttributeVector
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(ApiVersion apiVersion, RequestType requestType);
+  std::string        check(RequestType requestType);
 
   std::string        toJsonV1(bool                                   asJsonObject,
                               RequestType                            requestType,
@@ -73,8 +73,7 @@ typedef struct ContextAttributeVector
 
   void               toBson(double                    now,
                             orion::BSONObjBuilder*    attrsToAdd,
-                            orion::BSONArrayBuilder*  attrNamesToAdd,
-                            ApiVersion                apiVersion) const;
+                            orion::BSONArrayBuilder*  attrNamesToAdd) const;
 
   void               applyUpdateOperators(void);
 

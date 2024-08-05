@@ -54,7 +54,6 @@ TEST(versionTreat, ok)
   std::string     out;
   RestService     restService = { VersionRequest, 1, { "version" }, NULL };
 
-  ci.apiVersion   = V1;
   ci.restServiceP = &restService;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);

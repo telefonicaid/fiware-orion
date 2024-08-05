@@ -114,8 +114,7 @@ public:
 
   std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
 
-  std::string  toJsonAsValue(ApiVersion       apiVersion,
-                             bool             acceptedTextPlain,
+  std::string  toJsonAsValue(bool             acceptedTextPlain,
                              bool             acceptedJson,
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
@@ -136,7 +135,7 @@ public:
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck = false);
+  std::string  check(RequestType requestType, bool relaxForbiddenCheck = false);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 

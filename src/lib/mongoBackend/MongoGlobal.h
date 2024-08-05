@@ -228,8 +228,7 @@ extern bool entitiesQuery
   int                              limit          = DEFAULT_PAGINATION_LIMIT_INT,
   bool*                            limitReached   = NULL,
   long long*                       countP         = NULL,
-  const std::string&               sortOrderList  = "",
-  ApiVersion                       apiVersion     = V1
+  const std::string&               sortOrderList  = ""
 );
 
 
@@ -240,7 +239,6 @@ extern bool entitiesQuery
 */
 extern void pruneContextElements
 (
-  ApiVersion                           apiVersion,
   const StringList&                    attrsV,
   const ContextElementResponseVector&  oldCerV,
   ContextElementResponseVector*        newCerVP

@@ -81,11 +81,11 @@ TEST(ContextAttributeResponseVector, check_json)
   // 1. ok
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
-  out = carV.check(V1, false, UpdateContextAttribute, "");
+  out = carV.check(false, UpdateContextAttribute, "");
   EXPECT_STREQ("OK", out.c_str());
 
   // 2. Predetected Error
-  out = carV.check(V1, false, UpdateContextAttribute, "PRE ERROR");
+  out = carV.check(false, UpdateContextAttribute, "PRE ERROR");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -93,7 +93,7 @@ TEST(ContextAttributeResponseVector, check_json)
   ContextAttribute  ca2("", "caType", "caValue");
 
   car.contextAttributeVector.push_back(&ca2);
-  out = carV.check(V1, false, UpdateContextAttribute, "");
+  out = carV.check(false, UpdateContextAttribute, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

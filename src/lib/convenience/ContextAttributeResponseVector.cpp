@@ -70,7 +70,6 @@ std::string ContextAttributeResponseVector::toJsonV1
 */
 std::string ContextAttributeResponseVector::check
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   RequestType         request,
   const std::string&  predetectedError
@@ -80,7 +79,7 @@ std::string ContextAttributeResponseVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, asJsonObject, request, predetectedError)) != "OK")
+    if ((res = vec[ix]->check(asJsonObject, request, predetectedError)) != "OK")
     {
       return res;
     }

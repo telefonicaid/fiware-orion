@@ -60,5 +60,5 @@ std::string badVerbGetPostDeleteOnly
 
   alarmMgr.badInput(clientIp, details);
 
-  return (ciP->apiVersion == V1 || ciP->apiVersion == NO_VERSION)? "" :  oe.smartRender(ciP->apiVersion);
+  return oe.smartRender();
 }

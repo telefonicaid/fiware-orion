@@ -77,13 +77,13 @@ TEST(AppendContextElementRequest, check_json)
    acer.contextAttributeVector.push_back(&ca);
 
    // 1. ok
-   out = acer.check(V1, false, AppendContextElement, "");
+   out = acer.check(false, AppendContextElement, "");
    EXPECT_STREQ("OK", out.c_str());
 
 
    // 2. Predetected error
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   out = acer.check(V1, false, AppendContextElement, "Error is predetected");
+   out = acer.check(false, AppendContextElement, "Error is predetected");
    EXPECT_STREQ(expectedBuf, out.c_str());
 
 
@@ -91,7 +91,7 @@ TEST(AppendContextElementRequest, check_json)
    ContextAttribute  ca2("", "caType", "121");
 
    acer.contextAttributeVector.push_back(&ca2);
-   out = acer.check(V1, false, AppendContextElement, "");
+   out = acer.check(false, AppendContextElement, "");
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";   
    EXPECT_STREQ(expectedBuf, out.c_str());
    ca2.name = "ca2Name";

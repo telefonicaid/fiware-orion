@@ -50,7 +50,7 @@ typedef struct UpdateContextAttributeRequest
 
   UpdateContextAttributeRequest();
   std::string  toJsonV1(void);
-  std::string  check(ApiVersion apiVersion, const std::string& preError);
+  std::string  check(const std::string& preError);
   void         release();
 } UpdateContextAttributeRequest;
 
