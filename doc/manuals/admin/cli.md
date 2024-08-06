@@ -233,6 +233,5 @@ Two facts have to be taken into account:
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
 |	ORION_DISABLE_NGSIV1	|	disableNgsiv1	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
-|	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
 |       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
 |       ORION_LOG_DEPRECATE |  logDeprecate |

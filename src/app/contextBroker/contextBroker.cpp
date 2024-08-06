@@ -190,7 +190,6 @@ bool            disableNgsiv1;
 bool            disableFileLog;
 int             reqTimeout;
 bool            insecureNotif;
-bool            ngsiv1Autocast;
 
 bool            fcEnabled;
 double          fcGauge;
@@ -347,8 +346,6 @@ PaArgument paArgs[] =
   { "-disableNgsiv1",               &disableNgsiv1,         "DISABLE_NGSIV1",           PaBool,   PaOpt, false,                           false, true,                  DISABLE_NGSIV1_DESC          },
 
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF_DESC          },
-
-  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,                  NGSIV1_AUTOCAST_DESC         },
 
   { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
 

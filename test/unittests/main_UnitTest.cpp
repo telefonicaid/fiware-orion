@@ -68,7 +68,6 @@ int           subCacheInterval      = 10;
 unsigned int  cprForwardLimit       = 1000;
 bool          noCache               = false;
 bool          insecureNotif         = false;
-bool          ngsiv1Autocast        = false;
 char          fwdHost[64];
 char          notificationMode[64];
 char          notifFlowControl[64];

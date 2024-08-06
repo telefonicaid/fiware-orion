@@ -207,7 +207,6 @@ extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
-extern bool               ngsiv1Autocast;
 extern unsigned long long inReqPayloadMaxSize;
 extern unsigned long long outReqMsgMaxSize;
 

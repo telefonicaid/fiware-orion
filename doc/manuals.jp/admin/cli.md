@@ -169,5 +169,4 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_DISABLE_METRICS   |   disableMetrics  |
 |   ORION_DISABLE_NGSIV1    |   disableNgsiv1   |
 |   ORION_INSECURE_NOTIF    |   insecureNotif   |
-|   ORION_NGSIV1_AUTOCAST   |   ngsiv1Autocast  |
 |   ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
