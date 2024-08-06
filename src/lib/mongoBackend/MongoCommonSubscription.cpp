@@ -142,7 +142,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
       if (httpInfo.json->isObject())
       {
         orion::BSONObjBuilder jsonBuilder;
-        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(httpInfo.json->childV, jsonBuilder);
         orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
         logStr = jsonBuilderObj.toString();
         b->append(CSUB_JSON, jsonBuilderObj);
@@ -150,7 +150,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
       else  // httpInfo.json->isVector();
       {
         orion::BSONArrayBuilder jsonBuilder;
-        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(httpInfo.json->childV, jsonBuilder);
         orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
         logStr = jsonBuilderArr.toString();
         b->append(CSUB_JSON, jsonBuilderArr);
@@ -214,7 +214,7 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
       if (mqttInfo.json->isObject())
       {
         orion::BSONObjBuilder jsonBuilder;
-        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder);
         orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
         logStr = jsonBuilderObj.toString();
         b->append(CSUB_JSON, jsonBuilderObj);
@@ -222,7 +222,7 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
       else  // httpInfo.json->isVector();
       {
         orion::BSONArrayBuilder jsonBuilder;
-        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder);
         orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
         logStr = jsonBuilderArr.toString();
         b->append(CSUB_JSON, jsonBuilderArr);

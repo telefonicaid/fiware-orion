@@ -129,8 +129,7 @@ public:
   bool valueBson(const std::string&      valueKey,
                  orion::BSONObjBuilder*  bsonAttr,
                  const std::string&      attrType,
-                 bool                    autocast,
-                 bool                    strings2numbers = false) const;
+                 bool                    autocast) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
@@ -152,8 +151,7 @@ private:
 
   bool calculateOperator(const std::string&         valueKey,
                          orion::CompoundValueNode*  upOp,
-                         orion::BSONObjBuilder*     bsonAttr,
-                         bool                       strings2numbers) const;
+                         orion::BSONObjBuilder*     bsonAttr) const;
 
 } ContextAttribute;
 

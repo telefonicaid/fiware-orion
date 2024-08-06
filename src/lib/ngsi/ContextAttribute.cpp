@@ -149,8 +149,7 @@ bool ContextAttribute::calculateOperator
 (
   const std::string&         valueKey,
   orion::CompoundValueNode*  upOp,
-  orion::BSONObjBuilder*     bsonAttr,
-  bool                       strings2numbers
+  orion::BSONObjBuilder*     bsonAttr
 ) const
 {
   std::string op = upOp->name;
@@ -208,7 +207,7 @@ bool ContextAttribute::calculateOperator
 
     case orion::ValueTypeVector:
     case orion::ValueTypeObject:
-      compoundValueBson(compoundValueP->childV, ba2, strings2numbers);
+      compoundValueBson(compoundValueP->childV, ba2);
       ba.append(ba2.arr());
       break;
 
@@ -238,7 +237,7 @@ bool ContextAttribute::calculateOperator
       break;
 
     case orion::ValueTypeObject:
-      compoundValueBson(upOp->childV, bo, strings2numbers);
+      compoundValueBson(upOp->childV, bo);
       bsonAttr->append(valueKey, bo.obj());
       break;
 
@@ -277,8 +276,7 @@ bool ContextAttribute::valueBson
   const std::string&      valueKey,
   orion::BSONObjBuilder*  bsonAttr,
   const std::string&      attrType,
-  bool                    autocast,
-  bool                    strings2numbers
+  bool                    autocast
 ) const
 {
   if (compoundValueP == NULL)
@@ -290,7 +288,7 @@ bool ContextAttribute::valueBson
     if (compoundValueP->valueType == orion::ValueTypeVector)
     {
       orion::BSONArrayBuilder b;
-      compoundValueBson(compoundValueP->childV, b, strings2numbers);
+      compoundValueBson(compoundValueP->childV, b);
       bsonAttr->append(valueKey, b.arr());
     }
     else if (compoundValueP->valueType == orion::ValueTypeObject)
@@ -298,7 +296,7 @@ bool ContextAttribute::valueBson
       // Special processing of update operators
       if ((compoundValueP->childV.size() > 0) && (isUpdateOperator(compoundValueP->childV[0]->name)))
       {
-        if (!calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr, strings2numbers))
+        if (!calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr))
         {
           // in this case we return without generating any BSON
           return false;
@@ -307,7 +305,7 @@ bool ContextAttribute::valueBson
       else
       {
         orion::BSONObjBuilder b;
-        compoundValueBson(compoundValueP->childV, b, strings2numbers);
+        compoundValueBson(compoundValueP->childV, b);
         bsonAttr->append(valueKey, b.obj());
       }
     }

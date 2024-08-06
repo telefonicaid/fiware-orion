@@ -3204,13 +3204,13 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
         else if (child0->valueType == orion::ValueTypeVector)
         {
           orion::BSONArrayBuilder ba;
-          compoundValueBson(child0->childV, ba, false, false);
+          compoundValueBson(child0->childV, ba, false);
           b->append(valueKey, ba.arr());
         }
         else if (child0->valueType == orion::ValueTypeObject)
         {
           orion::BSONObjBuilder bo;
-          compoundValueBson(child0->childV, bo, false, false);
+          compoundValueBson(child0->childV, bo, false);
           b->append(valueKey, bo.obj());
         }
         else if (child0->valueType == orion::ValueTypeNotGiven)
@@ -3314,13 +3314,13 @@ static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBui
         else if (child->valueType == orion::ValueTypeVector)
         {
           orion::BSONArrayBuilder ba;
-          compoundValueBson(child->childV, ba, false, false);
+          compoundValueBson(child->childV, ba, false);
           b->append(valueKey, ba.arr());
         }
         else if (child->valueType == orion::ValueTypeObject)
         {
           orion::BSONObjBuilder bo;
-          compoundValueBson(child->childV, bo, false, false);
+          compoundValueBson(child->childV, bo, false);
           b->append(valueKey, bo.obj());
         }
         else if (child->valueType == orion::ValueTypeNotGiven)
