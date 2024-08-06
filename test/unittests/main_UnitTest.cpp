@@ -144,7 +144,7 @@ int main(int argC, char** argV)
   paParse(paArgs, argC, (char**) argV, 1, false);
 
   LM_M(("Init tests"));
-  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false, false);
+  orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false, false, false, false);
   // Note that multitenancy and mutex time stats are disabled for unit test mongo init
   mongoInit(dbURI, dbName, pwd, false, writeConcern, dbPoolSize, false);
   alarmMgr.init(false);
