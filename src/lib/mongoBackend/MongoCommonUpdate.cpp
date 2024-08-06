@@ -367,7 +367,7 @@ static ChangeType mergeAttrInfo
     if (!isSomeCalculatedOperatorUsed(caP))
     {
       // FIXME P7: boolean return value should be managed?
-      caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), false);
+      caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE));
     }
   }
   else
@@ -627,7 +627,7 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
     // FIXME P7: boolean return value should be managed?
-    caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType, false);
+    caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType);
 
     /* Custom metadata */
     orion::BSONObjBuilder    md;
@@ -706,7 +706,7 @@ static bool appendAttribute
   if (!isSomeCalculatedOperatorUsed(caP))
   {
     // FIXME P7: boolean return value should be managed?
-    caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, caP->type, false);
+    caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, caP->type);
   }
 
   /* 2. Type */
@@ -2885,7 +2885,7 @@ static bool createEntity
       attrType = attrsV[ix]->type;
     }
 
-    if (!attrsV[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, false))
+    if (!attrsV[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType))
     {
       // nothing added to bsonAttr, so attribute is not going to be included in the update to the MongoDB
       // (for example, when $unset:1 is used)

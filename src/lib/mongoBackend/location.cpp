@@ -374,9 +374,8 @@ static bool getGeoJson
     }
     else
     {
-      // Autocast doesn't make sense in this context
       // FIXME P7: boolean return value should be managed?
-      caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true);
+      caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "");
       geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
     }
 

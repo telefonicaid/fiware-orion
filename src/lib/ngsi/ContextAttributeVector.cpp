@@ -501,7 +501,7 @@ void ContextAttributeVector::toBson
     }
 
     // FIXME P7: boolean return value should be managed?
-    this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, false);
+    this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType);
 
     std::string effectiveName = dbEncode(this->vec[ix]->name);
 

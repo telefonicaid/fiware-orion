@@ -128,8 +128,7 @@ public:
   /* Used to render attribute value to BSON */
   bool valueBson(const std::string&      valueKey,
                  orion::BSONObjBuilder*  bsonAttr,
-                 const std::string&      attrType,
-                 bool                    autocast) const;
+                 const std::string&      attrType) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
@@ -144,8 +143,7 @@ private:
 
   void bsonAppendAttrValue(const std::string&      valueKey,
                            orion::BSONObjBuilder*  bsonAttr,
-                           const std::string&      attrType,
-                           bool                    autocast) const;
+                           const std::string&      attrType) const;
 
   bool hasIgnoreType(void) const;
 

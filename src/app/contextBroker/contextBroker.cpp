@@ -264,7 +264,6 @@ bool            logDeprecate;
 #define DISABLE_NGSIV1_DESC    "turn off NGSIv1 request endpoints"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF_DESC    "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
-#define NGSIV1_AUTOCAST_DESC   "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
 #define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
 #define DBURI_DESC             "complete URI for database connection"
