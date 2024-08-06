@@ -203,7 +203,6 @@ extern bool               timingStatistics;
 extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
-extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
@@ -231,8 +230,7 @@ extern void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics,
-  bool               _checkIdv1
+  bool               _notifQueueStatistics
 );
 
 

@@ -119,7 +119,6 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-statNotifQueue' (enable thread pool notifications queue statistics)]      ORION_STAT_NOTIF_QUEUE            FALSE /FALSE/
                                [option '-logSummary' <log summary period in seconds (defaults to 0, meaning 'of]   ORION_LOG_SUMMARY_PERIOD          0 <= 0 /0/ <= 2678400
                                [option '-relogAlarms' (log messages for existing alarms beyond the raising alar]   ORION_RELOG_ALARMS                FALSE /FALSE/
-                               [option '-strictNgsiv1Ids' (additional checks for id fields in the NGSIv1 API)]     ORION_CHECK_ID_V1                 FALSE /FALSE/
                                [option '-disableCustomNotifications' (disable NGSIv2 custom notifications)]        ORION_DISABLE_CUSTOM_NOTIF        FALSE /FALSE/
                                [option '-disableFileLog' (disable logging into file)]                              ORION_DISABLE_FILE_LOG            FALSE /FALSE/
                                [option '-logForHumans' (human readible log to screen)]                             ORION_LOG_FOR_HUMANS              FALSE /FALSE/

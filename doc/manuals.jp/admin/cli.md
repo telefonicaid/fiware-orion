@@ -160,7 +160,6 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_STAT_NOTIF_QUEUE  |   statNotifQueue  |
 |   ORION_LOG_SUMMARY_PERIOD    |   logSummary  |
 |   ORION_RELOG_ALARMS  |   relogAlarms |
-|   ORION_CHECK_ID_V1   |   strictNgsiv1Ids |
 |   ORION_DISABLE_CUSTOM_NOTIF  |   disableCustomNotifications  |
 |   ORION_DISABLE_FILE_LOG  |   disableFileLog  |
 |   ORION_LOG_FOR_HUMANS    |   logForHumans    |

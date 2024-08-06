@@ -180,7 +180,6 @@ bool            statTiming;
 bool            statNotifQueue;
 int             lsPeriod;
 bool            relogAlarms;
-bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
 unsigned long   logLineMaxSize;
@@ -334,7 +333,6 @@ PaArgument paArgs[] =
   { "-logSummary",                  &lsPeriod,              "LOG_SUMMARY_PERIOD",       PaInt,    PaOpt, 0,                               0,     ONE_MONTH_PERIOD,      LOG_SUMMARY_DESC             },
   { "-relogAlarms",                 &relogAlarms,           "RELOG_ALARMS",             PaBool,   PaOpt, false,                           false, true,                  RELOGALARMS_DESC             },
 
-  { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,                  CHECK_v1_ID_DESC             },
   { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,                  DISABLE_CUSTOM_NOTIF         },
 
   { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,                  DISABLE_FILE_LOG             },
@@ -1203,7 +1201,7 @@ int main(int argC, char* argV[])
   alarmMgr.init(relogAlarms);
   mqttMgr.init(mqttTimeout);
   exprMgr.init();
-  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
   mongoInit(dbURI, dbName, pwd, mtenant, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
