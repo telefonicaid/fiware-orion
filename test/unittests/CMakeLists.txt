@@ -67,18 +67,13 @@ SET (SOURCES
 
     serviceRoutines/badVerbGetOnly_test.cpp
     serviceRoutines/badVerbPostOnly_test.cpp
-    serviceRoutines/badVerbAllFour_test.cpp
     serviceRoutines/badVerbGetPostOnly_test.cpp
-    serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
     serviceRoutines/badVerbGetDeleteOnly_test.cpp
     serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/putSubscriptionConvOp_test.cpp
     serviceRoutines/versionTreat_test.cpp
     serviceRoutines/exitTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
 
-    convenience/Convenience_test.cpp
     convenience/AppendContextElementRequest_test.cpp
     convenience/AppendContextElementResponse_test.cpp
     convenience/ContextAttributeResponse_test.cpp
@@ -188,7 +183,6 @@ SET (SOURCES
     rest/OrionError_test.cpp
     rest/Verb_test.cpp
     rest/restReply_test.cpp
-    rest/RestService_test.cpp
     rest/rest_test.cpp
 )
 

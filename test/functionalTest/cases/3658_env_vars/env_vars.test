@@ -125,7 +125,6 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-logLineMaxSize' <log line maximum size (in bytes)>]                       ORION_LOG_LINE_MAX_SIZE           32768 /32768/ >= 100
                                [option '-logInfoPayloadMaxSize' <maximum length for request or response payload]   ORION_LOG_INFO_PAYLOAD_MAX_SIZE   5120 /5120/ >= 0
                                [option '-disableMetrics' (turn off the 'metrics' feature)]                         ORION_DISABLE_METRICS             FALSE /FALSE/
-                               [option '-disableNgsiv1' (turn off NGSIv1 request endpoints)]                       ORION_DISABLE_NGSIV1              FALSE /FALSE/
                                [option '-insecureNotif' (allow HTTPS notifications to peers which certificate c]   ORION_INSECURE_NOTIF              FALSE /FALSE/
                                [option '-mqttMaxAge' <max time (in minutes) that an unused MQTT connection is k]   ORION_MQTT_MAX_AGE                60 /60/
                                [option '-logDeprecate' (log deprecation usages as warnings)]                       ORION_LOG_DEPRECATE               FALSE /FALSE/

@@ -185,7 +185,6 @@ bool            logForHumans;
 unsigned long   logLineMaxSize;
 unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
-bool            disableNgsiv1;
 bool            disableFileLog;
 int             reqTimeout;
 bool            insecureNotif;
@@ -340,7 +339,6 @@ PaArgument paArgs[] =
   { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
 
   { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  DISABLE_METRICS_DESC         },
-  { "-disableNgsiv1",               &disableNgsiv1,         "DISABLE_NGSIV1",           PaBool,   PaOpt, false,                           false, true,                  DISABLE_NGSIV1_DESC          },
 
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF_DESC          },
 
@@ -1278,7 +1276,6 @@ int main(int argC, char* argV[])
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
-                          disableNgsiv1,
                           httpsPrivateServerKey,
                           httpsCertificate);
 
@@ -1297,7 +1294,6 @@ int main(int argC, char* argV[])
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
-                          disableNgsiv1,
                           NULL,
                           NULL);
   }
