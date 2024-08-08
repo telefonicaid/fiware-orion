@@ -27,7 +27,6 @@
 #include "parse/CompoundValueNode.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
-#include "jsonParse/jsonRequest.h"
 
 #include "unittest.h"
 

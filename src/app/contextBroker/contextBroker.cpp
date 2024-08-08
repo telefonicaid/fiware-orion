@@ -80,7 +80,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"

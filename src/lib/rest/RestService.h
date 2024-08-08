@@ -31,7 +31,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "jsonParse/jsonRequest.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 
 
@@ -76,7 +75,7 @@ extern std::string payloadParse
   ConnectionInfo*            ciP,
   ParseData*                 parseDataP,
   RestService*               service,
-  JsonRequest**              jsonPP,
+  //JsonRequest**              jsonPP,  FIXME PR
   JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
 );

@@ -29,11 +29,8 @@
 
 #include "common/globals.h"
 #include "convenience/RegisterProviderRequest.h"
-#include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "jsonParse/jsonRequest.h"
-#include "jsonParse/jsonRegisterProviderRequest.h"
 
 #include "testDataFromFile.h"
 

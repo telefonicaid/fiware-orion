@@ -16,7 +16,7 @@ Related to request management (RQ management):
 
 Related to parsing (PP prefix):
 
-* [PP-01: Parsing an NGSIv1 payload](jsonParse.md#flow-pp-01)
+* [PP-01: Parsing an NGSIv1 payload](jsonParse.md#flow-pp-01) - FIXME PR: review this
     * Continues from RQ-02, FW-02 or FW-04 
 * [PP-02: Parsing a text payload](sourceCode.md#flow-pp-02)
 	* Continues from RQ-02

@@ -37,7 +37,7 @@
 #include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "jsonParse/jsonRequest.h"
+#include "jsonParseV2/parseEntitiesResponseV1.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -263,7 +263,9 @@ static bool updateForward
     //
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
-    std::string  s;
+    bool r;
+    Entities                    entities;
+    OrionError                  oe;
 
     cleanPayload = jsonPayloadClean(out.c_str());
 
@@ -294,11 +296,11 @@ static bool updateForward
 
     parseData.upcrs.res.errorCode.fill(SccOk);
 
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
+    r = parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe);
 
-    if (s != "OK")
+    if (!r)
     {
-      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.error + " (" + oe.description + ")");
       upcrsP->errorCode.fill(SccContextElementNotFound, "");
       parseData.upcr.res.release();
       parseData.upcrs.res.release();

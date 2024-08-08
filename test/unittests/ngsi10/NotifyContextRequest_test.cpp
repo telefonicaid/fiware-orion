@@ -25,8 +25,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "jsonParse/jsonRequest.h"
-
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/NotifyContextRequest.h"

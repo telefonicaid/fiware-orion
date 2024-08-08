@@ -11,7 +11,6 @@
 * [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types, NGSI9 = context management availability)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
-* [src/lib/jsonParse/](#srclibjsonparse) (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
 * [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
@@ -296,16 +295,6 @@ _PP-02: Parsing a text payload_
 
 * `payloadParse()` calls `textRequestTreat()` (step 1) which contains a switch that calls the correct treat function depending on the type of the request (step 2). As of the moment of writing this document, Orion supports TEXT payloads only for one single type of request, so there is only one treat function to choose from (or ERROR if the request type is not `EntityAttributeValueRequest`).
 * `textParseAttributeValue()` extracts the string and checks for special strings such as true, false, and null and also examines the string to see whether it is a Number. Then this value along with the type of the value is set to the attribute that is a parameter for the function.
-
-[Top](#top)
-
-
-## src/lib/jsonParse/
-This library takes care of the JSON parsing of payload for NGSIv1 requests. It depends on the [Boost library property_tree](https://theboostcpplibraries.com/boost.propertytree) and uses SAX to translate the incoming JSON text into the ngsi classes.
-
-This library contains a vector of the type `JsonRequest`, that defines how to parse the different requests. The function `jsonTreat()` picks the parsing method and `jsonParse()` takes care of the parsing, with help from the Boost property_tree library.
-
-See detailed explanation of the V1 JSON parse implementation in its [dedicated document](jsonParse.md).
 
 [Top](#top)
 

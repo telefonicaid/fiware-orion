@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_JSONPARSE_JSONQUERYCONTEXTREQUEST_H_
-#define SRC_LIB_JSONPARSE_JSONQUERYCONTEXTREQUEST_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEENTITIESRESPONSEV1_H_
+#define SRC_LIB_JSONPARSEV2_PARSEENTITIESRESPONSEV1_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,43 +23,28 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 #include <string>
+#include <vector>
 
-#include "jsonParse/JsonNode.h"
+#include "rapidjson/document.h"
+
 #include "rest/ConnectionInfo.h"
+#include "apiTypesV2/Entities.h"
 
 
 
 /* ****************************************************************************
 *
-* qcrParseVector - 
+* parseEntitiesResponseV1 -
 */
-extern JsonNode jsonQcrParseVector[];
+extern bool parseEntitiesResponseV1
+(
+  ConnectionInfo*   ciP,
+  const char*       payload,
+  Entities*         evP,
+  OrionError*       oeP
+);
 
-
-
-/* ****************************************************************************
-*
-* jsonQcrInit - 
-*/
-extern void jsonQcrInit(ParseData* reqDataP);
-
-
-
-/* ****************************************************************************
-*
-* jsonQcrRelease - 
-*/
-extern void jsonQcrRelease(ParseData* reqDataP);
-
-
-
-/* ****************************************************************************
-*
-* jsonQcrCheck - 
-*/
-extern std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
-
-#endif  // SRC_LIB_JSONPARSE_JSONQUERYCONTEXTREQUEST_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSEENTITIESRESPONSEV1_H_

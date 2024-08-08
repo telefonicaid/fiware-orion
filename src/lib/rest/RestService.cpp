@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "jsonParse/jsonRequest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -174,7 +172,7 @@ std::string payloadParse
   ConnectionInfo*            ciP,
   ParseData*                 parseDataP,
   RestService*               service,
-  JsonRequest**              jsonPP,
+  //JsonRequest**              jsonPP,  FIXME PR
   JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
 )
@@ -214,6 +212,7 @@ std::string payloadParse
 
   return result;
 }
+
 
 
 
@@ -518,7 +517,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
-  JsonRequest*              jsonReqP   = NULL;
+  //JsonRequest*              jsonReqP   = NULL; // FIXME PR: remove
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
@@ -598,7 +597,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       ciP->parseDataP = &parseData;
       metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
       LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
+      // FIXME PR
+      response = payloadParse(ciP, &parseData, &serviceV[ix], /*&jsonReqP,*/ &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
@@ -606,10 +606,11 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         alarmMgr.badInput(clientIp, response);
         restReply(ciP, response);
 
-        if (jsonReqP != NULL)
+        // FIXME PR
+        /*if (jsonReqP != NULL)
         {
           jsonReqP->release(&parseData);
-        }
+        }*/
 
 
         delayedRelease(&jsonRelease);
@@ -644,10 +645,11 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       restReply(ciP, response);
 
-      if (jsonReqP != NULL)
-      {
-        jsonReqP->release(&parseData);
-      }
+      // FIXME PR: remove
+      //if (jsonReqP != NULL)
+      //{
+      //  jsonReqP->release(&parseData);
+      //}
 
       delayedRelease(&jsonRelease);
 
@@ -675,10 +677,11 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     filterRelease(&parseData, serviceV[ix].request);
 
-    if (jsonReqP != NULL)
-    {
-      jsonReqP->release(&parseData);
-    }
+    // FIXME PR: remove
+    //if (jsonReqP != NULL)
+    //{
+    //  jsonReqP->release(&parseData);
+    //}
 
     delayedRelease(&jsonRelease);
 

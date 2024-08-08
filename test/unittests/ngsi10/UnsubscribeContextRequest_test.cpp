@@ -28,7 +28,6 @@
 #include "testDataFromFile.h"
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
-#include "jsonParse/jsonRequest.h"
 
 #include "unittest.h"
 

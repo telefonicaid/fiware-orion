@@ -44,6 +44,7 @@ SET (SOURCES
     parseNotification.cpp
     parseExpression.cpp
     parseEntitiesResponse.cpp
+    parseEntitiesResponseV1.cpp
 )
 
 SET (HEADERS
@@ -70,6 +71,7 @@ SET (HEADERS
     parseNotification.h
     parseExpression.h
     parseEntitiesResponse.h
+    parseEntitiesResponseV1.h
 )
 
 

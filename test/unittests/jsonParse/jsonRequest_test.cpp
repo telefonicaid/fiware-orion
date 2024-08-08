@@ -27,7 +27,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"

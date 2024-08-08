@@ -48,8 +48,8 @@
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
 #include "serviceRoutines/postQueryContext.h"
-#include "jsonParse/jsonRequest.h"
 #include "jsonParseV2/parseEntitiesResponse.h"
+#include "jsonParseV2/parseEntitiesResponseV1.h"
 
 // FIXME P3: matchEntity() should be in a better place, and the following include to be removed
 #include "mongoBackend/MongoGlobal.h"  // matchEntity()
@@ -375,6 +375,8 @@ static bool queryForward
 
   if (qcrP->providerFormat == PfJson)
   {
+#if 0
+    // FIXME PR clean this block. Unifty with else, pobably only the parseEntitiesResponse/parseEntitiesResponseV1 is different
     std::string  s;
 
     //
@@ -410,6 +412,43 @@ static bool queryForward
     // 5. Fill in the response from the redirection into the response of this function
     //
     qcrsP->fill(&parseData.qcrs.res);
+#endif
+
+    bool                        r;
+    Entities                    entities;
+    OrionError                  oe;
+
+    // Note that parseEntitiesResponse() is thought for client-to-CB interactions, so it takes into account
+    // ciP->uriParamOptions[OPT_KEY_VALUES]. In this case, we never use keyValues in the CB-to-CPr so we
+    // set to false and restore its original value later. In this case it seems it is not needed to preserve
+    // ciP->httpStatusCode as in the similar case above
+    // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
+    // to make JSON parsing logic (internal to parseEntitiesResponse()) independent of ciP and to pass the
+    // keyValue directly as function parameter.
+    bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
+    ciP->uriParamOptions[OPT_KEY_VALUES] = false;
+    r = parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe);
+    ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
+
+    if (r == false)
+    {
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
+      parseData.qcr.res.release();
+      parseData.qcrs.res.release();
+      return false;
+    }
+
+    //
+    // 5. Fill in the response from the redirection into the response of this function
+    //
+    if (entities.size() > 0)
+    {
+      qcrsP->fill(entities);
+    }
+    else
+    {
+      qcrsP->errorCode.fill(SccContextElementNotFound);
+    }
   }
   else
   {
@@ -431,7 +470,7 @@ static bool queryForward
 
     if (b == false)
     {
-      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.error + " (" + oe.description + ")");
       parseData.qcr.res.release();
       parseData.qcrs.res.release();
       return false;

@@ -27,7 +27,6 @@
 
 #include "common/globals.h"
 #include "ngsi/Request.h"
-#include "jsonParse/jsonRequest.h"
 #include "serviceRoutines/postQueryContext.h"
 
 #include "unittest.h"

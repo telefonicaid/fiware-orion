@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "jsonParse/jsonRequest.h"
 #include "ngsi/ParseData.h"
 
 #include "unittest.h"
