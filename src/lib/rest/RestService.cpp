@@ -720,9 +720,9 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   // ... and this here is the error that is returned. A 400 Bad Request with "service XXX not recognized" as payload
   //
   std::string  details = std::string("service '") + ciP->url + "' not recognized";
-  std::string  answer;
 
-  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
+  OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, ERROR_BAD_REQUEST);
+  std::string answer = oe.toJson();
   alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
   restReply(ciP, answer);

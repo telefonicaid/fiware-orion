@@ -984,10 +984,9 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   if (ciP->httpHeaders.contentType.empty())
   {
     std::string details = "Content-Type header not used, default application/octet-stream is not supported";
+    OrionError oe(SccUnsupportedMediaType, details);
+    ciP->answer = oe.toJson();
     ciP->httpStatusCode = SccUnsupportedMediaType;
-    restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-
     return 1;
   }
 
@@ -995,8 +994,8 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   if ((ciP->httpHeaders.contentType != "application/json") && (ciP->httpHeaders.contentType != "text/plain"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
-    ciP->httpStatusCode = SccUnsupportedMediaType;
-    restErrorReplyGet(ciP, SccUnsupportedMediaType, details, &ciP->answer);
+    OrionError oe(SccUnsupportedMediaType, details);
+    ciP->answer = oe.toJson();
     ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
@@ -1464,8 +1463,8 @@ static MHD_Result connectionTreat
 
     snprintf(details, sizeof(details), "payload size: %d, max size supported: %llu", ciP->httpHeaders.contentLength, inReqPayloadMaxSize);
     alarmMgr.badInput(clientIp, details);
-    restErrorReplyGet(ciP, SccRequestEntityTooLarge, details, &ciP->answer);
-
+    OrionError oe(SccRequestEntityTooLarge, details);
+    ciP->answer = oe.toJson();
     ciP->httpStatusCode = SccRequestEntityTooLarge;
   }
 
@@ -1559,9 +1558,8 @@ static MHD_Result connectionTreat
       (ciP->httpHeaders.contentLength == 0) &&
       ((strncasecmp(ciP->url.c_str(), "/log/", 5) != 0) && (strncasecmp(ciP->url.c_str(), "/admin/log", 10) != 0)))
   {
-    std::string errorMsg;
-
-    restErrorReplyGet(ciP, SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request", &errorMsg);
+    OrionError oe(SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
+    std::string errorMsg = oe.toJson();
     ciP->httpStatusCode  = SccContentLengthRequired;
     restReply(ciP, errorMsg);
     alarmMgr.badInput(clientIp, errorMsg);

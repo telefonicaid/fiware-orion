@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/limits.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
@@ -66,6 +67,8 @@
 /* ****************************************************************************
 *
 * jsonRequest -
+*
+* FIXME PR: review this
 */
 static JsonRequest jsonRequest[] =
 {
@@ -194,13 +197,13 @@ std::string jsonTreat
     std::string  errorReply;
     char         reqTypeV[STRING_SIZE_FOR_INT];
 
-    restErrorReplyGet(ciP, SccBadRequest, details, &errorReply);
+    OrionError oe(SccBadRequest, details);
     snprintf(reqTypeV, sizeof(reqTypeV), "%d", request);
 
     std::string extra = std::string("RequestType ") + reqTypeV + " (" + requestType(request) + ")";
     alarmMgr.badInput(clientIp, "no request treating object found for RequestType", extra);
 
-    return errorReply;
+    return oe.toJson();
   }
 
   if (reqPP != NULL)
@@ -218,27 +221,22 @@ std::string jsonTreat
   }
   catch (const std::exception &e)
   {
-    std::string errorReply;
-    restErrorReplyGet(ciP, SccBadRequest, "JSON Parse Error", &errorReply);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     alarmMgr.badInput(clientIp, "JSON Parse Error", e.what());
-    return errorReply;
+    return oe.toJson();
   }
   catch (...)
   {
-    std::string errorReply;
-
-    restErrorReplyGet(ciP, SccBadRequest, "JSON Generic Error", &errorReply);
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
     alarmMgr.badInput(clientIp, "JSON parse generic error");
-    return errorReply;
+    return oe.toJson();
   }
 
   if (res != "OK")
   {
-    std::string answer;
     alarmMgr.badInput(clientIp, "JSON Parse Error", res);
-    ciP->httpStatusCode = SccBadRequest;
-    restErrorReplyGet(ciP, ciP->httpStatusCode, res, &answer);
-    return answer;
+    OrionError oe(SccBadRequest, ERROR_DESC_PARSE, ERROR_PARSE);
+    return oe.toJson();
   }
 
   if (ciP->inCompoundValue == true)
