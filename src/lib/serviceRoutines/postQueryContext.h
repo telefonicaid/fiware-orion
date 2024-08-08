@@ -37,7 +37,7 @@
 *
 * postQueryContext - 
 */
-extern std::string postQueryContext
+extern void postQueryContext
 (
   ConnectionInfo*            ciP,
   int                        components,

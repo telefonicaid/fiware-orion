@@ -52,7 +52,7 @@
 *
 *
 * 01. Fill in UpdateContextRequest
-* 02. Call standard op postQueryContext
+* 02. Call standard op postUpdateContext
 * 03. Check output from mongoBackend - any errors?
 * 04. Prepare HTTP headers
 * 05. Cleanup and return result

@@ -505,7 +505,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
 *
 * postQueryContext -
 */
-std::string postQueryContext
+void postQueryContext
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -519,7 +519,6 @@ std::string postQueryContext
   //
   QueryContextResponse*       qcrsP = &parseDataP->qcrs.res;
   QueryContextRequest*        qcrP  = &parseDataP->qcr.res;
-  std::string                 answer;
   QueryContextRequestVector   requestV;
   std::vector<std::string>    regIdsV;
   QueryContextResponseVector  responseV;
@@ -527,8 +526,6 @@ std::string postQueryContext
   long long*                  countP = NULL;
 
   bool skipForwarding = ciP->uriParamOptions[OPT_SKIPFORWARDING];
-
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
   //
   // 00. Count or not count? That is the question ...
@@ -556,9 +553,8 @@ std::string postQueryContext
     // Bad Input or Internal Error detected by Mongo Backend - request ends here !
     OrionError oe(qcrsP->errorCode);
 
-    TIMED_RENDER(answer = oe.toJsonV1());
     qcrP->release();
-    return answer;
+    return;
   }
 
 
@@ -582,10 +578,9 @@ std::string postQueryContext
       ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
       ciP->httpHeaderValue.push_back(cV);
     }
-    TIMED_RENDER(answer = qcrsP->toJsonV1(asJsonObject));
 
     qcrP->release();
-    return answer;
+    return;
   }
 
   //
@@ -860,10 +855,6 @@ std::string postQueryContext
   }
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
-  bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-
-  TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
-
 
   //
   // Time to cleanup.
@@ -883,5 +874,5 @@ std::string postQueryContext
   requestV.release();
   responseV.release();
 
-  return answer;
+  return;
 }

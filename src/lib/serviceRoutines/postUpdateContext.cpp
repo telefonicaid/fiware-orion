@@ -528,13 +528,12 @@ static void attributesToNotFound(UpdateContextRequest* upcrP)
 *
 * postUpdateContext -
 *
-* POST /v1/updateContext
-* POST /ngsi10/updateContext
+* Internal functions used by serviceRoutinesV2 functions
 *
 * Payload In:  UpdateContextRequest
 * Payload Out: UpdateContextResponse
 */
-std::string postUpdateContext
+void postUpdateContext
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -545,9 +544,7 @@ std::string postUpdateContext
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
-  std::string             answer;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
   bool overrideMetadata = ciP->uriParamOptions[OPT_OVERRIDEMETADATA];
   bool flowControl  = ciP->uriParamOptions[OPT_FLOW_CONTROL];
@@ -564,10 +561,9 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
     upcrP->release();
 
-    return answer;
+    return;
   }
   else if (ciP->servicePathV[0].empty())
   {
@@ -578,11 +574,8 @@ std::string postUpdateContext
   if (res != "OK")
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
-
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
-
     upcrP->release();
-    return answer;
+    return;
   }
 
 
@@ -623,10 +616,8 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
-
     upcrP->release();
-    return answer;
+    return;
   }
 
 
@@ -855,5 +846,5 @@ std::string postUpdateContext
   upcrsP->fill(&response);
   response.release();
 
-  return answer;
+  return;
 }

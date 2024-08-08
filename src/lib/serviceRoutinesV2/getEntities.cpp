@@ -308,7 +308,7 @@ std::string getEntities
   setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  postQueryContext(ciP, components, compV, parseDataP);
 
   // 03. Check Internal Errors
   if (parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError)
