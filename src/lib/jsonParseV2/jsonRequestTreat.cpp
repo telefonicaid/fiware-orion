@@ -174,7 +174,7 @@ std::string jsonRequestTreat
 
   default:
     OrionError error(SccNotImplemented, "Request Treat function not implemented");
-    answer = error.toJsonV1();
+    answer = error.toJson();
     ciP->httpStatusCode = SccNotImplemented;
     break;
   }

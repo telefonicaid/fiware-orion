@@ -53,7 +53,6 @@ public:
   std::string  smartRender(void);
   std::string  setStatusCodeAndSmartRender(HttpStatusCode* scP);
   std::string  toJson(void);
-  std::string  toJsonV1(void);
   void         fill(HttpStatusCode _code, const std::string& _description,  const std::string& _error = "");
   void         fill(const StatusCode& sc);
   void         fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _error);

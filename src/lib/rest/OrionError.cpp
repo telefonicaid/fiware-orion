@@ -173,36 +173,6 @@ std::string OrionError::toJson(void)
 
 /* ****************************************************************************
 *
-* OrionError::toJsonV1 -
-*
-*/
-std::string OrionError::toJsonV1(void)
-{
-  std::string  out           = "{";
-
-  //
-  // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
-  //
-  out += startTag("orionError",   false);
-  out += valueTag("code",         code, true);
-  out += valueTag("reasonPhrase", error, !description.empty());
-
-  if (!description.empty())
-  {
-    out += valueTag("details",    description);
-  }
-
-  out += endTag();
-
-  out += "}";
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
 * OrionError::shrinkError -
 *
 * This method removes any whitespace in the error field, i.e.

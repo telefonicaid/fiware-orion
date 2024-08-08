@@ -525,7 +525,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   if ((ciP->url.empty()) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
-    std::string response = error.toJsonV1();
+    std::string response = error.toJson();
 
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
     restReply(ciP, response);
