@@ -67,5 +67,5 @@ std::string badVerbGetDeletePatchOnly
 
   alarmMgr.badInput(clientIp, details);
 
-  return oe.smartRender();
+  return oe.toJson();
 }

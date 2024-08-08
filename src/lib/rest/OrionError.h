@@ -57,10 +57,6 @@ public:
   void         fill(const StatusCode& sc);
   void         fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _error);
 
-
-private:
-  void         shrinkError(void);
-
 } OrionError;
 
 #endif

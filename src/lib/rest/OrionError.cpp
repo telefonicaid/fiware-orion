@@ -127,24 +127,12 @@ void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetai
 
 /* ****************************************************************************
 *
-* OrionError::smartRender -
-*/
-std::string OrionError::smartRender(void)
-{
-  shrinkError();
-  return toJson();
-}
-
-
-
-/* ****************************************************************************
-*
 * OrionError::setStatusCodeAndSmartRender -
 */
 std::string OrionError::setStatusCodeAndSmartRender(HttpStatusCode* scP)
 {
   *scP = code;
-  return smartRender();
+  return toJson();
 }
 
 
@@ -169,76 +157,3 @@ std::string OrionError::toJson(void)
   return jh.str();
 }
 
-
-
-/* ****************************************************************************
-*
-* OrionError::shrinkError -
-*
-* This method removes any whitespace in the error field, i.e.
-* transforms "Not Found" to "NotFound".
-*
-* It is used by smartRender method, in order to prepare to render in API v2 case
-*
-* FIXME P4: The following alternative (more compact) way has been proposed:
-*
-*  #include <algorithm>  // std::remove_if
-*  #include <cctype>     // std::isspace
-*
-*  ...
-*
-*  reasonPhrase.erase(std::remove_if(error.begin(), error.end(), std::isspace), error.end());
-*
-* However, 'std::isspace' doesn't directly work. We have been able to make it work with
-* 'static_cast<int(*)(int)>(isspace)'. However, that is obscure so until we can find
-* a way of using just 'std::isspace', the current implementation stills.
-*
-*/
-void OrionError::shrinkError(void)
-{
-  char buf[80];  // 80 should be enough to hold any reason phrase
-
-#if 0
-  strncpy(buf, error.c_str(), sizeof(buf));
-
-  // See: http://stackoverflow.com/questions/1726302/removing-spaces-from-a-string-in-c
-  if (*j != ' ')
-  {
-    *i = *j;
-    ++i;
-  }
-  ++j;
-
-  char* i = buf;
-  char* j = buf;
-  while (*j != 0)
-  {
-    *i = *j++;
-    if (*i != ' ')
-    {
-      i++;
-    }
-  }
-  *i = 0;
-#endif
-
-  char*         fromP = (char*) error.c_str();
-  char*         toP   = buf;
-  unsigned int  toLen = 0;
-
-  while ((*fromP != 0) && (toLen < sizeof(buf)))
-  {
-    // If next char is not whitespace: copy to outgoing
-    if (*fromP != ' ')
-    {
-      *toP = *fromP;
-      ++toP;
-      ++toLen;
-    }
-
-    ++fromP;
-  }
-  *toP = 0;  // End-of string
-
-  error = std::string(buf);
-}

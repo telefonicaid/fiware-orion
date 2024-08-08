@@ -123,7 +123,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       OrionError error(SccBadRequest, errorString);
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender();
+      ciP->answer         = error.toJson();
     }
     // FIXME PR: solve this
     /*else if (ciP->apiVersion == ADMIN_API)
@@ -145,7 +145,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       {
         OrionError error(SccBadRequest, std::string("Bad pagination offset: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = error.code;
-        ciP->answer         = error.smartRender();
+        ciP->answer         = error.toJson();
         return MHD_YES;
       }
 
@@ -162,7 +162,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       {
         OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [must be a positive integer number]");
         ciP->httpStatusCode = error.code;
-        ciP->answer         = error.smartRender();
+        ciP->answer         = error.toJson();
         return MHD_YES;
       }
 
@@ -174,7 +174,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [max: " + MAX_PAGINATION_LIMIT + "]");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender();
+      ciP->answer         = error.toJson();
       return MHD_YES;
     }
   }
@@ -184,7 +184,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender();
+      ciP->answer         = error.toJson();
       return MHD_YES;
     }
   }
@@ -206,7 +206,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
     {
       OrionError error(SccBadRequest, "Invalid value for URI param /options/");
       ciP->httpStatusCode = error.code;
-      ciP->answer         = error.smartRender();
+      ciP->answer         = error.toJson();
     }
   }
   else if (key == URI_PARAM_TYPE)
@@ -269,7 +269,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
 
     alarmMgr.badInput(clientIp, details);
     ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender();
+    ciP->answer         = error.toJson();
   }
 
   return MHD_YES;
@@ -481,7 +481,7 @@ static void acceptParse(ConnectionInfo* ciP, const char* value)
   {
     OrionError oe(ciP->httpStatusCode, ciP->acceptHeaderError);
 
-    ciP->answer = oe.smartRender();
+    ciP->answer = oe.toJson();
   }
 }
 
@@ -1019,7 +1019,7 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   {
     OrionError error(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI);
     ciP->httpStatusCode = error.code;
-    ciP->answer         = error.smartRender();
+    ciP->answer         = error.toJson();
     return false;
   }
 
@@ -1319,7 +1319,7 @@ static MHD_Result connectionTreat
       OrionError oe(SccRequestEntityTooLarge, details);
 
       ciP->httpStatusCode = oe.code;
-      restReply(ciP, oe.smartRender());
+      restReply(ciP, oe.toJson());
       return MHD_YES;
     }
 
@@ -1478,7 +1478,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
-    restReply(ciP, oe.smartRender());
+    restReply(ciP, oe.toJson());
     return MHD_YES;
   }
 
@@ -1502,7 +1502,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.description);
-    restReply(ciP, oe.smartRender());
+    restReply(ciP, oe.toJson());
     return MHD_YES;
   }
 
@@ -1528,7 +1528,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.description);
-    restReply(ciP, oe.smartRender());
+    restReply(ciP, oe.toJson());
     return MHD_YES;
   }
 
@@ -1543,7 +1543,7 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
-    restReply(ciP, oe.smartRender());
+    restReply(ciP, oe.toJson());
     return MHD_YES;
   }
 

@@ -133,7 +133,7 @@ std::string StatusCode::toJsonV1(bool comma, bool showKey)
 std::string StatusCode::toJson(void)
 {
   OrionError oe(code, details, reasonPhrase);
-  return oe.smartRender();
+  return oe.toJson();
 }
 
 

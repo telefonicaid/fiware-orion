@@ -548,7 +548,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       alarmMgr.badInput(clientIp, oe.description);
       ciP->httpStatusCode = SccBadRequest;
-      restReply(ciP, oe.smartRender());
+      restReply(ciP, oe.toJson());
       return "URL PATH component error";
     }
   }
