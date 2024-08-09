@@ -50,7 +50,6 @@ struct UpdateContextSubscriptionRequest : public SubscribeContextRequest
   UpdateContextSubscriptionRequest();  
   std::string check(const std::string& predetectedError, int counter);
   void        release(void);
-  void        toNgsiv2Subscription(ngsiv2::SubscriptionUpdate* subUp);
 };
 
 #endif  // SRC_LIB_NGSI10_UPDATECONTEXTSUBSCRIPTIONREQUEST_H_

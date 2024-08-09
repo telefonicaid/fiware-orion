@@ -87,42 +87,6 @@ std::string UpdateContextSubscriptionRequest::check(const std::string& predetect
 */
 void UpdateContextSubscriptionRequest::release(void)
 {
-  // Old versions of this method also include a 'restriction.release()' call. However, now each time
-  // a UpdateContextSubscriptionRequest is created, the method toNgsiv2Subscription() is used on it and the
-  // 'ownership' of the Restriction is transferred to the corresponding NGSIv2 class. Thus, leaving
-  // that 'restriction.release()' would cause double-free problems
-
+  restriction.release();
   notifyConditionVector.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextSubscriptionRequest::toNgsiv2Subscription -
-*/
-void UpdateContextSubscriptionRequest::toNgsiv2Subscription(SubscriptionUpdate* subUp)
-{
-  // Parent method will do most of the work
-  SubscribeContextRequest::toNgsiv2Subscription(subUp);
-
-  // Fill remaining fields in SubscriptionUpdate
-  subUp->id         = subscriptionId.get();
-  subUp->fromNgsiv1 = true;
-
-  // Fields that can be modified in a NGSIv1 subscription
-  // (See https://fiware-orion.readthedocs.io/en/master/user/updating_regs_and_subs/index.html)
-  //
-  //  * notifyConditions (within subject in NGSIv2)
-  //  * throttling       (root field in NGSIv2)
-  //  * duration         (root field -as 'expires'- in NGSIv2)
-  //  * restriction      (already processed in the parent method)
-
-  subUp->subjectProvided      = (notifyConditionVector.size() > 0);
-  subUp->expiresProvided      = !duration.isEmpty();
-  subUp->statusProvided       = false;  // not supported in NGSIv1
-  subUp->notificationProvided = false;  // NGSIv1 doesn's allow changes in that part
-  subUp->attrsFormatProvided  = true;   // updating in NGSIv1 involves and implicit change to NGSIv1 legacy format
-  subUp->throttlingProvided   = !throttling.isEmpty();
-
 }

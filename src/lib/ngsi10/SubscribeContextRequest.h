@@ -62,7 +62,6 @@ typedef struct SubscribeContextRequest
 
   std::string  check(const std::string& predetectedError, int counter);
   void         release(void);
-  void         toNgsiv2Subscription(ngsiv2::Subscription* sub);
 
   void         fill(EntityTypeInfo typeInfo);
 } SubscribeContextRequest;
