@@ -114,8 +114,7 @@ public:
 
   std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
 
-  std::string  toJsonAsValue(ApiVersion       apiVersion,
-                             bool             acceptedTextPlain,
+  std::string  toJsonAsValue(bool             acceptedTextPlain,
                              bool             acceptedJson,
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
@@ -129,14 +128,12 @@ public:
   /* Used to render attribute value to BSON */
   bool valueBson(const std::string&      valueKey,
                  orion::BSONObjBuilder*  bsonAttr,
-                 const std::string&      attrType,
-                 bool                    autocast,
-                 bool                    strings2numbers = false) const;
+                 const std::string&      attrType) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck = false);
+  std::string  check(RequestType requestType, bool relaxForbiddenCheck = false);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
@@ -146,15 +143,13 @@ private:
 
   void bsonAppendAttrValue(const std::string&      valueKey,
                            orion::BSONObjBuilder*  bsonAttr,
-                           const std::string&      attrType,
-                           bool                    autocast) const;
+                           const std::string&      attrType) const;
 
   bool hasIgnoreType(void) const;
 
   bool calculateOperator(const std::string&         valueKey,
                          orion::CompoundValueNode*  upOp,
-                         orion::BSONObjBuilder*     bsonAttr,
-                         bool                       strings2numbers) const;
+                         orion::BSONObjBuilder*     bsonAttr) const;
 
 } ContextAttribute;
 

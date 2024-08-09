@@ -37,7 +37,7 @@
 #include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "jsonParse/jsonRequest.h"
+#include "jsonParseV2/parseEntitiesResponseV1.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -263,7 +263,9 @@ static bool updateForward
     //
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
-    std::string  s;
+    bool result;
+    Entities                    entities;
+    OrionError                  oe;
 
     cleanPayload = jsonPayloadClean(out.c_str());
 
@@ -294,11 +296,11 @@ static bool updateForward
 
     parseData.upcrs.res.errorCode.fill(SccOk);
 
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
+    result = parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe);
 
-    if (s != "OK")
+    if (!result)
     {
-      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.error + " (" + oe.description + ")");
       upcrsP->errorCode.fill(SccContextElementNotFound, "");
       parseData.upcr.res.release();
       parseData.upcrs.res.release();
@@ -528,13 +530,12 @@ static void attributesToNotFound(UpdateContextRequest* upcrP)
 *
 * postUpdateContext -
 *
-* POST /v1/updateContext
-* POST /ngsi10/updateContext
+* Internal functions used by serviceRoutinesV2 functions
 *
 * Payload In:  UpdateContextRequest
 * Payload Out: UpdateContextResponse
 */
-std::string postUpdateContext
+void postUpdateContext
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -545,9 +546,7 @@ std::string postUpdateContext
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
-  std::string             answer;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
   bool overrideMetadata = ciP->uriParamOptions[OPT_OVERRIDEMETADATA];
   bool flowControl  = ciP->uriParamOptions[OPT_FLOW_CONTROL];
@@ -564,10 +563,9 @@ std::string postUpdateContext
     upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
     upcrP->release();
 
-    return answer;
+    return;
   }
   else if (ciP->servicePathV[0].empty())
   {
@@ -578,11 +576,8 @@ std::string postUpdateContext
   if (res != "OK")
   {
     upcrsP->errorCode.fill(SccBadRequest, res);
-
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
-
     upcrP->release();
-    return answer;
+    return;
   }
 
 
@@ -603,7 +598,6 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
                                                   forcedUpdate,
                                                   overrideMetadata,
-                                                  ciP->apiVersion,
                                                   ngsiV2Flavour,
                                                   flowControl));
 
@@ -624,10 +618,8 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
-
     upcrP->release();
-    return answer;
+    return;
   }
 
 
@@ -792,73 +784,59 @@ std::string postUpdateContext
   transactionIdSet(prevTransId.c_str());
 
   //
-  // Note this is a slight break in the separation of concerns among the different layers (i.e.
-  // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
-  // a smart way of dealing with partial update situations
+  // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
+  // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
+  // two different CER (maybe using the same entity)
   //
-  if (ciP->apiVersion == V2)
+  std::string failing = "";
+  unsigned int failures = 0;
+
+  for (unsigned int ix = 0; ix < response.contextElementResponseVector.size(); ++ix)
   {
-    //
-    // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
-    // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
-    // two different CER (maybe using the same entity)
-    //
-    std::string failing = "";
-    unsigned int failures  = 0;
+    ContextElementResponse *cerP = response.contextElementResponseVector[ix];
 
-    for (unsigned int ix = 0; ix < response.contextElementResponseVector.size(); ++ix)
+    if (cerP->statusCode.code != SccOk)
     {
-      ContextElementResponse* cerP = response.contextElementResponseVector[ix];
+      failures++;
 
-      if (cerP->statusCode.code != SccOk)
+      std::string failingPerCer = "";
+      for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); ++jx)
       {
-        failures++;
-
-        std::string failingPerCer = "";
-        for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); ++jx)
+        failingPerCer += cerP->entity.attributeVector[jx]->name;
+        if (jx != cerP->entity.attributeVector.size() - 1)
         {
-          failingPerCer += cerP->entity.attributeVector[jx]->name;
-          if (jx != cerP->entity.attributeVector.size() - 1)
-          {
-            failingPerCer +=", ";
-          }
+          failingPerCer += ", ";
         }
-
-        failing += cerP->entity.id + "-" + cerP->entity.type + " : [" + failingPerCer + "], ";
       }
-    }
 
-    //
-    // Note that we modify parseDataP->upcrs.res.oe and not response.oe, as the former is the
-    // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
-    //
-    if ((forwardOk == true) && (failures == 0))
-    {
-      parseDataP->upcrs.res.oe.fill(SccNone, "");
-    }
-    else if (failures == response.contextElementResponseVector.size())
-    {
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
-    }
-    else if (failures > 0)
-    {
-      // Removing trailing ", "
-      failing = failing.substr(0, failing.size() - 2);
-
-      // If some CER (but not all) fail, then it is a partial update
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", ERROR_PARTIAL_UPDATE);
-    }
-    else  // failures == 0
-    {
-      // No failure, so invalidate any possible OrionError filled by mongoBackend on the mongoUpdateContext step
-      parseDataP->upcrs.res.oe.fill(SccNone, "");
+      failing += cerP->entity.id + "-" + cerP->entity.type + " : [" + failingPerCer + "], ";
     }
   }
-  else  // v1
+
+  //
+  // Note that we modify parseDataP->upcrs.res.oe and not response.oe, as the former is the
+  // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
+  //
+  if ((forwardOk == true) && (failures == 0))
   {
-    // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
-    // We render in the v1 case only
-    TIMED_RENDER(answer = response.toJsonV1(asJsonObject));
+    parseDataP->upcrs.res.oe.fill(SccNone, "");
+  }
+  else if (failures == response.contextElementResponseVector.size())
+  {
+    parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+  }
+  else if (failures > 0)
+  {
+    // Removing trailing ", "
+    failing = failing.substr(0, failing.size() - 2);
+
+    // If some CER (but not all) fail, then it is a partial update
+    parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", ERROR_PARTIAL_UPDATE);
+  }
+  else // failures == 0
+  {
+    // No failure, so invalidate any possible OrionError filled by mongoBackend on the mongoUpdateContext step
+    parseDataP->upcrs.res.oe.fill(SccNone, "");
   }
 
   //
@@ -870,5 +848,5 @@ std::string postUpdateContext
   upcrsP->fill(&response);
   response.release();
 
-  return answer;
+  return;
 }

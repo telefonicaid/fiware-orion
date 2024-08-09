@@ -137,7 +137,7 @@ std::string QueryContextRequest::toJsonV1(void)
 *
 * QueryContextRequest::check -
 */
-std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
+std::string QueryContextRequest::check(bool asJsonObject, const std::string& predetectedError)
 {
   std::string           res;
   QueryContextResponse  response;

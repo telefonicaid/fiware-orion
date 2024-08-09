@@ -764,12 +764,11 @@ static bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP)
 *
 * addFilterScope -
 */
-static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<orion::BSONObj>* filtersP)
+static void addFilterScope( const Scope* scoP, std::vector<orion::BSONObj>* filtersP)
 {
-  if ((apiVersion == V2) && (scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
+  if ((scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
   {
-    // Early return to avoid _id.type: {$exits: true} in NGSIv2 case. Entity type existence filter only
-    // makes sense in NGSIv1 (and may be removed soon as NGSIv1 is deprecated functionality)
+    // Early return to avoid _id.type: {$exits: true}
     return;
   }
 
@@ -1384,8 +1383,7 @@ bool entitiesQuery
   int                              limit,
   bool*                            limitReached,
   long long*                       countP,
-  const std::string&               sortOrderList,
-  ApiVersion                       apiVersion
+  const std::string&               sortOrderList
 )
 {
   /* Query structure is as follows
@@ -1480,8 +1478,8 @@ bool entitiesQuery
 
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
-      // FIXME P5: NGSIv1 filter, probably to be removed in the future
-      addFilterScope(apiVersion, scopeP, &filters);
+      // FIXME PR: NGSIv1 filter, probably to be removed in the future
+      addFilterScope(scopeP, &filters);
     }
     else if (scopeP->type == FIWARE_LOCATION ||
              scopeP->type == FIWARE_LOCATION_DEPRECATED ||
@@ -1617,11 +1615,8 @@ bool entitiesQuery
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
     ContextElementResponse*  cer = new ContextElementResponse(r, attrL);
 
-    // Add builtin attributes and metadata (only in NGSIv2)
-    if (apiVersion == V2)
-    {
-      addBuiltins(cer, "");
-    }
+    // Add builtin attributes and metadata
+    addBuiltins(cer, "");
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
@@ -1765,7 +1760,7 @@ bool entitiesQuery
 *
 * Remove attributes in the vector with 'found' value is 'false'
 *
-* In the case of NGSIv2 we filter attributes with CPr not included in a list of attributes
+* We filter attributes with CPr not included in a list of attributes
 * passed as reference (and that comes from the original NGSIv2 query). Otherwise,
 * over-querying for attributes may occur and this could break some CPr usage cases (in particular
 * the ones with IOTAs, which may report error in the case of being asked for an attribute
@@ -1777,7 +1772,6 @@ bool entitiesQuery
 */
 void pruneContextElements
 (
-  ApiVersion                           apiVersion,
   const StringList&                    attrsV,
   const ContextElementResponseVector&  oldCerV,
   ContextElementResponseVector*        newCerVP
@@ -1806,10 +1800,9 @@ void pruneContextElements
       ContextAttribute* caP = cerP->entity.attributeVector[jx];
 
       // To be included, it need to be found and one of the following:
-      // - It is V1
-      // - (Not being V1) The attributes filter list is empty
-      // - (Not being V1 and not empty attributes filter) The attribute is included in the filter list (taking into account wildcard)
-      if ((caP->found) && ((apiVersion == V1) || (attrsV.size() == 0) || (attrsV.lookup(caP->name, ALL_ATTRS))))
+      // - The attributes filter list is empty
+      // - (Not empty attributes filter) The attribute is included in the filter list (taking into account wildcard)
+      if ((caP->found) && ((attrsV.size() == 0) || (attrsV.lookup(caP->name, ALL_ATTRS))))
       {
         ContextAttribute* newCaP = new ContextAttribute(caP);
         newCerP->entity.attributeVector.push_back(newCaP);

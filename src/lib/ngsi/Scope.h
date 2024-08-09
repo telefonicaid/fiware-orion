@@ -76,8 +76,7 @@ typedef struct Scope
   Scope();
   Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
 
-  int          fill(ApiVersion          apiVersion,
-                    const std::string&  geometry,
+  int          fill(const std::string&  geometry,
                     const std::string&  coords,
                     const std::string&  georelString,
                     std::string*        errorString);

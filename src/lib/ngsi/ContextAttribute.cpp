@@ -62,53 +62,13 @@ void ContextAttribute::bsonAppendAttrValue
 (
   const std::string&      valueKey,
   orion::BSONObjBuilder*  bsonAttr,
-  const std::string&      attrType,
-  bool                    autocast
+  const std::string&      attrType
 ) const
 {
   std::string effectiveStringValue = stringValue;
   bool        effectiveBoolValue   = boolValue;
   double      effectiveNumberValue = numberValue;
   orion::ValueType   effectiveValueType   = valueType;
-
-  // Checking for ValueTypeString is an additional safety measure (ensuring that the attribute came from NGSIv1 in plain text)
-  if ((autocast) && (effectiveValueType == orion::ValueTypeString))
-  {
-    // Autocast only for selected attribute types
-    if ((attrType == DEFAULT_ATTR_NUMBER_TYPE) || (attrType == NUMBER_TYPE_ALT))
-    {
-      if (str2double(effectiveStringValue.c_str(), &effectiveNumberValue))
-      {
-        effectiveValueType = orion::ValueTypeNumber;
-      }
-      // Note that if str2double() fails, we keep ValueTypeString and everything works like without autocast
-    }
-    if (attrType == DEFAULT_ATTR_BOOL_TYPE)
-    {
-      // Note that we cannot use isTrue() or isFalse() functions, as they consider also 0 and 1 as
-      // valid true/false values and JSON spec mandates exactly true or false
-      if (effectiveStringValue == "true")
-      {
-        effectiveBoolValue = true;
-        effectiveValueType = orion::ValueTypeBoolean;
-      }
-      else if (effectiveStringValue == "false")
-      {
-        effectiveBoolValue = false;
-        effectiveValueType = orion::ValueTypeBoolean;
-      }
-      // Note that if above checks fail, we keep ValueTypeString and everything works like without autocast
-    }
-    if ((attrType == DATE_TYPE) || (attrType == DATE_TYPE_ALT))
-    {
-      effectiveNumberValue = parse8601Time(effectiveStringValue);
-      if (effectiveNumberValue != -1)
-      {
-        effectiveValueType = orion::ValueTypeNumber;
-      }
-      // Note that if parse8601Time() fails, we keep ValueTypeString and everything works like without autocast
-    }
-  }
 
   switch (effectiveValueType)
   {
@@ -149,8 +109,7 @@ bool ContextAttribute::calculateOperator
 (
   const std::string&         valueKey,
   orion::CompoundValueNode*  upOp,
-  orion::BSONObjBuilder*     bsonAttr,
-  bool                       strings2numbers
+  orion::BSONObjBuilder*     bsonAttr
 ) const
 {
   std::string op = upOp->name;
@@ -208,7 +167,7 @@ bool ContextAttribute::calculateOperator
 
     case orion::ValueTypeVector:
     case orion::ValueTypeObject:
-      compoundValueBson(compoundValueP->childV, ba2, strings2numbers);
+      compoundValueBson(compoundValueP->childV, ba2);
       ba.append(ba2.arr());
       break;
 
@@ -238,7 +197,7 @@ bool ContextAttribute::calculateOperator
       break;
 
     case orion::ValueTypeObject:
-      compoundValueBson(upOp->childV, bo, strings2numbers);
+      compoundValueBson(upOp->childV, bo);
       bsonAttr->append(valueKey, bo.obj());
       break;
 
@@ -276,21 +235,19 @@ bool ContextAttribute::valueBson
 (
   const std::string&      valueKey,
   orion::BSONObjBuilder*  bsonAttr,
-  const std::string&      attrType,
-  bool                    autocast,
-  bool                    strings2numbers
+  const std::string&      attrType
 ) const
 {
   if (compoundValueP == NULL)
   {
-    bsonAppendAttrValue(valueKey, bsonAttr, attrType, autocast);
+    bsonAppendAttrValue(valueKey, bsonAttr, attrType);
   }
   else
   {
     if (compoundValueP->valueType == orion::ValueTypeVector)
     {
       orion::BSONArrayBuilder b;
-      compoundValueBson(compoundValueP->childV, b, strings2numbers);
+      compoundValueBson(compoundValueP->childV, b);
       bsonAttr->append(valueKey, b.arr());
     }
     else if (compoundValueP->valueType == orion::ValueTypeObject)
@@ -298,7 +255,7 @@ bool ContextAttribute::valueBson
       // Special processing of update operators
       if ((compoundValueP->childV.size() > 0) && (isUpdateOperator(compoundValueP->childV[0]->name)))
       {
-        if (!calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr, strings2numbers))
+        if (!calculateOperator(valueKey, compoundValueP->childV[0], bsonAttr))
         {
           // in this case we return without generating any BSON
           return false;
@@ -307,7 +264,7 @@ bool ContextAttribute::valueBson
       else
       {
         orion::BSONObjBuilder b;
-        compoundValueBson(compoundValueP->childV, b, strings2numbers);
+        compoundValueBson(compoundValueP->childV, b);
         bsonAttr->append(valueKey, b.obj());
       }
     }
@@ -1217,7 +1174,6 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
 */
 std::string ContextAttribute::toJsonAsValue
 (
-  ApiVersion       apiVersion,          // in parameter
   bool             acceptedTextPlain,   // in parameter
   bool             acceptedJson,        // in parameter
   MimeType         outFormatSelection,  // in parameter
@@ -1238,14 +1194,7 @@ std::string ContextAttribute::toJsonAsValue
       switch (valueType)
       {
       case orion::ValueTypeString:
-        if (apiVersion == V2)
-        { 
-          out = '"' + stringValue + '"';
-        }
-        else
-        { 
-          out = stringValue;
-        }
+        out = '"' + stringValue + '"';
         break;
 
       case orion::ValueTypeNumber:
@@ -1381,12 +1330,12 @@ void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP, bool 
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck)
+std::string ContextAttribute::check(RequestType requestType, bool relaxForbiddenCheck)
 {
   size_t len;
   char errorMsg[128];
 
-  if (((apiVersion == V2) && (len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  if (((len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg, name);
@@ -1405,7 +1354,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(apiVersion, name.c_str()))
+  if (forbiddenIdCharsV2(name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute", name);
     return "Invalid characters in attribute name";
@@ -1419,14 +1368,14 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
   }
 
 
-  if (apiVersion == V2 && (requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if ((requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
-  if ((requestType != EntityAttributeValueRequest) && forbiddenIdChars(apiVersion, type.c_str()))
+  if ((requestType != EntityAttributeValueRequest) && forbiddenIdCharsV2(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";
@@ -1446,7 +1395,7 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     }
   }
 
-  return metadataVector.check(apiVersion);
+  return metadataVector.check();
 }
 
 

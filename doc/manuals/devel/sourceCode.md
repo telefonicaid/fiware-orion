@@ -11,11 +11,9 @@
 * [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types, NGSI9 = context management availability)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
-* [src/lib/jsonParse/](#srclibjsonparse) (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
 * [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
-* [src/lib/convenience/](#srclibconvenience) (Convenience operations in NGSIv1)
 * [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
 * [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI notifications)
@@ -209,7 +207,7 @@ The **ngsi** library contains a collection of classes for the different payloads
 
 ### Methods and hierarchy
 
-These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
+These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`) all have a standard set of methods:
 
 * `toJson()`, to render the object to a JSON string (for NGSIv2). This method levarages `JsonObjectHelper` and `JsonVectorHelper`
   in order to simplify the rendering process. This way you just add the elements you needs to print using `add*()` methods and don't
@@ -300,16 +298,6 @@ _PP-02: Parsing a text payload_
 [Top](#top)
 
 
-## src/lib/jsonParse/
-This library takes care of the JSON parsing of payload for NGSIv1 requests. It depends on the [Boost library property_tree](https://theboostcpplibraries.com/boost.propertytree) and uses SAX to translate the incoming JSON text into the ngsi classes.
-
-This library contains a vector of the type `JsonRequest`, that defines how to parse the different requests. The function `jsonTreat()` picks the parsing method and `jsonParse()` takes care of the parsing, with help from the Boost property_tree library.
-
-See detailed explanation of the V1 JSON parse implementation in its [dedicated document](jsonParse.md).
-
-[Top](#top)
-
-
 ## src/lib/jsonParseV2/
 This is where the newer NGSIv2 request payloads are parsed, using DOM. The [rapidjson](http://rapidjson.org/) library is used to parse the JSON payload, while the purpose of **jsonParseV2** (apart from invoking rapidjson) is to build a tree of objects representing the JSON payload.
 
@@ -371,14 +359,6 @@ So, for the rest library to find the service routine of an incoming request, it 
 Similar to the **serviceRoutines** library described above, the **serviceRoutinesV2** library contains the service routines for NGSIv2 requests.
 
 Some NGSIv2 service routines invoke [**mongoBackend**](#srclibmongobackend) directly. Others rely on a lower level service routine. See [the service routines mapping document](ServiceRoutines.txt) for details.
-
-[Top](#top)
-
-
-## src/lib/convenience/
-The **convenience** library contains top hierarchy classes for the NGSIv1 convenience operations. For a complete list of these requests (and the service routines in which they are based), kindly see [the service routines mapping document](ServiceRoutines.txt).
-
-This library is similar to the [**ngsi9**](#srclibngsi9) and [**ngsi10**](#srclibngsi10) libraries.
 
 [Top](#top)
 

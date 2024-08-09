@@ -256,7 +256,6 @@ void ContextElementResponse::release(void)
 */
 std::string ContextElementResponse::check
 (
-  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  predetectedError,
   int                 counter
@@ -264,7 +263,7 @@ std::string ContextElementResponse::check
 {
   std::string res;
 
-  if ((res = entity.check(apiVersion, requestType)) != "OK")
+  if ((res = entity.check(requestType)) != "OK")
   {
     return res;
   }

@@ -134,26 +134,15 @@ std::string EntityVector::toJsonV1
 *
 * EntityVector::check -
 */
-std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
+std::string EntityVector::check(RequestType requestType)
 {
-  if ((apiVersion == V1) && (requestType == UpdateContext))
-  {
-    if (vec.size() == 0)
-    {
-      return "No context elements";
-    }
-  }
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
+    if ((res = vec[ix]->check(requestType)) != "OK")
     {
-      if (apiVersion == V2)
-      {
-        alarmMgr.badInput(clientIp, "invalid vector of Entity", res);
-      }
+      alarmMgr.badInput(clientIp, "invalid vector of Entity", res);
       return res;
     }
   }

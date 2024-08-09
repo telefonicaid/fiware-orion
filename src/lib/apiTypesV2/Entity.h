@@ -99,7 +99,7 @@ class Entity
 
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
+  std::string  check(RequestType requestType);
 
   void         applyUpdateOperators(void);
 

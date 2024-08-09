@@ -74,7 +74,6 @@ std::string EntityTypeVectorResponse::toJsonV1
 */
 std::string EntityTypeVectorResponse::check
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   bool                asJsonOut,
   bool                collapsed,
@@ -86,7 +85,7 @@ std::string EntityTypeVectorResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = entityTypeVector.check(apiVersion, predetectedError)) != "OK")
+  else if ((res = entityTypeVector.check(predetectedError)) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     statusCode.fill(SccBadRequest, res);

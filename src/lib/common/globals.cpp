@@ -54,7 +54,6 @@ bool                   countersStatistics   = false;
 bool                   semWaitStatistics    = false;
 bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
-bool                   checkIdv1            = false;
 unsigned long long     inReqPayloadMaxSize  = DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE;
 unsigned long long     outReqMsgMaxSize     = DEFAULT_OUT_REQ_MSG_MAX_SIZE;
 
@@ -193,8 +192,7 @@ void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics,
-  bool               _checkIdv1
+  bool               _notifQueueStatistics
 )
 {
   // Give the rest library the correct version string of this executable
@@ -226,8 +224,6 @@ void orionInit
   notifQueueStatistics = _notifQueueStatistics;
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
-
-  checkIdv1 = _checkIdv1;
 }
 
 

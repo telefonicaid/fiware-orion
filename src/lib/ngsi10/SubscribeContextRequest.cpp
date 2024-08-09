@@ -73,20 +73,10 @@ std::string SubscribeContextRequest::check(const std::string& predetectedError, 
 *
 * SubscribeContextRequest::release -
 *
-* Old versions of this method also include a 'restriction.release()' call. However, now each time
-* a SubscribeContextRequest is created, the method toNgsiv2Subscription() is used on it and the
-* 'ownership' of the Restriction is transferred to the corresponding NGSIv2 class. Thus, leaving
-* that 'restriction.release()' would cause double-free problems.
-*
-* What causes the problem is the following line in SubscribeContextRequest::toNgsiv2Subscription:
-*
-*  sub->restriction = restriction;
-*
-* After doing this, we have TWO vectors pointing to the same scopes.
-*
 */
 void SubscribeContextRequest::release(void)
 {
+  restriction.release();
   entityIdVector.release();
   attributeList.release();
   notifyConditionVector.release();
@@ -108,81 +98,4 @@ void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
 
     restriction.scopeVector.push_back(scopeP);
   }
-}
-
-
-/* ****************************************************************************
-*
-* SubscribeContextRequest::toNgsiv2Subscription -
-*/
-void SubscribeContextRequest::toNgsiv2Subscription(Subscription* sub)
-{
-  // Convert entityIdVector
-  for (unsigned int ix = 0; ix < entityIdVector.size(); ++ix)
-  {
-    EntityId* enP = entityIdVector[ix];
-    EntID en;
-
-    if (enP->isPatternIsTrue())
-    {
-      en.idPattern = enP->id;
-    }
-    else
-    {
-      en.id = enP->id;
-    }
-    en.type = enP->type;
-
-    sub->subject.entities.push_back(en);
-  }
-
-  // Convert attributeList
-  for (unsigned int ix = 0; ix < attributeList.size(); ++ix)
-  {
-    sub->notification.attributes.push_back(attributeList[ix]);
-  }
-
-  // Convert reference
-  sub->notification.httpInfo.url = reference.get();
-
-  // Convert duration
-  if (duration.isEmpty())
-  {
-    sub->expires = DEFAULT_DURATION_IN_SECONDS + getCurrentTime();
-  }
-  else
-  {
-    sub->expires = duration.parse() + getCurrentTime();
-  }
-
-  // Convert restriction
-  sub->restriction = restriction;
-
-  // Convert notifyConditionVector
-  for (unsigned int ix = 0; ix < notifyConditionVector.size(); ++ix)
-  {
-      NotifyCondition* ncP = notifyConditionVector[ix];
-      if (ncP->type == ON_CHANGE_CONDITION)    // this is just a sanity measure: all types should be ONCHANGE
-      {
-        for (unsigned int jx = 0; jx < ncP->condValueList.size(); ++jx)
-        {
-          sub->subject.condition.attributes.push_back(ncP->condValueList[jx]);
-        }
-      }
-  }
-
-  // Convert throttling
-  sub->throttling = throttling.parse();
-
-  // Note that we don't do anything with 'restrictions': it is not needed by the NGSIv2 logic
-
-  // Fill NGSIv2 fields not used in NGSIv1 with default values
-  // description and expression are not touched, so default empty string provided by constructor will be used
-  sub->status                         = STATUS_ACTIVE;
-  sub->descriptionProvided            = false;
-  sub->attrsFormat                    = NGSI_V2_NORMALIZED;
-  sub->notification.blacklist         = false;
-  sub->notification.httpInfo.custom   = false;
-
-  sub->notification.metadata.clear();
 }

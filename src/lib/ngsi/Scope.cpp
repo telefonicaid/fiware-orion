@@ -100,7 +100,6 @@ static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
 */
 int Scope::fill
 (
-  ApiVersion          apiVersion,
   const std::string&  geometryString,
   const std::string&  coordsString,
   const std::string&  georelString,
@@ -112,13 +111,14 @@ int Scope::fill
   int                         points;
   std::vector<orion::Point*>  pointV;
 
-  type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
+  // FIXME PR: FIWARE_LOCATION_V2 is now useless?
+  type = FIWARE_LOCATION_V2;
 
   //
   // parse geometry
   //
   std::string errorString;
-  if (geometry.parse(apiVersion, geometryString.c_str(), &errorString) != 0)
+  if (geometry.parse(geometryString.c_str(), &errorString) != 0)
   {
     *errorStringP = std::string("error parsing geometry: ") + errorString;
     return -1;
@@ -229,48 +229,19 @@ int Scope::fill
     pointV.push_back(pointP);
   }
 
-
+  // FIXME PR: remove this "circle" processing that comes from NGSIv1?
   if (geometry.areaType == "circle")
   {
-    if (apiVersion == V2)
-    {
-      *errorStringP = "circle geometry is not supported by Orion API v2";
-      pointVectorRelease(pointV);
-      pointV.clear();
-      return -1;
-    }
-    else
-    {
-      if (pointV.size() != 1)
-      {
-        *errorStringP = "Too many coordinates for circle";
-        pointVectorRelease(pointV);
-        pointV.clear();
-        return -1;
-      }
-
-      areaType = orion::CircleType;
-
-      circle.radiusSet(geometry.radius);
-      circle.invertedSet(geometry.external);
-      circle.centerSet(pointV[0]);
-
-      pointVectorRelease(pointV);
-      pointV.clear();
-    }
+    *errorStringP = "circle geometry is not supported by Orion API v2";
+    pointVectorRelease(pointV);
+    pointV.clear();
+    return -1;
   }
   else if (geometry.areaType == "polygon")
   {
     areaType = orion::PolygonType;
     
-    if ((apiVersion == V1) && (pointV.size() < 3))
-    {
-      *errorStringP = "Too few coordinates for polygon";
-      pointVectorRelease(pointV);
-      pointV.clear();
-      return -1;
-    }
-    else if ((apiVersion == V2) && (pointV.size() < 4))
+    if (pointV.size() < 4)
     {
       *errorStringP = "Too few coordinates for polygon";
       pointVectorRelease(pointV);
@@ -279,9 +250,9 @@ int Scope::fill
     }
 
     //
-    // If v2, first and last point must be identical
+    // First and last point must be identical
     //
-    if ((apiVersion == V2) && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
+    if (pointV[0]->equals(pointV[pointV.size() - 1]) == false)
     {
       *errorStringP = "First and last point in polygon not the same";
       pointVectorRelease(pointV);

@@ -100,7 +100,7 @@ typedef struct Metadata
 
   void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 
-  std::string  check(ApiVersion apiVersion);
+  std::string  check(void);
 } Metadata;
 
 #endif  // SRC_LIB_NGSI_METADATA_H_

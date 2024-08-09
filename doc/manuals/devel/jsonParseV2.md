@@ -1,6 +1,6 @@
 # JSON Parse NGSIv2
 
-NGSIv2 payloads are parsed in a very different manner than NGSIv1 payloads. This document describes NGSIv2 parsing details. NGSIv1 parsing details are described in a [separate document](jsonParse.md).
+This document describes NGSIv2 parsing details.
 
 Instead of the centralized approach of NGSIv1 parse, an individual approach is used.
 The advantage of this approach is that the code is much easier to understand and to reuse, while the inconvenience is that some tasks, e.g. checks for unsupported fields are spread out in many different functions and this way it is easy for some of these checks to be forgotten.

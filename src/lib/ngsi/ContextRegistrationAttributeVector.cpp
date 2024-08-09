@@ -64,13 +64,13 @@ std::string ContextRegistrationAttributeVector::toJsonV1(bool comma)
 *
 * ContextRegistrationAttributeVector::check -
 */
-std::string ContextRegistrationAttributeVector::check(ApiVersion apiVersion)
+std::string ContextRegistrationAttributeVector::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion)) != "OK")
+    if ((res = vec[ix]->check()) != "OK")
     {
       return res;
     }

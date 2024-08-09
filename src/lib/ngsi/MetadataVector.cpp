@@ -124,13 +124,13 @@ std::string MetadataVector::toJson(const std::vector<Metadata*>& orderedMetadata
 *
 * MetadataVector::check -
 */
-std::string MetadataVector::check(ApiVersion apiVersion)
+std::string MetadataVector::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion)) != "OK")
+    if ((res = vec[ix]->check()) != "OK")
     {
       return res;
     }

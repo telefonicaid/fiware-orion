@@ -67,26 +67,13 @@ SET (SOURCES
 
     serviceRoutines/badVerbGetOnly_test.cpp
     serviceRoutines/badVerbPostOnly_test.cpp
-    serviceRoutines/badVerbAllFour_test.cpp
     serviceRoutines/badVerbGetPostOnly_test.cpp
-    serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
     serviceRoutines/badVerbGetDeleteOnly_test.cpp
     serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/putSubscriptionConvOp_test.cpp
     serviceRoutines/versionTreat_test.cpp
     serviceRoutines/exitTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
 
-    convenience/Convenience_test.cpp
-    convenience/AppendContextElementRequest_test.cpp
-    convenience/AppendContextElementResponse_test.cpp
-    convenience/ContextAttributeResponse_test.cpp
-    convenience/ContextAttributeResponseVector_test.cpp
-    convenience/UpdateContextAttributeRequest_test.cpp
-    convenience/UpdateContextElementRequest_test.cpp
-    convenience/UpdateContextElementResponse_test.cpp
-    convenience/RegisterProviderRequest_test.cpp
     common/commonFormat_test.cpp
     common/commonGlobals_test.cpp
     common/commonString_test.cpp
@@ -98,21 +85,14 @@ SET (SOURCES
     common/commonWsStrip_test.cpp
     common/commonMacroSubstitute_test.cpp
 
-    ngsi9/RegisterContextRequest_test.cpp
     ngsi9/RegisterContextResponse_test.cpp
-    ngsi9/DiscoverContextAvailabilityRequest_test.cpp
     ngsi9/DiscoverContextAvailabilityResponse_test.cpp
 
-    ngsi10/QueryContextRequest_test.cpp
     ngsi10/QueryContextResponse_test.cpp
     ngsi10/NotifyContextRequest_test.cpp
-    ngsi10/SubscribeContextRequest_test.cpp
     ngsi10/SubscribeContextResponse_test.cpp
-    ngsi10/UnsubscribeContextRequest_test.cpp
     ngsi10/UnsubscribeContextResponse_test.cpp
-    ngsi10/UpdateContextRequest_test.cpp
     ngsi10/UpdateContextResponse_test.cpp
-    ngsi10/UpdateContextSubscriptionRequest_test.cpp
     ngsi10/UpdateContextSubscriptionResponse_test.cpp
 
     ngsi/ContextAttribute_test.cpp
@@ -183,12 +163,10 @@ SET (SOURCES
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp
     parse/nullTreat_test.cpp
-    jsonParse/jsonRequest_test.cpp
 
     rest/OrionError_test.cpp
     rest/Verb_test.cpp
     rest/restReply_test.cpp
-    rest/RestService_test.cpp
     rest/rest_test.cpp
 )
 

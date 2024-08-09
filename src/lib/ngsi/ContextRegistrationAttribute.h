@@ -48,7 +48,7 @@ typedef struct ContextRegistrationAttribute
   ContextRegistrationAttribute(const std::string& _name, const std::string& _type);
   std::string     toJsonV1(bool comma);
 
-  std::string     check(ApiVersion apiVersion);
+  std::string     check(void);
 } ContextRegistrationAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTE_H_

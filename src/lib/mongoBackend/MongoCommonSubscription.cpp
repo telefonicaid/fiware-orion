@@ -142,7 +142,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
       if (httpInfo.json->isObject())
       {
         orion::BSONObjBuilder jsonBuilder;
-        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(httpInfo.json->childV, jsonBuilder);
         orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
         logStr = jsonBuilderObj.toString();
         b->append(CSUB_JSON, jsonBuilderObj);
@@ -150,7 +150,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
       else  // httpInfo.json->isVector();
       {
         orion::BSONArrayBuilder jsonBuilder;
-        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(httpInfo.json->childV, jsonBuilder);
         orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
         logStr = jsonBuilderArr.toString();
         b->append(CSUB_JSON, jsonBuilderArr);
@@ -175,7 +175,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
     // (-1 as date as creDate and modDate are not used in this case)
     orion::BSONObjBuilder    attrsToAdd;  // not actually used
     orion::BSONArrayBuilder  attrNamesToAdd;
-    httpInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+    httpInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd);
 
     // note that although metadata is not needed in the ngsi field logic,
     // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
@@ -214,7 +214,7 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
       if (mqttInfo.json->isObject())
       {
         orion::BSONObjBuilder jsonBuilder;
-        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder);
         orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
         logStr = jsonBuilderObj.toString();
         b->append(CSUB_JSON, jsonBuilderObj);
@@ -222,7 +222,7 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
       else  // httpInfo.json->isVector();
       {
         orion::BSONArrayBuilder jsonBuilder;
-        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder);
         orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
         logStr = jsonBuilderArr.toString();
         b->append(CSUB_JSON, jsonBuilderArr);
@@ -247,7 +247,7 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
     // (-1 as date as creDate and modDate are not used in this case)
     orion::BSONObjBuilder    attrsToAdd;  // not actually used
     orion::BSONArrayBuilder  attrNamesToAdd;
-    mqttInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+    mqttInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd);
 
     // note that although metadata is not needed in the ngsi field logic,
     // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic

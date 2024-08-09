@@ -51,26 +51,26 @@ TEST(Entity, check)
   ContextAttribute* caP = new ContextAttribute("A", "T", "val");
   enP->attributeVector.push_back(caP);
 
-  EXPECT_EQ("OK", enP->check(V2, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
 
   enP->id = "";
-  EXPECT_EQ("entity id length: 0, min length supported: 1", enP->check(V2, EntitiesRequest));
+  EXPECT_EQ("entity id length: 0, min length supported: 1", enP->check(EntitiesRequest));
 
   enP->id = "E<1>";
-  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, enP->check(V2, EntitiesRequest));
+  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, enP->check(EntitiesRequest));
   enP->isPattern = "true";
-  EXPECT_EQ("OK", enP->check(V2, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
   enP->id        = "E";
   enP->isPattern = "false";
 
   enP->type = "T<1>";
-  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(V2, EntitiesRequest));
+  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(EntitiesRequest));
   enP->isTypePattern  = true;
-  EXPECT_EQ("OK", enP->check(V2, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
   enP->type = "T";
 
   enP->isPattern = "<false>";
-  EXPECT_EQ("Invalid value for isPattern", enP->check(V2, EntitiesRequest));
+  EXPECT_EQ("Invalid value for isPattern", enP->check(EntitiesRequest));
 
   utExit();
 }
@@ -89,27 +89,27 @@ TEST(Entity, checkV1)
   utInit();
 
   enP->id = "";
-  EXPECT_EQ(enP->check(V1, UpdateContext), "empty entityId:id");
+  EXPECT_EQ(enP->check(UpdateContext), "entity id length: 0, min length supported: 1");
 
   enP->id = "id";
-  EXPECT_EQ(enP->check(V1, UpdateContext), "OK");
+  EXPECT_EQ(enP->check(UpdateContext), "entity type length: 0, min length supported: 1");
 
   ContextAttribute* aP = new ContextAttribute();
   aP->name  = "";
   aP->stringValue = "V";
   enP->attributeVector.push_back(aP);
-  EXPECT_EQ(enP->check(V1, UpdateContext), "missing attribute name");
+  EXPECT_EQ(enP->check(UpdateContext), "entity type length: 0, min length supported: 1");
   aP->name = "name";
 
   Entity* en2P = new Entity("id", "", "false");
 
   EntityVector* ceVectorP = new EntityVector();
 
-  EXPECT_EQ(ceVectorP->check(V1, UpdateContext), "No context elements");
+  EXPECT_EQ(ceVectorP->check(UpdateContext), "OK");
 
   ceVectorP->push_back(enP);
   ceVectorP->push_back(en2P);
-  EXPECT_EQ(ceVectorP->check(V1, UpdateContext), "OK");
+  EXPECT_EQ(ceVectorP->check(UpdateContext), "entity type length: 0, min length supported: 1");
 
   // render
   const char*               outfile1 = "ngsi.contextelement.check.middle.json";
@@ -119,7 +119,7 @@ TEST(Entity, checkV1)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", ceVectorP->check(V1, UpdateContext));
+  EXPECT_EQ("entity type length: 0, min length supported: 1", ceVectorP->check(UpdateContext));
 
   utExit();
 }

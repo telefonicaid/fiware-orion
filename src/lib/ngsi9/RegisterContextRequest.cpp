@@ -68,7 +68,7 @@ std::string RegisterContextRequest::toJsonV1(void)
 *
 * RegisterContextRequest::check -
 */
-std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError, int counter)
+std::string RegisterContextRequest::check(const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -83,9 +83,9 @@ std::string RegisterContextRequest::check(ApiVersion apiVersion, const std::stri
     alarmMgr.badInput(clientIp, "empty contextRegistration list");
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   } 
-  else if (((res = contextRegistrationVector.check(apiVersion, RegisterContext, predetectedError, counter)) != "OK") ||
-           ((res = duration.check())                                                                        != "OK") ||
-           ((res = registrationId.check())                                                                  != "OK"))
+  else if (((res = contextRegistrationVector.check(RegisterContext, predetectedError, counter)) != "OK") ||
+           ((res = duration.check())                                                            != "OK") ||
+           ((res = registrationId.check())                                                      != "OK"))
   {
     alarmMgr.badInput(clientIp, res);
     response.errorCode.fill(SccBadRequest, res);
@@ -109,33 +109,4 @@ void RegisterContextRequest::release(void)
   contextRegistrationVector.release();
   duration.release();
   registrationId.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* RegisterContextRequest::fill -
-*/
-void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName)
-{
-  ContextRegistration*          crP        = new ContextRegistration();
-  EntityId*                     entityIdP  = new EntityId(entityId, entityType, "false");
-
-  duration       = rpr.duration;
-  registrationId = rpr.registrationId;
-
-  crP->providingApplication = rpr.providingApplication;
-
-  crP->entityIdVector.push_back(entityIdP);
-  crP->entityIdVectorPresent = true;
-
-  if (!attributeName.empty())
-  {
-    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "");
-
-    crP->contextRegistrationAttributeVector.push_back(attributeP);
-  }
-
-  contextRegistrationVector.push_back(crP);
 }

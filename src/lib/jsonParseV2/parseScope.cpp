@@ -144,7 +144,7 @@ std::string parseScopeValueLocation(rapidjson::Value::ConstMemberIterator valueP
   }
 
   std::string result;
-  scopeP->fill(V2, geometryS, coordsS, georelS, &result);
+  scopeP->fill(geometryS, coordsS, georelS, &result);
 
   return result;
 }

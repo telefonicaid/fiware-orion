@@ -114,7 +114,7 @@ std::string EntityType::toJsonV1
 *
 * EntityType::check -
 */
-std::string EntityType::check(ApiVersion apiVersion, const std::string&  predetectedError)
+std::string EntityType::check(const std::string&  predetectedError)
 {
   if (!predetectedError.empty())
   {
@@ -125,7 +125,7 @@ std::string EntityType::check(ApiVersion apiVersion, const std::string&  predete
     return "Empty Type";
   }
 
-  return contextAttributeVector.check(apiVersion, EntityTypes);
+  return contextAttributeVector.check(EntityTypes);
 }
 
 

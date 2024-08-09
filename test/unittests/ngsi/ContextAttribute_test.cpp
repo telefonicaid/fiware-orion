@@ -43,18 +43,18 @@ TEST(ContextAttribute, checkOne)
   utInit();
 
   caP->name = "";
-  res     = caP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "missing attribute name");
+  res     = caP->check(RegisterContext);
+  EXPECT_EQ(res, "attribute name length: 0, min length supported: 1");
 
   caP->name  = "Algo, lo que sea!";
   caP->stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = caP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "OK");
+  res     = caP->check(RegisterContext);
+  EXPECT_EQ(res, "Invalid characters in attribute name");
 
   caP->stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-  res     = caP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "OK");
+  res     = caP->check(RegisterContext);
+  EXPECT_EQ(res, "Invalid characters in attribute name");
 
   utExit();
 }
@@ -82,8 +82,8 @@ TEST(ContextAttribute, checkVector)
   caVectorP->push_back(ca0P);
   caVectorP->push_back(ca1P);
 
-  res     = caVectorP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "OK");
+  res     = caVectorP->check(RegisterContext);
+  EXPECT_EQ(res, "Invalid characters in attribute name");
 
   utExit();
 }

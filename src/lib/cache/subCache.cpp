@@ -61,9 +61,7 @@ volatile SubCacheState subCacheState = ScsIdle;
 //
 // The 'mongo part' of the cache is implemented in mongoBackend/mongoSubCache.cpp/h and used in:
 //   - MongoCommonUpdate.cpp               (in function addTriggeredSubscriptions_withCache)
-//   - mongoSubscribeContext.cpp           (in function mongoSubscribeContext)
 //   - mongoUnsubscribeContext.cpp         (in function mongoUnsubscribeContext)
-//   - mongoUpdateContextSubscription.cpp  (in function mongoUpdateContextSubscription)
 //   - contextBroker.cpp                   (to initialize and sybchronize)
 //
 // To manipulate the subscription cache, a semaphore is necessary, as various threads can be

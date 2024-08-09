@@ -510,116 +510,81 @@ std::string Entity::toString(bool useIsPattern, const std::string& delimiter)
 *
 * ContextElement::check
 *
-* This V1 "branch" of this method has been ported from old ContextElement class
-*
 */
-std::string Entity::check(ApiVersion apiVersion, RequestType requestType)
+std::string Entity::check(RequestType requestType)
 {
-  if (apiVersion == V1)
+  ssize_t len;
+  char errorMsg[128];
+
+  if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
   {
-    std::string res;
-
-    if (id.empty())
-    {
-      return "empty entityId:id";
-    }
-
-    if (!isTrue(isPattern) && !isFalse(isPattern) && !isPattern.empty())
-    {
-      return std::string("invalid isPattern value for entity: /") + isPattern + "/";
-    }
-
-    if ((requestType == RegisterContext) && (isTrue(isPattern)))
-    {
-      return "isPattern set to true for registrations is currently not supported";
-    }
-
-    if (isTrue(isPattern))
-    {
-      regex_t re;
-      if ((id.find('\0') != std::string::npos) || (!regComp(&re, id.c_str(), REG_EXTENDED)))
-      {
-        return "invalid regex for entity id pattern";
-      }
-      regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
-    }
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
   }
-  else  // V2
+
+  if ((requestType == EntitiesRequest) && (id.empty()))
   {
-    ssize_t  len;
-    char     errorMsg[128];
+    return "No Entity ID";
+  }
 
-    if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
-    {
-      snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
-      return std::string(errorMsg);
-    }
+  if ((len = strlen(id.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
 
-    if ((requestType == EntitiesRequest) && (id.empty()))
-    {
-      return "No Entity ID";
-    }
+  if (isPattern.empty())
+  {
+    isPattern = "false";
+  }
 
-    if ( (len = strlen(id.c_str())) > MAX_ID_LEN)
-    {
-      snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
-      return std::string(errorMsg);
-    }
+  // isPattern MUST be either "true" or "false" (or empty => "false")
+  if ((isPattern != "true") && (isPattern != "false"))
+  {
+    alarmMgr.badInput(clientIp, "invalid value for isPattern", isPattern);
+    return "Invalid value for isPattern";
+  }
 
-    if (isPattern.empty())
+  // Check for forbidden chars for "id", but not if "id" is a pattern
+  if (isPattern == "false")
+  {
+    if (forbiddenIdCharsV2(id.c_str()))
     {
-      isPattern = "false";
-    }
-
-    // isPattern MUST be either "true" or "false" (or empty => "false")
-    if ((isPattern != "true") && (isPattern != "false"))
-    {
-      alarmMgr.badInput(clientIp, "invalid value for isPattern", isPattern);
-      return "Invalid value for isPattern";
-    }
-
-    // Check for forbidden chars for "id", but not if "id" is a pattern
-    if (isPattern == "false")
-    {
-      if (forbiddenIdChars(V2, id.c_str()))
-      {
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, id);
-        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
-      }
-    }
-
-    if ( (len = strlen(type.c_str())) > MAX_ID_LEN)
-    {
-      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
-      return std::string(errorMsg);
-    }
-
-    if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
-    {
-      if ( (len = strlen(type.c_str())) < MIN_ID_LEN)
-      {
-        snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-        alarmMgr.badInput(clientIp, errorMsg);
-        return std::string(errorMsg);
-      }
-    }
-
-    // Check for forbidden chars for "type", but not if "type" is a pattern
-    if (isTypePattern == false)
-    {
-      if (forbiddenIdChars(V2, type.c_str()))
-      {
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, type);
-        return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
-      }
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, id);
+      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
     }
   }
 
-  // Common part (V1 and V2)
-  return attributeVector.check(apiVersion, requestType);
+  if ((len = strlen(type.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
+  {
+    if ((len = strlen(type.c_str())) < MIN_ID_LEN)
+    {
+      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
+  }
+
+  // Check for forbidden chars for "type", but not if "type" is a pattern
+  if (isTypePattern == false)
+  {
+    if (forbiddenIdCharsV2(type.c_str()))
+    {
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, type);
+      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
+    }
+  }
+
+  return attributeVector.check(requestType);
 }
 
 

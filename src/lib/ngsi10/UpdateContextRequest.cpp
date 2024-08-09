@@ -32,12 +32,9 @@
 #include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
-#include "convenience/UpdateContextElementRequest.h"
-#include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "convenience/UpdateContextAttributeRequest.h"
 
 
 
@@ -76,7 +73,7 @@ std::string UpdateContextRequest::toJson(void)
 
   jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED));
 
-  jh.addString("actionType", actionTypeString(V2, updateActionType));
+  jh.addString("actionType", actionTypeString(updateActionType));
 
   return jh.str();
 }
@@ -97,7 +94,7 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
   //
   out += startTag();
   out += entityVector.toJsonV1(asJsonObject, UpdateContext, true);
-  out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
+  out += valueTag("updateAction", actionTypeString(updateActionType), false);
   out += endTag(false);
 
   return out;
@@ -109,7 +106,7 @@ std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 *
 * UpdateContextRequest::check -
 */
-std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
+std::string UpdateContextRequest::check(bool asJsonObject, const std::string& predetectedError)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -120,7 +117,7 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
     return response.toJsonV1(asJsonObject);
   }
 
-  if ((res = entityVector.check(apiVersion, UpdateContext)) != "OK")
+  if ((res = entityVector.check(UpdateContext)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
     return response.toJsonV1(asJsonObject);
@@ -138,49 +135,6 @@ std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject
 void UpdateContextRequest::release(void)
 {
   entityVector.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::fill -
-*/
-void UpdateContextRequest::fill
-(
-  const UpdateContextElementRequest* ucerP,
-  const std::string&                 entityId,
-  const std::string&                 entityType
-)
-{
-  Entity* eP = new Entity(entityId, entityType, "false");
-
-  eP->attributeVector.fill(ucerP->contextAttributeVector);
-
-  entityVector.push_back(eP);
-
-  updateActionType = ActionTypeUpdate;  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::fill -
-*/
-void UpdateContextRequest::fill
-(
-  const AppendContextElementRequest*  acerP,
-  const std::string&                  entityId,
-  const std::string&                  entityType
-)
-{
-  Entity* eP = new Entity(entityId, entityType, "false");
-
-  eP->attributeVector.fill(acerP->contextAttributeVector);
-
-  entityVector.push_back(eP);
-  updateActionType = ActionTypeAppend;  // Coming from an AppendContextElementRequest (POST), must be APPEND
 }
 
 
@@ -210,42 +164,6 @@ void UpdateContextRequest::fill
     ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
     eP->attributeVector.push_back(caP);
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::fill -
-*/
-void UpdateContextRequest::fill
-(
-  const UpdateContextAttributeRequest* ucarP,
-  const std::string&                   entityId,
-  const std::string&                   entityType,
-  const std::string&                   attributeName,  
-  ActionType                           _updateActionType
-)
-{
-  Entity*           eP = new Entity(entityId, entityType, "false");
-  ContextAttribute* caP;
-
-  if (ucarP->compoundValueP != NULL)
-  {
-    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->compoundValueP);
-  }
-  else
-  {
-    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->contextValue);
-    caP->valueType = ucarP->valueType;
-  }
-
-  caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
-  eP->attributeVector.push_back(caP);
-
-  entityVector.push_back(eP);
-
-  updateActionType = _updateActionType;
 }
 
 

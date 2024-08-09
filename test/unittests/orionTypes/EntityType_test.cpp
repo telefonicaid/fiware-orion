@@ -38,9 +38,9 @@ TEST(EntityType, check)
   EntityType et1("myType");
   EntityType et2("");
 
-  EXPECT_EQ("OK", et1.check(V1, ""));
-  EXPECT_EQ("Empty Type", et2.check(V1, ""));
-  EXPECT_EQ("foo", et1.check(V1, "foo"));
+  EXPECT_EQ("OK", et1.check(""));
+  EXPECT_EQ("Empty Type", et2.check(""));
+  EXPECT_EQ("foo", et1.check("foo"));
 
   utExit();
 }

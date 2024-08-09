@@ -52,7 +52,7 @@ typedef struct UpdateContextResponse
   ~UpdateContextResponse();
 
   std::string   toJsonV1(bool asJsonObject);
-  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
+  std::string   check(bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);
   void          fill(UpdateContextRequest* upcrP, HttpStatusCode sc);   // Needed by NGSIv2 forwarding logic

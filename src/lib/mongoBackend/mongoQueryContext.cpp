@@ -331,8 +331,7 @@ HttpStatusCode mongoQueryContext
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   std::map<std::string, bool>&         options,
-  long long*                           countP,
-  ApiVersion                           apiVersion
+  long long*                           countP
 )
 {
   int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -368,8 +367,7 @@ HttpStatusCode mongoQueryContext
                      limit,
                      &limitReached,
                      countP,
-                     sortOrderList,
-                     apiVersion);
+                     sortOrderList);
 
   if (!ok)
   {
@@ -445,7 +443,7 @@ HttpStatusCode mongoQueryContext
   }
 
   /* Prune "not found" CERs */
-  pruneContextElements(apiVersion, requestP->attrsList, rawCerV, &responseP->contextElementResponseVector);
+  pruneContextElements(requestP->attrsList, rawCerV, &responseP->contextElementResponseVector);
 
   /* Pagination stuff */
   if (responseP->contextElementResponseVector.size() == 0)

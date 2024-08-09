@@ -48,8 +48,8 @@
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
 #include "serviceRoutines/postQueryContext.h"
-#include "jsonParse/jsonRequest.h"
 #include "jsonParseV2/parseEntitiesResponse.h"
+#include "jsonParseV2/parseEntitiesResponseV1.h"
 
 // FIXME P3: matchEntity() should be in a better place, and the following include to be removed
 #include "mongoBackend/MongoGlobal.h"  // matchEntity()
@@ -368,86 +368,47 @@ static bool queryForward
 
   logInfoFwdRequest(regId.c_str(), verb.c_str(), (qcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
-  if (ciP->apiVersion == V2 && strstr(out.c_str(), "Fiware-Total-Count"))
+  if (strstr(out.c_str(), "Fiware-Total-Count"))
   {
     getProviderCount(out.c_str(), totalCount);
   }
 
-  if (qcrP->providerFormat == PfJson)
+  bool result;
+  Entities entities;
+  OrionError oe;
+
+  // Depending NGSIv1 or NGSIv2 in the CPr we use parseEntitiesResponseV1() or parseEntitiesResponseV2()
+
+  // Note that parseEntitiesResponse() is thought for client-to-CB interactions, so it takes into account
+  // ciP->uriParamOptions[OPT_KEY_VALUES]. In this case, we never use keyValues in the CB-to-CPr so we
+  // set to false and restore its original value later. In this case it seems it is not needed to preserve
+  // ciP->httpStatusCode as in the similar case above
+  // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
+  // to make JSON parsing logic (internal to parseEntitiesResponse()) independent of ciP and to pass the
+  // keyValue directly as function parameter.
+  bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
+  ciP->uriParamOptions[OPT_KEY_VALUES] = false;
+  result = qcrP->providerFormat == PfJson ? parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe) : parseEntitiesResponse(ciP, cleanPayload, &entities, &oe);
+  ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
+
+  if (result == false)
   {
-    std::string  s;
+    alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
+    parseData.qcr.res.release();
+    parseData.qcrs.res.release();
+    return false;
+  }
 
-    //
-    // NOTE
-    // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
-    // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a
-    // POST /v1/queryContext.
-    // So, here we change the verb/method for POST.
-    //
-    ciP->verb   = POST;
-    ciP->method = "POST";
-
-    // Note that jsonTreat() is thought for client-to-CB interactions, thus it modifies ciP->httpStatusCode
-    // Thus, we need to preserve it before (and recover after) in order a fail in the CB-to-CPr interaction doesn't
-    // "corrupt" the status code in the client-to-CB interaction.
-    // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
-    // to make JSON parsing logic (internal to jsonTreat()) independent of ciP (in fact, parsing process
-    // hasn't anything to do with connection).
-    HttpStatusCode sc = ciP->httpStatusCode;
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, NULL);
-    ciP->httpStatusCode = sc;
-
-    if (s != "OK")
-    {
-      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
-      parseData.qcr.res.release();
-      parseData.qcrs.res.release();
-      return false;
-    }
-
-
-    //
-    // 5. Fill in the response from the redirection into the response of this function
-    //
-    qcrsP->fill(&parseData.qcrs.res);
+  //
+  // 5. Fill in the response from the redirection into the response of this function
+  //
+  if (entities.size() > 0)
+  {
+    qcrsP->fill(entities);
   }
   else
   {
-    bool                        b;
-    Entities                    entities;
-    OrionError                  oe;
-
-    // Note that parseEntitiesResponse() is thought for client-to-CB interactions, so it takes into account
-    // ciP->uriParamOptions[OPT_KEY_VALUES]. In this case, we never use keyValues in the CB-to-CPr so we
-    // set to false and restore its original value later. In this case it seems it is not needed to preserve
-    // ciP->httpStatusCode as in the similar case above
-    // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
-    // to make JSON parsing logic (internal to parseEntitiesResponse()) independent of ciP and to pass the
-    // keyValue directly as function parameter.
-    bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
-    ciP->uriParamOptions[OPT_KEY_VALUES] = false;
-    b = parseEntitiesResponse(ciP, cleanPayload, &entities, &oe);
-    ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
-
-    if (b == false)
-    {
-      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
-      parseData.qcr.res.release();
-      parseData.qcrs.res.release();
-      return false;
-    }
-
-    //
-    // 5. Fill in the response from the redirection into the response of this function
-    //
-    if (entities.size() > 0)
-    {
-      qcrsP->fill(entities);
-    }
-    else
-    {
-      qcrsP->errorCode.fill(SccContextElementNotFound);
-    }
+    qcrsP->errorCode.fill(SccContextElementNotFound);
   }
 
   //
@@ -505,7 +466,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
 *
 * postQueryContext -
 */
-std::string postQueryContext
+void postQueryContext
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -519,7 +480,6 @@ std::string postQueryContext
   //
   QueryContextResponse*       qcrsP = &parseDataP->qcrs.res;
   QueryContextRequest*        qcrP  = &parseDataP->qcr.res;
-  std::string                 answer;
   QueryContextRequestVector   requestV;
   std::vector<std::string>    regIdsV;
   QueryContextResponseVector  responseV;
@@ -528,21 +488,13 @@ std::string postQueryContext
 
   bool skipForwarding = ciP->uriParamOptions[OPT_SKIPFORWARDING];
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-
   //
   // 00. Count or not count? That is the question ...
   //
-  // For API version 1, if the URI parameter 'details' is set to 'on', then the total of local
-  // entities is returned in the errorCode of the payload.
-  //
-  // In API version 2, this has changed completely. The total count is returned to client the HTTP header Fiware-Total-Count
+  // The total count is returned to client the HTTP header Fiware-Total-Count
   // only when count option is enabled, but we enable internally the countP variable, as if CPrs are involved in the
   // query execution we need it
-  if ((ciP->apiVersion == V2) || ((ciP->apiVersion == V1) && (ciP->uriParam["details"] == "on")))
-  {
-    countP = &count;
-  }
+  countP = &count;
 
   //
   // 01. Call mongoBackend/mongoQueryContext
@@ -555,17 +507,15 @@ std::string postQueryContext
                                                       ciP->servicePathV,
                                                       ciP->uriParam,
                                                       ciP->uriParamOptions,
-                                                      countP,
-                                                      ciP->apiVersion));
+                                                      countP));
 
   if ((qcrsP->errorCode.code == SccBadRequest) || (qcrsP->errorCode.code == SccReceiverInternalError))
   {
     // Bad Input or Internal Error detected by Mongo Backend - request ends here !
     OrionError oe(qcrsP->errorCode);
 
-    TIMED_RENDER(answer = oe.toJsonV1());
     qcrP->release();
-    return answer;
+    return;
   }
 
 
@@ -581,7 +531,7 @@ std::string postQueryContext
   //
   if (forwardsPending(qcrsP) == false)
   {
-    if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+    if (ciP->uriParamOptions["count"])
     {
       char cV[32];
 
@@ -589,10 +539,9 @@ std::string postQueryContext
       ciP->httpHeader.push_back(HTTP_FIWARE_TOTAL_COUNT);
       ciP->httpHeaderValue.push_back(cV);
     }
-    TIMED_RENDER(answer = qcrsP->toJsonV1(asJsonObject));
 
     qcrP->release();
-    return answer;
+    return;
   }
 
   //
@@ -718,20 +667,17 @@ std::string postQueryContext
   int providerOffset    =  0;
   int brokerCount       =  0;
 
-  if (ciP->apiVersion == V2)
+  brokerCount = *countP;
+  // Setting providerOffset
+  if (totalOffset >= (*countP))
   {
-    brokerCount   =  *countP;
-    // Setting providerOffset
-    if (totalOffset >= (*countP))
-    {
-      providerOffset = totalOffset - (*countP);
-    }
+    providerOffset = totalOffset - (*countP);
+  }
 
-    // Setting providerLimit
-    if (localQcrsP->contextElementResponseVector.size() >= 0)
-    {
-      providerLimit = providerLimit - localQcrsP->contextElementResponseVector.size();
-    }
+  // Setting providerLimit
+  if (localQcrsP->contextElementResponseVector.size() >= 0)
+  {
+    providerLimit = providerLimit - localQcrsP->contextElementResponseVector.size();
   }
 
   //
@@ -788,20 +734,18 @@ std::string postQueryContext
 
       if (queryForward(ciP, requestV[fIx], regIdsV[fIx], providerLimit, providerOffset, countP, fIx + 1, qP) == true)
       {
-        if (ciP->apiVersion == V2)
-        {
-          providerLimit = providerLimit - qP->contextElementResponseVector.size();
+        providerLimit = providerLimit - qP->contextElementResponseVector.size();
 
-          if (providerOffset > (*countP - brokerCount))
-          {
-            providerOffset -= (*countP - brokerCount);
-            brokerCount += (*countP - brokerCount);
-          }
-          else
-          {
-            providerOffset = 0;
-          }
+        if (providerOffset > (*countP - brokerCount))
+        {
+          providerOffset -= (*countP - brokerCount);
+          brokerCount += (*countP - brokerCount);
         }
+        else
+        {
+          providerOffset = 0;
+        }
+
         //
         // Each ContextElementResponse of qP should be tested to see whether there
         // is already an existing ContextElementResponse in responseV
@@ -861,7 +805,7 @@ std::string postQueryContext
   // Before implementing pagination for CPrs, this block of code was part of step 02.
   // However, in that step we only have the count for CB entities. It is in the new location
   // (after queryForward() invocation) when we have the total count CB+CPr
-  if ((ciP->apiVersion == V2) && (ciP->uriParamOptions["count"]))
+  if (ciP->uriParamOptions["count"])
   {
     char cV[32];
 
@@ -872,10 +816,6 @@ std::string postQueryContext
   }
 
   std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
-  bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-
-  TIMED_RENDER(answer = responseV.toJsonV1(asJsonObject, details, qcrsP->errorCode.details));
-
 
   //
   // Time to cleanup.
@@ -895,5 +835,5 @@ std::string postQueryContext
   requestV.release();
   responseV.release();
 
-  return answer;
+  return;
 }

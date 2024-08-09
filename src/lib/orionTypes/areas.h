@@ -189,7 +189,7 @@ class Geometry
 {
 public:
   Geometry();
-  int          parse(ApiVersion apiVersion, const char* in, std::string* errorString);
+  int          parse(const char* in, std::string* errorString);
 
   std::string  areaType;
   float        radius;

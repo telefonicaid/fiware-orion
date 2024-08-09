@@ -154,20 +154,6 @@ typedef enum Ngsiv2Flavour
 
 /* ****************************************************************************
 *
-*  NGSI API version -
-*/
-typedef enum ApiVersion
-{
-  NO_VERSION  = -1,
-  ADMIN_API   = 0,
-  V1          = 1,
-  V2          = 2
-} ApiVersion;
-
-
-
-/* ****************************************************************************
-*
 * PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
 */
 #define PERMANENT_EXPIRES_DATETIME  LLONG_MAX
@@ -217,11 +203,9 @@ extern bool               timingStatistics;
 extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
-extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
-extern bool               ngsiv1Autocast;
 extern unsigned long long inReqPayloadMaxSize;
 extern unsigned long long outReqMsgMaxSize;
 
@@ -246,8 +230,7 @@ extern void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics,
-  bool               _checkIdv1
+  bool               _notifQueueStatistics
 );
 
 

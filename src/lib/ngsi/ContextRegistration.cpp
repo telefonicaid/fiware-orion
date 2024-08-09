@@ -79,7 +79,6 @@ std::string ContextRegistration::toJsonV1(bool comma, bool isInVector)
 */
 std::string ContextRegistration::check
 (
-  ApiVersion          apiVersion,
   RequestType         requestType,
   const std::string&  predetectedError,
   int                 counter
@@ -92,7 +91,7 @@ std::string ContextRegistration::check
     return res;
   }
 
-  if ((res = contextRegistrationAttributeVector.check(apiVersion)) != "OK")
+  if ((res = contextRegistrationAttributeVector.check()) != "OK")
   {
     return res;
   }

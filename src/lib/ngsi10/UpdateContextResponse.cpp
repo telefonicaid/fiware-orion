@@ -116,7 +116,6 @@ std::string UpdateContextResponse::toJsonV1(bool asJsonObject)
 */
 std::string UpdateContextResponse::check
 (
-  ApiVersion          apiVersion,
   bool                asJsonObject,
   const std::string&  predetectedError
 )
@@ -127,7 +126,7 @@ std::string UpdateContextResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }  
-  else if (contextElementResponseVector.check(apiVersion, UpdateContext, predetectedError, 0) != "OK")
+  else if (contextElementResponseVector.check(UpdateContext, predetectedError, 0) != "OK")
   {
     alarmMgr.badInput(clientIp, res);
     errorCode.fill(SccBadRequest, res);
