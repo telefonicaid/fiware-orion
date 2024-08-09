@@ -57,8 +57,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -83,8 +82,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -109,8 +107,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -135,8 +132,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -228,7 +224,7 @@ Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Fiware-Total-Count: 4
 Content-Type: application/json
-Content-Length: 1053
+Content-Length: 1057
 
 [
     {
@@ -249,7 +245,7 @@ Content-Length: 1053
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -272,7 +268,7 @@ Content-Length: 1053
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -295,7 +291,7 @@ Content-Length: 1053
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -318,7 +314,7 @@ Content-Length: 1053
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -332,7 +328,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 527
+Content-Length: 529
 
 [
     {
@@ -353,7 +349,7 @@ Content-Length: 527
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -376,7 +372,7 @@ Content-Length: 527
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -390,7 +386,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 527
+Content-Length: 529
 
 [
     {
@@ -411,7 +407,7 @@ Content-Length: 527
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -434,7 +430,7 @@ Content-Length: 527
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -448,7 +444,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 264
+Content-Length: 265
 
 [
     {
@@ -469,7 +465,7 @@ Content-Length: 264
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
