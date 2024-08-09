@@ -86,8 +86,7 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${LISTENER_PORT}'/badresponse"
-    },
-    "legacyForwarding": true
+    }
   }
 }'
 orionCurl --url /v2/registrations --payload "$payload"
