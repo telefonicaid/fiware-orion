@@ -37,16 +37,6 @@
 
 /* ****************************************************************************
 *
-* Forward declarations
-*/
-struct UpdateContextElementRequest;
-struct AppendContextElementRequest;
-struct UpdateContextAttributeRequest;
-
-
-
-/* ****************************************************************************
-*
 * UpdateContextRequest - 
 */
 typedef struct UpdateContextRequest
