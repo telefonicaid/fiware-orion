@@ -33,6 +33,8 @@
 /* ****************************************************************************
 *
 * requestType -
+*
+* FIXME PR: review this list
 */
 const char* requestType(RequestType rt)
 {

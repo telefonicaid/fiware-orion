@@ -71,24 +71,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
                           ciP->compoundValueRoot,
                           parseDataP->lastContextAttribute));
 
-  //
-  // Special case for updateContextAttributeRequest. This payload has no
-  // ContextAttribute to point to by lastContextAttribute, as the whole payload
-  // is a part of a ContextAttribute.
-  //
-  RequestType requestType = ciP->restServiceP->request;
-  
-  if ((requestType == AttributeValueInstance)                           ||
-      (requestType == AttributeValueInstanceWithTypeAndId)              ||
-      (requestType == IndividualContextEntityAttribute)                 ||
-      (requestType == IndividualContextEntityAttributeWithTypeAndId))
-  {
-    parseDataP->upcar.res.compoundValueP = ciP->compoundValueRoot;
-  }
-  else
-  {
-    parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
-  }
+  parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
 
   // Reset the Compound stuff in ConnectionInfo
   ciP->compoundValueRoot = NULL;

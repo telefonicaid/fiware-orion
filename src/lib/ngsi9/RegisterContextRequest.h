@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "convenience/RegisterProviderRequest.h"
 #include "ngsi/ContextRegistrationVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/RegistrationId.h"
@@ -38,6 +37,8 @@
 /* ****************************************************************************
 *
 * RegisterContextRequest - 
+*
+* FIXME PR: empty class?
 */
 typedef struct RegisterContextRequest
 {
@@ -50,7 +51,6 @@ typedef struct RegisterContextRequest
   std::string   toJsonV1(void);
   std::string   check(const std::string& predetectedError, int counter);
   void          release(void);
-  void          fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName);
 } RegisterContextRequest;
 
 #endif  // SRC_LIB_NGSI9_REGISTERCONTEXTREQUEST_H_

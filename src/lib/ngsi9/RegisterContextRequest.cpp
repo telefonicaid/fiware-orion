@@ -110,32 +110,3 @@ void RegisterContextRequest::release(void)
   duration.release();
   registrationId.release();
 }
-
-
-
-/* ****************************************************************************
-*
-* RegisterContextRequest::fill -
-*/
-void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName)
-{
-  ContextRegistration*          crP        = new ContextRegistration();
-  EntityId*                     entityIdP  = new EntityId(entityId, entityType, "false");
-
-  duration       = rpr.duration;
-  registrationId = rpr.registrationId;
-
-  crP->providingApplication = rpr.providingApplication;
-
-  crP->entityIdVector.push_back(entityIdP);
-  crP->entityIdVectorPresent = true;
-
-  if (!attributeName.empty())
-  {
-    ContextRegistrationAttribute* attributeP = new ContextRegistrationAttribute(attributeName, "");
-
-    crP->contextRegistrationAttributeVector.push_back(attributeP);
-  }
-
-  contextRegistrationVector.push_back(crP);
-}

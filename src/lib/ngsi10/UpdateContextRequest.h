@@ -66,26 +66,11 @@ typedef struct UpdateContextRequest
   void               release(void);
   ContextAttribute*  attributeLookup(Entity* eP, const std::string& attributeName);
 
-
-  void         fill(const UpdateContextElementRequest* ucerP,
-                    const std::string&                 entityId,
-                    const std::string&                 entityType);
-
-  void         fill(const AppendContextElementRequest* acerP,
-                    const std::string&                 entityId,
-                    const std::string&                 entityType);
-
   void         fill(const std::string& entityId,
                     const std::string& entityType,
                     const std::string& isPattern,
                     const std::string& attributeName,
                     ActionType         _updateActionType);
-
-  void         fill(const UpdateContextAttributeRequest* ucarP,
-                    const std::string&                   entityId,
-                    const std::string&                   entityType,
-                    const std::string&                   attributeName,
-                    ActionType                           _updateActionType);
 
   void         fill(const Entity* entP, ActionType _updateActionType);
   void         fill(const std::string&   entityId,

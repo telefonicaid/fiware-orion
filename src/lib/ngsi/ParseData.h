@@ -44,10 +44,6 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
-#include "convenience/RegisterProviderRequest.h"
-#include "convenience/UpdateContextElementRequest.h"
-#include "convenience/AppendContextElementRequest.h"
-#include "convenience/UpdateContextAttributeRequest.h"
 #include "apiTypesV2/Entity.h"
 #include "apiTypesV2/BatchQuery.h"
 #include "apiTypesV2/BatchUpdate.h"
@@ -234,61 +230,6 @@ struct UpdateContextSubscriptionData
 
 /* ****************************************************************************
 *
-* RegisterProviderRequestData -
-*/
-struct RegisterProviderRequestData
-{
-  RegisterProviderRequestData(): metadataP(NULL) {}
-  RegisterProviderRequest  res;
-  Metadata*                metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextElementData -
-*/
-struct UpdateContextElementData
-{
-  UpdateContextElementData(): attributeP(NULL), metadataP(NULL) {}
-  UpdateContextElementRequest  res;
-  ContextAttribute*            attributeP;
-  Metadata*                    metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* AppendContextElementData -
-*/
-struct AppendContextElementData
-{
-  AppendContextElementData(): attributeP(NULL), metadataP(NULL) {}
-  AppendContextElementRequest  res;
-  ContextAttribute*            attributeP;
-  Metadata*                    metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextAttributeData -
-*/
-struct UpdateContextAttributeData
-{
-  UpdateContextAttributeData(): metadataP(NULL) {}
-  UpdateContextAttributeRequest  res;
-  Metadata*                      metadataP;
-  ContextAttribute               attribute;
-};
-
-
-
-/* ****************************************************************************
-*
 * EntityData - 
 */
 typedef struct EntityData
@@ -344,6 +285,8 @@ typedef struct BatchUpdateData
 /* ****************************************************************************
 *
 * ParseData -
+*
+* FIXME PR: review this list
 */
 typedef struct ParseData
 {
@@ -360,11 +303,6 @@ typedef struct ParseData
   UpdateContextData                           upcr;
   UpdateContextSubscriptionData               ucsr;
   NotifyContextData                           ncr;
-
-  RegisterProviderRequestData                 rpr;
-  UpdateContextElementData                    ucer;
-  AppendContextElementData                    acer;
-  UpdateContextAttributeData                  upcar;
 
   RegisterContextResponseData                 rcrs;
   DiscoverContextAvailabilityResponseData     dcars;
