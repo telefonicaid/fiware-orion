@@ -75,7 +75,6 @@ extern std::string payloadParse
   ConnectionInfo*            ciP,
   ParseData*                 parseDataP,
   RestService*               service,
-  //JsonRequest**              jsonPP,  FIXME PR
   JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
 );

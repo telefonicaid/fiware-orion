@@ -263,7 +263,7 @@ static bool updateForward
     //
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
-    bool r;
+    bool result;
     Entities                    entities;
     OrionError                  oe;
 
@@ -296,9 +296,9 @@ static bool updateForward
 
     parseData.upcrs.res.errorCode.fill(SccOk);
 
-    r = parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe);
+    result = parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe);
 
-    if (!r)
+    if (!result)
     {
       alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.error + " (" + oe.description + ")");
       upcrsP->errorCode.fill(SccContextElementNotFound, "");

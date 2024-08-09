@@ -172,7 +172,6 @@ std::string payloadParse
   ConnectionInfo*            ciP,
   ParseData*                 parseDataP,
   RestService*               service,
-  //JsonRequest**              jsonPP,  FIXME PR
   JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
 )
@@ -517,7 +516,6 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
-  //JsonRequest*              jsonReqP   = NULL; // FIXME PR: remove
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
@@ -597,21 +595,13 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       ciP->parseDataP = &parseData;
       metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
       LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
-      // FIXME PR
-      response = payloadParse(ciP, &parseData, &serviceV[ix], /*&jsonReqP,*/ &jsonRelease, compV);
+      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
       {
         alarmMgr.badInput(clientIp, response);
         restReply(ciP, response);
-
-        // FIXME PR
-        /*if (jsonReqP != NULL)
-        {
-          jsonReqP->release(&parseData);
-        }*/
-
 
         delayedRelease(&jsonRelease);
 
@@ -642,19 +632,11 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       std::string  response = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
 
       alarmMgr.badInput(clientIp, result);
-
       restReply(ciP, response);
-
-      // FIXME PR: remove
-      //if (jsonReqP != NULL)
-      //{
-      //  jsonReqP->release(&parseData);
-      //}
 
       delayedRelease(&jsonRelease);
 
       compV.clear();
-
       return response;
     }
 
@@ -676,12 +658,6 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     filterRelease(&parseData, serviceV[ix].request);
-
-    // FIXME PR: remove
-    //if (jsonReqP != NULL)
-    //{
-    //  jsonReqP->release(&parseData);
-    //}
 
     delayedRelease(&jsonRelease);
 

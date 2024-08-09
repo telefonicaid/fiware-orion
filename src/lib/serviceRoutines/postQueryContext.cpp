@@ -373,120 +373,42 @@ static bool queryForward
     getProviderCount(out.c_str(), totalCount);
   }
 
-  if (qcrP->providerFormat == PfJson)
+  bool result;
+  Entities entities;
+  OrionError oe;
+
+  // Depending NGSIv1 or NGSIv2 in the CPr we use parseEntitiesResponseV1() or parseEntitiesResponseV2()
+
+  // Note that parseEntitiesResponse() is thought for client-to-CB interactions, so it takes into account
+  // ciP->uriParamOptions[OPT_KEY_VALUES]. In this case, we never use keyValues in the CB-to-CPr so we
+  // set to false and restore its original value later. In this case it seems it is not needed to preserve
+  // ciP->httpStatusCode as in the similar case above
+  // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
+  // to make JSON parsing logic (internal to parseEntitiesResponse()) independent of ciP and to pass the
+  // keyValue directly as function parameter.
+  bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
+  ciP->uriParamOptions[OPT_KEY_VALUES] = false;
+  result = qcrP->providerFormat == PfJson ? parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe) : parseEntitiesResponse(ciP, cleanPayload, &entities, &oe);
+  ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
+
+  if (result == false)
   {
-#if 0
-    // FIXME PR clean this block. Unifty with else, pobably only the parseEntitiesResponse/parseEntitiesResponseV1 is different
-    std::string  s;
+    alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
+    parseData.qcr.res.release();
+    parseData.qcrs.res.release();
+    return false;
+  }
 
-    //
-    // NOTE
-    // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
-    // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a
-    // POST /v1/queryContext.
-    // So, here we change the verb/method for POST.
-    //
-    ciP->verb   = POST;
-    ciP->method = "POST";
-
-    // Note that jsonTreat() is thought for client-to-CB interactions, thus it modifies ciP->httpStatusCode
-    // Thus, we need to preserve it before (and recover after) in order a fail in the CB-to-CPr interaction doesn't
-    // "corrupt" the status code in the client-to-CB interaction.
-    // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
-    // to make JSON parsing logic (internal to jsonTreat()) independent of ciP (in fact, parsing process
-    // hasn't anything to do with connection).
-    HttpStatusCode sc = ciP->httpStatusCode;
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, NULL);
-    ciP->httpStatusCode = sc;
-
-    if (s != "OK")
-    {
-      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
-      parseData.qcr.res.release();
-      parseData.qcrs.res.release();
-      return false;
-    }
-
-
-    //
-    // 5. Fill in the response from the redirection into the response of this function
-    //
-    qcrsP->fill(&parseData.qcrs.res);
-#endif
-
-    bool                        r;
-    Entities                    entities;
-    OrionError                  oe;
-
-    // Note that parseEntitiesResponse() is thought for client-to-CB interactions, so it takes into account
-    // ciP->uriParamOptions[OPT_KEY_VALUES]. In this case, we never use keyValues in the CB-to-CPr so we
-    // set to false and restore its original value later. In this case it seems it is not needed to preserve
-    // ciP->httpStatusCode as in the similar case above
-    // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
-    // to make JSON parsing logic (internal to parseEntitiesResponse()) independent of ciP and to pass the
-    // keyValue directly as function parameter.
-    bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
-    ciP->uriParamOptions[OPT_KEY_VALUES] = false;
-    r = parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe);
-    ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
-
-    if (r == false)
-    {
-      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.description);
-      parseData.qcr.res.release();
-      parseData.qcrs.res.release();
-      return false;
-    }
-
-    //
-    // 5. Fill in the response from the redirection into the response of this function
-    //
-    if (entities.size() > 0)
-    {
-      qcrsP->fill(entities);
-    }
-    else
-    {
-      qcrsP->errorCode.fill(SccContextElementNotFound);
-    }
+  //
+  // 5. Fill in the response from the redirection into the response of this function
+  //
+  if (entities.size() > 0)
+  {
+    qcrsP->fill(entities);
   }
   else
   {
-    bool                        b;
-    Entities                    entities;
-    OrionError                  oe;
-
-    // Note that parseEntitiesResponse() is thought for client-to-CB interactions, so it takes into account
-    // ciP->uriParamOptions[OPT_KEY_VALUES]. In this case, we never use keyValues in the CB-to-CPr so we
-    // set to false and restore its original value later. In this case it seems it is not needed to preserve
-    // ciP->httpStatusCode as in the similar case above
-    // FIXME P5: not sure if I like this approach... very "hacking-style". Probably it would be better
-    // to make JSON parsing logic (internal to parseEntitiesResponse()) independent of ciP and to pass the
-    // keyValue directly as function parameter.
-    bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
-    ciP->uriParamOptions[OPT_KEY_VALUES] = false;
-    b = parseEntitiesResponse(ciP, cleanPayload, &entities, &oe);
-    ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
-
-    if (b == false)
-    {
-      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.error + " (" + oe.description + ")");
-      parseData.qcr.res.release();
-      parseData.qcrs.res.release();
-      return false;
-    }
-
-    //
-    // 5. Fill in the response from the redirection into the response of this function
-    //
-    if (entities.size() > 0)
-    {
-      qcrsP->fill(entities);
-    }
-    else
-    {
-      qcrsP->errorCode.fill(SccContextElementNotFound);
-    }
+    qcrsP->errorCode.fill(SccContextElementNotFound);
   }
 
   //
