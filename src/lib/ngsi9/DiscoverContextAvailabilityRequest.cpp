@@ -32,7 +32,6 @@
 #include "ngsi/StringList.h"
 #include "ngsi/Restriction.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 /* ****************************************************************************
 *
@@ -55,37 +54,6 @@ void DiscoverContextAvailabilityRequest::release(void)
   entityIdVector.release();
   attributeList.release();
   restriction.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityRequest::check -
-*/
-std::string DiscoverContextAvailabilityRequest::check(const std::string& predetectedError)
-{
-  DiscoverContextAvailabilityResponse  response;
-  std::string                          res;
-
-  if (!predetectedError.empty())
-  {
-    response.errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if (entityIdVector.size() == 0)
-  {
-    response.errorCode.fill(SccContextElementNotFound);
-  }
-  else if (((res = entityIdVector.check(DiscoverContextAvailability))       != "OK") ||
-           ((res = attributeList.check())                                   != "OK") ||
-           ((restrictions != 0) && ((res = restriction.check(restrictions)) != "OK")))
-  {
-    response.errorCode.fill(SccBadRequest, res);
-  }
-  else
-    return "OK";
-
-  return response.toJsonV1();
 }
 
 

@@ -73,20 +73,6 @@ class Entity
 
   ~Entity();
 
-  std::string  toJsonV1(bool                             asJsonObject,
-                        RequestType                      requestType,
-                        const std::vector<std::string>&  attrsFilter,
-                        bool                             blacklist,
-                        const std::vector<std::string>&  metadataFilter,
-                        bool                             comma,
-                        bool                             omitAttributeValues = false);
-
-  std::string  toJsonV1(bool                             asJsonObject,
-                        RequestType                      requestType,
-                        bool                             blacklist,
-                        bool                             comma,
-                        bool                             omitAttributeValues = false);
-
   std::string  toJson(RenderFormat                         renderFormat,
                       const std::vector<std::string>&      attrsFilter,
                       bool                                 blacklist,

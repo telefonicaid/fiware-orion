@@ -194,11 +194,12 @@ SET (ORION_LIBS
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
                   # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o
+    mongoBackend
     ngsi9
     ngsi10
     ngsi
     cache
-    mongoBackend
+    mongoBackend  # repeated (probably due to some circular dependency between mongoBackend and ngsi)
     mongoDriver
     parse
     apiTypesV2

@@ -36,6 +36,16 @@
 // the same macro in parseArg library
 #define FT(x) (x == true)? "true" : "false"
 
+
+
+/* ****************************************************************************
+*
+* Macros for JSON rendering
+*/
+#define JSON_STR(value)                std::string("\"" + std::string(value) + "\"")
+
+
+
 /* ****************************************************************************
 *
 * isIPv6 -
@@ -234,6 +244,14 @@ inline std::string removeQuotes(std::string s)
     return s;
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* htmlEscape - 
+*/
+extern char* htmlEscape(const char* s);
 
 
 

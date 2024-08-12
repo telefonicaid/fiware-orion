@@ -26,7 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "ngsi10/SubscribeContextResponse.h"
 
@@ -71,7 +70,7 @@ std::string SubscribeContextResponse::toJson(void)
     // FIXME P5: it is a bit weird to call a toJsonV1() method from a toJson() method. However,
     // SubscribeResponse doesn't have another option. This should be looked into detail.
     out += "{";
-    out += subscribeResponse.toJsonV1(false);
+    //out += subscribeResponse.toJsonV1(false);  // FIXME PR
     out += "}";
     return out;
   }
@@ -80,28 +79,4 @@ std::string SubscribeContextResponse::toJson(void)
     return subscribeError.toJson();
   }
 
-}
-
-/* ****************************************************************************
-*
-* SubscribeContextResponse::toJsonV1 -
-*/
-std::string SubscribeContextResponse::toJsonV1(void)
-{
-  std::string out     = "";
-
-  out += startTag();
-
-  if (subscribeError.errorCode.code == SccNone)
-  {
-    out += subscribeResponse.toJsonV1(false);
-  }
-  else
-  {
-    out += subscribeError.toJsonV1(SubscribeContext, false);
-  }
-
-  out += endTag(false);
-
-  return out;
 }

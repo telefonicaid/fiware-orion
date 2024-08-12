@@ -61,14 +61,6 @@ typedef struct ContextAttributeVector
 
   std::string        check(RequestType requestType);
 
-  std::string        toJsonV1(bool                                   asJsonObject,
-                              RequestType                            requestType,
-                              const std::vector<ContextAttribute*>&  orderedAttrs,
-                              const std::vector<std::string>&        metadataFilter,
-                              bool                                   comma       = false,
-                              bool                                   omitValue   = false,
-                              bool                                   attrsAsName = false);
-
   std::string        toJsonTypes(void);
 
   void               toBson(double                    now,

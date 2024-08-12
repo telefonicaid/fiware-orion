@@ -45,7 +45,6 @@ typedef struct RegistrationId
   void          set(const std::string& value);
   std::string   get(void) const;
   bool          isEmpty(void);
-  std::string   toJsonV1(RequestType requestType, bool comma);
   void          release(void);
 
   std::string   check(void);

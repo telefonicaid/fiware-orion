@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "ngsi/MetadataVector.h"
@@ -44,34 +43,6 @@
 MetadataVector::MetadataVector(void)
 {
   vec.clear();
-}
-
-
-
-/* ****************************************************************************
-*
-* MetadataVector::toJsonV1 -
-*
-* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
-*/
-std::string MetadataVector::toJsonV1(const std::vector<Metadata*>& orderedMetadata, bool comma)
-{
-  std::string out = "";
-
-  if (orderedMetadata.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("metadatas", true);
-  for (unsigned int ix = 0; ix < orderedMetadata.size(); ++ix)
-  {
-    out += orderedMetadata[ix]->toJsonV1(ix != orderedMetadata.size() - 1);
-  }
-  out += endTag(comma, true);
-
-
-  return out;
 }
 
 

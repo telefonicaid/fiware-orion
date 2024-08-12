@@ -30,73 +30,11 @@
 #include "logMsg/logMsg.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
 #include "orionTypes/EntityTypeVectorResponse.h"
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVectorResponse::toJsonV1 -
-*/
-std::string EntityTypeVectorResponse::toJsonV1
-(
-  bool        asJsonObject,
-  bool        asJsonOut,
-  bool        collapsed
-)
-{
-  std::string out  = "";
-
-  out += startTag();
-
-  if (entityTypeVector.size() > 0)
-  {
-    out += entityTypeVector.toJsonV1(asJsonObject, asJsonOut, collapsed, true);
-  }
-
-  out += statusCode.toJsonV1(false);
-
-  out += endTag();
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVectorResponse::check -
-*/
-std::string EntityTypeVectorResponse::check
-(
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  predetectedError)
-{
-  std::string res;
-
-  if (!predetectedError.empty())
-  {
-    statusCode.fill(SccBadRequest, predetectedError);
-  }
-  else if ((res = entityTypeVector.check(predetectedError)) != "OK")
-  {
-    alarmMgr.badInput(clientIp, res);
-    statusCode.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
-
-  return toJsonV1(asJsonObject, asJsonOut, collapsed);
-}
 
 
 

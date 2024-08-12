@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "ngsi/StringList.h"
@@ -76,33 +75,6 @@ std::string StringList::toJson(void)
   }
 
   return jh.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* StringList::toJsonV1 -
-*/
-std::string StringList::toJsonV1(bool comma, const std::string& fieldName)
-{
-  std::string  out = "";
-
-  if (stringV.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag(fieldName, true);
-
-  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
-  {
-    out += valueTag(fieldName, stringV[ix], ix != stringV.size() - 1, true);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
 }
 
 

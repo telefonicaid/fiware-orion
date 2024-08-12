@@ -31,8 +31,6 @@ SET (SOURCES
     UnsubscribeContextResponse.cpp
     UpdateContextRequest.cpp
     UpdateContextResponse.cpp
-    UpdateContextSubscriptionRequest.cpp
-    UpdateContextSubscriptionResponse.cpp
 )
 
 SET (HEADERS
@@ -46,8 +44,6 @@ SET (HEADERS
     UnsubscribeContextResponse.h
     UpdateContextRequest.h
     UpdateContextResponse.h
-    UpdateContextSubscriptionRequest.h
-    UpdateContextSubscriptionResponse.h
 )
 
 

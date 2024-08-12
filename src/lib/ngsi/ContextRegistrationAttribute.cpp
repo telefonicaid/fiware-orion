@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 
 
@@ -58,22 +57,6 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
 {
   name      = _name;
   type      = _type;  
-}
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttribute::toJsonV1 -
-*/
-std::string ContextRegistrationAttribute::toJsonV1(bool comma)
-{
-  std::string out = "";
-
-  out += startTag();
-  out += valueTag("name", name, true);
-  out += valueTag("type", type, false);
-  out += endTag(comma);
-
-  return out;
 }
 
 

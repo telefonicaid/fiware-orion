@@ -25,7 +25,6 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
 #include "rest/EntityTypeInfo.h"
@@ -36,36 +35,6 @@
 
 
 using namespace ngsiv2;
-
-
-
-/* ****************************************************************************
-*
-* SubscribeContextRequest::check -
-*/
-std::string SubscribeContextRequest::check(const std::string& predetectedError, int counter)
-{
-  SubscribeContextResponse response;
-  std::string              res;
-
-  /* First, check optional fields only in the case they are present */
-  /* Second, check the other (mandatory) fields */
-
-  if (((res = entityIdVector.check(SubscribeContext))                                   != "OK") ||
-      ((res = attributeList.check())                                                    != "OK") ||
-      ((res = reference.check(SubscribeContext))                                        != "OK") ||
-      ((res = duration.check())                                                         != "OK") ||
-      ((res = restriction.check(restrictions))                                          != "OK") ||
-      ((res = notifyConditionVector.check(SubscribeContext, predetectedError, counter)) != "OK") ||
-      ((res = throttling.check())                                                       != "OK"))
-  {
-    alarmMgr.badInput(clientIp, res);
-    response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
-    return response.toJsonV1();
-  }
-
-  return "OK";
-}
 
 
 

@@ -44,14 +44,6 @@ class EntityTypeVectorResponse
   EntityTypeVector  entityTypeVector;
   StatusCode        statusCode;
 
-  std::string       toJsonV1(bool  asJsonObject,
-                             bool  asJsonOut,
-                             bool  collapsed);
-
-  std::string       check(bool                asJsonObject,
-                          bool                asJsonOut,
-                          bool                collapsed,
-                          const std::string&  predetectedError);
   void              release(void);
   std::string       toJson(bool values);
 };

@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/Originator.h"
 
@@ -74,22 +73,6 @@ void Originator::set(const std::string& value)
 std::string Originator::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* Originator::toJsonV1 -
-*/
-std::string Originator::toJsonV1(bool comma)
-{
-  if (string.empty())
-  {
-    return "";
-  }
-
-  return valueTag("originator", string, comma);
 }
 
 

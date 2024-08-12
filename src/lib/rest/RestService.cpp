@@ -148,12 +148,6 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
     releaseP->scrP = NULL;
   }
 
-  if (releaseP->ucsrP != NULL)
-  {
-    releaseP->ucsrP->release();
-    releaseP->ucsrP = NULL;
-  }
-
   if (releaseP->subsP != NULL)
   {
     delete releaseP->subsP;
@@ -371,10 +365,6 @@ static void scopeFilter
   else if (ciP->restServiceP->request == SubscribeContext)
   {
     restrictionP = &parseDataP->scr.res.restriction;
-  }
-  else if (ciP->restServiceP->request == UpdateContextSubscription)
-  {
-    restrictionP = &parseDataP->ucsr.res.restriction;
   }
   else
   {

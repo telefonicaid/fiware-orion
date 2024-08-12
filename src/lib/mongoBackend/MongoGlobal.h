@@ -45,8 +45,6 @@
 #include "ngsi/Restriction.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "ngsi9/RegisterContextRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"

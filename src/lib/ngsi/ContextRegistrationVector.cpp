@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ContextRegistrationVector.h"
 
 
@@ -41,33 +40,6 @@
 void ContextRegistrationVector::push_back(ContextRegistration* item)
 {
   vec.push_back(item);
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationVector::toJsonV1 -
-*/
-std::string ContextRegistrationVector::toJsonV1(bool comma)
-{
-  std::string  out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("contextRegistrations", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
-  }
-
-  out += endTag(comma, comma);
-
-  return out;
 }
 
 

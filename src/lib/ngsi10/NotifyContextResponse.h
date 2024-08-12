@@ -36,6 +36,7 @@
 /* ****************************************************************************
 *
 * NotifyContextResponse -
+*
 */
 typedef struct NotifyContextResponse
 {
@@ -44,7 +45,6 @@ typedef struct NotifyContextResponse
   NotifyContextResponse();
   NotifyContextResponse(StatusCode& sc);
 
-  std::string   toJsonV1(void);
   void          release(void);
 } NotifyContextResponse;
 

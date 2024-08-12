@@ -29,7 +29,6 @@
 
 #include "common/globals.h"
 #include "common/idCheck.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
 
@@ -121,37 +120,6 @@ const char* SubscriptionId::c_str(void) const
 
 /* ****************************************************************************
 *
-* SubscriptionId::toJsonV1 -
-*/
-std::string SubscriptionId::toJsonV1(RequestType container, bool comma)
-{
-  std::string xString = string;
-
-  if (xString.empty())
-  {
-    if ((container == UpdateContextSubscription)                       ||
-        (container == UnsubscribeContext)                              ||
-        (container == RtUnsubscribeContextResponse)                    ||
-        (container == NotifyContext)                                   ||
-        (container == RtSubscribeResponse)                             ||
-        (container == RtSubscribeError))
-    {
-      // subscriptionId is Mandatory
-      xString = "000000000000000000000000";
-    }
-    else
-    {
-      return "";  // subscriptionId is Optional
-    }
-  }
-
-  return valueTag("subscriptionId", xString, comma);
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 void SubscriptionId::release(void)
@@ -170,8 +138,7 @@ bool SubscriptionId::rendered(RequestType container)
 {
   if ((string.empty()) || (string == "000000000000000000000000"))
   {
-    if ((container == UpdateContextSubscription)                       ||
-        (container == UnsubscribeContext)                              ||
+    if ((container == UnsubscribeContext)                              ||
         (container == RtUnsubscribeContextResponse)                    ||
         (container == NotifyContext)                                   ||
         (container == RtSubscribeResponse)                             ||

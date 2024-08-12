@@ -41,13 +41,10 @@ const char* requestType(RequestType rt)
   switch (rt)
   {
   case NoRequest:                                   return "NoRequest";
-  case RegisterContext:                             return "RegisterContextRequest";
-  case RegisterResponse:                            return "RegisterContextResponse";
   case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";   
   case QueryContext:                                return "QueryContextRequest";
   case RtQueryContextResponse:                      return "QueryContextResponse";
   case SubscribeContext:                            return "SubscribeContextRequest";
-  case UpdateContextSubscription:                   return "UpdateContextSubscriptionRequest";
   case UnsubscribeContext:                          return "UnsubscribeContextRequest";
   case NotifyContext:                               return "NotifyContextRequest";
   case NotifyContextSent:                           return "NotifyContextRequestSent";
@@ -186,7 +183,6 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
   //case EntityByIdAttributeByName:            return "/v1/registry/contextEntities/{id}/attributes/{name}";
   //case EntityByIdAttributeByNameIdAndType:   return "/v1/registry/contextEntities/type/{type}/id/{id}/attributes/{name}";
   //case EntityTypes:                          return "/v1/contextTypes";
-  case RegisterContext:
   case ContextEntitiesByEntityId:
   case ContextEntitiesByEntityIdAndType:
   case ContextEntityAttributes:
@@ -253,7 +249,6 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
   case SubscribeContext:
   case UnsubscribeContext:
   //case UpdateContext:
-  case UpdateContextSubscription:
     return "skip";
 
   // v2, v1 or NGSIv2

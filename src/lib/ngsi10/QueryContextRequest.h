@@ -67,7 +67,6 @@ typedef struct QueryContextRequest
 
   std::string   toJsonV1(void);
   std::string   toJson(void);
-  std::string   check(bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);
   void          fill(const std::string&  entityId,

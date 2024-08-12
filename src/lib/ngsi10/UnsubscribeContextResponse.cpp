@@ -26,7 +26,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
@@ -60,22 +59,6 @@ UnsubscribeContextResponse::UnsubscribeContextResponse(StatusCode& _statusCode)
 UnsubscribeContextResponse::~UnsubscribeContextResponse()
 {
   LM_T(LmtDestructor,("destroyed"));
-}
-
-/* ****************************************************************************
-*
-* UnsubscribeContextResponse::toJsonV1 -
-*/
-std::string UnsubscribeContextResponse::toJsonV1(void)
-{
-  std::string out = "";
-
-  out += startTag();
-  out += subscriptionId.toJsonV1(RtUnsubscribeContextResponse, true);
-  out += statusCode.toJsonV1(false);
-  out += endTag();
-
-  return out;
 }
 
 

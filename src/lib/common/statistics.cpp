@@ -23,7 +23,6 @@
 * Author: Ken Zangelin
 */
 #include "common/statistics.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "logMsg/logMsg.h"
 #include "common/JsonHelper.h"

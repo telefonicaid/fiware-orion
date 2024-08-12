@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
@@ -349,26 +348,6 @@ int Scope::fill
   }
 
   return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* Scope::toJsonV1 -
-*/
-std::string Scope::toJsonV1(bool notLastInVector)
-{
-  std::string out      = "";
-  const char* tTag     = "type";
-  const char* vTag     = "value";
-
-  out += startTag();
-  out += valueTag(tTag, type, true);
-  out += valueTag(vTag, value);
-  out += endTag(notLastInVector);
-
-  return out;
 }
 
 

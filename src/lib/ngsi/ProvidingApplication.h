@@ -63,7 +63,6 @@ typedef struct ProvidingApplication
   ProviderFormat  getProviderFormat(void);
   std::string     getRegId(void);
   bool            isEmpty(void);
-  std::string     toJsonV1(bool comma);
   const char*     c_str(void);
   void            release(void);
   std::string     check(void);

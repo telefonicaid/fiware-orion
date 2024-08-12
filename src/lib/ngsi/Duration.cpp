@@ -31,7 +31,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Duration.h"
@@ -130,27 +129,6 @@ int64_t Duration::parse(void)
   valid = (seconds == -1)? false : true;
 
   return seconds;
-}
-
-
-
-/* ****************************************************************************
-*
-* Duration::toJsonV1 -
-*/
-std::string Duration::toJsonV1(bool comma)
-{
-  if (string.empty())
-  {
-    return "";
-  }
-
-  if (valid == false)
-  {
-    return "";
-  }
-
-  return valueTag("duration", string, comma);
 }
 
 

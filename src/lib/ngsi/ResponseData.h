@@ -31,13 +31,10 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/Metadata.h"
 
-#include "ngsi9/RegisterContextResponse.h"
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "ngsi10/UpdateContextSubscriptionResponse.h"
 
 
 
@@ -47,13 +44,11 @@
 */
 typedef struct ResponseData
 {
-  RegisterContextResponse                         rcr;
   DiscoverContextAvailabilityResponse             dcar;
   QueryContextResponse                            qcr;
   SubscribeContextResponse                        scr;
   UnsubscribeContextResponse                      uncr;
   UpdateContextResponse                           upcr;
-  UpdateContextSubscriptionResponse               ucsr;
 } ResponseData;
 
 #endif  // SRC_LIB_NGSI_RESPONSEDATA_H_

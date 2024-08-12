@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/NotifyCondition.h"
 
@@ -55,31 +54,6 @@ NotifyCondition::NotifyCondition(NotifyCondition* ncP)
   type = ncP->type;
   condValueList.fill(ncP->condValueList);
   restriction.set(ncP->restriction.get());
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyCondition::toJsonV1 -
-*/
-std::string NotifyCondition::toJsonV1(bool notLastInVector)
-{
-  std::string out = "";
-
-  bool condValueListRendered   = condValueList.size() != 0;
-  bool restrictionRendered     = !restriction.get().empty();
-  bool commaAfterRestriction   = false;  // last element
-  bool commaAfterCondValueList = restrictionRendered;
-  bool commaAfterType          = condValueListRendered || restrictionRendered;
-
-  out += startTag();
-  out += valueTag("type", type, commaAfterType);
-  out += condValueList.toJsonV1(commaAfterCondValueList);
-  out += restriction.toJsonV1(commaAfterRestriction);
-  out += endTag();
-
-  return out;
 }
 
 

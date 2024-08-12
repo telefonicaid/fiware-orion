@@ -48,8 +48,6 @@ typedef struct EntityVector
 
   std::string  toJson(RenderFormat                     renderFormat);
 
-  std::string   toJsonV1(bool asJsonObject, RequestType requestType, bool comma);
-
   std::string   check(RequestType requestType);
   void          push_back(Entity* item);
   unsigned int  size(void);

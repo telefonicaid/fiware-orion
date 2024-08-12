@@ -97,19 +97,6 @@ public:
 
   double getEvalPriority(void);
 
-  std::string  toJsonV1(bool                             asJsonObject,
-                        RequestType                      request,
-                        const std::vector<std::string>&  metadataFilter,
-                        bool                             comma = false,
-                        bool                             omitValue = false);
-
-  std::string  toJsonV1AsObject(RequestType                    request,
-                                const std::vector<Metadata*>&  orderedMetadata,
-                                bool                           comma,
-                                bool                           omitValue = false);
-
-  std::string  toJsonV1AsNameString(bool comma);
-
   std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);

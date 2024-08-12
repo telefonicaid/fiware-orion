@@ -31,7 +31,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"
 #include "orionTypes/EntityTypeVector.h"
@@ -45,35 +44,6 @@
 EntityTypeVector::EntityTypeVector()
 {
   vec.clear();
-}
-
-
-/* ****************************************************************************
-*
-* EntityTypeVector::toJsonV1 -
-*/
-std::string EntityTypeVector::toJsonV1
-(
-  bool        asJsonObject,
-  bool        asJsonOut,
-  bool        collapsed,
-  bool        comma
-)
-{
-  std::string out  = "";
-
-  if (vec.size() > 0)
-  {
-    out += startTag("types", true);
-
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      out += vec[ix]->toJsonV1(asJsonObject, asJsonOut, collapsed, ix != vec.size() - 1);
-    }
-    out += endTag(comma, true);
-  }
-
-  return out;
 }
 
 

@@ -35,8 +35,11 @@ accumulatorStart --pretty-print
 #
 # 01. Register ConferenceRoom on CB with accumulator as providing application
 # 02. Register ConferenceRoom2 on CB with accumulator as providing application
-# 03. Query ConferenceRoom in CB
-# 04. Query ConferenceRoom2 in CB
+# 03. Register ConferenceRoom3 pressure on CB with accumulator as providing application
+# 04. Query ConferenceRoom in CB
+# 05. Query ConferenceRoom2 in CB
+# 06. Query ConferenceRoom3 pressure in CB
+# 07. Check three forwarded requests in logs
 #
 
 echo "01. Register ConferenceRoom on CB with accumulator as providing application"
@@ -62,6 +65,9 @@ echo
 echo
 
 
+REG1_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
 echo "02. Register ConferenceRoom2 on CB with accumulator as providing application"
 echo "============================================================================"
 payload='{
@@ -85,16 +91,60 @@ echo
 echo
 
 
-echo "03. Query ConferenceRoom in CB"
+REG2_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Register ConferenceRoom3 pressure on CB with accumulator as providing application"
+echo "====================================================================================="
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "Room",
+        "id": "ConferenceRoom3"
+      }
+    ],
+    "attrs": [ "pressure" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/cpr"
+    },
+    "legacyForwarding": true
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+REG3_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "04. Query ConferenceRoom in CB"
 echo "=============================="
 orionCurl --url /v2/entities/ConferenceRoom
 echo
 echo
 
 
-echo "04. Query ConferenceRoom2 in CB"
+echo "05. Query ConferenceRoom2 in CB"
 echo "==============================="
 orionCurl --url /v2/entities/ConferenceRoom2
+echo
+echo
+
+
+echo "06. Query ConferenceRoom3 pressure in CB"
+echo "======================================="
+orionCurl --url /v2/entities/ConferenceRoom3/attrs/pressure
+echo
+echo
+
+
+echo "07. Check three forwarded requests in logs"
+echo "=========================================="
+cat /tmp/contextBroker.log | grep "Request forwarded" | awk -F 'msg=' '{print $2}' | sed "s/${REG1_ID}/REG1_ID/" | sed "s/${REG2_ID}/REG2_ID/" | sed "s/${REG3_ID}/REG3_ID/"
 echo
 echo
 
@@ -120,7 +170,17 @@ Content-Length: 0
 
 
 
-03. Query ConferenceRoom in CB
+03. Register ConferenceRoom3 pressure on CB with accumulator as providing application
+=====================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+04. Query ConferenceRoom in CB
 ==============================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -176,7 +236,7 @@ Content-Length: 375
 }
 
 
-04. Query ConferenceRoom2 in CB
+05. Query ConferenceRoom2 in CB
 ===============================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -193,6 +253,28 @@ Content-Length: 97
     },
     "type": "Room"
 }
+
+
+06. Query ConferenceRoom3 pressure in CB
+=======================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 44
+
+{
+    "metadata": {},
+    "type": "degree",
+    "value": "14"
+}
+
+
+07. Check three forwarded requests in logs
+==========================================
+Request forwarded (regId: REG1_ID): POST http://localhost:9997/cpr/queryContext, request payload (88 bytes): {"entities":[{"id":"ConferenceRoom","type":"Room","isPattern":"false"}],"attributes":[]}, response payload (3912 bytes):
+Request forwarded (regId: REG2_ID): POST http://localhost:9997/cpr/queryContext, request payload (89 bytes): {"entities":[{"id":"ConferenceRoom2","type":"Room","isPattern":"false"}],"attributes":[]}, response payload (3912 bytes):
+Request forwarded (regId: REG3_ID): POST http://localhost:9997/cpr/queryContext, request payload (99 bytes): {"entities":[{"id":"ConferenceRoom3","type":"Room","isPattern":"false"}],"attributes":["pressure"]}, response payload (3912 bytes):
 
 
 --TEARDOWN--

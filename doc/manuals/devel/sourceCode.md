@@ -248,8 +248,8 @@ The **ngsi10** library contains the top hierarchy classes for NGSI10 (NGSIv1) re
 * `QueryContextResponse`
 * `SubscribeContextRequest`
 * `SubscribeContextResponse`
-* `UpdateContextSubscriptionRequest`
-* `UpdateContextSubscriptionResponse`
+* `UpdateContextSubscriptionRequest` - FIXME PR: removed
+* `UpdateContextSubscriptionResponse` - FIXME PR: removed
 * `UnsubscribeContextRequest`
 * `UnsubscribeContextResponse`
 * `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
@@ -263,10 +263,10 @@ See the explanation of methods and hierarchy of the [**ngsi** library](#methods-
 ## src/lib/ngsi9/
 Just like the ngsi10 library, the **ngsi9** library contains the top hierarchy classes for NGSI9 (NGSIv1) requests:
 
-* `RegisterContextRequest`
-* `RegisterContextResponse`
+* `RegisterContextRequest` - FIXME PR: removed
+* `RegisterContextResponse` - FIXME PR: removed
 * `DiscoverContextAvailabilityRequest`
-* `DiscoverContextAvailabilityResponse`
+* `DiscoverContextAvailabilityResponse` - FIXME PR: removed
 
 See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
 

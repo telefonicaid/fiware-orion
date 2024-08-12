@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/RestrictionString.h"
 
@@ -74,22 +73,6 @@ void RestrictionString::set(const std::string& value)
 std::string RestrictionString::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* RestrictionString::toJsonV1 -
-*/
-std::string RestrictionString::toJsonV1(bool comma)
-{
-  if (string.empty())
-  {
-    return "";
-  }
-
-  return valueTag("restriction", string, comma);
 }
 
 

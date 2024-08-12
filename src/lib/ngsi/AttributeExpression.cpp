@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/AttributeExpression.h"
 
@@ -78,22 +77,6 @@ void AttributeExpression::set(const std::string& value)
 std::string AttributeExpression::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* AttributeExpression::toJsonV1 -
-*/
-std::string AttributeExpression::toJsonV1(bool comma)
-{
-  if (string.empty())
-  {
-    return "";
-  }
-
-  return valueTag("attributeExpression", string, comma);
 }
 
 

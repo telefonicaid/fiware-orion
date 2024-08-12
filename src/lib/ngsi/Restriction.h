@@ -43,7 +43,6 @@ typedef struct Restriction
   AttributeExpression  attributeExpression;   // Optional (FI-WARE changes - MANDATORY in OMA spec)
   ScopeVector          scopeVector;           // Optional
 
-  std::string   toJsonV1(int restrictions, bool comma);
   void          release();
   void          fill(Restriction* rP);
 

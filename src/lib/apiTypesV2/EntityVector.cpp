@@ -32,7 +32,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -92,40 +91,6 @@ std::string EntityVector::toJson(RenderFormat renderFormat)
   }
 
   return jh.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityVector::toJsonV1 -
-*
-* Ported from old class ContextElementVector
-*/
-std::string EntityVector::toJsonV1
-(
-  bool         asJsonObject,
-  RequestType  requestType,
-  bool         comma
-)
-{
-  std::string  out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("contextElements", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(asJsonObject, requestType, false, ix != vec.size() - 1);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
 }
 
 

@@ -25,46 +25,8 @@
 #include <string>
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
-
-
-
-/* ****************************************************************************
-*
-* UnsubscribeContextRequest::toJsonV1 -
-*/
-std::string UnsubscribeContextRequest::toJsonV1(void)
-{
-  std::string out = "";
-
-  out += startTag();
-  out += subscriptionId.toJsonV1(UnsubscribeContext, false);
-  out += endTag();
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* UnsubscribeContextRequest::check - 
-*/
-std::string UnsubscribeContextRequest::check()
-{
-  UnsubscribeContextResponse  response;
-  std::string                 res;
-
-  if ((res = subscriptionId.check()) != "OK")
-  {
-     response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
-     return response.toJsonV1();
-  }
-
-  return "OK";
-}
 
 
 

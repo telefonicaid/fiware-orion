@@ -28,7 +28,6 @@
 
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/JsonHelper.h"
@@ -223,67 +222,6 @@ void Entity::filterAndOrderAttrs
       }
     }
   }
-}
-
-
-
-
-/* ****************************************************************************
-*
-* Entity::toJsonV1 -
-*
-* This method was ported from old ContextElement class. It was name render() there
-*
-*/
-std::string Entity::toJsonV1
-(
-  bool                             asJsonObject,
-  RequestType                      requestType,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             comma,
-  bool                             omitAttributeValues
-)
-{
-  std::string  out                              = "";
-  bool         contextAttributeVectorRendered   = attributeVector.size() != 0;
-
-  out += startTag(requestType != UpdateContext? "contextElement" : "");
-
-  // Filter and order attributes
-  std::vector<ContextAttribute*> orderedAttrs;
-  filterAndOrderAttrs(attrsFilter, blacklist, &orderedAttrs);
-
-  EntityId en(id, type, isPattern);
-  out += en.toJsonV1(contextAttributeVectorRendered, false);
-  out += attributeVector.toJsonV1(asJsonObject, requestType, orderedAttrs, metadataFilter, false, omitAttributeValues);
-
-  out += endTag(comma, false);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* Entity::toJsonV1 -
-*
-* Wrapper of toJsonV1 with empty attrsFilter and metadataFilter
-*
-*/
-std::string Entity::toJsonV1
-(
-  bool         asJsonObject,
-  RequestType  requestType,
-  bool         blacklist,
-  bool         comma,
-  bool         omitAttributeValues
-)
-{
-  std::vector<std::string> emptyV;
-  return toJsonV1(asJsonObject, requestType, emptyV, blacklist, emptyV, comma, omitAttributeValues);
 }
 
 

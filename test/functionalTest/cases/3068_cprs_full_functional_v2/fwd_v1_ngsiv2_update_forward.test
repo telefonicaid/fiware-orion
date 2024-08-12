@@ -35,6 +35,7 @@ accumulatorStart --pretty-print
 #
 # 01. Register ConferenceRoom on CB with accumulator as providing application
 # 02. Update ConferenceRoom in CB
+# 03. Check one forwarded requests in logs
 #
 
 echo "01. Register ConferenceRoom on CB with accumulator as providing application"
@@ -60,15 +61,53 @@ echo
 echo
 
 
+REG1_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
 echo "02. Update ConferenceRoom in CB"
 echo "==============================="
 payload='{
+  "lightstatus": {
+    "type": "StructuredValue",
+    "value": {
+      "x": 1,
+      "y": 2
+    }
+  },
+  "pressure": {
+    "type": "StructuredValue",
+    "value": ["a", "b", "c"]
+  },
  "temperature": {
-   "value": 4,
-   "type": "Number"
+   "value": 14,
+   "type": "Number",
+   "metadata": {
+    "ID1": {
+      "type": "Text",
+      "value": {
+        "x": 1,
+        "y": 2
+      }
+    },
+    "ID2": {
+      "type": "Text",
+      "value": ["a", "b", "c"]
+    },
+    "ID3": {
+      "type": "Text",
+      "value": "ThisIsID3"
+    }
+   }
   }
 }'
 orionCurl --url /v2/entities/ConferenceRoom/attrs?type=Room --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "03. Check one forwarded requests in logs"
+echo "========================================"
+cat /tmp/contextBroker.log | grep "Request forwarded" | awk -F 'msg=' '{print $2}' | sed "s/${REG1_ID}/REG1_ID/"
 echo
 echo
 
@@ -90,6 +129,11 @@ HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
+
+
+03. Check one forwarded requests in logs
+========================================
+Request forwarded (regId: REG1_ID): POST http://localhost:9997/cpr/updateContext, request payload (542 bytes): {"contextElements":[{"id":"ConferenceRoom","type":"Room","isPattern":"false","attributes":[{"name":"lightstatus","type":"StructuredValue","value":{"x":1,"y":2}},{"name":"pressure","type":"StructuredValue","value":["a","b","c"]},{"name":"temperature","type":"Number","value":14,"metadatas":[{"name":"ID1","type":"Text","value":{"type":"Text","value":{"x":1,"y":2}}},{"name":"ID2","type":"Text","value":{"type":"Text","value":["a","b","c"]}},{"name":"ID3","type":"Text","value":{"type":"Text","value":"ThisIsID3"}}]}]}],"updateAction":"UPDATE"}, response payload (3899 bytes): {
 
 
 --TEARDOWN--

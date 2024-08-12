@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "ngsi/Request.h"
 #include "ngsi/Reference.h"
@@ -94,22 +93,6 @@ void Reference::set(const std::string& value)
 std::string Reference::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* Reference::toJsonV1 -
-*/
-std::string Reference::toJsonV1(bool comma)
-{
-  if (string.empty())
-  {
-    return "";
-  }
-
-  return valueTag("reference", string, comma);
 }
 
 

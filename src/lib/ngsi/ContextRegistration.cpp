@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/ContextRegistration.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -45,30 +44,6 @@
 ContextRegistration::ContextRegistration()
 {
   entityIdVectorPresent = false;
-}
-
-/* ****************************************************************************
-*
-* ContextRegistration::toJsonV1 -
-*/
-std::string ContextRegistration::toJsonV1(bool comma, bool isInVector)
-{
-  std::string out = "";
-
-  //
-  // About JSON commas;
-  // As providingApplication is MANDATORY and it is the last item in ContextRegistration,
-  // the problem with the JSON commas disappear. All fields will have 'comma set to true'.
-  // All, except providingApplication of course :-)
-  //
-
-  out += startTag(!isInVector? "contextRegistration" : "");
-  out += entityIdVector.toJsonV1(true);
-  out += contextRegistrationAttributeVector.toJsonV1(true);
-  out += providingApplication.toJsonV1(false);
-  out += endTag(comma);
-
-  return out;
 }
 
 

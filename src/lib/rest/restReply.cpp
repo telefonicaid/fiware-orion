@@ -31,14 +31,10 @@
 #include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "ngsi9/RegisterContextResponse.h"
-
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/NotifyContextResponse.h"
 
 #include "rest/rest.h"

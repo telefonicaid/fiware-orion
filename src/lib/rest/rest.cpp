@@ -43,7 +43,6 @@
 #include "common/defaultValues.h"
 #include "common/clockFunctions.h"
 #include "common/statistics.h"
-#include "common/tag.h"
 #include "common/limits.h"                // SERVICE_NAME_MAX_LEN
 #include "common/logTracing.h"
 

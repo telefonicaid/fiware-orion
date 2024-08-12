@@ -30,35 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ConditionValueList.h"
-
-
-
-/* ****************************************************************************
-*
-* toJsonV1 -
-*/
-std::string ConditionValueList::toJsonV1(bool comma)
-{
-  std::string  out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("condValueList", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += valueTag("", vec[ix], ix != vec.size() - 1, true);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
-}
 
 
 

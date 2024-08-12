@@ -29,7 +29,6 @@
 
 #include "common/globals.h"
 #include "common/idCheck.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/RegistrationId.h"
 
@@ -102,30 +101,6 @@ void RegistrationId::set(const std::string& value)
 std::string RegistrationId::get(void) const
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* RegistrationId::toJsonV1 -
-*/
-std::string RegistrationId::toJsonV1(RequestType requestType, bool comma)
-{
-  if (string.empty())
-  {
-    if (requestType == RegisterResponse)  // registrationId is MANDATORY for RegisterContextResponse
-    {
-      string = "000000000000000000000000";
-      LM_T(LmtOldInfo, ("No registrationId - setting the registrationId to 24 zeroes"));
-    }
-    else
-    {
-      return "";
-    }
-  }
-
-  return valueTag("registrationId", string, comma);
 }
 
 

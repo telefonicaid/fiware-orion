@@ -37,14 +37,12 @@ struct ConnectionInfo;
 */
 typedef enum RequestType
 {
-  NoRequest,
-  RegisterContext = 1,
+  NoRequest = 0,
   DiscoverContextAvailability,
 
   QueryContext = 11,
   RtQueryContextResponse,
   SubscribeContext,
-  UpdateContextSubscription,
   UnsubscribeContext,
   RtUnsubscribeContextResponse,
   NotifyContext,
@@ -83,7 +81,6 @@ typedef enum RequestType
 
   LeakRequest,
   StatisticsRequest,
-  RegisterResponse,
   RtSubscribeResponse,
   RtSubscribeError,
 

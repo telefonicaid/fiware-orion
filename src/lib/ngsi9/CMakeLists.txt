@@ -21,17 +21,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET (SOURCES
-    RegisterContextRequest.cpp
-    RegisterContextResponse.cpp
     DiscoverContextAvailabilityRequest.cpp
-    DiscoverContextAvailabilityResponse.cpp
 )
 
 SET (HEADERS
     DiscoverContextAvailabilityRequest.h
-    DiscoverContextAvailabilityResponse.h
-    RegisterContextRequest.h
-    RegisterContextResponse.h
 )
 
 

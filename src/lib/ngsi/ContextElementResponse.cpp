@@ -27,7 +27,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
@@ -147,60 +146,6 @@ ContextElementResponse::ContextElementResponse
 ContextElementResponse::ContextElementResponse(Entity* eP, bool useDefaultType)
 {
   entity.fill(*eP, useDefaultType);
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponse::toJsonV1 -
-*/
-std::string ContextElementResponse::toJsonV1
-(
-  bool                             asJsonObject,
-  RequestType                      requestType,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             comma,
-  bool                             omitAttributeValues
-)
-{
-  std::string out = "";
-
-  out += startTag();
-  out += entity.toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, true, omitAttributeValues);
-  out += statusCode.toJsonV1(false);
-  out += endTag(comma, false);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponse::toJsonV1 -
-*
-* Wrapper of toJsonV1 with empty attrsFilter and metadataFilter
-*/
-std::string ContextElementResponse::toJsonV1
-(
-  bool         asJsonObject,
-  RequestType  requestType,
-  bool         blacklist,
-  bool         comma,
-  bool         omitAttributeValues
-)
-{
-  std::string out = "";
-
-  out += startTag();
-  out += entity.toJsonV1(asJsonObject, requestType, blacklist, true, omitAttributeValues);
-  out += statusCode.toJsonV1(false);
-  out += endTag(comma, false);
-
-  return out;
 }
 
 

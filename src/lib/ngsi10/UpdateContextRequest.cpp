@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttribute.h"
@@ -83,47 +82,108 @@ std::string UpdateContextRequest::toJson(void)
 /* ****************************************************************************
 *
 * UpdateContextRequest::toJsonV1 -
+*
+* This is used only in the legacyForwarding:true logic. It would remove once that deprecated feature
+* would be removed
+*
+* Example:
+*
+* {
+*   "contextElements": [
+*     {
+*       "type": "Room",
+*       "isPattern": "false",
+*       "id": "ConferenceRoom",
+*       "attributes": [
+*       {
+*         "name": "temperature",
+*         "type": "degree",
+*         "value": "c23",
+*         "metadatas": [
+*           {
+*             "name": "ID",
+*             "type": "integer",
+*             "value": "3"
+*           }
+*         ]
+*       }
+*      ]
+*    }
+*  ],
+*  "updateAction": "APPEND"
+* }
 */
 std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
 {
-  std::string  out = "";
+  JsonObjectHelper jh;
 
-  //
-  // About JSON commas:
-  //   Both fields are MANDATORY, so, always comma after "entityVector"
-  //
-  out += startTag();
-  out += entityVector.toJsonV1(asJsonObject, UpdateContext, true);
-  out += valueTag("updateAction", actionTypeString(updateActionType), false);
-  out += endTag(false);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::check -
-*/
-std::string UpdateContextRequest::check(bool asJsonObject, const std::string& predetectedError)
-{
-  std::string            res;
-  UpdateContextResponse  response;
-
-  if (!predetectedError.empty())
+  JsonVectorHelper jhContextElements;
+  for (unsigned int ix = 0; ix < entityVector.size(); ++ix)
   {
-    response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.toJsonV1(asJsonObject);
+    JsonObjectHelper jhEntity;
+    Entity* eP = entityVector[ix];
+
+    jhEntity.addString("id", eP->id);
+    jhEntity.addString("type", eP->type);
+    jhEntity.addString("isPattern", eP->isPattern);
+
+    JsonVectorHelper jhAttributes;
+    for (unsigned int jx = 0; jx < eP->attributeVector.size(); ++jx)
+    {
+      JsonObjectHelper jhAttribute;
+      ContextAttribute* caP = eP->attributeVector[jx];
+
+      jhAttribute.addString("name", caP->name);
+      jhAttribute.addString("type", caP->type);
+      jhAttribute.addRaw("value", caP->toJsonValue());
+
+      if (caP->metadataVector.size() > 0)
+      {
+        JsonVectorHelper jhMetadatas;
+        for (unsigned int kx = 0; kx < caP->metadataVector.size(); ++kx)
+        {
+          JsonObjectHelper jhMetadata;
+          Metadata *mdP = caP->metadataVector[kx];
+
+          jhMetadata.addString("name", mdP->name);
+          jhMetadata.addString("type", mdP->type);
+          jhMetadata.addRaw("value", mdP->toJson());
+
+          jhMetadatas.addRaw(jhMetadata.str());
+        }
+        jhAttribute.addRaw("metadatas", jhMetadatas.str());
+      }
+
+      jhAttributes.addRaw(jhAttribute.str());
+    }
+    jhEntity.addRaw("attributes", jhAttributes.str());
+
+    jhContextElements.addRaw(jhEntity.str());
+  }
+  jh.addRaw("contextElements", jhContextElements.str());
+
+  switch (updateActionType)
+  {
+  case ActionTypeUpdate:
+    jh.addString("updateAction", "UPDATE");
+    break;
+  case ActionTypeAppend:
+    jh.addString("updateAction", "APPEND");
+    break;
+  case ActionTypeAppendStrict:
+    jh.addString("updateAction", "APPEND_STRICT");
+    break;
+  case ActionTypeDelete:
+    jh.addString("updateAction", "DELETE");
+    break;
+  case ActionTypeReplace:
+    jh.addString("updateAction", "REPLACE");
+    break;
+  default:
+    jh.addString("updateAction", "UNKNOWN");
   }
 
-  if ((res = entityVector.check(UpdateContext)) != "OK")
-  {
-    response.errorCode.fill(SccBadRequest, res);
-    return response.toJsonV1(asJsonObject);
-  }
-
-  return "OK";
+  return jh.str();
 }
 
 

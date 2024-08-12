@@ -30,7 +30,6 @@
 
 #include "common/globals.h"
 #include "common/limits.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
@@ -230,55 +229,6 @@ Metadata::Metadata(const std::string& _name, const orion::BSONObj& mdB)
     LM_E(("Runtime Error (unknown metadata value type in DB: %d, using ValueTypeNotGiven)", getFieldF(mdB, ENT_ATTRS_MD_VALUE).type()));
     break;
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* Metadata::toJsonV1 -
-*/
-std::string Metadata::toJsonV1(bool comma)
-{
-  std::string out     = "";
-  std::string xValue  = toStringValue();
-
-  out += startTag();
-  out += valueTag("name", name, true);
-  out += valueTag("type", type, true);
-
-  if (compoundValueP != NULL)
-  {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson();
-  }
-  else if (valueType == orion::ValueTypeString)
-  {
-    out += valueTag("value", xValue, false);
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    out += JSON_STR("value") + ":" + xValue;
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    out += JSON_STR("value") + ":" + xValue;
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    out += JSON_STR("value") + ":" + xValue;
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {    
-    out += JSON_STR("value") + ":" + JSON_STR("not given");
-  }
-  else
-  {
-    out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
-  }
-
-  out += endTag(comma);
-
-  return out;
 }
 
 

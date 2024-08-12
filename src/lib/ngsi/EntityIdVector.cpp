@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/EntityVector.h"
@@ -54,32 +53,6 @@ std::string EntityIdVector::toJson(void)
   }
 
   return jh.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityIdVector::toJsonV1 -
-*/
-std::string EntityIdVector::toJsonV1(bool comma)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("entities", true);
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
 }
 
 

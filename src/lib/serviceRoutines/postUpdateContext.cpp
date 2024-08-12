@@ -115,6 +115,7 @@ static bool updateForward
   int              port;
   std::string      prefix;
 
+  // FIXME PR: not really needed...
   bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
 
   //

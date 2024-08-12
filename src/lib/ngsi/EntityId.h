@@ -65,7 +65,6 @@ class EntityId
   bool         isPatternIsTrue(void);
 
   std::string  toJson(void);
-  std::string  toJsonV1(bool comma, bool isInVector = false);
 
   std::string  check(RequestType  requestType);
 

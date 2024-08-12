@@ -32,7 +32,6 @@
 
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "common/limits.h"
 #include "ngsi/Request.h"
@@ -80,46 +79,6 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
   reasonPhrase  = httpStatusCodeString(code);
   details       = _details;
   keyName       = _keyName;
-}
-
-
-
-/* ****************************************************************************
-*
-* StatusCode::toJsonV1 -
-*/
-std::string StatusCode::toJsonV1(bool comma, bool showKey)
-{
-  std::string  out  = "";
-
-  if (strstr(details.c_str(), "\"") != NULL)
-  {
-    int    len  = details.length() * 2;
-    char*  s    = (char*) calloc(1, len + 1);
-
-    strReplace(s, len, details.c_str(), "\"", "\\\"");
-    details = s;
-    free(s);
-  }
-
-  if (code == SccNone)
-  {
-    fill(SccReceiverInternalError, "");
-    details += " - ZERO code set to 500";
-  }
-
-  out += startTag(showKey? keyName : "");
-  out += valueTag("code", code, true);
-  out += valueTag("reasonPhrase", reasonPhrase, !details.empty());
-
-  if (!details.empty())
-  {
-    out += valueTag("details", details, false);
-  }
-
-  out += endTag(comma);
-
-  return out;
 }
 
 

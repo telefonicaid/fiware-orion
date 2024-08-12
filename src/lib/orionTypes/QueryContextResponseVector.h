@@ -43,7 +43,6 @@ typedef struct QueryContextResponseVector
   unsigned int           size(void);
   void                   push_back(QueryContextResponse* item);
   void                   release(void);
-  std::string            toJsonV1(bool asJsonObject, bool details, const std::string& detailsString);
   void                   populate(QueryContextResponse* responseP);
 
   QueryContextResponse*  operator[](unsigned int ix) const;

@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/tag.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi/Request.h"
@@ -38,31 +37,6 @@
 ContextRegistrationResponse::ContextRegistrationResponse()
 {
   errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationResponse::toJsonV1 -
-*/
-std::string ContextRegistrationResponse::toJsonV1(bool comma)
-{
-  std::string  out               = "";
-  bool         errorCodeRendered = errorCode.code != SccNone;
-
-  out += startTag();
-
-  out += contextRegistration.toJsonV1(errorCodeRendered, false);
-
-  if (errorCodeRendered)
-  {
-    out += errorCode.toJsonV1(false);
-  }
-
-  out += endTag(comma);
-
-  return out;
 }
 
 

@@ -32,51 +32,19 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/Metadata.h"
-#include "ngsi9/RegisterContextRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "apiTypesV2/Entity.h"
 #include "apiTypesV2/BatchQuery.h"
 #include "apiTypesV2/BatchUpdate.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "apiTypesV2/Registration.h"
-
-
-
-/* ****************************************************************************
-*
-* RegisterContextData - output data and help pointers for RegisterContextRequest
-*/
-struct RegisterContextData
-{
-  RegisterContextData(): crP(NULL), entityIdP(NULL), attributeP(NULL), attributeMetadataP(NULL), registrationMetadataP(NULL) {}
-  RegisterContextRequest         res;
-  ContextRegistration*           crP;
-  EntityId*                      entityIdP;
-  ContextRegistrationAttribute*  attributeP;
-  Metadata*                      attributeMetadataP;
-  Metadata*                      registrationMetadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* RegisterContextResponseData - output data and help pointers for RegisterContextRequest
-*/
-typedef struct RegisterContextResponseData
-{
-  RegisterContextResponse        res;
-} RegisterContextResponseData;
 
 
 
@@ -91,17 +59,6 @@ struct DiscoverContextAvailabilityData
   EntityId*                           entityIdP;
   Scope*                              scopeP;
 };
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityResponseData -
-*/
-typedef struct DiscoverContextAvailabilityResponseData
-{
-  DiscoverContextAvailabilityResponse  res;
-} DiscoverContextAvailabilityResponseData;
 
 
 
@@ -220,7 +177,6 @@ struct UpdateContextResponseData
 struct UpdateContextSubscriptionData
 {
   UpdateContextSubscriptionData(): notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
-  UpdateContextSubscriptionRequest  res;
   NotifyCondition*                  notifyConditionP;
   Scope*                            scopeP;
   orion::Point*                     vertexP;
@@ -294,7 +250,6 @@ typedef struct ParseData
 
   std::string                                 errorString;
   ContextAttribute*                           lastContextAttribute;
-  RegisterContextData                         rcr;
   DiscoverContextAvailabilityData             dcar;
 
   QueryContextData                            qcr;
@@ -304,8 +259,6 @@ typedef struct ParseData
   UpdateContextSubscriptionData               ucsr;
   NotifyContextData                           ncr;
 
-  RegisterContextResponseData                 rcrs;
-  DiscoverContextAvailabilityResponseData     dcars;
   QueryContextResponseData                    qcrs;
   UpdateContextResponseData                   upcrs;
 

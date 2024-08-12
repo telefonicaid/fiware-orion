@@ -30,33 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/ContextRegistrationAttributeVector.h"
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttributeVector::toJsonV1 -
-*/
-std::string ContextRegistrationAttributeVector::toJsonV1(bool comma)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("attributes", true);
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(ix != vec.size() - 1);
-  }
-  out += endTag(comma, true);
-
-  return out;
-}
 
 
 

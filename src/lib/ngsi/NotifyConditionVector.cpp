@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/NotifyConditionVector.h"
 
 
@@ -41,31 +40,6 @@
 */
 NotifyConditionVector::NotifyConditionVector()
 {
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyConditionVector::toJsonV1 -
-*/
-std::string NotifyConditionVector::toJsonV1(bool comma)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("notifyConditions", true);
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(ix != vec.size() - 1);
-  }
-  out += endTag(comma, true);
-
-  return out;
 }
 
 

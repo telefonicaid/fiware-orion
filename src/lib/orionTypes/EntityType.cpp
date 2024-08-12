@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
 
-#include "common/tag.h"
 #include "common/limits.h"
 #include "common/JsonHelper.h"
 #include "ngsi/Request.h"
@@ -55,57 +54,6 @@ EntityType::EntityType(): count(0)
 EntityType::EntityType(std::string _type): type(_type), count(0)
 {
 
-}
-
-
-/* ****************************************************************************
-*
-* EntityType::toJsonV1 -
-*
-* This method is used by:
-*   o EntityTypeVector
-*   o EntityTypeResponse
-*
-* 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
-*/
-std::string EntityType::toJsonV1
-(
-  bool        asJsonObject,
-  bool        asJsonOut,
-  bool        collapsed,
-  bool        comma,
-  bool        typeNameBefore
-)
-{
-  std::string  out = "";
-
-  // No metadata filter in this case, an empty vector is used to fulfil method signature.
-  // For attribute filter, we use the ContextAttributeVector itself
-  std::vector<std::string> emptyMdV;
-
-  if (typeNameBefore && asJsonOut)
-  {
-    out += valueTag("name", type, true);
-    out += contextAttributeVector.toJsonV1(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, true, true, true);
-  }
-  else
-  {
-    out += startTag();
-
-    if (collapsed || contextAttributeVector.size() == 0)
-    {
-      out += valueTag("name", type, false);
-    }
-    else
-    {
-      out += valueTag("name", type, true);
-      out += contextAttributeVector.toJsonV1(asJsonObject, EntityTypes, contextAttributeVector.vec, emptyMdV, false, true, true);
-    }
-
-    out += endTag(comma, false);
-  }
-
-  return out;
 }
 
 

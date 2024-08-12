@@ -30,82 +30,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "common/JsonHelper.h"
 #include "ngsi/ContextElementResponseVector.h"
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::toJsonV1 -
-*/
-std::string ContextElementResponseVector::toJsonV1
-(
-  bool                             asJsonObject,
-  RequestType                      requestType,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             comma,
-  bool                             omitAttributeValues
-)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("contextResponses", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, ix < (vec.size() - 1), omitAttributeValues);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::toJsonV1 -
-*
-* Wrapper of toJsonV1 with empty attrsFilter and metadataFilter
-*/
-std::string ContextElementResponseVector::toJsonV1
-(
-  bool         asJsonObject,
-  RequestType  requestType,
-  bool         blacklist,
-  bool         comma,
-  bool         omitAttributeValues
-)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("contextResponses", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(asJsonObject, requestType, blacklist, ix < (vec.size() - 1), omitAttributeValues);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
-}
 
 
 

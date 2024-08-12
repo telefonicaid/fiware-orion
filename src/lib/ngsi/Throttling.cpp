@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/Throttling.h"
 
@@ -98,20 +97,4 @@ void Throttling::set(const std::string& value)
 const std::string Throttling::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* Throttling::toJsonV1 -
-*/
-std::string Throttling::toJsonV1(bool comma)
-{
-  if (string.empty())
-  {
-    return "";
-  }
-
-  return valueTag("throttling", string, comma);
 }

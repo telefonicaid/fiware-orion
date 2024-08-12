@@ -32,7 +32,6 @@
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "ngsi/EntityId.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 
 
@@ -109,42 +108,6 @@ std::string EntityId::toJson(void)
 
 /* ****************************************************************************
 *
-* EntityId::toJsonV1 -
-*
-*/
-std::string EntityId::toJsonV1(bool comma, bool isInVector)
-{
-  std::string  out              = "";
-  char*        isPatternEscaped = htmlEscape(isPattern.c_str());
-  char*        typeEscaped      = htmlEscape(type.c_str());
-  char*        idEscaped        = htmlEscape(id.c_str());
-
-  out += (isInVector? "{" : "");
-  out = out + "\"type\":\""      + typeEscaped      + "\",";
-  out = out + "\"isPattern\":\"" + isPatternEscaped + "\",";
-  out = out + "\"id\":\""        + idEscaped        + "\"";
-
-  if ((comma == true) && (isInVector == false))
-  {
-    out += ",";
-  }
-  else
-  {
-    out += (isInVector? "}" : "");
-    out += (comma == true)? "," : "";
-  }
-
-  free(typeEscaped);
-  free(idEscaped);
-  free(isPatternEscaped);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityId::toJson - 
 */
 std::string EntityId::toJson(void) const
@@ -179,11 +142,6 @@ std::string EntityId::check(RequestType requestType)
   if (!isTrue(isPattern) && !isFalse(isPattern) && !isPattern.empty())
   {
     return std::string("invalid isPattern value for entity: /") + isPattern + "/";
-  }
-
-  if ((requestType == RegisterContext) && (isTrue(isPattern)))
-  {
-    return "isPattern set to true for registrations is currently not supported";
   }
 
   if (isTrue(isPattern))

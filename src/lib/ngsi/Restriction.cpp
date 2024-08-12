@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/Restriction.h"
@@ -67,31 +66,6 @@ std::string Restriction::check(int counter)
 
   LM_T(LmtRestriction, ("Restriction::check returns OK (2)"));
   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* Restriction::toJsonV1 -
-*/
-std::string Restriction::toJsonV1(int restrictions, bool comma)
-{
-  std::string  tag = "restriction";
-  std::string  out = "";
-  bool         scopeVectorRendered = scopeVector.size() != 0;
-
-  if (restrictions == 0)
-  {
-    return "";
-  }
-
-  out += startTag(tag);
-  out += attributeExpression.toJsonV1(scopeVectorRendered);
-  out += scopeVector.toJsonV1(false);
-  out += endTag(comma);
-
-  return out;
 }
 
 

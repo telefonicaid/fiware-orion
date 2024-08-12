@@ -544,6 +544,24 @@ def cpr_simulation():
                             "code": "200",
                             "reasonPhrase": "OK"
                         }
+                    },
+                    {
+                        "contextElement": {
+                            "attributes": [
+                                {
+                                    "name": "pressure",
+                                    "type": "degree",
+                                    "value": "14"
+                                }
+                            ],
+                            "id": "ConferenceRoom3",
+                            "isPattern": "false",
+                            "type": "Room"
+                        },
+                        "statusCode": {
+                            "code": "200",
+                            "reasonPhrase": "OK"
+                        }
                     }
                 ]
             }

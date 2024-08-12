@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/JsonHelper.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
@@ -113,52 +112,52 @@ std::string QueryContextRequest::toJson(void)
 /* ****************************************************************************
 *
 * QueryContextRequest::toJsonV1 -
+*
+* This is used only in the legacyForwarding:true logic. It would remove once that deprecated feature
+* would be removed.
+*
+* Example:
+* {
+*   "entities": [
+*     {
+*       "type": "Room",
+*       "isPattern": "true",
+*       "id": "ConferenceRoom.*"
+*     }
+*   ],
+*   "attributes": [
+*     "temperature",
+*     "pressure",
+*     "lightstatus"
+*   ]
+}
 */
 std::string QueryContextRequest::toJsonV1(void)
 {
-  std::string   out                      = "";
-  bool          attributeListRendered    = attributeList.size() != 0;
-  bool          restrictionRendered      = restrictions != 0;
-  bool          commaAfterAttributeList  = restrictionRendered;
-  bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
+  // Diferent from original toJsonV1() we don't render restriction field (as it is not needed in the forwarding functionality)
 
-  out += startTag();
-  out += entityIdVector.toJsonV1(commaAfterEntityIdVector);
-  out += attributeList.toJsonV1(commaAfterAttributeList, "attributes");
-  out += restriction.toJsonV1(restrictions, false);
-  out += endTag();
+  JsonObjectHelper jh;
 
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextRequest::check -
-*/
-std::string QueryContextRequest::check(bool asJsonObject, const std::string& predetectedError)
-{
-  std::string           res;
-  QueryContextResponse  response;
-
-  if (!predetectedError.empty())
+  JsonVectorHelper jhEntities;
+  for (unsigned int ix = 0; ix < entityIdVector.size(); ++ix)
   {
-    response.errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if (((res = entityIdVector.check(QueryContext)) != "OK") ||
-           ((res = attributeList.check())              != "OK") ||
-           ((res = restriction.check(restrictions))    != "OK"))
-  {
-    alarmMgr.badInput(clientIp, res);
-    response.errorCode.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
+    JsonObjectHelper jhEntity;
+    jhEntity.addString("id", entityIdVector[ix]->id);
+    jhEntity.addString("type", entityIdVector[ix]->type);
+    jhEntity.addString("isPattern", entityIdVector[ix]->isPattern);
 
-  return response.toJsonV1(asJsonObject);
+    jhEntities.addRaw(jhEntity.str());
+  }
+  jh.addRaw("entities", jhEntities.str());
+
+  JsonVectorHelper jhAttributes;
+  for (unsigned int ix = 0; ix < attributeList.size(); ++ix)
+  {
+    jhAttributes.addString(attributeList[ix]);
+  }
+  jh.addRaw("attributes", jhAttributes.str());
+
+  return jh.str();
 }
 
 

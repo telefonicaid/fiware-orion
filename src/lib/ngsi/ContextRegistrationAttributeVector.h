@@ -40,7 +40,6 @@ typedef struct ContextRegistrationAttributeVector
 {
   std::vector<ContextRegistrationAttribute*>  vec;
 
-  std::string                      toJsonV1(bool comma);
   void                             push_back(ContextRegistrationAttribute* item);
   unsigned int                     size(void);
   void                             release();

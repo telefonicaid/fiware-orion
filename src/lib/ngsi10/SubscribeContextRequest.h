@@ -60,7 +60,6 @@ typedef struct SubscribeContextRequest
 
   SubscribeContextRequest(): restrictions(0) {}
 
-  std::string  check(const std::string& predetectedError, int counter);
   void         release(void);
 
   void         fill(EntityTypeInfo typeInfo);

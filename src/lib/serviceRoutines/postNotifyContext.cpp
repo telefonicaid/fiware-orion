@@ -62,7 +62,9 @@ std::string postNotifyContext
                                                        ciP->servicePathV,
                                                        ciP->httpHeaders.correlator,
                                                        ciP->httpHeaders.ngsiv2AttrsFormat));
-  TIMED_RENDER(answer = ncr.toJsonV1());
+  
+  //FIXME PR: this should be toJSON()
+  //TIMED_RENDER(answer = ncr.toJsonV1());
 
   return answer;
 }

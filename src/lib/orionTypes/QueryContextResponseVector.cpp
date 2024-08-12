@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "ngsi/Request.h"
 
@@ -80,127 +79,6 @@ void QueryContextResponseVector::release(void)
   }
 
   vec.clear();
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponseVector::toJsonV1 -
-*/
-std::string QueryContextResponseVector::toJsonV1(bool asJsonObject, bool details, const std::string& detailsString)
-{
-  QueryContextResponse* responseP = new QueryContextResponse();
-  std::string           answer;
-
-  //
-  // Here we have a vector of QueryContextResponse.
-  // What we need is ONE QueryContextResponse, so, we'll take all the
-  // contextElementResponses from each of the QueryContextResponses in the vector and
-  // move them to ONE QueryContextResponse (responseP)
-  //
-  // [ This might give me some problems with freeing the memory afterwards ...]
-  //
-
-
-  if (vec.size() == 0)
-  {
-    //
-    // Special case: vector is empty: translate to 404
-    //
-    if ((responseP->errorCode.code == SccOk) || (responseP->errorCode.code == SccNone))
-    {
-      responseP->errorCode.fill(SccContextElementNotFound);
-    }
-  }
-  else if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))
-  {
-    //
-    // Special case: only one QueryContextResponse in vec, and it has 0 contextElementResponses
-    // This is clearly a Not Found ...
-    //
-    if ((responseP->errorCode.code == SccOk) || (responseP->errorCode.code == SccNone))
-    {
-      responseP->errorCode.fill(SccContextElementNotFound);
-    }
-
-    if ((vec[0]->errorCode.code == SccOk) ||(vec[0]->errorCode.code == SccNone))
-    {
-      vec[0]->errorCode.fill(SccContextElementNotFound);
-    }
-
-    //
-    // Also, if same errorCode.code but no details ...
-    //
-    if ((responseP->errorCode.code == vec[0]->errorCode.code) && (responseP->errorCode.details.empty()))
-    {
-      responseP->errorCode.details = vec[0]->errorCode.details;
-    }
-  }
-  else
-  {
-    //
-    // We have found something, so, all good
-    //
-    responseP->errorCode.fill(SccOk);
-  }
-
-  if (details)
-  {
-    responseP->errorCode.fill(SccOk, detailsString);
-  }
-
-  for (unsigned int qIx = 0; qIx < vec.size(); ++qIx)
-  {
-    //
-    // If the response vector is empty and the errorCode also, then a 404 Not Found
-    // is inserted.
-    //
-    if (vec[qIx]->contextElementResponseVector.size() == 0)
-    {
-      if ((vec[qIx]->errorCode.code == SccOk) || (vec[qIx]->errorCode.code == SccNone))
-      {
-        ContextElementResponse* cerP = new ContextElementResponse();
-
-        cerP->statusCode.fill(SccContextElementNotFound);
-        responseP->contextElementResponseVector.push_back(cerP);
-      }
-    }
-
-    for (unsigned int cerIx = 0; cerIx < vec[qIx]->contextElementResponseVector.size(); ++cerIx)
-    {
-      ContextElementResponse* cerP = vec[qIx]->contextElementResponseVector[cerIx];
-
-      if ((cerP->statusCode.code != SccOk) && (cerP->statusCode.code != SccNone))  // Error - not to be added to output
-      {
-        continue;
-      }
-
-      //
-      // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
-      // If so, we just add the attributes of cerP to that contextElementResponse
-      //
-      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->entity);
-
-      if (targetCerP != NULL)
-      {
-        targetCerP->entity.attributeVector.push_back(cerP->entity.attributeVector, true);
-      }
-      else  // Not found so we will have to create a new ContextElementResponse
-      {
-        ContextElementResponse* newCerP = new ContextElementResponse(cerP, true);
-
-        newCerP->statusCode.fill(SccOk);
-        responseP->contextElementResponseVector.push_back(newCerP);
-      }
-    }
-  }
-
-  answer = responseP->toJsonV1(asJsonObject);
-  responseP->release();
-  delete responseP;
-
-  return answer;
 }
 
 

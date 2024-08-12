@@ -42,7 +42,6 @@ typedef struct AttributeExpression
   void                set(const std::string& value);
   std::string         get(void);
   bool                isEmpty(void);
-  std::string         toJsonV1(bool comma);
   const char*         c_str();
   void                release(void);
 

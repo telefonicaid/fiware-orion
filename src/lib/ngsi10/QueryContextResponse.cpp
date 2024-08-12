@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 
 #include "common/string.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
@@ -86,100 +85,6 @@ QueryContextResponse::~QueryContextResponse()
 {
   errorCode.release();
   contextElementResponseVector.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::toJsonV1 -
-*/
-std::string QueryContextResponse::toJsonV1(bool asJsonObject)
-{
-  std::string  out               = "";
-  bool         errorCodeRendered = false;
-
-  //
-  // 01. Decide whether errorCode should be rendered
-  //
-  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
-  {
-    errorCodeRendered = true;
-  }
-  else if (contextElementResponseVector.size() == 0)
-  {
-    errorCodeRendered = true;
-  }
-  else if (!errorCode.details.empty())
-  {
-    if (errorCode.code == SccNone)
-    {
-      errorCode.code = SccOk;
-    }
-
-    errorCodeRendered = true;
-  }
-
-
-  //
-  // 02. render
-  //
-  out += startTag();
-
-  if (contextElementResponseVector.size() > 0)
-  {
-    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, false, errorCodeRendered);
-  }
-
-  if (errorCodeRendered == true)
-  {
-    out += errorCode.toJsonV1(false);
-  }
-
-
-  //
-  // 03. Safety Check
-  //
-  // If neither errorCode nor CER vector was filled by mongoBackend, then we
-  // report a special kind of error.
-  //
-  if ((errorCode.code == SccNone) && (contextElementResponseVector.size() == 0))
-  {
-    LM_E(("Runtime Error (Both error-code and response vector empty)"));
-    errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.toJsonV1(false);
-  }
-
-  out += endTag();
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::check -
-*/
-std::string QueryContextResponse::check(bool asJsonObject, const std::string& predetectedError)
-{
-  std::string  res;
-
-  if (!predetectedError.empty())
-  {
-    errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if ((res = contextElementResponseVector.check(QueryContext, predetectedError, 0)) != "OK")
-  {
-    alarmMgr.badInput(clientIp, res);
-    errorCode.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
-
-  return toJsonV1(asJsonObject);
 }
 
 

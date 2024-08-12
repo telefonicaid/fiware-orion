@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <string>
 
-#include "common/tag.h"
+#include "common/string.h"
 #include "common/JsonHelper.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/StatusCode.h"

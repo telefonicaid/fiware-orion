@@ -89,7 +89,6 @@ typedef struct Metadata
   Metadata(const std::string& _name, const orion::BSONObj& mdB);
   ~Metadata();
 
-  std::string  toJsonV1(bool comma);
   std::string  toJson(void);
   void         release(void);
   void         fill(const struct Metadata& md);

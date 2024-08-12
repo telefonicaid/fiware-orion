@@ -191,7 +191,7 @@ static bool queryForward
     {
       LM_W(("Deprecated usage of legacyForwarding mode in query forwarding operation (regId: %s)", regId.c_str()));
     }
-
+    
     TIMED_RENDER(payload = qcrP->toJsonV1());
   }
   else

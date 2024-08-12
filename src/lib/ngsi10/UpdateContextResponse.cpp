@@ -30,7 +30,6 @@
 
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ContextElementResponse.h"
@@ -72,71 +71,6 @@ UpdateContextResponse::~UpdateContextResponse()
   errorCode.release();
   contextElementResponseVector.release();
   LM_T(LmtDestructor, ("destroyed"));
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextResponse::toJsonV1 -
-*/
-std::string UpdateContextResponse::toJsonV1(bool asJsonObject)
-{
-  std::string out = "";
-
-  out += startTag();
-
-  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
-  {
-    out += errorCode.toJsonV1(false);
-  }
-  else
-  {
-    if (contextElementResponseVector.size() == 0)
-    {
-      errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.toJsonV1(false);
-    }
-    else
-    {      
-      out += contextElementResponseVector.toJsonV1(asJsonObject, RtUpdateContextResponse, false, false);
-    }
-  }
-  
-  out += endTag();
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextResponse::check -
-*/
-std::string UpdateContextResponse::check
-(
-  bool                asJsonObject,
-  const std::string&  predetectedError
-)
-{
-  std::string  res;
-
-  if (!predetectedError.empty())
-  {
-    errorCode.fill(SccBadRequest, predetectedError);
-  }  
-  else if (contextElementResponseVector.check(UpdateContext, predetectedError, 0) != "OK")
-  {
-    alarmMgr.badInput(clientIp, res);
-    errorCode.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
-
-  return toJsonV1(asJsonObject);
 }
 
 

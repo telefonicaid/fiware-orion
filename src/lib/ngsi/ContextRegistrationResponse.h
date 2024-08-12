@@ -47,7 +47,6 @@ typedef struct ContextRegistrationResponse
 
   ContextRegistrationResponse();
 
-  std::string  toJsonV1(bool comma);
   void         release(void);
 
   std::string  check(RequestType         requestType,

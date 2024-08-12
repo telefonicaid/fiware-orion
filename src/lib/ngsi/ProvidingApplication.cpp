@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 
@@ -136,22 +135,6 @@ std::string ProvidingApplication::getRegId(void)
 std::string ProvidingApplication::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* ProvidingApplication::toJsonV1 -
-*/
-std::string ProvidingApplication::toJsonV1(bool comma)
-{
-  if (string.empty())
-  {
-    return "";
-  }
-
-  return valueTag("providingApplication", string, comma);
 }
 
 

@@ -49,7 +49,6 @@ typedef struct UnsubscribeContextResponse
   UnsubscribeContextResponse(StatusCode& statusCode);
   ~UnsubscribeContextResponse();
 
-  std::string     toJsonV1(void);
   void            release(void);
 } UnsubscribeContextResponse;
 
