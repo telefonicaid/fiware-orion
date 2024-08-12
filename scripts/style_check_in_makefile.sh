@@ -59,7 +59,6 @@ style_check src/lib/alarmMgr
 style_check src/lib/metricsMgr
 style_check test/unittests
 style_check test/unittests/orionTypes
-style_check test/unittests/jsonParse
 style_check test/unittests/apiTypesV2
 style_check test/unittests/cache
 style_check test/unittests/mongoBackend
@@ -74,7 +73,6 @@ style_check test/unittests/serviceRoutines
 # style_check src/lib/rest (3 files)
 # style_check src/lib/common (6 files)
 # style_check src/lib/orionTypes (9 files)
-# style_check src/lib/convenience (17 files)
 # style_check src/lib/jsonParse (19 files)
 # style_check src/lib/ngsi10 (24 files)
 # style_check src/lib/ngsi9 (24 files)
@@ -83,7 +81,6 @@ style_check test/unittests/serviceRoutines
 
 # style_check test/unittests/common (1 file)
 # style_check test/unittests/parse (2 files)
-# style_check test/unittests/convenience (8 files)
 # style_check test/unittests/ngsi10 (9 files)
 # style_check test/unittests/ngsi9 (10 files)
 # style_check test/unittests/ngsi (32 files)
