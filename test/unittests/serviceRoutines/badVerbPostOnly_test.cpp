@@ -38,8 +38,8 @@
 */
 static RestService badVerbV[] =
 {
-  { RegisterContext, 2, { "ngsi9",  "registerContext" }, badVerbPostOnly },
-  { InvalidRequest,  0, {                             }, NULL            }
+  { BatchUpdateRequest,  3, { "v2", "op", "update"    }, badVerbPostOnly },
+  { InvalidRequest,      0, {                         }, NULL            }
 };
 
 
@@ -50,10 +50,10 @@ static RestService badVerbV[] =
 */
 TEST(badVerbPostOnly, ok)
 {
-  ConnectionInfo ci("/ngsi9/registerContext",  "PUT", "1.1");
+  ConnectionInfo ci("/v2/op/update",  "PUT", "1.1");
   std::string     expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   std::string     out;
-  RestService     restService = { RegisterContext, 2, { "ngsi9", "registerContext" }, NULL };
+  RestService     restService = { BatchUpdateRequest,  3, { "v2", "op", "update"    }, NULL };
 
   ci.restServiceP = &restService;
 

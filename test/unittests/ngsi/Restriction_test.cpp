@@ -60,19 +60,3 @@ TEST(Restriction, check)
   checked = restriction.check(1);
   EXPECT_EQ(expected3, checked);
 }
-
-
-
-/* ****************************************************************************
-*
-* render - 
-*/
-TEST(Restriction, render)
-{
-  Restriction  restriction;
-  std::string  rendered;
-  std::string  expected = "";
-
-  rendered = restriction.toJsonV1(0, false);
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
-}

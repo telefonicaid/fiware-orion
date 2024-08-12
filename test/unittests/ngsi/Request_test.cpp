@@ -45,12 +45,10 @@ TEST(Request, requestType)
 {
   Req   req[] =
   {
-    { RegisterContext,                                 "RegisterContextRequest"                                 },
     { DiscoverContextAvailability,                     "DiscoverContextAvailabilityRequest"                     },    
 
     { QueryContext,                                "QueryContextRequest"                                    },
     { SubscribeContext,                            "SubscribeContextRequest"                                },
-    { UpdateContextSubscription,                   "UpdateContextSubscriptionRequest"                       },
     { UnsubscribeContext,                          "UnsubscribeContextRequest"                              },
     { NotifyContext,                               "NotifyContextRequest"                                   },
     { UpdateContext,                               "UpdateContextRequest"                                   },
@@ -80,7 +78,6 @@ TEST(Request, requestType)
     { StatisticsRequest,                           "Statistics"                                             },
     { ExitRequest,                                 "Exit"                                                   },
     { LeakRequest,                                 "Leak"                                                   },
-    { RegisterResponse,                            "RegisterContextResponse"                                },
 
     { RtSubscribeResponse,                         "SubscribeResponse"                                      },
     { RtSubscribeError,                            "SubscribeError"                                         },

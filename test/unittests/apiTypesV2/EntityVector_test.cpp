@@ -73,14 +73,14 @@ TEST(EntityVector, render)
   std::string   rendered;
   EntityVector  eV;
 
-  rendered = eV.toJsonV1(false, UpdateContextElement, false);
-  EXPECT_STREQ("", rendered.c_str());
+  rendered = eV.toJson(NGSI_V2_NORMALIZED);
+  EXPECT_STREQ("[]", rendered.c_str());
 
   eP->id   = "E_ID";
   eP->type = "E_TYPE";
   eV.push_back(eP);
 
-  rendered = eV.toJsonV1(false, UpdateContextElement, false);
+  rendered = eV.toJson(NGSI_V2_NORMALIZED);
 
   eV.release();
 }

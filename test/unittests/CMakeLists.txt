@@ -77,7 +77,6 @@ SET (SOURCES
     common/commonFormat_test.cpp
     common/commonGlobals_test.cpp
     common/commonString_test.cpp
-    common/commonTag_test.cpp
     common/commonSem_test.cpp
     # FIXME P3: this test is aligned with the old version of the statistics logic for NGSIv1
     # it should be moved to NGSIv2 or, alternatively, removed the file at the end
@@ -85,26 +84,16 @@ SET (SOURCES
     common/commonWsStrip_test.cpp
     common/commonMacroSubstitute_test.cpp
 
-    ngsi9/RegisterContextResponse_test.cpp
-    ngsi9/DiscoverContextAvailabilityResponse_test.cpp
-
-    ngsi10/QueryContextResponse_test.cpp
     ngsi10/NotifyContextRequest_test.cpp
     ngsi10/SubscribeContextResponse_test.cpp
     ngsi10/UnsubscribeContextResponse_test.cpp
-    ngsi10/UpdateContextResponse_test.cpp
-    ngsi10/UpdateContextSubscriptionResponse_test.cpp
 
     ngsi/ContextAttribute_test.cpp
     ngsi/NotifyCondition_test.cpp
     ngsi/AttributeList_test.cpp
     ngsi/ConditionValueList_test.cpp
-    ngsi/ContextAttributeVector_test.cpp
     ngsi/ContextElementResponse_test.cpp
     ngsi/ContextElementResponseVector_test.cpp
-    ngsi/ContextRegistrationAttribute_test.cpp
-    ngsi/ContextRegistrationAttributeVector_test.cpp
-    ngsi/ContextRegistrationVector_test.cpp
     ngsi/ProvidingApplication_test.cpp
     ngsi/Duration_test.cpp
     ngsi/AttributeExpression_test.cpp
@@ -127,9 +116,7 @@ SET (SOURCES
     ngsi/Throttling_test.cpp
 
     orionTypes/EntityType_test.cpp
-    orionTypes/EntityTypeResponse_test.cpp
     orionTypes/EntityTypeVector_test.cpp
-    orionTypes/EntityTypeVectorResponse_test.cpp
 
     apiTypesV2/Entities_test.cpp
     apiTypesV2/Entity_test.cpp  

@@ -71,6 +71,8 @@ TEST(ContextElementResponse, render)
   const char*             outfile = "ngsi.contextElementResponse.render.middle.json";
   std::string             out;
 
+  std::vector<std::string> emptyV;
+
    utInit();
 
    cer.entity.id         = "ID";
@@ -79,7 +81,7 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.toJsonV1(false, UpdateContextElement, false, false);
+   out = cer.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);;
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -79,33 +79,3 @@ TEST(Throttling, check)
 
   utExit();
 }
-
-
-
-/* ****************************************************************************
-*
-* render - 
-*/
-TEST(Throttling, render)
-{
-  Throttling   t;
-  std::string  out;
-  const char*  outfile1 = "ngsi.throttling.render.middle.json";
-
-  utInit();
-
-  t.set("");
-  out = t.toJsonV1(false);
-  EXPECT_STREQ("", out.c_str());
-
-  out = t.toJsonV1(false);
-  EXPECT_STREQ("", out.c_str());
-
-  t.set("PT1S");
-
-  out = t.toJsonV1(false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}

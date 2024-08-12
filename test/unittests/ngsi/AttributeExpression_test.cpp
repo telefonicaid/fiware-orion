@@ -38,22 +38,12 @@
 TEST(AttributeExpression, ok)
 {
    AttributeExpression ae;
-   const char*         outfile1 = "ngsi10.attributeExpression.ok.middle.json";
    std::string         out;
 
    utInit();
 
    ae.set("AE");
    EXPECT_STREQ("AE", ae.get().c_str());
-
-   ae.set("");
-   EXPECT_STREQ("", ae.toJsonV1(false).c_str());
-
-   ae.set("AE");
-
-   out = ae.toJsonV1(false);
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
 
    EXPECT_STREQ("AE", ae.c_str());
 

@@ -43,7 +43,7 @@ TEST(Reference, check)
   utInit();
 
   reference.string = "http://ip:12";
-  checked = reference.check(RegisterContext);
+  checked = reference.check(BatchUpdateRequest);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
@@ -67,33 +67,6 @@ TEST(Reference, isEmptySetAndGet)
 
   reference.set("");
   EXPECT_TRUE(reference.isEmpty());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* render -
-*/
-TEST(Reference, render)
-{
-  Reference    reference;
-  std::string  out;
-  const char*  outfile1 = "ngsi.reference.render.middle.json";
-
-  utInit();
-
-  reference .set("");
-  out = reference.toJsonV1(false);
-  EXPECT_STREQ("", out.c_str());
-
-  reference .set("REF");
-
-  out = reference.toJsonV1(false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

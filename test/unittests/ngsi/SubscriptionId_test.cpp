@@ -100,27 +100,3 @@ TEST(SubscriptionId, setGetAndIsEmpty)
   utExit();
 }
 
-
-
-/* ****************************************************************************
-*
-* render
-*/
-TEST(SubscriptionId, render)
-{
-  SubscriptionId  sId;
-  std::string     out;
-  const char*     outfile1 = "ngsi.subscriptionId.render2.middle.json";
-
-  utInit();
-
-  sId.set("012345012345012345012345");
-
-  out = sId.toJsonV1(UnsubscribeContext, false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  sId.release(); // just to exercise the code
-
-  utExit();
-}

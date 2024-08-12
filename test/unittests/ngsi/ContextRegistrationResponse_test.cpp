@@ -33,34 +33,6 @@
 
 /* ****************************************************************************
 *
-* render - 
-*/
-TEST(ContextRegistrationResponse, render)
-{
-  ContextRegistrationResponse  crr;
-  std::string                  rendered;
-  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
-  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderError.middle.json";
-
-  utInit();
-
-  crr.errorCode.fill(SccNone);
-  rendered = crr.toJsonV1(false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-  crr.errorCode.fill(SccBadRequest);
-  rendered = crr.toJsonV1(false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check - 
 */
 TEST(ContextRegistrationResponse, check)
@@ -71,7 +43,7 @@ TEST(ContextRegistrationResponse, check)
 
   utInit();
 
-  checked = crr.check(RegisterContext, "", 0);
+  checked = crr.check(BatchUpdateRequest, "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
 
   utExit();

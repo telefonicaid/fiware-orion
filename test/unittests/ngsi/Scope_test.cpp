@@ -33,29 +33,6 @@
 
 /* ****************************************************************************
 *
-* render -
-*/
-TEST(Scope, render)
-{
-  Scope        scope("Type", "Value");
-  std::string  out;
-  const char*  outfile1 = "ngsi.scope.render.middle.json";
-
-  utInit();
-
-  out = scope.toJsonV1(false);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  scope.release();
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check - should Scope::check always return "OK"?
 */
 TEST(Scope, check)

@@ -44,7 +44,7 @@ TEST(StatusCode, render)
 
   utInit();
 
-  out = sc2.toJsonV1(false);
+  out = sc2.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -80,7 +80,7 @@ TEST(StatusCode, fill)
 
   sc.fill(&ec);
   EXPECT_EQ(sc.code, SccBadRequest);
-  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Bad Request");
+  EXPECT_STREQ(sc.reasonPhrase.c_str(), "BadRequest");
   EXPECT_STREQ(sc.details.c_str(), "Very bad request :-)");
 
   utExit();

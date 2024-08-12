@@ -71,11 +71,12 @@ TEST(ContextElementResponseVector, render)
   ContextElementResponse        cer;
   std::string                   out;
 
+  std::vector<std::string> emptyV;
+
   utInit();
 
-  // FIXME P2: "" is string, function signature says bool..
-  out = cerv.toJsonV1(false, UpdateContextElement, false, "");
-  EXPECT_STREQ("", out.c_str());
+  out = cerv.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
+  EXPECT_STREQ("[]", out.c_str());
 
   cer.entity.id         = "ID";
   cer.entity.type       = "Type";

@@ -43,13 +43,13 @@ TEST(AttributeList, ok)
 
   utInit();
 
-  out = al.toJsonV1(false, "attributes");
-  EXPECT_STREQ("", out.c_str());
+  out = al.toJson();
+  EXPECT_STREQ("[]", out.c_str());
 
   al.push_back("a1");
   al.push_back("a2");
   
-  out = al.toJsonV1(false, "attributes");
+  out = al.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

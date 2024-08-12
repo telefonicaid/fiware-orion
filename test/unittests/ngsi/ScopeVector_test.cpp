@@ -31,35 +31,6 @@
 
 /* ****************************************************************************
 *
-* renderAndRelease -
-*
-*/
-TEST(ScopeVector, renderAndRelease)
-{
-  Scope*         s = new Scope("Type", "Value");
-  ScopeVector    sV;
-  std::string    out;
-
-  utInit();
-
-  out = sV.toJsonV1(false);
-  EXPECT_STREQ("", out.c_str());
-
-  sV.push_back(s);
-
-  out = sV.toJsonV1(false);
-
-  EXPECT_EQ(sV.size(), 1);
-  sV.release();
-  EXPECT_EQ(sV.size(), 0);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * check -
 */
 TEST(ScopeVector, check)
