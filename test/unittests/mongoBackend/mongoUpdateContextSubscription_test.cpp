@@ -37,7 +37,6 @@
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/NotifyCondition.h"
 
 #include "unittests/testInit.h"
 #include "unittests/unittest.h"

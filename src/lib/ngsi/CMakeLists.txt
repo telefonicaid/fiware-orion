@@ -21,14 +21,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET (SOURCES
-    AttributeExpression.cpp
-    ConditionValueList.cpp
     ContextAttribute.cpp
     ContextAttributeVector.cpp
     ContextElementResponse.cpp
     ContextElementResponseVector.cpp
     ContextRegistration.cpp
-    ContextRegistrationVector.cpp
     ContextRegistrationAttribute.cpp
     ContextRegistrationAttributeVector.cpp
     ContextRegistrationResponse.cpp
@@ -37,12 +34,9 @@ SET (SOURCES
     EntityIdVector.cpp
     Metadata.cpp
     MetadataVector.cpp
-    NotifyCondition.cpp
-    NotifyConditionVector.cpp
     ProvidingApplication.cpp
     Request.cpp
     Restriction.cpp
-    RestrictionString.cpp
     Scope.cpp
     ScopeVector.cpp
     StatusCode.cpp
@@ -50,8 +44,6 @@ SET (SOURCES
 )
 
 SET (HEADERS
-    AttributeExpression.h
-    ConditionValueList.h
     ContextAttribute.h
     ContextAttributeVector.h
     ContextElementResponse.h
@@ -59,18 +51,14 @@ SET (HEADERS
     ContextRegistrationAttribute.h
     ContextRegistrationAttributeVector.h
     ContextRegistration.h
-    ContextRegistrationVector.h
     ContextRegistrationResponse.h
     ContextRegistrationResponseVector.h
     EntityId.h
     EntityIdVector.h
     Metadata.h
     MetadataVector.h
-    NotifyCondition.h
-    NotifyConditionVector.h
     ProvidingApplication.h
     Restriction.h
-    RestrictionString.h
     Scope.h
     StatusCode.h
     StringList.h

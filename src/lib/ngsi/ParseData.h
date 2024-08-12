@@ -32,7 +32,6 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/Metadata.h"
-#include "ngsi/NotifyCondition.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/UpdateContextRequest.h"

@@ -342,12 +342,6 @@ HttpStatusCode mongoQueryContext
   LM_T(LmtMongo, ("QueryContext Request"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (countP != NULL)? "true" : "false"));
 
-  /* FIXME: restriction not supported for the moment */
-  if (!requestP->restriction.attributeExpression.isEmpty())
-  {
-    alarmMgr.badInput(clientIp, "restriction found, but restrictions are not supported by mongo backend");
-  }
-
   std::string                  err;
   bool                         ok;
   bool                         limitReached = false;

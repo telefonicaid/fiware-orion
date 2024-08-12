@@ -29,7 +29,6 @@
 
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
-#include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextAttribute.h"
 #include "cache/SubscriptionCache.h"

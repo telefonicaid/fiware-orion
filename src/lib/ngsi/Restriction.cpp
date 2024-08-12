@@ -49,14 +49,13 @@ std::string Restriction::check(int counter)
     return "OK";
   }
 
-  if ((scopeVector.size() == 0) && (attributeExpression.isEmpty()))
+  if (scopeVector.size() == 0)
   {
     alarmMgr.badInput(clientIp, "empty restriction");
     return "empty restriction";
   }
 
-  if (((res = scopeVector.check())         != "OK") ||
-      ((res = attributeExpression.check()) != "OK"))
+  if ((res = scopeVector.check()) != "OK")
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
     alarmMgr.badInput(clientIp, res);
@@ -76,7 +75,6 @@ std::string Restriction::check(int counter)
 */
 void Restriction::release(void)
 {
-  attributeExpression.release();
   scopeVector.release();
 }
 
@@ -88,9 +86,6 @@ void Restriction::release(void)
 */
 void Restriction::fill(Restriction* rP)
 {
-  const std::string ae = rP->attributeExpression.get();
-  attributeExpression.set(ae);
-
   for (unsigned int ix = 0; ix < rP->scopeVector.size(); ++ix)
   {
     scopeVector.push_back(new Scope(rP->scopeVector[ix]->type, rP->scopeVector[ix]->value, rP->scopeVector[ix]->oper));

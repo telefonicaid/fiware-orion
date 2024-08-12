@@ -2155,39 +2155,6 @@ bool registrationsQuery
 
 /* ****************************************************************************
 *
-* isCondValueInContextElementResponse -
-*/
-bool isCondValueInContextElementResponse(ConditionValueList* condValues, ContextElementResponseVector* cerV)
-{
-  /* Empty conValue means that any attribute matches (aka ONANYCHANGE) */
-  if (condValues->size() == 0)
-  {
-    return true;
-  }
-
-  for (unsigned int cvlx = 0; cvlx < condValues->size(); ++cvlx)
-  {
-    for (unsigned int aclx = 0; aclx < cerV->size(); ++aclx)
-    {
-      ContextAttributeVector caV = (*cerV)[aclx]->entity.attributeVector;
-
-      for (unsigned int kx = 0; kx < caV.size(); ++kx)
-      {
-        if (caV[kx]->name == (*condValues)[cvlx])
-        {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * condValueAttrMatch -
 */
 bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs)

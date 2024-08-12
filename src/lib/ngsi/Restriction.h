@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/Request.h"
-#include "ngsi/AttributeExpression.h"
 #include "ngsi/ScopeVector.h"
 
 
@@ -40,7 +39,6 @@
 */
 typedef struct Restriction
 {
-  AttributeExpression  attributeExpression;   // Optional (FI-WARE changes - MANDATORY in OMA spec)
   ScopeVector          scopeVector;           // Optional
 
   void          release();

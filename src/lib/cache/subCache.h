@@ -30,7 +30,6 @@
 #include <vector>
 
 #include "common/RenderFormat.h"
-#include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"

@@ -87,22 +87,17 @@ SET (SOURCES
     ngsi10/NotifyContextRequest_test.cpp
 
     ngsi/ContextAttribute_test.cpp
-    ngsi/NotifyCondition_test.cpp
     ngsi/AttributeList_test.cpp
-    ngsi/ConditionValueList_test.cpp
     ngsi/ContextElementResponse_test.cpp
     ngsi/ContextElementResponseVector_test.cpp
     ngsi/ProvidingApplication_test.cpp
-    ngsi/AttributeExpression_test.cpp
     ngsi/ContextRegistrationResponse_test.cpp
     ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
     ngsi/Metadata_test.cpp
     ngsi/MetadataVector_test.cpp
-    ngsi/NotifyConditionVector_test.cpp
     ngsi/Restriction_test.cpp
     ngsi/Request_test.cpp
-    ngsi/RestrictionString_test.cpp
     ngsi/Scope_test.cpp
     ngsi/ScopeVector_test.cpp
     ngsi/StatusCode_test.cpp

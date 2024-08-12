@@ -36,7 +36,6 @@
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "ngsi/NotifyCondition.h"
 #include "rest/HttpStatusCode.h"
 
 #include "ngsiNotify/QueueNotifier.h"
