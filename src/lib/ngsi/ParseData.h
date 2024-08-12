@@ -81,23 +81,6 @@ struct QueryContextResponseData
 
 /* ****************************************************************************
 *
-* SubscribeContextData -
-*/
-struct SubscribeContextData
-{
-  SubscribeContextData():entityIdP(NULL), attributeMetadataP(NULL), restrictionP(NULL), notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
-  EntityId*                      entityIdP;
-  Metadata*                      attributeMetadataP;
-  Restriction*                   restrictionP;
-  NotifyCondition*               notifyConditionP;
-  Scope*                         scopeP;
-  orion::Point*                  vertexP;
-};
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextData -
 */
 struct NotifyContextData
@@ -138,20 +121,6 @@ struct UpdateContextResponseData
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextSubscriptionData - 
-*/
-struct UpdateContextSubscriptionData
-{
-  UpdateContextSubscriptionData(): notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
-  NotifyCondition*                  notifyConditionP;
-  Scope*                            scopeP;
-  orion::Point*                     vertexP;
 };
 
 
@@ -214,32 +183,26 @@ typedef struct BatchUpdateData
 *
 * ParseData -
 *
-* FIXME PR: review this list
 */
 typedef struct ParseData
 {
-  ParseData():  lastContextAttribute(NULL) { }
-
-  std::string                                 errorString;
-  ContextAttribute*                           lastContextAttribute;
-
-  QueryContextData                            qcr;
-  SubscribeContextData                        scr;
-  UpdateContextData                           upcr;
-  UpdateContextSubscriptionData               ucsr;
-  NotifyContextData                           ncr;
-
-  QueryContextResponseData                    qcrs;
-  UpdateContextResponseData                   upcrs;
-
+  // filled by jsonRequestTreat() function in jsonRequestTreat.cpp
   EntityData                                  ent;
   AttributeData                               attr;
   AttributeValueData                          av;
   BatchQueryData                              bq;
   BatchUpdateData                             bu;
-
-  ngsiv2::SubscriptionUpdate                  subsV2;
+  ngsiv2::SubscriptionUpdate                  sub;
   ngsiv2::Registration                        reg;
+  NotifyContextData                           ncr;
+
+    // Used in postQueryContext() function for the forwarding logic
+  QueryContextData                            qcr;
+  QueryContextResponseData                    qcrs;
+
+  // Used in postUpdateContext() function for the forwarding logic
+  UpdateContextData                           upcr;
+  UpdateContextResponseData                   upcrs;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_

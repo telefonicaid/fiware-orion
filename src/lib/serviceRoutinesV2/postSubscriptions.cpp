@@ -74,7 +74,7 @@ extern std::string postSubscriptions
     std::string subsID;
 
     TIMED_MONGO(subsID = mongoCreateSubscription(
-                            parseDataP->subsV2,
+                            parseDataP->sub,
                             &beError,
                             ciP->tenant,
                             ciP->servicePathV));
@@ -96,7 +96,7 @@ extern std::string postSubscriptions
   }
 
   // free sub memory associated to subscriptions
-  parseDataP->subsV2.release();
+  parseDataP->sub.release();
 
   return answer;
 }

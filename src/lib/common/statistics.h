@@ -311,7 +311,6 @@
 */
 typedef struct TimeStat
 {
-  struct timespec  jsonV1ParseTime;
   struct timespec  jsonV2ParseTime;
   struct timespec  mongoBackendTime;
   struct timespec  mongoReadWaitTime;
