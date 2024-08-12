@@ -63,7 +63,7 @@ typedef struct ContextElementResponse
   ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const orion::BSONObj&  entityDoc,
                          const StringList&      attrL);
-  ContextElementResponse(Entity* eP, bool useDefaultType = false);
+  ContextElementResponse(Entity* eP);
 
   std::string  toJson(RenderFormat                         renderFormat,
                       const std::vector<std::string>&      attrsFilter,

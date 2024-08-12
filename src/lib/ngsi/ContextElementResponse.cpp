@@ -143,9 +143,9 @@ ContextElementResponse::ContextElementResponse
 *
 * This constructor builds the CER from a CEP. Note that statusCode is not touched.
 */
-ContextElementResponse::ContextElementResponse(Entity* eP, bool useDefaultType)
+ContextElementResponse::ContextElementResponse(Entity* eP)
 {
-  entity.fill(*eP, useDefaultType);
+  entity.fill(*eP, true);
 }
 
 
