@@ -39,7 +39,7 @@ TEST(ContextRegistrationResponse, check)
 {
   ContextRegistrationResponse  crr;
   std::string                  checked;
-  std::string                  expected = "no providing application";
+  std::string                  expected = "Empty entityIdVector";
 
   utInit();
 

@@ -400,7 +400,7 @@ std::string parseContextAttribute
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  std::string r = caP->check(ciP->requestType, relaxForbiddenCheck);
+  std::string r = caP->check(ciP->requestType == EntityAttributeValueRequest, relaxForbiddenCheck);
   if (r != "OK")
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error", r);

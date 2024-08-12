@@ -50,7 +50,7 @@ std::string Attribute::toJson
   HttpStatusCode*                  scP,                 // out parameter (pass-through)
   bool                             keyValues,           // in parameter
   const std::vector<std::string>&  metadataFilter,      // in parameter
-  RequestType                      requestType          // in parameter
+  bool                             asValue          // in parameter
 )
 {
   if (contextAttributeP == NULL) {
@@ -62,7 +62,7 @@ std::string Attribute::toJson
 
   std::string out;
 
-  if (requestType == EntityAttributeValueRequest)
+  if (asValue)
   {
     out = contextAttributeP->toJsonAsValue(acceptedTextPlain,
                                            acceptedJson,

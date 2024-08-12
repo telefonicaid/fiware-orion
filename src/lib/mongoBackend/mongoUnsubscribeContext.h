@@ -28,8 +28,6 @@
 #include <string>
 
 #include "rest/HttpStatusCode.h"
-#include "ngsi10/UnsubscribeContextRequest.h"
-#include "ngsi10/UnsubscribeContextResponse.h"
 
 
 
@@ -39,9 +37,9 @@
 */
 extern HttpStatusCode mongoUnsubscribeContext
 (
-  UnsubscribeContextRequest*   requestP,
-  UnsubscribeContextResponse*  responseP,
-  const std::string&           tenant = ""
+  const std::string&  subId,
+  OrionError*         responseP,
+  const std::string&  tenant = ""
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOUNSUBSCRIBECONTEXT_H_

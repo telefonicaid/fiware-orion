@@ -74,8 +74,7 @@ TEST(NotifyContextRequest, json_render)
 
   // Preparation
   ncrP = new NotifyContextRequest();
-  ncrP->subscriptionId.set("012345678901234567890123");
-  ncrP->originator.set("http://www.tid.es/NotifyContextRequestUnitTest");
+  ncrP->subscriptionId = "012345678901234567890123";
 
   std::vector<std::string> emptyV;
 

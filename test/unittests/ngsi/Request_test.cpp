@@ -45,32 +45,7 @@ TEST(Request, requestType)
 {
   Req   req[] =
   {
-    { DiscoverContextAvailability,                     "DiscoverContextAvailabilityRequest"                     },    
-
-    { QueryContext,                                "QueryContextRequest"                                    },
-    { SubscribeContext,                            "SubscribeContextRequest"                                },
-    { UnsubscribeContext,                          "UnsubscribeContextRequest"                              },
     { NotifyContext,                               "NotifyContextRequest"                                   },
-    { UpdateContext,                               "UpdateContextRequest"                                   },
-
-    { ContextEntitiesByEntityId,                   "ContextEntitiesByEntityId"                              },
-    { ContextEntityAttributes,                     "ContextEntityAttributes"                                },
-    { ContextEntityTypes,                          "ContextEntityTypes"                                     },
-    { ContextEntityTypeAttributeContainer,         "ContextEntityTypeAttributeContainer"                    },
-    { ContextEntityTypeAttribute,                  "ContextEntityTypeAttribute"                             },
-    { EntityByIdAttributeByName,                   "EntityByIdAttributeByName"                              },
-
-    { IndividualContextEntity,                     "IndividualContextEntity"                                },
-    { IndividualContextEntityAttributes,           "IndividualContextEntityAttributes"                      },
-    { IndividualContextEntityAttribute,            "IndividualContextEntityAttribute"                       },
-    { AttributeValueInstance,                      "AttributeValueInstance"                                 },
-    { UpdateContextElement,                        "UpdateContextElement"                                   },
-    { AppendContextElement,                        "AppendContextElement"                                   },
-    { UpdateContextAttribute,                      "UpdateContextAttribute"                                 },
-    { Ngsi10ContextEntityTypes,                    "Ngsi10ContextEntityTypes"                               },
-    { Ngsi10ContextEntityTypesAttributeContainer,  "Ngsi10ContextEntityTypesAttributeContainer"             },
-    { Ngsi10ContextEntityTypesAttribute,           "Ngsi10ContextEntityTypesAttribute"                      },
-    { Ngsi10SubscriptionsConvOp,                   "Ngsi10SubscriptionsConvOp"                              },
 
     { LogTraceRequest,                             "LogTrace"                                               },
     { LogLevelRequest,                             "LogLevel"                                               },
@@ -78,14 +53,6 @@ TEST(Request, requestType)
     { StatisticsRequest,                           "Statistics"                                             },
     { ExitRequest,                                 "Exit"                                                   },
     { LeakRequest,                                 "Leak"                                                   },
-
-    { RtSubscribeResponse,                         "SubscribeResponse"                                      },
-    { RtSubscribeError,                            "SubscribeError"                                         },
-
-    { EntityTypes,                                 "EntityTypes"                                            },
-    { AttributesForEntityType,                     "AttributesForEntityType"                                },
-    { RtEntityTypesResponse,                       "EntityTypesResponse"                                    },
-    { RtAttributesForEntityTypeResponse,           "AttributesForEntityTypeResponse"                        },
 
     { InvalidRequest,                              "InvalidRequest"                                         },
 

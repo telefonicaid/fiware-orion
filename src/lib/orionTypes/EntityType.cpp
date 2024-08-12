@@ -73,7 +73,7 @@ std::string EntityType::check(const std::string&  predetectedError)
     return "Empty Type";
   }
 
-  return contextAttributeVector.check(EntityTypes);
+  return contextAttributeVector.check(false);
 }
 
 

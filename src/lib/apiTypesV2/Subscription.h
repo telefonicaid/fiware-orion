@@ -28,8 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/Duration.h"
-#include "ngsi/Throttling.h"
 #include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"

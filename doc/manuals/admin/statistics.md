@@ -56,8 +56,7 @@ The counter block provides information about counters for the times a particular
   "counters": {
     "deprecatedFeatures": {
       "geoFormat": 2,
-      "ngsiv1Forwarding": 4,
-      "ngsiv1Requests": 4
+      "ngsiv1Forwarding": 4
     },
     "invalidRequests": 2,
     "jsonRequests": 4,

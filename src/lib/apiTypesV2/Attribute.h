@@ -61,7 +61,7 @@ class Attribute
                       HttpStatusCode*                  scP,
                       bool                             keyValues,
                       const std::vector<std::string>&  metadataFilter,
-                      RequestType                      requestType);
+                      bool                             asValue);
 
   void         fill(const QueryContextResponse& qcrs, const std::string& attrName, OrionError* oeP);
 };

@@ -33,7 +33,6 @@
 
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UpdateContextResponse.h"
 
 
@@ -44,10 +43,7 @@
 */
 typedef struct ResponseData
 {
-  DiscoverContextAvailabilityResponse             dcar;
   QueryContextResponse                            qcr;
-  SubscribeContextResponse                        scr;
-  UnsubscribeContextResponse                      uncr;
   UpdateContextResponse                           upcr;
 } ResponseData;
 

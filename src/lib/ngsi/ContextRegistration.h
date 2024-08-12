@@ -45,8 +45,6 @@ typedef struct ContextRegistration
   ContextRegistrationAttributeVector  contextRegistrationAttributeVector;    // Optional
   ProvidingApplication                providingApplication;                  // Mandatory
 
-  bool                                entityIdVectorPresent;                 // entityIdList present during parsing
-
   ContextRegistration();
   void         release();
 

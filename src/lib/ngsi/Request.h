@@ -40,87 +40,36 @@ struct ConnectionInfo;
 typedef enum RequestType
 {
   NoRequest = 0,
-  DiscoverContextAvailability,
 
-  QueryContext = 11,
-  RtQueryContextResponse,
-  SubscribeContext,
-  UnsubscribeContext,
-  RtUnsubscribeContextResponse,
-  NotifyContext,
-  UpdateContext,
-  RtUpdateContextResponse,
-  NotifyContextSent,
-
-  ContextEntitiesByEntityId = 21,
-  ContextEntityAttributes,
-  EntityByIdAttributeByName,
-  ContextEntityTypes,
-  ContextEntityTypeAttributeContainer,
-  ContextEntityTypeAttribute,
-
-  IndividualContextEntity                = 31,
-  IndividualContextEntityAttributes,
-  IndividualContextEntityAttribute,
-  IndividualContextEntityAttributeWithTypeAndId,
-  AttributeValueInstance,
-  AttributeValueInstanceWithTypeAndId,
-  Ngsi10ContextEntityTypes,
-  Ngsi10ContextEntityTypesAttributeContainer,
-  Ngsi10ContextEntityTypesAttribute,
-  Ngsi10SubscriptionsConvOp,
-
-  UpdateContextElement = 41,
-  AppendContextElement,
-  UpdateContextAttribute,
-
-  LogTraceRequest = 51,
-  LogLevelRequest,
-  SemStateRequest,
-  MetricsRequest,
-  VersionRequest,
-  ExitRequest,
-
-  LeakRequest,
-  StatisticsRequest,
-  RtSubscribeResponse,
-  RtSubscribeError,
-
-  RtContextElementResponse,
-  RtContextAttributeResponse,
-
-  EntityTypes = 65,
-  AttributesForEntityType,
-  RtEntityTypesResponse,
-  RtAttributesForEntityTypeResponse,
-  AllContextEntities,
-  AllEntitiesWithTypeAndId,
-  ContextEntitiesByEntityIdAndType,
-  EntityByIdAttributeByNameIdAndType,
-
-  // /v2 API
-  EntitiesRequest = 75,
-  EntitiesResponse,
+  // pure v2
   EntryPointsRequest,
-  EntryPointsResponse,
+  EntitiesRequest,  
   EntityRequest,
-  EntityResponse,
   EntityAttributeRequest,
-  EntityAttributeResponse,
   EntityAttributeValueRequest,
-  EntityAttributeValueResponse,
-  EntityTypeRequest,
   EntityAllTypesRequest,
+  EntityTypeRequest,
   SubscriptionsRequest,
   SubscriptionRequest,
+  RegistrationsRequest,
+  RegistrationRequest,
   BatchQueryRequest,
   BatchUpdateRequest,
+  NotifyContext,
 
-  // v2 registration
-  RegistrationRequest,
-  RegistrationsRequest,
+  // administrative requests
+  LogTraceRequest,
+  StatisticsRequest,
+  LogLevelRequest,
+  SemStateRequest,
+  VersionRequest,
+  MetricsRequest,
 
-  InvalidRequest = 100
+  // requests enabled in DEBUG compilation
+  ExitRequest,
+  LeakRequest,
+
+  InvalidRequest
 } RequestType;
 
 

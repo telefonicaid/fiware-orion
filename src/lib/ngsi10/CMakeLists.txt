@@ -25,10 +25,6 @@ SET (SOURCES
     NotifyContextResponse.cpp
     QueryContextRequest.cpp
     QueryContextResponse.cpp
-    SubscribeContextRequest.cpp
-    SubscribeContextResponse.cpp
-    UnsubscribeContextRequest.cpp
-    UnsubscribeContextResponse.cpp
     UpdateContextRequest.cpp
     UpdateContextResponse.cpp
 )
@@ -38,10 +34,6 @@ SET (HEADERS
     NotifyContextResponse.h
     QueryContextRequest.h
     QueryContextResponse.h
-    SubscribeContextRequest.h
-    SubscribeContextResponse.h
-    UnsubscribeContextRequest.h
-    UnsubscribeContextResponse.h
     UpdateContextRequest.h
     UpdateContextResponse.h
 )

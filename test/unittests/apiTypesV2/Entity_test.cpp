@@ -89,27 +89,28 @@ TEST(Entity, checkV1)
   utInit();
 
   enP->id = "";
-  EXPECT_EQ(enP->check(UpdateContext), "entity id length: 0, min length supported: 1");
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "entity id length: 0, min length supported: 1");
 
   enP->id = "id";
-  EXPECT_EQ(enP->check(UpdateContext), "entity type length: 0, min length supported: 1");
+  enP->typeGiven = true;
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "entity type length: 0, min length supported: 1");
 
   ContextAttribute* aP = new ContextAttribute();
   aP->name  = "";
   aP->stringValue = "V";
   enP->attributeVector.push_back(aP);
-  EXPECT_EQ(enP->check(UpdateContext), "entity type length: 0, min length supported: 1");
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "entity type length: 0, min length supported: 1");
   aP->name = "name";
 
   Entity* en2P = new Entity("id", "", "false");
 
   EntityVector* ceVectorP = new EntityVector();
 
-  EXPECT_EQ(ceVectorP->check(UpdateContext), "OK");
+  EXPECT_EQ(ceVectorP->check(BatchUpdateRequest), "OK");
 
   ceVectorP->push_back(enP);
   ceVectorP->push_back(en2P);
-  EXPECT_EQ(ceVectorP->check(UpdateContext), "entity type length: 0, min length supported: 1");
+  EXPECT_EQ(ceVectorP->check(BatchUpdateRequest), "entity type length: 0, min length supported: 1");
 
   // render
   const char*               outfile1 = "ngsi.contextelement.check.middle.json";
@@ -119,7 +120,7 @@ TEST(Entity, checkV1)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("entity type length: 0, min length supported: 1", ceVectorP->check(UpdateContext));
+  EXPECT_EQ("entity type length: 0, min length supported: 1", ceVectorP->check(BatchUpdateRequest));
 
   utExit();
 }

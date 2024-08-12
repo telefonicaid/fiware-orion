@@ -59,7 +59,7 @@ typedef struct ContextAttributeVector
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(RequestType requestType);
+  std::string        check(bool asValue);
 
   std::string        toJsonTypes(void);
 

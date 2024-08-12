@@ -46,7 +46,7 @@
 #define SCOPE_TYPE_SIMPLE_QUERY      "FIWARE::StringQuery"
 #define SCOPE_TYPE_SIMPLE_QUERY_MD   "FIWARE::StringQuery::Metadata"
 
-#define SCOPE_TYPE_LOCATION          FIWARE_LOCATION
+#define SCOPE_TYPE_LOCATION          FIWARE_LOCATION_V2
 
 #define SCOPE_VALUE_ENTITY_TYPE      "entity::type"
 

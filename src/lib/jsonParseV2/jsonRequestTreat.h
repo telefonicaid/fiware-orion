@@ -31,7 +31,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "ngsi10/SubscribeContextRequest.h"
 #include "apiTypesV2/Subscription.h"
 
 
@@ -44,14 +43,12 @@ typedef struct JsonDelayedRelease
 {
   Entity*                            entity;
   ContextAttribute*                  attribute;
-  SubscribeContextRequest*           scrP;
   ngsiv2::Subscription*              subsP;
 
   JsonDelayedRelease()
   {
     entity     = NULL;
     attribute  = NULL;
-    scrP       = NULL;
     subsP      = NULL;
   }
 } JsonDelayedRelease;

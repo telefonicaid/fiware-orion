@@ -8,7 +8,6 @@
 * [src/lib/rest/](#srclibrest) (REST interface, using external library microhttpd)
 * [src/lib/ngsi/](#srclibngsi) (Common NGSI types)
 * [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types, NGSI10 = context management)
-* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types, NGSI9 = context management availability)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
@@ -198,6 +197,8 @@ The JSON parse implementations reside in dedicated libraries while the text pars
 ## src/lib/ngsi/
 The **ngsi** library contains a collection of classes for the different payloads that constitutes the common part of the ngsi9 and ngsi10 protocols. Here you find basic classes like:
 
+FIXME PR: no point in aving ngsi/ and ngsi10/ separately (now that ngsi9/ has been removed)
+
 * `EntityId`
 * `EntityIdVector`
 * `ContextAttribute`
@@ -207,12 +208,11 @@ The **ngsi** library contains a collection of classes for the different payloads
 
 ### Methods and hierarchy
 
-These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`) all have a standard set of methods:
+These classes (as well as the classes in the library `ngsi10`) all have a standard set of methods:
 
-* `toJson()`, to render the object to a JSON string (for NGSIv2). This method levarages `JsonObjectHelper` and `JsonVectorHelper`
+* `toJson()`, to render the object to a JSON string. This method levarages `JsonObjectHelper` and `JsonVectorHelper`
   in order to simplify the rendering process. This way you just add the elements you needs to print using `add*()` methods and don't
   need to bother with starting/ending brackets, quotes and comma control.
-* `toJsonV1()`, to render the object to a JSON string (for NGSIv1)
 * `present()`, for debugging (the object is dumped as text to the log file)
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
@@ -260,21 +260,8 @@ See the explanation of methods and hierarchy of the [**ngsi** library](#methods-
 [Top](#top)
 
 
-## src/lib/ngsi9/
-Just like the ngsi10 library, the **ngsi9** library contains the top hierarchy classes for NGSI9 (NGSIv1) requests:
-
-* `RegisterContextRequest` - FIXME PR: removed
-* `RegisterContextResponse` - FIXME PR: removed
-* `DiscoverContextAvailabilityRequest`
-* `DiscoverContextAvailabilityResponse` - FIXME PR: removed
-
-See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
-
-[Top](#top)
-
-
 ## src/lib/apiTypesV2/
-The **apiTypesV2** library, just like the ngsi* libraries, contains classes; both basic classes (like the library **ngsi**) and top hierarchy classes (like the libraries **ngsi9** and **ngsi10**), for NGSIv2, the improved NGSI protocol.
+The **apiTypesV2** library, just like the ngsi* libraries, contains classes; both basic classes (like the library **ngsi**) and top hierarchy classes (like the library **ngsi10**), for NGSIv2, the improved NGSI protocol.
 
 The hierarchical methods `release()`, `toJson()`, `check()`, etc. are found in these classes as well.
 

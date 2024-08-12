@@ -142,12 +142,6 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
     releaseP->attribute = NULL;
   }
 
-  if (releaseP->scrP != NULL)
-  {
-    releaseP->scrP->release();
-    releaseP->scrP = NULL;
-  }
-
   if (releaseP->subsP != NULL)
   {
     delete releaseP->subsP;
@@ -270,28 +264,12 @@ static void commonFilters
   //
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
   {
-    Restriction* restrictionP = NULL;
-
-    //
-    // Lookup the restriction of the correct parseData, where to add the new scope.
-    //
-    if (serviceP->request == EntityTypes)
-    {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
-    else if (serviceP->request == AllContextEntities)
-    {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
-
+    Restriction* restrictionP = &parseDataP->qcr.res.restriction;
 
     if (restrictionP == NULL)
     {
-      // There are two possibilities to be here:
-      //   1. A filter given for a request NOT SUPPORTING the filter
-      //   2. The restrictionP-lookup is MISSING (not implemented)
-      //
-      // Either way, we just silently return.
+      // The restrictionP-lookup is MISSING (not implemented
+      // We just silently return.
       //
       return;
     }
@@ -308,27 +286,12 @@ static void commonFilters
   //
   if (ciP->uriParam[URI_PARAM_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
   {
-    Restriction* restrictionP = NULL;
-
-    //
-    // Lookup the restriction of the correct parseData, where to add the new scope.
-    //
-    if (serviceP->request == EntityTypes)
-    {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
-    else if (serviceP->request == AllContextEntities)
-    {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
+    Restriction* restrictionP = &parseDataP->qcr.res.restriction;
 
     if (restrictionP == NULL)
     {
-      // There are two possibilities to be here:
-      //   1. A filter given for a request NOT SUPPORTING the filter
-      //   2. The restrictionP-lookup is MISSING (not implemented)
-      //
-      // Either way, we just silently return.
+      // The restrictionP-lookup is MISSING (not implemented)
+      // We just silently return.
       //
       return;
     }
@@ -352,24 +315,7 @@ static void scopeFilter
   RestService*      serviceP
 )
 {
-  Restriction* restrictionP = NULL;
-
-  if (ciP->restServiceP->request == DiscoverContextAvailability)
-  {
-    restrictionP = &parseDataP->dcar.res.restriction;
-  }
-  else if (ciP->restServiceP->request == QueryContext)
-  {
-    restrictionP = &parseDataP->qcr.res.restriction;
-  }
-  else if (ciP->restServiceP->request == SubscribeContext)
-  {
-    restrictionP = &parseDataP->scr.res.restriction;
-  }
-  else
-  {
-    return;
-  }
+  Restriction* restrictionP = &parseDataP->qcr.res.restriction;
 
   for (unsigned int ix = 0; ix < restrictionP->scopeVector.size(); ++ix)
   {
@@ -393,6 +339,7 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
 {
   Restriction* restrictionP = NULL;
 
+#if 0
   if (request == EntityTypes)
   {
     restrictionP = &parseDataP->qcr.res.restriction;
@@ -401,9 +348,13 @@ static void filterRelease(ParseData* parseDataP, RequestType request)
   {
     restrictionP = &parseDataP->qcr.res.restriction;
   }
+#endif
+  restrictionP = &parseDataP->qcr.res.restriction;
 
   if (restrictionP != NULL)
+  {
     restrictionP->release();
+  }
 }
 
 

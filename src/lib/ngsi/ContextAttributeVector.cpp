@@ -122,13 +122,13 @@ std::string ContextAttributeVector::toJsonTypes(void)
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(RequestType requestType)
+std::string ContextAttributeVector::check(bool asValue)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(requestType)) != "OK")
+    if ((res = vec[ix]->check(asValue)) != "OK")
       return res;
   }
 

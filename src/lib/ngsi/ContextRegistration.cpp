@@ -34,16 +34,15 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/EntityId.h"
 
+
+
 /* ****************************************************************************
 *
 * ContextRegistration::ContextRegistration -
 *
-* Explicit constructor needed to initialize primitive types so they don't get
-* random values from the stack
 */
 ContextRegistration::ContextRegistration()
 {
-  entityIdVectorPresent = false;
 }
 
 
@@ -76,7 +75,7 @@ std::string ContextRegistration::check
     return res;
   }
 
-  if ((entityIdVectorPresent == true) && (entityIdVector.size() == 0))
+  if (entityIdVector.size() == 0)
   {
     return "Empty entityIdVector";
   }

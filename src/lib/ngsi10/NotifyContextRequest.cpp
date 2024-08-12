@@ -89,7 +89,7 @@ std::string NotifyContextRequest::toJson
   {
     JsonObjectHelper jh;
 
-    jh.addString("subscriptionId", subscriptionId.get());
+    jh.addString("subscriptionId", subscriptionId);
     jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP));
     return jh.str();
   }
@@ -117,7 +117,6 @@ NotifyContextRequest* NotifyContextRequest::clone(void)
   NotifyContextRequest* ncrP = new NotifyContextRequest();
 
   ncrP->subscriptionId = subscriptionId;
-  ncrP->originator     = originator;
 
   ncrP->contextElementResponseVector.fill(contextElementResponseVector);
 

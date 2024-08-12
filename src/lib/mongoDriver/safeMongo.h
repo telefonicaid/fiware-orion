@@ -28,8 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/SubscriptionId.h"
-#include "ngsi/RegistrationId.h"
 #include "ngsi/StatusCode.h"
 
 #include "mongoDriver/DBCursor.h"

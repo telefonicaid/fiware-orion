@@ -32,11 +32,9 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/Metadata.h"
-#include "ngsi9/DiscoverContextAvailabilityRequest.h"
-#include "ngsi10/SubscribeContextRequest.h"
+#include "ngsi/NotifyCondition.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi10/NotifyContextRequest.h"
@@ -45,20 +43,6 @@
 #include "apiTypesV2/BatchUpdate.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "apiTypesV2/Registration.h"
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityData -
-*/
-struct DiscoverContextAvailabilityData
-{
-  DiscoverContextAvailabilityData(): entityIdP(NULL), scopeP(NULL) {}
-  DiscoverContextAvailabilityRequest  res;
-  EntityId*                           entityIdP;
-  Scope*                              scopeP;
-};
 
 
 
@@ -102,7 +86,6 @@ struct QueryContextResponseData
 struct SubscribeContextData
 {
   SubscribeContextData():entityIdP(NULL), attributeMetadataP(NULL), restrictionP(NULL), notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
-  SubscribeContextRequest        res;
   EntityId*                      entityIdP;
   Metadata*                      attributeMetadataP;
   Restriction*                   restrictionP;
@@ -110,17 +93,6 @@ struct SubscribeContextData
   Scope*                         scopeP;
   orion::Point*                  vertexP;
 };
-
-
-
-/* ****************************************************************************
-*
-* UnsubscribeContextData -
-*/
-typedef struct UnsubscribeContextData
-{
-  UnsubscribeContextRequest res;
-} UnsubscribeContextData;
 
 
 
@@ -250,11 +222,9 @@ typedef struct ParseData
 
   std::string                                 errorString;
   ContextAttribute*                           lastContextAttribute;
-  DiscoverContextAvailabilityData             dcar;
 
   QueryContextData                            qcr;
   SubscribeContextData                        scr;
-  UnsubscribeContextData                      uncr;
   UpdateContextData                           upcr;
   UpdateContextSubscriptionData               ucsr;
   NotifyContextData                           ncr;

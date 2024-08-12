@@ -196,7 +196,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         return false;
       }
 
-      ncrP->subscriptionId.set(iter->value.GetString());
+      ncrP->subscriptionId = iter->value.GetString();
     }
     else if (name == "data")
     {

@@ -34,17 +34,6 @@
 
 /* ****************************************************************************
 *
-* isNgsiV1Url
-*/
-inline bool isNgsiV1Url(const char* url)
-{
-  return (strstr(url, "/v1/") || strcasestr(url, "/ngsi10/") || strcasestr(url, "/ngsi9/"));
-}
-
-
-
-/* ****************************************************************************
-*
 * truncatePayload -
 *
 * NOTE: this function allocated dynamic memory, be careful with memory leaks!
@@ -170,15 +159,6 @@ void logInfoRequestWithoutPayload
 )
 {
   LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
-
-  if (isNgsiV1Url(url))
-  {
-    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated NGSIv1 request received: %s %s, response code: %d", verb, url, rc));
-    }
-  }
 }
 
 
@@ -209,15 +189,6 @@ void logInfoRequestWithPayload
   }
 
   LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
-
-  if (isNgsiV1Url(url))
-  {
-    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated NGSIv1 request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
-    }
-  }
 
   if (cleanAfterUse)
   {

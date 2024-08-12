@@ -33,17 +33,13 @@ SET (SOURCES
     ContextRegistrationAttributeVector.cpp
     ContextRegistrationResponse.cpp
     ContextRegistrationResponseVector.cpp
-    Duration.cpp
     EntityId.cpp
     EntityIdVector.cpp
     Metadata.cpp
     MetadataVector.cpp
     NotifyCondition.cpp
     NotifyConditionVector.cpp
-    Originator.cpp
     ProvidingApplication.cpp
-    Reference.cpp
-    RegistrationId.cpp
     Request.cpp
     Restriction.cpp
     RestrictionString.cpp
@@ -51,10 +47,6 @@ SET (SOURCES
     ScopeVector.cpp
     StatusCode.cpp
     StringList.cpp
-    SubscribeResponse.cpp
-    SubscribeError.cpp
-    SubscriptionId.cpp
-    Throttling.cpp
 )
 
 SET (HEADERS
@@ -70,26 +62,18 @@ SET (HEADERS
     ContextRegistrationVector.h
     ContextRegistrationResponse.h
     ContextRegistrationResponseVector.h
-    Duration.h
     EntityId.h
     EntityIdVector.h
     Metadata.h
     MetadataVector.h
     NotifyCondition.h
     NotifyConditionVector.h
-    Originator.h
     ProvidingApplication.h
-    Reference.h
-    RegistrationId.h
     Restriction.h
     RestrictionString.h
     Scope.h
     StatusCode.h
     StringList.h
-    SubscribeError.h
-    SubscribeResponse.h
-    SubscriptionId.h
-    Throttling.h
 )
 
 

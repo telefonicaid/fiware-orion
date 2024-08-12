@@ -119,7 +119,7 @@ static bool setPayload
 (
   bool                             includePayload,
   const std::string&               notifPayload,
-  const SubscriptionId&            subscriptionId,
+  const std::string&               subscriptionId,
   Entity&                          en,
   ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
@@ -247,7 +247,7 @@ static void orderByPriority
 static bool setNgsiPayload
 (
   const Entity&                    ngsi,
-  const SubscriptionId&            subscriptionId,
+  const std::string&               subscriptionId,
   Entity&                          en,
   ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
@@ -335,7 +335,7 @@ static bool setNgsiPayload
 */
 static SenderThreadParams* buildSenderParamsCustom
 (
-    const SubscriptionId&            subscriptionId,
+    const std::string&               subscriptionId,
     ContextElementResponse*          notifyCerP,
     const ngsiv2::Notification&      notification,
     const std::string&               tenant,
@@ -603,7 +603,7 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->renderFormat     = renderFormatToString(renderFormat);
   paramsP->extraHeaders     = headers;
   paramsP->registration     = false;
-  paramsP->subscriptionId   = subscriptionId.get();
+  paramsP->subscriptionId   = subscriptionId;
   paramsP->qos              = notification.mqttInfo.qos;     // unspecified in case of HTTP notifications
   paramsP->retain           = notification.mqttInfo.retain;  // unspecified in case of HTTP notifications
   paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
@@ -718,11 +718,7 @@ SenderThreadParams* Notifier::buildSenderParams
     ncr.contextElementResponseVector.push_back(&cer);
 
     /* Complete the fields in NotifyContextRequest */
-    ncr.subscriptionId.set(subId);
-    // FIXME: we use a proper origin name
-    ncr.originator.set("localhost");
-
-    ncr.subscriptionId.set(subId);
+    ncr.subscriptionId = subId;
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
@@ -777,7 +773,7 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->content          = payloadString;
     paramsP->mimeType         = JSON;
     paramsP->renderFormat     = renderFormatToString(renderFormat);
-    paramsP->subscriptionId   = ncr.subscriptionId.get();
+    paramsP->subscriptionId   = ncr.subscriptionId;
     paramsP->registration     = false;
     paramsP->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
     paramsP->retain           = notification.mqttInfo.retain; // unspecified in case of HTTP notifications

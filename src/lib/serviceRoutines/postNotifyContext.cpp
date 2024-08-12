@@ -64,6 +64,7 @@ std::string postNotifyContext
                                                        ciP->httpHeaders.ngsiv2AttrsFormat));
   
   //FIXME PR: this should be toJSON()
+  // check this with a .test
   //TIMED_RENDER(answer = ncr.toJsonV1());
 
   return answer;

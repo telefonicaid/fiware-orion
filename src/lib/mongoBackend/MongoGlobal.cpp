@@ -49,7 +49,6 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi/Duration.h"
 #include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
@@ -1478,12 +1477,9 @@ bool entitiesQuery
 
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {
-      // FIXME PR: NGSIv1 filter, probably to be removed in the future
       addFilterScope(scopeP, &filters);
     }
-    else if (scopeP->type == FIWARE_LOCATION ||
-             scopeP->type == FIWARE_LOCATION_DEPRECATED ||
-             scopeP->type == FIWARE_LOCATION_V2)
+    else if (scopeP->type == FIWARE_LOCATION_V2)
     {
       geoScopes++;
       if (geoScopes > 1)

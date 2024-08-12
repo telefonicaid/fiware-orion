@@ -43,17 +43,17 @@ TEST(ContextAttribute, checkOne)
   utInit();
 
   caP->name = "";
-  res     = caP->check(BatchUpdateRequest);
+  res     = caP->check(false);
   EXPECT_EQ(res, "attribute name length: 0, min length supported: 1");
 
   caP->name  = "Algo, lo que sea!";
   caP->stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = caP->check(BatchUpdateRequest);
+  res     = caP->check(false);
   EXPECT_EQ(res, "Invalid characters in attribute name");
 
   caP->stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-  res     = caP->check(BatchUpdateRequest);
+  res     = caP->check(false);
   EXPECT_EQ(res, "Invalid characters in attribute name");
 
   utExit();
@@ -82,7 +82,7 @@ TEST(ContextAttribute, checkVector)
   caVectorP->push_back(ca0P);
   caVectorP->push_back(ca1P);
 
-  res     = caVectorP->check(BatchUpdateRequest);
+  res     = caVectorP->check(false);
   EXPECT_EQ(res, "Invalid characters in attribute name");
 
   utExit();

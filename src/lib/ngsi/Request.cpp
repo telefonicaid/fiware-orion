@@ -41,83 +41,36 @@ const char* requestType(RequestType rt)
   switch (rt)
   {
   case NoRequest:                                   return "NoRequest";
-  case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";   
-  case QueryContext:                                return "QueryContextRequest";
-  case RtQueryContextResponse:                      return "QueryContextResponse";
-  case SubscribeContext:                            return "SubscribeContextRequest";
-  case UnsubscribeContext:                          return "UnsubscribeContextRequest";
+
+  // pure v2
+  case EntryPointsRequest:                          return "EntryPointsRequest";
+  case EntitiesRequest:                             return "EntitiesRequest";
+  case EntityRequest:                               return "EntityRequest";
+  case EntityAttributeRequest:                      return "EntityAttributeRequest";
+  case EntityAttributeValueRequest:                 return "EntityAttributeValueRequest";
+  case EntityAllTypesRequest:                       return "EntityAllTypesRequest";
+  case EntityTypeRequest:                           return "EntityTypeRequest";
+  case SubscriptionsRequest:                        return "SubscriptionsRequest";
+  case SubscriptionRequest:                         return "SubscriptionRequest";
+  case RegistrationRequest:                         return "RegistrationRequest";
+  case RegistrationsRequest:                        return "RegistrationsRequest";
+  case BatchQueryRequest:                           return "BatchQueryRequest";
+  case BatchUpdateRequest:                          return "BatchUpdateRequest";
   case NotifyContext:                               return "NotifyContextRequest";
-  case NotifyContextSent:                           return "NotifyContextRequestSent";
-  case UpdateContext:                               return "UpdateContextRequest";
-  case RtUpdateContextResponse:                     return "UpdateContextResponse";
 
-  case ContextEntitiesByEntityId:                   return "ContextEntitiesByEntityId";
-  case ContextEntityAttributes:                     return "ContextEntityAttributes";
-  case EntityByIdAttributeByName:                   return "EntityByIdAttributeByName";
-  case ContextEntityTypes:                          return "ContextEntityTypes";
-  case ContextEntityTypeAttributeContainer:         return "ContextEntityTypeAttributeContainer";
-  case ContextEntityTypeAttribute:                  return "ContextEntityTypeAttribute";
-
-  case IndividualContextEntity:                     return "IndividualContextEntity";
-  case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";
-  case AttributeValueInstance:                      return "AttributeValueInstance";
-  case AttributeValueInstanceWithTypeAndId:         return "AttributeValueInstanceWithTypeAndId";
-  case IndividualContextEntityAttribute:            return "IndividualContextEntityAttribute";
-  case IndividualContextEntityAttributeWithTypeAndId:  return "IndividualContextEntityAttributeWithTypeAndId";
-  case UpdateContextElement:                        return "UpdateContextElement";
-  case AppendContextElement:                        return "AppendContextElement";
-  case UpdateContextAttribute:                      return "UpdateContextAttribute";
-  case Ngsi10ContextEntityTypes:                    return "Ngsi10ContextEntityTypes";
-  case Ngsi10ContextEntityTypesAttributeContainer:  return "Ngsi10ContextEntityTypesAttributeContainer";
-  case Ngsi10ContextEntityTypesAttribute:           return "Ngsi10ContextEntityTypesAttribute";
-  case Ngsi10SubscriptionsConvOp:                   return "Ngsi10SubscriptionsConvOp";
-
+  // administrative requests
   case LogTraceRequest:                             return "LogTrace";
+  case StatisticsRequest:                           return "Statistics";
   case LogLevelRequest:                             return "LogLevel";
   case SemStateRequest:                             return "SemState";
-  case MetricsRequest:                              return "Metrics";
   case VersionRequest:                              return "Version";
-  case StatisticsRequest:                           return "Statistics";
+  case MetricsRequest:                              return "Metrics";
+
+  // requests enabled in DEBUG compilation
   case ExitRequest:                                 return "Exit";
   case LeakRequest:                                 return "Leak";
+
   case InvalidRequest:                              return "InvalidRequest";
-
-  case RtUnsubscribeContextResponse:                     return "UnsubscribeContextResponse";
-  case RtSubscribeResponse:                              return "SubscribeResponse";
-  case RtSubscribeError:                                 return "SubscribeError";
-  case RtContextElementResponse:                         return "ContextElementResponse";
-  case RtContextAttributeResponse:                       return "ContextAttributeResponse";
-  case RtEntityTypesResponse:                            return "EntityTypesResponse";
-  case RtAttributesForEntityTypeResponse:                return "AttributesForEntityTypeResponse";
-  case EntityTypes:                                      return "EntityTypes";
-  case AttributesForEntityType:                          return "AttributesForEntityType";
-  case AllContextEntities:                               return "AllContextEntities";
-  case AllEntitiesWithTypeAndId:                         return "AllEntitiesWithTypeAndId";
-  case ContextEntitiesByEntityIdAndType:                 return "ContextEntitiesByEntityIdAndType";
-  case EntityByIdAttributeByNameIdAndType:               return "EntityByIdAttributeByNameIdAndType";
-
-  case EntitiesRequest:                                  return "EntitiesRequest";
-  case EntitiesResponse:                                 return "EntitiesResponse";
-
-  case EntryPointsRequest:                               return "EntryPointsRequest";
-  case EntryPointsResponse:                              return "EntryPointsResponse";
-
-  case EntityRequest:                                    return "EntityRequest";
-  case EntityResponse:                                   return "EntityResponse";
-  case EntityAttributeRequest:                           return "EntityAttributeRequest";
-  case EntityAttributeResponse:                          return "EntityAttributeResponse";
-  case EntityAttributeValueRequest:                      return "EntityAttributeValueRequest";
-  case EntityAttributeValueResponse:                     return "EntityAttributeValueResponse";
-
-  case EntityTypeRequest:                                return "EntityTypeRequest";
-  case EntityAllTypesRequest:                            return "EntityAllTypesRequest";
-  case SubscriptionsRequest:                             return "SubscriptionsRequest";
-  case SubscriptionRequest:                              return "SubscriptionRequest";
-  case BatchQueryRequest:                                return "BatchQueryRequest";
-  case BatchUpdateRequest:                               return "BatchUpdateRequest";
-
-  case RegistrationRequest:                              return "RegistrationRequest";
-  case RegistrationsRequest:                             return "RegistrationsRequest";
   }
 
   return "";
@@ -151,6 +104,7 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
   case RegistrationRequest:            return "/v2/registrations/{id}";
   case BatchQueryRequest:              return "/v2/op/query";
   case BatchUpdateRequest:             return "/v2/op/update";
+  case NotifyContext:                  return "/v2/op/notify";
 
   // administrative requests
   case LogTraceRequest:                return "/log/trace[/{level}]";
@@ -168,100 +122,6 @@ std::string requestTypeForCounter(RequestType rt, const std::string& _prefix)
     else
     {
       return "/statistics";
-    }
-
-  // pure v1
-  // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
-  //case RegisterContext:                      return "/v1/registry/registerContext";
-  //case ContextEntitiesByEntityId:            return "/v1/registry/contextEntities/{id}";
-  //case ContextEntitiesByEntityIdAndType:     return "/v1/registry/contextEntities/type/{type}/id/{id}";
-  //case ContextEntityAttributes:              return "/v1/registry/contextEntities/{id}/attributes";
-  //case ContextEntityTypeAttribute:           return "/v1/registry/contextEntityTypes/{type}/attributes/{name}";
-  //case ContextEntityTypeAttributeContainer:  return "/v1/registry/contextEntityTypes/{type}/attributes";
-  //case ContextEntityTypes:                   return "/v1/registry/contextEntityTypes/{type}";
-  //case DiscoverContextAvailability:          return "/v1/registry/discoverContextAvailability";
-  //case EntityByIdAttributeByName:            return "/v1/registry/contextEntities/{id}/attributes/{name}";
-  //case EntityByIdAttributeByNameIdAndType:   return "/v1/registry/contextEntities/type/{type}/id/{id}/attributes/{name}";
-  //case EntityTypes:                          return "/v1/contextTypes";
-  case ContextEntitiesByEntityId:
-  case ContextEntitiesByEntityIdAndType:
-  case ContextEntityAttributes:
-  case ContextEntityTypeAttribute:
-  case ContextEntityTypeAttributeContainer:
-  case ContextEntityTypes:
-  case DiscoverContextAvailability:
-  case EntityByIdAttributeByName:
-  case EntityByIdAttributeByNameIdAndType:
-  case EntityTypes:
-    return "skip";
-
-  // v1 or NGSI10;
-  // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
-  //case AllContextEntities:                             return prefix + "/contextEntitites";
-  //case AllEntitiesWithTypeAndId:                       return prefix + "/contextEntities/type/{type}/id/{id}";
-  //case AttributesForEntityType:                        return prefix + "/contextType/{type}";
-  //case IndividualContextEntity:                        return prefix + "/contextEntities/{id}";
-  case IndividualContextEntity:
-    if (prefix == "/v1")
-    {
-      return "/v1/contextEntities/{id}";
-    }
-    else
-    {
-      // ngsi10 case
-      return "skip";
-    }
-
-  //case IndividualContextEntityAttribute:               return prefix + "/contextEntities/{id}/attributes/{name}";
-  case IndividualContextEntityAttribute:
-    if (prefix == "/v1")
-    {
-      return "/v1/contextEntities/{id}/attributes/{name}";
-    }
-    else
-    {
-      // ngsi10 case
-      return "skip";
-    }
-  //case IndividualContextEntityAttributes:              return prefix + "/contextEntities/{id}/attributes/";
-  //case IndividualContextEntityAttributeWithTypeAndId:  return prefix + "/contextEntities/type/{type}/id/{id}/attributes/{name}";
-  //case Ngsi10ContextEntityTypes:                       return prefix + "/contextEntityTypes/{type}";
-  //case Ngsi10ContextEntityTypesAttribute:              return prefix + "/contextEntityTypes/{type}/attributes/{name}";
-  //case Ngsi10ContextEntityTypesAttributeContainer:     return prefix + "/contextEntityTypes/{type}/attributes/";
-  //case Ngsi10SubscriptionsConvOp:                      return prefix + "/contextSubscriptions/{id}";
-  case QueryContext:                                   return prefix + "/queryContext";
-  //case SubscribeContext:                               return prefix + "/subscribeContext|contextSubscriptions";
-  //case UnsubscribeContext:                             return prefix + "/unsubscribeContext";
-  case UpdateContext:                                  return prefix + "/updateContext";
-  //case UpdateContextSubscription:                      return prefix + "/updateContextSubscription";
-  case AllContextEntities:
-  case AllEntitiesWithTypeAndId:
-  case AttributesForEntityType:
-  //case IndividualContextEntity:
-  //case IndividualContextEntityAttribute:
-  case IndividualContextEntityAttributes:
-  case IndividualContextEntityAttributeWithTypeAndId:
-  case Ngsi10ContextEntityTypes:
-  case Ngsi10ContextEntityTypesAttribute:
-  case Ngsi10ContextEntityTypesAttributeContainer:
-  case Ngsi10SubscriptionsConvOp:
-  //case QueryContext:
-  case SubscribeContext:
-  case UnsubscribeContext:
-  //case UpdateContext:
-    return "skip";
-
-  // v2, v1 or NGSIv2
-  case NotifyContext:
-    if (prefix == "/v2")
-    {
-      return "/v2/op/notify";
-    }
-    else  // v1 or NGSI10 case
-    {
-      // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
-      //return prefix + "/notifyContext";
-      return "skip";
     }
 
   default:

@@ -108,7 +108,7 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->attr.attribute.check(EntityAttributeRequest)) != "OK")
+    if ((answer = parseDataP->attr.attribute.check(false)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
       return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));

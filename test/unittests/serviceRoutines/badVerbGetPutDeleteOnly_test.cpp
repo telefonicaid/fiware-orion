@@ -38,8 +38,8 @@
 */
 static RestService badVerbV[] =
 {
-  { AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, badVerbGetPutDeleteOnly },
-  { InvalidRequest,         0, {                                                          }, NULL                    }
+  { EntityAttributeRequest, 5, { "v2", "entities", "*", "attrs", "*"                      }, badVerbGetPutDeleteOnly   },
+  { InvalidRequest,         0, {                                                          }, NULL                      }
 };
 
 
@@ -50,13 +50,13 @@ static RestService badVerbV[] =
 */
 TEST(badVerbGetPutDeleteOnly, ok)
 {
-  ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature/14",  "POST", "1.1");
+  ConnectionInfo  ci("/v2/entities/entityId01/attrs/temperature",  "POST", "1.1");
   std::string     expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   std::string     out;
   RestService     restService =
     {
-      VersionRequest,
-      6, { "ngsi10", "contextEntities", "entityId01", "attributes", "temperature", "14" },
+      EntityAttributeRequest,
+      5, { "v2", "entities", "entityId01", "attrs", "temperature" },
       NULL
     };
 

@@ -68,7 +68,7 @@ UrlCounter noOfRequestCounters[] =
   {RegistrationRequest,           "v2", -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
   {BatchQueryRequest,             "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
   {BatchUpdateRequest,            "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
-  {NotifyContext,                 "v2",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  {NotifyContext,                 "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
 
   {LogTraceRequest,               "log", -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
   {StatisticsRequest,             "statistics", -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
@@ -77,63 +77,6 @@ UrlCounter noOfRequestCounters[] =
   {SemStateRequest,               "admin", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
   {VersionRequest,                "version", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
   {MetricsRequest,                "admin", -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
-
-  // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
-  // v1 and ngsi10 legacy                                                           GET    POST   PATCH  PUT    DELET  OPT
-  //{ContextEntitiesByEntityId,                     "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityAttributes,                       "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{EntityByIdAttributeByName,                     "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityTypes,                            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityTypeAttributeContainer,           "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityTypeAttribute,                    "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-
-  //{IndividualContextEntity,                       "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntity,                       "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  {IndividualContextEntity,                       "v1",     -1, -1, -1, -1, -1, -1, false,  false,  false, true,  true,  false},
-
-  //{IndividualContextEntityAttributes,             "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntityAttributes,             "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},ç
-
-  //{IndividualContextEntityAttribute,              "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntityAttribute,              "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  {IndividualContextEntityAttribute,              "v1",     -1, -1, -1, -1, -1, -1, true,  false,  false, false,  false,  false},
-
-  //{Ngsi10ContextEntityTypes,                      "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{Ngsi10ContextEntityTypes,                      "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-
-  //{Ngsi10ContextEntityTypesAttributeContainer,    "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{Ngsi10ContextEntityTypesAttributeContainer,    "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-
-  //{Ngsi10ContextEntityTypesAttribute,             "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{Ngsi10ContextEntityTypesAttribute,             "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-
-  //{Ngsi10SubscriptionsConvOp,                     "v1",     -1, -1, -1, -1, -1, -1, false,  false, false, true, true,  false},
-  //{Ngsi10SubscriptionsConvOp,                     "ngsi10", -1, -1, -1, -1, -1, -1, false,  false, false, true, true,  false},
-
-  //{EntityTypes,                                   "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{AttributesForEntityType,                       "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{AllContextEntities,                            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{AllEntitiesWithTypeAndId,                      "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntityAttributeWithTypeAndId, "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{ContextEntitiesByEntityIdAndType,              "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{EntityByIdAttributeByNameIdAndType,            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-
-  //{RegisterContext,                               "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{DiscoverContextAvailability,                   "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-
-  {UpdateContext,                                 "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  {UpdateContext,                                 "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  {QueryContext,                                  "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  {QueryContext,                                  "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{SubscribeContext,                              "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // two URLs: subscribeContext and contextSubscriptions
-  //{SubscribeContext,                              "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // two URLs: subscribeContext and contextSubscriptions
-  //{UpdateContextSubscription,                     "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{UpdateContextSubscription,                     "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{UnsubscribeContext,                            "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{UnsubscribeContext,                            "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-
-  //{NotifyContext,                                 "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // also in v2
-  //{NotifyContext,                                 "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // also in v2
 
   // Special ones (LeakRequest MUST be always the last one in the array. See statisticsUpdate() and resetStatistics() comments
   {ExitRequest,                   "exit", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
@@ -149,7 +92,6 @@ int noOfNotificationsSent        = -1;
 int noOfSimulatedNotifications   = -1;
 
 // Deprecated features
-int noOfDprNgsiv1Request         = -1;
 int noOfDprLegacyForwarding      = -1;
 int noOfDprGeoformat             = -1;
 

@@ -63,16 +63,10 @@ std::string EntityIdVector::toJson(void)
 */
 std::string EntityIdVector::check(RequestType requestType)
 {
-  // Only OK to be empty if part of a ContextRegistration
-  if ((requestType == DiscoverContextAvailability)           ||
-      (requestType == QueryContext)                          ||
-      (requestType == SubscribeContext))
+  if (vec.size() == 0)
   {
-    if (vec.size() == 0)
-    {
-      alarmMgr.badInput(clientIp, "mandatory entity list missing");
-      return "No entities";
-    }
+    alarmMgr.badInput(clientIp, "mandatory entity list missing");
+    return "Empty entityIdVector";
   }
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)

@@ -45,13 +45,6 @@ TEST(ContextRegistrationResponseVector, all)
 
   crrV.push_back(&crr);
 
-  // check OK
-  rendered = crrV.check(BatchUpdateRequest, "", 0);
-  EXPECT_EQ("OK", rendered);
-
-  // Now telling the crr that we've found an instance of '<entityIdList></entityIdList>
-  // but without any entities inside the vector
-  crr.contextRegistration.entityIdVectorPresent = true;
   rendered = crrV.check(BatchUpdateRequest, "", 0);
   EXPECT_EQ("Empty entityIdVector", rendered);
 

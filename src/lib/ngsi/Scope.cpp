@@ -110,7 +110,6 @@ int Scope::fill
   int                         points;
   std::vector<orion::Point*>  pointV;
 
-  // FIXME PR: FIWARE_LOCATION_V2 is now useless?
   type = FIWARE_LOCATION_V2;
 
   //
@@ -376,133 +375,16 @@ std::string Scope::check(void)
     }
   }
 
-  if (type == FIWARE_LOCATION || type == FIWARE_LOCATION_DEPRECATED)
+  if (type.empty())
   {
-    if (areaType == orion::CircleType)
-    {
-      if (circle.radiusString() == "0")
-      {
-        alarmMgr.badInput(clientIp, "radius zero for a circle area");
-        return "Radius zero for a circle area";
-      }
-      else if (circle.radiusString().empty())
-      {
-        alarmMgr.badInput(clientIp, "missing radius for circle area");
-        return "Missing radius for circle area";
-      }
-      else if (!circle.invertedString().empty())
-      {
-        if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
-        {
-          std::string details = std::string("bad value for circle/inverted: '") + circle.invertedString() + "'"; 
-          alarmMgr.badInput(clientIp, details);
-          return "bad value for circle/inverted: /" + circle.invertedString() + "/";
-        }
-      }
-      else if (circle.center.latitudeString().empty())
-      {
-        alarmMgr.badInput(clientIp, "missing latitude for circle center");
-        return "Missing latitude for circle center";
-      }
-      else if (circle.center.longitudeString().empty())
-      {
-        alarmMgr.badInput(clientIp, "missing longitude for circle center");
-        return "Missing longitude for circle center";
-      }
-
-      double latitude;
-      double longitude;
-      bool   ok;
-
-      ok = str2double(circle.center.latitudeString().c_str(), &latitude);
-      if ((ok == false) || (latitude > 90) || (latitude < -90))
-      {
-        std::string details = std::string("invalid value for latitude (") + circle.center.latitudeString() + ")";
-        alarmMgr.badInput(clientIp, details);
-        return "invalid value for latitude";
-      }
-
-      ok = str2double(circle.center.longitudeString().c_str(), &longitude);
-      if ((ok == false) || (longitude > 180) || (longitude < -180))
-      {
-        std::string details = std::string("invalid value for longitude: '") + circle.center.longitudeString() + "'";
-        alarmMgr.badInput(clientIp, details);
-        return "invalid value for longitude";
-      }
-    }
-    else if (areaType == orion::PolygonType)
-    {
-      if (polygon.vertexList.size() < 3)
-      {
-        char noOfV[STRING_SIZE_FOR_INT];
-
-        snprintf(noOfV, sizeof(noOfV), "%lu", polygon.vertexList.size());
-        std::string details = std::string("too few vertices for a polygon (") + noOfV + " is less than three)";
-        alarmMgr.badInput(clientIp, details);
-
-        return "too few vertices for a polygon";
-      }
-      else if (!polygon.invertedString().empty())
-      {
-        if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
-        {
-          std::string details = std::string("bad value for polygon/inverted: '") + polygon.invertedString() + "'";
-          alarmMgr.badInput(clientIp, details);
-          return "bad value for polygon/inverted: /" + polygon.invertedString() + "/";
-        }
-      }
-
-      for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
-      {
-        if (polygon.vertexList[ix]->latitudeString().empty())
-        {
-          alarmMgr.badInput(clientIp, "missing latitude value for polygon vertex");
-          return std::string("missing latitude value for polygon vertex");
-        }
-
-        if (polygon.vertexList[ix]->longitudeString().empty())
-        {
-          alarmMgr.badInput(clientIp, "missing longitude value for polygon vertex");
-          return std::string("missing longitude value for polygon vertex");
-        }
-
-        double latitude;
-        double longitude;
-        bool   ok;
-
-
-        ok = str2double(polygon.vertexList[ix]->latitudeString().c_str(), &latitude);
-        if ((ok == false) || (latitude > 90) || (latitude < -90))
-        {
-          std::string details = std::string("invalid value for latitude: '") + polygon.vertexList[ix]->latitudeString() + "'";
-          alarmMgr.badInput(clientIp, details);
-          return "invalid value for latitude";
-        }
-
-        ok = str2double(polygon.vertexList[ix]->longitudeString().c_str(), &longitude);
-        if ((ok == false) || (longitude > 180) || (longitude < -180))
-        {
-          std::string details = std::string("invalid value for longitude: '") + polygon.vertexList[ix]->longitudeString() + "'";
-          alarmMgr.badInput(clientIp, details);
-          return "invalid value for longitude";
-        }
-      }
-    }
+    alarmMgr.badInput(clientIp, "empty type in restriction scope");
+    return "Empty type in restriction scope";
   }
 
-  if ((type != FIWARE_LOCATION) && (type != FIWARE_LOCATION_DEPRECATED))
+  if (value.empty())
   {
-    if (type.empty())
-    {
-      alarmMgr.badInput(clientIp, "empty type in restriction scope");
-      return "Empty type in restriction scope";
-    }
-
-    if (value.empty())
-    {
-      alarmMgr.badInput(clientIp, "empty value in restriction scope");
-      return "Empty value in restriction scope";
-    }
+    alarmMgr.badInput(clientIp, "empty value in restriction scope");
+    return "Empty value in restriction scope";
   }
 
   if (type == FIWARE_LOCATION_V2)

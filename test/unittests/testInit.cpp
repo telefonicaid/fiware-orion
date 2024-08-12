@@ -278,12 +278,7 @@ bool matchNotifyContextRequest(NotifyContextRequest* expected, NotifyContextRequ
 
   /* The isEmpty() check is needed because, in some occasion, we don't have any expectations on
    * subscriptionId and, in these cases, we don't check its value */
-  if (!expected->subscriptionId.isEmpty() && (expected->subscriptionId.get() != arg->subscriptionId.get()))
-  {
-    return false;
-  }
-
-  if (expected->originator.get() != arg->originator.get())
+  if (!expected->subscriptionId.empty() && (expected->subscriptionId != arg->subscriptionId))
   {
     return false;
   }

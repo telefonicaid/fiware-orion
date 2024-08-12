@@ -85,8 +85,6 @@ SET (SOURCES
     common/commonMacroSubstitute_test.cpp
 
     ngsi10/NotifyContextRequest_test.cpp
-    ngsi10/SubscribeContextResponse_test.cpp
-    ngsi10/UnsubscribeContextResponse_test.cpp
 
     ngsi/ContextAttribute_test.cpp
     ngsi/NotifyCondition_test.cpp
@@ -95,7 +93,6 @@ SET (SOURCES
     ngsi/ContextElementResponse_test.cpp
     ngsi/ContextElementResponseVector_test.cpp
     ngsi/ProvidingApplication_test.cpp
-    ngsi/Duration_test.cpp
     ngsi/AttributeExpression_test.cpp
     ngsi/ContextRegistrationResponse_test.cpp
     ngsi/ContextRegistrationResponseVector_test.cpp
@@ -103,17 +100,12 @@ SET (SOURCES
     ngsi/Metadata_test.cpp
     ngsi/MetadataVector_test.cpp
     ngsi/NotifyConditionVector_test.cpp
-    ngsi/Originator_test.cpp
-    ngsi/Reference_test.cpp
     ngsi/Restriction_test.cpp
     ngsi/Request_test.cpp
     ngsi/RestrictionString_test.cpp
     ngsi/Scope_test.cpp
     ngsi/ScopeVector_test.cpp
     ngsi/StatusCode_test.cpp
-    ngsi/SubscribeError_test.cpp
-    ngsi/SubscriptionId_test.cpp
-    ngsi/Throttling_test.cpp
 
     orionTypes/EntityType_test.cpp
     orionTypes/EntityTypeVector_test.cpp

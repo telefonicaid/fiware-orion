@@ -117,19 +117,9 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
-    // FIXME PR: solve this
-    //if (ciP->apiVersion == V2)
-    {
-      OrionError error(SccBadRequest, errorString);
-      ciP->httpStatusCode = error.code;
-      ciP->answer         = error.toJson();
-    }
-    // FIXME PR: solve this
-    /*else if (ciP->apiVersion == ADMIN_API)
-    {
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = "{" + JSON_STR("error") + ":" + JSON_STR(errorString) + "}";
-    }*/
+    OrionError error(SccBadRequest, errorString);
+    ciP->httpStatusCode = error.code;
+    ciP->answer         = error.toJson();
 
     return MHD_YES;
   }

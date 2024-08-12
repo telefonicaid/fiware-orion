@@ -113,7 +113,7 @@ std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
       return answer;
     }
 
-    if ((answer = parseDataP->av.attribute.check(EntityAttributeValueRequest)) != "OK")
+    if ((answer = parseDataP->av.attribute.check(true)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
       return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));

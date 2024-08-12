@@ -1113,19 +1113,19 @@ void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP, bool 
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(RequestType requestType, bool relaxForbiddenCheck)
+std::string ContextAttribute::check(bool asValue, bool relaxForbiddenCheck)
 {
   size_t len;
   char errorMsg[128];
 
-  if (((len = strlen(name.c_str())) < MIN_ID_LEN) && (requestType != EntityAttributeValueRequest))
+  if (((len = strlen(name.c_str())) < MIN_ID_LEN) && (!asValue))
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg, name);
     return std::string(errorMsg);
   }
 
-  if ((name.empty()) && (requestType != EntityAttributeValueRequest))
+  if ((name.empty()) && (!asValue))
   {
     return "missing attribute name";
   }
@@ -1151,14 +1151,14 @@ std::string ContextAttribute::check(RequestType requestType, bool relaxForbidden
   }
 
 
-  if ((requestType != EntityAttributeValueRequest) && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if ((!asValue) && (len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "attribute type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg, type);
     return std::string(errorMsg);
   }
 
-  if ((requestType != EntityAttributeValueRequest) && forbiddenIdCharsV2(type.c_str()))
+  if ((!asValue) && forbiddenIdCharsV2(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";

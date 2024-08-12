@@ -32,8 +32,6 @@
 #include "metricsMgr/metricsMgr.h"
 
 #include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/SubscribeContextResponse.h"
-#include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi10/NotifyContextResponse.h"
 

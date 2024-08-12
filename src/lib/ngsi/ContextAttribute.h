@@ -120,7 +120,7 @@ public:
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(RequestType requestType, bool relaxForbiddenCheck = false);
+  std::string  check(bool asValue, bool relaxForbiddenCheck = false);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
