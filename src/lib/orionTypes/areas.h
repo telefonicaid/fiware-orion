@@ -40,7 +40,6 @@ namespace orion
 typedef enum AreaType
 {
   NoArea,
-  CircleType,
   PolygonType,
   PointType,
   LineType,

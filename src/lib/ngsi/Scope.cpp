@@ -449,7 +449,6 @@ void Scope::areaTypeSet(const std::string& areaTypeString)
 {
   if      (areaTypeString == "line")    areaType = orion::LineType;
   else if (areaTypeString == "polygon") areaType = orion::PolygonType;
-  else if (areaTypeString == "circle")  areaType = orion::CircleType;
   else if (areaTypeString == "point")   areaType = orion::PointType;
   else if (areaTypeString == "box")     areaType = orion::BoxType;
   else                                  areaType = orion::NoArea;       
