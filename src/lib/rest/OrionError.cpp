@@ -127,9 +127,9 @@ void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetai
 
 /* ****************************************************************************
 *
-* OrionError::setStatusCodeAndSmartRender -
+* OrionError::setSCAndRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(HttpStatusCode* scP)
+std::string OrionError::setSCAndRender(HttpStatusCode* scP)
 {
   *scP = code;
   return toJson();

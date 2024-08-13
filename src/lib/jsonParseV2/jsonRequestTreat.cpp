@@ -80,7 +80,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(EntitiesRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      return oe.setSCAndRender(&(ciP->httpStatusCode));
     }
     break;
 
@@ -95,7 +95,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->ent.res.check(EntityRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      return oe.setSCAndRender(&(ciP->httpStatusCode));
     }
     break;
 
@@ -111,7 +111,7 @@ std::string jsonRequestTreat
     if ((answer = parseDataP->attr.attribute.check(false)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      return oe.setSCAndRender(&(ciP->httpStatusCode));
     }
     break;
 

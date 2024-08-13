@@ -694,14 +694,14 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (servicePath[0] != '/')
   {
     OrionError oe(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
-    ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+    ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
     return 1;
   }
 
   if (servicePath[1] == '/')
   {
     OrionError oe(SccBadRequest, "empty component in ServicePath");
-    ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+    ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
     return 1;
   }
 
@@ -710,13 +710,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     if (ciP->verb == PATCH)
     {
       OrionError oe(SccBadRequest, "more than one servicepath in patch update request is not allowed");
-      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
       return 1;
     }
     if (ciP->verb == DELETE)
     {
       OrionError oe(SccBadRequest, "more than one servicepath is not allowed in DELETE operation");
-      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
       return 1;
     }
   }
@@ -726,7 +726,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (components > SERVICE_PATH_MAX_LEVELS)
   {
     OrionError oe(SccBadRequest, "too many components in ServicePath");
-    ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+    ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
     return 2;
   }
 
@@ -735,14 +735,14 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     if (strlen(compV[ix].c_str()) > SERVICE_PATH_MAX_COMPONENT_LEN)
     {
       OrionError oe(SccBadRequest, "component-name too long in ServicePath");
-      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
       return 3;
     }
 
     if (compV[ix].c_str()[0] == 0)
     {
       OrionError oe(SccBadRequest, "empty component in ServicePath");
-      ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
       return 3;
     }
 
@@ -754,13 +754,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (ciP->verb == PATCH)
       {
         OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in patch update request");
-        ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+        ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
         return 3;
       }
       else if (ciP->verb == DELETE)
       {
         OrionError oe(SccBadRequest, "servicepath with wildcard # is not allowed in DELETE operation");
-        ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+        ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
         return 3;
       }
       else
@@ -776,7 +776,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
         OrionError oe(SccBadRequest, "a component of ServicePath contains an illegal character");
-        ciP->answer = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+        ciP->answer = oe.setSCAndRender(&(ciP->httpStatusCode));
         return 4;
       }
     }

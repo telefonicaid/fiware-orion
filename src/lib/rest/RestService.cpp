@@ -558,7 +558,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       OrionError  oe(SccBadRequest, result);
 
-      std::string  response = oe.setStatusCodeAndSmartRender(&(ciP->httpStatusCode));
+      std::string  response = oe.setSCAndRender(&(ciP->httpStatusCode));
 
       alarmMgr.badInput(clientIp, result);
       restReply(ciP, response);
