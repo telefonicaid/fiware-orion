@@ -64,7 +64,6 @@ typedef struct Scope
   std::string  oper;     // Optional - used for filters
 
   orion::AreaType     areaType;
-  orion::Circle       circle;
   orion::Polygon      polygon;
   orion::Point        point;
   orion::Line         line;

@@ -640,127 +640,6 @@ orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<
 
 /* *****************************************************************************
 *
-* processAreaScope -
-*
-* Returns true if 'areaQueryP' was filled, false otherwise
-*/
-static bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP)
-{
-  // FIXME #3774: previously this part was based in streamming instead of append()
-
-  std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-
-  if (!mongoLocationCapable())
-  {
-    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
-      "Please upgrade MongoDB server to 2.4 or newer)";
-
-    alarmMgr.badInput(clientIp, details);
-    return false;
-  }
-
-  bool     inverted = false;
-  orion::BSONObj  geoWithin;
-
-  if (scoP->areaType == orion::CircleType)
-  {
-    double radians = scoP->circle.radius() / EARTH_RADIUS_METERS;
-
-    orion::BSONObjBuilder    bobGeoWithin;
-    orion::BSONArrayBuilder  baOuter;
-    orion::BSONArrayBuilder  baInner;
-
-    baInner.append(scoP->circle.center.longitude());
-    baInner.append(scoP->circle.center.latitude());
-
-    baOuter.append(baInner.arr());
-    baOuter.append(radians);
-
-    bobGeoWithin.append("$centerSphere", baOuter.arr());
-
-    geoWithin = bobGeoWithin.obj();
-
-    inverted  = scoP->circle.inverted();
-  }
-  else if (scoP->areaType == orion::PolygonType)
-  {
-    orion::BSONArrayBuilder  vertex;
-    double            lat0 = 0;
-    double            lon0 = 0;
-
-    for (unsigned int jx = 0; jx < scoP->polygon.vertexList.size() ; ++jx)
-    {
-      double  lat  = scoP->polygon.vertexList[jx]->latitude();
-      double  lon  = scoP->polygon.vertexList[jx]->longitude();
-
-      if (jx == 0)
-      {
-        lat0 = lat;
-        lon0 = lon;
-      }
-
-      orion::BSONArrayBuilder baCoords;
-      baCoords.append(lon);
-      baCoords.append(lat);
-
-      vertex.append(baCoords.arr());
-    }
-
-    /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
-    orion::BSONArrayBuilder baCoords0;
-    baCoords0.append(lon0);
-    baCoords0.append(lat0);
-    vertex.append(baCoords0.arr());
-
-    /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
-    orion::BSONObjBuilder bobGeoWithin;
-    orion::BSONObjBuilder bobGeometry;
-    orion::BSONArrayBuilder baVertex;
-
-    baVertex.append(vertex.arr());
-
-    bobGeometry.append("type", "Polygon");
-    bobGeometry.append("coordinates", baVertex.arr());
-
-    bobGeoWithin.append("$geometry", bobGeometry.obj());
-    geoWithin = bobGeoWithin.obj();
-
-    inverted  = scoP->polygon.inverted();
-  }
-  else
-  {
-    alarmMgr.badInput(clientIp, "unknown area type");
-    return false;
-  }
-
-  if (inverted)
-  {
-    /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
-     * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
-    orion::BSONObjBuilder bobAreaQuery;
-    orion::BSONObjBuilder bobGeoWithin;
-
-    bobGeoWithin.append("$geoWithin", geoWithin);
-
-    bobAreaQuery.append("$exists", true);
-    bobAreaQuery.append("$not", bobGeoWithin.obj());
-
-    queryP->append(locCoords, bobAreaQuery.obj());
-  }
-  else
-  {
-    orion::BSONObjBuilder bobAreaQuery;
-    bobAreaQuery.append("$geoWithin", geoWithin);
-    queryP->append(locCoords, bobAreaQuery.obj());
-  }
-
-  return true;
-}
-
-
-
-/* *****************************************************************************
-*
 * addFilterScope -
 */
 static void addFilterScope( const Scope* scoP, std::vector<orion::BSONObj>* filtersP)
@@ -1488,14 +1367,7 @@ bool entitiesQuery
       }
       else
       {
-        if (scopeP->type == FIWARE_LOCATION_V2)
-        {
-           processAreaScopeV2(scopeP, &finalQuery, &finalCountQuery);
-        }
-        else  // FIWARE Location NGSIv1 (legacy)
-        {
-          processAreaScope(scopeP, &finalQuery);
-        }
+        processAreaScopeV2(scopeP, &finalQuery, &finalCountQuery);
       }
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
