@@ -36,7 +36,6 @@ SET (SOURCES
     MetadataVector.cpp
     ProvidingApplication.cpp
     Request.cpp
-    Restriction.cpp
     Scope.cpp
     ScopeVector.cpp
     StatusCode.cpp
@@ -58,7 +57,6 @@ SET (HEADERS
     Metadata.h
     MetadataVector.h
     ProvidingApplication.h
-    Restriction.h
     Scope.h
     StatusCode.h
     StringList.h

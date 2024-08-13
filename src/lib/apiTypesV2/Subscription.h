@@ -32,7 +32,7 @@
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
-#include "ngsi/Restriction.h"
+#include "ngsi/ScopeVector.h"
 #include "common/RenderFormat.h"
 
 namespace ngsiv2
@@ -159,7 +159,7 @@ public:
   Notification  notification;
   long long     throttling;
   RenderFormat  attrsFormat;
-  Restriction   restriction;
+  ScopeVector   scopeVector;
   std::string   toJson();
   void          release();
 

@@ -32,7 +32,6 @@
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/Restriction.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "rest/EntityTypeInfo.h"
@@ -44,12 +43,9 @@
 *
 * QueryContextRequest::QueryContextRequest
 *
-* Explicit constructor needed to initialize primitive types so they don't get
-* random values from the stack
 */
 QueryContextRequest::QueryContextRequest()
 {
-  restrictions = 0;
 }
 
 
@@ -69,8 +65,6 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
   {
     attributeList.push_back(attributeName);
   }
-
-  restrictions = 0;
 }
 
 
@@ -87,8 +81,6 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
   entityIdVector.push_back(new EntityId(eP));
 
   attributeList.clone(_attributeList);
-
-  restrictions = 0;
 }
 
 
@@ -169,7 +161,7 @@ std::string QueryContextRequest::toJsonV1(void)
 void QueryContextRequest::release(void)
 {
   entityIdVector.release();
-  restriction.release();
+  scopeVector.release();
 }
 
 
@@ -215,7 +207,7 @@ void QueryContextRequest::fill
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
 
-    restriction.scopeVector.push_back(scopeP);
+    scopeVector.push_back(scopeP);
   }
 
   if (!attributeName.empty())
@@ -251,6 +243,6 @@ void QueryContextRequest::fill(BatchQuery* bqP)
   attributeList.fill(bqP->attributeV.stringV);  // attributeV is deprecated
   attrsList.fill(bqP->attrsV.stringV);
   metadataList.fill(bqP->metadataV.stringV);
-  restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
-  bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP
+  scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
+  bqP->scopeV.vec.clear();  // QueryContextRequest::scopeVector has taken over the Scopes from bqP
 }

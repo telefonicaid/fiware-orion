@@ -96,7 +96,6 @@ SET (SOURCES
     ngsi/EntityId_test.cpp
     ngsi/Metadata_test.cpp
     ngsi/MetadataVector_test.cpp
-    ngsi/Restriction_test.cpp
     ngsi/Request_test.cpp
     ngsi/Scope_test.cpp
     ngsi/ScopeVector_test.cpp

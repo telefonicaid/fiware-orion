@@ -197,7 +197,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -227,7 +227,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -256,7 +256,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 

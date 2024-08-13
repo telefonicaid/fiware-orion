@@ -49,7 +49,6 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
 #include "apiTypesV2/Subscription.h"
@@ -1252,7 +1251,7 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const Restriction&               res,
+  const ScopeVector&               spV,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   const std::string&               tenant,
@@ -1350,9 +1349,9 @@ bool entitiesQuery
   std::vector<orion::BSONObj>  filters;
   unsigned int                 geoScopes = 0;
 
-  for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < spV.size(); ++ix)
   {
-    const Scope* scopeP = res.scopeVector[ix];
+    const Scope* scopeP = spV[ix];
 
     if (scopeP->type.find(SCOPE_FILTER) == 0)
     {

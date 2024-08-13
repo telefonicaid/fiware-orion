@@ -1330,7 +1330,7 @@ static std::string parseNotifyConditionVector
   // Expression
   if (condition.HasMember("expression"))
   {
-    std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
+    std::string r = parseExpression(condition["expression"], &subsP->scopeVector, subsP);
 
     if (r != "OK")
     {

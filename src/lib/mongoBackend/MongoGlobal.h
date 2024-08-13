@@ -41,7 +41,6 @@
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/ContextRegistrationResponseVector.h"
-#include "ngsi/Restriction.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
@@ -215,7 +214,7 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const Restriction&               res,
+  const ScopeVector&               spV,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
   const std::string&               tenant,

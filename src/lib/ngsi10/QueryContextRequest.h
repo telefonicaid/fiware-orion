@@ -30,7 +30,7 @@
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/Restriction.h"
+#include "ngsi/ScopeVector.h"
 #include "rest/EntityTypeInfo.h"
 
 
@@ -54,9 +54,9 @@ typedef struct QueryContextRequest
   EntityIdVector    entityIdVector;  // Mandatory
   StringList        attributeList;   // Optional
   StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
-  Restriction       restriction;     // Optional
+  ScopeVector       scopeVector;     // Optional
 
-  int               restrictions;
+  //int               restrictions;
   StringList        metadataList;     // From URI param 'metadata'
   std::string       contextProvider;  // Not part of the payload - used internally only
   ProviderFormat    providerFormat;   // Not part of the payload - used internally only

@@ -103,16 +103,16 @@ namespace ngsiv2
 */
 Subscription::~Subscription()
 {
-  unsigned int sz = restriction.scopeVector.size();
+  unsigned int sz = scopeVector.size();
 
   if (sz > 0)
   {
     for (unsigned i = 0; i != sz; i++ )
     {
-      restriction.scopeVector[i]->release();
-      delete restriction.scopeVector[i];
+      scopeVector[i]->release();
+      delete scopeVector[i];
     }
-    restriction.scopeVector.vec.clear();
+    scopeVector.vec.clear();
   }
 }
 

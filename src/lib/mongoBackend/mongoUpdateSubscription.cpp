@@ -149,22 +149,22 @@ static void updateInCache
   //
   // StringFilter in Scope?
   //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.scopeVector?
   // If so, set it as string filter to the sub-cache item
   //
   StringFilter*  stringFilterP   = NULL;
   StringFilter*  mdStringFilterP = NULL;
 
-  for (unsigned int ix = 0; ix < subUp.restriction.scopeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < subUp.scopeVector.size(); ++ix)
   {
-    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    if (subUp.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      stringFilterP = subUp.restriction.scopeVector[ix]->stringFilterP;
+      stringFilterP = subUp.scopeVector[ix]->stringFilterP;
     }
 
-    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
+    if (subUp.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
     {
-      mdStringFilterP = subUp.restriction.scopeVector[ix]->mdStringFilterP;
+      mdStringFilterP = subUp.scopeVector[ix]->mdStringFilterP;
     }
   }
 

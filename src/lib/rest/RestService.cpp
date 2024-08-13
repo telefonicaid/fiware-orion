@@ -264,11 +264,11 @@ static void commonFilters
   //
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
   {
-    Restriction* restrictionP = &parseDataP->qcr.res.restriction;
+    ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-    if (restrictionP == NULL)
+    if (scopeVectorP == NULL)
     {
-      // The restrictionP-lookup is MISSING (not implemented
+      // The scopeVectorP-lookup is MISSING (not implemented
       // We just silently return.
       //
       return;
@@ -276,7 +276,7 @@ static void commonFilters
 
     Scope* scopeP  = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
     scopeP->oper   = SCOPE_OPERATOR_NOT;
-    restrictionP->scopeVector.push_back(scopeP);
+    scopeVectorP->push_back(scopeP);
   }
 
 
@@ -286,11 +286,11 @@ static void commonFilters
   //
   if (ciP->uriParam[URI_PARAM_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
   {
-    Restriction* restrictionP = &parseDataP->qcr.res.restriction;
+    ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-    if (restrictionP == NULL)
+    if (scopeVectorP == NULL)
     {
-      // The restrictionP-lookup is MISSING (not implemented)
+      // The scopeVectorP-lookup is MISSING (not implemented)
       // We just silently return.
       //
       return;
@@ -298,7 +298,7 @@ static void commonFilters
 
     Scope*  scopeP  = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
     scopeP->oper    = "";
-    restrictionP->scopeVector.push_back(scopeP);
+    scopeVectorP->push_back(scopeP);
   }
 }
 
@@ -315,11 +315,11 @@ static void scopeFilter
   RestService*      serviceP
 )
 {
-  Restriction* restrictionP = &parseDataP->qcr.res.restriction;
+  ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-  for (unsigned int ix = 0; ix < restrictionP->scopeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < scopeVectorP->size(); ++ix)
   {
-    Scope* scopeP = restrictionP->scopeVector[ix];
+    Scope* scopeP = (*scopeVectorP)[ix];
 
     if (scopeP->type == SCOPE_FILTER_NOT_EXISTENCE)
     {
@@ -337,23 +337,11 @@ static void scopeFilter
 */
 static void filterRelease(ParseData* parseDataP, RequestType request)
 {
-  Restriction* restrictionP = NULL;
+  ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-#if 0
-  if (request == EntityTypes)
+  if (scopeVectorP != NULL)
   {
-    restrictionP = &parseDataP->qcr.res.restriction;
-  }
-  else if (request == AllContextEntities)
-  {
-    restrictionP = &parseDataP->qcr.res.restriction;
-  }
-#endif
-  restrictionP = &parseDataP->qcr.res.restriction;
-
-  if (restrictionP != NULL)
-  {
-    restrictionP->release();
+    scopeVectorP->release();
   }
 }
 
