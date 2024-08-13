@@ -4356,7 +4356,7 @@ unsigned int processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(eP);
+        ContextElementResponse* notifyCerP = new ContextElementResponse(eP, true);
         notifyCerP->applyUpdateOperators();
 
         // Set action type
