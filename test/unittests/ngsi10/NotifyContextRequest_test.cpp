@@ -36,29 +36,6 @@
 
 /* ****************************************************************************
 *
-* Constructor -
-*/
-TEST(NotifyContextResponse, Constructor)
-{
-  StatusCode sc(SccOk, "2");
-  NotifyContextResponse ncr(sc);
-
-  utInit();
-
-  EXPECT_EQ(SccOk, ncr.responseCode.code);
-  ncr.release();
-
-  StatusCode ec(SccOk, "4");
-  NotifyContextResponse ncr2(ec);
-  EXPECT_EQ(SccOk, ncr2.responseCode.code);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * json_render -
 */
 TEST(NotifyContextRequest, json_render)

@@ -49,24 +49,6 @@ MetadataVector::MetadataVector(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::matchFilter -
-*
-*/
-bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter)
-{
-  /* Metadata filtering only in the case of actual metadata vector not containing "*" */
-  if ((metadataFilter.size() == 0) || (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_ALL) != metadataFilter.end()))
-  {
-    return true;
-  }
-
-  return std::find(metadataFilter.begin(), metadataFilter.end(), mdName) != metadataFilter.end();
-}
-
-
-
-/* ****************************************************************************
-*
 * MetadataVector::toJson -
 *
 * Metadatas named 'value' or 'type' are not rendered in API version 2, due to the 
@@ -170,22 +152,6 @@ void MetadataVector::release(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::fill -
-*/
-void MetadataVector::fill(MetadataVector* mvP)
-{
-  for (unsigned int ix = 0; ix < mvP->size(); ++ix)
-  {
-    Metadata* mP = new Metadata((*mvP)[ix]);
-
-    push_back(mP);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * MetadataVector::lookupByName - 
 */
 Metadata* MetadataVector::lookupByName(const std::string& _name) const
@@ -214,6 +180,6 @@ void MetadataVector::toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* 
     this->vec[ix]->appendToBsoN(md, mdNames, useDefaultType);
 
     LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      this->vec[ix]->name.c_str(), this->vec[ix]->type.c_str(), this->vec[ix]->toStringValue().c_str()));
+                      this->vec[ix]->name.c_str(), this->vec[ix]->type.c_str(), this->vec[ix]->toJson().c_str()));
   }
 }

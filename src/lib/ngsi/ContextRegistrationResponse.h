@@ -49,9 +49,6 @@ typedef struct ContextRegistrationResponse
 
   void         release(void);
 
-  std::string  check(RequestType         requestType,
-                     const std::string&  predetectedError,
-                     int                 counter);
 } ContextRegistrationResponse;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONRESPONSE_H_

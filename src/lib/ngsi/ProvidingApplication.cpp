@@ -48,33 +48,6 @@ ProvidingApplication::ProvidingApplication()
 
 /* ****************************************************************************
 *
-* ProvidingApplication::check -
-*/
-std::string ProvidingApplication::check(void)
-{
-  if (isEmpty())
-  {
-    return "no providing application";
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* ProvidingApplication::isEmpty -
-*/
-bool ProvidingApplication::isEmpty(void)
-{
-  return (string.empty())? true : false;
-}
-
-
-
-/* ****************************************************************************
-*
 * ProvidingApplication::set -
 */
 void ProvidingApplication::set(const std::string& value)
@@ -135,17 +108,6 @@ std::string ProvidingApplication::getRegId(void)
 std::string ProvidingApplication::get(void)
 {
   return string;
-}
-
-
-
-/* ****************************************************************************
-*
-* ProvidingApplication::c_str -
-*/
-const char* ProvidingApplication::c_str(void)
-{
-  return string.c_str();
 }
 
 

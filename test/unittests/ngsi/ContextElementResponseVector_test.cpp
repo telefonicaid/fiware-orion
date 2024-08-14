@@ -33,35 +33,6 @@
 
 /* ****************************************************************************
 *
-* check - 
-*/
-TEST(ContextElementResponseVector, check)
-{
-  ContextElementResponseVector  cerv;
-  ContextElementResponse        cer;
-  std::string                   out;
-
-  utInit();
-
-  out = cerv.check(BatchUpdateRequest, "", 0);
-  EXPECT_STREQ("OK", out.c_str());
-
-  cer.entity.id         = "ID";
-  cer.entity.type       = "Type";
-  cer.entity.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "details");
-
-  cerv.push_back(&cer);
-  out = cerv.check(BatchUpdateRequest, "", 0);
-  EXPECT_STREQ("OK", out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render - 
 *
 */

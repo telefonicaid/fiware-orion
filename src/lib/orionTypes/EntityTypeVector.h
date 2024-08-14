@@ -44,12 +44,7 @@ class EntityTypeVector
   EntityTypeVector();
 
   void          push_back(EntityType* item);
-  unsigned int  size(void);
   void          release(void);
-  std::string   check(const std::string& predetectedError);
-
-  EntityType*   operator[] (unsigned int ix) const;
-
 };
 
 #endif  // SRC_LIB_ORIONTYPES_ENTITYTYPEVECTOR_H_

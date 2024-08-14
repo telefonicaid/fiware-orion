@@ -56,19 +56,12 @@ class EntityId
            const std::string&  _isPattern     = "",
            bool                _isTypePattern = false);
 
-  void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern = false);
   void         fill(const struct EntityId* eidP, bool useDefaultType = false);
 
   void         release(void);
-  std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
-  bool         equal(EntityId* eP);
   bool         isPatternIsTrue(void);
 
   std::string  toJson(void);
-
-  std::string  check(RequestType  requestType);
-
-  std::string  toJson(void) const;
 };
 
 #endif  // SRC_LIB_NGSI_ENTITYID_H_

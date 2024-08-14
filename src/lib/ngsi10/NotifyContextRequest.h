@@ -48,7 +48,6 @@ typedef struct NotifyContextRequest
                        const std::vector<std::string>&      metadataFilter,
                        ExprContextObject*                   exprContextObjectP = NULL);
   void          release(void);
-  NotifyContextRequest* clone(void);
 } NotifyContextRequest;
 
 #endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTREQUEST_H_

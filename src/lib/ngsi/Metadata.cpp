@@ -320,65 +320,6 @@ void Metadata::release(void)
 
 /* ****************************************************************************
 *
-* fill - 
-*/
-void Metadata::fill(const struct Metadata& md)
-{
-  name         = md.name;
-  type         = md.type;
-  stringValue  = md.stringValue;
-}
-
-
-
-/* ****************************************************************************
-*
-* toStringValue -
-*/
-std::string Metadata::toStringValue(void) const
-{
-  switch (valueType)
-  {
-  case orion::ValueTypeString:
-    return stringValue;
-    break;
-
-  case orion::ValueTypeNumber:
-    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-    {
-      return JSON_STR(isodate2str(numberValue));
-    }
-    else // regular number
-    {
-      return double2string(numberValue);
-    }
-    break;
-
-  case orion::ValueTypeBoolean:
-    return boolValue ? "true" : "false";
-    break;
-
-  case orion::ValueTypeNull:
-    return "null";
-    break;
-
-  case orion::ValueTypeNotGiven:
-    return "<not given>";
-    break;
-
-  default:
-    return "<unknown type>";
-    break;
-  }
-
-  // Added to avoid warning when compiling with -fstack-check -fstack-protector
-  return "";
-}
-
-
-
-/* ****************************************************************************
-*
 * toJson - 
 */
 std::string Metadata::toJson(void)

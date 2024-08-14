@@ -84,29 +84,3 @@ unsigned int ContextRegistrationResponseVector::size(void) const
 {
   return vec.size();
 }
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationResponseVector::check -
-*/
-std::string ContextRegistrationResponseVector::check
-(
-  RequestType         requestType,
-  const std::string&  predetectedError,
-  int                 counter
-)
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(requestType, predetectedError, counter)) != "OK")
-    {
-      return res;
-    }
-  }
-
-  return "OK";
-}

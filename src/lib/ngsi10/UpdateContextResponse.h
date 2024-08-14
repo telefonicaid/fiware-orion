@@ -48,7 +48,6 @@ typedef struct UpdateContextResponse
   OrionError                    oe;                            // Used by NGSIv2
 
   UpdateContextResponse();
-  UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
   void          release(void);

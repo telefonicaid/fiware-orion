@@ -24,7 +24,6 @@ SET (SOURCES
     doNotify.cpp
     Notifier.cpp
     senderThread.cpp
-    ContextSubscriptionInfo.cpp
     QueueWorkers.cpp
     ServiceQueue.cpp
     QueueNotifier.cpp
@@ -33,7 +32,6 @@ SET (SOURCES
 
 SET (HEADERS
     doNotify.h
-    ContextSubscriptionInfo.h
     Notifier.h
     senderThread.h
     QueueWorkers.h

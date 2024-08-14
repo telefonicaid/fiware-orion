@@ -52,20 +52,6 @@ Point::Point(): valid(true), lat(0), lon(0)
 *
 * Point::Point -
 */
-Point::Point(::std::string latitude, ::std::string longitude): valid(true)
-{
-  if ((str2double(latitude.c_str(), &lat) == false) || (str2double(longitude.c_str(), &lon) == false))
-  {
-    valid = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* Point::Point -
-*/
 Point::Point(double _lat, double _lon): valid(true)
 {
   lat = _lat;
@@ -106,27 +92,6 @@ double Point::longitude(void) const
 }
 
 
-/* ****************************************************************************
-*
-* Point::latitudeSet -
-*/
-void Point::latitudeSet(::std::string latitude)
-{
-  valid = str2double(latitude.c_str(), &lat);
-}
-
-
-
-/* ****************************************************************************
-*
-* Point::longitudeSet -
-*/
-void Point::longitudeSet(::std::string longitude)
-{
-  valid = str2double(longitude.c_str(), &lon);
-}
-
-
 
 /* ****************************************************************************
 *
@@ -162,33 +127,6 @@ bool Point::equals(Point* p)
   }
 
   return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* Point::latitudeString -
-*/
-::std::string Point::latitudeString(void)
-{
-  char cV[STRING_SIZE_FOR_DOUBLE];
-
-  snprintf(cV, sizeof(cV), "%f", lat);
-  return cV;
-}
-
-
-/* ****************************************************************************
-*
-* Point::longitudeString -
-*/
-::std::string Point::longitudeString(void)
-{
-  char cV[STRING_SIZE_FOR_DOUBLE];
-
-  snprintf(cV, sizeof(cV), "%f", lon);
-  return cV;
 }
 
 
@@ -242,162 +180,12 @@ Box::Box()
 
 /* ****************************************************************************
 *
-* Box::Box -
-*/
-Box::Box(Point* lowerLeftP, Point* upperRightP)
-{
-  lowerLeft.fill(lowerLeftP);
-  upperRight.fill(upperRightP);
-}
-
-
-
-/* ****************************************************************************
-*
 * Box::fill -
 */
 void Box::fill(Point* lowerLeftP, Point* upperRightP)
 {
   lowerLeft.fill(lowerLeftP);
   upperRight.fill(upperRightP);
-}
-
-
-/* ****************************************************************************
-*
-* Circle::inverted -
-*/
-bool Circle::inverted(void) const
-{
-  if ((_inverted == "true") || (_inverted == "1"))
-  {
-    return true;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::radius -
-*
-*/
-double Circle::radius(void) const
-{
-  // NOTE: here we use atof and not str2double on purpose
-  float r = atof(_radius.c_str());
-
-  return r;
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::radiusString -
-*/
-::std::string Circle::radiusString(void) const
-{
-  return _radius;
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::invertedString -
-*
-*/
-::std::string Circle::invertedString(void) const
-{
-  return  _inverted;
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::radiusSet -
-*/
-void Circle::radiusSet(::std::string radius)
-{
-  _radius   = radius;
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::radiusSet -
-*/
-void Circle::radiusSet(float radius)
-{
-  char buffer[64];
-
-  snprintf(buffer, sizeof(buffer), "%f", radius);
-  _radius   = buffer;
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::invertedSet -
-*/
-void Circle::invertedSet(::std::string inverted)
-{
-  _inverted = inverted;
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::invertedSet -
-*/
-void Circle::invertedSet(bool inverted)
-{
-  _inverted = (inverted == true)? "true" : "false";
-}
-
-
-
-/* ****************************************************************************
-*
-* Circle::centerSet -
-*/
-void Circle::centerSet(Point* centerP)
-{
-  center.fill(centerP);
-}
-
-
-
-/* ****************************************************************************
-*
-* Polygon::inverted -
-*/
-bool Polygon::inverted(void) const
-{
-  if ((_inverted == "true") || (_inverted == "1"))
-  {
-    return true;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* Polygon::invertedSet -
-*/
-void Polygon::invertedSet(::std::string inverted)
-{
-  _inverted = inverted;
 }
 
 
@@ -409,17 +197,6 @@ void Polygon::invertedSet(::std::string inverted)
 void Polygon::invertedSet(bool inverted)
 {
   _inverted = (inverted == true)? "true" : "false";
-}
-
-
-
-/* ****************************************************************************
-*
-* Polygon::invertedString -
-*/
-::std::string Polygon::invertedString(void) const
-{
-  return _inverted;
 }
 
 
@@ -552,19 +329,6 @@ int Georel::parse(const char* in, std::string* errorString)
   }
 
   return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* Georel::fill -
-*/
-void Georel::fill(Georel* georelP)
-{
-  type        = georelP->type;
-  maxDistance = georelP->maxDistance;
-  minDistance = georelP->minDistance;
 }
 
 

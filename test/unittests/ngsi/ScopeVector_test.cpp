@@ -31,34 +31,6 @@
 
 /* ****************************************************************************
 *
-* check -
-*/
-TEST(ScopeVector, check)
-{
-  Scope*         s1 = new Scope("Type", "Value");
-  Scope*         s2 = new Scope("", "Value");
-  ScopeVector    sV;
-  std::string    expected1 = "OK";
-  std::string    expected2 = "Empty type in restriction scope";
-  std::string    rendered;
-
-  utInit();
-
-  sV.push_back(s1);
-  rendered = sV.check();
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
-
-  sV.push_back(s2);
-  rendered = sV.check();
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());  
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * getAndSize -
 */
 TEST(ScopeVector, getAndSize)

@@ -43,7 +43,6 @@ typedef struct NotifyContextResponse
   StatusCode    responseCode;              // Mandatory
 
   NotifyContextResponse();
-  NotifyContextResponse(StatusCode& sc);
 
   void          release(void);
 } NotifyContextResponse;

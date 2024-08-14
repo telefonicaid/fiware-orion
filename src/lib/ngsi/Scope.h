@@ -82,8 +82,6 @@ typedef struct Scope
 
   void         release(void);
 
-  std::string  check(void);
-  void         areaTypeSet(const std::string& areaTypeString);
 } Scope;
 
 #endif  // SRC_LIB_NGSI_SCOPE_H_

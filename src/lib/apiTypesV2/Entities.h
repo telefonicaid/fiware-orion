@@ -59,7 +59,6 @@ class Entities
                       bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);
 
-  std::string  check(RequestType requestType);
   void         release(void);
   void         fill(const QueryContextResponse& qcrs, OrionError* oeP);
   int          size(void) const { return vec.vec.size(); }

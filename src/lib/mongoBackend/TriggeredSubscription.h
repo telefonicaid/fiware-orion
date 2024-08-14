@@ -94,7 +94,6 @@ class TriggeredSubscription
   void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
   bool         stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
   bool         mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
-  std::string  toString(const std::string& delimiter);
 };
 
 #endif  // SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_

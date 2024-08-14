@@ -266,25 +266,6 @@ extern double getCurrentTime(void);
 
 
 
-/* ****************************************************************************
-*
-* toSeconds -
-*/
-extern int64_t toSeconds(int value, char what, bool dayPart);
-
-
-
-/*****************************************************************************
-*
-* parse8601 -
-*
-* This is common code for Duration and Throttling (at least)
-*
-*/
-extern int64_t parse8601(const std::string& s);
-
-
-
 /*****************************************************************************
 *
 * parse8601Time -

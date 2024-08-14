@@ -91,8 +91,6 @@ typedef struct Metadata
 
   std::string  toJson(void);
   void         release(void);
-  void         fill(const struct Metadata& md);
-  std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
   void         appendToBsoN(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);

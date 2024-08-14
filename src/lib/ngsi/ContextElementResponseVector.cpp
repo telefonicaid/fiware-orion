@@ -63,32 +63,6 @@ std::string ContextElementResponseVector::toJson
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::check -
-*/
-std::string ContextElementResponseVector::check
-(
-  RequestType         requestType,
-  const std::string&  predetectedError,
-  int                 counter
-)
-{
-  for (uint64_t ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(requestType, predetectedError, counter)) != "OK")
-    {
-      return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextElementResponseVector::push_back -
 */
 void ContextElementResponseVector::push_back(ContextElementResponse* item)

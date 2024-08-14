@@ -353,71 +353,6 @@ int Scope::fill
 
 /* ****************************************************************************
 *
-* Scope::check -
-*/
-std::string Scope::check(void)
-{
-  //
-  // Check for forbidden characters
-  //
-  if (forbiddenChars(type.c_str()))
-  {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a scope", type);
-    return "illegal chars in scope type";
-  }
-
-  if ((type != SCOPE_TYPE_SIMPLE_QUERY) && (type != SCOPE_TYPE_SIMPLE_QUERY_MD))
-  {
-    if (forbiddenChars(value.c_str()))
-    {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a scope", value);
-      return "illegal chars in scope";
-    }
-  }
-
-  if (type.empty())
-  {
-    alarmMgr.badInput(clientIp, "empty type in restriction scope");
-    return "Empty type in restriction scope";
-  }
-
-  if (value.empty())
-  {
-    alarmMgr.badInput(clientIp, "empty value in restriction scope");
-    return "Empty value in restriction scope";
-  }
-
-  if (type == FIWARE_LOCATION_V2)
-  {
-    if ((areaType == orion::PointType) && (georel.type == "coveredBy"))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: point geometry cannot be used with coveredBy georel");
-      return "Query not supported: point geometry cannot be used with coveredBy georel";
-    }
-    else if ((areaType == orion::LineType) && (georel.type == "coveredBy"))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: line  geometry cannot be used with coveredBy georel");
-      return "Query not supported: line geometry cannot be used with coveredBy georel";
-    }
-    else if ((areaType == orion::LineType) && (line.pointList.size() < 2))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: not enough points for a line");
-      return "Query not supported: not enough points for a line";
-    }
-    else if ((areaType == orion::PolygonType) && (polygon.vertexList.size() < 4))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: not enough vertices for a polygon");
-      return "Query not supported: not enough vertices for a polygon";
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 void Scope::release(void)
@@ -439,17 +374,3 @@ void Scope::release(void)
   }
 }
 
-
-
-/* ****************************************************************************
-*
-* Scope::areaTypeSet -
-*/
-void Scope::areaTypeSet(const std::string& areaTypeString)
-{
-  if      (areaTypeString == "line")    areaType = orion::LineType;
-  else if (areaTypeString == "polygon") areaType = orion::PolygonType;
-  else if (areaTypeString == "point")   areaType = orion::PointType;
-  else if (areaTypeString == "box")     areaType = orion::BoxType;
-  else                                  areaType = orion::NoArea;       
-}

@@ -129,9 +129,6 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   rendered = tree->toJson();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
-  tree->shortShow("");
-  tree->show("");
-
   lmTraceLevelSet(LmtCompoundValueAdd, false);
 
   delete tree;
@@ -174,9 +171,6 @@ TEST(CompoundValueNode, structInvalidAndOk)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
   rendered = tree->toJson();
   EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-  tree->shortShow("");
-  tree->show("");
 
   delete tree;
 

@@ -616,41 +616,6 @@ ContextAttribute::ContextAttribute
 
 
 
-
-/* ****************************************************************************
-*
-* ContextAttribute::ContextAttribute -
-*/
-ContextAttribute::ContextAttribute
-(
-  const std::string&         _name,
-  const std::string&         _type,
-  orion::CompoundValueNode*  _compoundValueP
-)
-{
-  LM_T(LmtClone, ("Creating a ContextAttribute, maintaining a pointer to compound value (at %p)", _compoundValueP));
-
-  name                  = _name;
-  type                  = _type;
-  compoundValueP        = _compoundValueP->clone();
-  numberValue           = 0;
-  found                 = false;
-  valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
-  skip                  = false;
-  typeGiven             = false;
-  onlyValue             = false;
-  previousValue         = NULL;
-  actionType            = "";
-  shadowed              = false;
-
-  creDate = 0;
-  modDate = 0;
-
-  providingApplication.set("");
-}
-
-
-
 /* ****************************************************************************
 *
 * ContextAttribute::getLocation() -
@@ -1253,17 +1218,6 @@ std::string ContextAttribute::getValue(void) const
 
   // Added to avoid warning when compiling with -fstack-check -fstack-protector 
   return "";
-}
-
-
-
-/* ****************************************************************************
-*
-* clone - 
-*/
-ContextAttribute* ContextAttribute::clone(void)
-{
-  return new ContextAttribute(this);
 }
 
 

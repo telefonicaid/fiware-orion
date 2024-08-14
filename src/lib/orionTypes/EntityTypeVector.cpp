@@ -50,58 +50,11 @@ EntityTypeVector::EntityTypeVector()
 
 /* ****************************************************************************
 *
-* EntityTypeVector::check -
-*/
-std::string EntityTypeVector::check(const std::string& predetectedError)
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(predetectedError)) != "OK")
-    {
-     return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityTypeVector::push_back -
 */
 void EntityTypeVector::push_back(EntityType* item)
 {
   vec.push_back(item);
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVector::operator[] -
-*/
-EntityType* EntityTypeVector::operator[] (unsigned int ix) const
-{
-   if (ix < vec.size())
-   {
-     return vec[ix];
-   }
-   return NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVector::size -
-*/
-unsigned int EntityTypeVector::size(void)
-{
-  return vec.size();
 }
 
 

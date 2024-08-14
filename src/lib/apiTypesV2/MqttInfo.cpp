@@ -49,16 +49,6 @@ MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), payloadType(Text), inc
 
 /* ****************************************************************************
 *
-* MqttInfo::MqttInfo - 
-*/
-MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
-{
-}
-
-
-
-/* ****************************************************************************
-*
 * MqttInfo::toJson -
 */
 std::string MqttInfo::toJson()

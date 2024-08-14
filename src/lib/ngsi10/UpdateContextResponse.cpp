@@ -44,20 +44,6 @@
 */
 UpdateContextResponse::UpdateContextResponse()
 {
-  errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextResponse::UpdateContextResponse -
-*/
-UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
-{
-  errorCode.fill(&_errorCode);
-  errorCode.keyNameSet("errorCode");
-  LM_T(LmtDestructor, ("destroyed"));
 }
 
 

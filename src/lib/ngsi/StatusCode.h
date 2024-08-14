@@ -43,6 +43,8 @@ struct UpdateContextResponse;
 /* ****************************************************************************
 *
 * StatusCode - 
+*
+* FIXME PR: merge into OrionError class
 */
 typedef struct StatusCode
 {
@@ -50,21 +52,14 @@ typedef struct StatusCode
   std::string     reasonPhrase;     // Mandatory
   std::string     details;          // Optional
 
-  std::string     keyName;          // tag to be rendered
-
   StatusCode();
-  StatusCode(const std::string& _keyName);
-  StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName = "statusCode");
 
   std::string  toJson(void);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
   void         fill(const StatusCode& sc);
-  void         fill(const struct UpdateContextResponse& ucrs);
   void         release(void);
-  void         keyNameSet(const std::string& _tag);
 
-  std::string  check(void);
 } StatusCode;
 
 #endif  // SRC_LIB_NGSI_STATUSCODE_H_

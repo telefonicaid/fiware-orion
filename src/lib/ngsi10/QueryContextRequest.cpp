@@ -170,24 +170,6 @@ void QueryContextRequest::release(void)
 *
 * QueryContextRequest::fill -
 */
-void QueryContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName)
-{
-  EntityId* eidP = new EntityId(entityId, entityType, "true");
-
-  entityIdVector.push_back(eidP);
-
-  if (!attributeName.empty())
-  {
-    attributeList.push_back(attributeName);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextRequest::fill -
-*/
 void QueryContextRequest::fill
 (
   const std::string& entityId,

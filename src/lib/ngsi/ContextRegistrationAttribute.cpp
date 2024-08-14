@@ -37,18 +37,6 @@
 *
 * ContextRegistrationAttribute::ContextRegistrationAttribute -
 */
-ContextRegistrationAttribute::ContextRegistrationAttribute()
-{
-  name     = "";
-  type     = "";
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttribute::ContextRegistrationAttribute -
-*/
 ContextRegistrationAttribute::ContextRegistrationAttribute
 (
   const std::string&  _name,
@@ -58,20 +46,3 @@ ContextRegistrationAttribute::ContextRegistrationAttribute
   name      = _name;
   type      = _type;  
 }
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationAttribute::check -
-*/
-std::string ContextRegistrationAttribute::check(void)
-{
-  if (name.empty())
-  {
-    return "missing name for registration attribute";
-  }
-
-  return "OK";
-}
-

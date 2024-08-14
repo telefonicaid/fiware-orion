@@ -90,7 +90,6 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, bool _value, bool _found = true);
-  ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Check if attribute means a location  */
   bool  getLocation(orion::BSONObj* attrsP) const;
@@ -121,7 +120,6 @@ public:
   std::string  getValue(void) const;
 
   std::string  check(bool asValue, bool relaxForbiddenCheck = false);
-  ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
 private:

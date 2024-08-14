@@ -68,8 +68,6 @@ class Entity
 
   Entity();
   Entity(const std::string& id, const std::string& type, const std::string& isPattern, bool isTypePattern = false);
-  explicit Entity(EntityId* eP);
-  explicit Entity(Entity* eP);
 
   ~Entity();
 

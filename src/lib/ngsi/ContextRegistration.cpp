@@ -49,44 +49,6 @@ ContextRegistration::ContextRegistration()
 
 /* ****************************************************************************
 *
-* ContextRegistration::check -
-*/
-std::string ContextRegistration::check
-(
-  RequestType         requestType,
-  const std::string&  predetectedError,
-  int                 counter
-)
-{
-  std::string res;
-
-  if ((res = entityIdVector.check(requestType)) != "OK")
-  {
-    return res;
-  }
-
-  if ((res = contextRegistrationAttributeVector.check()) != "OK")
-  {
-    return res;
-  }
-
-  if ((res = providingApplication.check()) != "OK")
-  {
-    return res;
-  }
-
-  if (entityIdVector.size() == 0)
-  {
-    return "Empty entityIdVector";
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistration::release -
 */
 void ContextRegistration::release(void)

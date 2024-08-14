@@ -54,7 +54,6 @@ public:
   std::string  setSCAndRender(HttpStatusCode* scP);
   std::string  toJson(void);
   void         fill(HttpStatusCode _code, const std::string& _description,  const std::string& _error = "");
-  void         fill(const StatusCode& sc);
   void         fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _error);
 
 } OrionError;

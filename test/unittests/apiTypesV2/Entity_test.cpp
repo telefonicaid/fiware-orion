@@ -106,11 +106,8 @@ TEST(Entity, checkV1)
 
   EntityVector* ceVectorP = new EntityVector();
 
-  EXPECT_EQ(ceVectorP->check(BatchUpdateRequest), "OK");
-
   ceVectorP->push_back(enP);
   ceVectorP->push_back(en2P);
-  EXPECT_EQ(ceVectorP->check(BatchUpdateRequest), "entity type length: 0, min length supported: 1");
 
   // render
   const char*               outfile1 = "ngsi.contextelement.check.middle.json";
@@ -119,8 +116,6 @@ TEST(Entity, checkV1)
   out = en2P->toJson(NGSI_V2_NORMALIZED, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("entity type length: 0, min length supported: 1", ceVectorP->check(BatchUpdateRequest));
 
   utExit();
 }

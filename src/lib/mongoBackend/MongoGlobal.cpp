@@ -2063,32 +2063,6 @@ bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string
 
 /* ****************************************************************************
 *
-* subToEntityIdVector -
-*
-* Extract the entity ID vector from a BSON document (in the format of the csubs
-* collection)
-*/
-EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
-{
-  EntityIdVector                   enV;
-  std::vector<orion::BSONElement>  subEnts = getFieldF(sub, CSUB_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
-  {
-    orion::BSONObj  subEnt = subEnts[ix].embeddedObject();
-    EntityId*       en     = new EntityId(getStringFieldF(subEnt, CSUB_ENTITY_ID),
-                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(subEnt, CSUB_ENTITY_TYPE) : "",
-                                     getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
-    enV.push_back(en);
-  }
-
-  return enV;
-}
-
-
-
-/* ****************************************************************************
-*
 * getCommonAttributes -
 */
 static void getCommonAttributes

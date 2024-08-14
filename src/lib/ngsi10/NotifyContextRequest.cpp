@@ -100,25 +100,11 @@ std::string NotifyContextRequest::toJson
 /* ****************************************************************************
 *
 * NotifyContextRequest::release -
+*
+* FIXME PR: this method is not called (it can be removed without compilation errors). Possible memory leak?
 */
 void NotifyContextRequest::release(void)
 {
   contextElementResponseVector.release();
 }
 
-
-
-/* ****************************************************************************
-*
-* NotifyContextRequest::clone -
-*/
-NotifyContextRequest* NotifyContextRequest::clone(void)
-{
-  NotifyContextRequest* ncrP = new NotifyContextRequest();
-
-  ncrP->subscriptionId = subscriptionId;
-
-  ncrP->contextElementResponseVector.fill(contextElementResponseVector);
-
-  return ncrP;
-}

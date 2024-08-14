@@ -59,7 +59,6 @@ typedef struct EntityIdVector
 
   EntityId* operator[](unsigned int ix) const;
 
-  std::string  check(RequestType requestType);
 } EntityIdVector;
 
 #endif  // SRC_LIB_NGSI_ENTITYIDVECTOR_H_

@@ -49,14 +49,10 @@ typedef struct QueryContextResponse
   StatusCode                    errorCode;                     // Optional
 
   QueryContextResponse();
-  QueryContextResponse(EntityId* eP, ContextAttribute* aP);
-  QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
   void                   release(void);
-  void                   fill(QueryContextResponse* qcrsP);
   void                   fill(const Entities& entities);
-  QueryContextResponse*  clone(void);
 } QueryContextResponse;
 
 #endif  // SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_

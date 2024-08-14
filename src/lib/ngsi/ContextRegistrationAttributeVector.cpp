@@ -36,27 +36,6 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::check -
-*/
-std::string ContextRegistrationAttributeVector::check(void)
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check()) != "OK")
-    {
-      return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextRegistrationAttributeVector::push_back -
 */
 void ContextRegistrationAttributeVector::push_back(ContextRegistrationAttribute* item)

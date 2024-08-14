@@ -79,33 +79,9 @@ extern bool parseUrl
 
 /* ****************************************************************************
 *
-* validUrl - check validity of a URL
-*/
-extern bool validUrl(const std::string& url);
-
-
-
-/* ****************************************************************************
-*
-* i2s - integer to string
-*/
-extern char* i2s(int i, char* placeholder, int placeholderSize);
-
-
-
-/* ****************************************************************************
-*
 * parsedUptime
 */
 extern std::string parsedUptime(int uptime);
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - 
-*/
-extern bool onlyWs(const char* s);
 
 
 
@@ -153,21 +129,6 @@ extern unsigned long atoUL(const char* string, std::string* errorMsg);
 * strToLower - 
 */
 extern char* strToLower(char* to, const char* from, int toSize);
-
-
-
-/* ****************************************************************************
-*
-* strReplace - 
-*/
-extern void strReplace
-(
-  char*       to,
-  int         toLen,
-  const char* from,
-  const char* newString,
-  const char* oldString
-);
 
 
 

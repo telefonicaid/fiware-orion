@@ -50,36 +50,8 @@ StatusCode::StatusCode()
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  keyName      = "statusCode";
 }
 
-
-
-/* ****************************************************************************
-*
-* StatusCode::StatusCode -
-*/
-StatusCode::StatusCode(const std::string& _keyName)
-{
-  code         = SccNone;
-  reasonPhrase = "";
-  details      = "";
-  keyName      = _keyName;
-}
-
-
-
-/* ****************************************************************************
-*
-* StatusCode::StatusCode -
-*/
-StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _keyName)
-{
-  code          = _code;
-  reasonPhrase  = httpStatusCodeString(code);
-  details       = _details;
-  keyName       = _keyName;
-}
 
 
 
@@ -134,73 +106,14 @@ void StatusCode::fill(const StatusCode& sc)
 
 /* ****************************************************************************
 *
-* StatusCode::fill - 
-*/
-void StatusCode::fill(const struct UpdateContextResponse& ucrs)
-{
-  if ((ucrs.errorCode.code != SccOk) && (ucrs.errorCode.code != SccNone))
-  {
-    fill(ucrs.errorCode);
-  }
-  else if (ucrs.contextElementResponseVector.vec.size() == 1)
-  {
-    fill(ucrs.contextElementResponseVector.vec[0]->statusCode);
-  }
-  else if (ucrs.contextElementResponseVector.vec.size() > 1)
-  {
-    LM_W(("Filling StatusCode from UpdateContextResponse with more than one contextElementResponse, picking one of them ..."));
-    fill(ucrs.contextElementResponseVector.vec[0]->statusCode);
-  }
-  else
-  {
-    // Empty UpdateContextResponse::contextElementResponseVector AND unfilled UpdateContextResponse::errorCode
-    LM_E(("Runtime Error (can't fill StatusCode from UpdateContextResponse)"));
-    fill(SccReceiverInternalError, "can't fill StatusCode from UpdateContextResponse");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* StatusCode::check -
-*/
-std::string StatusCode::check(void)
-{
-  if (code == SccNone)
-  {
-    return "no code";
-  }
-
-  if (reasonPhrase.empty())
-  {
-    return "no reason phrase";
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
+*
+* FIXME PR: rellay needed?
 */
 void StatusCode::release(void)
 {
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
-  keyName      = "statusCode";
 }
 
-
-
-/* ****************************************************************************
-*
-* keyNameSet -
-*/
-void StatusCode::keyNameSet(const std::string& _keyName)
-{
-  keyName = _keyName;
-}

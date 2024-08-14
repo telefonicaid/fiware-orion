@@ -41,38 +41,6 @@
 */
 QueryContextResponse::QueryContextResponse()
 {
-  errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::QueryContextResponse -
-*/
-QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
-{
-  errorCode.fill(&_errorCode);
-  errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::QueryContextResponse -
-*/
-QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
-{
-  ContextElementResponse* cerP = new ContextElementResponse();
-  ContextAttribute*       caP  = new ContextAttribute(aP);
-
-  cerP->entity.fill(eP->id, eP->type, eP->isPattern);
-  cerP->entity.attributeVector.push_back(caP);
-  cerP->statusCode.fill(SccOk);
-
-  contextElementResponseVector.push_back(cerP);
-  errorCode.fill(SccOk);
 }
 
 
@@ -105,26 +73,6 @@ void QueryContextResponse::release(void)
 *
 * QueryContextResponse::fill -
 */
-void QueryContextResponse::fill(QueryContextResponse* qcrsP)
-{
-  errorCode.fill(qcrsP->errorCode);
-
-  for (unsigned int cerIx = 0; cerIx < qcrsP->contextElementResponseVector.size(); ++cerIx)
-  {
-    ContextElementResponse* cerP = new ContextElementResponse();
-
-    cerP->fill(qcrsP->contextElementResponseVector[cerIx]);
-
-    contextElementResponseVector.push_back(cerP);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::fill -
-*/
 void QueryContextResponse::fill(const Entities& entities)
 {
   for (int eIx = 0; eIx < entities.size(); eIx++)
@@ -132,19 +80,4 @@ void QueryContextResponse::fill(const Entities& entities)
     ContextElementResponse* cerP = new ContextElementResponse(entities.vec.vec[eIx]);
     contextElementResponseVector.push_back(cerP);
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::clone -
-*/
-QueryContextResponse* QueryContextResponse::clone(void)
-{
-  QueryContextResponse* clon = new QueryContextResponse();
-
-  clon->fill(this);
-
-  return clon;
 }

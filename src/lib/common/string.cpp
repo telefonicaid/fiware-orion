@@ -471,34 +471,6 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
 /* ****************************************************************************
 *
-* validUrl - check validity of a URL
-*/
-bool validUrl(const std::string& url)
-{
-  std::string  host;
-  int          port;
-  std::string  path;
-  std::string  protocol;
-
-  return parseUrl(url, host, port, path, protocol);
-}
-
-
-
-/* ****************************************************************************
-*
-* i2s - integer to string
-*/
-char* i2s(int i, char* placeholder, int placeholderSize)
-{
-  snprintf(placeholder, placeholderSize, "%d", i);
-  return placeholder;
-}
-
-
-
-/* ****************************************************************************
-*
 * parsedUptime
 */
 std::string parsedUptime(int uptime)
@@ -520,32 +492,6 @@ std::string parsedUptime(int uptime)
 
   snprintf(s, sizeof(s), "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
-}
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - 
-*/
-bool onlyWs(const char* s)
-{
-  if (*s == 0)
-  {
-    return true;
-  }
-
-  while (*s != 0)
-  {
-    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
-    {
-      return false;
-    }
-
-    ++s;
-  }
-
-  return true;
 }
 
 
@@ -807,38 +753,6 @@ char* strToLower(char* to, const char* from, int toSize)
   to[ix] = 0;
 
   return to;
-}
-
-
-
-/* ****************************************************************************
-*
-* strReplace - 
-*/
-void strReplace(char* to, int toLen, const char* from, const char* oldString, const char* newString)
-{
-  int toIx   = 0;
-  int fromIx = 0;
-  int oldLen = strlen(oldString);
-  int newLen = strlen(newString);
-
-  while (from[fromIx] != 0)
-  {
-    if (strncmp(&from[fromIx], oldString, oldLen) == 0)
-    {
-      strncat(to, newString, toLen - strlen(to));
-      toIx   += newLen;
-      fromIx += oldLen;
-    }
-    else
-    {
-      to[toIx] = from[fromIx];
-      toIx   += 1;
-      fromIx += 1;
-    }
-  }
-
-  to[toIx] = 0;
 }
 
 

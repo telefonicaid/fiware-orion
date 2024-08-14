@@ -202,12 +202,7 @@ CompoundValueNode::~CompoundValueNode()
 */
 std::string CompoundValueNode::finish(void)
 {
-  LM_T(LmtCompoundValue, ("Finishing a compound"));
-
-  if (lmTraceIsSet(LmtCompoundValueShow))
-  {
-    show("");
-  }
+  LM_T(LmtCompoundValue, ("Finishing a compound: s (%s)", name.c_str(), toJson().c_str()));
 
   return check("");
 }
@@ -305,145 +300,6 @@ CompoundValueNode* CompoundValueNode::add
   CompoundValueNode* node = new CompoundValueNode(_name, _value, _type);
 
   return add(node);
-}
-
-
-
-/* ****************************************************************************
-*
-* shortShow -
-*/
-void CompoundValueNode::shortShow(const std::string& indent)
-{
-  if (valueType == orion::ValueTypeVector)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (vector)",
-                                 indent.c_str(),
-                                 name.c_str()));
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (object)",
-                                 indent.c_str(),
-                                 name.c_str()));
-  }
-  else if (valueType == orion::ValueTypeString)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (%s)",
-                                 indent.c_str(),
-                                 name.c_str(),
-                                 stringValue.c_str()));
-    return;
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (%s)",
-                                 indent.c_str(),
-                                 name.c_str(),
-                                 (boolValue == true)? "true" : "false"));
-    return;
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (null)",
-                                 indent.c_str(),
-                                 name.c_str()));
-    return;
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (not given)",
-                                 indent.c_str(),
-                                 name.c_str()));
-    return;
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (%f)",
-                                 indent.c_str(),
-                                 name.c_str(),
-                                 numberValue));
-    return;
-  }
-
-  for (uint64_t ix = 0; ix < childV.size(); ++ix)
-  {
-    childV[ix]->shortShow(indent + "  ");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* show -
-*/
-void CompoundValueNode::show(const std::string& indent)
-{
-  if (!name.empty())
-  {
-    LM_T(LmtCompoundValueShow, ("%sname:      %s",
-                                indent.c_str(),
-                                name.c_str()));
-  }
-
-  LM_T(LmtCompoundValueShow, ("%stype:      %s",
-                              indent.c_str(),
-                              orion::valueTypeName(valueType)));
-
-  if (valueType == orion::ValueTypeString)
-  {
-    LM_T(LmtCompoundValueShow, ("%sString Value:     %s",
-                                indent.c_str(),
-                                stringValue.c_str()));
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    LM_T(LmtCompoundValueShow, ("%sBool Value:     %s",
-                                indent.c_str(),
-                                (boolValue == false)? "false" : "true"));
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    LM_T(LmtCompoundValueShow, ("%sNumber Value:     %f",
-                                indent.c_str(),
-                                numberValue));
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    LM_T(LmtCompoundValueShow, ("%sNull",
-                                indent.c_str()));
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_T(LmtCompoundValueShow, ("%sNotGiven",
-                                indent.c_str()));
-  }
-  else if (childV.size() != 0)
-  {
-    std::string childrenString;
-
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      childrenString += childV[ix]->name;
-      if (ix != childV.size() - 1)
-      {
-        childrenString += ", ";
-      }
-    }
-
-    LM_T(LmtCompoundValueShow, ("%s%lu children (%s)",
-                                indent.c_str(),
-                                childV.size(),
-                                childrenString.c_str()));
-
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      childV[ix]->show(indent + "  ");
-    }
-  }
-
-  LM_T(LmtCompoundValueShow, (""));
 }
 
 
@@ -838,16 +694,5 @@ bool CompoundValueNode::isObject(void)
 bool CompoundValueNode::isString(void)
 {
   return (valueType == orion::ValueTypeString);
-}
-
-
-
-/* ****************************************************************************
-*
-* cname -
-*/
-const char* CompoundValueNode::cname(void)
-{
-  return name.c_str();
 }
 }

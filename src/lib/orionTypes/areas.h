@@ -61,20 +61,14 @@ class Point
 
  public:
   Point();
-  Point(::std::string latitude, ::std::string longitude);
   Point(double _lat, double _lon);
 
   void   fill(Point* p);
   double latitude(void) const;
   double longitude(void) const;
   void   latitudeSet(double latitude);
-  void   latitudeSet(::std::string latitude);
   void   longitudeSet(double longitude);
-  void   longitudeSet(::std::string longitude);
   bool   equals(Point* p);
-
-  ::std::string latitudeString(void);
-  ::std::string longitudeString(void);
 };
 
 
@@ -107,35 +101,8 @@ public:
   Point upperRight;
 
   Box();
-  Box(Point* lowerLeftP, Point* upperRightP);
 
   void fill(Point* lowerLeftP, Point* upperRightP);
-};
-
-
-
-/* ****************************************************************************
-*
-* Circle -
-*/
-class Circle
-{
- private:
-  ::std::string  _radius;
-  ::std::string  _inverted;
-
- public:
-  Point          center;
-  bool           inverted(void) const;
-  double         radius(void) const;
-
-  ::std::string  radiusString(void) const;
-  ::std::string  invertedString(void) const;
-  void           radiusSet(::std::string radius);
-  void           radiusSet(float _radius);
-  void           invertedSet(::std::string inverted);
-  void           invertedSet(bool _inverted);
-  void           centerSet(Point* _center);
 };
 
 
@@ -151,10 +118,7 @@ class Polygon
 
  public:
   ::std::vector<Point*> vertexList;
-  bool                  inverted(void) const;
-  void                  invertedSet(::std::string inverted);
   void                  invertedSet(bool inverted);
-  ::std::string         invertedString(void) const;
   void                  vertexAdd(Point* p);
   void                  release(void);
 };
@@ -170,7 +134,6 @@ class Georel
 public:
   Georel();
 
-  void         fill(Georel* georelP);
   int          parse(const char* in, std::string* errorString);
 
   std::string  type;

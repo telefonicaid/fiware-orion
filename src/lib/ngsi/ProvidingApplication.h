@@ -62,10 +62,7 @@ typedef struct ProvidingApplication
   std::string     get(void);
   ProviderFormat  getProviderFormat(void);
   std::string     getRegId(void);
-  bool            isEmpty(void);
-  const char*     c_str(void);
   void            release(void);
-  std::string     check(void);
 } ProvidingApplication;
 
 #endif  // SRC_LIB_NGSI_PROVIDINGAPPLICATION_H_

@@ -91,20 +91,6 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _description, con
 
 /* ****************************************************************************
 *
-* OrionError::fill -
-*/
-void OrionError::fill(const StatusCode& sc)
-{
-  code        = sc.code;
-  error       = (sc.reasonPhrase.empty())? httpStatusCodeString(code) : sc.reasonPhrase;
-  description = sc.details;
-  filled      = true;
-}
-
-
-
-/* ****************************************************************************
-*
 * OrionError::fillOrAppend -
 */
 void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _error)

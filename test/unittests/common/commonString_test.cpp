@@ -307,18 +307,7 @@ TEST(string, parseEmptyUrl)
     EXPECT_FALSE(result) << "wrong result (shall be false)";
 }
 
-/* ****************************************************************************
-*
-* i2s -
-*/
-TEST(commonString, i2s)
-{
-  char  ph[32];
-  char* p;
 
-  p = i2s(19, ph, sizeof(ph));
-  EXPECT_STREQ("19", p);
-}
 
 /* ****************************************************************************
 *

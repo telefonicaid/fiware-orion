@@ -108,72 +108,6 @@ std::string EntityId::toJson(void)
 
 /* ****************************************************************************
 *
-* EntityId::toJson - 
-*/
-std::string EntityId::toJson(void) const
-{
-  JsonObjectHelper jh;
-
-  char*  typeEscaped  = htmlEscape(type.c_str());
-  char*  idEscaped    = htmlEscape(id.c_str());
-
-  jh.addString("id", idEscaped);
-  jh.addString("type", typeEscaped);
-
-  free(typeEscaped);
-  free(idEscaped);
-
-  return jh.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityId::check -
-*/
-std::string EntityId::check(RequestType requestType)
-{
-  if (id.empty())
-  {
-    return "empty entityId:id";
-  }
-
-  if (!isTrue(isPattern) && !isFalse(isPattern) && !isPattern.empty())
-  {
-    return std::string("invalid isPattern value for entity: /") + isPattern + "/";
-  }
-
-  if (isTrue(isPattern))
-  {
-    regex_t re;
-    if ((id.find('\0') != std::string::npos) || (!regComp(&re, id.c_str(), REG_EXTENDED)))
-    {
-      return "invalid regex for entity id pattern";
-    }
-    regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
-  }
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityId::fill -
-*/
-void EntityId::fill(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern)
-{
-  id            = _id;
-  type          = _type;
-  isPattern     = _isPattern;
-  isTypePattern = _isTypePattern;
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityId::fill -
 */
 void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
@@ -201,40 +135,6 @@ void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 void EntityId::release(void)
 {
   /* This method is included for the sake of homogeneity */
-}
-
-
-
-/* ****************************************************************************
-*
-* toString -
-*/
-std::string EntityId::toString(bool useIsPattern, const std::string& delimiter)
-{
-  std::string s;
-
-  s = id + delimiter + type;
-
-  if (useIsPattern)
-  {
-    s += delimiter + isPattern;
-  }
-
-  return s;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityId::equal - return TRUE if EXACT match
-*/
-bool EntityId::equal(EntityId* eP)
-{
-  return ((eP->id                == id)                &&
-          (eP->type              == type)              &&
-          (eP->isPatternIsTrue() == isPatternIsTrue()) &&
-          (eP->isTypePattern     == isTypePattern));
 }
 
 

@@ -38,31 +38,6 @@
 
 /* ****************************************************************************
 *
-* ScopeVector::check -
-*/
-std::string ScopeVector::check(void)
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check()) != "OK")
-    {
-      char ixV[STRING_SIZE_FOR_INT];
-      snprintf(ixV, sizeof(ixV), "%d", ix);
-      std::string details = std::string("error in scope ") + ixV + ": " + res;
-      alarmMgr.badInput(clientIp, details);
-      return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * ScopeVector::push_back -
 */
 void ScopeVector::push_back(Scope* item)

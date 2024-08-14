@@ -76,38 +76,6 @@ Entity::Entity(const std::string& _id, const std::string& _type, const std::stri
 
 /* ****************************************************************************
 *
-* Entity::Entity -
-*
-* This constructor was ported from old ContextElement class
-*/
-Entity::Entity(EntityId* eP)
-{
-  id            = eP->id;
-  type          = eP->type;
-  isPattern     = eP->isPattern;
-  isTypePattern = eP->isTypePattern;
-  servicePath   = eP->servicePath;
-  creDate       = eP->creDate;
-  modDate       = eP->modDate;
-}
-
-
-
-/* ****************************************************************************
-*
-* Entity::Entity -
-*
-* This constructor was ported from old ContextElement class
-*/
-Entity::Entity(Entity* eP)
-{
-  fill(*eP);
-}
-
-
-
-/* ****************************************************************************
-*
 * Entity::~Entity - 
 */
 Entity::~Entity()

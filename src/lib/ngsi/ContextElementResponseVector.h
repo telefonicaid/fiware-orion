@@ -55,11 +55,7 @@ typedef struct ContextElementResponseVector
   void                     fill(ContextElementResponseVector& cerV);
   void                     fill(EntityVector& erV, HttpStatusCode sc);    // Needed by NGSIv2 forwarding logic
   ContextElementResponse*  operator[] (unsigned int ix) const;
-  
 
-  std::string              check(RequestType         requestType,
-                                 const std::string&  predetectedError,
-                                 int                 counter);
 } ContextElementResponseVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSEVECTOR_H_

@@ -48,18 +48,9 @@ NotifyContextResponse::NotifyContextResponse()
 
 /* ****************************************************************************
 *
-* NotifyContextResponse::NotifyContextResponse - 
-*/
-NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
-{
-   responseCode.fill(&sc);
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextResponse::release - 
+*
+* FIXME PR: this method is not called (it can be removed without compilation errors). Possible memory leak?
 */
 void NotifyContextResponse::release(void)
 {

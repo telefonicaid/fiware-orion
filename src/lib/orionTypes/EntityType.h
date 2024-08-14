@@ -45,7 +45,6 @@ class EntityType
   EntityType();
   explicit EntityType(std::string _type);
 
-  std::string   check(const std::string& predetectedError);
   void          release(void);
   std::string   toJson(bool includeType = false);
 };

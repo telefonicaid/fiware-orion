@@ -36,23 +36,6 @@
 */
 ContextRegistrationResponse::ContextRegistrationResponse()
 {
-  errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextRegistrationResponse::check -
-*/
-std::string ContextRegistrationResponse::check
-(
-  RequestType         requestType,
-  const std::string&  predetectedError,
-  int                 counter
-)
-{
-  return contextRegistration.check(requestType, predetectedError, counter);
 }
 
 

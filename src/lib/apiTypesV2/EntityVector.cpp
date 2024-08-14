@@ -97,28 +97,6 @@ std::string EntityVector::toJson(RenderFormat renderFormat)
 
 /* ****************************************************************************
 *
-* EntityVector::check -
-*/
-std::string EntityVector::check(RequestType requestType)
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(requestType)) != "OK")
-    {
-      alarmMgr.badInput(clientIp, "invalid vector of Entity", res);
-      return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityVector::push_back -
 */
 void EntityVector::push_back(Entity* item)

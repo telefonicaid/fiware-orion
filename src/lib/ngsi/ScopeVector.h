@@ -44,7 +44,6 @@ typedef struct ScopeVector
   unsigned int size(void) const;
   void         release();
   void         fill(const ScopeVector& scopeV, bool copy);
-  std::string  check(void);
   Scope* operator[](unsigned int ix) const;
   
 } ScopeVector;

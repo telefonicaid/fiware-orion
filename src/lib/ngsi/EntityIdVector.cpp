@@ -59,34 +59,6 @@ std::string EntityIdVector::toJson(void)
 
 /* ****************************************************************************
 *
-* EntityIdVector::check -
-*/
-std::string EntityIdVector::check(RequestType requestType)
-{
-  if (vec.size() == 0)
-  {
-    alarmMgr.badInput(clientIp, "mandatory entity list missing");
-    return "Empty entityIdVector";
-  }
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(requestType)) != "OK")
-    {
-      alarmMgr.badInput(clientIp, "invalid vector of EntityIds", res);
-      return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityIdVector::lookup - find a matching entity in the entity-vector
 */
 EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type, const std::string& isPattern)

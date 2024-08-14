@@ -38,12 +38,13 @@
 TEST(StatusCode, render)
 {
   StatusCode    sc1;
-  StatusCode    sc2(SccOk, "DETAILS");
+  StatusCode    sc2;
   std::string   out;
   const char*   outfile1  = "ngsi.statusCode.render4.middle.json";
 
   utInit();
 
+  sc2.fill(SccOk, "DETAILS");
   out = sc2.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -62,8 +63,8 @@ TEST(StatusCode, render)
 TEST(StatusCode, fill)
 {
   StatusCode    sc;
-  StatusCode    sc2(SccOk, "Details");
-  StatusCode    ec(SccBadRequest, "Very bad request :-)");
+  StatusCode    sc2;
+  StatusCode    ec;
   std::string   out;
 
   utInit();
@@ -73,42 +74,15 @@ TEST(StatusCode, fill)
   EXPECT_STREQ(sc.reasonPhrase.c_str(), "Forbidden");
   EXPECT_STREQ(sc.details.c_str(), "D");
 
-  sc.fill(&sc2);
+  sc.fill(SccOk, "Details");
   EXPECT_EQ(sc.code, SccOk);
   EXPECT_STREQ(sc.reasonPhrase.c_str(), "OK");
   EXPECT_STREQ(sc.details.c_str(), "Details");
 
-  sc.fill(&ec);
+  sc.fill(SccBadRequest, "Very bad request :-)");
   EXPECT_EQ(sc.code, SccBadRequest);
   EXPECT_STREQ(sc.reasonPhrase.c_str(), "BadRequest");
   EXPECT_STREQ(sc.details.c_str(), "Very bad request :-)");
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* check - 
-*/
-TEST(StatusCode, check)
-{
-  StatusCode    sc(SccOk, "");
-  std::string   out;
-
-  utInit();
-
-  out = sc.check();
-  EXPECT_STREQ("OK", out.c_str());
-
-  sc.fill(SccNone, "YYY");
-  out = sc.check();
-  EXPECT_STREQ("no code", out.c_str());
-
-  sc.fill(SccOk, "YYY");
-  out = sc.check();
-  EXPECT_STREQ("OK", out.c_str());
 
   utExit();
 }

@@ -60,26 +60,6 @@ EntityType::EntityType(std::string _type): type(_type), count(0)
 
 /* ****************************************************************************
 *
-* EntityType::check -
-*/
-std::string EntityType::check(const std::string&  predetectedError)
-{
-  if (!predetectedError.empty())
-  {
-    return predetectedError;
-  }
-  else if (type.empty())
-  {
-    return "Empty Type";
-  }
-
-  return contextAttributeVector.check(false);
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityType::release -
 */
 void EntityType::release(void)

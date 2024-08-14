@@ -117,21 +117,6 @@ void TriggeredSubscription::fillExpression
 }
 
 
-/* ****************************************************************************
-*
-* TriggeredSubscription::toString -
-*/
-std::string TriggeredSubscription::toString(const std::string& delimiter)
-{
-  std::stringstream ss;
-
-  ss << throttling << delimiter << lastNotification << delimiter << renderFormatToString(renderFormat) << delimiter << httpInfo.url;
-  ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
-
-  return ss.str();
-}
-
-
 
 /* ****************************************************************************
 *

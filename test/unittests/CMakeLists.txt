@@ -90,21 +90,13 @@ SET (SOURCES
     ngsi/AttributeList_test.cpp
     ngsi/ContextElementResponse_test.cpp
     ngsi/ContextElementResponseVector_test.cpp
-    ngsi/ProvidingApplication_test.cpp
-    ngsi/ContextRegistrationResponse_test.cpp
-    ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
     ngsi/Metadata_test.cpp
     ngsi/MetadataVector_test.cpp
     ngsi/Request_test.cpp
-    ngsi/Scope_test.cpp
     ngsi/ScopeVector_test.cpp
     ngsi/StatusCode_test.cpp
 
-    orionTypes/EntityType_test.cpp
-    orionTypes/EntityTypeVector_test.cpp
-
-    apiTypesV2/Entities_test.cpp
     apiTypesV2/Entity_test.cpp  
     apiTypesV2/EntityVector_test.cpp
 
@@ -135,7 +127,6 @@ SET (SOURCES
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp
-    parse/nullTreat_test.cpp
 
     rest/OrionError_test.cpp
     rest/Verb_test.cpp

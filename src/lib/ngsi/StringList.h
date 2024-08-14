@@ -42,17 +42,13 @@ typedef struct StringList
   std::vector<std::string>  stringV;
 
   void         fill(const std::vector<std::string>& aVec);
-  void         fill(const std::string& commaSeparatedList);
   std::string  toJson(void);
-  std::string  toString(void);
   void         release(void);
   bool         lookup(const std::string& string, const std::string& wildCard = "") const;
   void         push_back(const std::string& string);
   void         push_back_if_absent(const std::string& string);
   unsigned int size(void) const;
   void         clone(const StringList& sList);
-
-  std::string  check(void);
 
   std::string  operator[](unsigned int ix)  const
   {

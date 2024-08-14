@@ -39,16 +39,19 @@
 */
 TEST(OrionError, all)
 {
-  StatusCode    sc(SccBadRequest, "no details 2");
   OrionError    e0;
-  OrionError    e1(SccOk, "no details 3");
-  OrionError    e3(sc);
-  OrionError    e4(SccOk, "Good Request");
+  OrionError    e1;
+  OrionError    e3;
+  OrionError    e4;
   std::string   out;
   const char*   outfile1 = "orion.orionError.all1.valid.json";
   const char*   outfile2 = "orion.orionError.all3.valid.json";
   const char*   outfile3 = "orion.orionError.all4.valid.json";
   ConnectionInfo ci;
+
+  e1.fill(SccOk, "no details 3");
+  e3.fill(SccBadRequest, "no details 2");
+  e4.fill(SccOk, "Good Request");
 
   ci.outMimeType = JSON;
 
@@ -60,9 +63,9 @@ TEST(OrionError, all)
   EXPECT_EQ("OK",           e1.error);
   EXPECT_EQ("no details 3", e1.description);
 
-  EXPECT_EQ(sc.code,         e3.code);
-  EXPECT_EQ(sc.reasonPhrase, e3.error);
-  EXPECT_EQ(sc.details,      e3.description);
+  EXPECT_EQ(SccBadRequest,  e3.code);
+  EXPECT_EQ("BadRequest",   e3.error);
+  EXPECT_EQ("no details 2", e3.description);
 
   EXPECT_EQ(SccOk,          e4.code);
   EXPECT_EQ("OK",           e4.error);

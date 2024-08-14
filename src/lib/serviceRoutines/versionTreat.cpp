@@ -162,7 +162,6 @@ std::string versionTreat
   }
   
   std::string out     = "";
-  std::string indent  = "";
 
 #ifdef UNIT_TEST
   std::string uptime = "0 d, 0 h, 0 m, 0 s";

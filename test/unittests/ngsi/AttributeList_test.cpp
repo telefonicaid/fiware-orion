@@ -53,9 +53,5 @@ TEST(AttributeList, ok)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  al.push_back("");
-  out = al.check();
-  EXPECT_STREQ("empty string", out.c_str());
-
   utExit();
 }

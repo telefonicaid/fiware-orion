@@ -31,39 +31,6 @@
 
 /* ****************************************************************************
 *
-* check
-*/
-TEST(EntityVector, check)
-{
-  utInit();
-
-  Entity* enP;
-
-  // EntityVector with ok Entity inside
-  enP            = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
-  EntityVector enV1;
-  enV1.push_back(enP);
-
-  // EntityVector with nok Entity inside
-  enP            = new Entity();
-  enP->id        = "";
-  enP->type      = "T";
-  enP->isPattern = "false";
-  EntityVector enV2;
-  enV2.push_back(enP);
-
-  EXPECT_EQ("OK", enV1.check(EntitiesRequest));
-  EXPECT_EQ("entity id length: 0, min length supported: 1", enV2.check(EntitiesRequest));
-
-  utExit();
-}
-
-
-/* ****************************************************************************
-*
 * render -
 *
 */

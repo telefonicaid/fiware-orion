@@ -33,36 +33,6 @@
 
 /* ****************************************************************************
 *
-* check -
-*/
-TEST(ContextElementResponse, check)
-{
-   ContextElementResponse  cer;
-   std::string             out;
-
-   utInit();
-
-   out = cer.check(BatchUpdateRequest, "", 0);
-   EXPECT_STREQ("entity id length: 0, min length supported: 1", out.c_str());
-
-   cer.entity.id         = "ID";
-   cer.entity.type       = "Type";
-   cer.entity.isPattern  = "false";
-
-   out = cer.check(BatchUpdateRequest, "", 0);
-   EXPECT_STREQ("no code", out.c_str());
-
-   cer.statusCode.fill(SccOk, "details");
-   out = cer.check(BatchUpdateRequest, "", 0);
-   EXPECT_STREQ("OK", out.c_str());
-
-   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render -
 */
 TEST(ContextElementResponse, render)

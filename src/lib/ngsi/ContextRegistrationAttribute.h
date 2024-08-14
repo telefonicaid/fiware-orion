@@ -38,16 +38,15 @@
 /* ****************************************************************************
 *
 * ContextRegistrationAttribute -
+*
 */
 typedef struct ContextRegistrationAttribute
 {
   std::string     name;            // Mandatory
   std::string     type;            // Optional
 
-  ContextRegistrationAttribute();
   ContextRegistrationAttribute(const std::string& _name, const std::string& _type);
 
-  std::string     check(void);
 } ContextRegistrationAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTE_H_

@@ -272,17 +272,6 @@ extern bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std:
 
 /* ****************************************************************************
 *
-* subToEntityIdVector -
-*
-* Extract the entity ID vector from a BSON document (in the format of the csubs
-* collection)
-*/
-extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
-
-
-
-/* ****************************************************************************
-*
 * subToNotifyList -
 */
 void subToNotifyList
