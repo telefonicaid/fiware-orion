@@ -57,6 +57,7 @@ style_check src/lib/parseArgs
 style_check src/lib/cache
 style_check src/lib/alarmMgr
 style_check src/lib/metricsMgr
+style_check src/lib/expressions
 style_check test/unittests
 style_check test/unittests/orionTypes
 style_check test/unittests/jsonParse
@@ -152,7 +153,7 @@ style_check test/unittests/serviceRoutines
 # o ngsi/AttributeDomainName.cpp                                             (haderding/remove_ngsiv1_indent: 9 lines)
 # o ngsi/AttributeDomainName.h                                               (haderding/remove_ngsiv1_indent: 5 lines)
 # o ngsi/AttributeExpression.cpp                                             (haderding/remove_ngsiv1_indent: 9 lines)
-# o ngsi/AttributeExpression.h                                               (haderding/remove_ngsiv1_indent: 6 lines)
+# o ngsi/Attribute.h                                               (haderding/remove_ngsiv1_indent: 6 lines)
 # o ngsi/StringList.cpp                                                      (haderding/remove_ngsiv1_indent: 13 lines)
 # o ngsi/StringList.h                                                        (haderding/remove_ngsiv1_indent: 5 lines)
 # o ngsi/ConditionValueList.cpp                                              (haderding/remove_ngsiv1_indent: 13 lines)
