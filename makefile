@@ -77,10 +77,12 @@ prepare_coverage: compile_info
 	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_unit_test: compile_info
-	@echo '------------------------------- prepare_unit_test starts ---------------------------------'
+	mkdir -p  BUILD_UNITTEST || true
+	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+
+prepare_unit_test_coverage: compile_info
 	mkdir -p  BUILD_UNITTEST || true
 	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
-	@echo '------------------------------- prepare_unit_test ended ---------------------------------'
 
 release: prepare_release
 	cd BUILD_RELEASE && make -j$(CPU_COUNT)
@@ -209,18 +211,17 @@ uncrustify_changed:
 	git diff --name-only | grep "\.cpp\|\.h" | xargs uncrustify --no-backup -c scripts/uncrustify.cfg
 
 build_unit_test: prepare_unit_test 
-	@echo '------------------------------- build_unit_test starts ---------------------------------'
 	cd BUILD_UNITTEST && make -j$(CPU_COUNT)
-	@echo '------------------------------- build_unit_test ended ---------------------------------'
+
+build_unit_test_coverage: prepare_unit_test_coverage 
+	cd BUILD_UNITTEST && make -j$(CPU_COUNT)
 
 unit_test: build_unit_test
-	@echo '------------------------------- unit_test starts ---------------------------------'
 	if [ -z "${TEST_FILTER}" ]; then \
 	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbURI mongodb://${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
         else \
 	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbURI mongodb://${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
         fi
-	@echo '------------------------------- unit_test ended ---------------------------------'
 
 functional_test: install
 	./test/functionalTest/testHarness.sh
@@ -266,7 +267,7 @@ coverage: install_coverage
 	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
-coverage_unit_test: build_unit_test
+coverage_unit_test: build_unit_test_coverage
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
