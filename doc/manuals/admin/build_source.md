@@ -148,3 +148,5 @@ You can generate coverage reports for the Orion Context Broker using the followi
 * Run coverage
 
         make coverage INSTALL_DIR=~
+
+*NOTE*: note that functional test relying in debug traces are expected to fail under coverage execution (this is due to the LM_T macros used by the debug traces are disabled in the coverage code building, due to they add "noise" in condition coverage, thus making coverage reports more useful).

@@ -54,6 +54,19 @@ ifndef MONGO_HOST
     MONGO_HOST=localhost
 endif
 
+# Macros
+define CLEAN_COVERAGE_REPORT
+	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
+	# Remove unit test libraries and libraries developed before contextBroker project init
+	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
+	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
+	lcov -r coverage/broker.info "*/src/app/*" -o coverage/broker.info
+endef
+
 all: prepare_release release
 
 di: install_debug
@@ -242,15 +255,7 @@ coverage: coverage_functional_test coverage_unit_test
 	# Generate test report
 	echo "Generating coverage report"
 	lcov --add-tracefile BUILD_UNITTEST/coverage.info --add-tracefile BUILD_COVERAGE/coverage.info --output-file coverage/broker.info
-	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
-	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
-	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
-	lcov -r coverage/broker.info "*/src/app/*" -o coverage/broker.info
+	$(CLEAN_COVERAGE_REPORT)
 	genhtml -o coverage coverage/broker.info
 
 coverage_unit_test: build_unit_test_coverage
@@ -266,15 +271,7 @@ coverage_unit_test: build_unit_test_coverage
 	echo "Generating coverage report"
 	lcov --directory BUILD_UNITTEST --capture -b BUILD_UNITTEST --output-file coverage/broker.test.info 
 	lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
-	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
-	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
-	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
-	lcov -r coverage/broker.info "*/src/app/*" -o coverage/broker.info
+	$(CLEAN_COVERAGE_REPORT)
 	genhtml -o coverage coverage/broker.info
 
 coverage_functional_test: install_coverage
@@ -300,13 +297,7 @@ coverage_functional_test: install_coverage
 	echo "Generating coverage report"
 	lcov --directory BUILD_COVERAGE --capture -b BUILD_COVERAGE --output-file coverage/broker.test.info 
 	lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
-	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
-	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
+	$(CLEAN_COVERAGE_REPORT)
 	genhtml -o coverage coverage/broker.info
 
 valgrind: install_debug
