@@ -305,12 +305,12 @@ link_directories("/usr/lib/x86_64-linux-gnu")
 #
 # Enabling test harness
 #
-if (UNIT_TEST)
+if (UNIT_TEST OR COVERAGE)
    ENABLE_TESTING()
    INCLUDE(Dart)
    SET (CMAKE_TEST_TIMEOUT 60)
    SET (DART_TIMEOUT 60)
-   #ADD_SUBDIRECTORY(test/harness)
+   ADD_SUBDIRECTORY(test/functionalTest/cases)
 endif (UNIT_TEST)
 
 #

@@ -74,7 +74,7 @@ prepare_debug: compile_info
 
 prepare_coverage: compile_info
 	mkdir -p  BUILD_COVERAGE || true
-	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_unit_test: compile_info
 	@echo '------------------------------- prepare_unit_test starts ---------------------------------'
@@ -234,7 +234,6 @@ ftd: functional_test_debug
 test: unit_test functional_test
 
 coverage: install_coverage
-	# FIXME #4418: the functional test part of this target is not working properly. Check issue for details.
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
@@ -292,7 +291,6 @@ coverage_unit_test: build_unit_test
 	genhtml -o coverage coverage/broker.info
 
 coverage_functional_test: install_coverage
-	# FIXME #4418: this target is not working properly. Check issue for details.
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
