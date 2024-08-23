@@ -234,6 +234,25 @@ ftd: functional_test_debug
 
 test: unit_test functional_test
 
+coverage: coverage_functional_test coverage_unit_test
+	rm -rf coverage
+	lcov --capture --directory BUILD_UNITTEST --output-file BUILD_UNITTEST/coverage.info
+	lcov --capture --directory BUILD_COVERAGE --output-file BUILD_COVERAGE/coverage.info
+	mkdir coverage
+	# Generate test report
+	echo "Generating coverage report"
+	lcov --add-tracefile BUILD_UNITTEST/coverage.info --add-tracefile BUILD_COVERAGE/coverage.info --output-file coverage/broker.info
+	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
+	# Remove unit test libraries and libraries developed before contextBroker project init
+	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
+	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
+	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
+	lcov -r coverage/broker.info "*/src/app/*" -o coverage/broker.info
+	genhtml -o coverage coverage/broker.info
+
 coverage_unit_test: build_unit_test_coverage
 	# Init coverage
 	echo "Initializing coverage files"

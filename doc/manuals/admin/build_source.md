@@ -145,12 +145,6 @@ You can generate coverage reports for the Orion Context Broker using the followi
 
 * Do first a successful pass for unit_test and functional_test, to check that everything is ok (see above)
 
-* Run coverage (based in functionalt tests execution, the recommented one):
+* Run coverage
 
-        make coverage_functional_test INSTALL_DIR=~
-
-* Run coverage (based in unit tests execution, not so good):
-
-        make coverage_unit_test INSTALL_DIR=~
-
-*NOTE*: In the past we have a `make coverage` target. But it has maintainability problems (as the one described [in this issue](https://github.com/telefonicaid/fiware-orion/issues/4418)) so we remove it. Note that the unit test are not so important in the current days (it was in the early Context Broker days), in favour of functional test, so it's contributo to coverage is not very signficative.
+        make coverage INSTALL_DIR=~
