@@ -149,3 +149,5 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 * カバレッジを実行します
 
         make coverage INSTALL_DIR=~
+
+*注意*: デバッグ・トレースに依存する機能テストは、カバレッジ実行で失敗すると予想されます (例: notification_different_sizes または not_posix_regex_idpattern.test)。これは、デバッグ トレースで使用される LM_T マクロが条件カバレッジに "ノイズ" を追加するため、カバレッジ・コード・ビルドで無効になっているためです。この方法では、カバレッジ・レポートがより有用になります。
