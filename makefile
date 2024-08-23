@@ -234,39 +234,6 @@ ftd: functional_test_debug
 
 test: unit_test functional_test
 
-coverage: install_coverage
-	# Init coverage
-	echo "Initializing coverage files"
-	mkdir -p coverage
-	lcov -i --zerocounters --directory BUILD_COVERAGE/
-	lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
-	# Execute test for coverage
-	echo "Executing coverage test"
-	BUILD_COVERAGE/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_COVERAGE/unit_test.xml
-	if [ -z "${CONTEXTBROKER_TESTENV_SOURCED}" ]; then \
-	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
-	    exit 1; \
-	fi
-	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/functionalTest/cases/*.diff ]; then \
-           echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases\" manually to find the problem."; \
-	   exit 1; \
-	fi
-	@xsltproc scripts/cmake2junit.xsl BUILD_COVERAGE/Testing/`cat BUILD_COVERAGE/Testing/TAG| head -n1`/Test.xml  > BUILD_COVERAGE/functional_test.xml
-	# Generate test report
-	echo "Generating coverage report"
-	lcov --directory BUILD_COVERAGE --capture -b BUILD_COVERAGE --output-file coverage/broker.test.info 
-	lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
-	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
-	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
-	genhtml -o coverage coverage/broker.info
-
 coverage_unit_test: build_unit_test_coverage
 	# Init coverage
 	echo "Initializing coverage files"
@@ -275,7 +242,7 @@ coverage_unit_test: build_unit_test_coverage
 	lcov --capture --initial --directory BUILD_UNITTEST -b BUILD_UNITTEST --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
-	BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
+	BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbURI mongodb://${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
 	# Generate test report
 	echo "Generating coverage report"
 	lcov --directory BUILD_UNITTEST --capture -b BUILD_UNITTEST --output-file coverage/broker.test.info 
