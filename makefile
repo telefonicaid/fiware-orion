@@ -86,6 +86,7 @@ prepare_debug: compile_info
 	cd BUILD_DEBUG && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DDEBUG=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
 prepare_coverage: compile_info
+	# FIXME: should we use BUILD_COVERAGE for this or use BUILD_DEBUG? (note that for unit test we don't have BUILT_UNITTEST_COVERAGE....)
 	mkdir -p  BUILD_COVERAGE || true
 	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
