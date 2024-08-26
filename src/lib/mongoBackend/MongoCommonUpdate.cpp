@@ -1668,14 +1668,11 @@ static bool addTriggeredSubscriptions_noCache
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      //
-      // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
-      //
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long         maxFailsLimit      = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
       long long         failsCounter       = sub.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)     : -1;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "normalized";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
@@ -3931,8 +3928,7 @@ static unsigned int updateEntity
 
   /* Send notifications for each one of the subscriptions accumulated by
    * previous addTriggeredSubscriptions() invocations. Before that, we add
-   * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
-   * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
+   * builtin attributes and metadata */
   addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChange));
   unsigned int notifSent = processSubscriptions(subsToNotify,
                                                 notifyCerP,
@@ -4143,8 +4139,7 @@ unsigned int processContextElement
   }
 
   // Next block is to avoid that several entities with the same ID get updated at the same time, which is
-  // not allowed in NGSIv2. Note that multi-update has been allowed in NGSIv1 (maybe without
-  // thinking too much about it, but NGSIv1 behaviour has to be preserved to keep backward compatibility)
+  // not allowed in NGSIv2
   if (entitiesNumber > 1)
   {
     buildGeneralErrorResponse(eP, NULL, responseP, SccConflict, ERROR_DESC_TOO_MANY_ENTITIES);
@@ -4376,8 +4371,7 @@ unsigned int processContextElement
         notifyCerP->entity.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         /* Send notifications for each one of the subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations. Before that, we add
-         * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
-         * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
+         * builtin attributes and metadata */
         addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityCreate));
         notifSent = processSubscriptions(subsToNotify,
                                          notifyCerP,

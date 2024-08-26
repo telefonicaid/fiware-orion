@@ -144,7 +144,7 @@ std::string Subscription::toJson(void)
   jh.addString("status", this->status);
 
   jh.addRaw("subject", this->subject.toJson());
-  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
+  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat)));
 
   if (this->throttling > 0)
   {

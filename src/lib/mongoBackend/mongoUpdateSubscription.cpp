@@ -353,7 +353,7 @@ std::string mongoUpdateSubscription
 
   setServicePath(servicePath, &setB);
 
-  if (subUp.subjectProvided)       setEntities(subUp, &setB, subUp.fromNgsiv1);
+  if (subUp.subjectProvided)       setEntities(subUp, &setB);
   if (subUp.subjectProvided)       setConds(subUp, &setB);
   if (subUp.subjectProvided)       setOperations(subUp, &setB);
   if (subUp.subjectProvided)       setExpression(subUp, &setB);

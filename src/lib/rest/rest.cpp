@@ -167,16 +167,6 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
       return MHD_YES;
     }
   }
-  else if (key == URI_PARAM_PAGINATION_DETAILS)
-  {
-    if ((strcasecmp(value.c_str(), "on") != 0) && (strcasecmp(value.c_str(), "off") != 0))
-    {
-      OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
-      ciP->httpStatusCode = error.code;
-      ciP->answer         = error.toJson();
-      return MHD_YES;
-    }
-  }
   else if (key == URI_PARAM_ATTRIBUTES_FORMAT)
   {
     // If URI_PARAM_ATTRIBUTES_FORMAT used, set URI_PARAM_ATTRIBUTE_FORMAT as well
@@ -1276,7 +1266,6 @@ static MHD_Result connectionTreat
     //
     ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
-    ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, ciP);
 

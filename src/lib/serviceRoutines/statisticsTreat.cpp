@@ -172,13 +172,6 @@ std::string renderCounterStats(bool fullCounters)
         (noOfRequestCounters[ix].patch != -1) || (noOfRequestCounters[ix].put != -1) ||
         (noOfRequestCounters[ix]._delete != -1) || (noOfRequestCounters[ix].options != -1))
     {
-      // FIXME: in 3.9.0 most of the NGSIv1/NGSI10 requests were removed. We have invented and speciall value "skip"
-      // for these cases. This "skip" hack should be removed when we definitively remove all that code
-      if (requestTypeForCounter(noOfRequestCounters[ix].request, std::string(noOfRequestCounters[ix].prefix)) == "skip")
-      {
-        continue;
-      }
-
       // We add in the accumulator corresponing do the request kind
       if (((strncmp(noOfRequestCounters[ix].prefix, "v1", strlen("v1"))) == 0) || (strncmp(noOfRequestCounters[ix].prefix, "ngsi10", strlen("ngsi10")) == 0))
       {

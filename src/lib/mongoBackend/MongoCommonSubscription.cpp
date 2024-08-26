@@ -392,7 +392,7 @@ void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now)
 *
 * setEntities -
 */
-void setEntities(const Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1)
+void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   orion::BSONArrayBuilder entities;
 
@@ -439,15 +439,6 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b, bool fromNgs
       bob.append(CSUB_ENTITY_ISTYPEPATTERN, isTypePattern);
     }
     entities.append(bob.obj());
-  }
-
-  if ((fromNgsiv1) && (entities.arrSize() == 0))
-  {
-    // Special case: in NGSIv1 entities and condition attributes are not
-    // part of the same field (subject, in NGSIv2) so it may happen that
-    // subject only contains condition attributes and entities has to be
-    // left untouched in this case
-    return;
   }
 
   orion::BSONArray entitiesArr = entities.arr();

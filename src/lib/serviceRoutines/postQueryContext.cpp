@@ -815,8 +815,6 @@ void postQueryContext
     ciP->httpHeaderValue.push_back(cV);
   }
 
-  std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
-
   //
   // Time to cleanup.
   // But before doing that ...

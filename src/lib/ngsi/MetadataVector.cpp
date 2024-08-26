@@ -51,13 +51,6 @@ MetadataVector::MetadataVector(void)
 *
 * MetadataVector::toJson -
 *
-* Metadatas named 'value' or 'type' are not rendered in API version 2, due to the 
-* compact way in which API v2 is rendered. Metadatas named 'value' or 'type' would simply
-* collide with the 'value' and 'type' of the attribute itself (holder of the metadata).
-*
-* If anybody needs a metadata named 'value' or 'type', then API v1
-* will have to be used to retreive that information.
-*
 */
 std::string MetadataVector::toJson(const std::vector<Metadata*>& orderedMetadata)
 {

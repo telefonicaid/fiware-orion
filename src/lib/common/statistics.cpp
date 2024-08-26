@@ -341,7 +341,7 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb, const
     }
   }
 
-  // If it is not a NGSIv2 request it has to be NGSIv1 or invalid
+  // If it is not a NGSIv2 request it has to be invalid
   if (!requestFound)
   {
     ++noOfInvalidRequests;

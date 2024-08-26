@@ -52,11 +52,6 @@ public:
   std::string     type;                    // Optional
   MetadataVector  metadataVector;          // Optional
 
-  //
-  // Value - Optional (FI-WARE changes - MANDATORY in OMA spec)
-  //            Especially for the new convops, value is NOT mandatory
-  //            E.g. /v1/contextTypes
-  //
   orion::ValueType           valueType;    // Type of value: taken from JSON parse
   std::string                stringValue;  // "value" as a String
   double                     numberValue;  // "value" as a Number

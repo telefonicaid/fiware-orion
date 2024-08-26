@@ -319,9 +319,6 @@ static void processGenericEntities
 * NOTE
 *   If the in/out-parameter countP is non-NULL then the number of matching entities
 *   must be returned in *countP.
-*
-*   This replaces the 'uriParams[URI_PARAM_PAGINATION_DETAILS]' way of passing this information.
-*   The old method was one-way, using the new method
 */
 HttpStatusCode mongoQueryContext
 (

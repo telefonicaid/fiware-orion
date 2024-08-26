@@ -97,9 +97,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   // 04. Extract data from subP
   //
-  // NOTE: NGSIv1 JSON is 'default' (for old db-content)
-  //
-  std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+  std::string    renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "normalized";
   RenderFormat   renderFormat       = stringToRenderFormat(renderFormatString);
 
   cSubP->tenant                = (tenant[0] == 0)? strdup("") : strdup(tenant);
@@ -394,8 +392,6 @@ int mongoSubCacheItemInsert
 
 
   // 04. Extract data from subP
-  //
-  // NOTE: NGSIv1 JSON is 'default' (for old db-content)
   //
   cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
   cSubP->subscriptionId        = strdup(subscriptionId);
