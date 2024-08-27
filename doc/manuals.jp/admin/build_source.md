@@ -13,7 +13,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (ソースから)
 * libcurl: 7.88.1
-* openssl: 3.0.9
+* openssl: 3.0.13
 * libuuid: 2.38.1
 * libmosquitto: 2.0.15 (ソースから)
 * Mongo C driver: 1.24.3 (ソースから)
@@ -149,3 +149,5 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 * カバレッジを実行します
 
         make coverage INSTALL_DIR=~
+
+*注意*: デバッグ・トレースに依存する機能テストは、カバレッジ実行で失敗すると予想されます (例: notification_different_sizes または not_posix_regex_idpattern.test)。これは、デバッグ トレースで使用される LM_T マクロが条件カバレッジに "ノイズ" を追加するため、カバレッジ・コード・ビルドで無効になっているためです。この方法では、カバレッジ・レポートがより有用になります。

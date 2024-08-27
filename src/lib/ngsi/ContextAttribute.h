@@ -95,6 +95,8 @@ public:
   /* Check if attribute means a location  */
   bool  getLocation(orion::BSONObj* attrsP) const;
 
+  double getEvalPriority(void);
+
   std::string  toJsonV1(bool                             asJsonObject,
                         RequestType                      request,
                         const std::vector<std::string>&  metadataFilter,
@@ -110,7 +112,7 @@ public:
 
   std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
-  std::string  toJsonValue(void);
+  std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonAsValue(ApiVersion       apiVersion,
                              bool             acceptedTextPlain,

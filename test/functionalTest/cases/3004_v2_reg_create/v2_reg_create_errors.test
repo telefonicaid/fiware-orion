@@ -776,8 +776,7 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true
+    }
   },
   "status": 4
 }'
@@ -802,8 +801,7 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true
+    }
   },
   "status": "green"
 }'
@@ -854,8 +852,7 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true
+    }
   }
 }'
 orionCurl --url /v2/registrations --payload "$payload"
@@ -879,8 +876,7 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${CP1_PORT}'/v2"
-    },
-    "legacyForwarding": true
+    }
   }
 }'
 orionCurl --url /v2/registrations --payload "$payload"

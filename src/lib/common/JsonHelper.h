@@ -45,12 +45,11 @@ public:
   void        addBool(const std::string& key, bool b);
   void        addNull(const std::string& key);
 
-  std::string str();
+  std::string str(bool closed = true);
 
 private:
  std::string  ss;
  bool         empty;
- bool         closed;
 };
 
 
@@ -68,12 +67,11 @@ public:
   void        addNull(void);
 
 
-  std::string str();
+  std::string str(void);
 
 private:
  std::string  ss;
  bool         empty;
- bool         closed;
 };
 
 

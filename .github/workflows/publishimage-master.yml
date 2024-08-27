@@ -6,7 +6,7 @@ name: Publish Docker image (master)
 on:
   push:
     branches:
-      - master      
+      - master
 
 jobs:
   build-and-push:
@@ -26,7 +26,9 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TEF_TOKEN }}
 
     - name: Build Docker image
-      run: docker build -t telefonicaiot/fiware-orion:latest --build-arg GIT_REV_ORION=master --build-arg REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} --no-cache -f docker/Dockerfile .
+      run: |
+        export TOKEN=${{ secrets.REPO_ACCESS_TOKEN }}
+        docker build -t telefonicaiot/fiware-orion:latest --build-arg GIT_REV_ORION=master --secret id=repo_token,env=TOKEN --no-cache -f docker/Dockerfile .
 
     - name: Push Docker image
       run: docker push telefonicaiot/fiware-orion:latest

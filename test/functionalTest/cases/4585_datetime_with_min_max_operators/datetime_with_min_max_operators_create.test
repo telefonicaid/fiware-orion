@@ -1,0 +1,99 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+DateTime with min and max operators creating entities
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity with T1={$min: 2025-04-15T10:59:59.000Z}, T2={$max: 2024-04-15T10:59:59.000Z}
+# 02. Get entity see T1=1970-01-01T00:00:00.000Z, T2=2024-04-15T10:59:59.000Z
+#
+
+
+echo '01. Create entity with T1={$min: 2025-04-15T10:59:59.000Z}, T2={$max: 2024-04-15T10:59:59.000Z}'
+echo '==============================================================================================='
+payload='{
+  "id": "E1",
+  "type": "T",
+  "T1": {
+    "value": {"$min": "2025-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  },
+  "T2": {
+    "value": {"$max": "2024-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Get entity see T1=1970-01-01T00:00:00.000Z, T2=2024-04-15T10:59:59.000Z"
+echo "==========================================================================="
+orionCurl --url /v2/entities/E1/attrs
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity with T1={$min: 2025-04-15T10:59:59.000Z}, T2={$max: 2024-04-15T10:59:59.000Z}
+===============================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+02. Get entity see T1=1970-01-01T00:00:00.000Z, T2=2024-04-15T10:59:59.000Z
+===========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 149
+
+{
+    "T1": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "1970-01-01T00:00:00.000Z"
+    },
+    "T2": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2024-04-15T10:59:59.000Z"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

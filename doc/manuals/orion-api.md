@@ -75,6 +75,8 @@
       - [Additional considerations](#additional-considerations)
     - [JEXL Support](#jexl-support)
       - [JEXL usage example](#jexl-usage-example)
+      - [Metadata support](#metadata-support)
+      - [Evaluation priority](#evaluation-priority)
       - [Available Transformations](#available-transformations)
         - [`uppercase`](#uppercase)
         - [`lowercase`](#lowercase)
@@ -107,6 +109,9 @@
         - [`keys`](#keys)
         - [`arrSum`](#arrsum)
         - [`arrAvg`](#arravg)
+        - [`now`](#now)
+        - [`toIsoString`](#toisostring)
+        - [`getTime`](#gettime)
       - [Failsafe cases](#failsafe-cases)
       - [Known limitations](#known-limitations)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
@@ -746,6 +751,8 @@ type has an special semantic for Orion:
    * `DateTime`
    * `geo:json`
 
+* `evalPriority`: used by expression evaluation. Have a look to [this specific section](#evaluation-priority) for details.
+
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
 in [Geospatial properties of entities](#geospatial-properties-of-entities) section). Support
@@ -1326,7 +1333,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$max`
 
@@ -1354,7 +1361,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$push`
 
@@ -1612,7 +1619,8 @@ The only exception to "use only one operator" rule is the case of `$set` and
 Update operators can be used in entity creation or replace operations. In particular:
 
 * Numeric operators takes 0 as reference. For instance, `{"$inc": 4}` results in 4,
-  `{$mul: 1000}` results in 0, etc.
+  `{"$mul": 1000}` results in 0, etc.
+* Epoch time (`"1970-01-01T00:00:00Z"`) is used as reference for `DateTime` when `$min` or `$max` are used.
 * `$set` takes the empty object (`{}`) as reference. For instance, `"$set": {"X": 1}` results in just `{"X": 1}`
 * `$push` and `$addToSet` take the empty array (`[]`) as reference. For instance, `{"$push": 4}`
   results in `[ 4 ]`.
@@ -2507,6 +2515,77 @@ will trigger a notification like this:
 ]
 ```
 
+### Metadata support
+
+Attribute metadata is also included in the JEXL evaluation context, along with the actual attributes. This is done using a special context key named `metadata` which value is an object with the following structure:
+
+* keys are the name of the attributes
+* values are object with a key-map of the metadata values of the given attribute
+
+For instance, the expression `${metadata.A.MD1}` will result in the value of the metadata `MD1` belonging to the attribute `A`.
+
+Note that [builtin metadata](#builtin-metadata) are automatically added to the `metadata` context key. For instance, the `${A-metadata.A.previousValue}` expression will provide the difference between the current value of `A` (in the update request) and the previous one (before the update request).
+
+Finally, note that in the rare case an attribute named `metadata` is used (which is an anti-pattern strongly discouraged) it will not be added to the context, as the `metadata` with metadata values will take precedence.
+
+### Evaluation priority
+
+Each time an expression is evaluated, it is added to the expression context, so it can be reused by other expressions. However, by default Orion does not guarantee a given evaluation other.
+
+Thus, if we have this:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated"
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
+in the resulting notification `B` could be set to the desired `0.04` (if `A` is evaluated before `B`) or to the underised `null` (if `B` is evaluated before `A`), randomly.
+
+In order to overcome this problem, the `evalPriority` metadata can be used to define the evaluation order. It works this way:
+
+* `evalPriority` metadata is a number from 1 (first evaluation) to 100000 (last evaluation)
+* Expressions are evaluated in incresing order of priority
+* In case of ties, Orion does not guarantee a particular evaluation order. Thus, expressions in the same priority level must be considered independent, and expressions using other attributes with the same or lower priority would result in unexpected values.
+* If no `evalPriority` is set, default 100000 is used
+* `evalPriority` only has a meaning in `notification.httpCustom.ngsi` in subscriptions. As metadata in regular entities (e.g. an entity created with `POST /v2/entities`) Orion doesn't implements any semantic for it
+
+Using `evalPriority` the above example could be reformuled this way:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated",
+      "metadata": {
+        "evalPriority": {
+          "value": 1,
+          "type": "Number"
+        }
+      }
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
 ### Available Transformations
 
 #### `uppercase`
@@ -2623,7 +2702,7 @@ foo  bar
 
 #### substring
 
-Returns a substring between two positions.
+Returns a substring between two positions or `null` in case of wrong parameters (eg. final position is longer than string, final position is leeser than initial position, etc.)
 
 Extra arguments:
 * Initial position
@@ -2993,7 +3072,7 @@ results in
 
 #### thMapper
 
-Returns a value among several choices based in threshold values. This function is based in an array of *values* and an array of *choices* (which length is exactly the same as values plus one). Thus, if the input value is between the *i*-th and the *i+1*-th item of *values*, then *i*+1-th item of *choices* is returned.
+Returns a value among several choices based in threshold values. This function is based in an array of *values* and an array of *choices* (which length is exactly the same as values plus one). Thus, if the input value is greater than or equal to the *i*-th and less than the *i+1*-th item of *values*, then *i*+1-th item of *choices* is returned.
 
 This transformation returns `null` if some problem with the arguments is found (i.e. choices length is not exacly the same as values plus one, some of the items in the values array is not a number, etc.)
 
@@ -3084,6 +3163,67 @@ results in
 ```
 3
 ```
+
+#### now
+
+Returns the current time (plus a number of seconds specified as argument) as seconds since Unix epoch time.
+
+Extra arguments: none
+
+Example (being current time August 1st, 2024 at 9:31:02):
+
+```
+0|now
+```
+
+results in
+
+```
+1722504662
+```
+
+It can be checked at https://www.epochconverter.com that time corresponds to August 1st, 2024 at 9:31:02
+
+#### toIsoString
+
+Returns the [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) corresponding to a given timestamp (as seconds since Unix epoch time) passed as argument.
+
+Extra arguments: none
+
+Example (being context `{"c": 1720606949}`):
+
+```
+c|toIsoString
+```
+
+results in
+
+```
+"2024-07-10T10:22:29+00:00"
+```
+
+It can be checked at https://www.epochconverter.com that 1720606949 corresponds to 2024-07-10T10:22:29+00:00
+
+
+#### getTime
+
+Returns the timestamp (as seconds since Unix epoch time) correspoding to the [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) passed as argument.
+
+Extra arguments: none
+
+Example (being context `{"c": "2024-07-10T10:22:29+00:00"}`):
+
+```
+c|getTime
+```
+
+results in
+
+```
+1720606949
+```
+
+It can be checked at https://www.epochconverter.com that 1720606949 corresponds to 2024-07-10T10:22:29+00:00
 
 ### Failsafe cases
 

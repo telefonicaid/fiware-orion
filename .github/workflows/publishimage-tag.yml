@@ -30,7 +30,9 @@ jobs:
       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
     - name: Build Docker image
-      run: docker build -t telefonicaiot/fiware-orion:${{ env.VERSION }} --build-arg GIT_REV_ORION=${{ env.VERSION }} --build-arg REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} --no-cache -f docker/Dockerfile .
+      run: |
+        export TOKEN=${{ secrets.REPO_ACCESS_TOKEN }}
+        docker build -t telefonicaiot/fiware-orion:${{ env.VERSION }} --build-arg GIT_REV_ORION=${{ env.VERSION }} --secret id=repo_token,env=TOKEN --no-cache -f docker/Dockerfile .
 
     - name: Push Docker image
       run: docker push telefonicaiot/fiware-orion:${{ env.VERSION }}

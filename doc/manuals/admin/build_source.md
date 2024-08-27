@@ -13,7 +13,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (from source)
 * libcurl: 7.88.1
-* openssl: 3.0.9
+* openssl: 3.0.13
 * libuuid: 2.38.1
 * libmosquitto: 2.0.15 (from source)
 * Mongo C driver: 1.24.3 (from source)
@@ -148,3 +148,5 @@ You can generate coverage reports for the Orion Context Broker using the followi
 * Run coverage
 
         make coverage INSTALL_DIR=~
+
+*NOTE*: Functional tests relying in debug traces are expected to fail under coverage execution (e.g. notification_different_sizes or not_posix_regex_idpattern.test). This is due to the LM_T macros used by the debug traces are disabled in the coverage code build, as they add "noise" in condition coverage. This way coverage reports are more useful.

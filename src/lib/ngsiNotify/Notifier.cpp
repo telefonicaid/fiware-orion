@@ -195,6 +195,51 @@ static bool setJsonPayload
 
 /* ****************************************************************************
 *
+* orderByPriority -
+*
+* Return false if some problem occur
+*/
+static void orderByPriority
+(
+  const Entity&                    ngsi,
+  std::vector<ContextAttribute*>*  orderedAttrs
+)
+{
+  // Add all the attributes to a temporal vector
+  std::vector<ContextAttribute*> attrs;
+
+  for (unsigned ix = 0; ix < ngsi.attributeVector.size(); ix++)
+  {
+    attrs.push_back(ngsi.attributeVector[ix]);
+  }
+
+  // Pass the content of attrs to orderedAttrs based in the evalPriority element
+  while (!attrs.empty())
+  {
+    ContextAttribute* selectedAttr = attrs[0];
+    unsigned int      selectedIx   = 0;
+    double            prio         = selectedAttr->getEvalPriority();
+
+    for (unsigned ix = 0; ix < attrs.size(); ix++)
+    {
+      double newPrio = attrs[ix]->getEvalPriority();
+      if (newPrio < prio)
+      {
+        selectedAttr = attrs[ix];
+        selectedIx   = ix;
+        prio         = newPrio;
+      }
+    }
+
+    orderedAttrs->push_back(selectedAttr);
+    attrs.erase(attrs.begin() + selectedIx);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * setNgsiPayload -
 *
 * Return false if some problem occur
@@ -209,7 +254,8 @@ static bool setNgsiPayload
   bool                             blacklist,
   const std::vector<std::string>&  metadataFilter,
   std::string*                     payloadP,
-  RenderFormat                     renderFormat
+  RenderFormat                     renderFormat,
+  bool                             basic  // used by TIME_EXPR_CTXBLD_START/STOP macros
 )
 {
   NotifyContextRequest   ncr;
@@ -239,10 +285,21 @@ static bool setNgsiPayload
 
   cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
 
-  // First we add attributes in the ngsi field
-  for (unsigned int ix = 0; ix < ngsi.attributeVector.size(); ix++)
+  // First we add attributes in the ngsi field, adding calculated expressions to context in order of priority
+  std::vector<ContextAttribute*>  orderedNgsiAttrs;
+  orderByPriority(ngsi, &orderedNgsiAttrs);
+
+  for (unsigned int ix = 0; ix < orderedNgsiAttrs.size(); ix++)
   {
-    cer.entity.attributeVector.push_back(new ContextAttribute(ngsi.attributeVector[ix], false, true));
+    // Avoid to add context if an attribute with the same name exists in the entity
+    if (en.attributeVector.get(orderedNgsiAttrs[ix]->name) < 0)
+    {
+      TIME_EXPR_CTXBLD_START();
+      exprContextObjectP->add(orderedNgsiAttrs[ix]->name, orderedNgsiAttrs[ix]->toJsonValue(exprContextObjectP), true);
+      TIME_EXPR_CTXBLD_STOP();
+    }
+
+    cer.entity.attributeVector.push_back(new ContextAttribute(orderedNgsiAttrs[ix], false, true));
   }
   // Next, other attributes in the original entity not already added
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
@@ -310,6 +367,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
+  ExprContextObject exprMetadataContext(basic);
 
   // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
   // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
@@ -319,16 +377,31 @@ static SenderThreadParams* buildSenderParamsCustom
   TIME_EXPR_CTXBLD_START();
   exprContext.add("id", en.id);
   exprContext.add("type", en.type);
+
   if (!basic)
   {
     exprContext.add("service", tenant);
     exprContext.add("servicePath", en.servicePath);
     exprContext.add("authToken", xauthToken);
   }
+
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
   {
     en.attributeVector[ix]->addToContext(&exprContext, basic);
+
+    // Add attribute metadata to context
+    ExprContextObject exprAttrMetadataContext(basic);
+    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
+    {
+      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
+    }
+    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
   }
+
+  // Add all metadata under the "metadata" context key
+  // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
+  exprContext.add("metadata", exprMetadataContext);
+
   if (basic)
   {
     exprContext.add("service", tenant);
@@ -393,7 +466,7 @@ static SenderThreadParams* buildSenderParamsCustom
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
     const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
-    if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat))
+    if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat, basic))
     {
       // Warning already logged in macroSubstitute()
       return NULL;

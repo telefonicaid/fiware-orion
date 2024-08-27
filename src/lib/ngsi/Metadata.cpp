@@ -666,3 +666,71 @@ void Metadata::appendToBsoN(orion::BSONObjBuilder* mdBuilder, orion::BSONArrayBu
     }
   }
 }
+
+
+/* ****************************************************************************
+*
+* addToContext -
+*
+* FIXME P5: duplicated from ContextAttrMetibute::addToContext(). Maybe they should be unified
+*/
+void Metadata::addToContext(ExprContextObject* exprContextObjectP, bool legacy)
+{
+  if (compoundValueP != NULL)
+  {
+    // In legacy expression, objects are vector are strings to be stored in a std::map<std::string,std::string>
+    if (valueType == orion::ValueTypeObject)
+    {
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextObject());
+      }
+    }
+    else  // valueType == orion::ValueTypeVector
+    {
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextList());
+      }
+    }
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      exprContextObjectP->add(name, toJsonString(isodate2str(numberValue)));
+    }
+    else // regular number
+    {
+      exprContextObjectP->add(name, numberValue);
+    }
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    exprContextObjectP->add(name, toJsonString(stringValue));
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    exprContextObjectP->add(name, boolValue);
+  }
+  else if (valueType == orion::ValueTypeNull)
+  {
+    exprContextObjectP->add(name);
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_E(("Runtime Error (value not given for metadata %s)", name.c_str()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (invalid value type %s for metadata %s)", valueTypeName(valueType), name.c_str()));
+  }
+}
