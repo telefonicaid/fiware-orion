@@ -120,7 +120,7 @@ HttpStatusCode mongoUpdateContext
 {
   bool reqSemTaken;
 
-  reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "update request", SemWriteOp, &reqSemTaken);
 
   // Initial size of notification queue (could be used by flow control algorithm)
   unsigned int q0 = 0;
@@ -231,7 +231,7 @@ HttpStatusCode mongoUpdateContext
     responseP->errorCode.fill(SccOk);
   }
 
-  reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+  reqSemGive(__FUNCTION__, "update request", reqSemTaken);
 
   if (flowControl && fcEnabled && (responseP->errorCode.code == SccOk))
   {

@@ -45,10 +45,6 @@
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-
 *
-* We use the same class for both NGSI10 and NGSI9 subscription. The only difference
-* is that throttling and lastNotification are not needed in the second case (note
-* that there are different constructor depending the case)
-*
 */
 class TriggeredSubscription
 {

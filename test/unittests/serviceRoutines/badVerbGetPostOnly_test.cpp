@@ -53,7 +53,7 @@ TEST(badVerbGetPostOnly, ok)
   ConnectionInfo  ci("/v2/entities",  "PUT", "1.1");
   std::string     expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   std::string     out;
-  RestService     restService = { VersionRequest, 3, { "ngsi9", "contextEntities", "aaa" }, NULL };
+  RestService     restService = { VersionRequest, 3, { "foo", "bar", "aaa" }, NULL };
 
   ci.restServiceP = &restService;
 

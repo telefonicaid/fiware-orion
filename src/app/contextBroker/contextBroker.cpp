@@ -373,8 +373,8 @@ static const char* validLogLevels[] =
 * to treat the incoming request.
 *
 * The URL path is divided into components (Using '/' as field separator) so that the URL
-* "/ngsi9/registerContext" becomes a component vector of the two components
-* "ngsi9" and "registerContext".
+* "/v2/entities" becomes a component vector of the two components
+* "v2" and "entities".
 *
 * Each line contains the necessary information for ONE service:
 *   RequestType   request     - The type of the request

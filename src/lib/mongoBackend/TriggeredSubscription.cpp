@@ -99,10 +99,6 @@ TriggeredSubscription::~TriggeredSubscription()
 /* ****************************************************************************
 *
 * TriggeredSubscription::fillExpression -
-*
-* TriggeredSubscription class is shared for NGSI9 and NGSI10 subscriptions, so it is better
-* to keep expressions (an artifact for NGSI10) out of the constructor, in its independent fill
-* method
 */
 void TriggeredSubscription::fillExpression
 (

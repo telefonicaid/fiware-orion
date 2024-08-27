@@ -56,13 +56,13 @@ HttpStatusCode mongoUnsubscribeContext
   bool         reqSemTaken;
   std::string  err;
 
-  reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "unsubscribe request", SemWriteOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Unsubscribe Context"));
 
   if (subId.empty())
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "unsubscribe request (no subscriptions found)", reqSemTaken);
     responseP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
     alarmMgr.badInput(clientIp, "no subscriptionId");
 
@@ -78,7 +78,7 @@ HttpStatusCode mongoUnsubscribeContext
 
   if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, bobId.obj(), &sub, &err) && (err != ""))
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "unsubscribe request (mongo db exception)", reqSemTaken);
 
     responseP->fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
     return SccOk;
@@ -86,7 +86,7 @@ HttpStatusCode mongoUnsubscribeContext
 
   if (sub.isEmpty())
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "unsubscribe request (no subscriptions found)", reqSemTaken);
 
     responseP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
     return SccOk;
@@ -104,7 +104,7 @@ HttpStatusCode mongoUnsubscribeContext
 
   if (!orion::collectionRemove(composeDatabaseName(tenant), COL_CSUBS, bobId2.obj(), &err))
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "unsubscribe request (mongo db exception)", reqSemTaken);
 
     responseP->fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
     return SccOk;
@@ -131,7 +131,7 @@ HttpStatusCode mongoUnsubscribeContext
     cacheSemGive(__FUNCTION__, "Removing subscription from cache");
   }
 
-  reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
+  reqSemGive(__FUNCTION__, "unsubscribe request", reqSemTaken);
 
   return SccOk;
 }

@@ -345,7 +345,7 @@ HttpStatusCode mongoQueryContext
   bool                         reqSemTaken;
   ContextElementResponseVector rawCerV;
 
-  reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "query request", SemReadOp, &reqSemTaken);
 
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
@@ -364,7 +364,7 @@ HttpStatusCode mongoQueryContext
   {
     responseP->errorCode.fill(SccReceiverInternalError, err);
     rawCerV.release();
-    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+    reqSemGive(__FUNCTION__, "query request", reqSemTaken);
 
     return SccOk;
   }
@@ -474,6 +474,6 @@ HttpStatusCode mongoQueryContext
 
   rawCerV.release();
 
-  reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+  reqSemGive(__FUNCTION__, "query request", reqSemTaken);
   return SccOk;
 }

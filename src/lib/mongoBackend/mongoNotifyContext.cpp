@@ -56,7 +56,7 @@ HttpStatusCode mongoNotifyContext
 {
   bool reqSemTaken;
 
-  reqSemTake(__FUNCTION__, "ngsi10 notification", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "notification", SemWriteOp, &reqSemTaken);
 
   // Process each ContextElement
   for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix)
@@ -70,7 +70,7 @@ HttpStatusCode mongoNotifyContext
     processContextElement(eP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat, forcedUpdate, overrideMetadata, 0);
   }
 
-  reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
+  reqSemGive(__FUNCTION__, "notification", reqSemTaken);
   responseP->responseCode.fill(SccOk);
 
   return SccOk;
