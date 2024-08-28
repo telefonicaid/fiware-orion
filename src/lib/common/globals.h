@@ -269,9 +269,6 @@ extern double getCurrentTime(void);
 /*****************************************************************************
 *
 * parse8601Time -
-*
-* This is common code for Duration and Throttling (at least)
-*
 */
 extern double parse8601Time(const std::string& s);
 

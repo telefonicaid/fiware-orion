@@ -411,9 +411,7 @@ int daysInMonth(int year, int month)
 /*****************************************************************************
 *
 * parse8601Time -
-*
-* This is common code for Duration and Throttling (at least).
-*
+**
 * Based in http://stackoverflow.com/questions/26895428/how-do-i-parse-an-iso-8601-date-with-optional-milliseconds-to-a-struct-tm-in-c
 *
 */

@@ -183,16 +183,12 @@ static void setAttributes(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
 /* ****************************************************************************
 *
 * setDataProvided -
-*
-* Make sure there is only ONE "contextRegistration" in the vector
-* If we have more than one, then the Registration is made in API V1 as this is not
-* possible in V2 and we cannot respond to the request using the current implementation of V2.
-* This function will be changed to work in a different way once issue #3044 is dealt with.
 */
 static bool setDataProvided(ngsiv2::Registration* regP, const orion::BSONObj& r, bool arrayAllowed)
 {
   std::vector<orion::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
 
+  // Only one element is allowed. This is a weird thing in the database model, see issue #4611
   if (crV.size() > 1)
   {
     return false;
@@ -299,8 +295,9 @@ void mongoRegistrationGet
 
     if (setDataProvided(regP, r, false) == false)
     {
+      // FIXME #4611: this check will be no longer needed after fixing the issue. setDataProvided return type could be changed to void
       orion::releaseMongoConnection(connection);
-      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
+      LM_W(("Bad Input (getting registrations with more than one CR"));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, err);
       return;
@@ -397,8 +394,9 @@ void mongoRegistrationsGet
 
     if (setDataProvided(&reg, r, false) == false)
     {
+      // FIXME #4611: this check will be no longer needed after fixing the issue. setDataProvided return type could be changed to void
       orion::releaseMongoConnection(connection);
-      LM_W(("Bad Input (getting registrations with more than one CR is not yet implemented, see issue 3044)"));
+      LM_W(("Bad Input (getting registrations with more than one CR"));
       reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
       oeP->fill(SccReceiverInternalError, err);
       return;
