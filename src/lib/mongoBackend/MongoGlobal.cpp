@@ -1995,20 +1995,22 @@ bool registrationsQuery
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+    //std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
     //ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2; FIXME PR
     std::string               regId                     = getFieldF(r, "_id").OID();
 
-    for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
-    {
+    //for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
+    //{
       //processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
       ngsiv2::Registration reg;
-      if (reg.fromBson(queryContextRegistrationV[ix].embeddedObject()))
+      //if (reg.fromBson(queryContextRegistrationV[ix].embeddedObject()))
+      if (reg.fromBson(r))
       {
+        // FIXME PR: controll error if Registration comes from NGSIv1
         regV->push_back(reg);
       }
-    }
+    //}
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
      * response comes, it could have that we have same context registration elements, belong to different
