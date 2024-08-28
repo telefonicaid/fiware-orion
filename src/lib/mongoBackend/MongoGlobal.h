@@ -177,7 +177,7 @@ extern void ensureDateExpirationIndex(const std::string& tenant);
 *
 * matchEntity -
 */
-extern bool matchEntity(const EntityId* en1, const EntityId* en2);
+extern bool matchEntity(const ngsiv2::EntID& en1, const EntityId* en2);
 
 
 
@@ -250,14 +250,10 @@ extern bool registrationsQuery
   const EntityIdVector&               enV,
   const StringList&                   attrL,
   const ngsiv2::ForwardingMode        forwardingMode,
-  ContextRegistrationResponseVector*  crrV,
+  std::vector<ngsiv2::Registration>*  regV,
   std::string*                        err,
   const std::string&                  tenant,
-  const std::vector<std::string>&     servicePathV,
-  int                                 offset       = DEFAULT_PAGINATION_OFFSET_INT,
-  int                                 limit        = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                                details      = false,
-  long long*                          countP       = NULL
+  const std::vector<std::string>&     servicePathV
 );
 
 
@@ -350,7 +346,7 @@ extern orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::
 *
 * fillContextProviders -
 */
-extern void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV);
+extern void fillContextProviders(ContextElementResponse* cer, const std::vector<ngsiv2::Registration>& crrV);
 
 
 
@@ -370,7 +366,7 @@ extern void cprLookupByAttribute
 (
   const Entity&                            en,
   const std::string&                       attrName,
-  const ContextRegistrationResponseVector& crrV,
+  const std::vector<ngsiv2::Registration>& regV,
   std::string*                             perEntPa,
   MimeType*                                perEntPaMimeType,
   std::string*                             perAttrPa,

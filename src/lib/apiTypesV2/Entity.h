@@ -64,7 +64,7 @@ class Entity
   double                  creDate;          // used by dateCreated functionality in NGSIv2
   double                  modDate;          // used by dateModified functionality in NGSIv2
 
-  std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
+  std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality - FIXME PR: this could be a list of Provider (removing ProvidingApplication type)
 
   Entity();
   Entity(const std::string& id, const std::string& type, const std::string& isPattern, bool isTypePattern = false);

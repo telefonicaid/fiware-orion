@@ -47,198 +47,6 @@
 
 /* ****************************************************************************
 *
-* setRegistrationId -
-*/
-static void setRegistrationId(ngsiv2::Registration* regP, const orion::BSONObj& r)
-{
-  regP->id = getFieldF(r, "_id").OID();
-}
-
-
-
-/* ****************************************************************************
-*
-* setDescription -
-*/
-static void setDescription(ngsiv2::Registration* regP, const orion::BSONObj& r)
-{
-  if (r.hasField(REG_DESCRIPTION))
-  {
-    regP->description         = getStringFieldF(r, REG_DESCRIPTION);
-    regP->descriptionProvided = true;
-  }
-  else
-  {
-    regP->description         = "";
-    regP->descriptionProvided = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setProvider -
-*/
-static void setProvider(ngsiv2::Registration* regP, const ngsiv2::ForwardingMode forwardingMode, const std::string& format, const orion::BSONObj& r)
-{
-  regP->provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
-
-  regP->provider.supportedForwardingMode = forwardingMode;
-
-  if (format == "JSON")
-  {
-    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated usage of legacyForwarding mode detected in existing registration (regId: %s)", regP->id.c_str()));
-    }
-    regP->provider.legacyForwardingMode = true;
-  }
-  else
-  {
-    regP->provider.legacyForwardingMode = false;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setEntities -
-*/
-static void setEntities(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
-{
-  std::vector<orion::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
-  {
-    ngsiv2::EntID    entity;
-    orion::BSONObj   ce = dbEntityV[ix].embeddedObject();
-
-    if (ce.hasField(REG_ENTITY_ISPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-      else
-      {
-        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-      }
-    }
-    else
-    {
-      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
-    }
-
-    if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
-    {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
-
-      if (isPattern == "true")
-      {
-        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-      else
-      {
-        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-    }
-    else
-    {
-      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-    }
-
-    regP->dataProvided.entities.push_back(entity);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setAttributes -
-*/
-static void setAttributes(ngsiv2::Registration* regP, const orion::BSONObj& cr0)
-{
-  std::vector<orion::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
-
-  for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
-  {
-    orion::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
-    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
-
-    if (!attrName.empty())
-    {
-      regP->dataProvided.attributes.push_back(attrName);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* setDataProvided -
-*/
-static bool setDataProvided(ngsiv2::Registration* regP, const orion::BSONObj& r, bool arrayAllowed)
-{
-  std::vector<orion::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-
-  // Only one element is allowed. This is a weird thing in the database model, see issue #4611
-  if (crV.size() > 1)
-  {
-    return false;
-  }
-
-  // Get the forwarding mode to be used later in setProvider()
-  ngsiv2::ForwardingMode forwardingMode =
-      ngsiv2::stringToForwardingMode(r.hasField(REG_FORWARDING_MODE)? getStringField(r, REG_FORWARDING_MODE) : "all");
-
-  // Get the format to be used later in setProvider()
-  std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
-
-  //
-  // Extract the first (and only) CR from the contextRegistration vector
-  //
-  orion::BSONObj cr0 = crV[0].embeddedObject();
-
-  setEntities(regP, cr0);
-  setAttributes(regP, cr0);
-  setProvider(regP, forwardingMode, format, cr0);
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
-* setExpires -
-*/
-static void setExpires(ngsiv2::Registration* regP, const orion::BSONObj& r)
-{
-  regP->expires = (r.hasField(REG_EXPIRATION))? getIntOrLongFieldAsLongF(r, REG_EXPIRATION) : -1;
-}
-
-
-
-/* ****************************************************************************
-*
-* setStatus -
-*/
-static void setStatus(ngsiv2::Registration* regP, const orion::BSONObj& r)
-{
-  regP->status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
-}
-
-
-
-/* ****************************************************************************
-*
 * mongoRegistrationGet - 
 */
 void mongoRegistrationGet
@@ -290,10 +98,7 @@ void mongoRegistrationGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(regP, r);
-    setDescription(regP, r);
-
-    if (setDataProvided(regP, r, false) == false)
+    if (!regP->fromBson(r))
     {
       // FIXME #4611: this check will be no longer needed after fixing the issue. setDataProvided return type could be changed to void
       orion::releaseMongoConnection(connection);
@@ -302,9 +107,6 @@ void mongoRegistrationGet
       oeP->fill(SccReceiverInternalError, err);
       return;
     }
-
-    setExpires(regP, r);
-    setStatus(regP, r);
   }
   else
   {
@@ -389,10 +191,7 @@ void mongoRegistrationsGet
     //
     // Fill in the Registration with data retrieved from the data base
     //
-    setRegistrationId(&reg, r);
-    setDescription(&reg, r);
-
-    if (setDataProvided(&reg, r, false) == false)
+    if (!reg.fromBson(r))
     {
       // FIXME #4611: this check will be no longer needed after fixing the issue. setDataProvided return type could be changed to void
       orion::releaseMongoConnection(connection);
@@ -401,9 +200,6 @@ void mongoRegistrationsGet
       oeP->fill(SccReceiverInternalError, err);
       return;
     }
-
-    setExpires(&reg, r);
-    setStatus(&reg, r);
 
     regV->push_back(reg);
   }

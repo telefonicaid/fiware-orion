@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "apiTypesV2/EntID.h"
+#include "mongoDriver/BSONObj.h"
 
 
 namespace ngsiv2
@@ -149,7 +150,19 @@ struct Registration
 
   Registration();
   ~Registration();
+  bool                   fromBson(const orion::BSONObj& r);
   std::string            toJson();
+
+private:
+  // used by fromBson
+  void setRegistrationId(const orion::BSONObj& r);
+  void setDescription(const orion::BSONObj& r);
+  void setProvider(const ngsiv2::ForwardingMode forwardingMode, const std::string& format, const orion::BSONObj& r);
+  void setEntities(const orion::BSONObj& cr0);
+  void setAttributes(const orion::BSONObj& cr0);
+  bool setDataProvided(const orion::BSONObj& r, bool arrayAllowed);
+  void setExpires(const orion::BSONObj& r);
+  void setStatus(const orion::BSONObj& r);
 };
 }
 

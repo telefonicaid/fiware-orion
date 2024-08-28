@@ -401,7 +401,7 @@ void ensureDateExpirationIndex(const std::string& tenant)
 * commutative: en1 is interpreted as the entity to match *in* en2 (i.e.
 * it is assumed that the pattern is in en2)
 */
-bool matchEntity(const EntityId* en1, const EntityId* en2)
+bool matchEntity(const ngsiv2::EntID& en1, const EntityId* en2)
 {
   bool idMatch;
 
@@ -417,22 +417,24 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
     }
     else
     {
-      idMatch = (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0);
+      idMatch = (regexec(&regex, en1.id.c_str(), 0, NULL, 0) == 0);
 
       regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
     }
   }
   else  /* isPattern == false */
   {
-    idMatch = (en2->id == en1->id);
+    idMatch = (en2->id == en1.id);
   }
 
   // Note that type.empty() is like a * wildcard for type
-  return idMatch && (en1->type.empty() || en2->type.empty() || en2->type == en1->type);
+  return idMatch && (en1.type.empty() || en2->type.empty() || en2->type == en1.type);
 }
 
 
 
+#if 0
+// FIXME PR
 /* ****************************************************************************
 *
 * includedEntity -
@@ -457,6 +459,7 @@ bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
   }
   return false;
 }
+#endif
 
 
 
@@ -1694,6 +1697,8 @@ void pruneContextElements
 
 
 
+#if 0
+// FIXME PR
 /* ***************************************************************************
 *
 * processEntity -
@@ -1801,30 +1806,23 @@ static void processContextRegistrationElement
     crrV->push_back(crrP);
   }
 }
+#endif
 
 
 
 /* ****************************************************************************
 *
 * registrationsQuery -
-*
-* This method is used by discoverContextAvailabililty and subscribeContextAvailability. It takes
-* a vector with entities and a vector with attributes as input and returns the corresponding
-* ContextRegistrationResponseVector or error.
 */
 bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
   const ngsiv2::ForwardingMode        forwardingMode,
-  ContextRegistrationResponseVector*  crrV,
+  std::vector<ngsiv2::Registration>*  regV,
   std::string*                        err,
   const std::string&                  tenant,
-  const std::vector<std::string>&     servicePathV,
-  int                                 offset,
-  int                                 limit,
-  bool                                details,
-  long long*                          countP
+  const std::vector<std::string>&     servicePathV
 )
 {
   // query structure:
@@ -1973,15 +1971,13 @@ bool registrationsQuery
 
   orion::BSONObj query = queryBuilder.obj();
 
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
-
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
   orion::BSONObjBuilder bobSort;
   bobSort.append("_id", 1);
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, query, bobSort.obj(), limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, query, bobSort.obj(), 0, 0, &cursor, NULL, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1999,15 +1995,19 @@ bool registrationsQuery
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    MimeType                  mimeType = JSON;
     std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
     std::string               format                    = getStringFieldF(r, REG_FORMAT);
-    ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2;
+    //ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2; FIXME PR
     std::string               regId                     = getFieldF(r, "_id").OID();
 
     for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
+      //processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
+      ngsiv2::Registration reg;
+      if (reg.fromBson(queryContextRegistrationV[ix].embeddedObject()))
+      {
+        regV->push_back(reg);
+      }
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
@@ -2290,11 +2290,11 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 * This functions is very similar the one with the same name in mongoQueryContext.cpp
 * but acting on a single CER instead that on a complete vector of them.
 *
-* Looks in the CER passed as argument, searching for a suitable CPr in the CRR
+* Looks in the CER passed as argument, searching for a suitable CPr in the Registrations
 * vector passed as argument. If a suitable CPr is found, it is set in the CER (and the 'found' field
 * is changed to true)
 */
-void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV)
+void fillContextProviders(ContextElementResponse* cer, const std::vector<ngsiv2::Registration>& regV)
 {
   for (unsigned int ix = 0; ix < cer->entity.attributeVector.size(); ++ix)
   {
@@ -2315,7 +2315,7 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
-                         crrV,
+                         regV,
                          &perEntPa,
                          &perEntPaMimeType,
                          &perAttrPa,
@@ -2369,12 +2369,12 @@ void cprLookupByAttribute
 (
   const Entity&                             en,
   const std::string&                        attrName,
-  const ContextRegistrationResponseVector&  crrV,
+  const std::vector<ngsiv2::Registration>&  regV,
   std::string*                              perEntPa,
   MimeType*                                 perEntPaMimeType,
   std::string*                              perAttrPa,
-  MimeType*                                 perAttrPaMimeType,
-  ProviderFormat*                           providerFormatP,
+  MimeType*                                 perAttrPaMimeType,  // FIXME PR: really needed?
+  ProviderFormat*                           providerFormatP,    // FIXME PR: ProviderFormat is really needed as type?
   std::string*                              regId
 )
 {
@@ -2382,51 +2382,51 @@ void cprLookupByAttribute
   *perAttrPa = "";
   *regId = "";
 
-  for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
+  for (unsigned int regIx = 0; regIx < regV.size(); ++regIx)
   {
-    ContextRegistrationResponse* crr = crrV[crrIx];
+    ngsiv2::Registration reg = regV[regIx];
 
     /* Is there a matching entity in the CRR? */
-    for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
+    for (unsigned enIx = 0; enIx < reg.dataProvided.entities.size(); ++enIx)
     {
-      EntityId* regEn = crr->contextRegistration.entityIdVector[enIx];
+      EntID regEn = reg.dataProvided.entities[enIx];
 
-      if (regEn->isPatternIsTrue() && regEn->id == ".*")
+      if (regEn.idPattern == ".*")
       {
         // By the moment the only supported pattern is .*. In this case matching is
         // based exclusively in type
-        if (regEn->type != en.type && !regEn->type.empty())
+        if (regEn.type != en.type && !regEn.type.empty())
         {
           /* No match (keep searching the CRR) */
           continue;
         }
       }
-      else if (regEn->id != en.id || (regEn->type != en.type && !regEn->type.empty()))
+      else if (regEn.id != en.id || (regEn.type != en.type && !regEn.type.empty()))
       {
         /* No match (keep searching the CRR) */
         continue;
       }
 
-      /* CRR without attributes (keep searching in other CRR) */
-      if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
+      /* Registration without attributes (keep searching in other CRR) */
+      if (reg.dataProvided.attributes.size() == 0)
       {
-        *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
-        *regId            = crr->regId;
+        *perEntPa         = reg.provider.http.url;
+        *providerFormatP  = reg.provider.legacyForwardingMode? PfJson : PfV2;
+        *regId            = reg.id;
 
         break;  /* enIx */
       }
 
       /* Is there a matching entity or the absence of attributes? */
-      for (unsigned attrIx = 0; attrIx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++attrIx)
+      for (unsigned attrIx = 0; attrIx < reg.dataProvided.attributes.size(); ++attrIx)
       {
-        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector[attrIx]->name;
+        std::string regAttrName = reg.dataProvided.attributes[attrIx];
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result by keep searching the CRR vector, so we return */
-          *perAttrPa        = crr->contextRegistration.providingApplication.get();
-          *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
-          *regId            = crr->regId;
+          *perAttrPa        = reg.provider.http.url;
+          *providerFormatP  = reg.provider.legacyForwardingMode? PfJson : PfV2;
+          *regId            = reg.id;
 
           return;
         }

@@ -778,10 +778,13 @@ void postQueryContext
       for (unsigned int jx = 0; jx < responseV[ix]->contextElementResponseVector.size(); ++jx)
       {
         bool found = false;
-        EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.id, responseV[ix]->contextElementResponseVector[jx]->entity.type, "false");
+        //EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.id, responseV[ix]->contextElementResponseVector[jx]->entity.type, "false"); FIXME PR
+        ngsiv2::EntID tempEn;
+        tempEn.id = responseV[ix]->contextElementResponseVector[jx]->entity.id;
+        tempEn.type = responseV[ix]->contextElementResponseVector[jx]->entity.type;
         for (unsigned int kx = 0; kx < qcrP->entityIdVector.size(); ++kx)
         {
-          if (matchEntity(&tempEn, qcrP->entityIdVector[kx]))
+          if (matchEntity(tempEn, qcrP->entityIdVector[kx]))
           {
             found = true;
             break; // kx

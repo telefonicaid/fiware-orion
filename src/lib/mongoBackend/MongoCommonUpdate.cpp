@@ -3077,7 +3077,7 @@ static void searchContextProviders
   ContextElementResponse*         cerP
 )
 {
-  ContextRegistrationResponseVector  crrV;
+  std::vector<ngsiv2::Registration>  regV;
   EntityIdVector                     enV;
   StringList                         attrL;
   std::string                        err;
@@ -3092,11 +3092,11 @@ static void searchContextProviders
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrL, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrL, ngsiv2::ForwardUpdate, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        fillContextProviders(cerP, crrV);
+        fillContextProviders(cerP, regV);
       }
     }
     else
@@ -3107,18 +3107,17 @@ static void searchContextProviders
       //
       alarmMgr.dbError(err);
     }
-    crrV.release();
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
   StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrNullList, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrNullList, ngsiv2::ForwardUpdate, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        fillContextProviders(cerP, crrV);
+        fillContextProviders(cerP, regV);
       }
     }
     else
@@ -3129,7 +3128,6 @@ static void searchContextProviders
       //
       alarmMgr.dbError(err);
     }
-    crrV.release();
   }
 }
 
