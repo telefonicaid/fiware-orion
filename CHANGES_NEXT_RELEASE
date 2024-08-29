@@ -5,3 +5,4 @@
 - Fix: do not raise DB alarm in case of wrong GeoJSON in client request
 - Upgrade cjexl version from 0.3.0 to 0.4.0 (new transformations: now, getTime and toIsoString)
 - Upgrade Debian version from 12.4 to 12.6 in Dockerfile
+- Fix: invalid date in expires field of subscription (#2303)
