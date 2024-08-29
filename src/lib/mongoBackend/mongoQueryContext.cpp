@@ -72,7 +72,7 @@ static bool someContextElementNotFound(const ContextElementResponseVector& cerV)
 */
 static void fillContextProviders(ContextElementResponseVector& cerV, const std::vector<ngsiv2::Registration>& regV)
 {
-  for (unsigned int ix = 0; ix < regV.size(); ++ix)
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
     fillContextProviders(cerV[ix], regV);
   }
