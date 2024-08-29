@@ -2373,7 +2373,7 @@ void cprLookupByAttribute
   const std::string&                        attrName,
   const std::vector<ngsiv2::Registration>&  regV,
   std::string*                              perEntPa,
-  MimeType*                                 perEntPaMimeType,
+  MimeType*                                 perEntPaMimeType,   // FIXME PR: really needed?
   std::string*                              perAttrPa,
   MimeType*                                 perAttrPaMimeType,  // FIXME PR: really needed?
   ProviderFormat*                           providerFormatP,    // FIXME PR: ProviderFormat is really needed as type?
@@ -2388,7 +2388,7 @@ void cprLookupByAttribute
   {
     ngsiv2::Registration reg = regV[regIx];
 
-    /* Is there a matching entity in the CRR? */
+    /* Is there a matching entity in the Registration? */
     for (unsigned enIx = 0; enIx < reg.dataProvided.entities.size(); ++enIx)
     {
       EntID regEn = reg.dataProvided.entities[enIx];
@@ -2399,17 +2399,17 @@ void cprLookupByAttribute
         // based exclusively in type
         if (regEn.type != en.type && !regEn.type.empty())
         {
-          /* No match (keep searching the CRR) */
+          /* No match (keep searching the Registration) */
           continue;
         }
       }
       else if (regEn.id != en.id || (regEn.type != en.type && !regEn.type.empty()))
       {
-        /* No match (keep searching the CRR) */
+        /* No match (keep searching the Registration) */
         continue;
       }
 
-      /* Registration without attributes (keep searching in other CRR) */
+      /* Registration without attributes (keep searching in other Registration) */
       if (reg.dataProvided.attributes.size() == 0)
       {
         *perEntPa         = reg.provider.http.url;
@@ -2425,7 +2425,7 @@ void cprLookupByAttribute
         std::string regAttrName = reg.dataProvided.attributes[attrIx];
         if (regAttrName == attrName)
         {
-          /* We cannot "improve" this result by keep searching the CRR vector, so we return */
+          /* We cannot "improve" this result by keep searching the Registrations vector, so we return */
           *perAttrPa        = reg.provider.http.url;
           *providerFormatP  = reg.provider.legacyForwardingMode? PfJson : PfV2;
           *regId            = reg.id;

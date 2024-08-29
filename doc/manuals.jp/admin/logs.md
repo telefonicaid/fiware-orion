@@ -351,8 +351,6 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 ```
 time=2024-01-11T13:57:13.537Z | lvl=WARN | corr=527378d8-b089-11ee-875d-080027cd35f1 | trans=1704981432-655-00000000006 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationCreate.cpp[235]:mongoRegistrationCreate | msg=Deprecated usage of legacyForwarding mode in registration creation (regId: 659ff3b9691855f16d00ec5a)
 time=2024-01-11T13:57:13.565Z | lvl=WARN | corr=52778eaa-b089-11ee-861c-080027cd35f1 | trans=1704981432-655-00000000007 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationGet.cpp[93]:setProvider | msg=Deprecated usage of legacyForwarding mode detected in existing registration (regId: 659ff3b9691855f16d00ec5a)
-time=2024-01-11T13:57:13.595Z | lvl=WARN | corr=527c0912-b089-11ee-bb8c-080027cd35f1 | trans=1704981432-655-00000000008 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postQueryContext.cpp[191]:queryForward | msg=Deprecated usage of legacyForwarding mode in query forwarding operation (regId: 659ff3b9691855f16d00ec5a)
-time=2024-01-11T13:57:13.624Z | lvl=WARN | corr=52808938-b089-11ee-9835-080027cd35f1 | trans=1704981432-655-00000000010 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postUpdateContext.cpp[163]:updateForward | msg=Deprecated usage of legacyForwarding mode in update forwarding operation (regId: 659ff3b9691855f16d00ec5a)
 ```
 
 * `geo:point`, `geo:line`, `geo:box` また `geo:line` の使用
