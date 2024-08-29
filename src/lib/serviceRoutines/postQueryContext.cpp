@@ -775,13 +775,23 @@ void postQueryContext
       for (unsigned int jx = 0; jx < responseV[ix]->contextElementResponseVector.size(); ++jx)
       {
         bool found = false;
-        //EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.id, responseV[ix]->contextElementResponseVector[jx]->entity.type, "false"); FIXME PR
-        ngsiv2::EntID tempEn;
-        tempEn.id = responseV[ix]->contextElementResponseVector[jx]->entity.id;
-        tempEn.type = responseV[ix]->contextElementResponseVector[jx]->entity.type;
+        EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.id, responseV[ix]->contextElementResponseVector[jx]->entity.type, "false");
         for (unsigned int kx = 0; kx < qcrP->entityIdVector.size(); ++kx)
         {
-          if (matchEntity(tempEn, qcrP->entityIdVector[kx]))
+          ngsiv2::EntID entityId;
+          if (isTrue(qcrP->entityIdVector[kx]->isPattern))
+          {
+            entityId.idPattern = qcrP->entityIdVector[kx]->id;
+          }
+          else
+          {
+            entityId.id = qcrP->entityIdVector[kx]->id;
+          }
+          entityId.type = qcrP->entityIdVector[kx]->type;
+
+          // FIXME PR: remove this
+          //if (matchEntity(&tempEn, qcrP->entityIdVector[kx]))
+          if (matchEntity(&tempEn, entityId))
           {
             found = true;
             break; // kx

@@ -401,34 +401,34 @@ void ensureDateExpirationIndex(const std::string& tenant)
 * commutative: en1 is interpreted as the entity to match *in* en2 (i.e.
 * it is assumed that the pattern is in en2)
 */
-bool matchEntity(const ngsiv2::EntID& en1, const EntityId* en2)
+bool matchEntity(const EntityId* en1, const ngsiv2::EntID& en2)
 {
   bool idMatch;
 
-  if (isTrue(en2->isPattern))
+  if (!en2.idPattern.empty())
   {
     regex_t regex;
 
     idMatch = false;
-    if (!regComp(&regex, en2->id.c_str(), REG_EXTENDED))
+    if (!regComp(&regex, en2.idPattern.c_str(), REG_EXTENDED))
     {
-      std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
+      std::string details = std::string("error compiling regex for id: '") + en2.id + "'";
       alarmMgr.badInput(clientIp, details);
     }
     else
     {
-      idMatch = (regexec(&regex, en1.id.c_str(), 0, NULL, 0) == 0);
+      idMatch = (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0);
 
       regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
     }
   }
   else  /* isPattern == false */
   {
-    idMatch = (en2->id == en1.id);
+    idMatch = (en2.id == en1->id);
   }
 
   // Note that type.empty() is like a * wildcard for type
-  return idMatch && (en1.type.empty() || en2->type.empty() || en2->type == en1.type);
+  return idMatch && (en1->type.empty() || en2.type.empty() || en2.type == en1->type);
 }
 
 

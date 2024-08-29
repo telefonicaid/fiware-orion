@@ -119,7 +119,7 @@ static void addContextProviderEntity
 
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->entity.id == regEn.id) && (cerV[ix]->entity.type == regEn.type))
+    if ((cerV[ix]->entity.id == (regEn.idPattern.empty()? regEn.id : regEn.idPattern)) && (cerV[ix]->entity.type == regEn.type))
     {
       // Avoid duplicate PA in the vector
       if (!lookupProvidingApplication(cerV[ix]->entity.providingApplicationList, pa))
@@ -133,7 +133,7 @@ static void addContextProviderEntity
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
   ContextElementResponse* cerP = new ContextElementResponse();
 
-  cerP->entity.fill(regEn.id, regEn.type, regEn.idPattern.empty()? "false": "true");
+  cerP->entity.fill(regEn.idPattern.empty() ? regEn.id : regEn.idPattern, regEn.type, regEn.idPattern.empty()? "false": "true");
   cerP->entity.providingApplicationList.push_back(pa);
 
   cerP->statusCode.fill(SccOk);
@@ -198,7 +198,7 @@ static void addContextProviderAttribute
     /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
     ContextElementResponse* cerP            = new ContextElementResponse();
 
-    cerP->entity.fill(regEn.id, regEn.type, regEn.idPattern.empty() ? "false" : "true");
+    cerP->entity.fill(regEn.idPattern.empty() ? regEn.id : regEn.idPattern, regEn.type, regEn.idPattern.empty() ? "false" : "true");
     cerP->statusCode.fill(SccOk);
 
     ContextAttribute* caP = new ContextAttribute(regAttr, "", "");
@@ -213,15 +213,15 @@ static void addContextProviderAttribute
 
 /* ****************************************************************************
 *
-* matchEntityInCrr -
+* matchEntityInRegistration -
 */
-static bool matchEntityInCrr(const ngsiv2::Registration& reg, const EntityId* enP)
+static bool matchEntityInRegistration(const ngsiv2::Registration& reg, const EntityId* enP)
 {
   for (unsigned int ix = 0; ix < reg.dataProvided.entities.size(); ++ix)
   {
     ngsiv2::EntID entId = reg.dataProvided.entities[ix];
 
-    if (matchEntity(entId, enP))
+    if (matchEntity(enP, entId))
     {
       return true;
     }
@@ -261,7 +261,7 @@ static void addContextProviders
     //cr.providingApplication.setRegId(crrV[ix]->regId); FIXME PR: this is needed??
 
     /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
-    if (enP != NULL && !matchEntityInCrr(reg, enP))
+    if (enP != NULL && !matchEntityInRegistration(reg, enP))
     {
       continue;
     }
