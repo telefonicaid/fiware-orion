@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include <string>
 
@@ -612,9 +613,10 @@ double parse8601Time(const std::string& ss)
   // The following 'for' loop is implemented to handle a specific datetime case where the datetime string
   // is '2016-04-05T14:10:0x.00Z'. This particular case is being incorrectly PASS through the
   // sscanf() function i.e. used next to this 'for' loop.
-  for (char c : ss)
+  for (int i = 0; ss[i] != '\0'; i++)
   {
-    if (std::isalpha(c) && c != 'T' && c != 'Z')
+    char c = ss[i];
+    if (isalpha(c) && c != 'T' && c != 'Z')
     {
       return -1;
     }
