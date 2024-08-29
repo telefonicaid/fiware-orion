@@ -433,36 +433,6 @@ bool matchEntity(const EntityId* en1, const ngsiv2::EntID& en2)
 
 
 
-#if 0
-// FIXME PR
-/* ****************************************************************************
-*
-* includedEntity -
-*/
-bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
-{
-  for (unsigned int ix = 0; ix < entityIdV.size(); ++ix)
-  {
-    if (en.isPatternIsTrue() && en.id == ".*")
-    {
-      // By the moment the only supported pattern is .*. In this case matching is
-      // based exclusively in type
-      if (en.type == entityIdV[ix]->type)
-      {
-        return true;
-      }
-    }
-    else if (matchEntity(&en, entityIdV[ix]))
-    {
-      return true;
-    }
-  }
-  return false;
-}
-#endif
-
-
-
 /* ****************************************************************************
 *
 * includedAttribute -
@@ -1697,119 +1667,6 @@ void pruneContextElements
 
 
 
-#if 0
-// FIXME PR
-/* ***************************************************************************
-*
-* processEntity -
-*/
-static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector& enV, orion::BSONObj entity)
-{
-  EntityId en;
-
-  en.id        = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
-  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
-
-  if (includedEntity(en, enV))
-  {
-    EntityId* enP = new EntityId(en.id, en.type, en.isPattern);
-
-    crr->contextRegistration.entityIdVector.push_back(enP);
-  }
-}
-
-
-
-/* ***************************************************************************
-*
-* processAttribute -
-*/
-static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const orion::BSONObj& attribute)
-{
-  ContextRegistrationAttribute attr(
-    getStringFieldF(attribute, REG_ATTRS_NAME),
-    getStringFieldF(attribute, REG_ATTRS_TYPE));
-
-  if (includedAttribute(attr.name, attrL))
-  {
-    ContextRegistrationAttribute* attrP = new ContextRegistrationAttribute(attr.name, attr.type);
-    crr->contextRegistration.contextRegistrationAttributeVector.push_back(attrP);
-  }
-}
-
-
-
-/* ***************************************************************************
-*
-* processContextRegistrationElement -
-*/
-static void processContextRegistrationElement
-(
-  orion::BSONObj                      cr,
-  const EntityIdVector&               enV,
-  const StringList&                   attrL,
-  ContextRegistrationResponseVector*  crrV,
-  MimeType                            mimeType,
-  ProviderFormat                      providerFormat,
-  const std::string&                  regId
-)
-{
-  ContextRegistrationResponse crr;
-
-  crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
-  crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
-
-  std::vector<orion::BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
-  {
-    processEntity(&crr, enV, queryEntityV[ix].embeddedObject());
-  }
-
-  /* Note that attributes can be included only if at least one entity has been found */
-  if (crr.contextRegistration.entityIdVector.size() > 0)
-  {
-    if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
-    {
-      std::vector<orion::BSONElement> queryAttrV = getFieldF(cr, REG_ATTRS).Array();
-
-      for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
-      {
-        processAttribute(&crr, attrL, queryAttrV[ix].embeddedObject());
-      }
-    }
-  }
-
-  // FIXME: we don't take metadata into account at the moment
-  // crr.contextRegistration.registrationMetadataV = ..
-
-  /* Note that the context registration element is only included in one of the following cases:
-   * - The number of entities and attributes included are both greater than 0
-   * - The number of entities is greater than 0, the number of attributes is 0 but the discover
-   *   doesn't use attributes in the request
-   */
-  if (crr.contextRegistration.entityIdVector.size() == 0)
-  {
-    return;
-  }
-
-  if (crr.contextRegistration.contextRegistrationAttributeVector.size() > 0  ||
-      (crr.contextRegistration.contextRegistrationAttributeVector.size() == 0 && attrL.size() == 0))
-  {
-    ContextRegistrationResponse* crrP = new ContextRegistrationResponse();
-
-    crrP->contextRegistration = crr.contextRegistration;
-    crrP->providerFormat      = providerFormat;
-    crrP->regId               = regId;
-
-    crrV->push_back(crrP);
-  }
-}
-#endif
-
-
-
 /* ****************************************************************************
 *
 * registrationsQuery -
@@ -1850,8 +1707,6 @@ bool registrationsQuery
   // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
   // universal pattern) so we cannot avoid to use this operator.
   //
-  // FIXME P5: the 'contextRegistration' token (19 chars) repeats in the query BSON. It would be better use 'cr' (2 chars)
-  // but this would need a data model migration in DB
 
   /* Build query based on arguments */
   std::string       crEntitiesId      = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
@@ -1995,22 +1850,12 @@ bool registrationsQuery
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    //std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-    std::string               format                    = getStringFieldF(r, REG_FORMAT);
-    //ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2; FIXME PR
-    std::string               regId                     = getFieldF(r, "_id").OID();
-
-    //for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
-    //{
-      //processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
-      ngsiv2::Registration reg;
-      //if (reg.fromBson(queryContextRegistrationV[ix].embeddedObject()))
-      if (reg.fromBson(r))
-      {
-        // FIXME PR: controll error if Registration comes from NGSIv1
-        regV->push_back(reg);
-      }
-    //}
+    ngsiv2::Registration reg;
+    if (reg.fromBson(r))
+    {
+      // FIXME PR: control error if Registration comes from NGSIv1
+      regV->push_back(reg);
+    }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
      * response comes, it could have that we have same context registration elements, belong to different
@@ -2310,8 +2155,6 @@ void fillContextProviders(ContextElementResponse* cer, const std::vector<ngsiv2:
     /* Search for some CPr in crrV */
     std::string     perEntPa;
     std::string     perAttrPa;
-    MimeType        perEntPaMimeType  = NOMIMETYPE;
-    MimeType        perAttrPaMimeType = NOMIMETYPE;
     ProviderFormat  providerFormat;
     std::string     regId;
 
@@ -2319,9 +2162,7 @@ void fillContextProviders(ContextElementResponse* cer, const std::vector<ngsiv2:
                          ca->name,
                          regV,
                          &perEntPa,
-                         &perEntPaMimeType,
                          &perAttrPa,
-                         &perAttrPaMimeType,
                          &providerFormat,
                          &regId);
 
@@ -2373,9 +2214,7 @@ void cprLookupByAttribute
   const std::string&                        attrName,
   const std::vector<ngsiv2::Registration>&  regV,
   std::string*                              perEntPa,
-  MimeType*                                 perEntPaMimeType,   // FIXME PR: really needed?
   std::string*                              perAttrPa,
-  MimeType*                                 perAttrPaMimeType,  // FIXME PR: really needed?
   ProviderFormat*                           providerFormatP,    // FIXME PR: ProviderFormat is really needed as type?
   std::string*                              regId
 )

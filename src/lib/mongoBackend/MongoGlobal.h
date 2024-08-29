@@ -35,12 +35,10 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi/ContextRegistrationResponseVector.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
@@ -368,9 +366,7 @@ extern void cprLookupByAttribute
   const std::string&                       attrName,
   const std::vector<ngsiv2::Registration>& regV,
   std::string*                             perEntPa,
-  MimeType*                                perEntPaMimeType,
   std::string*                             perAttrPa,
-  MimeType*                                perAttrPaMimeType,
   ProviderFormat*                          providerFormatP,
   std::string*                             regId
 );

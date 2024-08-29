@@ -789,8 +789,6 @@ void postQueryContext
           }
           entityId.type = qcrP->entityIdVector[kx]->type;
 
-          // FIXME PR: remove this
-          //if (matchEntity(&tempEn, qcrP->entityIdVector[kx]))
           if (matchEntity(&tempEn, entityId))
           {
             found = true;

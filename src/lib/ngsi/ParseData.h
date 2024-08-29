@@ -29,7 +29,6 @@
 
 #include "orionTypes/areas.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/Metadata.h"
 #include "ngsi10/QueryContextRequest.h"

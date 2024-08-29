@@ -25,11 +25,6 @@ SET (SOURCES
     ContextAttributeVector.cpp
     ContextElementResponse.cpp
     ContextElementResponseVector.cpp
-    ContextRegistration.cpp
-    ContextRegistrationAttribute.cpp
-    ContextRegistrationAttributeVector.cpp
-    ContextRegistrationResponse.cpp
-    ContextRegistrationResponseVector.cpp
     EntityId.cpp
     EntityIdVector.cpp
     Metadata.cpp
@@ -47,11 +42,6 @@ SET (HEADERS
     ContextAttributeVector.h
     ContextElementResponse.h
     ContextElementResponseVector.h
-    ContextRegistrationAttribute.h
-    ContextRegistrationAttributeVector.h
-    ContextRegistration.h
-    ContextRegistrationResponse.h
-    ContextRegistrationResponseVector.h
     EntityId.h
     EntityIdVector.h
     Metadata.h

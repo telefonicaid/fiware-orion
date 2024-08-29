@@ -31,7 +31,6 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -258,7 +257,6 @@ static void addContextProviders
   for (unsigned int ix = 0; ix < regV.size(); ++ix)
   {
     ngsiv2::Registration reg = regV[ix];
-    //cr.providingApplication.setRegId(crrV[ix]->regId); FIXME PR: this is needed??
 
     /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInRegistration(reg, enP))
