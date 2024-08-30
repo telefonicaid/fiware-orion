@@ -6,3 +6,4 @@
 - Fix: registrations with more tha one contextRegistration element (not possible in NGSIv2) are logged as Runtime Errors
 - Upgrade cjexl version from 0.3.0 to 0.4.0 (new transformations: now, getTime and toIsoString)
 - Upgrade Debian version from 12.4 to 12.6 in Dockerfile
+- Fix: invalid date in expires field of subscription (#2303)

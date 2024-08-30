@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include <string>
 
@@ -432,6 +433,18 @@ double parse8601Time(const std::string& ss)
   if (ss.length() > 29)
   {
     return -1;
+  }
+
+  // The following 'for' loop is implemented to handle a specific datetime case where the datetime string
+  // is '2016-04-05T14:10:0x.00Z'. This particular case is being incorrectly PASS through the
+  // sscanf() function i.e. used next to this 'for' loop.
+  for (int i = 0; ss[i] != '\0'; i++)
+  {
+    char c = ss[i];
+    if (isalpha(c) && c != 'T' && c != 'Z')
+    {
+      return -1;
+    }
   }
 
   // According to https://en.wikipedia.org/wiki/ISO_8601#Times, the following formats have to be supported
