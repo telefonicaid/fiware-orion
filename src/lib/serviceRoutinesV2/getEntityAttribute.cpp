@@ -30,7 +30,6 @@
 #include "common/errorMessages.h"
 #include "rest/uriParamNames.h"
 
-#include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
@@ -65,7 +64,6 @@ std::string getEntityAttribute
 {
   std::string  type   = ciP->uriParam["type"];
   std::string  answer;
-  Attribute    attribute;
 
   if (forbiddenIdCharsV2(compV[2].c_str(), NULL) ||
       forbiddenIdCharsV2(compV[4].c_str(), NULL))
@@ -78,27 +76,26 @@ std::string getEntityAttribute
   // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
 
-
   // 02. Call standard op postQueryContext
+  OrionError oe;
   postQueryContext(ciP, components, compV, parseDataP);
-
+  ContextAttribute* caP = parseDataP->qcrs.res.getAttr(compV[4], &oe);
 
   // 03. Render entity attribute response
-  OrionError oe;
-  attribute.fill(parseDataP->qcrs.res, compV[4], &oe);
-
-  if (oe.code == SccNone)
+  if (caP != NULL)
   {
-    StringList metadataFilter;
-    setMetadataFilter(ciP->uriParam, &metadataFilter);
-    TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
-                                           ciP->httpHeaders.accepted("application/json"),
-                                           ciP->httpHeaders.outformatSelect(),
-                                           &(ciP->outMimeType),
-                                           &(ciP->httpStatusCode),
-                                           ciP->uriParamOptions[OPT_KEY_VALUES],
-                                           metadataFilter.stringV,
-                                           false));
+    if (ciP->uriParamOptions[OPT_KEY_VALUES])  // NGSI_V2_KEYVALUES
+    {
+      JsonObjectHelper jh;
+      jh.addRaw(caP->name, caP->toJsonValue());
+      TIMED_RENDER(answer = jh.str());
+    }
+    else  // NGSI_V2_NORMALIZED
+    {
+      StringList metadataFilter;
+      setMetadataFilter(ciP->uriParam, &metadataFilter);
+      TIMED_RENDER(answer = caP->toJson(metadataFilter.stringV));
+    }
   }
   else
   {

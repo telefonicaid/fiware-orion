@@ -53,6 +53,7 @@ typedef struct QueryContextResponse
 
   void                   release(void);
   void                   fill(const Entities& entities);
+  ContextAttribute*      getAttr(const std::string& attrName, OrionError* oeP);
 } QueryContextResponse;
 
 #endif  // SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_

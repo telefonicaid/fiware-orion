@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/string.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
@@ -80,4 +81,59 @@ void QueryContextResponse::fill(const Entities& entities)
     ContextElementResponse* cerP = new ContextElementResponse(entities.vec.vec[eIx]);
     contextElementResponseVector.push_back(cerP);
   }
+}
+
+
+/* ****************************************************************************
+*
+* QueryContextResponse::getAttr -
+*
+* If attribute is found:
+* - It is returned by the function
+* - The OrionError is set to SccNone
+*
+* If attribute is not found
+* - Function returns NULL
+* - The OrionError is not touched
+*
+*/
+ContextAttribute* QueryContextResponse::getAttr(const std::string& attrName, OrionError* oeP)
+{
+  if (errorCode.code == SccContextElementNotFound)
+  {
+    oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+    return NULL;
+  }
+
+  if (errorCode.code != SccOk)
+  {
+    //
+    // any other error distinct from Not Found
+    //
+    oeP->fill(errorCode.code, errorCode.details, errorCode.reasonPhrase);
+    return NULL;
+  }
+
+  if (contextElementResponseVector.size() > 1)  // errorCode.code == SccOk
+  {
+    //
+    // If there are more than one entity, we return an error
+    //
+    oeP->fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    return NULL;
+  }
+
+  // Look for the attribute by name
+  ContextElementResponse* cerP = contextElementResponseVector[0];
+
+  for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
+  {
+    if (cerP->entity.attributeVector[i]->name == attrName)
+    {
+      return cerP->entity.attributeVector[i];
+    }
+  }
+
+  oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+  return NULL;
 }

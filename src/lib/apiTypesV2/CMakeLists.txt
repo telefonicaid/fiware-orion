@@ -24,7 +24,6 @@ SET (SOURCES
     Entity.cpp
     EntityVector.cpp
     Entities.cpp
-    Attribute.cpp
     Subscription.cpp
     Registration.cpp
     EntID.cpp
@@ -38,7 +37,6 @@ SET (HEADERS
     Entity.h
     EntityVector.h
     Entities.h    
-    Attribute.h
     Subscription.h
     Registration.h
     EntID.h
