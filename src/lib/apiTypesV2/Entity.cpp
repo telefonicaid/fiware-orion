@@ -587,7 +587,8 @@ void Entity::fill(const Entity& en, bool useDefaultType, bool cloneCompounds)
 
   attributeVector.fill(en.attributeVector, useDefaultType, cloneCompounds);
 
-  providingApplicationList = en.providingApplicationList;
+  providerList      = en.providerList;
+  providerRegIdList = en.providerRegIdList;
 }
 
 

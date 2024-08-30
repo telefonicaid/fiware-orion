@@ -365,9 +365,9 @@ extern void cprLookupByAttribute
   const Entity&                            en,
   const std::string&                       attrName,
   const std::vector<ngsiv2::Registration>& regV,
-  std::string*                             perEntPa,
-  std::string*                             perAttrPa,
-  ProviderFormat*                          providerFormatP,
+  std::string*                             perEntProviderP,
+  std::string*                             perAttrProviderP,
+  bool*                                    legacyProviderFormatP,
   std::string*                             regId
 );
 

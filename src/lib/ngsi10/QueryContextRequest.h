@@ -56,14 +56,13 @@ typedef struct QueryContextRequest
   StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
   ScopeVector       scopeVector;     // Optional
 
-  //int               restrictions;
-  StringList        metadataList;     // From URI param 'metadata'
-  std::string       contextProvider;  // Not part of the payload - used internally only
-  ProviderFormat    providerFormat;   // Not part of the payload - used internally only
+  StringList        metadataList;          // From URI param 'metadata'
+  std::string       contextProvider;       // Not part of the payload - used internally only
+  bool              legacyProviderFormat;  // Not part of the payload - used internally only
 
   QueryContextRequest();
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, ProviderFormat _providerFormat);
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList&  attributeList, ProviderFormat _providerFormat);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, bool _legacyProviderFormat);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList&  attributeList, bool _legacyProviderFormat);
 
   std::string   toJsonV1(void);
   std::string   toJson(void);

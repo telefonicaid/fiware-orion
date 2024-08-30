@@ -51,10 +51,11 @@ UpdateContextRequest::UpdateContextRequest()
 *
 * UpdateContextRequest::UpdateContextRequest -
 */
-UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, ProviderFormat _providerFormat, Entity* eP)
+UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, bool _legacyProviderFormat, Entity* eP)
 {
-  contextProvider = _contextProvider;
-  providerFormat  = _providerFormat;
+  contextProvider      = _contextProvider;
+  legacyProviderFormat = _legacyProviderFormat;
+
   Entity* neweP = new Entity(eP->id, eP->type, eP->isPattern);
   neweP->renderId = eP->renderId;
   entityVector.push_back(neweP);

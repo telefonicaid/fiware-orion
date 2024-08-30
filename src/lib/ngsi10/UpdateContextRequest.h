@@ -45,10 +45,10 @@ typedef struct UpdateContextRequest
   ActionType              updateActionType;      // Mandatory
 
   std::string             contextProvider;       // Not part of the payload - used internally only
-  ProviderFormat          providerFormat;        // Not part of the payload - used internally only
+  bool                    legacyProviderFormat;  // Not part of the payload - used internally only
 
   UpdateContextRequest();
-  UpdateContextRequest(const std::string& _contextProvider, ProviderFormat _providerFormat, Entity* eP);
+  UpdateContextRequest(const std::string& _contextProvider, bool _providerFormat, Entity* eP);
 
   std::string        toJsonV1(bool asJsonObject);
   std::string        toJson(void);

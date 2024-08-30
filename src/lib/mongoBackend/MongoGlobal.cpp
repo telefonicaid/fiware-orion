@@ -1630,7 +1630,8 @@ void pruneContextElements
                          cerP->entity.modDate);
 
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
-    newCerP->entity.providingApplicationList = cerP->entity.providingApplicationList;
+    newCerP->entity.providerList = cerP->entity.providerList;
+    newCerP->entity.providerRegIdList = cerP->entity.providerRegIdList;
     newCerP->statusCode.fill(&cerP->statusCode);
 
     bool pruneEntity = cerP->prune;
@@ -1652,8 +1653,8 @@ void pruneContextElements
     /* If after pruning the entity has no attribute and no CPr information, then it is not included
      * in the output vector, except if "prune" is set to false */
     if (pruneEntity &&
-        (newCerP->entity.attributeVector.size()          == 0) &&
-        (newCerP->entity.providingApplicationList.size() == 0))
+        (newCerP->entity.attributeVector.size() == 0) &&
+        (newCerP->entity.providerList.size()    == 0))
     {
       newCerP->release();
       delete newCerP;
@@ -2152,25 +2153,26 @@ void fillContextProviders(ContextElementResponse* cer, const std::vector<ngsiv2:
       continue;
     }
 
-    /* Search for some CPr in crrV */
-    std::string     perEntPa;
-    std::string     perAttrPa;
-    ProviderFormat  providerFormat;
+    /* Search for some CPr in Registrations vector */
+    std::string     perEntProvider;
+    std::string     perAttrProvider;
+    bool            legacyProviderFormat;
     std::string     regId;
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
                          regV,
-                         &perEntPa,
-                         &perAttrPa,
-                         &providerFormat,
+                         &perEntProvider,
+                         &perAttrProvider,
+                         &legacyProviderFormat,
                          &regId);
 
-    /* Looking results after crrV processing */
-    ca->providingApplication.set(perAttrPa.empty() ? perEntPa : perAttrPa);
-    ca->providingApplication.setProviderFormat(providerFormat);
-    ca->providingApplication.setRegId(regId);
-    ca->found = (!ca->providingApplication.get().empty());
+    /* Looking results after Registrations vector processing */
+    ca->provider.http.url = perAttrProvider.empty() ? perEntProvider : perAttrProvider;
+    ca->provider.legacyForwardingMode = legacyProviderFormat;
+    ca->providerRegId = regId;
+
+    ca->found = (!ca->provider.http.url.empty());
   }
 }
 
@@ -2213,14 +2215,14 @@ void cprLookupByAttribute
   const Entity&                             en,
   const std::string&                        attrName,
   const std::vector<ngsiv2::Registration>&  regV,
-  std::string*                              perEntPa,
-  std::string*                              perAttrPa,
-  ProviderFormat*                           providerFormatP,    // FIXME PR: ProviderFormat is really needed as type?
+  std::string*                              perEntProviderP,
+  std::string*                              perAttrProviderP,
+  bool*                                     legacyPproviderFormatP,
   std::string*                              regId
 )
 {
-  *perEntPa  = "";
-  *perAttrPa = "";
+  *perEntProviderP  = "";
+  *perAttrProviderP = "";
   *regId = "";
 
   for (unsigned int regIx = 0; regIx < regV.size(); ++regIx)
@@ -2251,9 +2253,9 @@ void cprLookupByAttribute
       /* Registration without attributes (keep searching in other Registration) */
       if (reg.dataProvided.attributes.size() == 0)
       {
-        *perEntPa         = reg.provider.http.url;
-        *providerFormatP  = reg.provider.legacyForwardingMode? PfJson : PfV2;
-        *regId            = reg.id;
+        *perEntProviderP         = reg.provider.http.url;
+        *legacyPproviderFormatP  = reg.provider.legacyForwardingMode;
+        *regId                   = reg.id;
 
         break;  /* enIx */
       }
@@ -2265,9 +2267,9 @@ void cprLookupByAttribute
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result by keep searching the Registrations vector, so we return */
-          *perAttrPa        = reg.provider.http.url;
-          *providerFormatP  = reg.provider.legacyForwardingMode? PfJson : PfV2;
-          *regId            = reg.id;
+          *perAttrProviderP        = reg.provider.http.url;
+          *legacyPproviderFormatP  = reg.provider.legacyForwardingMode;
+          *regId                   = reg.id;
 
           return;
         }

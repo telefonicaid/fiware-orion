@@ -182,7 +182,7 @@ static bool queryForward
   std::string     mimeType;
   std::string     op;
 
-  if (qcrP->providerFormat == PfJson)
+  if (qcrP->legacyProviderFormat)
   {
     op        = "/queryContext";
 
@@ -331,8 +331,8 @@ static bool queryForward
                       noHeaders,
                       mimeType,
                       -1,  // default timeout
-                      qcrP->providerFormat == PfJson? -1 : providerLimit,
-                      qcrP->providerFormat == PfJson? -1 : providerOffset);
+                      qcrP->legacyProviderFormat? -1 : providerLimit,
+                      qcrP->legacyProviderFormat? -1 : providerOffset);
   
   if (r != 0)
   {
@@ -385,7 +385,7 @@ static bool queryForward
   // keyValue directly as function parameter.
   bool previousKeyValues = ciP->uriParamOptions[OPT_KEY_VALUES];
   ciP->uriParamOptions[OPT_KEY_VALUES] = false;
-  result = qcrP->providerFormat == PfJson ? parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe) : parseEntitiesResponse(ciP, cleanPayload, &entities, &oe);
+  result = qcrP->legacyProviderFormat? parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe) : parseEntitiesResponse(ciP, cleanPayload, &entities, &oe);
   ciP->uriParamOptions[OPT_KEY_VALUES] = previousKeyValues;
 
   if (result == false)
@@ -438,7 +438,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
   {
     ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
 
-    if (cerP->entity.providingApplicationList.size() != 0)
+    if (cerP->entity.providerList.size() != 0)
     {
       return true;
     }
@@ -447,7 +447,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (!aP->providingApplication.get().empty())
+      if (!aP->provider.http.url.empty())
       {
         return true;
       }
@@ -572,20 +572,20 @@ void postQueryContext
     // When there is a Context Provider in ContextElement::providingApplicationList, then the
     // request must be sent to that Context Provider also
     //
-    for (unsigned int ix = 0; ix < cerP->entity.providingApplicationList.size(); ++ix)
+    for (unsigned int ix = 0; ix < cerP->entity.providerList.size(); ++ix)
     {
       QueryContextRequest* requestP;
 
-      requestP = new QueryContextRequest(cerP->entity.providingApplicationList[ix].get(), &en, qcrP->attributeList, cerP->entity.providingApplicationList[ix].providerFormat);
+      requestP = new QueryContextRequest(cerP->entity.providerList[ix].http.url, &en, qcrP->attributeList, cerP->entity.providerList[ix].legacyForwardingMode);
       requestV.push_back(requestP);
-      regIdsV.push_back(cerP->entity.providingApplicationList[ix].getRegId());
+      regIdsV.push_back(cerP->entity.providerRegIdList[ix]);
     }
 
     //
     // What if the Attribute Vector of the ContextElementResponse is empty?
     // For now, just push it into localQcrsP, but only if its local, i.e. its contextElement.providingApplicationList is empty
     //
-    if ((cerP->entity.attributeVector.size() == 0) && (cerP->entity.providingApplicationList.size() == 0))
+    if ((cerP->entity.attributeVector.size() == 0) && (cerP->entity.providerList.size() == 0))
     {
       localQcrsP->contextElementResponseVector.push_back(new ContextElementResponse(&en, NULL));
     }
@@ -599,7 +599,7 @@ void postQueryContext
         // An empty providingApplication means the attribute is local
         // In such a case, the response is already in our hand, we just need to copy it to responseV
         //
-        if (aP->providingApplication.get().empty())
+        if (aP->provider.http.url.empty())
         {
           if (aP->found == false)
           {
@@ -631,13 +631,13 @@ void postQueryContext
         //
         // Not a local attribute - aP->providingApplication is not empty
         //
-        QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), &en);
+        QueryContextRequest* requestP = requestV.lookup(aP->provider.http.url, &en);
 
         if (requestP == NULL)
         {
-          requestP = new QueryContextRequest(aP->providingApplication.get(), &en, aP->name, aP->providingApplication.providerFormat);
+          requestP = new QueryContextRequest(aP->provider.http.url, &en, aP->name, aP->provider.legacyForwardingMode);
           requestV.push_back(requestP);
-          regIdsV.push_back(aP->providingApplication.getRegId());
+          regIdsV.push_back(aP->providerRegId);
         }
         else
         {

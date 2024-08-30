@@ -339,7 +339,11 @@ ContextAttribute::ContextAttribute()
   creDate = 0;
   modDate = 0;
 
-  providingApplication.set("");
+  provider.http.url                = "";
+  provider.legacyForwardingMode    = false;
+  provider.supportedForwardingMode = ngsiv2::ForwardAll;
+
+  providerRegId                    = "";
 }
 
 
@@ -415,9 +419,8 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
   creDate = caP->creDate;
   modDate = caP->modDate;
 
-  providingApplication.set(caP->providingApplication.get());
-  providingApplication.setProviderFormat(caP->providingApplication.getProviderFormat());
-  providingApplication.setRegId(caP->providingApplication.getRegId());
+  provider = caP->provider;
+  providerRegId = caP->providerRegId;
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
                   compoundValueP,
@@ -495,7 +498,11 @@ ContextAttribute::ContextAttribute
   creDate = 0;
   modDate = 0;
 
-  providingApplication.set("");
+  provider.http.url                = "";
+  provider.legacyForwardingMode    = false;
+  provider.supportedForwardingMode = ngsiv2::ForwardAll;
+
+  providerRegId                    = "";
 }
 
 
@@ -534,7 +541,11 @@ ContextAttribute::ContextAttribute
   creDate = 0;
   modDate = 0;
 
-  providingApplication.set("");
+  provider.http.url                = "";
+  provider.legacyForwardingMode    = false;
+  provider.supportedForwardingMode = ngsiv2::ForwardAll;
+
+  providerRegId                    = "";
 }
 
 
@@ -572,7 +583,11 @@ ContextAttribute::ContextAttribute
   creDate = 0;
   modDate = 0;
 
-  providingApplication.set("");
+  provider.http.url                = "";
+  provider.legacyForwardingMode    = false;
+  provider.supportedForwardingMode = ngsiv2::ForwardAll;
+
+  providerRegId                    = "";
 }
 
 
@@ -611,7 +626,11 @@ ContextAttribute::ContextAttribute
   creDate = 0;
   modDate = 0;
 
-  providingApplication.set("");
+  provider.http.url                = "";
+  provider.legacyForwardingMode    = false;
+  provider.supportedForwardingMode = ngsiv2::ForwardAll;
+
+  providerRegId                    = "";
 }
 
 

@@ -74,7 +74,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (!aP->providingApplication.get().empty())
+      if (!aP->provider.http.url.empty())
       {
         return true;
       }
@@ -153,7 +153,7 @@ static bool updateForward
   std::string     out;
   int             r;
 
-  if (upcrP->providerFormat == PfJson)
+  if (upcrP->legacyProviderFormat)
   {
     TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
 
@@ -246,7 +246,7 @@ static bool updateForward
   LM_T(LmtCPrForwardResponsePayload, ("forward updateContext response payload: %s", out.c_str()));
 
   //
-  // If NGSIv1 (providerFormat == PfJson):
+  // If NGSIv1 (legacyProviderFormat):
   //   4. Parse the response and fill in a binary UpdateContextResponse
   //   5. Fill in the response from the redirection into the response of this function
   //   6. 'Fix' StatusCode
@@ -256,7 +256,7 @@ static bool updateForward
   //   4. Look for "204 No Content" in the response of the forwarded request
   //   5. If found: OK, else, error
   //
-  if (upcrP->providerFormat == PfJson)
+  if (upcrP->legacyProviderFormat)
   {
     //
     // 4. Parse the response and fill in a binary UpdateContextResponse
@@ -689,7 +689,7 @@ void postUpdateContext
       //
       // 1. If the attribute is found locally - just add the attribute to the outgoing response
       //
-      if (aP->providingApplication.get().empty())
+      if (aP->provider.http.url.empty())
       {
         ContextAttribute ca(aP);
         response.foundPush(&cerP->entity, &ca);
@@ -698,15 +698,15 @@ void postUpdateContext
 
 
       //
-      // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
+      // 2. Lookup UpdateContextRequest in requestV according to provider.
       //    If not found, add one.
-      UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
+      UpdateContextRequest*  reqP = requestV.lookup(aP->provider.http.url);
       if (reqP == NULL)
       {
-        reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
+        reqP = new UpdateContextRequest(aP->provider.http.url, aP->provider.legacyForwardingMode, &cerP->entity);
         reqP->updateActionType = ActionTypeUpdate;
         requestV.push_back(reqP);
-        regIdsV.push_back(aP->providingApplication.getRegId());
+        regIdsV.push_back(aP->providerRegId);
       }
 
       //

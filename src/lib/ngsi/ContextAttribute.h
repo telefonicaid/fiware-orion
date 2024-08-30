@@ -30,14 +30,15 @@
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
+#include "common/MimeType.h"
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/MetadataVector.h"
 #include "ngsi/Request.h"
-#include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoDriver/BSONObjBuilder.h"
 #include "expressions/ExprContext.h"
+#include "apiTypesV2/Registration.h"
 
 
 
@@ -57,8 +58,10 @@ public:
   double                     numberValue;  // "value" as a Number
   bool                       boolValue;    // "value" as a Boolean  
 
-  ProvidingApplication       providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
-  bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
+  ngsiv2::Provider           provider;                // Used internally for CPr forwarding functionality
+  std::string                providerRegId;          // Side vector to provider, to hold the reg ids where they come (used for login purposes)
+
+  bool                       found;                   // Used internally for CPr forwarding functionality (update case)
                                                       // It means attribute found either locally or remotely in providing application
 
   bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists

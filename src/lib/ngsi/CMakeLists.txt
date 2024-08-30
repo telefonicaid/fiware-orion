@@ -29,7 +29,6 @@ SET (SOURCES
     EntityIdVector.cpp
     Metadata.cpp
     MetadataVector.cpp
-    ProvidingApplication.cpp
     Request.cpp
     Scope.cpp
     ScopeVector.cpp
@@ -46,7 +45,6 @@ SET (HEADERS
     EntityIdVector.h
     Metadata.h
     MetadataVector.h
-    ProvidingApplication.h
     Scope.h
     StatusCode.h
     StringList.h

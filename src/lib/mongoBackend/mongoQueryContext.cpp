@@ -82,13 +82,13 @@ static void fillContextProviders(ContextElementResponseVector& cerV, const std::
 
 /* ****************************************************************************
 *
-* addContextProviderEntity -
+* lookupProvider -
 */
-static bool lookupProvidingApplication(const std::vector<ProvidingApplication>& paV, const ProvidingApplication &pa)
+static bool lookupProvider(const std::vector<ngsiv2::Provider>& providerV, const ngsiv2::Provider &provider)
 {
-  for (unsigned int ix = 0; ix < paV.size(); ++ix)
+  for (unsigned int ix = 0; ix < providerV.size(); ++ix)
   {
-    if ((paV[ix].string == pa.string) && (paV[ix].regId == pa.regId))
+    if (providerV[ix].http.url == provider.http.url)
     {
       return true;
     }
@@ -110,20 +110,15 @@ static void addContextProviderEntity
   const std::string&             regId
 )
 {
-  // FIXME PR: don't like this. Use Provider directly
-  ProvidingApplication pa;
-  pa.string = provider.http.url;
-  pa.providerFormat = provider.legacyForwardingMode ? PfJson : PfV2;
-  pa.regId = regId;
-
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
     if ((cerV[ix]->entity.id == (regEn.idPattern.empty()? regEn.id : regEn.idPattern)) && (cerV[ix]->entity.type == regEn.type))
     {
-      // Avoid duplicate PA in the vector
-      if (!lookupProvidingApplication(cerV[ix]->entity.providingApplicationList, pa))
+      // Avoid duplicate Provider in the vector
+      if (!lookupProvider(cerV[ix]->entity.providerList, provider))
       {
-        cerV[ix]->entity.providingApplicationList.push_back(pa);
+        cerV[ix]->entity.providerList.push_back(provider);
+        cerV[ix]->entity.providerRegIdList.push_back(regId);
       }
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
@@ -133,7 +128,8 @@ static void addContextProviderEntity
   ContextElementResponse* cerP = new ContextElementResponse();
 
   cerP->entity.fill(regEn.idPattern.empty() ? regEn.id : regEn.idPattern, regEn.type, regEn.idPattern.empty()? "false": "true");
-  cerP->entity.providingApplicationList.push_back(pa);
+  cerP->entity.providerList.push_back(provider);
+  cerP->entity.providerRegIdList.push_back(regId);
 
   cerP->statusCode.fill(SccOk);
   cerV.push_back(cerP);
@@ -158,12 +154,6 @@ static void addContextProviderAttribute
   bool                            limitReached
 )
 {
-  // FIXME PR: don't like this. Use Provider directly
-  ProvidingApplication pa;
-  pa.string = provider.http.url;
-  pa.providerFormat = provider.legacyForwardingMode ? PfJson : PfV2;
-  pa.regId = regId;
-
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
     if ((cerV[ix]->entity.id != regEn.id) || (cerV[ix]->entity.type != regEn.type))
@@ -187,7 +177,8 @@ static void addContextProviderAttribute
     /* Reached this point, no attribute was found, so adding it with corresponding CPr info */
     ContextAttribute* caP = new ContextAttribute(regAttr, "", "");
 
-    caP->providingApplication = pa;
+    caP->provider = provider;
+    caP->providerRegId = regId;
     cerV[ix]->entity.attributeVector.push_back(caP);
     return;
   }
@@ -202,7 +193,8 @@ static void addContextProviderAttribute
 
     ContextAttribute* caP = new ContextAttribute(regAttr, "", "");
 
-    caP->providingApplication = pa;
+    caP->provider = provider;
+    caP->providerRegId = regId;
     cerP->entity.attributeVector.push_back(caP);
     cerV.push_back(cerP);
   }

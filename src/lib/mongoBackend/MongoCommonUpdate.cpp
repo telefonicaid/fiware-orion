@@ -3147,7 +3147,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (!aP->providingApplication.get().empty())
+      if (!aP->provider.http.url.empty())
       {
         return true;
       }
