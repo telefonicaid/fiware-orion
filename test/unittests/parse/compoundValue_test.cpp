@@ -44,7 +44,7 @@ TEST(compoundValue, tenCompounds)
   utInit();
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->toJsonV1(false);
+  rendered = upcrP->toJsonV1();
 
   utExit();
 }
