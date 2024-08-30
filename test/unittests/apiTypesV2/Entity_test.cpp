@@ -72,6 +72,8 @@ TEST(Entity, check)
   enP->isPattern = "<false>";
   EXPECT_EQ("Invalid value for isPattern", enP->check(EntitiesRequest));
 
+  delete enP;
+
   utExit();
 }
 
@@ -116,6 +118,8 @@ TEST(Entity, checkV1)
   out = en2P->toJson(NGSI_V2_NORMALIZED, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  delete enP;
 
   utExit();
 }
