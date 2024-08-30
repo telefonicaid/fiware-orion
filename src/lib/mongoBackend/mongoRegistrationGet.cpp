@@ -100,9 +100,9 @@ void mongoRegistrationGet
     //
     if (!regP->fromBson(r))
     {
-      // FIXME #4611: this check will be no longer needed after fixing the issue. setDataProvided return type could be changed to void
+      // FIXME #4611: this check will be no longer needed after fixing the issue. fromBson return type could be changed to void
       orion::releaseMongoConnection(connection);
-      LM_W(("Bad Input (getting registrations with more than one CR"));
+      LM_E(("Runtime Error (registrations with more than one CR are considered runtime errors since Orion 4.1.0, please fix reg %s at DB)", regP->id.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Registration", reqSemTaken);
       oeP->fill(SccReceiverInternalError, err);
       return;
@@ -193,9 +193,9 @@ void mongoRegistrationsGet
     //
     if (!reg.fromBson(r))
     {
-      // FIXME #4611: this check will be no longer needed after fixing the issue. setDataProvided return type could be changed to void
+      // FIXME #4611: this check will be no longer needed after fixing the issue. fromBson return type could be changed to void
       orion::releaseMongoConnection(connection);
-      LM_W(("Bad Input (getting registrations with more than one CR"));
+      LM_E(("Runtime Error (registrations with more than one CR are considered runtime errors since Orion 4.1.0, please fix reg %s at DB)", reg.id.c_str()));
       reqSemGive(__FUNCTION__, "Mongo Get Registrations", reqSemTaken);
       oeP->fill(SccReceiverInternalError, err);
       return;

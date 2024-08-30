@@ -114,7 +114,7 @@ std::string UpdateContextRequest::toJson(void)
 *  "updateAction": "APPEND"
 * }
 */
-std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
+std::string UpdateContextRequest::toJsonV1(void)
 {
   JsonObjectHelper jh;
 

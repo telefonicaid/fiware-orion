@@ -115,9 +115,6 @@ static bool updateForward
   int              port;
   std::string      prefix;
 
-  // FIXME PR: not really needed...
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
@@ -155,7 +152,7 @@ static bool updateForward
 
   if (upcrP->legacyProviderFormat)
   {
-    TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
+    TIMED_RENDER(payload = upcrP->toJsonV1());
 
     op = "/updateContext";
 

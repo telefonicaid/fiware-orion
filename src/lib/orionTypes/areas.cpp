@@ -390,12 +390,6 @@ int Geometry::parse(const char* in, std::string* errorString)
     }
   }
 
-  if ((areaType == "circle") && (radius == -1))
-  {
-    *errorString = "no radius for circle";
-    return -1;
-  }
-
   if ((areaType == "polygon") && (radius != -1))
   {
     *errorString = "radius set for polygon";

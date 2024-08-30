@@ -58,10 +58,6 @@ extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 *
 * Tests
 *
-*
-* - queryGeoCircleIn1
-* - queryGeoCircleIn2
-* - queryGeoCircleOut
 * - queryGeoPolygonIn1
 * - queryGeoPolygonIn2
 * - queryGeoPolygonIn3

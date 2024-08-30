@@ -1854,8 +1854,12 @@ bool registrationsQuery
     ngsiv2::Registration reg;
     if (reg.fromBson(r))
     {
-      // FIXME PR: control error if Registration comes from NGSIv1
       regV->push_back(reg);
+    }
+    else
+    {
+      // FIXME #4611: this else branch will be no longer needed after fixing the issue
+      LM_E(("Runtime Error (registrations with more than one CR are considered runtime errors since Orion 4.1.0, please fix reg %s at DB)", reg.id.c_str()));
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the

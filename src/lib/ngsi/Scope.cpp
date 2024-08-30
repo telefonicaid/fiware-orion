@@ -227,15 +227,7 @@ int Scope::fill
     pointV.push_back(pointP);
   }
 
-  // FIXME PR: remove this "circle" processing that comes from NGSIv1?
-  if (geometry.areaType == "circle")
-  {
-    *errorStringP = "circle geometry is not supported by Orion API v2";
-    pointVectorRelease(pointV);
-    pointV.clear();
-    return -1;
-  }
-  else if (geometry.areaType == "polygon")
+  if (geometry.areaType == "polygon")
   {
     areaType = orion::PolygonType;
     
@@ -357,7 +349,7 @@ int Scope::fill
 */
 void Scope::release(void)
 {  
-  // NOTE: georel, circle, box, and point don't use dynamic memory, so they don't need release methods
+  // NOTE: georel, box, and point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
 
