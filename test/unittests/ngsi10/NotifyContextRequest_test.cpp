@@ -40,14 +40,14 @@
 */
 TEST(NotifyContextRequest, json_render)
 {
+  utInit();
+
   const char*              filename1  = "ngsi10.notifyContextRequest.jsonRender1.valid.json";
   const char*              filename2  = "ngsi10.notifyContextRequest.jsonRender2.valid.json";
   const char*              filename3  = "ngsi10.notifyContextRequest.jsonRender3.valid.json";
   NotifyContextRequest*    ncrP;
   ContextElementResponse*  cerP;
-  std::string              rendered;
-
-  utInit();
+  std::string              rendered;  
 
   // Preparation
   ncrP = new NotifyContextRequest();

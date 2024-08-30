@@ -48,7 +48,6 @@ extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 */
 TEST(cache, SubscriptionCache)
 {
-  LM_M(("In SubscriptionCache test"));
   utInit();
 
   std::vector<EntityInfo*>  entityIdInfos;

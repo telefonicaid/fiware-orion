@@ -37,23 +37,23 @@
 */
 TEST(ContextElementResponse, render)
 {
+  utInit();
+
   ContextElementResponse  cer;
   const char*             outfile = "ngsi.contextElementResponse.render.middle.json";
   std::string             out;
 
   std::vector<std::string> emptyV;
+   
+  cer.entity.id         = "ID";
+  cer.entity.type       = "Type";
+  cer.entity.isPattern  = "false";
 
-   utInit();
+  cer.statusCode.fill(SccOk, "details");
 
-   cer.entity.id         = "ID";
-   cer.entity.type       = "Type";
-   cer.entity.isPattern  = "false";
+  out = cer.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);;
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-   cer.statusCode.fill(SccOk, "details");
-
-   out = cer.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);;
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
-
-   utExit();
+  utExit();
 }

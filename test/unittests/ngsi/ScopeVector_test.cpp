@@ -35,13 +35,13 @@
 */
 TEST(ScopeVector, getAndSize)
 {
+  utInit();
+
   ScopeVector   sV;
   Scope         scope0("Type", "Value0");
   Scope         scope1("Type", "Value1");
   Scope         scope2("Type", "Value2");
   Scope*        scopeP;
-
-  utInit();
 
   sV.push_back(&scope0);
   sV.push_back(&scope1);

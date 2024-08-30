@@ -37,11 +37,11 @@
 */
 TEST(compoundValue, tenCompounds)
 {
+  utInit();
+
   ParseData                  reqData;
   UpdateContextRequest*      upcrP;
-  std::string                rendered;
-
-  utInit();
+  std::string                rendered;  
 
   upcrP = &reqData.upcr.res;
   rendered = upcrP->toJsonV1();

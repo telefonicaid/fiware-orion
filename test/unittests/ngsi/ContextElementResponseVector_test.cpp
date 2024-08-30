@@ -38,13 +38,13 @@
 */
 TEST(ContextElementResponseVector, render)
 {
+  utInit();
+  
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
 
-  std::vector<std::string> emptyV;
-
-  utInit();
+  std::vector<std::string> emptyV;  
 
   out = cerv.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
   EXPECT_STREQ("[]", out.c_str());

@@ -34,11 +34,11 @@
 */
 TEST(Metadata, constructor)
 {
+  utInit();
+
   Metadata m1;
   Metadata m2("n2", "t2", "v2");
   Metadata m3(&m2);
-
-  utInit();
 
   EXPECT_EQ("", m1.name);
   EXPECT_EQ("n2", m2.name);
@@ -56,14 +56,14 @@ TEST(Metadata, constructor)
 */
 TEST(Metadata, render)
 {
+  utInit();
+
   std::string  out;
   Metadata     m1;
   Metadata     m2("Name", "Integer", "19");
 
   const char*  outfile1 = "ngsi.metdata.render1.middle.json";
   const char*  outfile2 = "ngsi.metdata.render2.middle.json";
-
-  utInit();
 
   out = m1.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";

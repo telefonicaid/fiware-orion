@@ -37,10 +37,10 @@
 */
 TEST(ContextAttribute, checkOne)
 {
-  ContextAttribute*  caP = new ContextAttribute();
-  std::string       res;
-
   utInit();
+
+  ContextAttribute*  caP = new ContextAttribute();
+  std::string       res;  
 
   caP->name = "";
   res     = caP->check(false);

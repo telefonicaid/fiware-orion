@@ -37,11 +37,11 @@
 */
 TEST(AttributeList, ok)
 {
+  utInit();
+
   StringList     al;
   std::string    out;
-  const char*    outfile1 = "ngsi.attributeList.ok.middle.json";
-
-  utInit();
+  const char*    outfile1 = "ngsi.attributeList.ok.middle.json";  
 
   out = al.toJson();
   EXPECT_STREQ("[]", out.c_str());

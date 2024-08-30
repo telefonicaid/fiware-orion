@@ -38,12 +38,12 @@
 */
 TEST(CompoundValueNode, tree)
 {
+  utInit();
+
   orion::CompoundValueNode*  tree  = new orion::CompoundValueNode(orion::ValueTypeObject);
   orion::CompoundValueNode*  vec;
   orion::CompoundValueNode*  vecItem;
-  char*                      name  = (char*) "vecItem";
-
-  utInit();
+  char*                      name  = (char*) "vecItem";  
 
   lmTraceLevelSet(LmtCompoundValueAdd, true);
   vec = tree->add(orion::ValueTypeVector, "vec", "");

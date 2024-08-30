@@ -86,9 +86,9 @@ TEST(Entity, check)
 */
 TEST(Entity, checkV1)
 {
-  Entity* enP = new Entity();
-
   utInit();
+
+  Entity* enP = new Entity();  
 
   enP->id = "";
   EXPECT_EQ(enP->check(BatchUpdateRequest), "entity id length: 0, min length supported: 1");

@@ -34,11 +34,11 @@
 */
 TEST(EntityId, render)
 {
+  utInit();
+  
   EntityId     eId;
   std::string  out;
-  const char*  outfile1 = "ngsi.entityId.render.middle.json";
-
-  utInit();
+  const char*  outfile1 = "ngsi.entityId.render.middle.json";  
 
   out = eId.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";

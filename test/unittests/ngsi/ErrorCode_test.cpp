@@ -34,11 +34,11 @@
 */
 TEST(ErrorCode, render)
 {
+  utInit();
+
   ErrorCode    e1;
   std::string  out;
   const char*  outfile1 = "ngsi.errorCode.render1.middle.json";
-
-  utInit();
 
   out = e1.render();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
@@ -55,6 +55,8 @@ TEST(ErrorCode, render)
 */
 TEST(ErrorCode, check)
 {
+  utInit();
+
   ErrorCode    e1(0, "REASON", "DETAILS");
   ErrorCode    e2(200, "", "DETAILS");
   ErrorCode    e3(200, "REASON", "DETAILS");
@@ -62,8 +64,6 @@ TEST(ErrorCode, check)
   std::string  expected1 = "no code";
   std::string  expected2 = "no reason phrase";
   std::string  expected3 = "OK";
-
-  utInit();
 
   rendered = e1.check(RegisterContext, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());

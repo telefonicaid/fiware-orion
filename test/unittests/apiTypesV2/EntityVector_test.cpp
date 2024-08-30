@@ -36,6 +36,8 @@
 */
 TEST(EntityVector, render)
 {
+  utInit();
+
   Entity*       eP = new Entity();
   std::string   rendered;
   EntityVector  eV;
@@ -50,4 +52,6 @@ TEST(EntityVector, render)
   rendered = eV.toJson(NGSI_V2_NORMALIZED);
 
   eV.release();
+
+  utExit();
 }

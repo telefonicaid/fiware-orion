@@ -37,12 +37,12 @@
 */
 TEST(StatusCode, render)
 {
+  utInit();
+
   StatusCode    sc1;
   StatusCode    sc2;
   std::string   out;
   const char*   outfile1  = "ngsi.statusCode.render4.middle.json";
-
-  utInit();
 
   sc2.fill(SccOk, "DETAILS");
   out = sc2.toJson();
@@ -62,12 +62,12 @@ TEST(StatusCode, render)
 */
 TEST(StatusCode, fill)
 {
+  utInit();
+
   StatusCode    sc;
   StatusCode    sc2;
   StatusCode    ec;
   std::string   out;
-
-  utInit();
 
   sc.fill(SccForbidden, "D");
   EXPECT_EQ(sc.code, SccForbidden);
