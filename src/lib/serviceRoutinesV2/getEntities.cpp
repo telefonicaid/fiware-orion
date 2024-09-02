@@ -272,22 +272,16 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-    bool      isIdPattern = (!idPattern.empty() || pattern == ".*");
-    EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
-
+    EntityId* entityId = new EntityId("", pattern, "", typePattern);
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
   }
   else if (ciP->uriParamTypes.size() == 0)
   {
-    parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, "", EntityTypeEmptyOrNotEmpty, "");
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
-  }
-  else if (ciP->uriParamTypes.size() == 1)
-  {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, type, EntityTypeNotEmpty, "");
   }
   else
   {
@@ -297,7 +291,7 @@ std::string getEntities
     //
     for (unsigned int ix = 0; ix < ciP->uriParamTypes.size(); ++ix)
     {
-      EntityId* entityId = new EntityId(pattern, ciP->uriParamTypes[ix], "true");
+      EntityId* entityId = new EntityId("", pattern, ciP->uriParamTypes[ix], "");
 
       parseDataP->qcr.res.entityIdVector.push_back(entityId);
     }

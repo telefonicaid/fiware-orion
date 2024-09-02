@@ -272,9 +272,9 @@ Content-Length: 44
 
 07. Check three forwarded requests in logs
 ==========================================
-Request forwarded (regId: REG1_ID): POST http://localhost:9997/cpr/queryContext, request payload (88 bytes): {"entities":[{"id":"ConferenceRoom","type":"Room","isPattern":"false"}],"attributes":[]}, response payload (3912 bytes):
-Request forwarded (regId: REG2_ID): POST http://localhost:9997/cpr/queryContext, request payload (89 bytes): {"entities":[{"id":"ConferenceRoom2","type":"Room","isPattern":"false"}],"attributes":[]}, response payload (3912 bytes):
-Request forwarded (regId: REG3_ID): POST http://localhost:9997/cpr/queryContext, request payload (99 bytes): {"entities":[{"id":"ConferenceRoom3","type":"Room","isPattern":"false"}],"attributes":["pressure"]}, response payload (3912 bytes):
+Request forwarded (regId: REG1_ID): POST http://localhost:9997/cpr/queryContext, request payload (88 bytes): {"entities":[{"id":"ConferenceRoom","isPattern":"false","type":"Room"}],"attributes":[]}, response payload (3912 bytes):
+Request forwarded (regId: REG2_ID): POST http://localhost:9997/cpr/queryContext, request payload (89 bytes): {"entities":[{"id":"ConferenceRoom2","isPattern":"false","type":"Room"}],"attributes":[]}, response payload (3912 bytes):
+Request forwarded (regId: REG3_ID): POST http://localhost:9997/cpr/queryContext, request payload (99 bytes): {"entities":[{"id":"ConferenceRoom3","isPattern":"false","type":"Room"}],"attributes":["pressure"]}, response payload (3912 bytes):
 
 
 --TEARDOWN--

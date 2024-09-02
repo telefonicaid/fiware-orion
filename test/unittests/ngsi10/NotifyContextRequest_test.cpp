@@ -63,7 +63,8 @@ TEST(NotifyContextRequest, json_render)
 
   // 2. With ContextResponseList
   cerP = new ContextElementResponse();
-  cerP->entity.fill("E01", "EType", "false");
+  EntityId enId1("E01", "", "EType", "");
+  cerP->entity.fill(enId1);
   ncrP->contextElementResponseVector.push_back(cerP);
   cerP->statusCode.fill(SccOk);
 
@@ -74,7 +75,8 @@ TEST(NotifyContextRequest, json_render)
 
   // 3. ContextResponseList with two instances
   cerP = new ContextElementResponse();
-  cerP->entity.fill("E02", "EType", "false");
+  EntityId enId2("E02", "", "EType", "");
+  cerP->entity.fill(enId2);
   ncrP->contextElementResponseVector.push_back(cerP);
   cerP->statusCode.fill(SccOk);
 

@@ -1999,8 +1999,8 @@ static unsigned int processSubscriptions
       std::string  keyType = "_id." ENT_ENTITY_TYPE;
       std::string  keySp   = "_id." ENT_SERVICE_PATH;
 
-      std::string  id      = notifyCerP->entity.id;
-      std::string  type    = notifyCerP->entity.type;
+      std::string  id      = notifyCerP->entity.entityId.id;
+      std::string  type    = notifyCerP->entity.entityId.type;
       std::string  sp      = notifyCerP->entity.servicePath;
 
       bobCountQuery.append(keyId, id);
@@ -2170,7 +2170,8 @@ static void buildGeneralErrorResponse
 {
   ContextElementResponse* cerP = new ContextElementResponse();
 
-  cerP->entity.fill(ceP->id, ceP->type, ceP->isPattern);
+  EntityId enId(ceP->entityId.id, ceP->entityId.idPattern, ceP->entityId.type, ceP->entityId.typePattern);
+  cerP->entity.fill(enId);
 
   if (caP != NULL)
   {
@@ -2644,8 +2645,8 @@ static bool processContextAttributeVector
   OrionError*                                     oe
 )
 {
-  std::string               entityId        = cerP->entity.id;
-  std::string               entityType      = cerP->entity.type;
+  std::string               entityId        = cerP->entity.entityId.id;
+  std::string               entityType      = cerP->entity.entityId.type;
   std::string               entityDetail    = cerP->entity.toString();
   bool                      entityModified  = false;
   std::vector<std::string>  attrsWithModifiedValue;
@@ -2916,15 +2917,15 @@ static bool createEntity
 
   orion::BSONObjBuilder bsonIdBuilder;
 
-  bsonIdBuilder.append(ENT_ENTITY_ID, eP->id);
+  bsonIdBuilder.append(ENT_ENTITY_ID, eP->entityId.id);
 
-  if (eP->type.empty())
+  if (eP->entityId.type.empty())
   {
     bsonIdBuilder.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
   }
   else
   {
-    bsonIdBuilder.append(ENT_ENTITY_TYPE, eP->type);
+    bsonIdBuilder.append(ENT_ENTITY_TYPE, eP->entityId.type);
   }
 
   bsonIdBuilder.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
@@ -3477,12 +3478,13 @@ static unsigned int updateEntity
   std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
   std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
-  EntityId en(entityId, entityType);
+  EntityId en(entityId, "", entityType, "");
 
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
   ContextElementResponse* cerP = new ContextElementResponse();
-  cerP->entity.fill(entityId, entityType, "false");
+  EntityId enId(entityId, "", entityType, "");
+  cerP->entity.fill(enId);
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
@@ -3515,8 +3517,8 @@ static unsigned int updateEntity
 
     // Note we cannot use eP->type for the type, as it may be blank in the request
     // (that would break the cases/1494_subscription_alteration_types/sub_alteration_type_entity_delete2.test case)
-    if (!addTriggeredSubscriptions(notifyCerP->entity.id,
-                                   notifyCerP->entity.type,
+    if (!addTriggeredSubscriptions(notifyCerP->entity.entityId.id,
+                                   notifyCerP->entity.entityId.type,
                                    attrNames,
                                    attrNames,
                                    attrNames,
@@ -3997,8 +3999,8 @@ static bool contextElementPreconditionsCheck
     }
   }
 
-  /* Not supporting isPattern = true currently */
-  if (isTrue(eP->isPattern))
+  /* Not supporting idPattern currently */
+  if (!eP->entityId.idPattern.empty())
   {
     buildGeneralErrorResponse(eP, NULL, responseP, SccNotImplemented);
     // No need of filling responseP->oe, this cannot happen in NGSIv2
@@ -4070,15 +4072,15 @@ unsigned int processContextElement
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
   orion::BSONObjBuilder  bob;
-  EntityId               en(eP->id, eP->type);
-  std::string            enStr = eP->id;
+  EntityId               en(eP->entityId.id, "", eP->entityId.type, "");
+  std::string            enStr = eP->entityId.id;
 
-  bob.append(idString, eP->id);
+  bob.append(idString, eP->entityId.id);
 
-  if (!eP->type.empty())
+  if (!eP->entityId.type.empty())
   {
-    bob.append(typeString, eP->type);
-    enStr += '/' + eP->type;
+    bob.append(typeString, eP->entityId.type);
+    enStr += '/' + eP->entityId.type;
   }
 
   // Service path
@@ -4243,7 +4245,8 @@ unsigned int processContextElement
     /* Creating the common part of the response that doesn't depend on the case */
     ContextElementResponse* cerP = new ContextElementResponse();
 
-    cerP->entity.fill(eP->id, eP->type, "false");
+    EntityId enId(eP->entityId.id, "", eP->entityId.type, "");
+    cerP->entity.fill(enId);
 
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
@@ -4326,8 +4329,8 @@ unsigned int processContextElement
           attrNames.push_back(eP->attributeVector[ix]->name);
         }
 
-        if (!addTriggeredSubscriptions(eP->id,
-                                       eP->type,
+        if (!addTriggeredSubscriptions(eP->entityId.id,
+                                       eP->entityId.type,
                                        attrNames,
                                        attrNames,
                                        attrNames,

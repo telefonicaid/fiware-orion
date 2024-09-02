@@ -562,7 +562,7 @@ void postQueryContext
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse*  cerP  = qcrsP->contextElementResponseVector[ix];
-    EntityId                 en(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
+    EntityId                 en(cerP->entity.entityId);
 
     //
     // If a Context Provider has been registered with an empty attribute list for
@@ -649,7 +649,6 @@ void postQueryContext
           pushed = requestP->entityIdVector.push_back_if_absent(entityP);
           if (pushed == false)
           {
-            entityP->release();
             delete entityP;
           }
         }
@@ -775,11 +774,11 @@ void postQueryContext
       for (unsigned int jx = 0; jx < responseV[ix]->contextElementResponseVector.size(); ++jx)
       {
         bool found = false;
-        EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.id, responseV[ix]->contextElementResponseVector[jx]->entity.type, "false");
+        EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.entityId);
         for (unsigned int kx = 0; kx < qcrP->entityIdVector.size(); ++kx)
         {
           ngsiv2::EntID entityId;
-          if (isTrue(qcrP->entityIdVector[kx]->isPattern))
+          /*if (isTrue(qcrP->entityIdVector[kx]->isPattern))
           {
             entityId.idPattern = qcrP->entityIdVector[kx]->id;
           }
@@ -787,7 +786,12 @@ void postQueryContext
           {
             entityId.id = qcrP->entityIdVector[kx]->id;
           }
+          entityId.type = qcrP->entityIdVector[kx]->type;*/
+          // FIXME PR: next line will be simpler when EntID+EntityId unification comes
+          entityId.id = qcrP->entityIdVector[kx]->id;
+          entityId.idPattern = qcrP->entityIdVector[kx]->idPattern;
           entityId.type = qcrP->entityIdVector[kx]->type;
+          entityId.typePattern = qcrP->entityIdVector[kx]->typePattern;
 
           if (matchEntity(&tempEn, entityId))
           {

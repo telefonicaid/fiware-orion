@@ -161,7 +161,7 @@ void ContextElementResponseVector::fill(EntityVector& erV, HttpStatusCode sc)
   {
     ContextElementResponse* cerP = new ContextElementResponse(erV[ix]);
 
-    cerP->statusCode.fill(sc, erV[ix]->id);
+    cerP->statusCode.fill(sc, erV[ix]->entityId.id);
 
     push_back(cerP);
   }

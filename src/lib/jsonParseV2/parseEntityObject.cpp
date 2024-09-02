@@ -81,9 +81,9 @@ std::string parseEntityObject
         return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID;
       }
 
-      eP->id = iter->value.GetString();
+      eP->entityId.id = iter->value.GetString();
 
-      if (forbiddenIdCharsV2(eP->id.c_str(), ""))
+      if (forbiddenIdCharsV2(eP->entityId.id.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
@@ -106,8 +106,7 @@ std::string parseEntityObject
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
-      eP->id        = iter->value.GetString();
-      eP->isPattern = "true";
+      eP->entityId.idPattern = iter->value.GetString();
     }
     else if (name == "type")
     {
@@ -116,15 +115,15 @@ std::string parseEntityObject
         return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE;
       }
 
-      eP->type      = iter->value.GetString();
-      eP->typeGiven = true;
+      eP->entityId.type  = iter->value.GetString();
+      eP->typeGiven      = true;
 
-      if (eP->type.empty())
+      if (eP->entityId.type.empty())
       {
         return ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
       }
 
-      if (forbiddenIdCharsV2(eP->type.c_str(), ""))
+      if (forbiddenIdCharsV2(eP->entityId.type.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
@@ -143,8 +142,7 @@ std::string parseEntityObject
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
-      eP->type          = iter->value.GetString();
-      eP->isTypePattern = true;
+      eP->entityId.typePattern  = iter->value.GetString();
     }
     else
     {

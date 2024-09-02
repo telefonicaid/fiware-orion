@@ -112,7 +112,9 @@ static void addContextProviderEntity
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->entity.id == (regEn.idPattern.empty()? regEn.id : regEn.idPattern)) && (cerV[ix]->entity.type == regEn.type))
+    // FIXME PR ngsiv2::EntID should be changed to EntityId
+    EntityId temp(regEn.id, regEn.idPattern, regEn.type, regEn.typePattern);
+    if (cerV[ix]->entity.entityId == temp)
     {
       // Avoid duplicate Provider in the vector
       if (!lookupProvider(cerV[ix]->entity.providerList, provider))
@@ -127,7 +129,8 @@ static void addContextProviderEntity
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
   ContextElementResponse* cerP = new ContextElementResponse();
 
-  cerP->entity.fill(regEn.idPattern.empty() ? regEn.id : regEn.idPattern, regEn.type, regEn.idPattern.empty()? "false": "true");
+  EntityId enId(regEn.id, regEn.idPattern, regEn.type, regEn.typePattern);
+  cerP->entity.fill(enId);
   cerP->entity.providerList.push_back(provider);
   cerP->entity.providerRegIdList.push_back(regId);
 
@@ -156,7 +159,7 @@ static void addContextProviderAttribute
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->entity.id != regEn.id) || (cerV[ix]->entity.type != regEn.type))
+    if ((cerV[ix]->entity.entityId.id != regEn.id) || (cerV[ix]->entity.entityId.type != regEn.type))
     {
      continue;
     }
@@ -188,7 +191,8 @@ static void addContextProviderAttribute
     /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
     ContextElementResponse* cerP            = new ContextElementResponse();
 
-    cerP->entity.fill(regEn.idPattern.empty() ? regEn.id : regEn.idPattern, regEn.type, regEn.idPattern.empty() ? "false" : "true");
+    EntityId enId(regEn.id, regEn.idPattern, regEn.type, regEn.typePattern);
+    cerP->entity.fill(enId);
     cerP->statusCode.fill(SccOk);
 
     ContextAttribute* caP = new ContextAttribute(regAttr, "", "");
@@ -309,7 +313,7 @@ static void processGenericEntities
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* enP = enV[ix];
-    if (enP->type.empty() || isTrue(enP->isPattern))
+    if (enP->type.empty() || !enP->idPattern.empty())
     {
       addContextProviders(cerV, regV, limitReached, enP);
     }

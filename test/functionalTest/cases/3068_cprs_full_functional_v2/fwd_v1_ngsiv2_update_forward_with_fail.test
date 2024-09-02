@@ -154,7 +154,7 @@ Raising alarm ForwardingError localhost:9997/cprfail/updateContext: error parsin
 
 04. Check one forwarded requests in logs
 ========================================
-Request forwarded (regId: REG1_ID): POST http://localhost:9997/cprfail/updateContext, request payload (542 bytes): {"contextElements":[{"id":"ConferenceRoom","type":"Room","isPattern":"false","attributes":[{"name":"lightstatus","type":"StructuredValue","value":{"x":1,"y":2}},{"name":"pressure","type":"StructuredValue","value":["a","b","c"]},{"name":"temperature","type":"Number","value":14,"metadatas":[{"name":"ID1","type":"Text","value":{"type":"Text","value":{"x":1,"y":2}}},{"name":"ID2","type":"Text","value":{"type":"Text","value":["a","b","c"]}},{"name":"ID3","type":"Text","value":{"type":"Text","value":"ThisIsID3"}}]}]}],"updateAction":"UPDATE"}, response payload (3188 bytes): {
+Request forwarded (regId: REG1_ID): POST http://localhost:9997/cprfail/updateContext, request payload (542 bytes): {"contextElements":[{"id":"ConferenceRoom","isPattern":"false","type":"Room","attributes":[{"name":"lightstatus","type":"StructuredValue","value":{"x":1,"y":2}},{"name":"pressure","type":"StructuredValue","value":["a","b","c"]},{"name":"temperature","type":"Number","value":14,"metadatas":[{"name":"ID1","type":"Text","value":{"type":"Text","value":{"x":1,"y":2}}},{"name":"ID2","type":"Text","value":{"type":"Text","value":["a","b","c"]}},{"name":"ID3","type":"Text","value":{"type":"Text","value":"ThisIsID3"}}]}]}],"updateAction":"UPDATE"}, response payload (3188 bytes): {
 
 
 --TEARDOWN--

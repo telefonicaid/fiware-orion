@@ -61,27 +61,11 @@ std::string EntityIdVector::toJson(void)
 *
 * EntityIdVector::lookup - find a matching entity in the entity-vector
 */
-EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type, const std::string& isPattern)
+EntityId* EntityIdVector::lookup(const std::string& id, const std::string& idPattern, const std::string& type, const std::string& typePattern)
 {
-  //
-  // isPattern:  "false" or "" is the same
-  //
-  std::string isPatternFromParam = isPattern;
-  if (isPatternFromParam.empty())
-  {
-    isPatternFromParam = "false";
-  }
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    std::string isPatternFromVec = vec[ix]->isPattern;
-
-    if (isPatternFromVec.empty())
-    {
-      isPatternFromVec = "false";
-    }
-
-    if ((vec[ix]->id == id) && (vec[ix]->type == type) && (isPatternFromVec == isPatternFromParam))
+    if ((vec[ix]->id == id) && (vec[ix]->type == type) && (vec[ix]->idPattern == idPattern) && (vec[ix]->typePattern == typePattern))
     {
       return vec[ix];
     }
@@ -113,7 +97,7 @@ void EntityIdVector::push_back(EntityId* item)
 */
 bool EntityIdVector::push_back_if_absent(EntityId* item)
 {
-  if (lookup(item->id, item->type, item->isPattern) == NULL)
+  if (lookup(item->id, item->idPattern, item->type, item->typePattern) == NULL)
   {
     vec.push_back(item);
     return true;
@@ -157,7 +141,6 @@ void EntityIdVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release();
     delete(vec[ix]);
   }
 
@@ -176,7 +159,7 @@ void EntityIdVector::fill(EntityVector& _vec)
   for (unsigned int ix = 0; ix < _vec.size(); ++ix)
   {
     Entity*   entityP   = _vec[ix];
-    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern, entityP->isTypePattern);
+    EntityId* entityIdP = new EntityId(entityP->entityId.id, entityP->entityId.idPattern, entityP->entityId.type, entityP->entityId.typePattern);
 
     vec.push_back(entityIdP);
   }

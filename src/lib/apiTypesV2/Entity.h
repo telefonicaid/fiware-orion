@@ -51,10 +51,7 @@ struct QueryContextResponse;
 class Entity
 {
  public:
-  std::string             id;               // Mandatory
-  std::string             type;             // Optional
-  std::string             isPattern;        // Optional
-  bool                    isTypePattern;
+  EntityId                entityId;         // Mandatory
   ContextAttributeVector  attributeVector;  // Optional
 
   std::string             servicePath;      // Not part of payload, just an internal field
@@ -68,7 +65,7 @@ class Entity
   std::vector<std::string>      providerRegIdList; // Side vector to providerList, to hold the reg ids where they come (used for login purposes)
 
   Entity();
-  Entity(const std::string& id, const std::string& type, const std::string& isPattern, bool isTypePattern = false);
+  Entity(const std::string& id, const std::string& idPattern, const std::string& type, const std::string& typePattern);
 
   ~Entity();
 
@@ -82,7 +79,7 @@ class Entity
   std::string  toJson(RenderFormat                     renderFormat,
                       bool                             renderNgsiField = false);
 
-  std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
+  std::string  toString(void);
 
   std::string  check(RequestType requestType);
 
@@ -90,23 +87,17 @@ class Entity
 
   void         release(void);
 
-  void         fill(const std::string&             id,
-                    const std::string&             type,
-                    const std::string&             isPattern,
+  void         fill(const EntityId&                entId,
                     const ContextAttributeVector&  caV,
                     double                         creDate,
                     double                         modDate);
 
-  void         fill(const std::string&  id,
-                    const std::string&  type,
-                    const std::string&  isPattern,
+  void         fill(const EntityId&     entId,
                     const std::string&  servicePath,
                     double              creDate = 0,
                     double              modDate = 0);
 
-  void         fill(const std::string&  id,
-                    const std::string&  type,
-                    const std::string&  isPattern);
+  void         fill(const EntityId& entId);
 
   void         fill(const Entity& en, bool useDefaultType = false, bool cloneCompounds = false);
 
@@ -132,6 +123,11 @@ class Entity
                                const std::vector<std::string>&        metadataFilter,
                                bool                                   renderNgsiField   = false,
                                ExprContextObject*                     exprContextObject = NULL);
+
+  std::string  checkId(RequestType requestType);
+  std::string  checkIdPattern(RequestType requestType);
+  std::string  checkType(RequestType requestType);
+  std::string  checkTypePattern(RequestType requestType);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

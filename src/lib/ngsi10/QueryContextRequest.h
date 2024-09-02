@@ -68,8 +68,8 @@ typedef struct QueryContextRequest
   std::string   toJson(void);
   void          release(void);
   void          fill(const std::string&  entityId,
+                     const std::string&  entityIdPattern,
                      const std::string&  entityType,
-                     const std::string&  isPattern,
                      EntityTypeInfo      typeInfo,
                      const std::string&  attributeName);
   void          fill(BatchQuery* bqP);

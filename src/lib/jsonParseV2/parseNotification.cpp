@@ -79,7 +79,8 @@ static bool parseContextElementResponse
     return false;
   }
 
-  cerP->entity.fill(entity.id, entity.type, entity.isPattern);
+  EntityId enId(entity.entityId.id, entity.entityId.idPattern, entity.entityId.type, entity.entityId.typePattern);
+  cerP->entity.fill(enId);
   cerP->entity.attributeVector.push_back(entity.attributeVector);
   entity.release();
 

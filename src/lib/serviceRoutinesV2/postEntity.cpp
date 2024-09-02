@@ -65,8 +65,8 @@ std::string postEntity
   Entity*        eP  = &parseDataP->ent.res;
   ActionType     op;
 
-  eP->id   = compV[2];
-  eP->type = ciP->uriParam["type"];
+  eP->entityId.id   = compV[2];
+  eP->entityId.type = ciP->uriParam["type"];
 
   if (forbiddenIdCharsV2(compV[2].c_str() , NULL))
   {

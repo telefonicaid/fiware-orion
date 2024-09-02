@@ -49,9 +49,8 @@ TEST(ContextElementResponseVector, render)
   out = cerv.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
   EXPECT_STREQ("[]", out.c_str());
 
-  cer.entity.id         = "ID";
-  cer.entity.type       = "Type";
-  cer.entity.isPattern  = "false";
+  cer.entity.entityId.id   = "ID";
+  cer.entity.entityId.type = "Type";
   cer.statusCode.fill(SccOk, "details");
 
   utExit();

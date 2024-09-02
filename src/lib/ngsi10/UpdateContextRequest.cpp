@@ -56,7 +56,7 @@ UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, 
   contextProvider      = _contextProvider;
   legacyProviderFormat = _legacyProviderFormat;
 
-  Entity* neweP = new Entity(eP->id, eP->type, eP->isPattern);
+  Entity* neweP = new Entity(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
   neweP->renderId = eP->renderId;
   entityVector.push_back(neweP);
 }
@@ -124,9 +124,17 @@ std::string UpdateContextRequest::toJsonV1(void)
     JsonObjectHelper jhEntity;
     Entity* eP = entityVector[ix];
 
-    jhEntity.addString("id", eP->id);
-    jhEntity.addString("type", eP->type);
-    jhEntity.addString("isPattern", eP->isPattern);
+    if (eP->entityId.idPattern.empty())
+    {
+      jhEntity.addString("id", eP->entityId.id);
+      jhEntity.addString("isPattern", "false");
+    }
+    else
+    {
+      jhEntity.addString("id", eP->entityId.idPattern);
+      jhEntity.addString("isPattern", "true");
+    }
+    jhEntity.addString("type", eP->entityId.type);
 
     JsonVectorHelper jhAttributes;
     for (unsigned int jx = 0; jx < eP->attributeVector.size(); ++jx)
@@ -207,15 +215,17 @@ void UpdateContextRequest::release(void)
 void UpdateContextRequest::fill
 (
   const std::string& entityId,
+  const std::string& entityIdPattern,
   const std::string& entityType,
-  const std::string& isPattern,
   const std::string& attributeName,
   ActionType         _updateActionType
 )
 {
   Entity* eP = new Entity();
 
-  eP->fill(entityId, entityType, isPattern);
+  EntityId enId(entityId, entityIdPattern, entityType, "");
+
+  eP->fill(enId);
   entityVector.push_back(eP);
 
   updateActionType = _updateActionType;
@@ -235,7 +245,7 @@ void UpdateContextRequest::fill
 */
 void UpdateContextRequest::fill(const Entity* entP, ActionType _updateActionType)
 {
-  Entity*  eP = new Entity(entP->id, entP->type, "false");
+  Entity*  eP = new Entity(entP->entityId.id, "", entP->entityId.type, "");
 
   eP->attributeVector.fill(entP->attributeVector);
 
@@ -257,7 +267,7 @@ void UpdateContextRequest::fill
   const std::string&   type
 )
 {
-  Entity*           eP = new Entity(entityId, type, "false");
+  Entity*           eP = new Entity(entityId, "", type, "");
   ContextAttribute* aP = new ContextAttribute(attributeP);
 
   eP->attributeVector.push_back(aP);
@@ -286,7 +296,7 @@ void UpdateContextRequest::fill
   for (unsigned int eIx = 0; eIx < entities->vec.size(); ++eIx)
   {
     Entity*  eP    = entities->vec[eIx];
-    Entity*  neweP = new Entity(eP->id, eP->type, eP->isPattern);
+    Entity*  neweP = new Entity(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
     {
@@ -312,7 +322,7 @@ ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::s
     Entity* enP = entityVector[ceIx];
 
     // empty type in request (enP) is always a match
-    if ((enP->id != eP->id) || ((enP->type != "") && (enP->type != eP->type)))
+    if ((enP->entityId.id != eP->entityId.id) || ((enP->entityId.type != "") && (enP->entityId.type != eP->entityId.type)))
     {
       continue;
     }

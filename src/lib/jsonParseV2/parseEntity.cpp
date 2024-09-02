@@ -161,9 +161,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
           return oe.toJson();
         }
 
-        eP->id = iter->value.GetString();
+        eP->entityId.id = iter->value.GetString();
 
-        if (eP->id.empty())
+        if (eP->entityId.id.empty())
         {
           OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITY_ID, ERROR_BAD_REQUEST);
 
@@ -173,11 +173,11 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
           return oe.toJson();
         }
 
-        if (forbiddenIdCharsV2(eP->id.c_str(), ""))
+        if (forbiddenIdCharsV2(eP->entityId.id.c_str(), ""))
         {
           OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, ERROR_BAD_REQUEST);
 
-          alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, eP->id);
+          alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, eP->entityId.id);
           ciP->httpStatusCode = SccBadRequest;
 
           return oe.toJson();
@@ -205,10 +205,10 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         return oe.toJson();
       }
 
-      eP->type      = iter->value.GetString();
-      eP->typeGiven = true;
+      eP->entityId.type      = iter->value.GetString();
+      eP->typeGiven          = true;
 
-      if (eP->type.empty())
+      if (eP->entityId.type.empty())
       {
         const char* errorText = ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
         OrionError  oe(SccBadRequest, errorText, ERROR_BAD_REQUEST);
@@ -219,14 +219,13 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         return oe.toJson();
       }
 
-      if (forbiddenIdCharsV2(eP->type.c_str(), ""))
+      if (forbiddenIdCharsV2(eP->entityId.type.c_str(), ""))
       {
         OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, ERROR_BAD_REQUEST);
 
-        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, eP->type);
+        alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, eP->entityId.type);
         ciP->httpStatusCode = SccBadRequest;
 
-        return oe.toJson();
       }
     }
     else  // attribute
@@ -269,7 +268,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 
   if (!eP->typeGiven)
   {
-    eP->type = DEFAULT_ENTITY_TYPE;
+    eP->entityId.type = DEFAULT_ENTITY_TYPE;
   }
 
   return "OK";

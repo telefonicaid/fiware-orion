@@ -84,7 +84,7 @@ std::string getEntity
   }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill(entityId, "", type, EntityTypeEmptyOrNotEmpty, "");
 
   // Get attrs and metadata filters from URL params
   setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);

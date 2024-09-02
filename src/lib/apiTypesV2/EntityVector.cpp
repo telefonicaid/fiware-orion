@@ -141,7 +141,7 @@ Entity* EntityVector::lookup(const std::string& name, const std::string& type)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if ((vec[ix]->id == name) && (vec[ix]->type == type))
+    if ((vec[ix]->entityId.id == name) && (vec[ix]->entityId.type == type))
     {
       return vec[ix];
     }

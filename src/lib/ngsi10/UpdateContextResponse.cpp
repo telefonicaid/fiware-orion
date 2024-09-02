@@ -90,7 +90,8 @@ void UpdateContextResponse::notFoundPush(Entity* eP, ContextAttribute* aP, Statu
   {
     // Build ContextElementResponse
     cerP = new ContextElementResponse();
-    cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+    EntityId enId(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
+    cerP->entity.fill(enId);
     if (aP != NULL)
     {
       // We copy ContextAttribute given Entity destructor does release() on the vector
@@ -103,7 +104,7 @@ void UpdateContextResponse::notFoundPush(Entity* eP, ContextAttribute* aP, Statu
     }
     else
     {
-      cerP->statusCode.fill(SccContextElementNotFound, eP->id);
+      cerP->statusCode.fill(SccContextElementNotFound, eP->entityId.id);
     }
 
     contextElementResponseVector.push_back(cerP);
@@ -133,7 +134,8 @@ void UpdateContextResponse::foundPush(Entity* eP, ContextAttribute* aP)
   {
     // Build ContextElementResponse
     cerP = new ContextElementResponse();
-    cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+    EntityId enId(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
+    cerP->entity.fill(enId);
     if (aP != NULL)
     {
       // We copy ContextAttribute given Entity destructor does release() on the vector

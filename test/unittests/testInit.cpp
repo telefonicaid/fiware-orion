@@ -85,24 +85,7 @@ void setupDatabase(void)
 */
 static bool equalEntity(EntityId enExpected, EntityId enArg)
 {
-  LM_M(("enArg '%s', '%s', '%s'",
-        enArg.id.c_str(),
-        enArg.type.c_str(),
-        enArg.isPattern.c_str()));
-
-  LM_M(("enExpected '%s', '%s', '%s'",
-        enExpected.id.c_str(),
-        enExpected.type.c_str(),
-        enExpected.isPattern.c_str()));
-
-  if (enExpected.id == enArg.id && enExpected.type == enArg.type && enExpected.isPattern == enArg.isPattern)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return (enExpected == enArg);
 }
 
 
@@ -226,8 +209,8 @@ static bool equalContextElementResponseVector
       ContextElementResponse* cerArg      = cerArgV[ix];
       ContextElementResponse* cerExpected = cerExpectedV[jx];
 
-      EntityId enExpected(cerExpected->entity.id, cerExpected->entity.type);
-      EntityId enArg(cerArg->entity.id, cerArg->entity.type);
+      EntityId enExpected(cerExpected->entity.entityId.id, cerExpected->entity.entityId.idPattern, cerExpected->entity.entityId.type, cerExpected->entity.entityId.typePattern);
+      EntityId enArg(cerArg->entity.entityId.id, cerArg->entity.entityId.idPattern, cerArg->entity.entityId.type, cerArg->entity.entityId.typePattern);
 
       if (!equalEntity(enExpected, enArg))
       {

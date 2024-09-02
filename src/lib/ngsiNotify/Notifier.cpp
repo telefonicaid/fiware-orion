@@ -140,7 +140,9 @@ static bool setPayload
     NotifyContextRequest   ncr;
     ContextElementResponse cer;
 
-    cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
+    EntityId enId(en.entityId.id, en.entityId.idPattern, en.entityId.type, en.entityId.typePattern);
+
+    cer.entity.fill(enId, en.servicePath);
 
     // cloneCompount set to true. Otherwise nasty things as the one
     // described in issue #4263 will happend
@@ -262,28 +264,29 @@ static bool setNgsiPayload
   ContextElementResponse cer;
 
   std::string effectiveId;
-  if (ngsi.id.empty())
+  if (ngsi.entityId.id.empty())
   {
-    effectiveId = en.id;
+    effectiveId = en.entityId.id;
   }
   else
   {
     // If id is not found in the replacements macro, we use en.id.
-    effectiveId = removeQuotes(smartStringValue(ngsi.id, exprContextObjectP, '"' + en.id + '"'));
+    effectiveId = removeQuotes(smartStringValue(ngsi.entityId.id, exprContextObjectP, '"' + en.entityId.id + '"'));
   }
 
   std::string effectiveType;
-  if (ngsi.type.empty())
+  if (ngsi.entityId.type.empty())
   {
-    effectiveType = en.type;
+    effectiveType = en.entityId.type;
   }
   else
   {
     // If type is not found in the replacements macro, we use en.type.
-    effectiveType = removeQuotes(smartStringValue(ngsi.type, exprContextObjectP, '"' + en.type + '"'));
+    effectiveType = removeQuotes(smartStringValue(ngsi.entityId.type, exprContextObjectP, '"' + en.entityId.type + '"'));
   }
 
-  cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
+  EntityId entId(effectiveId, "", effectiveType, "");
+  cer.entity.fill(entId, en.servicePath);
 
   // First we add attributes in the ngsi field, adding calculated expressions to context in order of priority
   std::vector<ContextAttribute*>  orderedNgsiAttrs;
@@ -375,8 +378,8 @@ static SenderThreadParams* buildSenderParamsCustom
   // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
   // over the ones comming from headers of the same name, we conditionally add them depending the case
   TIME_EXPR_CTXBLD_START();
-  exprContext.add("id", en.id);
-  exprContext.add("type", en.type);
+  exprContext.add("id", en.entityId.id);
+  exprContext.add("type", en.entityId.type);
 
   if (!basic)
   {

@@ -45,9 +45,8 @@ TEST(ContextElementResponse, render)
 
   std::vector<std::string> emptyV;
    
-  cer.entity.id         = "ID";
-  cer.entity.type       = "Type";
-  cer.entity.isPattern  = "false";
+  cer.entity.entityId.id    = "ID";
+  cer.entity.entityId.type  = "Type";
 
   cer.statusCode.fill(SccOk, "details");
 

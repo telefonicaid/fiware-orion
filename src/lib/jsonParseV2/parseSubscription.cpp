@@ -524,7 +524,7 @@ static std::string parseCustomPayload
           return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
         }
 
-        ngsi->id = iter->value.GetString();
+        ngsi->entityId.id = iter->value.GetString();
       }
       else if (name == "type")
       {
@@ -533,7 +533,7 @@ static std::string parseCustomPayload
           return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
         }
 
-        ngsi->type = iter->value.GetString();
+        ngsi->entityId.type = iter->value.GetString();
       }
       else  // attribute
       {

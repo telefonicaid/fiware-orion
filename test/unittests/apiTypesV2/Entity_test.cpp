@@ -43,34 +43,34 @@ TEST(Entity, check)
   utInit();
 
   Entity* enP         = new Entity();
-  enP->id             = "E";
-  enP->type           = "T";
-  enP->isPattern      = "false";
-  enP->isTypePattern  = false;
+  enP->entityId.id    = "E";
+  enP->entityId.type  = "T";
 
   ContextAttribute* caP = new ContextAttribute("A", "T", "val");
   enP->attributeVector.push_back(caP);
 
   EXPECT_EQ("OK", enP->check(EntitiesRequest));
 
-  enP->id = "";
-  EXPECT_EQ("entity id length: 0, min length supported: 1", enP->check(EntitiesRequest));
+  enP->entityId.id = "";
+  EXPECT_EQ("id and idPattern cannot be both empty at the same time", enP->check(EntitiesRequest));
 
-  enP->id = "E<1>";
+  enP->entityId.id = "E<1>";
   EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, enP->check(EntitiesRequest));
-  enP->isPattern = "true";
-  EXPECT_EQ("OK", enP->check(EntitiesRequest));
-  enP->id        = "E";
-  enP->isPattern = "false";
 
-  enP->type = "T<1>";
+  enP->entityId.idPattern = "E<1>";
+  enP->entityId.id        = "";
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
+
+  enP->entityId.id        = "E";
+  enP->entityId.idPattern = "";
+
+  enP->entityId.type = "T<1>";
+  enP->typeGiven = true;
   EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(EntitiesRequest));
-  enP->isTypePattern  = true;
-  EXPECT_EQ("OK", enP->check(EntitiesRequest));
-  enP->type = "T";
 
-  enP->isPattern = "<false>";
-  EXPECT_EQ("Invalid value for isPattern", enP->check(EntitiesRequest));
+  enP->entityId.typePattern = "T<1>";
+  enP->entityId.type        = "";
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
 
   delete enP;
 
@@ -88,23 +88,24 @@ TEST(Entity, checkV1)
 {
   utInit();
 
-  Entity* enP = new Entity();  
+  Entity* enP = new Entity();
 
-  enP->id = "";
-  EXPECT_EQ(enP->check(BatchUpdateRequest), "entity id length: 0, min length supported: 1");
+  enP->entityId.id = "";
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "id and idPattern cannot be both empty at the same time");
 
-  enP->id = "id";
+  enP->entityId.id = "id";
   enP->typeGiven = true;
-  EXPECT_EQ(enP->check(BatchUpdateRequest), "entity type length: 0, min length supported: 1");
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "type and typePattern cannot be both empty at the same time");
 
   ContextAttribute* aP = new ContextAttribute();
   aP->name  = "";
   aP->stringValue = "V";
   enP->attributeVector.push_back(aP);
-  EXPECT_EQ(enP->check(BatchUpdateRequest), "entity type length: 0, min length supported: 1");
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "type and typePattern cannot be both empty at the same time");
   aP->name = "name";
 
-  Entity* en2P = new Entity("id", "", "false");
+  Entity* en2P = new Entity("id", "", "", "");
+  en2P->renderId = true;
 
   EntityVector* ceVectorP = new EntityVector();
 

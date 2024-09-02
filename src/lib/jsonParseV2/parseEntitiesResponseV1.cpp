@@ -322,7 +322,7 @@ static std::string parseEntity(ConnectionInfo* ciP, rapidjson::Value::ConstMembe
       {
         return "entity id must be a string";
       }
-      eP->id = iter->value.GetString();
+      eP->entityId.id = iter->value.GetString();
     }
     if (name == "type")
     {
@@ -330,11 +330,11 @@ static std::string parseEntity(ConnectionInfo* ciP, rapidjson::Value::ConstMembe
       {
         return "entity type must be a string";
       }
-      eP->type = iter->value.GetString();
+      eP->entityId.type = iter->value.GetString();
     }
   }
 
-  if ((eP->id.empty()) || (eP->type.empty()))
+  if ((eP->entityId.id.empty()) || (eP->entityId.type.empty()))
   {
     return "entity must have id and type";
   }

@@ -56,8 +56,8 @@ typedef struct UpdateContextRequest
   ContextAttribute*  attributeLookup(Entity* eP, const std::string& attributeName);
 
   void         fill(const std::string& entityId,
+                    const std::string& entityIdPattern,
                     const std::string& entityType,
-                    const std::string& isPattern,
                     const std::string& attributeName,
                     ActionType         _updateActionType);
 

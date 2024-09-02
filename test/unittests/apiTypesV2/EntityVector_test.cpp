@@ -45,8 +45,8 @@ TEST(EntityVector, render)
   rendered = eV.toJson(NGSI_V2_NORMALIZED);
   EXPECT_STREQ("[]", rendered.c_str());
 
-  eP->id   = "E_ID";
-  eP->type = "E_TYPE";
+  eP->entityId.id   = "E_ID";
+  eP->entityId.type = "E_TYPE";
   eV.push_back(eP);
 
   rendered = eV.toJson(NGSI_V2_NORMALIZED);

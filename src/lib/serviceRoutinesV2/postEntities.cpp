@@ -51,7 +51,7 @@ static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
 
 static bool legalEntityLength(Entity* eP, const std::string& servicePath)
 {
-  return (servicePath.size() + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
+  return (servicePath.size() + eP->entityId.id.size() + eP->entityId.type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
 }
 
 
@@ -139,10 +139,10 @@ std::string postEntities
   else
   {
     // Prepare HTTP headers
-    std::string location = "/v2/entities/" + eP->id;
-    if (!eP->type.empty())
+    std::string location = "/v2/entities/" + eP->entityId.id;
+    if (!eP->entityId.type.empty())
     {
-      location += "?type=" + eP->type;
+      location += "?type=" + eP->entityId.type;
     }
     else
     {

@@ -40,11 +40,9 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(): creDate(0), modDate(0)
+EntityId::EntityId(): id(""), idPattern(""), type(""), typePattern("")
 {
-  isTypePattern = false;
 }
-
 
 
 /* ****************************************************************************
@@ -57,6 +55,7 @@ EntityId::EntityId(EntityId* eP)
 }
 
 
+
 /* ****************************************************************************
 *
 * EntityId::EntityId -
@@ -64,15 +63,13 @@ EntityId::EntityId(EntityId* eP)
 EntityId::EntityId
 (
   const std::string&  _id,
+  const std::string&  _idPattern,
   const std::string&  _type,
-  const std::string&  _isPattern,
-  bool                _isTypePattern
+  const std::string&  _typePattern
 ) : id(_id),
+    idPattern(_idPattern),
     type(_type),
-    isPattern(_isPattern),
-    isTypePattern(_isTypePattern),
-    creDate(0),
-    modDate(0)
+    typePattern(_typePattern)
 {
 }
 
@@ -87,18 +84,24 @@ std::string EntityId::toJson(void)
 {
   JsonObjectHelper jh;
 
-  if (isTrue(isPattern))
+  if (!this->id.empty())
   {
-    jh.addString("idPattern", id);
-  }
-  else
-  {
-    jh.addString("id", id);
+    jh.addString("id", this->id);
   }
 
-  if (!type.empty())
+  if (!this->idPattern.empty())
   {
-    jh.addString("type", type);
+    jh.addString("idPattern", this->idPattern);
+  }
+
+  if (!this->type.empty())
+  {
+    jh.addString("type", this->type);
+  }
+
+  if (!this->typePattern.empty())
+  {
+    jh.addString("typePattern", this->typePattern);
   }
 
   return jh.str();
@@ -113,12 +116,9 @@ std::string EntityId::toJson(void)
 void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 {
   id            = eidP->id;
+  idPattern     = eidP->idPattern;
   type          = eidP->type;
-  isPattern     = eidP->isPattern;
-  isTypePattern = eidP->isTypePattern;
-  servicePath   = eidP->servicePath;
-  creDate       = eidP->creDate;
-  modDate       = eidP->modDate;
+  typePattern   = eidP->typePattern;
 
   if (useDefaultType && (type.empty()))
   {
@@ -130,20 +130,19 @@ void EntityId::fill(const struct EntityId* eidP, bool useDefaultType)
 
 /* ****************************************************************************
 *
-* release -
+* EntityId::fill -
 */
-void EntityId::release(void)
+
+void EntityId::fill
+(
+  const std::string& _id,
+  const std::string& _idPattern,
+  const std::string& _type,
+  const std::string& _typePattern
+)
 {
-  /* This method is included for the sake of homogeneity */
-}
-
-
-
-/* ****************************************************************************
-*
-* isPatternIsTrue - 
-*/
-bool EntityId::isPatternIsTrue(void)
-{
-  return isTrue(isPattern);
+  id          = _id;
+  idPattern   = _idPattern;
+  type        = _type;
+  typePattern = _typePattern;
 }

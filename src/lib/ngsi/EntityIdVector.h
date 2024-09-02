@@ -53,7 +53,7 @@ typedef struct EntityIdVector
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);
   unsigned int size(void) const;
-  EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
+  EntityId*    lookup(const std::string& id, const std::string& idPattern, const std::string& type, const std::string& typePattern);
   void         release();
   void         fill(EntityVector& _vec);
 

@@ -74,9 +74,9 @@ std::string deleteEntity
     return oe.toJson();
   }
 
-  eP       = new Entity();
-  eP->id   = compV[2];
-  eP->type = ciP->uriParam["type"];
+  eP                = new Entity();
+  eP->entityId.id   = compV[2];
+  eP->entityId.type = ciP->uriParam["type"];
 
   if (compV.size() == 5)  // Deleting an attribute
   {

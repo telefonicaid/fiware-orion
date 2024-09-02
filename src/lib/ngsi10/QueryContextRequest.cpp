@@ -134,9 +134,17 @@ std::string QueryContextRequest::toJsonV1(void)
   for (unsigned int ix = 0; ix < entityIdVector.size(); ++ix)
   {
     JsonObjectHelper jhEntity;
-    jhEntity.addString("id", entityIdVector[ix]->id);
+    if (entityIdVector[ix]->idPattern.empty())
+    {
+      jhEntity.addString("id", entityIdVector[ix]->id);
+      jhEntity.addString("isPattern", "false");
+    }
+    else
+    {
+      jhEntity.addString("id", entityIdVector[ix]->idPattern);
+      jhEntity.addString("isPattern", "true");
+    }
     jhEntity.addString("type", entityIdVector[ix]->type);
-    jhEntity.addString("isPattern", entityIdVector[ix]->isPattern);
 
     jhEntities.addRaw(jhEntity.str());
   }
@@ -173,13 +181,13 @@ void QueryContextRequest::release(void)
 void QueryContextRequest::fill
 (
   const std::string& entityId,
+  const std::string& entityIdPattern,
   const std::string& entityType,
-  const std::string& isPattern,
   EntityTypeInfo     typeInfo,
   const std::string& attributeName
 )
 {
-  EntityId* eidP = new EntityId(entityId, entityType, isPattern);
+  EntityId* eidP = new EntityId(entityId, entityIdPattern, entityType, "");
 
   entityIdVector.push_back(eidP);
 
@@ -218,7 +226,7 @@ void QueryContextRequest::fill(BatchQuery* bqP)
   }
   else
   {
-    EntityId* eP = new EntityId(".*", "", "true");
+    EntityId* eP = new EntityId("", ".*", "", "");
     entityIdVector.push_back(eP);
   }
 

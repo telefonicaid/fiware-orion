@@ -48,10 +48,8 @@
 *
 * Entity::Entity - 
 */
-Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDate(0), modDate(0)
+Entity::Entity(): typeGiven(false), renderId(true), creDate(0), modDate(0)
 {
-  creDate = 0;
-  modDate = 0;
 }
 
 
@@ -62,14 +60,16 @@ Entity::Entity(): isTypePattern(false), typeGiven(false), renderId(true), creDat
 *
 * This constructor was ported from old ContextElement class
 */
-Entity::Entity(const std::string& _id, const std::string& _type, const std::string& _isPattern, bool _isTypePattern)
+Entity::Entity(const std::string& _id, const std::string& _idPattern, const std::string& _type, const std::string& _typePattern)
 {
-  id            = _id;
-  type          = _type;
-  isPattern     = _isPattern;
-  isTypePattern = _isTypePattern;
-  creDate       = 0;
-  modDate       = 0;
+  entityId.id            = _id;
+  entityId.idPattern     = _idPattern;
+  entityId.type          = _type;
+  entityId.typePattern   = _typePattern;
+  typeGiven              = false;
+  renderId               = true;
+  creDate                = 0;
+  modDate                = 0;
 }
 
 
@@ -321,10 +321,10 @@ std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& ordere
 
   if (renderId)
   {
-    jh.addString("id", id);
+    jh.addString("id", entityId.id);
 
     /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-    jh.addString("type", (!type.empty())? type : DEFAULT_ENTITY_TYPE);
+    jh.addString("type", (!entityId.type.empty())? entityId.type : DEFAULT_ENTITY_TYPE);
   }
 
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
@@ -361,21 +361,21 @@ std::string Entity::toJsonNormalized
     {
       /* In ngsi field in notifications "" is allowed for id and type, in which case we don't
        * print the field */
-      if (!id.empty())
+      if (!entityId.id.empty())
       {
-        jh.addString("id", id);
+        jh.addString("id", entityId.id);
       }
-      if (!type.empty())
+      if (!entityId.type.empty())
       {
-        jh.addString("type", type);
+        jh.addString("type", entityId.type);
       }
     }
     else
     {
-      jh.addString("id", id);
+      jh.addString("id", entityId.id);
 
       /* This is needed for entities coming from NGSIv1 (which allows empty or missing types) */
-      jh.addString("type", (!type.empty())? type : DEFAULT_ENTITY_TYPE);
+      jh.addString("type", (!entityId.type.empty())? entityId.type : DEFAULT_ENTITY_TYPE);
     }
   }
 
@@ -394,20 +394,171 @@ std::string Entity::toJsonNormalized
 *
 * toString -
 *
-* FIXME P3: Copied from EntityId class
 */
-std::string Entity::toString(bool useIsPattern, const std::string& delimiter)
+std::string Entity::toString(void)
 {
   std::string s;
 
-  s = id + delimiter + type;
+  std::string effectiveId;
+  std::string effectiveType;
 
-  if (useIsPattern)
+  if (entityId.idPattern.empty())
   {
-    s += delimiter + isPattern;
+    effectiveId = entityId.id;
+  }
+  else
+  {
+    effectiveId = entityId.idPattern;
   }
 
+  if (entityId.typePattern.empty())
+  {
+    effectiveType = entityId.type;
+  }
+  else
+  {
+    effectiveType = entityId.typePattern;
+  }
+
+  return effectiveId + ", " + effectiveType;
+
   return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::checkId
+*
+*/
+std::string Entity::checkId(RequestType requestType)
+{
+  ssize_t len;
+  char errorMsg[128];
+
+  if (((len = strlen(entityId.id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if ((len = strlen(entityId.id.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  // Check for forbidden chars for "id", but not for "idPattern" is a pattern
+  if (forbiddenIdCharsV2(entityId.id.c_str()))
+  {
+    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, entityId.id);
+    return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::checkIdPattern
+*
+*/
+std::string Entity::checkIdPattern(RequestType requestType)
+{
+  ssize_t len;
+  char errorMsg[128];
+
+  if (((len = strlen(entityId.idPattern.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity idPattern length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if ((len = strlen(entityId.idPattern.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity idPattern length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::checkType
+*
+*/
+std::string Entity::checkType(RequestType requestType)
+{
+  ssize_t len;
+  char errorMsg[128];
+
+  if ((len = strlen(entityId.type.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
+  {
+    if ((len = strlen(entityId.type.c_str())) < MIN_ID_LEN)
+    {
+      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
+  }
+
+  // Check for forbidden chars for "type", but not for "typePattern"
+  if (forbiddenIdCharsV2(entityId.type.c_str()))
+  {
+    alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, entityId.type);
+    return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::checkTypePattern
+*
+*/
+std::string Entity::checkTypePattern(RequestType requestType)
+{
+  ssize_t len;
+  char errorMsg[128];
+
+  if ((len = strlen(entityId.typePattern.c_str())) > MAX_ID_LEN)
+  {
+    snprintf(errorMsg, sizeof errorMsg, "entity typePattern length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
+
+  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
+  {
+    if ((len = strlen(entityId.typePattern.c_str())) < MIN_ID_LEN)
+    {
+      snprintf(errorMsg, sizeof errorMsg, "entity typePattern length: %zd, min length supported: %d", len, MIN_ID_LEN);
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
+  }
+
+  return "OK";
 }
 
 
@@ -419,74 +570,58 @@ std::string Entity::toString(bool useIsPattern, const std::string& delimiter)
 */
 std::string Entity::check(RequestType requestType)
 {
-  ssize_t len;
+  std::string err;
   char errorMsg[128];
 
-  if (((len = strlen(id.c_str())) < MIN_ID_LEN) && (requestType != EntityRequest))
+  // In EntityRequest the entity id comes in the URL so Entity is allowed to have empty id and idPattern
+  if ((requestType != EntityRequest) && (entityId.id.empty()) && (entityId.idPattern.empty()))
   {
-    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    snprintf(errorMsg, sizeof errorMsg, "id and idPattern cannot be both empty at the same time");
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if ((requestType == EntitiesRequest) && (id.empty()))
+  if ((!entityId.id.empty()) && (!entityId.idPattern.empty()))
   {
-    return "No Entity ID";
-  }
-
-  if ((len = strlen(id.c_str())) > MAX_ID_LEN)
-  {
-    snprintf(errorMsg, sizeof errorMsg, "entity id length: %zd, max length supported: %d", len, MAX_ID_LEN);
+    snprintf(errorMsg, sizeof errorMsg, "id and idPattern cannot be both filled at the same time");
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (isPattern.empty())
+  if ((!entityId.id.empty()) && ((err = checkId(requestType)) != "OK"))
   {
-    isPattern = "false";
+    return err;
+  }
+  if ((!entityId.idPattern.empty()) && ((err = checkIdPattern(requestType)) != "OK"))
+  {
+    return err;
   }
 
-  // isPattern MUST be either "true" or "false" (or empty => "false")
-  if ((isPattern != "true") && (isPattern != "false"))
+  // typeGiven enables some additional checkings for type and typePattern
+  if (typeGiven)
   {
-    alarmMgr.badInput(clientIp, "invalid value for isPattern", isPattern);
-    return "Invalid value for isPattern";
-  }
-
-  // Check for forbidden chars for "id", but not if "id" is a pattern
-  if (isPattern == "false")
-  {
-    if (forbiddenIdCharsV2(id.c_str()))
+    if ((entityId.type.empty()) && (entityId.typePattern.empty()))
     {
-      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, id);
-      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
-    }
-  }
-
-  if ((len = strlen(type.c_str())) > MAX_ID_LEN)
-  {
-    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, max length supported: %d", len, MAX_ID_LEN);
-    alarmMgr.badInput(clientIp, errorMsg);
-    return std::string(errorMsg);
-  }
-
-  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
-  {
-    if ((len = strlen(type.c_str())) < MIN_ID_LEN)
-    {
-      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+      snprintf(errorMsg, sizeof errorMsg, "type and typePattern cannot be both empty at the same time");
       alarmMgr.badInput(clientIp, errorMsg);
       return std::string(errorMsg);
     }
-  }
 
-  // Check for forbidden chars for "type", but not if "type" is a pattern
-  if (isTypePattern == false)
-  {
-    if (forbiddenIdCharsV2(type.c_str()))
+    if ((!entityId.type.empty()) && (!entityId.typePattern.empty()))
     {
-      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, type);
-      return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
+      snprintf(errorMsg, sizeof errorMsg, "type and typePattern cannot be both filled at the same time");
+      alarmMgr.badInput(clientIp, errorMsg);
+      return std::string(errorMsg);
+    }
+
+    if ((!entityId.type.empty()) && ((err = checkType(requestType)) != "OK"))
+    {
+      return err;
+    }
+
+    if ((!entityId.typePattern.empty()) && ((err = checkTypePattern(requestType)) != "OK"))
+    {
+      return err;
     }
   }
 
@@ -500,17 +635,13 @@ std::string Entity::check(RequestType requestType)
 */
 void Entity::fill
 (
-  const std::string&             _id,
-  const std::string&             _type,
-  const std::string&             _isPattern,
+  const EntityId&                _entityId,
   const ContextAttributeVector&  caV,
   double                         _creDate,
   double                         _modDate
 )
 {
-  id         = _id;
-  type       = _type;
-  isPattern  = _isPattern;
+  entityId   = _entityId;
 
   creDate    = _creDate;
   modDate    = _modDate;
@@ -526,17 +657,13 @@ void Entity::fill
 */
 void Entity::fill
 (
-  const std::string&  _id,
-  const std::string&  _type,
-  const std::string&  _isPattern,
+  const EntityId&     _entityId,
   const std::string&  _servicePath,
   double              _creDate,
   double              _modDate
 )
 {
-  id          = _id;
-  type        = _type;
-  isPattern   = _isPattern;
+  entityId   = _entityId;
 
   servicePath = _servicePath;
 
@@ -550,16 +677,9 @@ void Entity::fill
 *
 * Entity::fill -
 */
-void Entity::fill
-(
-  const std::string&  _id,
-  const std::string&  _type,
-  const std::string&  _isPattern
-)
+void Entity::fill(const EntityId& _entityId)
 {
-  id         = _id;
-  type       = _type;
-  isPattern  = _isPattern;
+  entityId   = _entityId;
 }
 
 
@@ -572,17 +692,14 @@ void Entity::fill
 */
 void Entity::fill(const Entity& en, bool useDefaultType, bool cloneCompounds)
 {
-  id            = en.id;
-  type          = en.type;
-  isPattern     = en.isPattern;
-  isTypePattern = en.isTypePattern;
+  entityId      = en.entityId;
   servicePath   = en.servicePath;
   creDate       = en.creDate;
   modDate       = en.modDate;
 
-  if (useDefaultType && (type.empty()))
+  if (useDefaultType && (entityId.type.empty()))
   {
-    type = DEFAULT_ENTITY_TYPE;
+    entityId.type = DEFAULT_ENTITY_TYPE;
   }
 
   attributeVector.fill(en.attributeVector, useDefaultType, cloneCompounds);
@@ -634,9 +751,7 @@ void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
       }
     }
 
-    fill(eP->id,
-         eP->type,
-         eP->isPattern,
+    fill(eP->entityId,
          eP->attributeVector,
          eP->creDate,
          eP->modDate);
@@ -711,8 +826,5 @@ ContextAttribute* Entity::getAttribute(const std::string& attrName)
 */
 bool Entity::equal(Entity* eP)
 {
-  return ((eP->id                == id)                &&
-          (eP->type              == type)              &&
-          (isTrue(eP->isPattern) == isTrue(isPattern)) &&
-          (eP->isTypePattern     == isTypePattern));
+  return entityId == eP->entityId;
 }

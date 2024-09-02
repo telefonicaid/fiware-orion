@@ -135,11 +135,9 @@ void Entities::fill(const QueryContextResponse& qcrs, OrionError* oeP)
     {
       Entity*         newP  = new Entity();
 
-      newP->id        = eP->id;
-      newP->type      = eP->type;
-      newP->isPattern = eP->isPattern;
-      newP->creDate   = eP->creDate;
-      newP->modDate   = eP->modDate;
+      newP->entityId = eP->entityId;
+      newP->creDate  = eP->creDate;
+      newP->modDate  = eP->modDate;
 
       newP->attributeVector.fill(eP->attributeVector);
       vec.push_back(newP);

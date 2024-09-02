@@ -162,13 +162,13 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
   {
     // id and type (both optional in this case)
     orion::BSONObjBuilder bob;
-    if (!httpInfo.ngsi.id.empty())
+    if (!httpInfo.ngsi.entityId.id.empty())
     {
-      bob.append(ENT_ENTITY_ID, httpInfo.ngsi.id);
+      bob.append(ENT_ENTITY_ID, httpInfo.ngsi.entityId.id);
     }
-    if (!httpInfo.ngsi.type.empty())
+    if (!httpInfo.ngsi.entityId.type.empty())
     {
-      bob.append(ENT_ENTITY_TYPE, httpInfo.ngsi.type);
+      bob.append(ENT_ENTITY_TYPE, httpInfo.ngsi.entityId.type);
     }
 
     // attributes
@@ -234,13 +234,13 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
   {
     // id and type (both optional in this case)
     orion::BSONObjBuilder bob;
-    if (!mqttInfo.ngsi.id.empty())
+    if (!mqttInfo.ngsi.entityId.id.empty())
     {
-      bob.append(ENT_ENTITY_ID, mqttInfo.ngsi.id);
+      bob.append(ENT_ENTITY_ID, mqttInfo.ngsi.entityId.id);
     }
-    if (!mqttInfo.ngsi.type.empty())
+    if (!mqttInfo.ngsi.entityId.type.empty())
     {
-      bob.append(ENT_ENTITY_TYPE, mqttInfo.ngsi.type);
+      bob.append(ENT_ENTITY_TYPE, mqttInfo.ngsi.entityId.type);
     }
 
     // attributes

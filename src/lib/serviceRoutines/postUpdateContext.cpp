@@ -400,7 +400,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     {
       if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))
       {
-        cerP->statusCode.fill(SccContextElementNotFound, cerP->entity.id);
+        cerP->statusCode.fill(SccContextElementNotFound, cerP->entity.entityId.id);
       }
     }
     else if ((noOfFounds > 0) && (noOfNotFounds > 0))
@@ -408,12 +408,12 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       // Adding a ContextElementResponse for the 'Not-Founds'
 
       ContextElementResponse* notFoundCerP = new ContextElementResponse();
-      notFoundCerP->entity.fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
+      notFoundCerP->entity.fill(cerP->entity.entityId);
 
       //
       // Filling in StatusCode (SccContextElementNotFound) for NotFound
       //
-      notFoundCerP->statusCode.fill(SccContextElementNotFound, cerP->entity.id);
+      notFoundCerP->statusCode.fill(SccContextElementNotFound, cerP->entity.entityId.id);
 
       //
       // Setting StatusCode to OK for Found
@@ -450,7 +450,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details.empty()))
     {
-      cerP->statusCode.details = cerP->entity.id;
+      cerP->statusCode.details = cerP->entity.entityId.id;
     }
   }
 
@@ -475,7 +475,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     {
       if (upcrsP->errorCode.code == SccOk)
       {
-        upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->entityVector[0]->id);
+        upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->entityVector[0]->entityId.id);
       }
     }
   }
@@ -489,11 +489,11 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   {
     if (upcrsP->contextElementResponseVector.size() == 1)
     {
-      upcrsP->errorCode.details = upcrsP->contextElementResponseVector[0]->entity.id;
+      upcrsP->errorCode.details = upcrsP->contextElementResponseVector[0]->entity.entityId.id;
     }
     else if (upcrsP->contextElementResponseVector.size() == 0)
     {
-      upcrsP->errorCode.details = upcrP->entityVector[0]->id;
+      upcrsP->errorCode.details = upcrP->entityVector[0]->entityId.id;
     }
   }
 }
@@ -710,11 +710,11 @@ void postUpdateContext
       // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
       //    If not found, add one (to the EntityVector of the UpdateContextRequest).
       //
-      Entity* eP = reqP->entityVector.lookup(cerP->entity.id, cerP->entity.type);
+      Entity* eP = reqP->entityVector.lookup(cerP->entity.entityId.id, cerP->entity.entityId.type);
       if (eP == NULL)
       {
         eP = new Entity();
-        eP->fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
+        eP->fill(cerP->entity.entityId);
         reqP->entityVector.push_back(eP);
       }
 
@@ -804,7 +804,7 @@ void postUpdateContext
         }
       }
 
-      failing += cerP->entity.id + "-" + cerP->entity.type + " : [" + failingPerCer + "], ";
+      failing += cerP->entity.entityId.id + "-" + cerP->entity.entityId.type + " : [" + failingPerCer + "], ";
     }
   }
 

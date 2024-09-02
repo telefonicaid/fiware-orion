@@ -470,12 +470,12 @@ static void fillQueryEntity(orion::BSONObjBuilder* bobP, const EntityId* enP)
   const std::string  idString    = "_id." ENT_ENTITY_ID;
   const std::string  typeString  = "_id." ENT_ENTITY_TYPE;
 
-  if (enP->isPattern == "true")
+  if (!enP->idPattern.empty())
   {
     // In the case of "universal pattern" we can avoid adding anything (simpler query)
-    if (enP->id != ".*")
+    if (enP->idPattern != ".*")
     {
-      bobP->appendRegex(idString, enP->id);
+      bobP->appendRegex(idString, enP->idPattern);
     }
   }
   else
@@ -483,17 +483,18 @@ static void fillQueryEntity(orion::BSONObjBuilder* bobP, const EntityId* enP)
     bobP->append(idString, enP->id);
   }
 
-  if (!enP->type.empty())
+
+  if (!enP->typePattern.empty())
   {
-    if (enP->isTypePattern)
+    // In the case of "universal pattern" we can avoid adding anything (simpler query)
+    if (enP->typePattern != ".*")
     {
-      // In the case of "universal pattern" we can avoid adding anything (simpler query)
-      if (enP->type != ".*")
-      {
-        bobP->appendRegex(typeString, enP->type);
-      }
+      bobP->appendRegex(typeString, enP->typePattern);
     }
-    else
+  }
+  else
+  {
+    if (!enP->type.empty())
     {
       bobP->append(typeString, enP->type);
     }
@@ -1511,11 +1512,12 @@ bool entitiesQuery
     //
     if (enV.size() == 1)
     {
-      cer->entity.fill(enV[0]->id, enV[0]->type, enV[0]->isPattern);
+      cer->entity.fill(enV[0]);
     }
     else
     {
-      cer->entity.fill("", "", "");
+      EntityId enId("", "", "", "");
+      cer->entity.fill(enId);
     }
 
     cer->statusCode.fill(SccReceiverInternalError, nextErr);
@@ -1547,13 +1549,13 @@ bool entitiesQuery
    * used before pruning in the CPr calculation logic */
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    if (enV[ix]->isPattern != "true")
+    if (enV[ix]->idPattern.empty())
     {
       bool needToAdd = true;
 
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
-        if (((*cerV)[jx]->entity.id == enV[ix]->id) && ((*cerV)[jx]->entity.type == enV[ix]->type))
+        if (((*cerV)[jx]->entity.entityId.id == enV[ix]->id) && ((*cerV)[jx]->entity.entityId.type == enV[ix]->type))
         {
           needToAdd = false;
           break;  /* jx */
@@ -1564,9 +1566,7 @@ bool entitiesQuery
       {
         ContextElementResponse* cerP = new ContextElementResponse();
 
-        cerP->entity.id = enV[ix]->id;
-        cerP->entity.type = enV[ix]->type;
-        cerP->entity.isPattern = "false";
+        cerP->entity.entityId = enV[ix];
 
         //
         // This entity has to be pruned if after CPr searching no attribute is "added" to it.
@@ -1622,9 +1622,7 @@ void pruneContextElements
     ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
-    newCerP->entity.fill(cerP->entity.id,
-                         cerP->entity.type,
-                         cerP->entity.isPattern,
+    newCerP->entity.fill(cerP->entity.entityId,
                          cerP->entity.servicePath,
                          cerP->entity.creDate,
                          cerP->entity.modDate);
@@ -1722,11 +1720,11 @@ bool registrationsQuery
     const EntityId* en = enV[ix];
     orion::BSONObjBuilder b;
 
-    if (isTrue(en->isPattern))
+    if (!en->idPattern.empty())
     {
-      b.appendRegex(crEntitiesId, en->id);
+      b.appendRegex(crEntitiesId, en->idPattern);
     }
-    else  /* isPattern = false */
+    else  /* not a pattern */
     {
       b.append(crEntitiesId, en->id);
     }
@@ -2242,13 +2240,13 @@ void cprLookupByAttribute
       {
         // By the moment the only supported pattern is .*. In this case matching is
         // based exclusively in type
-        if (regEn.type != en.type && !regEn.type.empty())
+        if (regEn.type != en.entityId.type && !regEn.type.empty())
         {
           /* No match (keep searching the Registration) */
           continue;
         }
       }
-      else if (regEn.id != en.id || (regEn.type != en.type && !regEn.type.empty()))
+      else if (regEn.id != en.entityId.id || (regEn.type != en.entityId.type && !regEn.type.empty()))
       {
         /* No match (keep searching the Registration) */
         continue;

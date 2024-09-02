@@ -61,7 +61,7 @@ ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* a
 {
   prune = false;
 
-  entity.fill(eP->id, eP->type, eP->isPattern);
+  entity.fill(eP);
 
   if (aP != NULL)
   {
@@ -105,10 +105,9 @@ ContextElementResponse::ContextElementResponse
   // Entity
   orion::BSONObj id = getFieldF(entityDoc, "_id").embeddedObject();
 
-  std::string entityId   = getStringFieldF(id, ENT_ENTITY_ID);
-  std::string entityType = id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(id, ENT_ENTITY_TYPE) : "";
+  EntityId entId(getStringFieldF(id, ENT_ENTITY_ID), "", id.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(id, ENT_ENTITY_TYPE) : "", "");
 
-  entity.fill(entityId, entityType, "false");
+  entity.fill(entId);
   entity.servicePath = id.hasField(ENT_SERVICE_PATH) ? getStringFieldF(id, ENT_SERVICE_PATH) : "";
 
   /* Get the location attribute (if it exists) */

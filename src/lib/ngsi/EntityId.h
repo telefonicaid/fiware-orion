@@ -39,27 +39,40 @@
 class EntityId
 {
  public:
-  std::string  id;            // Mandatory
-  std::string  type;          // Optional
-  std::string  isPattern;     // Optional
-  bool         isTypePattern; // Used by NGSIv2 API
-
-  std::string  servicePath;   // Not part of payload, just an internal field
-
-  double       creDate;       // used by dateCreated functionality in NGSIv2
-  double       modDate;       // used by dateModified functionality in NGSIv2
+  std::string id;
+  std::string idPattern;
+  std::string type;
+  std::string typePattern;
 
   EntityId();
+
   EntityId(EntityId* eP);
-  EntityId(const std::string&  _id,
-           const std::string&  _type,
-           const std::string&  _isPattern     = "",
-           bool                _isTypePattern = false);
+  EntityId(const std::string& _id,
+           const std::string& _idPattern,
+           const std::string& _type,
+           const std::string& _typePattern);
+
+  bool operator==(const EntityId& e)
+  {
+    return (id          == e.id)        &&
+           (idPattern   == e.idPattern) &&
+           (type        == e.type)      &&
+           (typePattern == e.typePattern);
+  }
+
+  bool operator!=(const EntityId& e)
+  {
+    return (id          != e.id)        ||
+           (idPattern   != e.idPattern) ||
+           (type        != e.type)      ||
+           (typePattern != e.typePattern);
+  }
 
   void         fill(const struct EntityId* eidP, bool useDefaultType = false);
-
-  void         release(void);
-  bool         isPatternIsTrue(void);
+  void         fill(const std::string& _id,
+                    const std::string& _idPattern,
+                    const std::string& _type,
+                    const std::string& _typePattern);
 
   std::string  toJson(void);
 };
