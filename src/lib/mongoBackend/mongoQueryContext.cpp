@@ -105,16 +105,14 @@ static bool lookupProvider(const std::vector<ngsiv2::Provider>& providerV, const
 static void addContextProviderEntity
 (
   ContextElementResponseVector&  cerV,
-  const ngsiv2::EntID&           regEn,
+  const EntityId&                regEn,
   const ngsiv2::Provider&        provider,
   const std::string&             regId
 )
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    // FIXME PR ngsiv2::EntID should be changed to EntityId
-    EntityId temp(regEn.id, regEn.idPattern, regEn.type, regEn.typePattern);
-    if (cerV[ix]->entity.entityId == temp)
+    if (cerV[ix]->entity.entityId == regEn)
     {
       // Avoid duplicate Provider in the vector
       if (!lookupProvider(cerV[ix]->entity.providerList, provider))
@@ -150,7 +148,7 @@ static void addContextProviderEntity
 static void addContextProviderAttribute
 (
   ContextElementResponseVector&   cerV,
-  ngsiv2::EntID                   regEn,
+  EntityId                        regEn,
   const std::string&              regAttr,
   const ngsiv2::Provider&         provider,
   const std::string&              regId,
@@ -214,7 +212,7 @@ static bool matchEntityInRegistration(const ngsiv2::Registration& reg, const Ent
 {
   for (unsigned int ix = 0; ix < reg.dataProvided.entities.size(); ++ix)
   {
-    ngsiv2::EntID entId = reg.dataProvided.entities[ix];
+    EntityId entId = reg.dataProvided.entities[ix];
 
     if (matchEntity(enP, entId))
     {

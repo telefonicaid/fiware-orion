@@ -175,7 +175,7 @@ extern void ensureDateExpirationIndex(const std::string& tenant);
 *
 * matchEntity -
 */
-extern bool matchEntity(const EntityId* en1, const ngsiv2::EntID& en2);
+extern bool matchEntity(const EntityId* en1, const EntityId& en2);
 
 
 

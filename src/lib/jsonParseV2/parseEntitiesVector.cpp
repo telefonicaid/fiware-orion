@@ -35,7 +35,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
-#include "apiTypesV2/EntID.h"
+#include "ngsi/EntityId.h"
 #include "common/string.h"
 #include "common/errorMessages.h"
 #include "jsonParseV2/utilsParse.h"
@@ -49,10 +49,10 @@
 */
 bool parseEntitiesVector
 (
-  ConnectionInfo*              ciP,
-  std::vector<ngsiv2::EntID>*  eivP,
-  const rapidjson::Value&      entities,
-  std::string*                 errorStringP
+  ConnectionInfo*           ciP,
+  std::vector<EntityId>*    eivP,
+  const rapidjson::Value&   entities,
+  std::string*              errorStringP
 )
 {
   if (!entities.IsArray())
@@ -209,7 +209,7 @@ bool parseEntitiesVector
       }
     }
 
-    ngsiv2::EntID  eid(id, idPattern, type, typePattern);
+    EntityId  eid(id, idPattern, type, typePattern);
 
     if (std::find(eivP->begin(), eivP->end(), eid) == eivP->end())  // if not already included
     {

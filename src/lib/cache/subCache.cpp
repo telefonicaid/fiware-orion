@@ -810,7 +810,7 @@ void subCacheItemInsert
   const char*                             servicePath,
   const ngsiv2::HttpInfo&                 httpInfo,
   const ngsiv2::MqttInfo&                 mqttInfo,
-  const std::vector<ngsiv2::EntID>&       entIdVector,
+  const std::vector<EntityId>&            entIdVector,
   const std::vector<std::string>&         attributes,
   const std::vector<std::string>&         metadata,
   const std::vector<std::string>&         conditionAttrs,
@@ -918,7 +918,7 @@ void subCacheItemInsert
   //
   for (unsigned int ix = 0; ix < entIdVector.size(); ++ix)
   {
-    const ngsiv2::EntID* eIdP = &entIdVector[ix];
+    const EntityId*      eIdP = &entIdVector[ix];
     std::string          isPattern      = (eIdP->id.empty())? "true" : "false";
     bool                 isTypePattern  = (eIdP->type.empty());
     std::string          id             = (eIdP->id.empty())? eIdP->idPattern   : eIdP->id;

@@ -26,7 +26,6 @@ SET (SOURCES
     Entities.cpp
     Subscription.cpp
     Registration.cpp
-    EntID.cpp
     BatchQuery.cpp
     BatchUpdate.cpp
     HttpInfo.cpp
@@ -39,7 +38,6 @@ SET (HEADERS
     Entities.h    
     Subscription.h
     Registration.h
-    EntID.h
     BatchQuery.h
     BatchUpdate.h
     CustomPayloadType.h

@@ -71,7 +71,6 @@
 * USING
 */
 using ngsiv2::HttpInfo;
-using ngsiv2::EntID;
 
 
 
@@ -401,7 +400,7 @@ void ensureDateExpirationIndex(const std::string& tenant)
 * commutative: en1 is interpreted as the entity to match *in* en2 (i.e.
 * it is assumed that the pattern is in en2)
 */
-bool matchEntity(const EntityId* en1, const ngsiv2::EntID& en2)
+bool matchEntity(const EntityId* en1, const EntityId& en2)
 {
   bool idMatch;
 
@@ -422,7 +421,7 @@ bool matchEntity(const EntityId* en1, const ngsiv2::EntID& en2)
       regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
     }
   }
-  else  /* isPattern == false */
+  else  /* is not a pattern */
   {
     idMatch = (en2.id == en1->id);
   }
@@ -2234,7 +2233,7 @@ void cprLookupByAttribute
     /* Is there a matching entity in the Registration? */
     for (unsigned enIx = 0; enIx < reg.dataProvided.entities.size(); ++enIx)
     {
-      EntID regEn = reg.dataProvided.entities[enIx];
+      EntityId regEn = reg.dataProvided.entities[enIx];
 
       if (regEn.idPattern == ".*")
       {

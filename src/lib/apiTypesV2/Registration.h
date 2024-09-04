@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "apiTypesV2/EntID.h"
+#include "ngsi/EntityId.h"
 #include "mongoDriver/BSONObj.h"
 
 
@@ -124,7 +124,7 @@ struct Provider
 */
 struct DataProvided
 {
-  std::vector<EntID>        entities;
+  std::vector<EntityId>     entities;
   std::vector<std::string>  attributes;
 
   std::string               toJson();

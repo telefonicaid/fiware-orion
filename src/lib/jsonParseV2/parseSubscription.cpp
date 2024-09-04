@@ -59,7 +59,6 @@
 * USING
 */
 using ngsiv2::SubscriptionUpdate;
-using ngsiv2::EntID;
 using rapidjson::Value;
 
 

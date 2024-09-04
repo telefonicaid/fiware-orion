@@ -777,23 +777,7 @@ void postQueryContext
         EntityId tempEn(responseV[ix]->contextElementResponseVector[jx]->entity.entityId);
         for (unsigned int kx = 0; kx < qcrP->entityIdVector.size(); ++kx)
         {
-          ngsiv2::EntID entityId;
-          /*if (isTrue(qcrP->entityIdVector[kx]->isPattern))
-          {
-            entityId.idPattern = qcrP->entityIdVector[kx]->id;
-          }
-          else
-          {
-            entityId.id = qcrP->entityIdVector[kx]->id;
-          }
-          entityId.type = qcrP->entityIdVector[kx]->type;*/
-          // FIXME PR: next line will be simpler when EntID+EntityId unification comes
-          entityId.id = qcrP->entityIdVector[kx]->id;
-          entityId.idPattern = qcrP->entityIdVector[kx]->idPattern;
-          entityId.type = qcrP->entityIdVector[kx]->type;
-          entityId.typePattern = qcrP->entityIdVector[kx]->typePattern;
-
-          if (matchEntity(&tempEn, entityId))
+          if (matchEntity(&tempEn, qcrP->entityIdVector[kx]))
           {
             found = true;
             break; // kx

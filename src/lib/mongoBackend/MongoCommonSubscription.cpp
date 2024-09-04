@@ -45,7 +45,6 @@
 */
 using ngsiv2::Subscription;
 using ngsiv2::HttpInfo;
-using ngsiv2::EntID;
 
 
 
@@ -398,7 +397,7 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
 
   for (unsigned int ix = 0; ix < sub.subject.entities.size(); ++ix)
   {
-    EntID       en            = sub.subject.entities[ix];
+    EntityId    en            = sub.subject.entities[ix];
     std::string finalId;
     std::string finalType;
     std::string isIdPattern;

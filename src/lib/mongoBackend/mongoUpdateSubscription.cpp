@@ -54,7 +54,6 @@
 using ngsiv2::HttpInfo;
 using ngsiv2::Subscription;
 using ngsiv2::SubscriptionUpdate;
-using ngsiv2::EntID;
 
 
 /* ****************************************************************************

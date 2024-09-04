@@ -53,7 +53,6 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 using ngsiv2::Subscription;
-using ngsiv2::EntID;
 
 
 
@@ -145,7 +144,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   ASSERT_EQ(3, subs.size());
   Subscription             s;
-  std::vector<EntID>       ents;
+  std::vector<EntityId>    ents;
   std::vector<std::string> attrs;
 
   /* Subscription #1 */
@@ -247,7 +246,7 @@ TEST(mongoGetSubscription, getSubscription)
   EXPECT_EQ("OK", oe.error);
   EXPECT_EQ("", oe.description);
 
-  std::vector<EntID>       ents;
+  std::vector<EntityId>    ents;
   std::vector<std::string> attrs;
 
   /* Subscription #1 */

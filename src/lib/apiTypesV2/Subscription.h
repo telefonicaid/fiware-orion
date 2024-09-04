@@ -28,10 +28,10 @@
 #include <string>
 #include <vector>
 
-#include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
+#include "ngsi/EntityId.h"
 #include "ngsi/ScopeVector.h"
 #include "common/RenderFormat.h"
 
@@ -136,9 +136,9 @@ struct Condition
 */
 struct Subject
 {
-  std::vector<EntID> entities;
-  Condition          condition;
-  std::string        toJson();
+  std::vector<EntityId> entities;
+  Condition             condition;
+  std::string           toJson();
 };
 
 

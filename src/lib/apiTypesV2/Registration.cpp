@@ -133,7 +133,7 @@ void Registration::setEntities(const orion::BSONObj& cr0)
 
   for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
   {
-    ngsiv2::EntID    entity;
+    EntityId         entity;
     orion::BSONObj   ce = dbEntityV[ix].embeddedObject();
 
     if (ce.hasField(REG_ENTITY_ISPATTERN))

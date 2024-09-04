@@ -196,7 +196,7 @@ extern void subCacheItemInsert
   const char*                        servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
   const ngsiv2::MqttInfo&            mqttInfo,
-  const std::vector<ngsiv2::EntID>&  entities,
+  const std::vector<EntityId>&       entities,
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
