@@ -250,8 +250,6 @@ int Scope::fill
       return -1;
     }
 
-    polygon.invertedSet(geometry.external);
-
     for (unsigned int ix = 0; ix < pointV.size(); ++ix)
     {
       polygon.vertexAdd(pointV[ix]);

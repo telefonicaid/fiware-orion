@@ -192,17 +192,6 @@ void Box::fill(Point* lowerLeftP, Point* upperRightP)
 
 /* ****************************************************************************
 *
-* Polygon::invertedSet -
-*/
-void Polygon::invertedSet(bool inverted)
-{
-  _inverted = (inverted == true)? "true" : "false";
-}
-
-
-
-/* ****************************************************************************
-*
 * Polygon::vertexAdd -
 */
 void Polygon::vertexAdd(Point* p)
@@ -337,7 +326,7 @@ int Georel::parse(const char* in, std::string* errorString)
 *
 * Geometry::Geometry -
 */
-Geometry::Geometry(): areaType(""), radius(-1), external(false)
+Geometry::Geometry(): areaType("")
 {
 }
 
@@ -369,31 +358,11 @@ int Geometry::parse(const char* in, std::string* errorString)
 
       areaType = items[ix];
     }
-    else if (strncmp(items[ix].c_str(), "radius", 6) == 0)
-    {
-      radius = atoi((char*) &items[ix].c_str()[7]);
-
-      if (radius == 0)
-      {
-        *errorString = "Invalid value of /radius/";
-        return -1;
-      }
-    }
-    else if (items[ix] == "external")
-    {
-      external = true;
-    }
     else
     {
       *errorString = "Invalid selector in geometry specification";
       return -1;
     }
-  }
-
-  if ((areaType == "polygon") && (radius != -1))
-  {
-    *errorString = "radius set for polygon";
-    return -1;
   }
 
   return 0;

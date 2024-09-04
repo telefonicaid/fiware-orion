@@ -113,12 +113,8 @@ public:
 */
 class Polygon
 {
- private:
-  ::std::string         _inverted;
-
  public:
   ::std::vector<Point*> vertexList;
-  void                  invertedSet(bool inverted);
   void                  vertexAdd(Point* p);
   void                  release(void);
 };
@@ -154,8 +150,6 @@ public:
   int          parse(const char* in, std::string* errorString);
 
   std::string  areaType;
-  float        radius;
-  bool         external;
 };
 
 }
