@@ -33,7 +33,6 @@
 #include "common/errorMessages.h"
 #include "alarmMgr/AlarmManager.h"
 #include "alarmMgr/alarmMgr.h"
-#include "apiTypesV2/Entities.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
@@ -413,7 +412,7 @@ static std::string parseEntity(ConnectionInfo* ciP, rapidjson::Value::ConstMembe
 * }
 *
 */
-bool parseEntitiesResponseV1(ConnectionInfo* ciP, const char* payload, Entities* evP, OrionError* oeP)
+bool parseEntitiesResponseV1(ConnectionInfo* ciP, const char* payload, EntityVector* evP, OrionError* oeP)
 {
   rapidjson::Document  document;
 

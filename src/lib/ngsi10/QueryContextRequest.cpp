@@ -222,7 +222,7 @@ void QueryContextRequest::fill(BatchQuery* bqP)
 {
   if (bqP->entities.vec.size() != 0)
   {
-    entityIdVector.fill(bqP->entities.vec);
+    entityIdVector.fill(bqP->entities);
   }
   else
   {

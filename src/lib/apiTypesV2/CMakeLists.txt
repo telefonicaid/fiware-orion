@@ -23,7 +23,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 SET (SOURCES
     Entity.cpp
     EntityVector.cpp
-    Entities.cpp
     Subscription.cpp
     Registration.cpp
     BatchQuery.cpp
@@ -35,7 +34,6 @@ SET (SOURCES
 SET (HEADERS
     Entity.h
     EntityVector.h
-    Entities.h    
     Subscription.h
     Registration.h
     BatchQuery.h

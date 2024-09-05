@@ -287,8 +287,8 @@ void UpdateContextRequest::fill
 */
 void UpdateContextRequest::fill
 (
-  Entities*    entities,
-  ActionType  _updateActionType
+  EntityVector*  entities,
+  ActionType     _updateActionType
 )
 {
   updateActionType = _updateActionType;

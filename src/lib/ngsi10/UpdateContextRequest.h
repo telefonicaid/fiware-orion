@@ -31,7 +31,6 @@
 #include "apiTypesV2/EntityVector.h"
 #include "orionTypes/UpdateActionType.h"
 #include "apiTypesV2/Entity.h"
-#include "apiTypesV2/Entities.h"
 
 
 
@@ -67,7 +66,7 @@ typedef struct UpdateContextRequest
                     ActionType           _updateActionType,
                     const std::string&   type = "");
 
-  void         fill(Entities* entities, ActionType _updateActionType);
+  void         fill(EntityVector* entities, ActionType _updateActionType);
 } UpdateContextRequest;
 
 #endif  // SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_

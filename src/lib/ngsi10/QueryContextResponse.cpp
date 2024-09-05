@@ -74,11 +74,11 @@ void QueryContextResponse::release(void)
 *
 * QueryContextResponse::fill -
 */
-void QueryContextResponse::fill(const Entities& entities)
+void QueryContextResponse::fill(const EntityVector& entities)
 {
-  for (int eIx = 0; eIx < entities.size(); eIx++)
+  for (unsigned int eIx = 0; eIx < entities.vec.size(); eIx++)
   {
-    ContextElementResponse* cerP = new ContextElementResponse(entities.vec.vec[eIx]);
+    ContextElementResponse* cerP = new ContextElementResponse(entities.vec[eIx]);
     contextElementResponseVector.push_back(cerP);
   }
 }

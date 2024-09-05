@@ -31,7 +31,6 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
 #include "rest/OrionError.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/deleteEntity.h"

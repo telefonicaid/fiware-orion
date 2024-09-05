@@ -30,7 +30,6 @@
 #include <sstream>
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "apiTypesV2/Entities.h"
 #include "ngsi/StatusCode.h"
 
 
@@ -52,7 +51,7 @@ typedef struct QueryContextResponse
   ~QueryContextResponse();
 
   void                   release(void);
-  void                   fill(const Entities& entities);
+  void                   fill(const EntityVector& entities);
   ContextAttribute*      getAttr(const std::string& attrName, OrionError* oeP);
 } QueryContextResponse;
 

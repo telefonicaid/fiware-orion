@@ -34,7 +34,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
-#include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "serviceRoutines/postUpdateContext.h"
@@ -67,7 +66,7 @@ std::string postBatchUpdate
 {
   BatchUpdate*           buP    = &parseDataP->bu.res;
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
-  Entities               entities;
+  EntityVector           entities;
 
   upcrP->fill(&buP->entities, buP->updateActionType);
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed

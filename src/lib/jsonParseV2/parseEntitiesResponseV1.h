@@ -31,7 +31,8 @@
 #include "rapidjson/document.h"
 
 #include "rest/ConnectionInfo.h"
-#include "apiTypesV2/Entities.h"
+
+#include "apiTypesV2/EntityVector.h"
 
 
 
@@ -43,7 +44,7 @@ extern bool parseEntitiesResponseV1
 (
   ConnectionInfo*   ciP,
   const char*       payload,
-  Entities*         evP,
+  EntityVector*     evP,
   OrionError*       oeP
 );
 

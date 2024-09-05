@@ -31,7 +31,6 @@
 #include "parse/forbiddenChars.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/patchEntity.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"

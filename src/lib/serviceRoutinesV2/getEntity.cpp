@@ -33,7 +33,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"

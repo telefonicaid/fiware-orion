@@ -259,8 +259,8 @@ static bool updateForward
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
     bool result;
-    Entities                    entities;
-    OrionError                  oe;
+    EntityVector  entities;
+    OrionError    oe;
 
     cleanPayload = jsonPayloadClean(out.c_str());
 

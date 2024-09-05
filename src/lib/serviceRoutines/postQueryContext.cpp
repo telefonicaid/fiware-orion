@@ -371,7 +371,7 @@ static bool queryForward
   }
 
   bool result;
-  Entities entities;
+  EntityVector entities;
   OrionError oe;
 
   // Depending NGSIv1 or NGSIv2 in the CPr we use parseEntitiesResponseV1() or parseEntitiesResponseV2()

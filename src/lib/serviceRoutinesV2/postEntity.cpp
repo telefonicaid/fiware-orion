@@ -32,7 +32,6 @@
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
 
-#include "apiTypesV2/Entities.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
