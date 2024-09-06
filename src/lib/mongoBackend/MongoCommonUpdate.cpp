@@ -2154,41 +2154,6 @@ static unsigned int processSubscriptions
 
 
 
-#if 0
-/* ****************************************************************************
-*
-* buildGeneralErrorResponse -
-*/
-static void buildGeneralErrorResponse
-(
-  Entity*                 ceP,
-  ContextAttribute*       caP,
-  UpdateContextResponse*  responseP,
-  HttpStatusCode          code,
-  std::string             details = "",
-  ContextAttributeVector* cavP    = NULL
-)
-{
-  ContextElementResponse* cerP = new ContextElementResponse();
-
-  EntityId enId(ceP->entityId.id, ceP->entityId.idPattern, ceP->entityId.type, ceP->entityId.typePattern);
-  cerP->entity.fill(enId);
-
-  if (caP != NULL)
-  {
-    cerP->entity.attributeVector.push_back(caP);
-  }
-  else if (cavP != NULL)
-  {
-    cerP->entity.attributeVector.fill(*cavP);
-  }
-
-  cerP->statusCode.fill(code, details);
-  responseP->contextElementResponseVector.push_back(cerP);
-}
-#endif
-
-
 /* ****************************************************************************
 *
 * setResponseMetadata -
@@ -3990,10 +3955,7 @@ static bool contextElementPreconditionsCheck
     {
       if ((name == eP->attributeVector[jx]->name))
       {
-        //ContextAttribute* ca = new ContextAttribute(eP->attributeVector[ix]);
         alarmMgr.badInput(clientIp, "duplicated attribute name", name);
-        //buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
-        //                          "duplicated attribute /" + name + "/");
         responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
         return false;  // Error already in responseP
       }
@@ -4003,8 +3965,8 @@ static bool contextElementPreconditionsCheck
   /* Not supporting idPattern currently */
   if (!eP->entityId.idPattern.empty())
   {
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccNotImplemented);
     // No need of filling responseP->oe, this cannot happen in NGSIv2
+    // FIXME PR: check this
     return false;  // Error already in responseP
   }
 
@@ -4117,7 +4079,6 @@ unsigned int processContextElement
 
   if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, query, &entitiesNumber, &err))
   {
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
     return 0;
   }
@@ -4125,7 +4086,6 @@ unsigned int processContextElement
   // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
   if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
   {
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS);
     responseP->oe.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
     return 0;
   }
@@ -4134,7 +4094,6 @@ unsigned int processContextElement
   // both for regular case and when ?options=append is used
   if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
   {
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
     responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
     return 0;
   }
@@ -4143,7 +4102,6 @@ unsigned int processContextElement
   // not allowed in NGSIv2
   if (entitiesNumber > 1)
   {
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccConflict, ERROR_DESC_TOO_MANY_ENTITIES);
     responseP->oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
     return 0;
   }
@@ -4155,7 +4113,6 @@ unsigned int processContextElement
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
     responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
 
     return 0;
@@ -4394,14 +4351,12 @@ unsigned int processContextElement
   if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
     std::string details = ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS + enStr + " - " + attributeAlreadyExistsList;
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
   if ((attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
     std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - " + attributeNotExistingList;
-    //buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
     responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
   }
 
