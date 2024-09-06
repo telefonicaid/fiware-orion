@@ -222,9 +222,9 @@ TEST(mongoQueryTypes, queryAllType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(3, res.entityTypeVector.size());
     ContextAttribute* ca;
@@ -340,9 +340,9 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("Count: 3", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("Count: 3", res.error.details);
 
     ASSERT_EQ(3, res.entityTypeVector.size());
     ContextAttribute* ca;
@@ -457,9 +457,9 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(3, res.entityTypeVector.size());
     ContextAttribute* ca;
@@ -574,9 +574,9 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(1, res.entityTypeVector.size());
     ContextAttribute* ca;
@@ -647,9 +647,9 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(1, res.entityTypeVector.size());
     ContextAttribute* ca;
@@ -699,9 +699,9 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(2, res.entityTypeVector.size());
     ContextAttribute* ca;
@@ -777,9 +777,9 @@ TEST(mongoQueryTypes, queryAllPaginationNonExisting)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
-    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccContextElementNotFound, res.error.code);
+    EXPECT_EQ("No context element found", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(0, res.entityTypeVector.size());
 
@@ -809,9 +809,9 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(1, res.entityTypeVector.size());
     ContextAttribute* ca;
@@ -869,9 +869,9 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
-    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
-    EXPECT_EQ("Number of types: 3. Offset is 7", res.statusCode.details);
+    EXPECT_EQ(SccContextElementNotFound, res.error.code);
+    EXPECT_EQ("No context element found", res.error.reasonPhrase);
+    EXPECT_EQ("Number of types: 3. Offset is 7", res.error.details);
 
     ASSERT_EQ(0, res.entityTypeVector.size());
 
@@ -905,8 +905,8 @@ TEST(mongoQueryTypes, queryAllDbException)
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ(SccReceiverInternalError, res.error.code);
+  EXPECT_EQ("Internal Server Error", res.error.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
             "cursor: { batchSize: 1000 }, "
@@ -916,7 +916,7 @@ TEST(mongoQueryTypes, queryAllDbException)
             "{ $unwind: \"$attrNames\" }, "
             "{ $group: { _id: { $cond: [ { $in: [ \"$_id.type\", [ null, \"\" ] ] }, \"\", \"$_id.type\" ] }, attrs: { $addToSet: \"$attrNames\" } } }, "
             "{ $sort: { _id: 1 } }, { $skip: 0 }, { $limit: 20 } ] } "
-            "- exception: boom!!)", res.statusCode.details);
+            "- exception: boom!!)", res.error.details);
   EXPECT_EQ(0, res.entityTypeVector.size());
 
   /* Restore real DB connection */
@@ -958,8 +958,8 @@ TEST(mongoQueryTypes, queryAllGenericException)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ(SccReceiverInternalError, res.error.code);
+  EXPECT_EQ("Internal Server Error", res.error.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
             "cursor: { batchSize: 1000 }, "
@@ -969,7 +969,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
             "{ $unwind: \"$attrNames\" }, "
             "{ $group: { _id: { $cond: [ { $in: [ \"$_id.type\", [ null, \"\" ] ] }, \"\", \"$_id.type\" ] }, attrs: { $addToSet: \"$attrNames\" } } }, "
             "{ $sort: { _id: 1 } }, { $skip: 0 }, { $limit: 20 } ] } "
-            "- exception: std::exception)", res.statusCode.details);
+            "- exception: std::exception)", res.error.details);
   EXPECT_EQ(0, res.entityTypeVector.size());
 
   /* Restore real DB connection */
@@ -1004,9 +1004,9 @@ TEST(mongoQueryTypes, queryGivenTypeBasic)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(5, res.entityType.contextAttributeVector.size());
@@ -1072,9 +1072,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("Count: 5", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("Count: 5", res.error.details);
 
     EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(5, res.entityType.contextAttributeVector.size());
@@ -1140,9 +1140,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationAll)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(5, res.entityType.contextAttributeVector.size());
@@ -1208,9 +1208,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlyFirst)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(1, res.entityType.contextAttributeVector.size());
 
@@ -1248,9 +1248,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlySecond)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(1, res.entityType.contextAttributeVector.size());
@@ -1289,9 +1289,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationRange)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(3, res.entityType.contextAttributeVector.size());
@@ -1344,9 +1344,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExisting)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
-    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccContextElementNotFound, res.error.code);
+    EXPECT_EQ("No context element found", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
 
@@ -1377,9 +1377,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ("", res.error.details);
 
     EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(2, res.entityType.contextAttributeVector.size());
@@ -1425,9 +1425,9 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
-    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
-    EXPECT_EQ("Number of attributes: 5. Offset is 7", res.statusCode.details);
+    EXPECT_EQ(SccContextElementNotFound, res.error.code);
+    EXPECT_EQ("No context element found", res.error.reasonPhrase);
+    EXPECT_EQ("Number of attributes: 5. Offset is 7", res.error.details);
 
     ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
 
@@ -1462,8 +1462,8 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ(SccReceiverInternalError, res.error.code);
+  EXPECT_EQ("Internal Server Error", res.error.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
             "cursor: { batchSize: 1000 }, "
@@ -1474,7 +1474,7 @@ TEST(mongoQueryTypes, queryGivenTypeDbException)
             "{ $unwind: \"$attrs\" }, "
             "{ $group: { _id: \"$attrs\" } }, "
             "{ $sort: { _id: 1 } } ] } "
-            "- exception: boom!!)", res.statusCode.details);
+            "- exception: boom!!)", res.error.details);
   EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
   /* Restore real DB connection */
@@ -1514,8 +1514,8 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ(SccReceiverInternalError, res.error.code);
+  EXPECT_EQ("Internal Server Error", res.error.reasonPhrase);
   EXPECT_EQ("Database Error (collection: utest "
             "- runCommand(): { aggregate: \"entities\", "
             "cursor: { batchSize: 1000 }, "
@@ -1526,7 +1526,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
             "{ $unwind: \"$attrs\" }, "
             "{ $group: { _id: \"$attrs\" } }, "
             "{ $sort: { _id: 1 } } ] } "
-            "- exception: std::exception)", res.statusCode.details);
+            "- exception: std::exception)", res.error.details);
   EXPECT_EQ(0, res.entityType.contextAttributeVector.size());
 
   /* Restore real DB connection */

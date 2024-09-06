@@ -28,7 +28,6 @@
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "rest/ConnectionInfo.h"
-#include "ngsi/StatusCode.h"
 #include "rest/OrionError.h"
 
 
@@ -61,19 +60,6 @@ OrionError::OrionError(HttpStatusCode _code, const std::string& _description, co
 
 
 
-/* ****************************************************************************
-*
-* OrionError::OrionError -
-*/
-OrionError::OrionError(StatusCode& sc)
-{
-  code        = sc.code;
-  error       = httpStatusCodeString(code);
-  description = sc.details;
-  filled      = true;
-}
-
-
 
 /* ****************************************************************************
 *
@@ -85,6 +71,28 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _description, con
   error       = _error.empty()? httpStatusCodeString(code) : _error;
   description = _description;
   filled      = true;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::fill -
+*/
+void OrionError::fill(const OrionError& oe)
+{
+  fill(oe.code, oe.description, oe.error);
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::fill -
+*/
+void OrionError::fill(OrionError* oeP)
+{
+  fill(oeP->code, oeP->description, oeP->error);
 }
 
 

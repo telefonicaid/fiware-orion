@@ -51,7 +51,7 @@ TEST(ContextElementResponseVector, render)
 
   cer.entity.entityId.id   = "ID";
   cer.entity.entityId.type = "Type";
-  cer.statusCode.fill(SccOk, "details");
+  cer.error.fill(SccOk, "details");
 
   utExit();
 }

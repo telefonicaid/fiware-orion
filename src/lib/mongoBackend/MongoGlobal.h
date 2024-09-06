@@ -214,7 +214,7 @@ extern bool entitiesQuery
   const StringList&                attrL,
   const ScopeVector&               spV,
   ContextElementResponseVector*    cerV,
-  std::string*                     err,
+  OrionError*                      oeP,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,

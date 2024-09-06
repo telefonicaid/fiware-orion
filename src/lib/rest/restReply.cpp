@@ -28,7 +28,6 @@
 
 #include "common/MimeType.h"
 #include "common/limits.h"
-#include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
 #include "ngsi10/QueryContextResponse.h"

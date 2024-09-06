@@ -30,7 +30,7 @@
 #include <sstream>
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 
 
 
@@ -45,7 +45,7 @@
 typedef struct QueryContextResponse
 {
   ContextElementResponseVector  contextElementResponseVector;  // Optional
-  StatusCode                    errorCode;                     // Optional
+  OrionError                    error;                         // Optional
 
   QueryContextResponse();
   ~QueryContextResponse();

@@ -86,13 +86,13 @@ std::string patchEntity
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // Adjust error code if needed
-  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), false);
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.error), false);
 
   // 03. Check output from mongoBackend - any errors?
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+  if ((parseDataP->upcrs.res.error.code != SccNone ) && (parseDataP->upcrs.res.error.code != SccOk))
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.error.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.error.code;
   }
   else
   {

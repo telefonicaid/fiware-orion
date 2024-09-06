@@ -229,7 +229,15 @@ void logInfoFwdRequest
 {
   char buffer[STRING_SIZE_FOR_INT];
   snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoFwdRequest(regId, verb, url, requestPayload, responsePayload, buffer);
+
+  if (responsePayload == NULL)
+  {
+    logInfoFwdRequest(regId, verb, url, requestPayload, "", buffer);
+  }
+  else
+  {
+    logInfoFwdRequest(regId, verb, url, requestPayload, responsePayload, buffer);
+  }
 }
 
 

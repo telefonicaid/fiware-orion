@@ -2397,7 +2397,7 @@ static bool updateContextAttributeItem
     {
       /* If updateAttribute() returns false, then that particular attribute has not
        * been found. In this case, we interrupt the processing and early return with
-       * an error StatusCode */
+       * an error OrionError */
 
       //
       // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
@@ -2408,7 +2408,7 @@ static bool updateContextAttributeItem
                             " - entity: [" + entityDetail + "]" +
                             " - offending attribute: " + targetAttr->getName();
 
-      cerP->statusCode.fill(SccInvalidParameter, details);
+      cerP->error.fill(SccInvalidParameter, details);
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
@@ -2425,7 +2425,7 @@ static bool updateContextAttributeItem
                           " - offending attribute: " + targetAttr->getName() +
                           " - " + err;
 
-    cerP->statusCode.fill(SccInvalidParameter, details);
+    cerP->error.fill(SccInvalidParameter, details);
     // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
 
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
@@ -2484,7 +2484,7 @@ static bool appendContextAttributeItem
                           " - offending attribute: " + targetAttr->getName() +
                           " - " + err;
 
-    cerP->statusCode.fill(SccInvalidParameter, details);
+    cerP->error.fill(SccInvalidParameter, details);
     // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
 
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
@@ -2536,7 +2536,7 @@ static bool deleteContextAttributeItem
                             " - offending attribute: " + targetAttr->getName() +
                             " - location attribute has to be defined at creation time, with APPEND";
 
-      cerP->statusCode.fill(SccInvalidParameter, details);
+      cerP->error.fill(SccInvalidParameter, details);
       oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time", targetAttr->getName());
@@ -2564,13 +2564,13 @@ static bool deleteContextAttributeItem
   {
     /* If deleteAttribute() returns false, then that particular attribute has not
      * been found. In this case, we interrupt the processing and early return with
-     * a error StatusCode */
+     * a OrionError */
     std::string details = std::string("action: DELETE") +
                           " - entity: [" + entityDetail + "]" +
                           " - offending attribute: " + targetAttr->getName() +
                           " - attribute not found";
 
-    cerP->statusCode.fill(SccInvalidParameter, details);
+    cerP->error.fill(SccInvalidParameter, details);
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
@@ -2707,7 +2707,7 @@ static bool processContextAttributeVector
     {
       std::string details = std::string("unknown actionType");
 
-      cerP->statusCode.fill(SccInvalidParameter, details);
+      cerP->error.fill(SccInvalidParameter, details);
       oe->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
       // If we reach this point, there's a BUG in the parse layer checks
@@ -2751,7 +2751,7 @@ static bool processContextAttributeVector
   }
   else if (!addTriggeredSubscriptions(entityId, entityType, attributes, attrsWithModifiedValue, attrsWithModifiedMd, subsToNotify, err, tenant, servicePathV, targetAltType))
   {
-    cerP->statusCode.fill(SccReceiverInternalError, err);
+    cerP->error.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
     return false;
   }
@@ -2765,14 +2765,14 @@ static bool processContextAttributeVector
 
     // FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
 
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
   }
 #endif
 
   /* If the status code was not touched (filled with an error), then set it with Ok */
-  if (cerP->statusCode.code == SccNone)
+  if (cerP->error.code == SccNone)
   {
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
   }
 
   return entityModified;
@@ -3020,12 +3020,12 @@ static bool removeEntity
   std::string err;
   if (!collectionRemove(composeDatabaseName(tenant), COL_ENTITIES, bob.obj(), &err))
   {
-    cerP->statusCode.fill(SccReceiverInternalError, err);
+    cerP->error.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
     return false;
   }
 
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
   return true;
 }
 
@@ -3469,7 +3469,7 @@ static unsigned int updateEntity
   if ((action == ActionTypeDelete) && (eP->attributeVector.size() == 0))
   {
     LM_T(LmtServicePath, ("Removing entity"));
-    removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
+    removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->error));
     responseP->contextElementResponseVector.push_back(cerP);
 
     /* EntityDelete subscriptions may be triggered */
@@ -3495,8 +3495,8 @@ static unsigned int updateEntity
                                    ngsiv2::SubAltType::EntityDelete))
     {
       releaseTriggeredSubscriptions(&subsToNotify);
-      cerP->statusCode.fill(SccReceiverInternalError, err);
-      responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
+      cerP->error.fill(SccReceiverInternalError, err);
+      responseP->error.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
       responseP->contextElementResponseVector.push_back(cerP);
       return 0;  // Error already in responseP
@@ -3627,7 +3627,7 @@ static unsigned int updateEntity
                                      forcedUpdate,
                                      overrideMetadata,
                                      loopDetected,
-                                     &(responseP->oe)))
+                                     &(responseP->error)))
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
 
@@ -3879,8 +3879,8 @@ static unsigned int updateEntity
   }
   if (!success)
   {
-    cerP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
+    cerP->error.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err, "InternalServerError");
 
     responseP->contextElementResponseVector.push_back(cerP);
 
@@ -3922,11 +3922,11 @@ static unsigned int updateEntity
     searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
   }
 
-  // StatusCode may be set already (if so, we keep the existing value)
+  // OrionError may be set already (if so, we keep the existing value)
 
-  if (cerP->statusCode.code == SccNone)
+  if (cerP->error.code == SccNone)
   {
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
   }
 
   responseP->contextElementResponseVector.push_back(cerP);
@@ -3956,7 +3956,7 @@ static bool contextElementPreconditionsCheck
       if ((name == eP->attributeVector[jx]->name))
       {
         alarmMgr.badInput(clientIp, "duplicated attribute name", name);
-        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
+        responseP->error.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
         return false;  // Error already in responseP
       }
     }
@@ -3965,7 +3965,7 @@ static bool contextElementPreconditionsCheck
   /* Not supporting idPattern currently */
   if (!eP->entityId.idPattern.empty())
   {
-    // No need of filling responseP->oe, this cannot happen in NGSIv2
+    // No need of filling responseP->error, this cannot happen in NGSIv2
     // FIXME PR: check this
     return false;  // Error already in responseP
   }
@@ -4079,14 +4079,14 @@ unsigned int processContextElement
 
   if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, query, &entitiesNumber, &err))
   {
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
+    responseP->error.fill(SccReceiverInternalError, err, "InternalServerError");
     return 0;
   }
 
   // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
   if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
   {
-    responseP->oe.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
+    responseP->error.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
     return 0;
   }
 
@@ -4094,7 +4094,7 @@ unsigned int processContextElement
   // both for regular case and when ?options=append is used
   if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
   {
-    responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+    responseP->error.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
     return 0;
   }
 
@@ -4102,7 +4102,7 @@ unsigned int processContextElement
   // not allowed in NGSIv2
   if (entitiesNumber > 1)
   {
-    responseP->oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    responseP->error.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
     return 0;
   }
 
@@ -4113,7 +4113,7 @@ unsigned int processContextElement
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
+    responseP->error.fill(SccReceiverInternalError, err, "InternalServerError");
 
     return 0;
   }
@@ -4224,7 +4224,7 @@ unsigned int processContextElement
     {
       /* In the case of UPDATE or REPLACE we look for context providers */
       searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
-      cerP->statusCode.fill(SccOk);
+      cerP->error.fill(SccOk);
       responseP->contextElementResponseVector.push_back(cerP);
 
       //
@@ -4232,10 +4232,10 @@ unsigned int processContextElement
       //
       if (forwardsPending(responseP) == false)
       {
-        cerP->statusCode.fill(SccContextElementNotFound);
+        cerP->error.fill(SccContextElementNotFound);
 
         std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
-        responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
+        responseP->error.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
         if (updateCoverageP != NULL)
         {
           *updateCoverageP = UC_ENTITY_NOT_FOUND;
@@ -4244,10 +4244,10 @@ unsigned int processContextElement
     }
     else if (action == ActionTypeDelete)
     {
-      cerP->statusCode.fill(SccContextElementNotFound);
+      cerP->error.fill(SccContextElementNotFound);
 
       std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
-      responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
+      responseP->error.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
       responseP->contextElementResponseVector.push_back(cerP);
       if (updateCoverageP != NULL)
       {
@@ -4269,14 +4269,14 @@ unsigned int processContextElement
                         servicePathV,
                         fiwareCorrelator,
                         ngsiv2Flavour == NGSIV2_NO_FLAVOUR,
-                        &(responseP->oe)))
+                        &(responseP->error)))
       {
-        cerP->statusCode.fill(SccInvalidParameter, errDetail);
-        // In this case, responseP->oe is not filled, as createEntity() deals internally with that
+        cerP->error.fill(SccInvalidParameter, errDetail);
+        // In this case, responseP->error is not filled, as createEntity() deals internally with that
       }
       else
       {
-        cerP->statusCode.fill(SccOk);
+        cerP->error.fill(SccOk);
 
         /* Successful creation: send potential notifications */
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
@@ -4299,8 +4299,8 @@ unsigned int processContextElement
                                        ngsiv2::SubAltType::EntityCreate))
         {
           releaseTriggeredSubscriptions(&subsToNotify);
-          cerP->statusCode.fill(SccReceiverInternalError, err);
-          responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
+          cerP->error.fill(SccReceiverInternalError, err);
+          responseP->error.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
           responseP->contextElementResponseVector.push_back(cerP);
           return 0;  // Error already in responseP
@@ -4351,13 +4351,13 @@ unsigned int processContextElement
   if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
     std::string details = ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS + enStr + " - " + attributeAlreadyExistsList;
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
+    responseP->error.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
   if ((attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
     std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - " + attributeNotExistingList;
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
+    responseP->error.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
   }
 
   // The following check makes sense only when there are at least one attribute in the request

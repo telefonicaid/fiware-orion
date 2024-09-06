@@ -142,8 +142,8 @@ HttpStatusCode mongoUpdateContext
 
     std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
     alarmMgr.badInput(clientIp, details);
-    responseP->errorCode.fill(SccBadRequest, "service path length greater than the one in update");
-    responseP->oe.fill(SccBadRequest, "service path length greater than the one in update", ERROR_BAD_REQUEST);
+    responseP->error.fill(SccBadRequest, "service path length greater than the one in update");
+    responseP->error.fill(SccBadRequest, "service path length greater than the one in update", ERROR_BAD_REQUEST);
   }
   else
   {
@@ -218,22 +218,26 @@ HttpStatusCode mongoUpdateContext
     // Other cases follow the usual response processing flow (whatever it is :)
     if (updateCoverage == UC_PARTIAL)
     {
-      responseP->oe.code  = SccInvalidModification;
-      responseP->oe.error = ERROR_PARTIAL_UPDATE;
+      responseP->error.code  = SccInvalidModification;
+      responseP->error.error = ERROR_PARTIAL_UPDATE;
     }
 
     LM_T(LmtNotifier, ("total notifications sent during update: %d", notifSent));
 
     /* Note that although individual processContextElements() invocations return ConnectionError, this
-       error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
+       error gets "encapsulated" in the OrionError of the corresponding ContextElementResponse and we
        consider the overall mongoUpdateContext() as OK.
+       FIXME PR: we are removing the "corresponding ContextElementResposne" error. Review this wording
     */
-    responseP->errorCode.fill(SccOk);
+    if (responseP->error.code == SccNone)
+    {
+      responseP->error.fill(SccOk);
+    }
   }
 
   reqSemGive(__FUNCTION__, "update request", reqSemTaken);
 
-  if (flowControl && fcEnabled && (responseP->errorCode.code == SccOk))
+  if (flowControl && fcEnabled && (responseP->error.code == SccOk))
   {
     LM_T(LmtNotifier, ("start notification flow control algorithm"));
     flowControlAwait(q0, notifSent, tenant);

@@ -369,7 +369,7 @@ HttpStatusCode mongoEntityTypesValues
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
-    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -411,7 +411,7 @@ HttpStatusCode mongoEntityTypesValues
     *totalTypesP = docs;
   }
 
-  responseP->statusCode.fill(SccOk);
+  responseP->error.fill(SccOk);
   reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
   return SccOk;
@@ -557,7 +557,7 @@ HttpStatusCode mongoEntityTypes
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
-    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -642,11 +642,11 @@ HttpStatusCode mongoEntityTypes
       *totalTypesP = docs;
       char detailsMsg[256];
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, offset);
-      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
+      responseP->error.fill(SccContextElementNotFound, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccContextElementNotFound);
+      responseP->error.fill(SccContextElementNotFound);
     }
   }
   else
@@ -656,11 +656,11 @@ HttpStatusCode mongoEntityTypes
       *totalTypesP = docs;
       char detailsMsg[256];
       snprintf(detailsMsg, sizeof(detailsMsg), "Count: %u", *totalTypesP);
-      responseP->statusCode.fill(SccOk, detailsMsg);
+      responseP->error.fill(SccOk, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccOk);
+      responseP->error.fill(SccOk);
     }
   }
 
@@ -770,7 +770,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
-    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -849,7 +849,7 @@ HttpStatusCode mongoAttributesForEntityType
 
   if (docs == 0)
   {
-    responseP->statusCode.fill(SccContextElementNotFound);
+    responseP->error.fill(SccContextElementNotFound);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -862,11 +862,11 @@ HttpStatusCode mongoAttributesForEntityType
     if (count)
     {
       snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) docs);
-      responseP->statusCode.fill(SccOk, detailsMsg);
+      responseP->error.fill(SccOk, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccOk);
+      responseP->error.fill(SccOk);
     }
   }
   else
@@ -874,11 +874,11 @@ HttpStatusCode mongoAttributesForEntityType
     if (count)
     {
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %u", docs, offset);
-      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
+      responseP->error.fill(SccContextElementNotFound, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccContextElementNotFound);
+      responseP->error.fill(SccContextElementNotFound);
     }
   }
 

@@ -113,7 +113,7 @@ std::string getEntityAttribute
   else
   {
     // the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    ciP->httpStatusCode = parseDataP->qcrs.res.error.code;
   }
 
   // 04. Cleanup and return result

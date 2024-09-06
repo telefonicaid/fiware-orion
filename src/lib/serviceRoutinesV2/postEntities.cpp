@@ -120,19 +120,13 @@ std::string postEntities
   postUpdateContext(ciP, components, compV, parseDataP, ngsiv2flavour);
 
   //
-  // 03. Check error - 3 different ways to get an error from postUpdateContext ... :-(
-  //     FIXME P4: make postUpdateContext have ONE way to return errors. See github issue #2763
+  // 03. Check error
   //
   std::string  answer = "";
-  if (parseDataP->upcrs.res.oe.code != SccNone)
+  if (parseDataP->upcrs.res.error.code != SccOk)
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
-  }
-  else if (parseDataP->upcrs.res.errorCode.code != SccOk)
-  {
-    ciP->httpStatusCode = parseDataP->upcrs.res.errorCode.code;
-    TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.error.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.error.toJson());
     ciP->answer         = answer;
   }
   else

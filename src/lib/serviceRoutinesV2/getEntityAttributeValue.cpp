@@ -94,7 +94,7 @@ std::string getEntityAttributeValue
     std::string attributeType = caP->type;
 
     // the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    ciP->httpStatusCode = parseDataP->qcrs.res.error.code;
 
     // Remove unwanted fields from attribute before rendering
     caP->type = "";

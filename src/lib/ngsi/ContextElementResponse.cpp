@@ -80,7 +80,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, boo
   prune = false;
 
   entity.fill(cerP->entity, false, cloneCompounds);
-  statusCode.fill(cerP->statusCode);
+  error.fill(cerP->error);
 }
 
 
@@ -92,7 +92,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, boo
 * This constructor builds the CER object based in a BSON object taken from the
 * entities collection at DB.
 *
-* Note that statusCode is not touched by this constructor.
+* Note that error field is not touched by this constructor.
 */
 ContextElementResponse::ContextElementResponse
 (
@@ -140,7 +140,7 @@ ContextElementResponse::ContextElementResponse
 *
 * ContextElementResponse::ContextElementResponse -
 *
-* This constructor builds the CER from a CEP. Note that statusCode is not touched.
+* This constructor builds the CER from a CEP. Note that error field is not touched.
 */
 ContextElementResponse::ContextElementResponse(Entity* eP, bool useDefaultType)
 {
@@ -189,5 +189,4 @@ void ContextElementResponse::applyUpdateOperators(void)
 void ContextElementResponse::release(void)
 {
   entity.release();
-  statusCode.release();
 }

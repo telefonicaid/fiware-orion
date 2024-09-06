@@ -29,7 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/HttpStatusCode.h"
 
@@ -41,18 +41,5 @@
 */
 NotifyContextResponse::NotifyContextResponse()
 {
-  responseCode.fill(SccOk);
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextResponse::release - 
-*
-* FIXME PR: this method is not called (it can be removed without compilation errors). Possible memory leak?
-*/
-void NotifyContextResponse::release(void)
-{
-  responseCode.release();
+  error.fill(SccOk);
 }

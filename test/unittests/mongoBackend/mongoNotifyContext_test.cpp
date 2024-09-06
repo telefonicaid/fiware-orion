@@ -197,7 +197,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     cerP->entity.fill("E1", "T1", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     cerP->entity.attributeVector.push_back(caP);
-    cerP->statusCode.fill(SccOk, "");
+    cerP->error.fill(SccOk, "");
     req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
@@ -339,7 +339,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
     cerP->entity.attributeVector.push_back(ca1P);
     cerP->entity.attributeVector.push_back(ca2P);
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
     req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */
@@ -481,12 +481,12 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     cer1P->entity.fill("E1", "T1", "false");
     ContextAttribute* ca1P = new ContextAttribute("A1", "TA1", "new_val");
     cer1P->entity.attributeVector.push_back(ca1P);
-    cer1P->statusCode.fill(SccOk);
+    cer1P->error.fill(SccOk);
     req.contextElementResponseVector.push_back(cer1P);
     cer2P->entity.fill("E2", "T2", "false");
     ContextAttribute* ca2P = new ContextAttribute("A3", "TA3", "new_val2");
     cer2P->entity.attributeVector.push_back(ca2P);
-    cer2P->statusCode.fill(SccOk);
+    cer2P->error.fill(SccOk);
     req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
@@ -630,14 +630,14 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     ContextAttribute* ca2P = new ContextAttribute("A2", "TA2", "new_val2");
     cer1P->entity.attributeVector.push_back(ca1P);
     cer1P->entity.attributeVector.push_back(ca2P);
-    cer1P->statusCode.fill(SccOk);
+    cer1P->error.fill(SccOk);
     req.contextElementResponseVector.push_back(cer1P);
     cer2P->entity.fill("E2", "T2", "false");
     ContextAttribute* ca3P = new ContextAttribute("A3", "TA3", "new_val3");
     ContextAttribute* ca4P = new ContextAttribute("A4", "TA4", "new_val4");
     cer2P->entity.attributeVector.push_back(ca3P);
     cer2P->entity.attributeVector.push_back(ca4P);
-    cer2P->statusCode.fill(SccOk);
+    cer2P->error.fill(SccOk);
     req.contextElementResponseVector.push_back(cer2P);
 
     /* Invoke the function in mongoBackend library */
@@ -777,7 +777,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     cerP->entity.fill("E10", "T10", "false");
     ContextAttribute* caP = new ContextAttribute("A1", "TA1", "new_val");
     cerP->entity.attributeVector.push_back(caP);
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
     req.contextElementResponseVector.push_back(cerP);
 
     /* Invoke the function in mongoBackend library */

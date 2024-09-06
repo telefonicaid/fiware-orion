@@ -71,7 +71,7 @@ HttpStatusCode mongoNotifyContext
   }
 
   reqSemGive(__FUNCTION__, "notification", reqSemTaken);
-  responseP->responseCode.fill(SccOk);
+  responseP->error.fill(SccOk);
 
   return SccOk;
 }

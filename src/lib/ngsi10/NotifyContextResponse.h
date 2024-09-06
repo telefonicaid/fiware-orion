@@ -29,7 +29,7 @@
 #include <string>
 
 #include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 
 
 
@@ -37,14 +37,14 @@
 *
 * NotifyContextResponse -
 *
+* FIXME: class really needed?
 */
 typedef struct NotifyContextResponse
 {
-  StatusCode    responseCode;              // Mandatory
+  OrionError    error;              // Mandatory
 
   NotifyContextResponse();
 
-  void          release(void);
 } NotifyContextResponse;
 
 #endif  // SRC_LIB_NGSI10_NOTIFYCONTEXTRESPONSE_H_

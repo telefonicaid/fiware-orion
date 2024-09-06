@@ -133,9 +133,9 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf869999", res.subscriptionId.get());
-    EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
-    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
-    EXPECT_EQ("subscriptionId: /51307b66f481db11bf869999/", res.statusCode.details);
+    EXPECT_EQ(SccContextElementNotFound, res.error.code);
+    EXPECT_EQ("No context element found", res.error.reasonPhrase);
+    EXPECT_EQ("subscriptionId: /51307b66f481db11bf869999/", res.error.details);
 
     /* Check database (untouched) */
     DBClientBase* connection = getMongoConnection();
@@ -173,9 +173,9 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
-    EXPECT_EQ(SccOk, res.statusCode.code);
-    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ(0, res.statusCode.details.size());
+    EXPECT_EQ(SccOk, res.error.code);
+    EXPECT_EQ("OK", res.error.reasonPhrase);
+    EXPECT_EQ(0, res.error.details.size());
 
     /* Check database (one document, but not the deleted one) */
     DBClientBase* connection = getMongoConnection();
@@ -225,11 +225,11 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
-    EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-    EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+    EXPECT_EQ(SccReceiverInternalError, res.error.code);
+    EXPECT_EQ("Internal Server Error", res.error.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- findOne(): { _id: ObjectId('51307b66f481db11bf860001') } "
-              "- exception: boom!!)", res.statusCode.details);
+              "- exception: boom!!)", res.error.details);
 
     // Sleeping a little to "give mongod time to process its input".
     // Without this sleep, this tests fails around 10% of the times (in Ubuntu 13.04)
@@ -297,11 +297,11 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
-    EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-    EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+    EXPECT_EQ(SccReceiverInternalError, res.error.code);
+    EXPECT_EQ("Internal Server Error", res.error.reasonPhrase);
     EXPECT_EQ("Database Error (collection: utest.csubs "
               "- remove(): { _id: ObjectId('51307b66f481db11bf860001') } "
-              "- exception: boom!!)", res.statusCode.details);
+              "- exception: boom!!)", res.error.details);
 
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);

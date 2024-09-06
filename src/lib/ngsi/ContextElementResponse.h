@@ -29,7 +29,7 @@
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextAttribute.h"
 #include "apiTypesV2/Entity.h"
@@ -46,7 +46,7 @@
 typedef struct ContextElementResponse
 {
   Entity           entity;                     // Mandatory (represents a Context Element)
-  StatusCode       statusCode;                 // Mandatory
+  OrionError       error;                 // Mandatory
 
   bool             prune;                      // operational attribute used internally by the queryContext logic for not deleting entities that were
                                                // without attributes in the Orion DB

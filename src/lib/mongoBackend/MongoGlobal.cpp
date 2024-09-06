@@ -1226,7 +1226,7 @@ bool entitiesQuery
   const StringList&                attrL,
   const ScopeVector&               spV,
   ContextElementResponseVector*    cerV,
-  std::string*                     err,
+  OrionError*                      oeP,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset,
@@ -1246,6 +1246,8 @@ bool entitiesQuery
    *  }
    *
    */
+
+  std::string err;
 
   orion::BSONObjBuilder    finalQuery;
   orion::BSONObjBuilder    finalCountQuery;
@@ -1430,7 +1432,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, countQuery, sort, limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, countQuery, sort, limit, offset, &cursor, countP, &err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1486,7 +1488,6 @@ bool entitiesQuery
       }
     }
 
-    cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
 
@@ -1498,35 +1499,15 @@ bool entitiesQuery
 
   if (errType == ON_NEXT_MANAGED_ERROR)
   {
-    ContextElementResponse*  cer   = new ContextElementResponse();
-
     alarmMgr.dbError(nextErr);
 
-    //
-    // It would be nice to fill in the entity but it is difficult to do this.
-    //
-    // Solution:
-    //   If the incoming entity-vector has only *one* entity, I simply fill it in with enV[0] and
-    //   if more than one entity is in the vector, an empty entity is returned.
-    //
-    if (enV.size() == 1)
-    {
-      cer->entity.fill(enV[0]);
-    }
-    else
-    {
-      EntityId enId("", "", "", "");
-      cer->entity.fill(enId);
-    }
-
-    cer->statusCode.fill(SccReceiverInternalError, nextErr);
-    cerV->push_back(cer);
-    return true;
+    oeP->fill(SccReceiverInternalError, nextErr);
+    return false;
   }
   else if (errType == ON_NEXT_UNMANAGED_ERROR)
   {
-    *err = nextErr;
     LM_E(("Runtime Error (exception in next(): %s - query: %s)", nextErr.c_str(), query.toString().c_str()));
+    oeP->fill(SccReceiverInternalError, nextErr);
     return false;
   }
 
@@ -1581,7 +1562,7 @@ bool entitiesQuery
           cerP->entity.attributeVector.push_back(caP);
         }
 
-        cerP->statusCode.fill(SccOk);
+        cerP->error.fill(SccOk);
 
         cerV->push_back(cerP);
       }
@@ -1629,7 +1610,7 @@ void pruneContextElements
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
     newCerP->entity.providerList = cerP->entity.providerList;
     newCerP->entity.providerRegIdList = cerP->entity.providerRegIdList;
-    newCerP->statusCode.fill(&cerP->statusCode);
+    newCerP->error.fill(&cerP->error);
 
     bool pruneEntity = cerP->prune;
 

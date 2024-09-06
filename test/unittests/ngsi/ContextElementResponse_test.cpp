@@ -48,7 +48,7 @@ TEST(ContextElementResponse, render)
   cer.entity.entityId.id    = "ID";
   cer.entity.entityId.type  = "Type";
 
-  cer.statusCode.fill(SccOk, "details");
+  cer.error.fill(SccOk, "details");
 
   out = cer.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);;
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

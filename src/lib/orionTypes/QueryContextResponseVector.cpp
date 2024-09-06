@@ -101,7 +101,7 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
     //
     // Special case: vector is empty: translate to 404
     //
-    responseP->errorCode.fill(SccContextElementNotFound);
+    responseP->error.fill(SccContextElementNotFound);
   }
   else if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))
   {
@@ -109,15 +109,15 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
     // Special case: only one QueryContextResponse in vec, and it has 0 contextElementResponses
     // This is clearly a Not Found ...
     //
-    responseP->errorCode.fill(SccContextElementNotFound);
-    vec[0]->errorCode.fill(SccContextElementNotFound);
+    responseP->error.fill(SccContextElementNotFound);
+    vec[0]->error.fill(SccContextElementNotFound);
   }
   else
   {
     //
     // We have found something, so, all good
     //
-    responseP->errorCode.fill(SccOk);
+    responseP->error.fill(SccOk);
   }
 
   for (unsigned int qIx = 0; qIx < vec.size(); ++qIx)
@@ -128,11 +128,11 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
     //
     if (vec[qIx]->contextElementResponseVector.size() == 0)
     {
-      if ((vec[qIx]->errorCode.code == SccOk) || (vec[qIx]->errorCode.code == SccNone))
+      if ((vec[qIx]->error.code == SccOk) || (vec[qIx]->error.code == SccNone))
       {
         ContextElementResponse* cerP = new ContextElementResponse();
 
-        cerP->statusCode.fill(SccContextElementNotFound);
+        cerP->error.fill(SccContextElementNotFound);
         responseP->contextElementResponseVector.push_back(cerP);
       }
     }
@@ -141,7 +141,7 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
     {
       ContextElementResponse* cerP = vec[qIx]->contextElementResponseVector[cerIx];
 
-      if ((cerP->statusCode.code != SccOk) && (cerP->statusCode.code != SccNone))  // Error - not to be added to output
+      if ((cerP->error.code != SccOk) && (cerP->error.code != SccNone))  // Error - not to be added to output
       {
         continue;
       }
@@ -160,7 +160,7 @@ void QueryContextResponseVector::populate(QueryContextResponse* responseP)
       {
         ContextElementResponse* newCerP = new ContextElementResponse(cerP);
 
-        newCerP->statusCode.fill(SccOk);
+        newCerP->error.fill(SccOk);
         responseP->contextElementResponseVector.push_back(newCerP);
       }
     }

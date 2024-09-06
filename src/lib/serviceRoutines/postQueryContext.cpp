@@ -131,7 +131,7 @@ static void getProviderCount(std::string cpResponse, long long*  totalCount)
 * 3. Send the request to the providing application (and await the response)
 * 4. Parse the response and fill in a binary QueryContextResponse
 * 5. Fill in the response from the redirection into the response of this function
-* 6. 'Fix' StatusCode
+* 6. 'Fix' OrionError
 * 7. Freeing memory
 *
 */
@@ -405,15 +405,15 @@ static bool queryForward
   }
   else
   {
-    qcrsP->errorCode.fill(SccContextElementNotFound);
+    qcrsP->error.fill(SccContextElementNotFound);
   }
 
   //
-  // 6. 'Fix' StatusCode
+  // 6. 'Fix' OrionError
   //
-  if (qcrsP->errorCode.code == SccNone)
+  if (qcrsP->error.code == SccNone)
   {
-    qcrsP->errorCode.fill(SccOk);
+    qcrsP->error.fill(SccOk);
   }
 
 
@@ -496,7 +496,7 @@ void postQueryContext
   //
   // 01. Call mongoBackend/mongoQueryContext
   //
-  qcrsP->errorCode.fill(SccOk);
+  qcrsP->error.fill(SccOk);
 
   TIMED_MONGO(ciP->httpStatusCode = mongoQueryContext(qcrP,
                                                       qcrsP,
@@ -506,10 +506,10 @@ void postQueryContext
                                                       ciP->uriParamOptions,
                                                       countP));
 
-  if ((qcrsP->errorCode.code == SccBadRequest) || (qcrsP->errorCode.code == SccReceiverInternalError))
+  if ((qcrsP->error.code == SccBadRequest) || (qcrsP->error.code == SccReceiverInternalError))
   {
     // Bad Input or Internal Error detected by Mongo Backend - request ends here !
-    OrionError oe(qcrsP->errorCode);
+    OrionError oe(qcrsP->error);
 
     qcrP->release();
     return;
@@ -726,7 +726,7 @@ void postQueryContext
       }
 
       qP = new QueryContextResponse();
-      qP->errorCode.fill(SccOk);
+      qP->error.fill(SccOk);
 
       if (queryForward(ciP, requestV[fIx], regIdsV[fIx], providerLimit, providerOffset, countP, fIx + 1, qP) == true)
       {
@@ -750,7 +750,7 @@ void postQueryContext
       }
       else
       {
-        qP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+        qP->error.fill(SccContextElementNotFound, "invalid context provider response");
         responseV.push_back(qP);
       }
     }

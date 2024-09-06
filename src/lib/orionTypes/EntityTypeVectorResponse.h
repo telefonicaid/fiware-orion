@@ -29,7 +29,7 @@
 #include <vector>
 
 #include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "orionTypes/EntityTypeVector.h"
 
 
@@ -42,7 +42,7 @@ class EntityTypeVectorResponse
 {
  public:
   EntityTypeVector  entityTypeVector;
-  StatusCode        statusCode;
+  OrionError        error;
 
   void              release(void);
   std::string       toJson(bool values);

@@ -132,7 +132,7 @@ static void addContextProviderEntity
   cerP->entity.providerList.push_back(provider);
   cerP->entity.providerRegIdList.push_back(regId);
 
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
   cerV.push_back(cerP);
 }
 
@@ -191,7 +191,7 @@ static void addContextProviderAttribute
 
     EntityId enId(regEn.id, regEn.idPattern, regEn.type, regEn.typePattern);
     cerP->entity.fill(enId);
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
 
     ContextAttribute* caP = new ContextAttribute(regAttr, "", "");
 
@@ -359,7 +359,7 @@ HttpStatusCode mongoQueryContext
                      requestP->attributeList,
                      requestP->scopeVector,
                      &rawCerV,
-                     &err,
+                     &responseP->error,
                      tenant,
                      servicePathV,
                      offset,
@@ -370,7 +370,6 @@ HttpStatusCode mongoQueryContext
 
   if (!ok)
   {
-    responseP->errorCode.fill(SccReceiverInternalError, err);
     rawCerV.release();
     reqSemGive(__FUNCTION__, "query request", reqSemTaken);
 
@@ -454,11 +453,11 @@ HttpStatusCode mongoQueryContext
       char details[256];
 
       snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", *countP, offset); // FIXME PR: this could be removed??
-      responseP->errorCode.fill(SccContextElementNotFound, details);
+      responseP->error.fill(SccContextElementNotFound, details);
     }
     else
     {
-      responseP->errorCode.fill(SccContextElementNotFound);
+      responseP->error.fill(SccContextElementNotFound);
     }
   }
   else if (countP != NULL)
@@ -472,7 +471,7 @@ HttpStatusCode mongoQueryContext
     char details[64];
 
     snprintf(details, sizeof(details), "Count: %lld", *countP);
-    responseP->errorCode.fill(SccOk, details);
+    responseP->error.fill(SccOk, details);
   }
 
   rawCerV.release();

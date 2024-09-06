@@ -123,7 +123,7 @@ ContextElementResponse* ContextElementResponseVector::lookup(Entity* eP, HttpSta
   {
     if (vec[ix]->entity.equal(eP) == true)
     {
-      if ((code == SccNone) || (vec[ix]->statusCode.code == code))
+      if ((code == SccNone) || (vec[ix]->error.code == code))
       {
         return vec[ix];
       }
@@ -161,7 +161,7 @@ void ContextElementResponseVector::fill(EntityVector& erV, HttpStatusCode sc)
   {
     ContextElementResponse* cerP = new ContextElementResponse(erV[ix]);
 
-    cerP->statusCode.fill(sc, erV[ix]->entityId.id);
+    cerP->error.fill(sc, erV[ix]->entityId.id);
 
     push_back(cerP);
   }

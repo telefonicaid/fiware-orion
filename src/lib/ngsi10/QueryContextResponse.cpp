@@ -31,7 +31,7 @@
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi10/QueryContextResponse.h"
 
 
@@ -52,7 +52,6 @@ QueryContextResponse::QueryContextResponse()
 */
 QueryContextResponse::~QueryContextResponse()
 {
-  errorCode.release();
   contextElementResponseVector.release();
 }
 
@@ -65,7 +64,6 @@ QueryContextResponse::~QueryContextResponse()
 void QueryContextResponse::release(void)
 {
   contextElementResponseVector.release();
-  errorCode.release();
 }
 
 
@@ -99,22 +97,22 @@ void QueryContextResponse::fill(const EntityVector& entities)
 */
 ContextAttribute* QueryContextResponse::getAttr(const std::string& attrName, OrionError* oeP)
 {
-  if (errorCode.code == SccContextElementNotFound)
+  if (error.code == SccContextElementNotFound)
   {
     oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
     return NULL;
   }
 
-  if (errorCode.code != SccOk)
+  if (error.code != SccOk)
   {
     //
     // any other error distinct from Not Found
     //
-    oeP->fill(errorCode.code, errorCode.details, errorCode.reasonPhrase);
+    oeP->fill(error.code, error.description, error.error);
     return NULL;
   }
 
-  if (contextElementResponseVector.size() > 1)  // errorCode.code == SccOk
+  if (contextElementResponseVector.size() > 1)  // error.code == SccOk
   {
     //
     // If there are more than one entity, we return an error

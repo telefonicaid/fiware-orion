@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 
 #include "mongoDriver/DBCursor.h"
 #include "mongoDriver/BSONObj.h"

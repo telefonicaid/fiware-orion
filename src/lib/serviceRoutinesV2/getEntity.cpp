@@ -116,7 +116,7 @@ std::string getEntity
                                         parseDataP->qcr.res.metadataList.stringV));
 
     // response code the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    ciP->httpStatusCode = parseDataP->qcrs.res.error.code;
   }
   else
   {

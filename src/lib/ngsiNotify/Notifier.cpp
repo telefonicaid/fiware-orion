@@ -148,7 +148,7 @@ static bool setPayload
     // described in issue #4263 will happend
     cer.entity.attributeVector.push_back(en.attributeVector, true);
 
-    cer.statusCode.code = SccOk;
+    cer.error.code = SccOk;
 
     ncr.subscriptionId  = subscriptionId;
     ncr.contextElementResponseVector.push_back(&cer);
@@ -313,7 +313,7 @@ static bool setNgsiPayload
     }
   }
 
-  cer.statusCode.code = SccOk;
+  cer.error.code = SccOk;
 
   ncr.subscriptionId  = subscriptionId;
   ncr.contextElementResponseVector.push_back(&cer);
@@ -716,7 +716,7 @@ SenderThreadParams* Notifier::buildSenderParams
     /* Note we use cloneCompound=true in cer.entity.fill(). This is due to
      * cer.entity destructor does release() on the attrs vector */
     cer.entity.fill(notifyCerP->entity, false, true);
-    cer.statusCode.fill(SccOk);
+    cer.error.fill(SccOk);
 
     ncr.contextElementResponseVector.push_back(&cer);
 

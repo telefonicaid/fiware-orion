@@ -32,7 +32,6 @@ SET (SOURCES
     Request.cpp
     Scope.cpp
     ScopeVector.cpp
-    StatusCode.cpp
     StringList.cpp
 )
 
@@ -46,7 +45,6 @@ SET (HEADERS
     Metadata.h
     MetadataVector.h
     Scope.h
-    StatusCode.h
     StringList.h
 )
 

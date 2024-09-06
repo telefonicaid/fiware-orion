@@ -718,18 +718,18 @@ void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
 {
   Entity* eP = NULL;
 
-  if (qcrs.errorCode.code == SccContextElementNotFound)
+  if (qcrs.error.code == SccContextElementNotFound)
   {
     oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
   }
-  else if (qcrs.errorCode.code != SccOk)
+  else if (qcrs.error.code != SccOk)
   {
     //
     // any other error distinct from Not Found
     //
-    oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
+    oeP->fill(qcrs.error.code, qcrs.error.description, qcrs.error.error);
   }
-  else  // qcrs.errorCode.code == SccOk
+  else  // qcrs.error.code == SccOk
   {
     //
     // If there are more than one entity (ignoring SccContextElementNotFound cases), we return an error
@@ -737,7 +737,7 @@ void Entity::fill(const QueryContextResponse& qcrs, OrionError* oeP)
     //
     for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
     {
-      if (qcrs.contextElementResponseVector[ix]->statusCode.code != SccContextElementNotFound)
+      if (qcrs.contextElementResponseVector[ix]->error.code != SccContextElementNotFound)
       {
         if (eP != NULL)
         {

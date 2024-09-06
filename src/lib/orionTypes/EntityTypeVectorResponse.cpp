@@ -45,7 +45,6 @@
 void EntityTypeVectorResponse::release(void)
 {
   entityTypeVector.release();
-  statusCode.release();
 }
 
 

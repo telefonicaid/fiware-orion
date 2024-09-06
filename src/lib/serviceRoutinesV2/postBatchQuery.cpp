@@ -55,7 +55,7 @@
 */
 static void fillEntityVector(const QueryContextResponse& qcrs, EntityVector* enVP, OrionError* oeP)
 {
-  if (qcrs.errorCode.code == SccContextElementNotFound)
+  if (qcrs.error.code == SccContextElementNotFound)
   {
     //
     // If no entities are found, we respond with a 200 OK
@@ -65,28 +65,27 @@ static void fillEntityVector(const QueryContextResponse& qcrs, EntityVector* enV
     oeP->fill(SccOk, "", "OK");
     return;
   }
-  else if (qcrs.errorCode.code != SccOk)
+  else if (qcrs.error.code != SccOk)
   {
     //
     // If any other error - use the error for the response
     //
 
-    oeP->fill(qcrs.errorCode.code, qcrs.errorCode.details, qcrs.errorCode.reasonPhrase);
+    oeP->fill(qcrs.error.code, qcrs.error.description, qcrs.error.error);
     return;
   }
 
   for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
   {
     Entity* eP = &qcrs.contextElementResponseVector[ix]->entity;
-    StatusCode* scP = &qcrs.contextElementResponseVector[ix]->statusCode;
 
-    if (scP->code == SccReceiverInternalError)
+    if ((&qcrs.contextElementResponseVector[ix]->error)->code == SccReceiverInternalError)
     {
       // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
       // think so, as the releasing logic in the upper layer will deal with that but
       // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
       // cannot help here and it is better to ensure)
-      oeP->fill(SccReceiverInternalError, scP->details, "InternalServerError");
+      oeP->fill(&qcrs.contextElementResponseVector[ix]->error);
       enVP->release();
       return;
     }

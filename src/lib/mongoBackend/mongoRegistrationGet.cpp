@@ -144,7 +144,7 @@ void mongoRegistrationsGet
   bool         reqSemTaken = false;
   std::string  err;
   orion::OID   oid;
-  StatusCode   sc;
+  OrionError   oe;
   std::string  servicePath = (servicePathV.size() == 0)? "/#" : servicePathV[0];  // FIXME P4: see #3100
 
   reqSemTake(__FUNCTION__, "Mongo Get Registrations", SemReadOp, &reqSemTaken);

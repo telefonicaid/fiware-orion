@@ -26,7 +26,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ParseData.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
@@ -66,7 +66,7 @@ TEST(NotifyContextRequest, json_render)
   EntityId enId1("E01", "", "EType", "");
   cerP->entity.fill(enId1);
   ncrP->contextElementResponseVector.push_back(cerP);
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   rendered = ncrP->toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
@@ -78,7 +78,7 @@ TEST(NotifyContextRequest, json_render)
   EntityId enId2("E02", "", "EType", "");
   cerP->entity.fill(enId2);
   ncrP->contextElementResponseVector.push_back(cerP);
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
   rendered = ncrP->toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
