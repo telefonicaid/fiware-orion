@@ -1515,7 +1515,7 @@ static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
       // EntityUpdate is special, it is a "sub-type" of EntityChange
       if (isChangeAltType(targetAltType))
       {
-        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (isChangeAltType(targetAltType)))
+        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (isChangeAltType(altType)))
         {
           return true;
         }
