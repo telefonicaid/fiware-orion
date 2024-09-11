@@ -1493,7 +1493,7 @@ static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
   // change and create. Maybe this could be check at MongoDB query stage, but seems be more complex
   if (altTypeStrings.size() == 0)
   {
-    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
+    if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
     {
       return true;
     }
@@ -1513,9 +1513,9 @@ static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
     else
     {
       // EntityUpdate is special, it is a "sub-type" of EntityChange
-      if (targetAltType == ngsiv2::SubAltType::EntityChange)
+      if (isChangeAltType(targetAltType))
       {
-        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
+        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (isChangeAltType(targetAltType)))
         {
           return true;
         }
@@ -1659,11 +1659,13 @@ static bool addTriggeredSubscriptions_noCache
           continue;
         }
       }
-      else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
+      else if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::EntityCreate))
       {
         // Skip if: 1) there is no change in the *value* of attributes listed in conditions.attrs and 2) there is no change
         // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadtaChange is true)
-        if (!condValueAttrMatch(sub, attrsWithModifiedValue) && !(notifyOnMetadataChange && condValueAttrMatch(sub, attrsWithModifiedMd)))
+        bool b1 = condValueAttrMatch(sub, attrsWithModifiedValue);
+        bool b2 = condValueAttrMatch(sub, attrsWithModifiedMd);
+        if (!b1 && !(notifyOnMetadataChange && b2))
         {
           continue;
         }
@@ -2766,24 +2768,41 @@ static bool processContextAttributeVector
     {
       attrsWithModifiedValue.push_back(ca->name);
       attrsWithModifiedMd.push_back(ca->name);
+      targetAltType = ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
     }
     else if (changeType == CHANGE_ONLY_VALUE)
     {
       attrsWithModifiedValue.push_back(ca->name);
+      if ((targetAltType == ngsiv2::SubAltType::EntityChangeBothValueAndMetadata) || (targetAltType == ngsiv2::SubAltType::EntityChangeOnlyMetadata))
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
+      }
+      else
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeOnlyValue;
+      }
     }
     else if (changeType == CHANGE_ONLY_MD)
     {
       attrsWithModifiedMd.push_back(ca->name);
+      if ((targetAltType == ngsiv2::SubAltType::EntityChangeBothValueAndMetadata) || (targetAltType == ngsiv2::SubAltType::EntityChangeOnlyValue))
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
+      }
+      else
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeOnlyMetadata;
+      }
     }
 
-    attributes.push_back(ca->name);
+    attributes.push_back(ca->name); 
 
     /* If actual update then targetAltType changes from EntityUpdate (the value used to initialize
      * the variable) to EntityChange */
-    if (changeType != NO_CHANGE)
+    /*if (changeType != NO_CHANGE)
     {
       targetAltType = ngsiv2::SubAltType::EntityChange;
-    }
+    }*/
   }
 
   /* Add triggered subscriptions */
@@ -3948,7 +3967,7 @@ static unsigned int updateEntity
    * previous addTriggeredSubscriptions() invocations. Before that, we add
    * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
    * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
-  addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChange));
+  addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChangeBothValueAndMetadata));
   unsigned int notifSent = processSubscriptions(subsToNotify,
                                                 notifyCerP,
                                                 tenant,

@@ -57,7 +57,9 @@ typedef enum NotificationType
 */
 typedef enum SubAltType
 {
-  EntityChange,
+  EntityChangeBothValueAndMetadata,  // this is the reference one used by parsing/rendering logic
+  EntityChangeOnlyValue,
+  EntityChangeOnlyMetadata,
   EntityUpdate,
   EntityCreate,
   EntityDelete,
@@ -189,6 +191,14 @@ extern ngsiv2::SubAltType parseAlterationType(const std::string& altType);
 * subAltType2string -
 */
 extern std::string subAltType2string(ngsiv2::SubAltType altType);
+
+
+
+/* ****************************************************************************
+*
+* isChangeAltType -
+*/
+extern bool isChangeAltType(ngsiv2::SubAltType altType);
 
 
 

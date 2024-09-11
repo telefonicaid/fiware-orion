@@ -42,7 +42,7 @@ ngsiv2::SubAltType parseAlterationType(const std::string& altType)
 {
   if (altType == "entityChange")
   {
-    return ngsiv2::SubAltType::EntityChange;
+    return ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
   }
   else if (altType == "entityUpdate")
   {
@@ -66,11 +66,24 @@ ngsiv2::SubAltType parseAlterationType(const std::string& altType)
 
 /* ****************************************************************************
 *
+* isChangeAltType -
+*/
+bool isChangeAltType(ngsiv2::SubAltType altType)
+{
+  return (altType == ngsiv2::SubAltType::EntityChangeBothValueAndMetadata) ||
+         (altType == ngsiv2::SubAltType::EntityChangeOnlyMetadata)         ||
+         (altType == ngsiv2::SubAltType::EntityChangeOnlyValue);
+}
+
+
+
+/* ****************************************************************************
+*
 * subAltType2string -
 */
 std::string subAltType2string(ngsiv2::SubAltType altType)
 {
-  if (altType == ngsiv2::SubAltType::EntityChange)
+  if (isChangeAltType(altType))
   {
     return "entityChange";
   }

@@ -403,7 +403,7 @@ static bool matchAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAlt
   // If subAltTypeV size == 0 default alteration types are update with change and create
   if (cSubP->subAltTypeV.size() == 0)
   {
-    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
+    if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
     {
       return true;
     }
@@ -417,9 +417,9 @@ static bool matchAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAlt
     ngsiv2::SubAltType altType = cSubP->subAltTypeV[ix];
 
     // EntityUpdate is special, it is a "sub-type" of EntityChange
-    if (targetAltType == ngsiv2::SubAltType::EntityChange)
+    if (isChangeAltType(targetAltType))
     {
-      if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
+      if ((altType == ngsiv2::SubAltType::EntityUpdate) || (isChangeAltType(altType)))
       {
         return true;
       }
@@ -507,7 +507,7 @@ static bool subMatch
       return false;
     }
   }
-  else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
+  else if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::EntityCreate))
   {
     if (!attributeMatch(cSubP, attrsWithModifiedValue) &&
         !(cSubP->notifyOnMetadataChange && attributeMatch(cSubP, attrsWithModifiedMd)))
