@@ -34,7 +34,8 @@ accumulatorStart --pretty-print
 # 01. Create sub with alterationType entityUpdate+entityCreate and notifyOnMetadataChange false
 # 02. Create entity dummy-device-01 with two attributes
 # 03. Update entity dummy-device-01 metadata in two attributes
-# 04. Dump accumulator and see three notifications
+# 04. Update entity dummy-device-01 without actual update
+# 05. Dump accumulator and see three notifications
 #
 
 
@@ -141,7 +142,7 @@ echo
 echo
 
 
-echo "03. Update entity dummy-device-01 without actual update"
+echo "04. Update entity dummy-device-01 without actual update"
 echo "======================================================="
 payload='{
   "temperature": {
@@ -158,7 +159,7 @@ echo
 echo
 
 
-echo "04. Dump accumulator and see three notifications"
+echo "05. Dump accumulator and see three notifications"
 echo "================================================"
 accumulatorDump
 echo
@@ -194,7 +195,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-03. Update entity dummy-device-01 without actual update
+04. Update entity dummy-device-01 without actual update
 =======================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -202,7 +203,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Dump accumulator and see three notifications
+05. Dump accumulator and see three notifications
 ================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
