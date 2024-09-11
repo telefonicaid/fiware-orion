@@ -1641,14 +1641,20 @@ static bool addTriggeredSubscriptions_noCache
 
     if (subs.count(subIdStr) == 0)
     {
+      // Early extraction of fiedl from DB document. The rest of fields are got later
+      bool  notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
+
+      // If notifyOnMetadataChange is false and only metadata has been changed, we "downgrade" to ngsiv2::EntityUpdate
+      if (!notifyOnMetadataChange && (targetAltType == ngsiv2::EntityChangeOnlyMetadata))
+      {
+        targetAltType = ngsiv2::EntityUpdate;
+      }
+
       // Check alteration type
       if (!matchAltType(sub, targetAltType))
       {
         continue;
       }
-
-      // Early extraction of fiedl from DB document. The rest of fields are got later
-      bool  notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
 
       // Depending of the alteration type, we use the list of attributes in the request or the list
       // with effective modifications. Note that EntityDelete doesn't check the list
@@ -1662,9 +1668,10 @@ static bool addTriggeredSubscriptions_noCache
       else if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::EntityCreate))
       {
         // Skip if: 1) there is no change in the *value* of attributes listed in conditions.attrs and 2) there is no change
-        // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadtaChange is true)
+        // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadataChange is true)
         bool b1 = condValueAttrMatch(sub, attrsWithModifiedValue);
         bool b2 = condValueAttrMatch(sub, attrsWithModifiedMd);
+
         if (!b1 && !(notifyOnMetadataChange && b2))
         {
           continue;
@@ -2795,14 +2802,7 @@ static bool processContextAttributeVector
       }
     }
 
-    attributes.push_back(ca->name); 
-
-    /* If actual update then targetAltType changes from EntityUpdate (the value used to initialize
-     * the variable) to EntityChange */
-    /*if (changeType != NO_CHANGE)
-    {
-      targetAltType = ngsiv2::SubAltType::EntityChange;
-    }*/
+    attributes.push_back(ca->name);
   }
 
   /* Add triggered subscriptions */

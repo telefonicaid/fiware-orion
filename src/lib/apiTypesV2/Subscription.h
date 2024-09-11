@@ -57,7 +57,9 @@ typedef enum NotificationType
 */
 typedef enum SubAltType
 {
-  EntityChangeBothValueAndMetadata,  // this is the reference one used by parsing/rendering logic
+  // EntityChange has been specialized into three sub-types in order to solve #4605
+  // (EntityChangeBothValueAndMetadata is thre reference one used in parsing/rendering logic)
+  EntityChangeBothValueAndMetadata,
   EntityChangeOnlyValue,
   EntityChangeOnlyMetadata,
   EntityUpdate,

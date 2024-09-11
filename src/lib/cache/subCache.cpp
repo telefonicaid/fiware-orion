@@ -490,6 +490,11 @@ static bool subMatch
     return false;
   }
 
+  // If notifyOnMetadataChange is false and only metadata has been changed, we "downgrade" to ngsiv2::EntityUpdate
+  if (!cSubP->notifyOnMetadataChange && (targetAltType == ngsiv2::EntityChangeOnlyMetadata))
+  {
+    targetAltType = ngsiv2::EntityUpdate;
+  }
 
   //
   // If one of the attribute names in the scope vector
@@ -509,8 +514,11 @@ static bool subMatch
   }
   else if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::EntityCreate))
   {
-    if (!attributeMatch(cSubP, attrsWithModifiedValue) &&
-        !(cSubP->notifyOnMetadataChange && attributeMatch(cSubP, attrsWithModifiedMd)))
+    // No match if: 1) there is no change in the *value* of attributes listed in conditions.attrs and 2) there is no change
+    // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadataChange is true)
+    bool b1 = attributeMatch(cSubP, attrsWithModifiedValue);
+    bool b2 = attributeMatch(cSubP, attrsWithModifiedMd);
+    if (!b1 && !(cSubP->notifyOnMetadataChange && b2))
     {
       LM_T(LmtSubCacheMatch, ("No match due to attributes"));
       return false;
