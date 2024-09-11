@@ -452,6 +452,12 @@ static bool subMatch
   ngsiv2::SubAltType               targetAltType
 )
 {
+  // If notifyOnMetadataChange is false and only metadata has been changed, we "downgrade" to ngsiv2::EntityUpdate
+  if (!cSubP->notifyOnMetadataChange && (targetAltType == ngsiv2::EntityChangeOnlyMetadata))
+  {
+    targetAltType = ngsiv2::EntityUpdate;
+  }
+
   // Check alteration type
   if (!matchAltType(cSubP, targetAltType))
   {
@@ -488,12 +494,6 @@ static bool subMatch
   {
     LM_T(LmtSubCacheMatch, ("No match due to servicePath"));
     return false;
-  }
-
-  // If notifyOnMetadataChange is false and only metadata has been changed, we "downgrade" to ngsiv2::EntityUpdate
-  if (!cSubP->notifyOnMetadataChange && (targetAltType == ngsiv2::EntityChangeOnlyMetadata))
-  {
-    targetAltType = ngsiv2::EntityUpdate;
   }
 
   //
