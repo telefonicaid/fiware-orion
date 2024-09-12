@@ -3,6 +3,7 @@
 - Fix: $max and $min operators were not supported with DateTime attributes (#4585)
 - Fix: wrong date values should not allowed in subscription's expires field (#4541)
 - Fix: do not raise DB alarm in case of wrong GeoJSON in client request
+- Fix: metadata modifications are not considered as change (with regards to subscription alterationTypes) if notifyOnMetadataChange is false (#4605)
 - Upgrade cjexl version from 0.3.0 to 0.4.0 (new transformations: now, getTime and toIsoString)
 - Upgrade Debian version from 12.4 to 12.6 in Dockerfile
 - Fix: invalid date in expires field of subscription (#2303)
