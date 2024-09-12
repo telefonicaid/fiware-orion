@@ -35,6 +35,7 @@
 #include "rest/OrionError.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/deleteEntity.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
 
@@ -44,7 +45,7 @@
 *
 * deleteEntity -
 *
-* DELETE /v2/entities/{entityId}
+* DELETE /v2/entities/{entityId}[/attrs/{attrName}]
 *
 * Payload In:  None
 * Payload Out: None
@@ -89,6 +90,9 @@ std::string deleteEntity
 
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
+
+  // Adjust error code if needed
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), true);
 
   ciP->outMimeType = JSON;
 

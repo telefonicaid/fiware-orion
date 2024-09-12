@@ -31,7 +31,7 @@ brokerStart CB 0 IPv4 -statCounters
 
 #
 # This test is special and doesn't follow the typical steps pattern
-# Instead of that, we just stimulate some possible API rute (without output)
+# Instead of that, we just stimulate some possible API routes (without output)
 # and do GET /statistics after that
 #
 
@@ -46,10 +46,15 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1525
+Content-Length: 1602
 
 {
     "counters": {
+        "deprecatedFeatures": {
+            "geoFormat": 0,
+            "ngsiv1Forwarding": 0,
+            "ngsiv1Requests": 0
+        },
         "discoveryErrors": 0,
         "invalidRequests": 0,
         "jsonRequests": 0,

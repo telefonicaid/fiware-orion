@@ -58,8 +58,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "inactive"
 }'
@@ -100,7 +99,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 311
+Content-Length: 312
 
 {
     "dataProvided": {
@@ -125,7 +124,7 @@ Content-Length: 311
         "http": {
             "url": "http://localhost:REGEX(\d+)/v2"
         },
-        "legacyForwarding": true,
+        "legacyForwarding": false,
         "supportedForwardingMode": "all"
     },
     "status": "inactive"

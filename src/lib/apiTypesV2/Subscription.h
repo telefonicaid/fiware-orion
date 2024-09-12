@@ -57,7 +57,11 @@ typedef enum NotificationType
 */
 typedef enum SubAltType
 {
-  EntityChange,
+  // EntityChange has been specialized into three sub-types in order to solve #4605
+  // (EntityChangeBothValueAndMetadata is thre reference one used in parsing/rendering logic)
+  EntityChangeBothValueAndMetadata,
+  EntityChangeOnlyValue,
+  EntityChangeOnlyMetadata,
   EntityUpdate,
   EntityCreate,
   EntityDelete,
@@ -149,8 +153,9 @@ struct Subject
 *
 * Subscription -
 */
-struct Subscription
+class Subscription
 {
+public:
   std::string   id;
   std::string   description;
   bool          descriptionProvided;
@@ -163,6 +168,10 @@ struct Subscription
   Restriction   restriction;
   std::string   toJson();
   void          release();
+
+  Subscription():
+    attrsFormat(NGSI_V2_NORMALIZED)
+  {}
 
   ~Subscription();
 };
@@ -184,6 +193,14 @@ extern ngsiv2::SubAltType parseAlterationType(const std::string& altType);
 * subAltType2string -
 */
 extern std::string subAltType2string(ngsiv2::SubAltType altType);
+
+
+
+/* ****************************************************************************
+*
+* isChangeAltType -
+*/
+extern bool isChangeAltType(ngsiv2::SubAltType altType);
 
 
 

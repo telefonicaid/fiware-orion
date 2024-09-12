@@ -271,49 +271,24 @@ The symptoms of a database connection problem are the following:
 -   At startup time. The broker doesn't start and the following message
     appears in the log file:
 
-` X@08:04:45 main[313]: MongoDB error`
+```
+... msg=Database Startup Error (cannot connect to mongo - doing 100 retries with a 1000 millisecond interval)
+... msg=Fatal Error (MongoDB error)
+
+```
 
 -   During broker operation. Error message like the following ones
     appear in the responses sent by the broker.
 
 ```
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: Null cursor"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [CONNECT_ERROR] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: socket exception [FAILED_STATE] for localhost:27017"
-    }
-    ...
-
-    ...
-    "errorCode": {
-        "code": "500",
-        "reasonPhrase": "Database Error",
-        "details": "collection: ... - exception: DBClientBase::findN: transport error: localhost:27017 ns: orion.$cmd query: { .. }"
-    }
-    ...
-
+{
+    "error": "InternalServerError",
+    "description": "Database Error ..."
+}
 ```
 
 In both cases, check that the connection to MonogDB is correctly
-configured (in particular, the "-dbhost" option [from the command
+configured (in particular, the `-dbURI` option [from the command
 line](cli.md)) and that the mongod/mongos
 process (depending if you are using sharding or not) is up and running.
 

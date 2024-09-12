@@ -280,10 +280,17 @@ void JsonObjectHelper::addNull(const std::string& key)
 *
 * JsonObjectHelper::str -
 */
-std::string JsonObjectHelper::str()
+std::string JsonObjectHelper::str(bool closed)
 {
-  ss += '}';
-  return ss;
+  // closed == false used in ExprContext logic
+  if (closed)
+  {
+    return ss + '}';
+  }
+  else
+  {
+    return ss;
+  }
 }
 
 
@@ -408,9 +415,21 @@ void JsonVectorHelper::addBool(bool b)
 
 /* ****************************************************************************
 *
+* JsonObjectHelper::addNull -
+*/
+void JsonVectorHelper::addNull(void)
+{
+  addRaw("null");
+}
+
+
+
+
+/* ****************************************************************************
+*
 * JsonVectorHelper::str -
 */
-std::string JsonVectorHelper::str()
+std::string JsonVectorHelper::str(void)
 {
   ss += ']';
   return ss;

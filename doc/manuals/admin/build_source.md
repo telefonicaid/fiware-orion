@@ -4,6 +4,8 @@ Orion Context Broker reference distribution is Debian 12. This doesn't mean that
 
 You can also have a look to [3.1 Building in not official distributions](../../../docker/README.md#31-building-in-not-official-distributions) section in the Docker documentation to check how to build Docker containers images in distributions other than the official one.
 
+*NOTE:* the build process described in this document does not include the cjexl library, as it is considered optional from the point of view of the basic building process.
+
 ## Debian 12 (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
@@ -11,7 +13,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (from source)
 * libcurl: 7.88.1
-* openssl: 3.0.9
+* openssl: 3.0.13
 * libuuid: 2.38.1
 * libmosquitto: 2.0.15 (from source)
 * Mongo C driver: 1.24.3 (from source)
@@ -107,7 +109,7 @@ The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tes
 
 In the case of the aarch64 architecture, install libxslt using apt-get, and run `./configure` with `--build=arm-linux` option.
 
-* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) for details. Recommended version is 6.0 (it may work with previous versions, but we don't recommend it).
+* Install MongoDB (tests rely on mongod running in localhost). Check [the official MongoDB documentation](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) for details. Recommended version is 6.0 (it may work with previous versions, but we don't recommend it).
 
 * Run unit test
 
@@ -146,3 +148,5 @@ You can generate coverage reports for the Orion Context Broker using the followi
 * Run coverage
 
         make coverage INSTALL_DIR=~
+
+*NOTE*: Functional tests relying in debug traces are expected to fail under coverage execution (e.g. notification_different_sizes or not_posix_regex_idpattern.test). This is due to the LM_T macros used by the debug traces are disabled in the coverage code build, as they add "noise" in condition coverage. This way coverage reports are more useful.

@@ -130,7 +130,7 @@ payload='{
     "type": "irrelevant"
   },
   "B4": {
-    "value": { "z": 10, "w": "ttt"},
+    "value": { "w": "ttt", "z": 10 },
     "type": "irrelevant"
   },
   "B5": {
@@ -279,7 +279,7 @@ MQTT message at topic topic1:
             "A3": {
                 "metadata": {},
                 "type": "Boolean",
-                "value": "this is an stringfied object: {\"z\":10,\"w\":\"ttt\"}"
+                "value": "this is an stringfied object: {\"w\":\"ttt\",\"z\":10}"
             },
             "A4": {
                 "metadata": {},

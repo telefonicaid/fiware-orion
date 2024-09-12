@@ -1,0 +1,620 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+JEXL expression in custom notification (using all transformations)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub using all transformations
+# 02. Create entity E1 with A to AD attributes
+# 03. Dump accumulator and see expected notification
+#
+
+
+echo "01. Create custom sub using all transformations"
+echo "==============================================="
+# NOTE: '\'' is the way of scaping a ' in the payload variable below (see https://stackoverflow.com/a/1250279/1485926)
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "attrs": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T",
+      "U",
+      "V",
+      "W",
+      "X",
+      "Y",
+      "Z",
+      "AA",
+      "AB",
+      "AC",
+      "AD",
+      "AE",
+      "AF",
+      "AG"
+    ],
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "A": {
+          "type": "Text",
+          "value": "${A+(3|toString)}"
+        },
+        "B": {
+          "type": "Text",
+          "value": "${B|replaceStr('\''A'\'','\''B'\'')}"
+        },
+        "C": {
+          "type": "Number",
+          "value": "${C+1}"
+        },
+        "D": {
+          "type": "Text",
+          "value": "${D|uppercase}"
+        },
+        "E": {
+          "type": "TextUnrestricted",
+          "value": "${E|lowercase}"
+        },
+        "F": {
+          "type": "Text",
+          "value": "${F[1]|trim}"
+        },
+        "G": {
+          "type": "Number",
+          "value": "${G|toFixed(1)}"
+        },
+        "H": {
+          "type": "Text",
+          "value": "${H|includes('\''N'\'')}"
+        },
+        "I": {
+          "type": "Text",
+          "value": "${I|indexOf('\''test'\'')}"
+        },
+        "J": {
+          "type": "Text",
+          "value": "${(J|isNaN)}"
+        },
+        "K": {
+          "type": "Text",
+          "value": "${K|typeOf}"
+        },
+        "L": {
+          "type": "TextUnrestricted",
+          "value": "${(L|split('\'' '\''))}"
+        },
+        "M": {
+          "type": "Number",
+          "value": "${M|round}"
+        },
+        "N": {
+          "type": "Text",
+          "value": "${N|substring(1,2)}"
+        },
+        "O": {
+          "type": "Text",
+          "value": "${ZZ||'\''Is null'\''}"
+        },
+        "P": {
+          "type": "Number",
+          "value": "${P|len}"
+        },
+        "Q": {
+          "type": "Number",
+          "value": "${Q|log}"
+        },
+        "R": {
+          "type": "Number",
+          "value": "${R|log10}"
+        },
+        "S": {
+          "type": "Number",
+          "value": "${S|log2}"
+        },
+        "T": {
+          "type": "Number",
+          "value": "${T|sqrt}"
+        },
+        "U": {
+          "type": "Text",
+          "value": "${U|mapper(['\''es'\'','\''fr'\''],['\''Spain'\'','\''France'\''])}"
+        },
+        "V": {
+          "type": "Text",
+          "value": "${V|thMapper([1,2],['\''low'\'','\''medium'\'','\''high'\''])}"
+        },
+        "W": {
+          "type": "StructuredValue",
+          "value": "${W|toJson}"
+        },
+        "X": {
+          "type": "Text",
+          "value": "${X|replaceRegex('\''[0-9]+'\'','\''x'\'')}"
+        },
+        "Y": {
+          "type": "Text",
+          "value": "${Y|matchRegex('\''[0-9]+'\'')}"
+        },
+        "Z": {
+          "type": "StructuredValue",
+          "value": "${Z|values}"
+        },
+        "AA": {
+          "type": "StructuredValue",
+          "value": "${AA|keys}"
+        },                                
+        "AB": {
+          "type": "Number",
+          "value": "${AB|arrSum}"
+        },
+        "AC": {
+          "type": "Number",
+          "value": "${AC|arrAvg}"
+        },
+        "AD": {
+          "type": "Number",
+          "value": "${AD|len}"
+        },
+        "AE": {
+          "type": "Number",
+          "value": "${AE|now}"
+        },
+        "AF": {
+          "type": "Text",
+          "value": "${AF|toIsoString}"
+        },
+        "AG": {
+          "type": "Number",
+          "value": "${AG|getTime}"
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with A to AD attributes"
+echo "============================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "type": "Text",
+    "value": "NA"
+  },
+  "B": {
+    "type": "Text",
+    "value": "NA"
+  },
+  "C": {
+    "type": "Number",
+    "value": 0.17
+  },
+  "D": {
+    "type": "Text",
+    "value": "rice"
+  },
+  "E": {
+    "type": "TextUnrestricted",
+    "value": "NA"
+  },
+  "F": {
+    "type": "Json",
+    "value": [
+      "Dolot sequitud",
+      "    trimable"
+    ],
+    "metadata": {}
+  },
+  "G": {
+    "type": "Number",
+    "value": 0.85
+  },
+  "H": {
+    "type": "Text",
+    "value": "NA"
+  },
+  "I": {
+    "type": "Text",
+    "value": "Ipsum test",
+    "metadata": {}
+  },
+  "J": {
+    "type": "Text",
+    "value": "NA"
+  },
+  "K": {
+    "type": "Text",
+    "value": "NA"
+  },
+  "L": {
+    "type": "Json",
+    "value": "Lorem limoso"
+  },
+  "M": {
+    "type": "Number",
+    "value": 0.3
+  },
+  "N": {
+    "type": "Text",
+    "value": "NA"
+  },
+  "O": {
+    "type": "Text",
+    "value": null
+  },
+  "P": {
+    "type": "Text",
+    "value": "NA"
+  },
+  "Q": {
+    "type": "Number",
+    "value": 2.80
+  },
+  "R": {
+    "type": "Number",
+    "value": 100
+  },
+  "S": {
+    "type": "Number",
+    "value": 32
+  },
+  "T": {
+    "type": "Number",
+    "value": 25
+  },
+  "U": {
+    "type": "Text",
+    "value": "fr"
+  },
+  "V": {
+    "type": "Number",
+    "value": 1.5
+  },
+  "W": {
+    "type": "Text",
+    "value": "[1,2,3]"
+  },
+  "X": {
+    "type": "Text",
+    "value": "aba1234aba782"
+  },
+  "Y": {
+    "type": "Text",
+    "value": "aba1234aba782"
+  },
+  "Z": {
+    "type": "StructuredValue",
+    "value": {"x": 1, "y": {"y1": 2, "y2": 3}}
+  },
+  "AA": {
+    "type": "StructuredValue",
+    "value": {"x": 1, "y": {"y1": 2, "y2": 3}}
+  },
+  "AB": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
+  },
+  "AC": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
+  },
+  "AD": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
+  },
+  "AE": {
+    "type": "Number",
+    "value": 0
+  },
+  "AF": {
+    "type": "Number",
+    "value": 1722500129
+  },
+  "AG": {
+    "type": "Number",
+    "value": "1979-11-13T18:01:14+00:00"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator and see expected notification"
+echo "=================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub using all transformations
+===============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1 with A to AD attributes
+============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Dump accumulator and see expected notification
+==================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 1809
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Text",
+                "value": "NA3"
+            },
+            "AA": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    "x",
+                    "y"
+                ]
+            },
+            "AB": {
+                "metadata": {},
+                "type": "Number",
+                "value": 6
+            },
+            "AC": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "AD": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "AE": {
+                "metadata": {},
+                "type": "Number",
+                "value": REGEX(\d+)
+            },
+            "AF": {
+                "metadata": {},
+                "type": "Text",
+                "value": "2024-08-01T08:15:29+00:00"
+            },
+            "AG": {
+                "metadata": {},
+                "type": "Number",
+                "value": 311364074
+            },
+            "B": {
+                "metadata": {},
+                "type": "Text",
+                "value": "NB"
+            },
+            "C": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1.17
+            },
+            "D": {
+                "metadata": {},
+                "type": "Text",
+                "value": "RICE"
+            },
+            "E": {
+                "metadata": {},
+                "type": "TextUnrestricted",
+                "value": "na"
+            },
+            "F": {
+                "metadata": {},
+                "type": "Text",
+                "value": "trimable"
+            },
+            "G": {
+                "metadata": {},
+                "type": "Number",
+                "value": 0.8
+            },
+            "H": {
+                "metadata": {},
+                "type": "Text",
+                "value": true
+            },
+            "I": {
+                "metadata": {},
+                "type": "Text",
+                "value": 6
+            },
+            "J": {
+                "metadata": {},
+                "type": "Text",
+                "value": true
+            },
+            "K": {
+                "metadata": {},
+                "type": "Text",
+                "value": "String"
+            },
+            "L": {
+                "metadata": {},
+                "type": "TextUnrestricted",
+                "value": [
+                    "Lorem",
+                    "limoso"
+                ]
+            },
+            "M": {
+                "metadata": {},
+                "type": "Number",
+                "value": 0
+            },
+            "N": {
+                "metadata": {},
+                "type": "Text",
+                "value": "A"
+            },
+            "O": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Is null"
+            },
+            "P": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "Q": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1.029619417
+            },
+            "R": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "S": {
+                "metadata": {},
+                "type": "Number",
+                "value": 5
+            },
+            "T": {
+                "metadata": {},
+                "type": "Number",
+                "value": 5
+            },
+            "U": {
+                "metadata": {},
+                "type": "Text",
+                "value": "France"
+            },
+            "V": {
+                "metadata": {},
+                "type": "Text",
+                "value": "medium"
+            },
+            "W": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            "X": {
+                "metadata": {},
+                "type": "Text",
+                "value": "abaxabax"
+            },
+            "Y": {
+                "metadata": {},
+                "type": "Text",
+                "value": [
+                    "1234",
+                    "782"
+                ]
+            },
+            "Z": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    1,
+                    {
+                        "y1": 2,
+                        "y2": 3
+                    }
+                ]
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

@@ -47,10 +47,10 @@ services:
       - "1026:1026"
     depends_on:
       - mongo
-    command: -dbhost mongo
+    command: -dbURI mongodb://mongo
 
   mongo:
-    image: mongo:4.4
+    image: mongo:6.0
     command: --nojournal
 ```
 

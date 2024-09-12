@@ -44,9 +44,6 @@
 
 #define EARTH_RADIUS_METERS         6371000
 
-#define LOCATION_WGS84              "WGS84"
-#define LOCATION_WGS84_LEGACY       "WSG84"    // We fixed the right string at 0.17.0, but the old one needs to be mantained
-
 
 
 /* ****************************************************************************
@@ -131,6 +128,7 @@
 #define OPT_OVERRIDEMETADATA            "overrideMetadata"
 #define OPT_SKIPFORWARDING              "skipForwarding"
 #define OPT_FULL_COUNTERS               "fullCounters"
+#define OPT_LIB_VERSIONS                "libVersions"  // used in GET /version operation
 
 
 /* ****************************************************************************
@@ -149,8 +147,7 @@ typedef enum Ngsiv2Flavour
 {
   NGSIV2_NO_FLAVOUR               = 0,
   NGSIV2_FLAVOUR_ONCREATE         = 1,
-  NGSIV2_FLAVOUR_ONAPPEND         = 2,
-  NGSIV2_FLAVOUR_ONUPDATE         = 3
+  NGSIV2_FLAVOUR_ONAPPEND         = 2
 } Ngsiv2Flavour;
 
 

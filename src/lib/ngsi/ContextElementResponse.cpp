@@ -98,9 +98,7 @@ ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP, boo
 ContextElementResponse::ContextElementResponse
 (
   const orion::BSONObj&  entityDoc,
-  const StringList&      attrL,
-  bool                   includeEmpty,
-  ApiVersion             apiVersion
+  const StringList&      attrL
 )
 {
   prune = false;
@@ -125,7 +123,7 @@ ContextElementResponse::ContextElementResponse
   //
   // Attribute vector
   //
-  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL, includeEmpty, locAttr, apiVersion);
+  entity.attributeVector.fill(getObjectFieldF(entityDoc, ENT_ATTRS), attrL);
 
   /* Set creDate and modDate at entity level */
   if (entityDoc.hasField(ENT_CREATION_DATE))
@@ -217,12 +215,12 @@ std::string ContextElementResponse::toJson
   const std::vector<std::string>&      attrsFilter,
   bool                                 blacklist,
   const std::vector<std::string>&      metadataFilter,
-  std::map<std::string, std::string>*  replacementsP
+  ExprContextObject*                   exprContextObjectP
 )
 {
   std::string out;
 
-  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, replacementsP);
+  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, exprContextObjectP);
 
   return out;
 }

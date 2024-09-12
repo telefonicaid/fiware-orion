@@ -403,7 +403,7 @@ static bool matchAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAlt
   // If subAltTypeV size == 0 default alteration types are update with change and create
   if (cSubP->subAltTypeV.size() == 0)
   {
-    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
+    if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
     {
       return true;
     }
@@ -417,9 +417,9 @@ static bool matchAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAlt
     ngsiv2::SubAltType altType = cSubP->subAltTypeV[ix];
 
     // EntityUpdate is special, it is a "sub-type" of EntityChange
-    if (targetAltType == ngsiv2::SubAltType::EntityChange)
+    if (isChangeAltType(targetAltType))
     {
-      if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
+      if ((altType == ngsiv2::SubAltType::EntityUpdate) || (isChangeAltType(altType)))
       {
         return true;
       }
@@ -452,6 +452,12 @@ static bool subMatch
   ngsiv2::SubAltType               targetAltType
 )
 {
+  // If notifyOnMetadataChange is false and only metadata has been changed, we "downgrade" to ngsiv2::EntityUpdate
+  if (!cSubP->notifyOnMetadataChange && (targetAltType == ngsiv2::EntityChangeOnlyMetadata))
+  {
+    targetAltType = ngsiv2::EntityUpdate;
+  }
+
   // Check alteration type
   if (!matchAltType(cSubP, targetAltType))
   {
@@ -490,7 +496,6 @@ static bool subMatch
     return false;
   }
 
-
   //
   // If one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
@@ -507,10 +512,13 @@ static bool subMatch
       return false;
     }
   }
-  else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
+  else if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::EntityCreate))
   {
-    if (!attributeMatch(cSubP, attrsWithModifiedValue) &&
-        !(cSubP->notifyOnMetadataChange && attributeMatch(cSubP, attrsWithModifiedMd)))
+    // No match if: 1) there is no change in the *value* of attributes listed in conditions.attrs and 2) there is no change
+    // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadataChange is true)
+    bool b1 = attributeMatch(cSubP, attrsWithModifiedValue);
+    bool b2 = attributeMatch(cSubP, attrsWithModifiedMd);
+    if (!b1 && !(cSubP->notifyOnMetadataChange && b2))
     {
       LM_T(LmtSubCacheMatch, ("No match due to attributes"));
       return false;

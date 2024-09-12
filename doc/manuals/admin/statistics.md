@@ -54,6 +54,11 @@ The counter block provides information about counters for the times a particular
 {
   ...
   "counters": {
+    "deprecatedFeatures": {
+      "geoFormat": 2,
+      "ngsiv1Forwarding": 4,
+      "ngsiv1Requests": 4
+    },
     "invalidRequests": 2,
     "jsonRequests": 4,
     "noPayloadRequests": 250,
@@ -123,20 +128,22 @@ Provides timing information, i.e. the time that CB passes executing in different
   "timing": {
     "accumulated": {
       "jsonV1Parse": 7.860908311,
-      "mongoBackend": 416.796091597,
-      "mongoReadWait": 4656.924425628,
-      "mongoWriteWait": 259.347915990,
-      "mongoCommandWait": 0.514811318,
-      "render": 108.162782114,
-      "total": 6476.593504743
-     },
+      "jsonV2Parse": 120.680244446,
+      "mongoBackend": 12778.52734375,
+      "mongoReadWait": 7532.301757812,
+      "mongoWriteWait": 3619.282226562,
+      "mongoCommandWait": 0.120559767,
+      "exprJexlCtxBld": 27.092681885,
+      "exprJexlEval": 124.217208862,
+      "render": 44.540554047,
+      "total": 25051.384765625
+    },
     "last": {
-      "mongoBackend": 0.014752309,
-      "mongoReadWait": 0.012018445,
-      "mongoWriteWait": 0.000574611,
-      "render": 0.000019136,
-      "total": 0.015148915
-     }
+      "mongoBackend": 0.003775352,
+      "mongoReadWait": 0.0013743,
+      "render": 0.000286864,
+      "total": 0.00440685
+    }
   }
   ...
 }
@@ -161,10 +168,15 @@ The particular counters are as follows:
   `last` includes the accumulation for all of them. In the case of mongoReadWait, only the time used
   to get the results cursor is taken into account, but not the time to process cursors results (which
   is time that belongs to mongoBackend counters).
+* `exprJexlCtxBld`: time passed building context for custom notification expression evaluation (see [macro substitution](../orion-api.md#macro-substitution) and [JEXL support](../orion-api.md#jexl-support))
+* `exprJexlEval`: time passed evaluating custom notification expressions (see [macro substitution](../orion-api.md#macro-substitution) and [JEXL support](../orion-api.md#jexl-support))
+
+*NOTE*: if Orion binary is build without using cjexl and only basic replacement is available, then `exprBasicCtxtBld` and `exprBasicEval`
+fields appear instead of `exprJexlCtxBld` and `exprJexlEval`.
 
 Times are measured from the point in time in which a particular thread request starts using a module until it finishes using it.
 Thus, if the thread is stopped for some reason (e.g. the kernel decides to give priority to another thread based on its
-scheculing policy) the time that the thread was sleeping, waiting to execute again is included in the measurement and thus, the measurement is not accurate. That is why we say *pseudo* selt/end-to-end time. However,
+scheculing policy) the time that the thread was sleeping, waiting to execute again is included in the measurement and thus, the measurement is not accurate. That is why we say *pseudo* self/end-to-end time. However,
 under low load conditions this situation is not expected to have a significant impact.
 
 ### NotifQueue block

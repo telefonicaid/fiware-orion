@@ -210,8 +210,7 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   nP->lastSuccessCode   = r.hasField(CSUB_LASTSUCCESSCODE)?  getIntOrLongFieldAsLongF(r, CSUB_LASTSUCCESSCODE)  : -1;
 
   // Attributes format
-  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V1_LEGACY;
-
+  subP->attrsFormat = r.hasField(CSUB_FORMAT)? stringToRenderFormat(getStringFieldF(r, CSUB_FORMAT)) : NGSI_V2_NORMALIZED;
 
   //
   // Check values from subscription cache, update object from cache-values if necessary

@@ -64,6 +64,7 @@
 #include "mongoDriver/safeMongo.h"
 #include "mongoDriver/BSONObjBuilder.h"
 #include "mongoDriver/BSONArrayBuilder.h"
+#include "mongoDriver/DBErrors.h"
 
 
 /* ****************************************************************************
@@ -1492,7 +1493,7 @@ static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
   // change and create. Maybe this could be check at MongoDB query stage, but seems be more complex
   if (altTypeStrings.size() == 0)
   {
-    if ((targetAltType == ngsiv2::SubAltType::EntityChange) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
+    if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::SubAltType::EntityCreate))
     {
       return true;
     }
@@ -1512,9 +1513,9 @@ static bool matchAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
     else
     {
       // EntityUpdate is special, it is a "sub-type" of EntityChange
-      if (targetAltType == ngsiv2::SubAltType::EntityChange)
+      if (isChangeAltType(targetAltType))
       {
-        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (altType == ngsiv2::SubAltType::EntityChange))
+        if ((altType == ngsiv2::SubAltType::EntityUpdate) || (isChangeAltType(altType)))
         {
           return true;
         }
@@ -1640,14 +1641,20 @@ static bool addTriggeredSubscriptions_noCache
 
     if (subs.count(subIdStr) == 0)
     {
+      // Early extraction of fiedl from DB document. The rest of fields are got later
+      bool  notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
+
+      // If notifyOnMetadataChange is false and only metadata has been changed, we "downgrade" to ngsiv2::EntityUpdate
+      if (!notifyOnMetadataChange && (targetAltType == ngsiv2::EntityChangeOnlyMetadata))
+      {
+        targetAltType = ngsiv2::EntityUpdate;
+      }
+
       // Check alteration type
       if (!matchAltType(sub, targetAltType))
       {
         continue;
       }
-
-      // Early extraction of fiedl from DB document. The rest of fields are got later
-      bool  notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
 
       // Depending of the alteration type, we use the list of attributes in the request or the list
       // with effective modifications. Note that EntityDelete doesn't check the list
@@ -1658,11 +1665,14 @@ static bool addTriggeredSubscriptions_noCache
           continue;
         }
       }
-      else if ((targetAltType == ngsiv2::EntityChange) || (targetAltType == ngsiv2::EntityCreate))
+      else if ((isChangeAltType(targetAltType)) || (targetAltType == ngsiv2::EntityCreate))
       {
         // Skip if: 1) there is no change in the *value* of attributes listed in conditions.attrs and 2) there is no change
-        // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadtaChange is true)
-        if (!condValueAttrMatch(sub, attrsWithModifiedValue) && !(notifyOnMetadataChange && condValueAttrMatch(sub, attrsWithModifiedMd)))
+        // in the *metadata* of the attributes listed in conditions.attrs (the 2) only if notifyOnMetadataChange is true)
+        bool b1 = condValueAttrMatch(sub, attrsWithModifiedValue);
+        bool b2 = condValueAttrMatch(sub, attrsWithModifiedMd);
+
+        if (!b1 && !(notifyOnMetadataChange && b2))
         {
           continue;
         }
@@ -2448,7 +2458,6 @@ static bool updateContextAttributeItem
                             " - offending attribute: " + targetAttr->getName();
 
       cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
@@ -2561,7 +2570,6 @@ static bool deleteContextAttributeItem
   std::string*              currentLocAttrName,
   bool*                     entityModified,
   orion::BSONDate*          dateExpiration,
-  ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
@@ -2571,7 +2579,7 @@ static bool deleteContextAttributeItem
     *entityModified = true;
 
     /* Check aspects related with location */
-    if (!targetAttr->getLocation(&attrs, apiVersion).empty())
+    if (targetAttr->getLocation(&attrs))
     {
       std::string details = std::string("action: DELETE") +
                             " - entity: [" + entityDetail + "]" +
@@ -2613,12 +2621,9 @@ static bool deleteContextAttributeItem
                           " - attribute not found";
 
     cerP->statusCode.fill(SccInvalidParameter, details);
-    oe->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
-
-    return false;
   }
 
   return true;
@@ -2746,7 +2751,6 @@ static bool processContextAttributeVector
                                       currentLocAttrName,
                                       &entityModified,
                                       dateExpiration,
-                                      apiVersion,
                                       oe))
       {
         return false;
@@ -2771,24 +2775,34 @@ static bool processContextAttributeVector
     {
       attrsWithModifiedValue.push_back(ca->name);
       attrsWithModifiedMd.push_back(ca->name);
+      targetAltType = ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
     }
     else if (changeType == CHANGE_ONLY_VALUE)
     {
       attrsWithModifiedValue.push_back(ca->name);
+      if ((targetAltType == ngsiv2::SubAltType::EntityChangeBothValueAndMetadata) || (targetAltType == ngsiv2::SubAltType::EntityChangeOnlyMetadata))
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
+      }
+      else
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeOnlyValue;
+      }
     }
     else if (changeType == CHANGE_ONLY_MD)
     {
       attrsWithModifiedMd.push_back(ca->name);
+      if ((targetAltType == ngsiv2::SubAltType::EntityChangeBothValueAndMetadata) || (targetAltType == ngsiv2::SubAltType::EntityChangeOnlyValue))
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
+      }
+      else
+      {
+        targetAltType = ngsiv2::SubAltType::EntityChangeOnlyMetadata;
+      }
     }
 
     attributes.push_back(ca->name);
-
-    /* If actual update then targetAltType changes from EntityUpdate (the value used to initialize
-     * the variable) to EntityChange */
-    if (changeType != NO_CHANGE)
-    {
-      targetAltType = ngsiv2::SubAltType::EntityChange;
-    }
   }
 
   /* Add triggered subscriptions */
@@ -3473,9 +3487,9 @@ static unsigned int updateEntity
   const std::string&              xauthToken,
   Entity*                         eP,
   UpdateContextResponse*          responseP,
-  bool*                           attributeAlreadyExistsError,
+  unsigned int*                   attributeAlreadyExistsNumber,
   std::string*                    attributeAlreadyExistsList,
-  bool*                           attributeNotExistingError,
+  unsigned int*                   attributeNotExistingNumber,
   std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
   const bool&                     overrideMetadata,
@@ -3486,10 +3500,10 @@ static unsigned int updateEntity
 )
 {
   // Used to accumulate error response information
-  *attributeAlreadyExistsError         = false;
+  *attributeAlreadyExistsNumber        = 0;
   *attributeAlreadyExistsList          = "[ ";
 
-  *attributeNotExistingError           = false;
+  *attributeNotExistingNumber          = 0;
   *attributeNotExistingList            = "[ ";
 
   const std::string  idString          = "_id." ENT_ENTITY_ID;
@@ -3510,7 +3524,7 @@ static unsigned int updateEntity
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
-  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL, true, apiVersion);
+  ContextElementResponse*  notifyCerP = new ContextElementResponse(r, emptyAttrL);
 
   // The hasField() check is needed as the entity could have been created with very old Orion version not
   // supporting modification/creation dates
@@ -3537,7 +3551,7 @@ static unsigned int updateEntity
       attrNames.push_back(eP->attributeVector[ix]->name);
     }
 
-    // Note we cannot usse eP->type for the type, as it may be blank in the request
+    // Note we cannot use eP->type for the type, as it may be blank in the request
     // (that would break the cases/1494_subscription_alteration_types/sub_alteration_type_entity_delete2.test case)
     if (!addTriggeredSubscriptions(notifyCerP->entity.id,
                                    notifyCerP->entity.type,
@@ -3616,53 +3630,45 @@ static unsigned int updateEntity
   }
 
   //
-  // Before calling processContextAttributeVector and actually do the work, let's check if the
-  // request is of type 'append-only' and if we have any problem with attributes already existing.
-  //
-  if (action == ActionTypeAppendStrict)
-  {
-    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
-    {
-      if (attrs.hasField(eP->attributeVector[ix]->name))
-      {
-        alarmMgr.badInput(clientIp, "attribute already exists", eP->attributeVector[ix]->name);
-        *attributeAlreadyExistsError = true;
+  // Calculate list of existing and not existing attributes (used by decide if this was a partial update, full update or full fail
+  // depending on the operation)
 
-        //
-        // This attribute should now be removed from the 'query' ...
-        // processContextAttributeVector looks at the 'skip' field
-        //
+  for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
+  {
+    if (attrs.hasField(dbEncode(eP->attributeVector[ix]->name)))
+    {
+      (*attributeAlreadyExistsNumber)++;;
+
+      //
+      // If action is ActionTypeAppendStrict, this attribute should now be removed from the 'query' ...
+      // processContextAttributeVector looks at the 'skip' field
+      //
+      if (action == ActionTypeAppendStrict)
+      {
         eP->attributeVector[ix]->skip = true;
-
-        // Add to the list of existing attributes - for the error response
-        if (*attributeAlreadyExistsList != "[ ")
-        {
-          *attributeAlreadyExistsList += ", ";
-        }
-        *attributeAlreadyExistsList += eP->attributeVector[ix]->name;
       }
-    }
-    *attributeAlreadyExistsList += " ]";
-  }
 
-  if ((apiVersion == V2) && (action == ActionTypeUpdate))
-  {
-    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
-    {
-      if (!attrs.hasField (eP->attributeVector[ix]->name))
+      // Add to the list of existing attributes
+      if (*attributeAlreadyExistsList != "[ ")
       {
-        *attributeNotExistingError = true;
-
-        // Add to the list of non existing attributes - for the error response
-        if (*attributeNotExistingList != "[ ")
-        {
-          *attributeNotExistingList += ", ";
-        }
-        *attributeNotExistingList += eP->attributeVector[ix]->name;
+        *attributeAlreadyExistsList += ", ";
       }
+      *attributeAlreadyExistsList += eP->attributeVector[ix]->name;
     }
-    *attributeNotExistingList += " ]";
+    else  // !attrs.hasField(dbEncode(eP->attributeVector[ix]->name))
+    {
+      (*attributeNotExistingNumber)++;
+
+      // Add to the list of non existing attributes
+      if (*attributeNotExistingList != "[ ")
+      {
+        *attributeNotExistingList += ", ";
+      }
+      *attributeNotExistingList += eP->attributeVector[ix]->name;
+    }
   }
+  *attributeNotExistingList += " ]";
+  *attributeAlreadyExistsList += " ]";
 
   // The logic to detect notification loops is to check that the correlator in the request differs from the last one seen for the entity and,
   // in addition, the request was sent due to a custom notification
@@ -3702,9 +3708,9 @@ static unsigned int updateEntity
     //
     searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
 
-    if (!(attributeAlreadyExistsError && (action == ActionTypeAppendStrict)))
+    if (!((*attributeAlreadyExistsNumber) > 0 && (action == ActionTypeAppendStrict)))
     {
-      // Note that CER generation in the case of attributeAlreadyExistsError has its own logic at
+      // Note that CER generation in the case of attributeAlreadyExistsNumber has its own logic at
       // processContextElement() function so we need to skip this addition or we will get duplicated
       // CER
       responseP->contextElementResponseVector.push_back(cerP);
@@ -3935,7 +3941,7 @@ static unsigned int updateEntity
       notifyCerP->release();
       delete notifyCerP;
 
-      notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL, true, apiVersion);
+      notifyCerP = new ContextElementResponse(getObjectFieldF(reply, "value"), emptyAttrL);
     }
   }
   else
@@ -3961,7 +3967,7 @@ static unsigned int updateEntity
    * previous addTriggeredSubscriptions() invocations. Before that, we add
    * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
    * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
-  addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChange));
+  addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChangeBothValueAndMetadata));
   unsigned int notifSent = processSubscriptions(subsToNotify,
                                                 notifyCerP,
                                                 tenant,
@@ -4115,9 +4121,16 @@ unsigned int processContextElement
   const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
   ApiVersion                           apiVersion,
-  Ngsiv2Flavour                        ngsiv2Flavour
+  Ngsiv2Flavour                        ngsiv2Flavour,
+  UpdateCoverage*                      updateCoverageP
 )
 {
+  // By default, assume everything is gone to be ok. Next in this function we are going to check for some partial/failure cases
+  if (updateCoverageP != NULL)
+  {
+    *updateCoverageP = UC_SUCCESS;
+  }
+
   /* Check preconditions */
   if (!contextElementPreconditionsCheck(eP, responseP, action, apiVersion))
   {
@@ -4128,14 +4141,16 @@ unsigned int processContextElement
   const std::string  idString          = "_id." ENT_ENTITY_ID;
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
-  EntityId           en(eP->id, eP->type);
-  orion::BSONObjBuilder     bob;
+  orion::BSONObjBuilder  bob;
+  EntityId               en(eP->id, eP->type);
+  std::string            enStr = eP->id;
 
   bob.append(idString, eP->id);
 
   if (!eP->type.empty())
   {
     bob.append(typeString, eP->type);
+    enStr += '/' + eP->type;
   }
 
   // Service path
@@ -4187,6 +4202,7 @@ unsigned int processContextElement
     }
 
     // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
+    // both for regular case and when ?options=append is used
     if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
     {
       buildGeneralErrorResponse(eP, NULL, responseP, SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
@@ -4263,11 +4279,11 @@ unsigned int processContextElement
   unsigned int notifSent = 0;
 
   // Used to accumulate error response information, checked at the end
-  bool         attributeAlreadyExistsError = false;
-  std::string  attributeAlreadyExistsList  = "[ ";
+  unsigned int  attributeAlreadyExistsNumber = 0;
+  std::string   attributeAlreadyExistsList   = "[ ";
 
-  bool         attributeNotExistingError = false;
-  std::string  attributeNotExistingList  = "[ ";
+  unsigned int  attributeNotExistingNumber  = 0;
+  std::string   attributeNotExistingList    = "[ ";
 
   /* Note that the following loop is not executed if result size is 0, which leads to the
    * 'if' just below to create a new entity */
@@ -4280,9 +4296,9 @@ unsigned int processContextElement
                              xauthToken,
                              eP,
                              responseP,
-                             &attributeAlreadyExistsError,
+                             &attributeAlreadyExistsNumber,
                              &attributeAlreadyExistsList,
-                             &attributeNotExistingError,
+                             &attributeNotExistingNumber,
                              &attributeNotExistingList,
                              forcedUpdate,
                              overrideMetadata,
@@ -4342,7 +4358,12 @@ unsigned int processContextElement
         }
         else
         {
-          responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+          std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
+          responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
+          if (updateCoverageP != NULL)
+          {
+            *updateCoverageP = UC_ENTITY_NOT_FOUND;
+          }
         }
       }
     }
@@ -4350,8 +4371,13 @@ unsigned int processContextElement
     {
       cerP->statusCode.fill(SccContextElementNotFound);
 
-      responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+      std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
+      responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
       responseP->contextElementResponseVector.push_back(cerP);
+      if (updateCoverageP != NULL)
+      {
+        *updateCoverageP = UC_ENTITY_NOT_FOUND;
+      }
     }
     else   /* APPEND or APPEND_STRICT */
     {
@@ -4449,18 +4475,53 @@ unsigned int processContextElement
     }
   }
 
-  if (attributeAlreadyExistsError == true)
+  if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
-    std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
+    std::string details = ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS + enStr + " - " + attributeAlreadyExistsList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
-  if (attributeNotExistingError == true)
+  if ((apiVersion == V2) && (attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
-    std::string details = "one or more of the attributes in the request do not exist: " + attributeNotExistingList;
+    std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - " + attributeNotExistingList;
     buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
+  }
+
+  // The following check makes sense only when there are at least one attribute in the request
+  // (e.g. not for entity deletion, which doesn't include attributes)
+  if ((updateCoverageP != NULL) && (eP->attributeVector.size() > 0))
+  {
+    if ((action == ActionTypeUpdate) || (action == ActionTypeDelete))
+    {
+      // Full failure if the number of the non-existing attributes are all the ones in the request
+      if (attributeNotExistingNumber == eP->attributeVector.size())
+      {
+        *updateCoverageP = UC_FULL_ATTRS_FAIL;
+      }
+      // Partial failure/success if the number of the non-existing attributes is less than the ones in the request (else branch)
+      // and at least there was one existing attribute
+      else if (attributeNotExistingNumber > 0)
+      {
+        *updateCoverageP = UC_PARTIAL;
+      }
+    }
+
+    if (action == ActionTypeAppendStrict)
+    {
+      // Full failure if the number of the existing attributes are all the ones in the request
+      if (attributeAlreadyExistsNumber == eP->attributeVector.size())
+      {
+        *updateCoverageP = UC_FULL_ATTRS_FAIL;
+      }
+      // Partial failure/success if the number of the existing attributes is less than the ones in the request (else branch)
+      // and at least there was one non-existing attribute
+      else if (attributeAlreadyExistsNumber > 0)
+      {
+        *updateCoverageP = UC_PARTIAL;
+      }
+    }
   }
 
   // Response in responseP

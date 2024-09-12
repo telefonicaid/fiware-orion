@@ -95,7 +95,6 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   ContextRegistrationResponse*          crrP;
   EntityId*                             eidP;
   ContextRegistrationAttribute*         attrP;
-  Metadata*                             mdP;
 
   utInit();
 

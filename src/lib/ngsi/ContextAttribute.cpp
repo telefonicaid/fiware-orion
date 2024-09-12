@@ -706,81 +706,79 @@ ContextAttribute::ContextAttribute
 * - If overrideMetadata option is used (as in this case existing medatada are goint to be deleted and
 *   doesn't count for looking ignoreTYpe)
 */
-std::string ContextAttribute::getLocation(orion::BSONObj* attrsP, ApiVersion apiVersion) const
+bool ContextAttribute::getLocation(orion::BSONObj* attrsP) const
 {
-  if (apiVersion == V1)
+  // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
+  if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
   {
-    // Deprecated way, but still supported
-    for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+    // First lookup in the metadata included in the request
+    if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
     {
-      if (metadataVector[ix]->name == NGSI_MD_LOCATION)
-      {
-        return metadataVector[ix]->stringValue;
-      }
+      return !hasIgnoreType();
     }
 
-    // Current way of declaring location in NGSIv1, aligned with NGSIv2 (originally only only geo:point was supported
-    // but doing so have problems so we need to support all them at the end, 
-    // see https://github.com/telefonicaid/fiware-orion/issues/3442 for details)
-    if ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON))
+    // If ignoreType has not yet found, second lookup in the existing metadata attributes
+    // (if attrP is not NULL and metadata array exists)
+    if (attrsP != NULL)
     {
-      return LOCATION_WGS84;
-    }
-  }
-  else // v2
-  {
-    // null value is allowed but inhibits the attribute to be used as location (e.g. in geo-queries)
-    if ((valueType != orion::ValueTypeNull) && ((type == GEO_POINT) || (type == GEO_LINE) || (type == GEO_BOX) || (type == GEO_POLYGON) || (type == GEO_JSON)))
-    {
-      // First lookup in the metadata included in the request
-      if (metadataVector.lookupByName(NGSI_MD_IGNORE_TYPE))
+      std::string effectiveName = dbEncode(name);
+      if (attrsP->hasField(effectiveName))
       {
-        return hasIgnoreType() ? "" : LOCATION_WGS84;
-      }
-
-      // If ignoreType has not yet found, second lookup in the existing metadata attributes
-      // (if attrP is not NULL and metadata array exists)
-      if (attrsP != NULL)
-      {
-        std::string effectiveName = dbEncode(name);
-        if (attrsP->hasField(effectiveName))
+        orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
+        if (attr.hasField(ENT_ATTRS_MD))
         {
-          orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
-          if (attr.hasField(ENT_ATTRS_MD))
+          // FIXME P5: not sure if this way of lookup the metadata collection is the best one
+          // or can be simplified
+          orion::BSONObj         md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
+          std::set<std::string>  mdsSet;
+
+          md.getFieldNames(&mdsSet);
+
+          for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
           {
-            // FIXME P5: not sure if this way of lookup the metadata collection is the best one
-            // or can be simplified
-            orion::BSONObj         md = getFieldF(attr, ENT_ATTRS_MD).embeddedObject();
-            std::set<std::string>  mdsSet;
-
-            md.getFieldNames(&mdsSet);
-
-            for (std::set<std::string>::iterator i = mdsSet.begin(); i != mdsSet.end(); ++i)
+            std::string  mdName = *i;
+            if (mdName == NGSI_MD_IGNORE_TYPE)
             {
-              std::string  mdName = *i;
-              if (mdName == NGSI_MD_IGNORE_TYPE)
+              orion::BSONObj mdItem = getObjectFieldF(md, mdName);
+              orion::BSONElement mdValue = getFieldF(mdItem, ENT_ATTRS_MD_VALUE);
+              if ((mdValue.type() == orion::Bool) && (mdValue.Bool() == true))
               {
-                orion::BSONObj mdItem = getObjectFieldF(md, mdName);
-                orion::BSONElement mdValue = getFieldF(mdItem, ENT_ATTRS_MD_VALUE);
-                if ((mdValue.type() == orion::Bool) && (mdValue.Bool() == true))
-                {
-                  return "";
-                }
-                else  // false or not a boolean
-                {
-                  return LOCATION_WGS84;
-                }
+                return false;
+              }
+              else  // false or not a boolean
+              {
+                return true;
               }
             }
           }
         }
       }
+    }
 
-      return LOCATION_WGS84;
+    return true;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* getEvalPriority -
+*/
+double ContextAttribute::getEvalPriority(void)
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ix++)
+  {
+    if (metadataVector[ix]->name == NGSI_MD_EVAL_PRIORITY)
+    {
+      return metadataVector[ix]->numberValue;
     }
   }
 
-  return "";
+  // if the attribute doesn't have evalPriority metadata, then max priority is assumed
+  return MAX_PRIORITY;
 }
 
 
@@ -1074,7 +1072,7 @@ void ContextAttribute::filterAndOrderMetadata
 * renderNgsiField true is used in custom notification payloads, which have some small differences
 * with regards to conventional rendering
 */
-std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, std::map<std::string, std::string>* replacementsP)
+std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField, ExprContextObject* exprContextObjectP)
 {
   JsonObjectHelper jh;
 
@@ -1107,7 +1105,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
     // of DB entities) may lead to NULL, so the check is needed
     if (childToRenderP != NULL)
     {
-      jh.addRaw("value", childToRenderP->toJson(replacementsP));
+      jh.addRaw("value", childToRenderP->toJson(exprContextObjectP));
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -1123,7 +1121,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jh.addRaw("value", smartStringValue(stringValue, replacementsP, "null"));
+    jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -1146,9 +1144,9 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
 
   //
-  // metadata (note that ngsi field in custom notifications doesn't include metadata)
+  // metadata (note that ngsi field in custom notifications avoids empty metadata array, i.e. "metadata": {})
   //
-  if (!renderNgsiField)
+  if ((!renderNgsiField) || (metadataVector.size() > 0))
   {
     jh.addRaw("metadata", metadataVector.toJson(orderedMetadata));
   }
@@ -1162,9 +1160,10 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
 * toJsonValue -
 *
 * To be used by options=values and options=unique renderings
+* Also used by the ngsi expression logic
 *
 */
-std::string ContextAttribute::toJsonValue(void)
+std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
 {
   if (compoundValueP != NULL)
   {
@@ -1186,10 +1185,7 @@ std::string ContextAttribute::toJsonValue(void)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    std::string out = "\"";
-    out += toJsonString(stringValue);
-    out += '"';
-    return out;
+    return smartStringValue(stringValue, exprContextObjectP, "null");
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -1314,9 +1310,78 @@ std::string ContextAttribute::toJsonAsValue
 
 /* ****************************************************************************
 *
+* addToContext -
+*
+* Pretty similar in structure to toJsonValue
+*/
+void ContextAttribute::addToContext(ExprContextObject* exprContextObjectP, bool legacy)
+{
+  if (compoundValueP != NULL)
+  {
+    // In legacy expression, objects are vector are strings to be stored in a std::map<std::string,std::string>
+    if (valueType == orion::ValueTypeObject)
+    {
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextObject());
+      }
+    }
+    else  // valueType == orion::ValueTypeVector
+    {
+      if (legacy)
+      {
+        exprContextObjectP->add(name, compoundValueP->toJson(), true);
+      }
+      else
+      {
+        exprContextObjectP->add(name, compoundValueP->toExprContextList());
+      }
+    }
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      exprContextObjectP->add(name, toJsonString(isodate2str(numberValue)));
+    }
+    else // regular number
+    {
+      exprContextObjectP->add(name, numberValue);
+    }
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    exprContextObjectP->add(name, toJsonString(stringValue));
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    exprContextObjectP->add(name, boolValue);
+  }
+  else if (valueType == orion::ValueTypeNull)
+  {
+    exprContextObjectP->add(name);
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_E(("Runtime Error (value not given for attribute %s)", name.c_str()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType)
+std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck)
 {
   size_t len;
   char errorMsg[128];
@@ -1367,14 +1432,14 @@ std::string ContextAttribute::check(ApiVersion apiVersion, RequestType requestTy
     return "Invalid characters in attribute type";
   }
 
-  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
+  if ((!relaxForbiddenCheck) && (compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
   {
     return compoundValueP->check("");
   }
 
   if (valueType == orion::ValueTypeString)
   {
-    if ((type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
+    if ((!relaxForbiddenCheck) && (type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
     {
       alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";

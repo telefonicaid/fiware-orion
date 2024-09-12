@@ -1,0 +1,333 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Log deprecate warnings with dynamic changes done by management REST API
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPV4 -logDeprecate
+
+--SHELL--
+
+#
+# 00. Check deprecate is true
+# 01. Query E1-T1
+# 02. GET /v1/contextEntities/E/attributes/A
+# 03. Disable logDeprecated by API
+# 04. Check deprecate is false
+# 05. Query E1-T1 (not logged)
+# 06. GET /v1/contextEntities/E/attributes/A (not logged)
+# 07. Enable logDeprecated by API
+# 08. Check deprecate is false
+# 09. Query E1-T1
+# 10. GET /v1/contextEntities/E/attributes/A
+# 11. Get WARNING trace in logs (see 4 traces)
+#
+
+
+echo "00. Check deprecate is true"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "01. Query E1-T1"
+echo "==============="
+payload='{
+  "entities": [
+    {
+      "type": "T1",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}"
+echo
+echo
+
+
+echo "02. GET /v1/contextEntities/E/attributes/A"
+echo "=========================================="
+orionCurl --url /v1/contextEntities/E/attributes/A
+echo
+echo
+
+
+echo "03. Disable logDeprecated by API"
+echo "================================"
+orionCurl --url /admin/log?deprecate=false -X PUT
+echo
+echo
+
+
+echo "04. Check deprecate is false"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "05. Query E1-T1 (not logged)"
+echo "============================"
+payload='{
+  "entities": [
+    {
+      "type": "T1",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}"
+echo
+echo
+
+
+echo "06. GET /v1/contextEntities/E/attributes/A (not logged)"
+echo "======================================================="
+orionCurl --url /v1/contextEntities/E/attributes/A
+echo
+echo
+
+
+
+echo "07. Enable logDeprecated by API"
+echo "================================"
+orionCurl --url /admin/log?deprecate=TrUe -X PUT
+echo
+echo
+
+
+echo "08. Check deprecate is true"
+echo "============================"
+orionCurl --url /admin/log
+echo
+echo
+
+
+echo "09. Query E1-T1"
+echo "==============="
+payload='{
+  "entities": [
+    {
+      "type": "T1",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}"
+echo
+echo
+
+
+echo "10. GET /v1/contextEntities/E/attributes/A"
+echo "=========================================="
+orionCurl --url /v1/contextEntities/E/attributes/A
+echo
+echo
+
+
+echo "11. Get WARNING trace in logs (see 4 traces)"
+echo "============================================"
+cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+--REGEXPECT--
+00. Check deprecate is true
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
+
+{
+    "deprecate": true,
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
+}
+
+
+01. Query E1-T1
+===============
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+02. GET /v1/contextEntities/E/attributes/A
+==========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
+
+{
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /E/",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+03. Disable logDeprecated by API
+================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
+
+
+
+04. Check deprecate is false
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
+
+{
+    "deprecate": false,
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
+}
+
+
+05. Query E1-T1 (not logged)
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+06. GET /v1/contextEntities/E/attributes/A (not logged)
+=======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
+
+{
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /E/",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+07. Enable logDeprecated by API
+================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
+
+
+
+08. Check deprecate is true
+============================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
+
+{
+    "deprecate": true,
+    "infoPayloadMaxSize": 5120,
+    "level": "DEBUG",
+    "lineMaxSize": 32768
+}
+
+
+09. Query E1-T1
+===============
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+10. GET /v1/contextEntities/E/attributes/A
+==========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
+
+{
+    "statusCode": {
+        "code": "404",
+        "details": "Entity id: /E/",
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+11. Get WARNING trace in logs (see 4 traces)
+============================================
+Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
+Deprecated NGSIv1 request received: GET /v1/contextEntities/E/attributes/A, response code: 200
+Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
+Deprecated NGSIv1 request received: GET /v1/contextEntities/E/attributes/A, response code: 200
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

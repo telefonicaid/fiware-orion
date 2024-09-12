@@ -73,6 +73,47 @@
       - [NGSI payload patching](#ngsi-payload-patching)
       - [Omitting payload](#omitting-payload)
       - [Additional considerations](#additional-considerations)
+    - [JEXL Support](#jexl-support)
+      - [JEXL usage example](#jexl-usage-example)
+      - [Metadata support](#metadata-support)
+      - [Evaluation priority](#evaluation-priority)
+      - [Available Transformations](#available-transformations)
+        - [`uppercase`](#uppercase)
+        - [`lowercase`](#lowercase)
+        - [`split`](#split)
+        - [`indexOf`](#indexof)
+        - [`len`](#len)
+        - [`trim`](#trim)
+        - [`substring`](#substring)
+        - [`includes`](#includes)
+        - [`isNaN`](#isNaN)
+        - [`parseInt`](#parseint)
+        - [`parseFloat`](#parsefloat)
+        - [`typeOf`](#typeOf)
+        - [`toString`](#tostring)
+        - [`toJson`](#tojson)
+        - [`floor`](#floor)
+        - [`ceil`](#ceil)
+        - [`round`](#round)
+        - [`toFixed`](#tofixed)
+        - [`log`](#log)
+        - [`log10`](#log10)
+        - [`log2`](#log2)
+        - [`sqrt`](#sqrt)
+        - [`replaceStr`](#replacestr)
+        - [`replaceRegex`](#replaceregex)
+        - [`matchRegex`](#matchregex)
+        - [`mapper`](#mapper)
+        - [`thMapper`](#thmapper)
+        - [`values`](#values)
+        - [`keys`](#keys)
+        - [`arrSum`](#arrsum)
+        - [`arrAvg`](#arravg)
+        - [`now`](#now)
+        - [`toIsoString`](#toisostring)
+        - [`getTime`](#gettime)
+      - [Failsafe cases](#failsafe-cases)
+      - [Known limitations](#known-limitations)
     - [Oneshot Subscriptions](#oneshot-subscriptions)
     - [Covered Subscriptions](#covered-subscriptions)
     - [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)
@@ -398,11 +439,12 @@ the following will be used (note that "%25" is the encoding for "%").
 GET /v2/entities/E%253C01%253E
 ```
 
-There are some exception cases in which the above restrictions do not apply. In particular, in the following fields:
+There are some exception cases in which the above restrictions do not apply. In particular, in the following cases:
 
 * URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
+* Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL expression syntax](#jexl-support))
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
 ## Identifiers syntax restrictions
@@ -427,6 +469,8 @@ The rules are:
 In addition, the [General syntax restrictions](#general-syntax-restrictions) also apply to these identifiers.
 
 In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
+
+Note that although `:` and `-` are allowed in identifiers, they are strongly discouraged, as they collide with the [JEXL syntax](#jexl-support). In particular, `-` is used for subtraction operation (e.g. `${A-B}`) and `:` is used in the ternary operator (eg. `A?'A is true':'A is false`). Thus, an attribute name `lower-temperature` in an expression `${lower-temperature}` would be interpreted as the value of `lower` attribute minus `temperature` attribute (and not as the value of an attribute named `lower-temperature`).
 
 ## Error Responses
 
@@ -458,6 +502,7 @@ The `error` reporting is as follows:
   + HTTP 411 Length Required corresponds to `ContentLengthRequired` (`411`)
   + HTTP 413 Request Entity Too Large corresponds to `RequestEntityTooLarge` (`413`)
   + HTTP 415 Unsupported Media Type corresponds to `UnsupportedMediaType` (`415`)
++ Internal errors use `InternalServerError` (`500`)
 
 ## Multi tenancy
 
@@ -541,8 +586,8 @@ In order to search for `Tree1` in that scope, the same
 Fiware-ServicePath will be used.
 
 Scopes are hierarchical and hierarchical search can be done. In order to
-do that the `\#` special keyword is used. Thus, a query with
-pattern entity id `.\*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
+do that the `#` special keyword is used. Thus, a query with
+pattern entity id `.*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
 
 Finally, you can query for disjoint scopes, using a comma-separated list
@@ -570,7 +615,7 @@ Some additional remarks:
     entities created without `Fiware-ServicePath` (or that don't include
     service path information in the database) belongs to a root scope
     `/` implicitly. All the queries without using `Fiware-ServicePath`
-    (including subscriptions) are on `\#` implicitly. This behavior
+    (including subscriptions) are on `/#` implicitly. This behavior
     ensures backward compatibility to pre-0.14.0 versions.
 
 -   It is possible to have an entity with the same ID and type in
@@ -586,6 +631,8 @@ Some additional remarks:
 -   Entities belongs to one (and only one) scope.
 
 -   `Fiware-ServicePath` header is included in notification requests sent by Orion.
+
+-   You can use the [`servicePath` builtin attribute](#builtin-attributes) to get the entity service path.
 
 -   The scopes entities can be combined orthogonally with the
     [multi-tenancy functionality](#multi-tenancy). In that case,
@@ -654,7 +701,7 @@ rendered by Orion to provide extra information. From a representation point of v
 are just like regular attributes, with name, value and type.
 
 Builtin attributes are not rendered by default. In order to render a specific attribute, add its
-name to the `attrs` parameter in URLs (or payload field in POST /v2/op/query operation) or
+name to the `attrs` parameter in URLs (or payload field in `POST /v2/op/query` operation) or
 subscription (`attrs` sub-field within `notification`).
 
 The list of builtin attributes is as follows:
@@ -680,6 +727,13 @@ the subscriptions based in alteration type features (see [Subscription based in 
 Like regular attributes, they can be used in `q` filters and in `orderBy` (except `alterationType`).
 However, they cannot be used in resource URLs.
 
+The following builtin attributes are included in notifications (if added to `attrs` sub-field within `notification`) even
+when `onlyChangedAttrs` is set to `true`:
+
+* `alterationType`
+* `dateCreated`
+* `dateModified`
+
 ## Special Metadata Types
 
 Generally speaking, user-defined metadata types are informative; they are processed by Orion
@@ -696,6 +750,8 @@ this metadata is not needed most of the cases, but there are two cases in which 
 type has an special semantic for Orion:
    * `DateTime`
    * `geo:json`
+
+* `evalPriority`: used by expression evaluation. Have a look to [this specific section](#evaluation-priority) for details.
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
@@ -726,8 +782,6 @@ The list of builtin metadata is as follows:
 * `actionType` (type: `Text`): only in notifications.  It is included if the attribute to which it is attached
   was included in the request that triggered the notification. Its value depends on the request operation
   type: `update` for updates, `append` for creation and `delete` for deletion. Its type is always `Text`.
-
-* `location`, which is currently [deprecated](deprecated.md), but still supported.
 
 Like regular metadata, they can be used in `mq` filters. However, they cannot be used in resource URLs.
 
@@ -804,7 +858,7 @@ i.e. `GET /v2/entities?q=T>2021-04-21`.
 {
   "timestamp": {
     "value": "2017-06-17T07:21:24.238Z",
-    "type: "DateTime"
+    "type": "DateTime"
   }
 }
 ```
@@ -1279,7 +1333,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$max`
 
@@ -1307,7 +1361,7 @@ PUT /v2/entities/E/attrs/A
 
 would not change attribute value.
 
-Apart from numbers, other value types are supported (eg, strings).
+Apart from numbers, other value types are supported (eg, strings or `DateTime`).
 
 #### `$push`
 
@@ -1565,7 +1619,8 @@ The only exception to "use only one operator" rule is the case of `$set` and
 Update operators can be used in entity creation or replace operations. In particular:
 
 * Numeric operators takes 0 as reference. For instance, `{"$inc": 4}` results in 4,
-  `{$mul: 1000}` results in 0, etc.
+  `{"$mul": 1000}` results in 0, etc.
+* Epoch time (`"1970-01-01T00:00:00Z"`) is used as reference for `DateTime` when `$min` or `$max` are used.
 * `$set` takes the empty object (`{}`) as reference. For instance, `"$set": {"X": 1}` results in just `{"X": 1}`
 * `$push` and `$addToSet` take the empty array (`[]`) as reference. For instance, `{"$push": 4}`
   results in `[ 4 ]`.
@@ -1946,40 +2001,7 @@ If `attrsFormat` is `values` then values partial entity representation mode is u
 }
 ```
 
-If `attrsFormat` is `legacy` then subscription representation follows  NGSIv1 format. This way, users
-can benefit from the enhancements of Orion subscriptions (e.g. filtering) with NGSIv1 legacy notification receivers.
-
-Note that NGSIv1 is deprecated. Thus, we don't recommend to use `legacy` notification format any longer.
-
-```json
-{
-	"subscriptionId": "56e2ad4e8001ff5e0a5260ec",
-	"originator": "localhost",
-	"contextResponses": [{
-		"contextElement": {
-			"type": "Car",
-			"isPattern": "false",
-			"id": "Car1",
-			"attributes": [{
-				"name": "temperature",
-				"type": "centigrade",
-				"value": "26.5",
-				"metadatas": [{
-					"name": "TimeInstant",
-					"type": "recvTime",
-					"value": "2015-12-12 11:11:11.123"
-				}]
-			}]
-		},
-		"statusCode": {
-			"code": "200",
-			"reasonPhrase": "OK"
-		}
-	}]
-}
-```
-
-Notifications must include the `Ngsiv2-AttrsFormat` (expect when `attrsFormat` is `legacy`)
+Notifications must include the `Ngsiv2-AttrsFormat`
 HTTP header with the value of the format of the associated subscription, so that notification receivers
 are aware of the format without needing to process the notification payload.
 
@@ -2013,23 +2035,22 @@ In case of `mqttCustom`:
 * `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
 
-Macro substitution for templates is based on the syntax `${..}`. In particular:
+Macro substitution for templates is based on the syntax `${<JEXL expression>}`. The support to JEXL
+is explained in [JEXL Support](#jexl-support) section. The following identifiers are included in
+the context evaluated by the JEXL expression:
 
-* `${id}` is replaced by the `id` of the entity
-* `${type}` is replaced by the `type` of the entity
-* `${service}` is replaced by the service (i.e. `fiware-service` header value) in the
+* `id`: for the `id` of the entity
+* `type`: for the `type` of the entity
+* `service`: for the service (i.e. `fiware-service` header value) in the
   update request triggering the subscription.
-* `${servicePath}` is replaced by the service path (i.e. `fiware-servicepath` header value) in the
+* `servicePath`: for the service path (i.e. `fiware-servicepath` header value) in the
   update request triggering the subscription.
-* `${authToken}` is replaced by the authorization token (i.e. `x-auth-token` header value) in the
+* `authToken: for the authorization token (i.e. `x-auth-token` header value) in the
   update request triggering the subscription.
-* Any other `${token}` is replaced by the value of the attribute whose name is `token` or with
-  an empty string if the attribute is not included in the notification. If the value is a number,
-  a bool or null then its string representation is used. If the value is a JSON array or object
-  then its JSON representation as string is used.
+* All the attributes in the entity triggering the notification (included in the update triggering the notification or not)
 
-In the rare case an attribute was named in the same way of the `${service}`, `${servicePath}` or
-`${authToken}` (e.g. an attribute which name is `service`) then the attribute value takes precedence.
+In the rare case an attribute was named in the same way of the `service`, `servicePath` or
+`authToken` (e.g. an attribute which name is `service`) then the attribute value takes precedence.
 
 Example:
 
@@ -2254,6 +2275,8 @@ Some notes to take into account when using `ngsi`:
   * If the macro *covers completely the string where is used*, then the JSON nature of the attribute value
     is taken into account. For instance, `"value": "${temperature}"` resolves to `"value": 10`
     if temperature attribute is a number or to `"value": "10"` if `temperature` attribute is a string.
+    * Exception to this is `id` and `type`. Given that entity id and type must be a string (as decribed
+      in [this section](#identifiers-syntax-restrictions)) the attribute value is always casted to string in this case.
   * If the macro *is only part of string where is used*, then the attribute value is always casted
     to string. For instance, `"value": "Temperature is: ${temperature}"` resolves to 
     `"value": "Temperature is 10"` even if temperature attribute is a number. Note that if the
@@ -2284,6 +2307,937 @@ Some considerations to take into account when using custom notifications:
   `Ngsiv2-AttrsFormat` header is set to `custom`. However, note that if NGSI patching is used
   (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
   notification (given that the notification format is actually the same).
+
+## JEXL Support
+
+Orion Context Broker supports [JEXL expressions](https://github.com/TomFrost/Jexl) in custom notification [macro replacement](#macro-substitution). Thus, subscriptions like this can be defined:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "relativeHumidity": {
+      "value": "${humidity/100}",
+      "type": "Calculated"
+    }
+  }
+}
+```
+
+So, if a given update sets entity `humidity` attribute to `84.4` then the notification will include a `relativeHumidity` attribute with value `0.844`.
+
+A particular case of expressions are the ones in which the expression is a given context identifier, without an actual expression using it. For instance:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "originalHumidity": {
+      "value": "${humidity}",
+      "type": "Calculated"
+    }
+  }
+}
+```
+
+We also refers to this case as *basic replacement*.
+
+An useful resource to test JEXL expressions is the [JEXL playground](https://czosel.github.io/jexl-playground). However, take into account the differences between the original JEXL implementation in JavaScript and the one included in Orion, described in the [known limitations](#known-limitations) section.
+
+Orion relies on cjexl library to provide this functionality. If Orion binary is build without using cjexl, then only basic replacement functionality is available.
+
+### JEXL usage example
+
+As example, let's consider a subscription like this:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "speed": {
+      "value": "${(speed|split(' '))[0]|parseInt}",
+      "type": "Calculated"
+    },
+    "ratio": {
+      "value": "${count.sum/count.count}",
+      "type": "Calculated"
+    },
+    "code": {
+      "value": "${code||'invalid'}",
+      "type": "Calculated"
+    },
+    "alert": {
+      "value": "${(value>max)?'nok':'ok'}",
+      "type": "Calculated"
+    },
+    "count": {
+      "value": "${{count:count.count+1, sum:count.sum+((speed|split(' '))[0]|parseInt)}}",
+      "type": "Calculated"
+    }
+}
+```
+
+A entity update like this:
+
+```
+{
+  ...
+  "speed": {
+    "value": "10 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 100
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": null,
+    "type": "Number"
+  },
+  "value": {
+    "value": 14,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}
+```
+
+will trigger a notification like this:
+
+```
+"data": [
+  {
+    ...
+    "speed": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 10
+    },
+    "ratio": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 20
+    },
+    "code": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "invalid"
+    },
+    "alert": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "ok"
+    },
+    "count": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": {
+        "count": 6,
+        "sum": 110
+      }
+    }
+  }
+]
+```
+
+A new entity update like this:
+
+```
+{
+  ...
+  "speed": {
+    "value": "30 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 500
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": 456,
+    "type": "Number"
+  },
+  "value": {
+    "value": 75,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}
+```
+
+will trigger a notification like this:
+
+```
+"data": [
+  {
+    ...
+    "speed": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 30
+    },
+    "ratio": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 100
+    },
+    "code": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 456
+    },
+    "alert": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "nok"
+    },
+    "count": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": {
+        "count": 6,
+        "sum": 530
+      }
+    }
+  }
+]
+```
+
+### Metadata support
+
+Attribute metadata is also included in the JEXL evaluation context, along with the actual attributes. This is done using a special context key named `metadata` which value is an object with the following structure:
+
+* keys are the name of the attributes
+* values are object with a key-map of the metadata values of the given attribute
+
+For instance, the expression `${metadata.A.MD1}` will result in the value of the metadata `MD1` belonging to the attribute `A`.
+
+Note that [builtin metadata](#builtin-metadata) are automatically added to the `metadata` context key. For instance, the `${A-metadata.A.previousValue}` expression will provide the difference between the current value of `A` (in the update request) and the previous one (before the update request).
+
+Finally, note that in the rare case an attribute named `metadata` is used (which is an anti-pattern strongly discouraged) it will not be added to the context, as the `metadata` with metadata values will take precedence.
+
+### Evaluation priority
+
+Each time an expression is evaluated, it is added to the expression context, so it can be reused by other expressions. However, by default Orion does not guarantee a given evaluation other.
+
+Thus, if we have this:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated"
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
+in the resulting notification `B` could be set to the desired `0.04` (if `A` is evaluated before `B`) or to the underised `null` (if `B` is evaluated before `A`), randomly.
+
+In order to overcome this problem, the `evalPriority` metadata can be used to define the evaluation order. It works this way:
+
+* `evalPriority` metadata is a number from 1 (first evaluation) to 100000 (last evaluation)
+* Expressions are evaluated in incresing order of priority
+* In case of ties, Orion does not guarantee a particular evaluation order. Thus, expressions in the same priority level must be considered independent, and expressions using other attributes with the same or lower priority would result in unexpected values.
+* If no `evalPriority` is set, default 100000 is used
+* `evalPriority` only has a meaning in `notification.httpCustom.ngsi` in subscriptions. As metadata in regular entities (e.g. an entity created with `POST /v2/entities`) Orion doesn't implements any semantic for it
+
+Using `evalPriority` the above example could be reformuled this way:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated",
+      "metadata": {
+        "evalPriority": {
+          "value": 1,
+          "type": "Number"
+        }
+      }
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
+### Available Transformations
+
+#### `uppercase`
+
+Convert a string into uppercase.
+
+Extra arguments: none
+
+Example (being context `{"c": "fooBAR"}`):
+
+```
+c|uppercase
+```
+
+results in
+
+```
+"FOOBAR"
+```
+
+#### lowercase
+
+Convert a string into lowercase.
+
+Extra arguments: none
+
+Example (being context `{"c": "fooBAR"}`):
+
+```
+c|lowercase
+```
+
+results in
+
+```
+"foobar"
+```
+
+#### split
+
+Split the input string into array items.
+
+Extra arguments: delimiter to use for the split.
+
+Example (being context `{"c": "foo,bar,zzz"}`):
+
+```
+c|split(',')
+```
+
+results in
+
+```
+[ "foo", "bar", "zzz" ]
+```
+
+#### indexOf
+
+Provides the position of a given string within the input string. In the string is not found, returns `null`.
+
+Extra arguments: the input string to search.
+
+Note this function doesn't work if the input is an array (it only works for strings).
+
+Example (being context `{"c": "fooxybar"}`):
+
+```
+c|indexOf('xy')
+```
+
+results in
+
+```
+3
+```
+
+#### len
+
+Provides the length of a string.
+
+Extra arguments: none.
+
+Note this function doesn't work if the input is an array (it only works for strings).
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|len
+```
+
+results in
+
+```
+6
+```
+
+#### trim
+
+Removes starting and trailing whitespaces.
+
+Extra arguments: none.
+
+Example (being context `{"c": "  foo  bar  "}`):
+
+```
+c|trim
+```
+
+results in
+
+```
+foo  bar
+```
+
+#### substring
+
+Returns a substring between two positions or `null` in case of wrong parameters (eg. final position is longer than string, final position is leeser than initial position, etc.)
+
+Extra arguments:
+* Initial position
+* Final position
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|substring(3,5)
+```
+
+results in
+
+```
+ba
+```
+
+#### includes
+
+Returns `true` if a given string is contained in the input string, `false` otherwise.
+
+Extra arguments: the input string to search.
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|includes('ba')
+```
+
+results in
+
+```
+true
+```
+
+#### isNaN
+
+Returns `true` if the input is not a number, `false` otherwise.
+
+Extra arguments: none.
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|isNaN
+```
+
+results in
+
+```
+true
+```
+
+#### parseInt
+
+Parses a string and return the corresponding integer number.
+
+Extra arguments: none.
+
+Example (being context `{"c": "25"}`):
+
+```
+c|parseInt
+```
+
+results in
+
+```
+25
+```
+
+#### parseFloat
+
+Parses a string and return the corresponding float number
+
+Extra arguments: none.
+
+Example (being context `{"c": "25.33"}`):
+
+```
+c|parseFloat
+```
+
+results in
+
+```
+25.33
+```
+
+#### typeOf
+
+Return a string with the type of the input.
+
+Extra arguments: none.
+
+Example (being context `{"c": 23}`):
+
+```
+c|typeOf
+```
+
+results in
+
+```
+"Number"
+```
+
+#### toString
+
+Return a string representation of the input.
+
+Extra arguments: none.
+
+Example (being context `{"c": 23}`):
+
+```
+c|toString
+```
+
+results in
+
+```
+"23"
+```
+
+#### toJson
+
+Convert the input string to a JSON document. If the string is not a valid JSON, it returns `null`.
+
+Extra arguments: none.
+
+Example (being context `{"c": "[1,2]"}`):
+
+```
+c|toJson
+```
+
+results in
+
+```
+[1, 2]
+```
+
+#### floor
+
+Return the closest lower integer of a given number.
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|floor
+```
+
+results in
+
+```
+3
+```
+
+#### ceil
+
+Return the closest upper integer of a given number.
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|ceil
+```
+
+results in
+
+```
+4
+```
+
+#### round
+
+Return the closest integer (either lower or upper) of a given number.
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|round
+```
+
+results in
+
+```
+3
+```
+
+#### toFixed
+
+Rounds a number to a number of decimal digits.
+
+Extra arguments: number of decimal digits.
+
+Example (being context `{"c": 3.18}`):
+
+```
+c|toFixed(1)
+```
+
+results in
+
+```
+3.2
+```
+
+#### log
+
+Return the natural logarithm of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|log
+```
+
+results in
+
+```
+1.144222799920162
+```
+
+#### log10
+
+Return the base 10 logarithm of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|log10
+```
+
+results in
+
+```
+0.49692964807321494
+```
+
+#### log2
+
+Return the base 2 logarithm of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|log2
+```
+
+results in
+
+```
+1.6507645591169025
+```
+
+#### sqrt
+
+Return the square root of a given number
+
+Extra arguments: none.
+
+Example (being context `{"c": 3.14}`):
+
+```
+c|sqrt
+```
+
+results in
+
+```
+1.772004514666935
+```
+
+#### replaceStr
+
+Replace occurrences of a string with another in the input string.
+
+Extra arguments:
+* Source string to replace
+* Destination string to replace
+
+Example (being context `{"c": "foobar"}`):
+
+```
+c|replaceStr('o','u')
+```
+
+results in
+
+```
+"fuubar"
+```
+
+#### replaceRegex
+
+Replace tokens matching a given regex in an input string by another string.
+
+Extra arguments:
+* Regex to match tokens to replace
+* Destination string to replace
+
+Example (being context `{"c": "aba1234aba786aba"}`):
+
+```
+c|replaceRegex('\d+','X')
+```
+
+results in
+
+```
+"abaXabaXaba"
+```
+
+#### matchRegex
+
+Returns an array of tokens matching a given regular expression in input string. In the case of invalid regex, it returns `null`. If no matches are found, it returns the empty array (`[]`).
+
+Extra arguments: regular expression.
+
+Example (being context `{"c": "abc1234fgh897hyt"}`):
+
+```
+c|matchRegex('\d+`)
+```
+
+results in
+
+```
+["1234, "897"]]
+```
+
+#### mapper
+
+Returns a value among several choices based in one to one mapping. This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
+
+This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, the input is not an string, etc.)
+
+Extra arguments:
+* values array
+* choices array
+
+Example (being context `{"c": "fr", "values": ["es", "fr", "de"], "choices": ["Spain", "France", "Germany"]}`):
+
+```
+c|mapper(values,choices)
+```
+
+results in
+
+```
+"France"
+```
+
+#### thMapper
+
+Returns a value among several choices based in threshold values. This function is based in an array of *values* and an array of *choices* (which length is exactly the same as values plus one). Thus, if the input value is greater than or equal to the *i*-th and less than the *i+1*-th item of *values*, then *i*+1-th item of *choices* is returned.
+
+This transformation returns `null` if some problem with the arguments is found (i.e. choices length is not exacly the same as values plus one, some of the items in the values array is not a number, etc.)
+
+Extra arguments:
+* values array
+* choices array
+
+Example (being context `{"c": 0.5, "values": [-1, 1], "choices": ["low", "medium", "high"]}`):
+
+```
+c|thMapper(values,choices)
+```
+
+results in
+
+```
+"medium"
+```
+
+#### values
+
+Returns an array with the values of the keys of a given object (or `null` if input is not an object).
+
+Extra arguments: none
+
+Example (being context `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|values
+```
+
+results in
+
+```
+[1,"foo"]
+```
+
+#### keys
+
+Returns an array with the keys of a given object (or `null` if input is not an object).
+
+Extra arguments: none
+
+Example (being context `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|keys
+```
+
+results in
+
+```
+["x","y"]
+```
+
+#### arrSum
+
+Returns the sum of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+
+Extra arguments: none
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrSum
+```
+
+results in
+
+```
+6
+```
+
+#### arrAvg
+
+Returns the average of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+
+Extra arguments: none
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrAvg
+```
+
+results in
+
+```
+3
+```
+
+#### now
+
+Returns the current time (plus a number of seconds specified as argument) as seconds since Unix epoch time.
+
+Extra arguments: none
+
+Example (being current time August 1st, 2024 at 9:31:02):
+
+```
+0|now
+```
+
+results in
+
+```
+1722504662
+```
+
+It can be checked at https://www.epochconverter.com that time corresponds to August 1st, 2024 at 9:31:02
+
+#### toIsoString
+
+Returns the [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) corresponding to a given timestamp (as seconds since Unix epoch time) passed as argument.
+
+Extra arguments: none
+
+Example (being context `{"c": 1720606949}`):
+
+```
+c|toIsoString
+```
+
+results in
+
+```
+"2024-07-10T10:22:29+00:00"
+```
+
+It can be checked at https://www.epochconverter.com that 1720606949 corresponds to 2024-07-10T10:22:29+00:00
+
+
+#### getTime
+
+Returns the timestamp (as seconds since Unix epoch time) correspoding to the [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) passed as argument.
+
+Extra arguments: none
+
+Example (being context `{"c": "2024-07-10T10:22:29+00:00"}`):
+
+```
+c|getTime
+```
+
+results in
+
+```
+1720606949
+```
+
+It can be checked at https://www.epochconverter.com that 1720606949 corresponds to 2024-07-10T10:22:29+00:00
+
+### Failsafe cases
+
+As failsafe behaviour, evaluation returns `null` in the following cases:
+
+* Some of the transformation used in the expression is unknown (e.g. `A|undefinedExpression`)
+* Operations with identifiers that are not defined in the context are used. For instance, `(A==null)?0:A` will result in `null` (and not `0`) if `A` is not in the context, due to `==` is an operation that cannot be done on undefined identifiers. However, `A||0` will work (i.e. `0` will result if `A` is not in the context), as `||` is not considered an operation on `A`.
+* Syntax error in the JEXL expression (e.g. `A[0|uppercase`)
+
+### Known limitations
+
+- The unitary minus operator is not working properly, e.g. the following expression doesn't work (it failsafes to `null`): `A||-1`. However, the following alternatives are working: `A||0-1` and `A||'-1'|parseInt)`
+- Negation operator `!` (supported in original JavaScript JEXL) is not supported
+- Attribute names and entity identifiers using JEXL operators (eg. `:` or `-`) may lead to undesired expression results. For example, an attribute named `temperature-basic`, when you use it as part of an expression, it would be the result of subtracting the value of the attribute `basic` to the value of the attribute `temperature` (or `null`, if `temperature` or `basic` don't exist) instead the value of the attribute `temperature-basic`.
 
 ## Oneshot Subscriptions
 
@@ -2383,10 +3337,6 @@ This default behaviour can be changed using the `covered` field set to `true` th
 in which case all attributes are included in the notification, no matter if they exist or not in the
 entity. For these attributes that don't exist (`brightness` in this example) the `null`
 value (of type `"None"`) is used.
-
-In the case of custom notifications, if `covered` is set to `true` then `null` will be used to replace `${...}`
-for non existing attributes (the default behavior when `covered` is not set to `true` is to replace by the
-empty string the non existing attributes).
 
 We use the term "covered" in the sense the notification "covers" completely all the attributes
 in the `notification.attrs` field. It can be useful for those notification endpoints that are
@@ -2816,7 +3766,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -2824,7 +3776,16 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-The response is an object representing the entity identified by the ID. The object follows
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+If the entity is found, the response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections).
 
@@ -2899,8 +3860,9 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 200 OK
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -2908,7 +3870,16 @@ Successful operations return `Content-Type` header with `application/json` value
 
 _**Response payload**_
 
-The payload is an object representing the entity identified by the ID in the URL parameter. The object follows
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+If the entity is found, the payload is an object representing the entity identified by the ID in the URL parameter. The object follows
 the JSON entity representation format (described in [JSON Entity Representation](#json-entity-representation) section and
 side [Simplified Entity Representation](#simplified-entity-representation) and [Partial Representations](#partial-representations) sections),
 but omitting `id` and `type` fields.
@@ -3005,8 +3976,45 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * 422 Unprocessable Content for existing attributes when `append` options is used (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of *all* attributes exist when `append` options is used:
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+```
+
+In the case of *some* (but not all) attributes exist when `append` options is used (partial update):
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ B ]",
+    "error": "PartialUpdate"
+}
+```
+
+The entity type in `description` is shown only if the request includes it. Otherwise, it is omitted:
+
+```
+"description": "one or more of the attributes in the request already exist: E - [ B ]",
+```
 
 #### Update Existing Entity Attributes `PATCH /v2/entities/{entityId}/attrs`
 
@@ -3068,8 +4076,45 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * 422 Unprocessable Content for non existing attributes (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of *none* of the attributes in the request exist:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ]",
+    "error": "Unprocessable"
+}
+```
+
+In the case of *some* (but not all) attributes does not exist (partial update):
+
+```
+{
+    "description": "do not exist: E/T - [ C ]",
+    "error": "PartialUpdate"
+}
+```
+
+The entity type in `description` is shown only if the request includes it. Otherwise, it is omitted:
+
+```
+"description": "do not exist: E - [ C ]",
+```
 
 #### Replace all entity attributes `PUT /v2/entities/{entityId}/attrs`
 
@@ -3130,8 +4175,20 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 #### Remove Entity `DELETE /v2/entities/{entityId}`
 
@@ -3161,8 +4218,20 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 ### Attributes
 
@@ -3287,8 +4356,29 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 #### Remove a Single Attribute `DELETE /v2/entities/{entityId}/attrs/{attrName}`
 
@@ -3319,8 +4409,29 @@ _**Request headers**_
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 ### Attribute Value
 
@@ -3359,9 +4470,11 @@ _**Request headers**_
 
 _**Response code**_
 
-* Successful operation uses 200 OK.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Successful operation uses 200 OK
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * 406 Not Acceptable in the case of not acceptable content (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
 
 _**Response headers**_
 
@@ -3369,7 +4482,26 @@ _**Response headers**_
 
 _**Response payload**_
 
-The response payload can be an object, array, string, number, boolean or null with the value of the attribute.
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
+
+In the case of entity and attribute both are found, the response payload can be an object, array, string,
+number, boolean or null with the value of the attribute.
 
 * If attribute value is JSON Array or Object:
   * If `Accept` header can be expanded to `application/json` or `text/plain` return the value as a JSON with a
@@ -3458,8 +4590,29 @@ Example:
 _**Response code**_
 
 * Successful operation uses 204 No Content
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found for not found entity or not found attribute (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+In the case of not found entity:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+In the case of not found attribute:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
 
 ### Types
 
@@ -3667,7 +4820,7 @@ A `notification` object contains the following subfields:
 |--------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field. It must be a non-empty list.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, `values` or `legacy`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
 | `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
 | `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is omitted)) |
 | `covered`          | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |
@@ -4442,9 +5595,86 @@ Example:
 
 _**Response code**_
 
-* Successful operation uses 204 No Content.
-* Errors use a non-2xx and (optionally) an error payload. See subsection on [Error Responses](#error-responses) for
-  more details.
+* Successful operation uses 204 No Content
+* Errors use a non-2xx code and error payload:
+  * 404 Not Found if none of the entities in the `entities` field exists in `update`, `delete` or `replace` cases (see next subsection)
+  * 422 Unprocessable Content for other cases (see next subsection)
+  * Check additional cases in [Error Responses](#error-responses) general documentation
+
+_**Response payload**_
+
+For action type `replace`:
+
+* If *none* of the entities in `entities` exist:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+* If *any (but not all)* of the entities in `entities` does not exist (partial update):
+
+```
+{
+    "description": "do not exist: G/T - [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+For action type `update` or `delete`:
+
+* If *none* of the entities in `entities` exist:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+* If at least one entity in `entities` exists and in *all* of existing entities there was a *full fail* due to missing attributes:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ], G/T [entity itself]",
+    "error": "Unprocessable"
+}
+```
+
+* If at least one entity in `entities` exists and in *at least one* of the existing entities *at least* one attribute exists
+  but not all entities exist or all entities exist but in at least one entity there is at least one missing attribute (partial update):
+
+```
+{
+    "description": "do not exist: E/T - [ D ], G/T [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+For action type `appendStrict`:
+
+* If in *all* entities in `entities` there was a *full fail* due to existing attributes:
+
+{
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A, B ], E2/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+
+* If in *at least one entity* in `entities` in *at least* one attribute there was a success but not all entities in `entities` have
+  a full success (partial update):
+
+{
+    "description": "one or more of the attributes in the request already exist: E2/T - [ A, B ]",
+    "error": "PartialUpdate"
+}
+
+The entity type in `description` is shown only if the request includes it. Otherwise, it is omitted:
+
+```
+"description": "one or more of the attributes in the request already exist: E2 - [ A, B ]"
+```
 
 ### Query operation
 

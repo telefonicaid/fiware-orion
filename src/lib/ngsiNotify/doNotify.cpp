@@ -127,11 +127,11 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
   // Add notificacion result summary in log INFO level
   if (statusCode != -1)
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), statusCode);
+    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode);
   }
   else
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), out.c_str());
+    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
   }
 }
 
@@ -164,7 +164,7 @@ static void doNotifyMqtt(SenderThreadParams* params)
     // mqttOnPublishCallback is called (by the moment we are not doing nothing there, just printing in
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
-    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str());
+    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else

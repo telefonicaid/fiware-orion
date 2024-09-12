@@ -125,13 +125,13 @@ time=2020-10-26T10:32:41.724Z | lvl=INFO | corr=93bdc5b4-1776-11eb-954d-000c29df
   異なる値を持ちます
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: 200
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f914177334436ea590f6edb","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 200
 ```
 
 * MQTT 通知の場合、上記のトレースの `msg` フィールドはわずかに異なります:
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoMqttNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoMqttNotification | msg=MQTT Notif delivered (subId: 60ffea6c1bca454f9a64c96c): broker: localhost:1883, topic: sub2, payload (123 bytes): {"subscriptionId":"60ffea6c1bca454f9a64c96c","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}
 ```
 
 * [コンテキスト・プロバイダ](../user/context_providers.md) (クエリまたは更新) にフォワードされたリクエスト
@@ -156,7 +156,7 @@ time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
   または接続の問題が発生した場合の文字列のいずれかになります。 例えば:
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, response code: Couldn't connect to server
+time=2020-10-26T10:32:22.145Z | lvl=INFO | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f914177334436ea590f6edb","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't connect to server
 ```
 
 * クライアント・リクエストがコンテキスト・プロバイダへのフォワーディングをトリガーすると、最初に転送された
@@ -286,56 +286,56 @@ contextBroker -fg -httpTimeout 10000 -logLevel INFO -notificationMode threadpool
 送信成功 (レスポンス・コード 200) :
 
 ```
-time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e174b14e7532482ac794): POST localhost:1028/accumulate, response code: 200
+time=2020-10-26T14:48:37.192Z | lvl=INFO | corr=54393a44-179a-11eb-bb87-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000006 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e174b14e7532482ac794): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f96e174b14e7532482ac794","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 200
 ```
 
 400 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
 time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e1fdb14e7532482ac795) response NOT OK, http code: 400
-time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, response code: 400
+time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, payload (123 bytes): {"subscriptionId":"5f96e1fdb14e7532482ac795","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 400
 ```
 
 404 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
 time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e27cb14e7532482ac796) response NOT OK, http code: 404
-time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, response code: 404
+time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, payload (123 bytes): {"subscriptionId":"5f96e27cb14e7532482ac796","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 404
 ```
 
 500 での通知エンドポイントのレスポンス (WARN トレースがプリントされます) :
 
 ```
 time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e2cfb14e7532482ac797) response NOT OK, http code: 500
-time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, response code: 500
+time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, payload (123 bytes): {"subscriptionId":"5f96e2cfb14e7532482ac797","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 500
 ```
 
 10 秒以内にエンドポイントが応答しない、またはその他の何らかの接続エラーが発生しました (アラームは WARN レベルで発生します) :
 
 ```
 time=2020-10-26T14:54:15.996Z | lvl=WARN | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
-time=2020-10-26T14:54:15.996Z | lvl=INFO | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, response code: Timeout was reached
+time=2020-10-26T14:54:15.996Z | lvl=INFO | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, payload (123 bytes): {"subscriptionId":"5f96e30db14e7532482ac798","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Timeout was reached
 ```
 
 応答しないポートのエンドポイント。例えば、localhost：9999 (アラームは WARN ログ・レベルで発生します) :
 
 ```
 time=2020-10-26T15:01:50.659Z | lvl=WARN | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
-time=2020-10-26T15:01:50.659Z | lvl=INFO | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, response code: Couldn't connect to server
+time=2020-10-26T15:01:50.659Z | lvl=INFO | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e4deb14e7532482ac79c","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't connect to server
 ```
 
 解決できない名前のエンドポイント。例えば、foo.bar.bar.com (アラームは WARN ログ・レベルで発生します) :
 
 ```
 time=2020-10-26T15:03:54.258Z | lvl=WARN | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
-time=2020-10-26T15:03:54.258Z | lvl=INFO | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, response code: Couldn't resolve host name
+time=2020-10-26T15:03:54.258Z | lvl=INFO | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e559b14e7532482ac79d","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't resolve host name
 ```
 
 到達不能な IP のエンドポイント。例えば、12.34.56.87 (アラームは WARN ログ・レベルで発生します) :
 
 ```
 time=2020-10-26T15:06:14.642Z | lvl=WARN | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
-time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, response code: Timeout was reached
+time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e5dbb14e7532482ac79e","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Timeout was reached
 ```
 
 [トップ](#top)
@@ -346,19 +346,13 @@ time=2020-10-26T15:06:14.642Z | lvl=INFO | corr=c4a3192e-179c-11eb-ac8f-000c29df
 `-logDeprecate` CLI 設定 (または [ログ管理 REST API](management_api.md#log-configs-and-trace-levels) の `deprecate` パラメータ)
 が使用されている場合、次の WARN トレースが生成されます:
 
-* NGSIv1 リクエスト (ペイロードありとペイロードなしの両方)。 注: これには、[`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification)
-  を使用した通知や、[`"legacyForwarding": true`](../orion-api.md#registrationprovider)
-  を使用したレジストレーションに対応する転送リクエストは含まれないことに注意してください)。例えば：
+* [`"legacyForwarding": true`](../orion-api.md#registrationprovider)) の使用。例えば：
 
 ```
-time=2023-05-25T14:27:45.958Z | lvl=WARN | corr=513bd10e-fb08-11ed-8ad7-000c29583ca5 | trans=1685024865-125-00000000001 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[171]:logInfoRequestWithPayload | msg=Deprecated NGSIv1 request received: POST /v1/queryContext, request payload (48 bytes): { "entities": [ { "type": "T1", "id": "E1" } ] }, response code: 200
-time=2023-05-25T14:27:46.041Z | lvl=WARN | corr=51490536-fb08-11ed-9782-000c29583ca5 | trans=1685024865-125-00000000002 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[114]:logInfoRequestWithoutPayload | msg=Deprecated NGSIv1 request received: GET /v1/contextEntities/E, response code: 200
-```
-
-* 位置メタデータの NGSIv1 での使用。例：
-
-```
-time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c29583ca5 | trans=1686237259-703-00000000003 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[329]:getGeoJson | msg=Deprecated usage of metadata location coords detected in attribute location at entity update, please use geo:json instead
+time=2024-01-11T13:57:13.537Z | lvl=WARN | corr=527378d8-b089-11ee-875d-080027cd35f1 | trans=1704981432-655-00000000006 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationCreate.cpp[235]:mongoRegistrationCreate | msg=Deprecated usage of legacyForwarding mode in registration creation (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.565Z | lvl=WARN | corr=52778eaa-b089-11ee-861c-080027cd35f1 | trans=1704981432-655-00000000007 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=mongoRegistrationGet.cpp[93]:setProvider | msg=Deprecated usage of legacyForwarding mode detected in existing registration (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.595Z | lvl=WARN | corr=527c0912-b089-11ee-bb8c-080027cd35f1 | trans=1704981432-655-00000000008 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postQueryContext.cpp[191]:queryForward | msg=Deprecated usage of legacyForwarding mode in query forwarding operation (regId: 659ff3b9691855f16d00ec5a)
+time=2024-01-11T13:57:13.624Z | lvl=WARN | corr=52808938-b089-11ee-9835-080027cd35f1 | trans=1704981432-655-00000000010 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=postUpdateContext.cpp[163]:updateForward | msg=Deprecated usage of legacyForwarding mode in update forwarding operation (regId: 659ff3b9691855f16d00ec5a)
 ```
 
 * `geo:point`, `geo:line`, `geo:box` また `geo:line` の使用
@@ -366,6 +360,9 @@ time=2023-06-08T15:14:20.999Z | lvl=WARN | corr=24fd2acc-060f-11ee-94cc-000c2958
 ```
 time=2023-06-08T15:14:21.176Z | lvl=WARN | corr=2518249e-060f-11ee-9e76-000c29583ca5 | trans=1686237259-703-00000000004 | from=127.0.0.1 | srv=s1 | subsrv=/A | comp=Orion | op=location.cpp[353]:getGeoJson | msg=Deprecated usage of geo:point detected in attribute location at entity update, please use geo:json instead
 ```
+
+非推奨機能の使用状況は、`-logDeprecate` CLI (またはログ管理 REST API の同等の `deprecate` パラメータ) が使用されていない場合でも、
+[統計 API の counters ブロック](statistics#counter-block) の `deprecatedFeature` オブジェクトで追跡されます。
 
 非推奨の機能とその解決方法の詳細については、[非推奨ドキュメント](../deprecated.md) を参照してください。
 

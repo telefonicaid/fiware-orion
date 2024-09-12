@@ -73,6 +73,47 @@
       - [NGSI ペイロードのパッチ適用 (NGSI payload patching)](#ngsi-payload-patching)
       - [ペイロードの省略 (Omitting payload)](#omitting-payload)
       - [その他の考慮事項](#additional-considerations)
+    - [JEXL サポート (JEXL Support)](#jexl-support)
+      - [JEXL 使用例 (JEXL usage example)](#jexl-usage-example)
+      - [メタデータのサポート (Metadata support)](#metadata-support)
+      - [評価の優先順位](#evaluation-priority)
+      - [利用可能な変換 (Available Transformations)](#available-transformations)
+        - [`uppercase`](#uppercase)
+        - [`lowercase`](#lowercase)
+        - [`split`](#split)
+        - [`indexOf`](#indexof)
+        - [`len`](#len)
+        - [`trim`](#trim)
+        - [`substring`](#substring)
+        - [`includes`](#includes)
+        - [`isNaN`](#isNaN)
+        - [`parseInt`](#parseint)
+        - [`parseFloat`](#parsefloat)
+        - [`typeOf`](#typeOf)
+        - [`toString`](#tostring)
+        - [`toJson`](#tojson)
+        - [`floor`](#floor)
+        - [`ceil`](#ceil)
+        - [`round`](#round)
+        - [`toFixed`](#tofixed)
+        - [`log`](#log)
+        - [`log10`](#log10)
+        - [`log2`](#log2)
+        - [`sqrt`](#sqrt)
+        - [`replaceStr`](#replacestr)
+        - [`replaceRegex`](#replaceregex)
+        - [`matchRegex`](#matchregex)
+        - [`mapper`](#mapper)
+        - [`thMapper`](#thmapper)
+        - [`values`](#values)
+        - [`keys`](#keys)
+        - [`arrSum`](#arrsum)
+        - [`arrAvg`](#arravg)
+        - [`now`](#now)
+        - [`toIsoString`](#toisostring)
+        - [`getTime`](#gettime)
+      - [フェイルセーフ・ケース (Failsafe cases)](#failsafe-cases)
+      - [既知の制限 (Known limitations)](#known-limitations)
     - [Oneshot サブスクリプション (Oneshot Subscriptions)](#oneshot-subscriptions)
     - [カバード・サブスクリプション (Covered subscriptions)](#covered-subscriptions)
     - [変更タイプに基づくサブスクリプション (Subscriptions based in alteration type)](#subscriptions-based-in-alteration-type)
@@ -391,11 +432,12 @@ Orion で使用されるメタデータ更新セマンティクス (および関
 GET /v2/entities/E%253C01%253E
 ```
 
-上記の制限が適用されない例外的なケースがいくつかあります。 特に、次のフィールドで:
+上記の制限が適用されない例外的なケースがいくつかあります。 特に、次のケースで:
 
 -   URL パラメータ `q` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
 -   URL パラメータ `mq` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
 -   URL パラメータ `georel` と `coords` は `;` を許可します
+-   [NGSI ペイロード パッチ](#ngsi-payload-patching) の `ngsi` (つまり `id`、`type`、および属性値) 内 ([JEXL 式構文](#jexl-support) で使用される文字をサポートするため)
 -   属性タイプとして `TextUnrestricted` を使用する属性値 ([特別な属性タイプ](#special-attribute-types)のセクションを参照)
 
 <a name="identifiers-syntax-restrictions"></a>
@@ -421,6 +463,8 @@ GET /v2/entities/E%253C01%253E
 
 クライアントが構文の観点から無効なフィールドを使用しようとすると、クライアントは、原因を説明する "Bad Request" エラーの
 レスポンスを受け取ります。
+
+`:` と `-` は識別子で使用できますが、[JEXL 構文](#jexl-support) と衝突するため、使用は強く推奨されません。特に、`-` は減算演算 (例: `${A-B}`) に使用され、`:` は三項演算子 (例: `A?'A is true':'A is false`) に使用されます。したがって、式 `${lower-temperature}` 内の属性名 `lower-temperature` は、`lower` 属性の値から `temperature` 属性を引いた値として解釈されます (`lower-temperature` という名前の属性の値として解釈されるわけではありません)。
 
 <a name="error-responses"></a>
 
@@ -453,6 +497,7 @@ Oron の実装では、この節で説明する HTTP ステータス・コード
     -   HTTP 411 Length Required は `ContentLengthRequired` (`411`) に対応します
     -   HTTP 413 Request Entity Too Large は、`RequestEntityTooLarge` (`413`) に対応します
     -   HTTP 415 Unsupported Media Type は `UnsupportedMediaType` (`415`) に対応します
+-   内部エラー (Internal errors) には `InternalServerError` (`500`) を使用します
 
 <a name="multi-tenancy"></a>
 
@@ -526,8 +571,8 @@ Orion は階層スコープをサポートしているため、エンティテ�
 
 そのスコープで `Tree1` を検索するために、同じ Fiware-ServicePath が使用されます。
 
-スコープは階層的で、階層的な検索が可能です。これを行うために、`\#` 特別なキーワードが使用されます。 したがって、
-`/Madrid/Gardens/ParqueNorte/#` の `Tree` 型のエンティティ ID `.\*` のパターンを持つ query は、`ParqueNorte`,
+スコープは階層的で、階層的な検索が可能です。これを行うために、`#` 特別なキーワードが使用されます。 したがって、
+`/Madrid/Gardens/ParqueNorte/#` の `Tree` 型のエンティティ ID `.*` のパターンを持つ query は、`ParqueNorte`,
 `Parterre1`, `Parterre2` のすべてのツリー (trees) を返します。
 
 最後に、`Fiware-ServicePath` ヘッダでカンマ区切りのリストを使用して、ばらばらなスコープをクエリできます。たとえば、
@@ -550,7 +595,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 
 -   `Fiware-ServicePath` はオプションのヘッダです。`Fiware-ServicePath` なしで作成された (またはデータベースにサービス
    ・パス情報を含まない) すべてのエンティティは、暗黙的にルート・スコープ `/` に属していると想定されます。
-    `Fiware-ServicePath` を使用しないすべてのクエリ (サブスクリプションを含む) は、暗黙的に `\#` にあります。
+    `Fiware-ServicePath` を使用しないすべてのクエリ (サブスクリプションを含む) は、暗黙的に `/#` にあります。
     この動作により、0.14.0より前のバージョンとの下位互換性が保証されます
 
 -   異なるスコープで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
@@ -562,6 +607,8 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   エンティティは1つの (そして、1つだけの) スコープに属します
 
 -   `Fiware-ServicePath` ヘッダは、Orion から送信される通知リクエストに含まれています
+
+-   [`servicePath` 組み込み属性](#builtin-attributes)を使用してエンティティ・サービス・パスを取得できます
 
 -   スコープ・エンティティは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
     その場合、各 `scope tree` (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
@@ -625,7 +672,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 クライアントによって直接変更できないエンティティのプロパティがありますが、追加情報を提供するために Orion
 によってレンダリングすることができます。表現の観点から見ると、それらは名前、値、型とともに通常の属性と同じです。
 
-組み込み属性はデフォルトでレンダリングされません。特定の属性をレンダリングするには、URLs (または、POST /v2/op/query
+組み込み属性はデフォルトでレンダリングされません。特定の属性をレンダリングするには、URLs (または、`POST /v2/op/query`
 オペレーションのペイロード・フィールド) または、サブスクリプション (`notification` 内の `attrs` サブフィールド) の
 `attrs` パラメータにその名前を追加してください。
 
@@ -651,6 +698,13 @@ Orion は階層スコープをサポートしているため、エンティテ�
 通常の属性と同様に、`q` フィルタと `orderBy` (`alterationType` を除く) で使用できます。
 ただし、リソース URLs では使用できません。
 
+次の組み込み属性は、`onlyChangedAttrs` が `true` に設定されている場合でも、通知に含まれます (`notification` 内の `attrs`
+サブ・フィールドに追加された場合):
+
+-   `alterationType`
+-   `dateCreated`
+-   `dateModified`
+
 <a name="special-metadata-types"></a>
 
 ## 特殊なメタデータ型 (Special Metadata Types)
@@ -666,6 +720,9 @@ Orion は階層スコープをサポートしているため、エンティテ�
     Orion の特別なセマンティックを持つ 2 つのケースがあることに注意してください:
     -   `DateTime`
     -   `geo:json`
+
+- `evalPriority`: 式の評価で使用されます。詳細については、[この特定のセクション](#evaluation-priority)を参照してください
+
 
 現時点では、'ignoreType' は地理位置情報タイプに対してのみサポートされており、この方法により、エンティティごとに1つの
 地理位置情報のみという制限を克服するメカニズムが可能になります
@@ -693,7 +750,6 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `actionType` (型: `Text`): 通知のみ。添付されている属性が、通知をトリガーしたリクエストに含まれていた場合に
     含まれます。その値は、リクエスト・オペレーションのタイプによって異なります。更新の場合は `update`、作成の場合は
     `append`、削除の場合は `delete` です。その型は常に `Text` です
--   現在、[非推奨](#deprecated.md) ですが、まだサポートされています
 
 通常のメタデータと同様、`mq` フィルタでも使用できます。ただし、リソース URLs では使用できません。
 
@@ -1231,7 +1287,7 @@ PUT /v2/entities/E/attrs/A
 
 属性値は変更されません。
 
-数値とは別に、他の値タイプ (文字列など) がサポートされています。
+数値とは別に、他の値タイプ (文字列や `DateTime` など) がサポートされています。
 
 <a name="max"></a>
 
@@ -1261,7 +1317,7 @@ PUT /v2/entities/E/attrs/A
 
 属性値は変更されません。
 
-数値とは別に、他の値タイプ (文字列など) がサポートされています。
+数値とは別に、他の値タイプ (文字列や `DateTime` など) がサポートされています。
 
 <a name="push"></a>
 
@@ -1534,7 +1590,8 @@ PUT /v2/entities/E/attrs/A
 
 更新演算子は、エンティティの作成または置換操作で使用できます。特に:
 
-* 数値演算子は 0 を基準とします。たとえば、`{"$inc": 4}` の結果は 4、`{$mul: 1000}` の結果は 0 になります
+* 数値演算子は 0 を基準とします。たとえば、`{"$inc": 4}` の結果は 4、`{"$mul": 1000}` の結果は 0 になります
+* `$min` または `$max` が使用される場合、エポック時間 (`"1970-01-01T00:00:00Z"`) が `DateTime` の参照として使用されます
 * `$set` は空のオブジェクト (`{}`) を参照として受け取ります。たとえば、`"$set": {"X": 1}` は単に `{"X": 1}` になります
 * `$push` と `$addToSet` は空の配列 (`[]`) を参照として受け取ります。たとえば、`{"$push": 4}` は `[ 4 ]` になります
 * `$pull`、`$pullAll`、および `$unset` は無視されます。これは、演算子が使用される属性がエンティティ内に作成されないことを意味します。
@@ -1930,40 +1987,7 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
 }
 ```
 
-`attrsFormat` が `legacy` の場合、サブスクリプション表現は NGSIv1 形式に従います。このようにして、ユーザは、NGSIv1
-レガシー通知レシーバによる Orion サブスクリプションの拡張 (フィルタリングなど) の恩恵を受けることができます。
-
-NGSIv1 は非推奨であることに注意してください。したがって、`legacy` 通知形式を使用することはお勧めしません。
-
-```json
-{
-	"subscriptionId": "56e2ad4e8001ff5e0a5260ec",
-	"originator": "localhost",
-	"contextResponses": [{
-		"contextElement": {
-			"type": "Car",
-			"isPattern": "false",
-			"id": "Car1",
-			"attributes": [{
-				"name": "temperature",
-				"type": "centigrade",
-				"value": "26.5",
-				"metadatas": [{
-					"name": "TimeInstant",
-					"type": "recvTime",
-					"value": "2015-12-12 11:11:11.123"
-				}]
-			}]
-		},
-		"statusCode": {
-			"code": "200",
-			"reasonPhrase": "OK"
-		}
-	}]
-}
-```
-
-通知には、関連するサブスクリプションの形式の値を含む `Ngsiv2-AttrsFormat` (`attrsFormat` が `legacy` の場合を想定) HTTP
+通知には、関連するサブスクリプションの形式の値を含む `Ngsiv2-AttrsFormat` HTTP
 ヘッダを含める必要があります。これにより、通知受信者は通知ペイロードを処理しなくても形式を認識できます。
 
 **注:** 通知には必ず1つのエンティティが含まれることに注意してください。そのため、`data`
@@ -1999,22 +2023,22 @@ NGSIv1 は非推奨であることに注意してください。したがって�
 -   `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 -   `topic`
 
-テンプレートのマクロ置換は、構文 `${..}` に基づいています。特に:
+テンプレートのマクロ置換は、構文 `${<JEXL expression>}` に基づいています。JEXL のサポートについては、
+[JEXL サポート](#jexl-support) セクションで説明されています。JEXL 式によって評価されるコンテキストには、
+次の識別子が含まれます:
 
--   `${id}` は、エンティティの `id` に置き換えられます
--   `${type}` は、エンティティの `type` に置き換えられます
--   `${service}` は、サブスクリプションをトリガーする更新リクエストのサービス (つまり、`Fiware-Service` ヘッダ値)
-    に置き換えられます
--   `${servicePath}` は、サブスクリプションをトリガーする更新リクエストのサービス パス (つまり、`Fiware-Servicepath`
-    ヘッダ値) に置き換えられます
--   `${authToken}` は、サブスクリプションをトリガーする更新リクエストで認証トークン (つまり、`x-auth-token` ヘッダ値)
-    に置き換えられます
--   他の `${token}` は、名前が `token` の属性の値に置き換えられます。属性が通知に含まれていない場合は空文字列に
-    置き換えられます。値が数値、bool または null の場合、その文字列表現が使用されます。値が JSON 配列または
-    オブジェクトの場合、JSON 表現は文字列として使用されます
+-   `id`: エンティティの `id`
+-   `type`: エンティティの `type`
+-   `service`: サブスクリプションをトリガーする更新リクエスト内のサービス
+    (つまり、`fiware-service` ヘッダ値)
+-   `servicePath`: サブスクリプションをトリガーする更新リクエスト内のサービス・パス
+    (つまり、`fiware-servicepath` ヘッダ値)
+-   `authToken: サブスクリプションをトリガーする更新リクエスト内の認証トークン
+    (つまり、`x-auth-token` ヘッダ値)
+-   通知をトリガーするエンティティ内のすべての属性（通知をトリガーする更新に含まれているかどうか）
 
-まれに、属性が `${service}`, `${servicePath}` または `${authToken}` と同じ方法で命名された場合 (例: `service`
-という名前の属性)、属性値が優先されます。
+まれに、属性の名前が `service`、`servicePath`、または `authToken` と同じ名前になっている場合
+(名前が `service` である属性など)、属性値が優先されます。
 
 例:
 
@@ -2245,6 +2269,9 @@ the value of the "temperature" attribute (of type Number) is 23.4
     -   マクロが *使用されている文字列を完全にカバーしている場合*、属性値の JSON の性質が考慮されます。たとえば、
         `"value": "${temperature}"` は、温度属性が数値の場合は `"value": 10` に解決され、`temperature`
         属性が文字列の場合は `"value": "10"` に解決されます
+        -   `id` と `type` は例外です。エンティティ ID と型が文字列でなければならないことを考えると
+            ([このセクション](#identifiers-syntax-restrictions)で説明されているように)、この場合、
+            属性値は常に文字列にキャストされます
     -   マクロが使用されている文字列の一部のみである場合、属性値は常に文字列にキャストされます。たとえば、
         `"value": "Temperature is: ${temperature}"` は、温度属性が数値であっても、`"value": "Temperature is 10"`
         に解決されます。属性値が JSON 配列またはオブジェクトの場合、この場合は文字列化されることに注意してください
@@ -2280,6 +2307,1018 @@ the value of the "temperature" attribute (of type Number) is 23.4
 -   テキスト・ベースまたは JSON ペイロードが使用される場合 (つまり、 `payload` または `json` フィールドが使用される場合)、
     `Ngsiv2-AttrsFormat` ヘッダは `custom` に設定されます。ただし、NGSI patch が使用される場合 (つまり、`ngsi` フィールド)、
     通常の通知と同様に、`Ngsiv2-AttrsFormat: normalized` が使用されることに注意してください (通知形式が実際には同じである場合)
+
+<a name="jexl-support"></a>
+
+## JEXL サポート (JEXL Support)
+
+Orion Context Brokerは、カスタム通知の[マクロ置換](#macro-substitution)で[JEXL式](https://github.com/TomFrost/Jexl)をサポートしています。したがって、次のようなサブスクリプションを定義できます:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "relativeHumidity": {
+      "value": "${humidity/100}",
+      "type": "Calculated"
+    }
+  }
+}
+```
+
+したがって、特定の更新によってエンティティの `humidity` 属性が `84.4` に設定された場合、通知には値 `0.844` の `relativeHumidity` 属性が含まれます。
+
+式の特殊なケースとしては、式が特定のコンテキスト識別子であり、実際の式でそれを使用しないケースがあります。たとえば、次のようになります:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "originalHumidity": {
+      "value": "${humidity}",
+      "type": "Calculated"
+    }
+  }
+}
+```
+
+このケースを *基本置換* (basic replacement) とも呼びます。
+
+JEXL 式をテストするための便利なリソースは [JEXL プレイグラウンド](https://czosel.github.io/jexl-playground) です。ただし、[既知の制限](#known-limitations) セクションで説明されているように、JavaScript での元の JEXL 実装と Orion に含まれる実装の違いを考慮してください。
+
+Orion は、この機能を提供するために cjexl ライブラリに依存しています。Orion バイナリが cjexl を使用せずにビルドされている場合、基本置換機能のみが利用できます。
+
+<a name="jexl-usage-example"></a>
+
+### JEXL 使用例 (JEXL usage example)
+
+例として、次のようなサブスクリプションを考えてみましょう:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "speed": {
+      "value": "${(speed|split(' '))[0]|parseInt}",
+      "type": "Calculated"
+    },
+    "ratio": {
+      "value": "${count.sum/count.count}",
+      "type": "Calculated"
+    },
+    "code": {
+      "value": "${code||'invalid'}",
+      "type": "Calculated"
+    },
+    "alert": {
+      "value": "${(value>max)?'nok':'ok'}",
+      "type": "Calculated"
+    },
+    "count": {
+      "value": "${{count:count.count+1, sum:count.sum+((speed|split(' '))[0]|parseInt)}}",
+      "type": "Calculated"
+    }
+}
+```
+
+エンティティの更新は次のようになります:
+
+```
+{
+  ...
+  "speed": {
+    "value": "10 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 100
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": null,
+    "type": "Number"
+  },
+  "value": {
+    "value": 14,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}
+```
+
+次のような通知がトリガーされます:
+
+```
+"data": [
+  {
+    ...
+    "speed": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 10
+    },
+    "ratio": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 20
+    },
+    "code": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "invalid"
+    },
+    "alert": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "ok"
+    },
+    "count": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": {
+        "count": 6,
+        "sum": 110
+      }
+    }
+  }
+]
+```
+
+新しいエンティティの更新は次のようになります:
+
+```
+{
+  ...
+  "speed": {
+    "value": "30 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 500
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": 456,
+    "type": "Number"
+  },
+  "value": {
+    "value": 75,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}
+```
+
+次のような通知が表示されます:
+
+```
+"data": [
+  {
+    ...
+    "speed": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 30
+    },
+    "ratio": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 100
+    },
+    "code": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": 456
+    },
+    "alert": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": "nok"
+    },
+    "count": {
+      "metadata": {},
+      "type": "Calculated",
+      "value": {
+        "count": 6,
+        "sum": 530
+      }
+    }
+  }
+]
+```
+
+<a name="metadata-support"></a>
+
+### メタデータのサポート (Metadata support)
+
+属性メタデータも、実際の属性とともに JEXL 評価コンテキストに含まれています。これは、`metadata` という特別なコンテキスト・キーを使用して行われます。このキーの値は、次の構造を持つオブジェクトです:
+
+* キーは属性の名前
+* 値は、指定された属性のメタデータ値のキー マップを持つオブジェクト
+
+たとえば、式 `${metadata.A.MD1}` は、属性 `A` に属するメタデータ `MD1` の値になります。
+
+[組み込みメタデータ](#builtin-metadata) は、`metadata` コンテキスト キーに自動的に追加されることに注意してください。たとえば、`${A-metadata.A.previousValue}` 式は、`A` の現在の値 (更新要求内) と以前の値 (更新要求前) の差を提供します。
+
+最後に、まれに `metadata` という名前の属性が使用される場合 (これはアンチパターンであり、強く推奨されません)、メタデータ値を持つ `metadata` が優先されるため、コンテキストに追加されないことに注意してください。
+
+<a name="evaluation-priority"></a>
+
+### 評価の優先順位
+
+式が評価されるたびに、その式は式のコンテキストに追加され、他の式で再利用できるようになります。ただし、デフォルトでは、Orion は特定の評価を保証しません。
+
+したがって、次の式があるとします:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated"
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
+結果の通知では、`B` は、希望する `0.04` (`A` が `B` の前に評価される場合) または、過小評価された `null` (`B` が `A` の前に評価される場合) にランダムに設定される可能性があります。
+
+この問題を克服するために、`evalPriority` メタデータを使用して評価順序を定義できます。これは次のように機能します:
+
+- `evalPriority` メタデータは、1 (最初の評価) から 100000 (最後の評価) までの数値です
+- 式は優先度の昇順で評価されます
+- 同順位の場合、Orion は特定の評価順序を保証しません。したがって、同じ優先度レベルの式は独立していると見なす必要があり、同じまたはより低い優先度の他の属性を使用する式は予期しない値になります
+- `evalPriority` が設定されていない場合は、デフォルトの 100000 が使用されます
+- `evalPriority` は、サブスクリプションの `notification.httpCustom.ngsi` でのみ意味を持ちます。通常のエンティティのメタデータ (`POST /v2/entities` で作成されたエンティティなど) として、Orion はそれに対するセマンティクスを実装しません
+
+`evalPriority` を使用すると、上記の例は次のように書き直すことができます:
+
+```
+"httpCustom": {
+  ...
+  "ngsi": {
+    "A": {
+      "value": "${16|sqrt}",
+      "type": "Calculated",
+      "metadata": {
+        "evalPriority": {
+          "value": 1,
+          "type": "Number"
+        }
+      }
+    },
+    "B": {
+      "value": "${A/100}",
+      "type": "Calculated"
+    }
+  },
+  "attrs": [ "B" ]
+}
+```
+
+<a name="available-transformations"></a>
+
+### 利用可能な変換 (Available Transformations)
+
+<a name="uppercase"></a>
+
+#### `uppercase`
+
+文字列を大文字に変換します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "fooBAR"}`):
+
+```
+c|uppercase
+```
+
+結果
+
+```
+"FOOBAR"
+```
+
+<a name="lowercase"></a>
+
+#### lowercase
+
+文字列を小文字に変換します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "fooBAR"}`):
+
+```
+c|lowercase
+```
+
+結果
+
+```
+"foobar"
+```
+
+<a name="split"></a>
+
+#### split
+
+入力文字列を配列項目に分割します。
+
+追加引数: 分割に使用する区切り文字
+
+例 (コンテキスト `{"c": "foo,bar,zzz"}`):
+
+```
+c|split(',')
+```
+
+結果
+
+```
+[ "foo", "bar", "zzz" ]
+```
+
+<a name="indexof"></a>
+
+#### indexOf
+
+入力文字列内の指定された文字列の位置を提供します。文字列が見つからない場合は、`null` を返します。
+
+追加引数: 検索する入力文字列
+
+この関数は、入力が配列の場合は機能しないことに注意してください (文字列に対してのみ機能します)。
+
+例 (コンテキスト `{"c": "fooxybar"}`):
+
+```
+c|indexOf('xy')
+```
+
+結果
+
+```
+3
+```
+
+<a name="len"></a>
+
+#### len
+
+文字列の長さを提供します。
+
+追加引数: なし
+
+この関数は、入力が配列の場合は機能しないことに注意してください (文字列に対してのみ機能します)。
+
+例 (コンテキスト `{"c": "foobar"}`):
+
+```
+c|len
+```
+
+結果
+
+```
+6
+```
+
+<a name="trim"></a>
+
+#### trim
+
+先頭と末尾の空白を削除します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "  foo  bar  "}`):
+
+```
+c|trim
+```
+
+結果
+
+```
+foo  bar
+```
+
+<a name="substring"></a>
+
+#### substring
+
+2つの位置の間の部分文字列を返します。パラメータが間違っている場合は `null` を返します (例: 最終位置が文字列より長い、最終位置が初期位置より短いなど)。
+
+追加引数:
+* 開始位置
+*  終了位置
+
+例 (コンテキスト `{"c": "foobar"}`):
+
+```
+c|substring(3,5)
+```
+
+結果
+
+```
+ba
+```
+
+<a name="includes"></a>
+
+#### includes
+
+指定された文字列が入力文字列に含まれている場合は `true` を返し、含まれていない場合は `false` を返します。
+
+追加引数: 検索する入力文字列
+
+例 (コンテキスト `{"c": "foobar"}`):
+
+```
+c|includes('ba')
+```
+
+結果
+
+```
+true
+```
+
+<a name="isNaN"></a>
+
+#### isNaN
+
+入力が数値でない場合は `true` を返し、それ以外の場合は `false` を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "foobar"}`):
+
+```
+c|isNaN
+```
+
+結果
+
+```
+true
+```
+
+<a name="parseint"></a>
+
+#### parseInt
+
+文字列を解析し、対応する整数を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "25"}`):
+
+```
+c|parseInt
+```
+
+結果
+
+```
+25
+```
+
+<a name="parsefloat"></a>
+
+#### parseFloat
+
+文字列を解析し、対応する浮動小数点数を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "25.33"}`):
+
+```
+c|parseFloat
+```
+
+結果
+
+```
+25.33
+```
+
+<a name="typeOf"></a>
+
+#### typeOf
+
+入力の型を含む文字列を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 23}`):
+
+```
+c|typeOf
+```
+
+結果
+
+```
+"Number"
+```
+
+<a name="tostring"></a>
+
+#### toString
+
+入力の文字列表現を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 23}`):
+
+```
+c|toString
+```
+
+結果
+
+```
+"23"
+```
+
+<a name="tojson"></a>
+
+#### toJson
+
+入力文字列を JSON ドキュメントに変換します。文字列が有効な JSON でない場合は、`null` を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "[1,2]"}`):
+
+```
+c|toJson
+```
+
+結果
+
+```
+[1, 2]
+```
+
+<a name="floor"></a>
+
+#### floor
+
+指定された数値に最も近い小さい整数を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 3.14}`):
+
+```
+c|floor
+```
+
+結果
+
+```
+3
+```
+
+<a name="ceil"></a>
+
+#### ceil
+
+指定された数値に最も近い上位の整数を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 3.14}`):
+
+```
+c|ceil
+```
+
+結果
+
+```
+4
+```
+
+<a name="round"></a>
+
+#### round
+
+指定された数値に最も近い整数（下限または上限）を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 3.14}`):
+
+```
+c|round
+```
+
+結果
+
+```
+3
+```
+
+<a name="tofixed"></a>
+
+#### toFixed
+
+数値を小数点以下の桁数に丸めます。
+
+追加引数: 小数点以下の桁数
+
+例 (コンテキスト `{"c": 3.18}`):
+
+```
+c|toFixed(1)
+```
+
+結果
+
+```
+3.2
+```
+
+<a name="log"></a>
+
+#### log
+
+与えられた数値の自然対数を返す。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 3.14}`):
+
+```
+c|log
+```
+
+結果
+
+```
+1.144222799920162
+```
+
+<a name="log10"></a>
+
+#### log10
+
+与えられた数値の10を底とする対数を返す。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 3.14}`):
+
+```
+c|log10
+```
+
+結果
+
+```
+0.49692964807321494
+```
+
+<a name="log2"></a>
+
+#### log2
+
+指定された数値の 2 を底とする対数を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 3.14}`):
+
+```
+c|log2
+```
+
+結果
+
+```
+1.6507645591169025
+```
+
+<a name="sqrt"></a>
+
+#### sqrt
+
+指定された数値の平方根を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": 3.14}`):
+
+```
+c|sqrt
+```
+
+結果
+
+```
+1.772004514666935
+```
+
+<a name="replacestr"></a>
+
+#### replaceStr
+
+入力文字列内の文字列を別の文字列に置き換えます。
+
+追加引数:
+* 置換するソース文字列
+* 置換先の文字列
+
+例 (コンテキスト `{"c": "foobar"}`):
+
+```
+c|replaceStr('o','u')
+```
+
+結果
+
+```
+"fuubar"
+```
+
+<a name="replaceregex"></a>
+
+#### replaceRegex
+
+入力文字列内の指定された正規表現に一致するトークンを別の文字列に置き換えます。
+
+追加引数:
+* 置換するトークンに一致する正規表現
+* 置換先の文字列
+
+例 (コンテキスト `{"c": "aba1234aba786aba"}`):
+
+```
+c|replaceRegex('\d+','X')
+```
+
+結果
+
+```
+"abaXabaXaba"
+```
+
+<a name="matchregex"></a>
+
+#### matchRegex
+
+入力文字列内の指定された正規表現に一致するトークンの配列を返します。無効な正規表現の場合は、`null` を返します。一致するものが見つからない場合は、空の配列 (`[]`) を返します。
+
+追加引数: 正規表現
+
+例 (コンテキスト `{"c": "abc1234fgh897hyt"}`):
+
+```
+c|matchRegex('\d+`)
+```
+
+結果
+
+```
+["1234, "897"]]
+```
+
+<a name="mapper"></a>
+
+#### mapper
+
+1 対 1 のマッピングに基づいて、複数の選択肢の中から値を返します。この関数は、値の配列 (*value*) と選択肢の配列 (*choices*) に基づいています (長さはまったく同じ) 。したがって、入力値が *values* の *i* 番目の項目と等しい場合は、*choices* の *i* 番目の項目が返されます。
+
+この変換は、引数に何らかの問題が見つかった場合 (つまり、入力が値の中に見つからない、選択肢の長さが値とまったく同じではない、入力が文字列ではないなど)、`null` を返します。
+
+追加引数:
+* 値の配列 (values array)
+* 選択肢の配列 (choices array)
+
+例 (コンテキスト `{"c": "fr", "values": ["es", "fr", "de"], "choices": ["Spain", "France", "Germany"]}`):
+
+```
+c|mapper(values,choices)
+```
+
+結果
+
+```
+"France"
+```
+
+<a name="thmapper"></a>
+
+#### thMapper
+
+しきい値に基づいて、複数の選択肢の中から値を返します。この関数は、値の配列 (*values*) と選択肢の配列 (*choices*) に基づいています (長さは、値に 1 を加えた値とまったく同じです)。したがって、入力値が *i* 番目の *values* 項目以上で *i+1* 番目の項目より小さい場合、*i*+1 番目の *choices* 項目が返されます。
+
+引数に問題が見つかった場合 (つまり、選択肢の長さが値に 1 を加えた値とまったく同じではない、値配列の一部の項目が数値ではないなど)、この変換は `null` を返します。
+
+追加引数:
+* 値の配列 (values array)
+* 選択肢の配列 (choices array)
+
+例 (コンテキスト `{"c": 0.5, "values": [-1, 1], "choices": ["low", "medium", "high"]}`):
+
+```
+c|thMapper(values,choices)
+```
+
+結果
+
+```
+"medium"
+```
+
+<a name="values"></a>
+
+#### values
+
+指定されたオブジェクトのキーの値を含む配列を返します (入力がオブジェクトでない場合は `null`)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|values
+```
+
+結果
+
+```
+[1,"foo"]
+```
+
+<a name="keys"></a>
+
+#### keys
+
+指定されたオブジェクトのキーを含む配列を返します (入力がオブジェクトでない場合は `null`)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": {"x": 1, "y": "foo"}}`):
+
+```
+c|keys
+```
+
+結果
+
+```
+["x","y"]
+```
+
+<a name="arrsum"></a>
+
+#### arrSum
+
+配列の要素の合計を返します (配列内の入力または配列に数値以外の項目が含まれている場合は `null` を返します)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": [1, 5]}`):
+
+```
+c|arrSum
+```
+
+結果
+
+```
+6
+```
+
+<a name="arravg"></a>
+
+#### arrAvg
+
+配列の要素の平均を返します (配列内の入力または配列に数値以外の項目が含まれている場合は `null` を返します)。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": [1, 5]}`):
+
+```
+c|arrAvg
+```
+
+結果
+
+```
+3
+```
+
+<a name="now"></a>
+
+#### now
+
+現在の時刻（引数として指定された秒数を加えたもの）を Unix エポック時間からの秒数として返します。
+
+追加の引数: なし
+
+例 (現在の時刻が 2024 年 8 月 1 日 9:31:02 の場合):
+
+```
+0|now
+```
+
+結果
+
+```
+1722504662
+```
+
+https://www.epochconverter.com で確認すると、その時間は 2024 年 8 月 1 日 9:31:02 に相当します。
+
+<a name="toisostring"></a>
+
+#### toIsoString
+
+引数として渡された特定のタイムスタンプ (Unix エポック時間からの秒数) に対応する [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) を返します。
+
+追加の引数: なし
+
+例 (コンテキスト `{"c": 1720606949}`):
+
+```
+c|toIsoString
+```
+
+結果
+
+```
+"2024-07-10T10:22:29+00:00"
+```
+
+https://www.epochconverter.com で、1720606949 が 2024-07-10T10:22:29+00:00 に対応していることを確認できます。
+
+<a name="gettime"></a>
+
+#### getTime
+
+引数として渡された [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) に対応するタイムスタンプ (Unix エポック時間からの秒数) を返します。
+
+追加引数: なし
+
+例 (コンテキスト `{"c": "2024-07-10T10:22:29+00:00"}`):
+
+```
+c|getTime
+```
+
+結果
+
+```
+1720606949
+```
+
+https://www.epochconverter.com で、1720606949 が 2024-07-10T10:22:29+00:00 に対応していることを確認できます。
+
+<a name="failsafe-cases"></a>
+
+### フェイルセーフ・ケース (Failsafe cases)
+
+フェイルセーフ動作として、評価は次の場合に `null` を返します:
+
+* 式で使用されている変換の一部が不明です (例: `A|undefinedExpression`)
+* コンテキストで定義されていない識別子を使用した演算が使用されています。たとえば、`(A==null)?0:A` は、`A` がコンテキストにない場合、`null` (`0` ではありません) になります。これは、`==` が未定義の識別子では実行できない演算であるためです。ただし、`||` は `A` に対する演算とは見なされないため、`A||0` は機能します (つまり、`A` がコンテキストにない場合は `0` になります)
+* JEXL 式の構文エラーです (例: `A[0|uppercase`)
+
+<a name="known-limitations"></a>
+
+### 既知の制限 (Known limitations)
+
+- 単位マイナス演算子が正しく動作しません。たとえば、次の式は動作しません (`null` にフェイルセーフされます): `A||-1`。ただし、次の代替式は動作します: `A||0-1` および `A||'-1'|parseInt)`
+- 否定演算子 `!` (元の JavaScript JEXL でサポート) はサポートされていません
+- JEXL 演算子 (例: `:` または `-`) を使用する属性名とエンティティ識別子は、望ましくない式結果につながる可能性があります。たとえば、`temperature-basic` という名前の属性を式の一部として使用すると、属性 `temperature-basic` の値ではなく、属性 `basic` の値から属性 `temperature` の値 (または、`temperature` または `basic` が存在しない場合は `null`) を減算した結果になります
 
 <a name="oneshot-subscriptions"></a>
 
@@ -2384,10 +3423,6 @@ EOF
 
 この場合、エンティティに存在するかどうかに関係なく、すべての属性が通知に含まれます。存在しないこれらの属性
 (この例では `brightness`) には、`null` 値 (タイプ `"None"`) が使用されます。
-
-カスタム通知の場合、`covered` が `true` に設定されていると、`null` は、存在しない属性の `${...}` を置き換えるために
-使用されます (`covered` が `true` に設定されていない場合のデフォルトの動作は、存在しない属性を空の文字列に
-置き換えることです)。
 
 通知が `notification.attrs` フィールドのすべての属性を完全に "カバーする" (covers) という意味で "カバーされる" (covered)
 という用語を使用します。これは、可変の属性セットに対して十分な柔軟性がなく、受信したすべての通知で常に同じ着信属性の
@@ -2822,6 +3857,9 @@ _**レスポンス・コード**_
 -   成功したオペレーションでは、200 OK を使用します
 -   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
     [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
 
 _**レスポンス・ヘッダ**_
 
@@ -2829,8 +3867,17 @@ _**レスポンス・ヘッダ**_
 
 _**レスポンス・ペイロード**_
 
-レスポンスは、id で識別されるエンティティを表すオブジェクトです。オブジェクトは、JSON エンティティ表現形式
-([JSON エンティティ表現](#json-entity-representation)のセクションと、
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+エンティティが見つかった場合、レスポンスは ID で識別されるエンティティを表すオブジェクトになります。
+オブジェクトは、JSON エンティティ表現形式 ([JSON エンティティ表現](#json-entity-representation)のセクションと、
 [簡略化されたエンティティ表現](#simplified-entity-representation)および、[部分的表現](#partial-representations)
 のセクションで説明されています) に従います。
 
@@ -2906,8 +3953,9 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
 
 _**レスポンス・ヘッダ**_
 
@@ -2915,8 +3963,17 @@ _**レスポンス・ヘッダ**_
 
 _**レスポンス・ペイロード**_
 
-ペイロードは、URL パラメータの id で識別されるエンティティを表すオブジェクトです。オブジェクトは JSON
-エンティティ表現形式 ([JSON エンティティ表現](#json-entity-representation)のセクションと、
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+エンティティが見つかった場合、ペイロードは、URL パラメータの ID によって識別されるエンティティを表すオブジェクトです。
+オブジェクトは JSON エンティティ表現形式 ([JSON エンティティ表現](#json-entity-representation)のセクションと、
 [簡略化されたエンティティ表現](#simplified-entity-representation)および、[部分表現](#partial-representations)
 のセクションで説明されています) に従いますが、`id` フィールドと `type` フィールドは省略されます。
 
@@ -3014,8 +4071,45 @@ JSON エンティティ表現形式 ([JSON エンティティ表現](#json-entit
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   `append` オプションが使用されたときに、属性が存在していて、422 Unprocessable Content になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+`append` オプションが使用されたときに、*すべて* の属性が存在する場合:
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+```
+
+`append` オプションが使用されたときに、*一部* (すべてではない) 属性が存在する場合 (部分更新):
+
+```
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ B ]",
+    "error": "PartialUpdate"
+}
+```
+
+`description` 内のエンティティ型は、リクエストにエンティティ型が含まれている場合にのみ表示されます。それ以外の場合は省略されます:
+
+```
+"description": "one or more of the attributes in the request already exist: E - [ B ]",
+```
 
 <a name="update-existing-entity-attributes-patch-v2entitiesentityidattrs"></a>
 
@@ -3081,6 +4175,46 @@ _**レスポンス**_
 -   成功したオペレーションでは、204 No Content を使用します
 -   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
     [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   属性が存在しないで、422 Unprocessable Content になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+リクエストに属性が *何も存在しない* 場合:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ]",
+    "error": "Unprocessable"
+}
+```
+
+*一部* (すべてではない) 属性が存在しない場合 (部分更新):
+
+```
+{
+    "description": "do not exist: E/T - [ C ]",
+    "error": "PartialUpdate"
+}
+```
+
+
+`description` 内のエンティティ型は、リクエストにエンティティ型が含まれている場合にのみ表示されます。それ以外の場合は省略されます:
+
+```
+"description": "do not exist: E - [ C ]",
+```
 
 <a name="replace-all-entity-attributes-put-v2entitiesentityidattrs"></a>
 
@@ -3143,8 +4277,20 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 <a name="remove-entity-delete-v2entitiesentityid"></a>
 
@@ -3176,8 +4322,20 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティが見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
 
 <a name="attributes"></a>
 
@@ -3308,8 +4466,29 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 <a name="remove-a-single-attribute-delete-v2entitiesentityidattrsattrname"></a>
 
@@ -3342,8 +4521,29 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   正常なオペレーションには、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+    "description": "The entity does not have such an attribute",
+    "error": "NotFound"
+}
+```
 
 <a name="attribute-value"></a>
 
@@ -3387,8 +4587,10 @@ _**リクエスト・ヘッダ**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   コンテンツが受け入れられないときに、406 Not Acceptable になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
 
 _**レスポンス・ヘッダ**_
 
@@ -3396,7 +4598,25 @@ _**レスポンス・ヘッダ**_
 
 _**レスポンス・ペイロード**_
 
-レスポンス・ペイロードは、オブジェクト、配列、文字列、数値、ブール値、または属性の値を持つ null にすることができます。
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
+
+エンティティと属性の両方が見つかった場合、レスポンス・ペイロードはオブジェクト、配列、文字列、数値、ブール値、または属性の値を持つ null になります。
 
 -   属性値が JSON 配列またはオブジェクトの場合:
     -   `Accept` ヘッダを `application/json` または `text/plain` に展開できる場合、レスポンス・タイプが
@@ -3486,8 +4706,29 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、200 OK を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   エンティティまたは属性が見つからず、404 Not Found になる場合 (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+エンティティが見つからない場合:
+
+```
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+```
+
+属性が見つからない場合:
+
+```
+{
+   "description": "The entity does not have such an attribute",
+   "error": "NotFound"
+}
+```
 
 <a name="types"></a>
 
@@ -3715,7 +4956,7 @@ _**レスポンス・ペイロード**_
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs` または `exceptAttrs`                                                                                                                                                                    |            | array   | 両方を同時に使用することはできません。<ul><li><code>attrs</code>: 通知メッセージに含まれる属性のリスト。また、<code>attrsFormat</code> <code>value</code> が使用されたときに属性が通知に表示される順序も定義します ("通知メッセージ" のセクションを参照)。空のリストは、すべての属性が通知に含まれることを意味します。詳細については、[属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)のセクションを参照してください</li><li><code>exceptAttrs</code>: 通知メッセージから除外される属性のリスト。つまり、通知メッセージには、このフィールドにリストされているものを除くすべてのエンティティ属性が含まれます。 空でないリストでなければなりません。</li><li><code>attrs</code> も <code>exceptAttrs</code> も指定されていない場合、すべての属性が通知に含まれます</li></ul> |
 | [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) または [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓          | object  | それらの1つが存在する必要がありますが、同時に1つを超えてはなりません。x トランスポート・プロトコルを介して配信される通知のパラメータを伝達するために使用されます                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `attrsFormat`                                                                                                                                                                                   | ✓          | string  | エンティティが通知でどのように表されるかを指定します。受け入れられる値は、`normalized` (デフォルト), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, `values`, または `legacy` です。<br> `attrsFormat` がそれらとは異なる値をとると、エラーが発生します。 詳細については、[通知メッセージ](#notification-messages)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `attrsFormat`                                                                                                                                                                                   | ✓          | string  | エンティティが通知でどのように表されるかを指定します。受け入れられる値は、`normalized` (デフォルト), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, または `values` です。<br> `attrsFormat` がそれらとは異なる値をとると、エラーが発生します。 詳細については、[通知メッセージ](#notification-messages)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `metadata`                                                                                                                                                                                      | ✓          | string  | 通知メッセージに含まれるメタデータのリスト。詳細については、[属性とメタデータの除外](#filtering-out-attributes-and-metadata)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `onlyChangedAttrs`                                                                                                                                                                              | ✓          | boolean | `true` の場合、通知には、`attrs` または `exceptAttrs` フィールドと組み合わせて、トリガー更新リクエストで変更された属性のみが含まれます。(フィールドが省略されている場合、デフォルトは `false` です))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `covered`                                                                                                                                                                                       | ✓          | boolean | `true` の場合、通知には、エンティティに存在しない場合でも (この場合、`null` 値で) `attrs` フィールドで定義されたすべての属性が含まれます。(デフォルト値は false です)。詳細については、[対象サブスクリプション](#covered-subscriptions)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -4548,8 +5789,84 @@ _**リクエスト・ペイロード**_
 _**レスポンス・コード**_
 
 -   成功したオペレーションでは、204 No Content を使用します
--   エラーは、2xx 以外のものと、(オプションで) エラー・ペイロードを使用します。詳細については、
-    [エラー・レスポンス](#error-responses)のサブセクションを参照してください
+-   エラーでは、2xx 以外のコードとエラー・ペイロードが使用されます:
+    -   `update`, `delete` または `replace` 時に `entities` フィールドにエンティティが存在しなければ、404 Not Found になります (次のサブセクションを参照)
+    -   そのほかの場合は、422 Unprocessable Content になります (次のサブセクションを参照)
+    -   [エラー・レスポンス](#error-responses) の一般ドキュメントで追加のケースを確認してください
+
+_**レスポンス・ペイロード**_
+
+アクション・タイプが `replace` の場合:
+
+-   `entities` 内にエンティティが *何も*存在しない場合:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+-   `entities` 内にエンティティの *いずれか (すべてではない)* が存在しない場合 (部分更新):
+
+```
+{
+    "description": "do not exist: G/T - [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+アクション・タイプが `update` または `delete` の場合:
+
+-   `entities` 内にエンティティが *何も*存在しない場合:
+
+```
+{
+    "description": "do not exist: F/T - [entity itself], G/T [entity itself]",
+    "error": "NotFound"
+}
+```
+
+-   `entities` に少なくとも1つのエンティティが存在し、既存のエンティティの *すべて* で属性の欠落により *完全な失敗* が発生した場合:
+
+```
+{
+    "description": "do not exist: E/T - [ C, D ], G/T [entity itself]",
+    "error": "Unprocessable"
+}
+```
+
+-   `entities` 内に少なくとも1つのエンティティが存在し、既存のエンティティの *少なくとも1つ*に、*少なくとも*1つの属性が存在するが、すべてのエンティティが存在するわけではない、
+    またはすべてのエンティティが存在するが、少なくとも1つのエンティティに少なくとも1つの属性が欠落している場合 (部分更新):
+
+```
+{
+    "description": "do not exist: E/T - [ D ], G/T [entity itself]",
+    "error": "PartialUpdate"
+}
+```
+
+アクション・タイプが `appendStrict` の場合:
+
+-   `entities` 内の *すべて* エンティティで、既存の属性が原因で*完全な失敗*があった場合:
+
+{
+    "description": "one or more of the attributes in the request already exist: E1/T - [ A, B ], E2/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+
+-   *少なくとも*1つの属性の `entities` 内の *少なくとも 1 つのエンティティ* で成功したが、 `entities` 内のすべてのエンティティが完全に成功したわけではない場合 (部分更新):
+
+{
+    "description": "one or more of the attributes in the request already exist: E2/T - [ A, B ]",
+    "error": "PartialUpdate"
+}
+
+`description` 内のエンティティ型は、リクエストにエンティティ型が含まれている場合にのみ表示されます。それ以外の場合は省略されます:
+
+```
+"description": "one or more of the attributes in the request already exist: E2 - [ A, B ]"
+```
 
 <a name="query-operation"></a>
 

@@ -229,4 +229,14 @@
 
 
 
+/* ****************************************************************************
+*
+* MIX_PRIORITY and MAX_PRIORITY
+*
+*/
+#define MIN_PRIORITY  1
+#define MAX_PRIORITY  100000
+
+
+
 #endif  // SRC_LIB_COMMON_LIMITS_H_

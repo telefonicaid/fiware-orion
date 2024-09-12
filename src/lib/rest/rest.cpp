@@ -618,6 +618,10 @@ static void requestCompleted
     clock_addtime(&accTimeStat.mongoWriteWaitTime,    &threadLastTimeStat.mongoWriteWaitTime);
     clock_addtime(&accTimeStat.mongoReadWaitTime,     &threadLastTimeStat.mongoReadWaitTime);
     clock_addtime(&accTimeStat.mongoCommandWaitTime,  &threadLastTimeStat.mongoCommandWaitTime);
+    clock_addtime(&accTimeStat.exprBasicCtxBldTime,   &threadLastTimeStat.exprBasicCtxBldTime);
+    clock_addtime(&accTimeStat.exprBasicEvalTime,     &threadLastTimeStat.exprBasicEvalTime);
+    clock_addtime(&accTimeStat.exprJexlCtxBldTime,    &threadLastTimeStat.exprJexlCtxBldTime);
+    clock_addtime(&accTimeStat.exprJexlEvalTime,      &threadLastTimeStat.exprJexlEvalTime);
     clock_addtime(&accTimeStat.renderTime,            &threadLastTimeStat.renderTime);
     clock_addtime(&accTimeStat.reqTime,               &threadLastTimeStat.reqTime);
 
@@ -700,6 +704,13 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   if (servicePath[0] != '/')
   {
     OrionError oe(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
+    ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+    return 1;
+  }
+
+  if (servicePath[1] == '/')
+  {
+    OrionError oe(SccBadRequest, "empty component in ServicePath");
     ciP->answer = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
     return 1;
   }
@@ -795,7 +806,7 @@ static char* removeTrailingSlash(std::string path)
   char* cpath = (char*) path.c_str();
 
   /* strlen(cpath) > 1 ensures that root service path "/" is not touched */
-  while ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
+  if ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
   {
     cpath[strlen(cpath) - 1] = 0;
   }
@@ -1555,15 +1566,15 @@ static MHD_Result connectionTreat
 
     if (textAccepted)
     {
-      oe.details = "acceptable MIME types: application/json, text/plain";
+      oe.description = "acceptable MIME types: application/json, text/plain";
     }
     else
     {
-      oe.details = "acceptable MIME types: application/json";
+      oe.description = "acceptable MIME types: application/json";
     }
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details);
+    alarmMgr.badInput(clientIp, oe.description);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }
@@ -1581,15 +1592,15 @@ static MHD_Result connectionTreat
 
     if (textAccepted)
     {
-      oe.details = "acceptable MIME types: application/json, text/plain";
+      oe.description = "acceptable MIME types: application/json, text/plain";
     }
     else
     {
-      oe.details = "acceptable MIME types: application/json";
+      oe.description = "acceptable MIME types: application/json";
     }
 
     ciP->httpStatusCode = oe.code;
-    alarmMgr.badInput(clientIp, oe.details);
+    alarmMgr.badInput(clientIp, oe.description);
     restReply(ciP, oe.smartRender(ciP->apiVersion));
     return MHD_YES;
   }

@@ -32,10 +32,12 @@
 #include "serviceRoutines/leakTreat.h"
 
 #include "serviceRoutines/postDiscoverContextAvailability.h"
-#include "serviceRoutines/postQueryContext.h"
+/// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+///#include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/postRegisterContext.h"
 #include "serviceRoutines/postSubscribeContext.h"
-#include "serviceRoutines/postUpdateContext.h"
+/// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+///#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/postUpdateContextSubscription.h"
 #include "serviceRoutines/postUnsubscribeContext.h"
 #include "serviceRoutines/postNotifyContext.h"
@@ -90,7 +92,8 @@
 // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
 // (along with badNgsi9Request.h|cpp files themselves)
 //#include "serviceRoutines/badNgsi9Request.h"
-#include "serviceRoutines/badNgsi10Request.h"
+/// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+///#include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
 #include "serviceRoutinesV2/badVerbAllNotDelete.h"
 
@@ -212,7 +215,8 @@ static RestService getServiceVlegacy[] =
   //{ Ngsi10ContextEntityTypesAttribute,             5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*"                        },  getNgsi10ContextEntityTypesAttribute             },
   //{ IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                              },  getIndividualContextEntity                       },
   //{ IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                                },  getIndividualContextEntity                       },
-  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           },  getIndividualContextEntityAttribute              },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           },  getIndividualContextEntityAttribute              },
   //{ Ngsi10ContextEntityTypes,                      3, { "v1",      "contextEntityTypes", "*"                                           },  getNgsi10ContextEntityTypes                      },
   //{ Ngsi10ContextEntityTypesAttributeContainer,    4, { "v1",      "contextEntityTypes", "*", "attributes"                             },  getNgsi10ContextEntityTypes                      },
   //{ Ngsi10ContextEntityTypesAttribute,             5, { "v1",      "contextEntityTypes", "*", "attributes", "*"                        },  getNgsi10ContextEntityTypesAttribute             },
@@ -285,8 +289,9 @@ static RestService postServiceVlegacy[] =
   // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
   //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, postRegisterContext                               },
   //{ DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, postDiscoverContextAvailability                   },
-  { UpdateContext,                                 2, { "v1",      "updateContext"                                                     }, (RestTreat) postUpdateContext                     },
-  { QueryContext,                                  2, { "v1",      "queryContext"                                                      }, postQueryContext                                  },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ UpdateContext,                                 2, { "v1",      "updateContext"                                                     }, (RestTreat) postUpdateContext                     },
+  ///{ QueryContext,                                  2, { "v1",      "queryContext"                                                      }, postQueryContext                                  },
   // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
   //{ SubscribeContext,                              2, { "v1",      "subscribeContext"                                                  }, postSubscribeContext                              },
   //{ UpdateContextSubscription,                     2, { "v1",      "updateContextSubscription"                                         }, postUpdateContextSubscription                     },
@@ -319,8 +324,9 @@ static RestService postServiceVlegacy[] =
   //{ IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, postIndividualContextEntityAttributeWithTypeAndId },
   //{ ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, postContextEntitiesByEntityIdAndType              },
   //{ EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, postEntityByIdAttributeByNameWithTypeAndId        },
-  { UpdateContext,                                 2, { "ngsi10",  "updateContext"                                                     }, (RestTreat) postUpdateContext                     },
-  { QueryContext,                                  2, { "ngsi10",  "queryContext"                                                      }, postQueryContext                                  },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ UpdateContext,                                 2, { "ngsi10",  "updateContext"                                                     }, (RestTreat) postUpdateContext                     },
+  ///{ QueryContext,                                  2, { "ngsi10",  "queryContext"                                                      }, postQueryContext                                  },
   //{ SubscribeContext,                              2, { "ngsi10",  "subscribeContext"                                                  }, postSubscribeContext                              },
   //{ UpdateContextSubscription,                     2, { "ngsi10",  "updateContextSubscription"                                         }, postUpdateContextSubscription                     },
   //{ UnsubscribeContext,                            2, { "ngsi10",  "unsubscribeContext"                                                }, postUnsubscribeContext                            },
@@ -355,7 +361,8 @@ static RestService putServiceVlegacy[] =
   //{ IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, putIndividualContextEntity                       },
   //{ IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, putIndividualContextEntityAttribute              },
   //{ Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                       }, putSubscriptionConvOp                            },
-  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, putIndividualContextEntity                       },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, putIndividualContextEntity                       },
   //{ IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                              }, putIndividualContextEntity                       },
   //{ IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                         }, putIndividualContextEntityAttribute              },
   //{ Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                       }, putSubscriptionConvOp                            },
@@ -416,7 +423,8 @@ static RestService deleteServiceVlegacy[] =
   //{ IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                              }, deleteIndividualContextEntity                       },
   //{ IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                         }, deleteIndividualContextEntityAttribute              },
   //{ Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                       }, deleteSubscriptionConvOp                            },
-  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, deleteIndividualContextEntity                       },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                            }, deleteIndividualContextEntity                       },
   //{ IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                              }, deleteIndividualContextEntity                       },
   //{ IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                         }, deleteIndividualContextEntityAttribute              },
   //{ Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                       }, deleteSubscriptionConvOp                            },
@@ -496,17 +504,19 @@ static RestService badVerbVlegacy[] =
   // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
   //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
   //{ DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
-  { RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, badVerbPostOnly           },
-  { DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, badVerbPostOnly           },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ RegisterContext,                               3, { "v1", "registry", "registerContext"                                            }, badVerbPostOnly           },
+  ///{ DiscoverContextAvailability,                   3, { "v1", "registry", "discoverContextAvailability"                                }, badVerbPostOnly           },
   // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
   //{ RegisterContext,                               2, { "ngsi9",          "registerContext"                                            }, badVerbPostOnly           },
   //{ DiscoverContextAvailability,                   2, { "ngsi9",          "discoverContextAvailability"                                }, badVerbPostOnly           },
-  { UpdateContext,                                 2, { "v1",             "updateContext"                                              }, badVerbPostOnly           },
-  { QueryContext,                                  2, { "v1",             "queryContext"                                               }, badVerbPostOnly           },
-  { SubscribeContext,                              2, { "v1",             "subscribeContext"                                           }, badVerbPostOnly           },
-  { UpdateContextSubscription,                     2, { "v1",             "updateContextSubscription"                                  }, badVerbPostOnly           },
-  { UnsubscribeContext,                            2, { "v1",             "unsubscribeContext"                                         }, badVerbPostOnly           },
-  { NotifyContext,                                 2, { "v1",             "notifyContext"                                              }, badVerbPostOnly           },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ UpdateContext,                                 2, { "v1",             "updateContext"                                              }, badVerbPostOnly           },
+  ///{ QueryContext,                                  2, { "v1",             "queryContext"                                               }, badVerbPostOnly           },
+  ///{ SubscribeContext,                              2, { "v1",             "subscribeContext"                                           }, badVerbPostOnly           },
+  ///{ UpdateContextSubscription,                     2, { "v1",             "updateContextSubscription"                                  }, badVerbPostOnly           },
+  ///{ UnsubscribeContext,                            2, { "v1",             "unsubscribeContext"                                         }, badVerbPostOnly           },
+  ///{ NotifyContext,                                 2, { "v1",             "notifyContext"                                              }, badVerbPostOnly           },
   // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
   //{ ContextEntitiesByEntityId,                     3, { "ngsi9",          "contextEntities", "*"                                       }, badVerbGetPostOnly        },
   //{ ContextEntityAttributes,                       4, { "ngsi9",          "contextEntities", "*", "attributes"                         }, badVerbGetPostOnly        },
@@ -514,35 +524,36 @@ static RestService badVerbVlegacy[] =
   //{ ContextEntityTypes,                            3, { "ngsi9",          "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
   //{ ContextEntityTypeAttributeContainer,           4, { "ngsi9",          "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
   //{ ContextEntityTypeAttribute,                    5, { "ngsi9",          "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
-  { ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, badVerbGetPostOnly        },
-  { ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, badVerbGetPostOnly        },
-  { EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, badVerbGetPostOnly        },
-  { ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
-  { ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
-  { ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
-  { IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, badVerbAllFour            },
-  { IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, badVerbAllFour            },
-  { IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, badVerbAllFour            },
-  { Ngsi10ContextEntityTypes,                      3, { "ngsi10",  "contextEntityTypes", "*"                                           }, badVerbGetOnly            },
-  { Ngsi10ContextEntityTypesAttributeContainer,    4, { "ngsi10",  "contextEntityTypes", "*", "attributes"                             }, badVerbGetOnly            },
-  { Ngsi10ContextEntityTypesAttribute,             5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*"                        }, badVerbGetOnly            },
-  { SubscribeContext,                              2, { "ngsi10",  "contextSubscriptions"                                              }, badVerbPostOnly           },
-  { Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                         }, badVerbPutDeleteOnly      },
-  { IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                              }, badVerbAllFour            },
-  { IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                                }, badVerbAllFour            },
-  { IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           }, badVerbAllFour            },
-  { Ngsi10ContextEntityTypes,                      3, { "v1",      "contextEntityTypes", "*"                                           }, badVerbGetOnly            },
-  { Ngsi10ContextEntityTypesAttributeContainer,    4, { "v1",      "contextEntityTypes", "*", "attributes"                             }, badVerbGetOnly            },
-  { Ngsi10ContextEntityTypesAttribute,             5, { "v1",      "contextEntityTypes", "*", "attributes", "*"                        }, badVerbGetOnly            },
-  { SubscribeContext,                              2, { "v1",      "contextSubscriptions"                                              }, badVerbPostOnly           },
-  { Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                         }, badVerbPutDeleteOnly      },
-  { EntityTypes,                                   2, { "v1", "contextTypes"                                                           }, badVerbGetOnly            },
-  { AttributesForEntityType,                       3, { "v1", "contextTypes", "*"                                                      }, badVerbGetOnly            },
-  { AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, badVerbGetPostOnly        },
-  { AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, badVerbAllFour            },
-  { IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, badVerbAllFour            },
-  { ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, badVerbGetPostOnly        },
-  { EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, badVerbGetPostOnly        },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ ContextEntitiesByEntityId,                     4, { "v1", "registry", "contextEntities", "*"                                       }, badVerbGetPostOnly        },
+  ///{ ContextEntityAttributes,                       5, { "v1", "registry", "contextEntities", "*", "attributes"                         }, badVerbGetPostOnly        },
+  ///{ EntityByIdAttributeByName,                     6, { "v1", "registry", "contextEntities", "*", "attributes", "*"                    }, badVerbGetPostOnly        },
+  ///{ ContextEntityTypes,                            4, { "v1", "registry", "contextEntityTypes", "*"                                    }, badVerbGetPostOnly        },
+  ///{ ContextEntityTypeAttributeContainer,           5, { "v1", "registry", "contextEntityTypes", "*", "attributes"                      }, badVerbGetPostOnly        },
+  ///{ ContextEntityTypeAttribute,                    6, { "v1", "registry", "contextEntityTypes", "*", "attributes", "*"                 }, badVerbGetPostOnly        },
+  ///{ IndividualContextEntity,                       3, { "ngsi10",  "contextEntities", "*"                                              }, badVerbAllFour            },
+  ///{ IndividualContextEntityAttributes,             4, { "ngsi10",  "contextEntities", "*", "attributes"                                }, badVerbAllFour            },
+  ///{ IndividualContextEntityAttribute,              5, { "ngsi10",  "contextEntities", "*", "attributes", "*"                           }, badVerbAllFour            },
+  ///{ Ngsi10ContextEntityTypes,                      3, { "ngsi10",  "contextEntityTypes", "*"                                           }, badVerbGetOnly            },
+  ///{ Ngsi10ContextEntityTypesAttributeContainer,    4, { "ngsi10",  "contextEntityTypes", "*", "attributes"                             }, badVerbGetOnly            },
+  ///{ Ngsi10ContextEntityTypesAttribute,             5, { "ngsi10",  "contextEntityTypes", "*", "attributes", "*"                        }, badVerbGetOnly            },
+  ///{ SubscribeContext,                              2, { "ngsi10",  "contextSubscriptions"                                              }, badVerbPostOnly           },
+  ///{ Ngsi10SubscriptionsConvOp,                     3, { "ngsi10",  "contextSubscriptions", "*"                                         }, badVerbPutDeleteOnly      },
+  ///{ IndividualContextEntity,                       3, { "v1",      "contextEntities", "*"                                              }, badVerbAllFour            },
+  ///{ IndividualContextEntityAttributes,             4, { "v1",      "contextEntities", "*", "attributes"                                }, badVerbAllFour            },
+  ///{ IndividualContextEntityAttribute,              5, { "v1",      "contextEntities", "*", "attributes", "*"                           }, badVerbAllFour            },
+  ///{ Ngsi10ContextEntityTypes,                      3, { "v1",      "contextEntityTypes", "*"                                           }, badVerbGetOnly            },
+  ///{ Ngsi10ContextEntityTypesAttributeContainer,    4, { "v1",      "contextEntityTypes", "*", "attributes"                             }, badVerbGetOnly            },
+  ///{ Ngsi10ContextEntityTypesAttribute,             5, { "v1",      "contextEntityTypes", "*", "attributes", "*"                        }, badVerbGetOnly            },
+  ///{ SubscribeContext,                              2, { "v1",      "contextSubscriptions"                                              }, badVerbPostOnly           },
+  ///{ Ngsi10SubscriptionsConvOp,                     3, { "v1",      "contextSubscriptions", "*"                                         }, badVerbPutDeleteOnly      },
+  ///{ EntityTypes,                                   2, { "v1", "contextTypes"                                                           }, badVerbGetOnly            },
+  ///{ AttributesForEntityType,                       3, { "v1", "contextTypes", "*"                                                      }, badVerbGetOnly            },
+  ///{ AllContextEntities,                            2, { "v1", "contextEntities"                                                        }, badVerbGetPostOnly        },
+  ///{ AllEntitiesWithTypeAndId,                      6, { "v1", "contextEntities", "type", "*", "id", "*"                                }, badVerbAllFour            },
+  ///{ IndividualContextEntityAttributeWithTypeAndId, 8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*"             }, badVerbAllFour            },
+  ///{ ContextEntitiesByEntityIdAndType,              7, { "v1", "registry", "contextEntities", "type", "*", "id", "*"                    }, badVerbGetPostOnly        },
+  ///{ EntityByIdAttributeByNameIdAndType,            9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }, badVerbGetPostOnly        },
   // FIXME: disable administrative API routes not aligned with documentation in Orion 3.8.0,
   // to be definetively removed at some point of the future
   { LogTraceRequest,                               2, { "log", "trace"                                                                 }, badVerbGetDeleteOnly      },
@@ -561,15 +572,17 @@ static RestService badVerbVlegacy[] =
   { LogLevelRequest,                               2, { "admin", "log"                                                                 }, badVerbPutOnly            },
   { SemStateRequest,                               2, { "admin", "sem"                                                                 }, badVerbGetOnly            },
   { MetricsRequest,                                2, { "admin", "metrics"                                                             }, badVerbGetDeleteOnly      },
-  { UpdateContext,                                 2, { "ngsi10",  "updateContext"                                                     }, badVerbPostOnly           },
-  { QueryContext,                                  2, { "ngsi10",  "queryContext"                                                      }, badVerbPostOnly           },
-  { SubscribeContext,                              2, { "ngsi10",  "subscribeContext"                                                  }, badVerbPostOnly           },
-  { UpdateContextSubscription,                     2, { "ngsi10",  "updateContextSubscription"                                         }, badVerbPostOnly           },
-  { UnsubscribeContext,                            2, { "ngsi10",  "unsubscribeContext"                                                }, badVerbPostOnly           },
-  { NotifyContext,                                 2, { "ngsi10",  "notifyContext"                                                     }, badVerbPostOnly           },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ UpdateContext,                                 2, { "ngsi10",  "updateContext"                                                     }, badVerbPostOnly           },
+  ///{ QueryContext,                                  2, { "ngsi10",  "queryContext"                                                      }, badVerbPostOnly           },
+  ///{ SubscribeContext,                              2, { "ngsi10",  "subscribeContext"                                                  }, badVerbPostOnly           },
+  ///{ UpdateContextSubscription,                     2, { "ngsi10",  "updateContextSubscription"                                         }, badVerbPostOnly           },
+  ///{ UnsubscribeContext,                            2, { "ngsi10",  "unsubscribeContext"                                                }, badVerbPostOnly           },
+  ///{ NotifyContext,                                 2, { "ngsi10",  "notifyContext"                                                     }, badVerbPostOnly           },
   // FIXME: disable NGSI9 API routes in Orion 3.8.0, to be definetively removed at some point of the future
   //{ InvalidRequest,                                2, { "ngsi9",   "*"                                                                 }, badNgsi9Request           },
-  { InvalidRequest,                                2, { "ngsi10",  "*"                                                                 }, badNgsi10Request          },
+  /// FIXME: disable unused NGSIv1 API (last batch) in Orion 4.0.0, to be definetively removed at some point of the future
+  ///{ InvalidRequest,                                2, { "ngsi10",  "*"                                                                 }, badNgsi10Request          },
   { InvalidRequest,                                0, { "*", "*", "*", "*", "*", "*"                                                   }, badRequest                },
   { InvalidRequest,                                0, {                                                                                }, NULL                      },
 

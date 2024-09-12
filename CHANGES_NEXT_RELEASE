@@ -1,12 +1,9 @@
-- Add: servicePath field to builtin attributes (#2877)
-- Add: notification.mqtt.retain and notification.mqttCustom.retain flag for MQTT retain in notifications (#4388)
-- Fix: correctly detect JSON attribute and metadata value changes in subscription triggering logic (#4211, #4434, #643)
-- Fix: DateTime and geo:json types were not supported in custom notifications using ngsi patching (#4435)
-- Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
-- Fix: improve error traces (#4387)
-- Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
-- Fix: improve logs in MongoDB query logic
-- Upgrade Debian version from 11.6 to 12.1 in Dockerfile
-- Hardening: upgrade libmongoc dependency from 1.23.1 to 1.24.3
-- Reference MongoDB version changed from 4.4 to 6.0
-- Reference distribution changed from Debian 11 to Debian 12
+- Add: custom notification ngsi patching evaluation priority based in evalPriority builtin metadata (#4556)
+- Add: attribute metadata to JEXL context (#4594, #4560)
+- Fix: $max and $min operators were not supported with DateTime attributes (#4585)
+- Fix: wrong date values should not allowed in subscription's expires field (#4541)
+- Fix: do not raise DB alarm in case of wrong GeoJSON in client request
+- Fix: metadata modifications are not considered as change (with regards to subscription alterationTypes) if notifyOnMetadataChange is false (#4605)
+- Upgrade cjexl version from 0.3.0 to 0.4.0 (new transformations: now, getTime and toIsoString)
+- Upgrade Debian version from 12.4 to 12.6 in Dockerfile
+- Fix: invalid date in expires field of subscription (#2303)

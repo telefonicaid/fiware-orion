@@ -37,6 +37,7 @@
 #include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoDriver/BSONObjBuilder.h"
+#include "expressions/ExprContext.h"
 
 
 
@@ -92,7 +93,9 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Check if attribute means a location  */
-  std::string  getLocation(orion::BSONObj* attrsP, ApiVersion apiVersion) const;
+  bool  getLocation(orion::BSONObj* attrsP) const;
+
+  double getEvalPriority(void);
 
   std::string  toJsonV1(bool                             asJsonObject,
                         RequestType                      request,
@@ -107,9 +110,9 @@ public:
 
   std::string  toJsonV1AsNameString(bool comma);
 
-  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, std::map<std::string, std::string>* replacementsP = NULL);
+  std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
-  std::string  toJsonValue(void);
+  std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonAsValue(ApiVersion       apiVersion,
                              bool             acceptedTextPlain,
@@ -117,6 +120,8 @@ public:
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
                              HttpStatusCode*  scP);
+
+  void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 
   void         release(void);
   std::string  getName(void);
@@ -131,7 +136,7 @@ public:
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
+  std::string  check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck = false);
   ContextAttribute* clone();
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 

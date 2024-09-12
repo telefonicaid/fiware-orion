@@ -1,0 +1,231 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Notification payload included in logs in several subscriptions types
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4 -multiservice
+accumulatorStart --pretty-print localhost $LISTENER_PORT
+
+--SHELL--
+
+#
+# 01. Create subscription SUB1 (normalized)
+# 02. Create subscription SUB2 (simplifiedKeyValues)
+# 03. Create subscription SUB3 (custom text)
+# 04. Create subscription SUB4 (empty payload)
+# 05. Create E entity (triggering 4 notifications)
+# 06. Check notification logs (sorted by sub id)
+#
+
+
+echo "01. Create subscription SUB1 (normalized)"
+echo "========================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"}
+    }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create subscription SUB2 (simplifiedKeyValues)"
+echo "=================================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    },
+    "notification": {
+        "http": {"url": "http://localhost:'$LISTENER_PORT'/notify"},
+        "attrsFormat": "simplifiedKeyValues"
+    }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Create subscription SUB3 (custom text)"
+echo "=========================================="
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    },
+    "notification": {
+        "httpCustom": {
+            "url": "http://localhost:'$LISTENER_PORT'/notify",  
+            "payload": "this is ${A}"
+        }        
+    }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID3=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "04. Create subscription SUB4 (empty payload)"
+echo "============================================"
+payload='
+{
+    "subject": {
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    },
+    "notification": {
+        "httpCustom": {
+            "url": "http://localhost:'$LISTENER_PORT'/notify",
+            "payload": null
+        }        
+    }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID4=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "05. Create E entity (triggering 4 notifications)"
+echo "================================================"
+payload='
+{
+   "id":"E",
+   "type":"T",
+   "A":{
+      "value": 42,
+      "type": "Number"
+   }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "06. Check notification logs (sorted by sub id)"
+echo "=============================================="
+cat /tmp/contextBroker.log | grep INFO | grep 'Notif' | awk -F '|' '{print $10}' | sed -e "s/$SUB_ID1/SUB_ID1/g" | sed -e "s/$SUB_ID2/SUB_ID2/g" | sed -e "s/$SUB_ID3/SUB_ID3/g" | sed -e "s/$SUB_ID4/SUB_ID4/g" | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription SUB1 (normalized)
+=========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+02. Create subscription SUB2 (simplifiedKeyValues)
+==================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+03. Create subscription SUB3 (custom text)
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+04. Create subscription SUB4 (empty payload)
+============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+05. Create E entity (triggering 4 notifications)
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+06. Check notification logs (sorted by sub id)
+==============================================
+ msg=Notif delivered (subId: SUB_ID1): POST localhost:9997/notify, payload (123 bytes): {"subscriptionId":"SUB_ID1","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 200
+ msg=Notif delivered (subId: SUB_ID2): POST localhost:9997/notify, payload (28 bytes): {"id":"E","type":"T","A":42}, response code: 200
+ msg=Notif delivered (subId: SUB_ID3): POST localhost:9997/notify, payload (10 bytes): this is 42, response code: 200
+ msg=Notif delivered (subId: SUB_ID4): POST localhost:9997/notify, payload (0 bytes): , response code: 200
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

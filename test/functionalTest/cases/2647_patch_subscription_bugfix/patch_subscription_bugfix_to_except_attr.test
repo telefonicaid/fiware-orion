@@ -67,8 +67,7 @@ payload='{
       "url": "http://localhost:1234"
     },
     "attrs": ["temperature", "humidity"],
-    "metadata": [ "previousValue", "actionType" , "*"],
-    "attrsFormat": "legacy"
+    "metadata": [ "previousValue", "actionType" , "*"]
   },
   "throttling": 5,
   "expires": "2016-04-05T14:00:00.00Z",
@@ -128,7 +127,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 664
+Content-Length: 668
 
 {
     "description": "One subscription to rule them all",
@@ -139,7 +138,7 @@ Content-Length: 664
             "temperature",
             "humidity"
         ],
-        "attrsFormat": "legacy",
+        "attrsFormat": "normalized",
         "covered": false,
         "http": {
             "url": "http://localhost:1234"

@@ -42,22 +42,25 @@ typedef struct OrionError
 {
 public:
   HttpStatusCode  code;
-  std::string     reasonPhrase;
-  std::string     details;
+  std::string     error;
+  std::string     description;
+  bool            filled;
 
   OrionError();
   OrionError(StatusCode& statusCode);
-  OrionError(HttpStatusCode _code, const std::string& _details = "", const std::string& _reasonPhrase = "");
+  OrionError(HttpStatusCode _code, const std::string& _description = "", const std::string& _error = "");
 
   std::string  smartRender(ApiVersion apiVersion);
   std::string  setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP);
   std::string  toJson(void);
   std::string  toJsonV1(void);
-  void         fill(HttpStatusCode _code, const std::string& _details,  const std::string& _reasonPhrase = "");
+  void         fill(HttpStatusCode _code, const std::string& _description,  const std::string& _error = "");
   void         fill(const StatusCode& sc);
+  void         fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _error);
+
 
 private:
-  void         shrinkReasonPhrase(void);
+  void         shrinkError(void);
 
 } OrionError;
 

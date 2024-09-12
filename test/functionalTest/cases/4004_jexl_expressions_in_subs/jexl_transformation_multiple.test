@@ -1,0 +1,293 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+JEXL basic expression in custom notification (multiple transformations)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub with several attributes with transformations
+# 02. Create entity E1
+# 03. Update entity E1
+# 05. Dump accumulator and see two expected transformations
+#
+
+
+echo "01. Create custom sub with several attributes with transformations"
+echo "=================================================================="
+# NOTE: '\'' is the way of scaping a ' in the payload variable below (see https://stackoverflow.com/a/1250279/1485926)
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "speed": {
+          "value": "${(speed|split('\'' '\''))[0]|parseInt}",
+          "type": "Calculated"
+        },
+        "ratio": {
+          "value": "${count.sum/count.count}",
+          "type": "Calculated"
+        },
+        "code": {
+          "value": "${code||'\''invalid'\''}",
+          "type": "Calculated"
+        },
+        "alert": {
+          "value": "${(value>max)?'\''nok'\'':'\''ok'\''}",
+          "type": "Calculated"
+        },
+        "count": {
+          "value": "${{count:count.count+1, sum:count.sum+((speed|split('\'' '\''))[0]|parseInt)}}",
+          "type": "Calculated"
+        }
+      }
+    },
+    "attrs": [ "speed", "ratio", "code", "alert", "count" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1"
+echo "===================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "speed": {
+    "value": "10 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 100
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": null,
+    "type": "Number"
+  },
+  "value": {
+    "value": 14,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update entity E1"
+echo "===================="
+payload='{
+  "speed": {
+    "value": "30 m/s",
+    "type": "Text"
+  },
+  "count": {
+    "value": {
+      "count": 5,
+      "sum": 500
+    },
+    "type": "StructuredValue"
+  },
+  "code": {
+    "value": 456,
+    "type": "Number"
+  },
+  "value": {
+    "value": 75,
+    "type": "Number"
+  },
+  "max": {
+    "value": 50,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator and see two expected transformations"
+echo "========================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub with several attributes with transformations
+==================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1
+====================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Update entity E1
+====================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Dump accumulator and see two expected transformations
+=========================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 379
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "alert": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": "ok"
+            },
+            "code": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": "invalid"
+            },
+            "count": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": {
+                    "count": 6,
+                    "sum": 110
+                }
+            },
+            "id": "E1",
+            "ratio": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 20
+            },
+            "speed": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 10
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 375
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "alert": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": "nok"
+            },
+            "code": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 456
+            },
+            "count": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": {
+                    "count": 6,
+                    "sum": 530
+                }
+            },
+            "id": "E1",
+            "ratio": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 100
+            },
+            "speed": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 30
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

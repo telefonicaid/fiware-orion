@@ -28,15 +28,15 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 		services:
 		  orion:
-		    image: fiware/orion
+		    image: telefonicaiot/fiware-orion
 		    ports:
 		      - "1026:1026"
 		    depends_on:
 		      - mongo
-		    command: -dbhost mongo
+		    command: -dbURI mongodb://mongo
 
 		  mongo:
-		    image: mongo:4.4
+		    image: mongo:6.0
 		    command: --nojournal
 
 3. コマンドラインを使用して作成したディレクトリで、`sudo docker-compose up` を実行します
@@ -49,7 +49,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 	 curl localhost:1026/version
 
-この方法で行ったことは、[Docker Hub](https://hub.docker.com/) というイメージの公開リポジトリから [Orion Context Broker](https://hub.docker.com/r/fiware/orion/) と [MongoDB](https://hub.docker.com/_/mongo/) 用のイメージをダウンロードすることです。次に、両方のイメージに基づいて2つのコンテナを作成しました。
+この方法で行ったことは、[Docker Hub](https://hub.docker.com/) というイメージの公開リポジトリから [Orion Context Broker](https://hub.docker.com/r/telefonicaiot/fiware-orion/) と [MongoDB](https://hub.docker.com/_/mongo/) 用のイメージをダウンロードすることです。次に、両方のイメージに基づいて2つのコンテナを作成しました。
 
 このシナリオを停止したい場合は、docker-compose が実行されているターミナルで Control+C を押す必要があります。このメソッドを使用して Orion で使用されていたデータはすべて失われます。
 
@@ -60,13 +60,13 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 > ヒント : これらの方法を試しているか、複数回実行していて、コンテナがすでに存在しているというエラーが表示された場合は、`docker rm orion1` で削除できます。コンテナを停止しなければならない場合は、まず `docker stop orion1` を実行して、止めてください。
 
-これらのコマンドを使用すると、Orion のタグと特定のバージョンにアクセスできます。たとえば、特定のバージョンが必要な場合は、次のコマンドで `fiware/orion` の代わりに `fiware/orion:0.22` を使用できます。バージョンを指定しない場合は、デフォルトで ` 最新 ` のものから取得します。
+これらのコマンドを使用すると、Orion のタグと特定のバージョンにアクセスできます。たとえば、特定のバージョンが必要な場合は、次のコマンドで `telefonicaiot/fiware-orion` の代わりに `telefonicaiot/fiware-orion:4.0.0` を使用できます。バージョンを指定しない場合は、デフォルトで ` 最新 ` のものから取得します。
 
 ### 2A. MongoDB はローカルホスト上にある場合
 
 これを実行するには、このコマンドを実行します。
 
-	 sudo docker run -d --name orion1 -p 1026:1026 fiware/orion
+	 sudo docker run -d --name orion1 -p 1026:1026 telefonicaiot/fiware-orion
 
 すべてが動作することを確認します。
 
@@ -75,11 +75,11 @@ Orion Context Broker を試してみたいし、データベースについて�
 ### 2B. MongoDB が別の Docker コンテナで動作している場合
 他のコンテナで MongoDB を実行したい場合は、次のように起動することができます
 
-	 sudo docker run --name mongodb -d mongo:4.4
+	 sudo docker run --name mongodb -d mongo:6.0
 
 そして、このコマンドで Orion を実行します
 
-	 sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 fiware/orion -dbhost mongodb
+	 sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 telefonicaiot/fiware-orion -dbURI mongodb://mongodb
 
 すべてが動作することを確認します。
 
@@ -91,7 +91,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 別の MongoDB インスタンスに接続する場合は、前のコマンドの**代わりに**、次のコマンドを実行します
 
-	 sudo docker run -d --name orion1 -p 1026:1026 fiware/orion -dbhost <MongoDB Host>
+	 sudo docker run -d --name orion1 -p 1026:1026 telefonicaiot/fiware-orion -dbURI mongodb://<MongoDB Host>
 
 すべてが動作することを確認します。
 
@@ -109,12 +109,12 @@ Orion Context Broker を試してみたいし、データベースについて�
 4. Orion を実行 ...
 	 * docker-compose で自動化されたシナリオを使用し、新しいイメージを構築する : `sudo docker-compose up`。必要に応じて、提供されている `docker-compose.yml` ファイルを変更することもできます
 	 * 手動で MongoDB を別のコンテナで実行します :
-                 1. `sudo docker run --name mongodb -d mongo:4.4`
+                 1. `sudo docker run --name mongodb -d mongo:6.0`
                  2. `sudo docker build -t orion .`
-                 3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbhost mongodb`.
+                 3. `sudo docker run -d --name orion1 --link mongodb:mongodb -p 1026:1026 orion -dbURI mongodb://mongodb`.
 	 * 手動で MongoDB ホストを見つける場所を指定します :
 		 1. `sudo docker build -t orion .`
-		 2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbhost <MongoDB Host>`.
+		 2. `sudo docker run -d --name orion1 -p 1026:1026 orion -dbURI mongodb://<MongoDB Host>`.
 
 すべてが動作することを確認します
 
@@ -186,6 +186,6 @@ sudo を使用したくない場合は、[以下の手順](http://askubuntu.com/
 
 ### 4.4 Orion の追加パラメータ
 
-コンテナイメージの名前 (ビルドしている場合は `orion`、リポジトリからプルしている場合は `fiware/orion`) の後ろは、Orion Context Broker のパラメータとして解釈されます。ここでは、MongoDB ホストがどこにあるかを broker に伝えています。これは、他の MongoDB コンテナの名前で表されます。他のコマンドライン・オプションの [ドキュメント](https://github.com/telefonicaid/fiware-orion)を見てください。
+コンテナイメージの名前 (ビルドしている場合は `orion`、リポジトリからプルしている場合は `telefonicaiot/fiware-orion`) の後ろは、Orion Context Broker のパラメータとして解釈されます。ここでは、MongoDB ホストがどこにあるかを broker に伝えています。これは、他の MongoDB コンテナの名前で表されます。他のコマンドライン・オプションの [ドキュメント](https://github.com/telefonicaid/fiware-orion)を見てください。
 
 Orion は [マルチテナントモード](https://fiware-orion.readthedocs.io/en/master/user/multitenancy/index.html)で動作します。

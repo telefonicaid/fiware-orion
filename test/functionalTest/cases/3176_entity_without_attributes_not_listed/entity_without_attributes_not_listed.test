@@ -55,8 +55,7 @@ payload='{
     "http": {
       "url": "http://contextsource.example.org"
     },
-    "supportedForwardingMode": "all",
-    "legacyForwarding": true
+    "supportedForwardingMode": "all"
   },
   "status": "active"
 }'

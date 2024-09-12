@@ -20,7 +20,7 @@
 #
 
 ARG  IMAGE_NAME=debian
-ARG  IMAGE_TAG=12.1-slim
+ARG  IMAGE_TAG=12.6-slim
 FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -39,7 +39,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR /opt
 
-RUN \
+RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # Install security updates
     apt-get -y update && \
     apt-get -y upgrade && \
@@ -102,6 +102,7 @@ RUN \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
+    bash get_cjexl.sh 0.4.0 $(cat /run/secrets/repo_token) && \
     make && \
     make install && \
     # reduce size of installed binaries
@@ -125,6 +126,7 @@ RUN \
            /opt/mongo-c-driver-1.24.3 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
+           /usr/local/lib/libcjexl.a \
            /opt/rapidjson-1.1.0 \
            /opt/v1.1.0.tar.gz \
            /usr/local/include/rapidjson \

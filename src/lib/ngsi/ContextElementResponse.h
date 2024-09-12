@@ -33,6 +33,7 @@
 #include "ngsi/StringList.h"
 #include "ngsi/ContextAttribute.h"
 #include "apiTypesV2/Entity.h"
+#include "expressions/ExprContext.h"
 
 #include "mongoDriver/BSONObj.h"
 
@@ -61,9 +62,7 @@ typedef struct ContextElementResponse
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const orion::BSONObj&  entityDoc,
-                         const StringList&      attrL,
-                         bool                   includeEmpty = true,
-                         ApiVersion             apiVersion   = V1);
+                         const StringList&      attrL);
   ContextElementResponse(Entity* eP, bool useDefaultType = false);
 
   std::string  toJsonV1(bool                             asJsonObject,
@@ -84,7 +83,7 @@ typedef struct ContextElementResponse
                       const std::vector<std::string>&      attrsFilter,
                       bool                                 blacklist,
                       const std::vector<std::string>&      metadataFilter,
-                      std::map<std::string, std::string>*  replacementsP);
+                      ExprContextObject*                   exprContextObjectP);
 
   void         applyUpdateOperators(void);
 

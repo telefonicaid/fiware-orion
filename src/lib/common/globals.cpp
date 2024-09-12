@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include <string>
 
@@ -536,6 +537,53 @@ static int timezoneOffset(const char* tz)
 
 /*****************************************************************************
 *
+* isLeapYear -
+*
+* This code will check, if the given year is a leap year or not.
+*
+*/
+bool isLeapYear(int year)
+{
+  // ref: https://www.geeksforgeeks.org/program-check-given-year-leap-year/
+  if (year % 400 == 0)
+  {
+    return true;
+  }
+  if ((year % 4 == 0) && (year % 100 != 0))
+  {
+    return true;
+  }
+  return false;
+}
+
+
+
+/*****************************************************************************
+*
+* daysInMonth -
+*
+* This code will check correct number of days in given month.
+*
+*/
+int daysInMonth(int year, int month)
+{
+  if (month == 1) //february
+  {
+    return isLeapYear(year) ? 29 : 28;
+  }
+  // for April, June, September, November
+  if (month == 3 || month == 5 || month == 8 || month == 10)
+  {
+    return 30;
+  }
+  // For all other months (Jan, March, May, July, Aug, October, December)
+  return 31;
+}
+
+
+
+/*****************************************************************************
+*
 * parse8601Time -
 *
 * This is common code for Duration and Throttling (at least).
@@ -560,6 +608,18 @@ double parse8601Time(const std::string& ss)
   if (ss.length() > 29)
   {
     return -1;
+  }
+
+  // The following 'for' loop is implemented to handle a specific datetime case where the datetime string
+  // is '2016-04-05T14:10:0x.00Z'. This particular case is being incorrectly PASS through the
+  // sscanf() function i.e. used next to this 'for' loop.
+  for (int i = 0; ss[i] != '\0'; i++)
+  {
+    char c = ss[i];
+    if (isalpha(c) && c != 'T' && c != 'Z')
+    {
+      return -1;
+    }
   }
 
   // According to https://en.wikipedia.org/wiki/ISO_8601#Times, the following formats have to be supported
@@ -605,6 +665,25 @@ double parse8601Time(const std::string& ss)
   time.tm_hour = h;        // 0-23
   time.tm_min  = m;        // 0-59
   time.tm_sec  = (int) s;  // 0-61 (0-60 in C++11)
+
+  const int minYear = 0;
+  const int minMonth = 0;
+  const int maxMonth = 11;
+  const int minDay = 1;
+  const int maxDay = daysInMonth(y, time.tm_mon);;
+  const int minHour = 0;
+  const int maxHour = 23;
+  const int minMinute = 0;
+  const int maxMinute = 59;
+  const int minSecond = 0;
+  const int maxSecond = 59;
+
+  if (time.tm_year < minYear || time.tm_mon < minMonth || time.tm_mon > maxMonth || time.tm_mday < minDay ||
+      time.tm_mday > maxDay || time.tm_hour < minHour || time.tm_hour > maxHour || time.tm_min < minMinute ||
+      time.tm_min > maxMinute || time.tm_sec < minSecond || time.tm_sec > maxSecond)
+  {
+    return -1;
+  }
 
   int64_t  totalSecs  = timegm(&time) - offset;
   float    millis     = s - (int) s;

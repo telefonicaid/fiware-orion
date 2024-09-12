@@ -105,17 +105,9 @@ bool mongoMultitenant(void)
 void mongoInit
 (
   const char*  dbURI,
-  const char*  dbHost,
-  const char*  rplSet,
   std::string  dbName,
-  const char*  user,
   const char*  pwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
@@ -125,17 +117,9 @@ void mongoInit
   multitenant = mtenant;
 
   if (orion::mongoConnectionPoolInit(dbURI,
-                                     dbHost,
                                      dbName.c_str(),
-                                     rplSet,
-                                     user,
                                      pwd,
-                                     mechanism,
-                                     authDb,
-                                     dbSSL,
-                                     dbDisableRetryWrites,
                                      mtenant,
-                                     timeout,
                                      writeConcern,
                                      dbPoolSize,
                                      mutexTimeStat) != 0)
@@ -232,6 +216,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
   orion::BSONObjBuilder bob;
   bob.append("listDatabases", 1);
+  bob.append("nameOnly", true);
 
   if (!orion::runDatabaseCommand("admin", bob.obj(), &result, &err))
   {
@@ -1385,11 +1370,6 @@ static bool isCustomAttr(std::string attrName)
 * This method is used by queryContext. It takes a vector with entities and a vector
 * with attributes as input and returns the corresponding ContextElementResponseVector or error.
 *
-* Note the includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
-* subscribeContext case, as empty values can cause problems in the case of federating Context
-* Brokers (the notifyContext is processed as an updateContext and in the latter case, an
-* empty value causes an error)
 */
 bool entitiesQuery
 (
@@ -1398,7 +1378,6 @@ bool entitiesQuery
   const Restriction&               res,
   ContextElementResponseVector*    cerV,
   std::string*                     err,
-  bool                             includeEmpty,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   int                              offset,
@@ -1636,7 +1615,7 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL);
 
     // Add builtin attributes and metadata (only in NGSIv2)
     if (apiVersion == V2)
@@ -2292,13 +2271,22 @@ static void getCommonAttributes
   std::vector<std::string>&         resultVector
 )
 {
-  for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+  for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
   {
-    for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+    // some builtin attributes are always include (even when onlyChangedAttrs is true)
+    if ((sVector[avOc] == ALTERATION_TYPE) || (sVector[avOc] == DATE_CREATED) || (sVector[avOc] == DATE_MODIFIED))
     {
-      if (fVector[cavOc] == sVector[avOc])
-      {
-        resultVector.push_back(fVector[cavOc]);
+      resultVector.push_back(sVector[avOc]);
+    }
+    else 
+    {
+      for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+      {      
+        if (fVector[cavOc] == sVector[avOc])
+        {
+          resultVector.push_back(sVector[avOc]);
+          break;          
+        }
       }
     }
   }

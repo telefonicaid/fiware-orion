@@ -1,0 +1,671 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Evaluation priority in expressions CRUD and errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub with expressions with evalPriority as string, see error
+# 02. Create custom sub with expressions with evalPriority 0, see error
+# 03. Create custom sub with expressions with evalPriority 100001, see error
+# 04. Create custom sub with expression with evalPriority 1
+# 05. Get sub to see evalPriority 1
+# 06. Update custom sub with expression with evalPriority as string, see error
+# 07. Update custom sub with expression with evalPriority 0, see error
+# 08. Update custom sub with expressions with evalPriority 100001, see error
+# 09. Update custom sub with expression with evalPriority 2
+# 10. Get sub to see evalPriority 2
+# 11. Update custom sub with expression without evalPriority
+# 12. Get sub to see no evalPriority
+# 13. Update custom sub with expression with evalPriority 3
+# 14. Get sub to see evalPriority 3
+#
+
+
+echo "01. Create custom sub with expressions with evalPriority as string, see error"
+echo "============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": "foo",
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create custom sub with expressions with evalPriority 0, see error"
+echo "====================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 0,
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create custom sub with expressions with evalPriority 100001, see error"
+echo "======================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 100001,
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create custom sub with expression with evalPriority 1"
+echo "========================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 1,
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "05. Get sub to see evalPriority 1"
+echo "================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "06.Update custom sub with expression with evalPriority as string, see error"
+echo "==========================================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": "foo",
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. Update custom sub with expression with evalPriority 0, see error"
+echo "===================================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 0,
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "08. Update custom sub with expressions with evalPriority 100001, see error"
+echo "======================================================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 100001,
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "09. Update custom sub with expressions with evalPriority 2"
+echo "=========================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 2,
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "10. Get sub to see evalPriority 2"
+echo "================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "11. Update custom sub with expression without evalPriority"
+echo "=========================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated"
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "12. Get sub to see no evalPriority"
+echo "=================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "13. Update custom sub with expressions with evalPriority 3"
+echo "=========================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "S": {
+          "value": "${Z1+1}",
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 3,
+              "type": "Number"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "14. Get sub to see evalPriority 3"
+echo "================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub with expressions with evalPriority as string, see error
+=============================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
+
+{
+    "description": "evalPriority metadata must be a number",
+    "error": "BadRequest"
+}
+
+
+02. Create custom sub with expressions with evalPriority 0, see error
+=====================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
+
+{
+    "description": "evalPriority metadata minimum priority is 1",
+    "error": "BadRequest"
+}
+
+
+03. Create custom sub with expressions with evalPriority 100001, see error
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
+
+{
+    "description": "evalPriority metadata maximum priority is 100000",
+    "error": "BadRequest"
+}
+
+
+04. Create custom sub with expression with evalPriority 1
+=========================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+05. Get sub to see evalPriority 1
+=================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 411
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "ngsi": {
+                "S": {
+                    "metadata": {
+                        "evalPriority": {
+                            "type": "Number",
+                            "value": 1
+                        }
+                    },
+                    "type": "Calculated",
+                    "value": "${Z1+1}"
+                }
+            },
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+06.Update custom sub with expression with evalPriority as string, see error
+===========================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
+
+{
+    "description": "evalPriority metadata must be a number",
+    "error": "BadRequest"
+}
+
+
+07. Update custom sub with expression with evalPriority 0, see error
+====================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 82
+
+{
+    "description": "evalPriority metadata minimum priority is 1",
+    "error": "BadRequest"
+}
+
+
+08. Update custom sub with expressions with evalPriority 100001, see error
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
+
+{
+    "description": "evalPriority metadata maximum priority is 100000",
+    "error": "BadRequest"
+}
+
+
+09. Update custom sub with expressions with evalPriority 2
+==========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Get sub to see evalPriority 2
+=================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 411
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "ngsi": {
+                "S": {
+                    "metadata": {
+                        "evalPriority": {
+                            "type": "Number",
+                            "value": 2
+                        }
+                    },
+                    "type": "Calculated",
+                    "value": "${Z1+1}"
+                }
+            },
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+11. Update custom sub with expression without evalPriority
+==========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+12. Get sub to see no evalPriority
+==================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 355
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "ngsi": {
+                "S": {
+                    "type": "Calculated",
+                    "value": "${Z1+1}"
+                }
+            },
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+13. Update custom sub with expressions with evalPriority 3
+==========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+14. Get sub to see evalPriority 3
+=================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 411
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "ngsi": {
+                "S": {
+                    "metadata": {
+                        "evalPriority": {
+                            "type": "Number",
+                            "value": 3
+                        }
+                    },
+                    "type": "Calculated",
+                    "value": "${Z1+1}"
+                }
+            },
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

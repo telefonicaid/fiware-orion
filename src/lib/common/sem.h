@@ -47,7 +47,7 @@ typedef enum SemOpType
 *
 * semInit -
 */
-extern int semInit
+extern void semInit
 (
   SemOpType  _reqPolicy     = SemReadWriteOp,
   bool       semTimeStat    = false,

@@ -223,7 +223,7 @@ Content-Length: 946
                             "y1",
                             "y2"
                         ]
-                    },                    
+                    },
                     "text": "foo"
                 },
                 "qos": 0,

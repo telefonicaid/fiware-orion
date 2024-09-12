@@ -332,16 +332,17 @@ ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::s
   {
     Entity* enP = entityVector[ceIx];
 
-    if ((enP->id != eP->id) || (enP->type != eP->type))
+    // empty type in request (enP) is always a match
+    if ((enP->id != eP->id) || ((enP->type != "") && (enP->type != eP->type)))
     {
       continue;
     }
 
-    Entity* eP = entityVector[ceIx];
+    Entity* eVItemP = entityVector[ceIx];
 
-    for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
+    for (unsigned int aIx = 0; aIx < eVItemP->attributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP = eP->attributeVector[aIx];
+      ContextAttribute* aP = eVItemP->attributeVector[aIx];
 
       if (aP->name == attributeName)
       {

@@ -18,7 +18,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET (SOURCES
     BSONTypes.cpp
@@ -47,6 +47,7 @@ SET (HEADERS
     OID.h
     DBConnection.h
     DBCursor.h
+    DBErrors.h
     safeMongo.h
     connectionOperations.h
     mongoConnectionPool.h

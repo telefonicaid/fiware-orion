@@ -32,7 +32,8 @@ Disclaimer:
 The following list of features are planned to be addressed in the short term,
 and incorporated into the coming release(s) of the product:
 
-- MQTT Retain flag ([#4388](https://github.com/telefonicaid/fiware-orion/issues/4388))
+- Dynamic / high order attribute values (e.g. an attribute being a sum of two other attributes) based on subscriptions to do internal modifications to CB entities
+([#3815](https://github.com/telefonicaid/fiware-orion/issues/3815), [#4513](https://github.com/telefonicaid/fiware-orion/issues/4513))
 - MQTT notification retrial ([#4439](https://github.com/telefonicaid/fiware-orion/issues/4439))
 - Allow multiple types in entity to support UNE 178503 requirements ([#3638](https://github.com/telefonicaid/fiware-orion/issues/3638))
 - Pattern/filter batch updates ([#2389](https://github.com/telefonicaid/fiware-orion/issues/2389))
@@ -47,12 +48,9 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
+- Permissions attribute on entities ([#4514](https://github.com/telefonicaid/fiware-orion/issues/4514))
 - Advanced query language ([#4395](https://github.com/telefonicaid/fiware-orion/issues/4395))
 - Signed entities ([#4398](https://github.com/telefonicaid/fiware-orion/issues/4398))
-- Dynamic / high order attribute values (e.g. an attribute being a sum of two other attributes)
- supported by a Expressions Language - help wanted 
-([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004)),
-([#3815](https://github.com/telefonicaid/fiware-orion/issues/3815))
 - Service provisioning API (pools, etc.) ([#4442](https://github.com/telefonicaid/fiware-orion/issues/4442))
 - Advanced subscription management
    - Subscription debug mode (precise statistics consolidation, keep recent history of notifications sent, etc.) ([#4399](https://github.com/telefonicaid/fiware-orion/issues/4399))
@@ -75,6 +73,8 @@ you wish to get involved in the implementation or influence the roadmap
 
 The following list contains all features that were in the roadmap and have already been implemented.
 
+- Expression language support (JEXL) ([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004)) ([4.0.0](https://github.com/telefonicaid/fiware-orion/releases/tag/4.0.0))
+- MQTT Retain flag ([#4388](https://github.com/telefonicaid/fiware-orion/issues/4388)) ([3.11.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.11.0))
 - Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560)) ([3.8.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.8.0))
 - New subscripition modes (create only, update only, delete only and combinations) ([#1494](https://github.com/telefonicaid/fiware-orion/issues/1494)) ([3.7.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.7.0))
 - Per sub/reg HTTP timeout ([#3842](https://github.com/telefonicaid/fiware-orion/issues/3842)) 

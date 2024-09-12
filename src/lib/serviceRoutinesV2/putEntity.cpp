@@ -34,6 +34,7 @@
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/putEntity.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
@@ -43,7 +44,7 @@
 *
 * putEntity - 
 *
-* PUT /v2/entities
+* PUT /v2/entities/<id>/attrs
 *
 * Payload In:  Entity
 * Payload Out: None
@@ -83,6 +84,9 @@ std::string putEntity
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
+
+// Adjust error code if needed
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), false);
 
   // 03. Check error
   std::string answer = "";

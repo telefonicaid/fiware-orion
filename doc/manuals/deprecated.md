@@ -15,6 +15,9 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* CLI parameters (and associated env vars): `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
+  `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` in Orion 3.12.0. Use `dbURI` instead,
+  checking [this section](#mapping-to-mongouri-from-old-cli-parameters) if you need to know hot to build the MongoDB URI (removed in Orion 4.0.0).
 * `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types in Orion 3.10.0. Use `geo:json` instead.
 * `GET /v2` operation in Orion 3.8.0. This operation is pretty useless and not actually used.
 * Initial notification in subscriptions (along with `skipInitialNotification` option) in Orion 3.1.0.
@@ -36,6 +39,8 @@ A list of deprecated features and the version in which they were deprecated foll
         * `POST /NGSI10/updateContext`
         * `POST /v1/queryContext`
         * `POST /NGSI10/queryContext`
+    * NGSIv1 format in subscription notifications (`notification.atttrsFormat` set to `legacy`) removed in Orion 4.0.0
+    * Finally, the last remaining NGSIv1 operations where removed in Orion 4.0.0
 * `attributes` field in `POST /v2/op/query` is in Orion 1.15.0. It is a combination of `attrs` (to select
   which attributes to include in the response to the query) and unary attribute filter in `q` within
   `expression` (to return only entities which have these attributes). Use them instead.
@@ -58,7 +63,7 @@ A list of deprecated features and the version in which they were deprecated foll
 * `/ngsi10` and `/ngsi9` as URL path prefixes are deprecated in Orion 1.2.0. Please,
   use `/v1` and `/v1/registry` instead.
         * `/ngsi9` URL paths removed in Orion 3.8.0
-* `location` metadata to specify entity location is deprecated in Orion 1.1.0. The new way
+* `location` metadata to specify entity location is deprecated in Orion 1.1.0 (removed in Orion 3.11.0). The new way
   of specifying entity location is to use `geo:json` type for the attribute (see details in
   [the corresponding section of the Orion API specification](orion-api.md#geospatial-properties-of-entities).
 * Deprecated command line argument in Orion 0.26.1 (removed in Orion 1.0.0).
@@ -76,6 +81,30 @@ A list of deprecated features and the version in which they were deprecated foll
 	* **-fwdPort <port>**. Forwarding port for NGIS9 registerContext when the broker runs in "ConfMan mode".
 * Configuration Manager role (deprecated in 0.21.0, removed in 0.25.0)
 * Associations (deprecated in 0.21.0, removed in 0.25.0).
+
+### Mapping to MongoURI from old CLI parameters
+
+Considering we have the following CLI parameters:
+
+* `-dbhost HOST`
+* `-rplSet RPLSET`
+* `-dbTimeout TIMEOUT`
+* `-dbuser USER`
+* `-dbpass PASS`
+* `-dbAuthMech AUTHMECH`
+* `-dbAuthDb AUTHDB`
+* `-dbSSL`
+* `-dbDisableRetryWrites`
+
+The resulting MongoURI (i.e. the value for `-dbURI`) should be:
+
+> mongodb://[USER:PASS@]HOST/[AUTHDB][?replicaSet=RPLSET[&authMechanism=AUTHMECH][&tls=true&tlsAllowInvalidCertificates=true][&retryWrites=false][&connectTimeoutMS=TIMEOUT]
+
+Notes:
+
+* The `&tls=true&tlsAllowInvalidCertificates=true` token is added if `-dbSSL` is used
+* The `&retryWrites=false` token is added if `-dbDisableRetryWrites` is used
+* Other `[...]` mean optional tokens, depending on if the corresponding parameter is used or not.
 
 ## Log deprecation warnings
 
@@ -110,9 +139,10 @@ The following table provides information about the last Orion version supporting
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |
-| `location` metadata to specify entity location                             | Not yet defined                           | Not yet defined                 |
 | `GET /v2` operation                                                        | Not yet defined                           | Not yet defined                 |
 | `geo:point`, `geo:line`, `geo:box` and `geo:polygon` attribute types       | Not yet defined                           | Not yet defined                 |
+| CLI `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` (and associated env vars)                        | 3.12.0                           | February 29th, 2024                 |
+| `location` metadata to specify entity location                             | 3.10.1                                    | June 12th, 2023                 |
 | NGSIv1 API (along with CLI: `-strictNgsiv1Ids` and `-ngsiv1Autocast`)      | 3.9.0 (*)                                 | June 2nd, 2023                  |
 | `/ngsi10` and `/ngsi9` URL prefixes                                        | 3.7.0 (*)                                 | May 26th, 2022                  |
 | Initial notification upon subscription creation or update                  | 3.1.0                                     | June 9th, 2021                  |

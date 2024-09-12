@@ -53,20 +53,20 @@ TEST(OrionError, all)
   ci.outMimeType = JSON;
 
   EXPECT_EQ(SccNone, e0.code);
-  EXPECT_EQ("",      e0.reasonPhrase);
-  EXPECT_EQ("",      e0.details);
+  EXPECT_EQ("",      e0.error);
+  EXPECT_EQ("",      e0.description);
 
   EXPECT_EQ(SccOk,          e1.code);
-  EXPECT_EQ("OK",           e1.reasonPhrase);
-  EXPECT_EQ("no details 3", e1.details);
+  EXPECT_EQ("OK",           e1.error);
+  EXPECT_EQ("no details 3", e1.description);
 
   EXPECT_EQ(sc.code,         e3.code);
-  EXPECT_EQ(sc.reasonPhrase, e3.reasonPhrase);
-  EXPECT_EQ(sc.details,      e3.details);
+  EXPECT_EQ(sc.reasonPhrase, e3.error);
+  EXPECT_EQ(sc.details,      e3.description);
 
   EXPECT_EQ(SccOk,          e4.code);
-  EXPECT_EQ("OK",           e4.reasonPhrase);
-  EXPECT_EQ("Good Request", e4.details);
+  EXPECT_EQ("OK",           e4.error);
+  EXPECT_EQ("Good Request", e4.description);
 
   ci.outMimeType = JSON;
 

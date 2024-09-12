@@ -88,6 +88,11 @@ static void setProvider(ngsiv2::Registration* regP, const ngsiv2::ForwardingMode
 
   if (format == "JSON")
   {
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode detected in existing registration (regId: %s)", regP->id.c_str()));
+    }
     regP->provider.legacyForwardingMode = true;
   }
   else

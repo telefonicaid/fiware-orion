@@ -308,10 +308,7 @@ void ContextAttributeVector::fill(const ContextAttributeVector& caV, bool useDef
 void ContextAttributeVector::fill
 (
   const orion::BSONObj&  attrs,
-  const StringList&      attrL,
-  bool                   includeEmpty,
-  const std::string&     locAttr,
-  ApiVersion             apiVersion
+  const StringList&      attrL
 )
 {
   std::set<std::string>  attrNames;
@@ -323,7 +320,6 @@ void ContextAttributeVector::fill
     orion::BSONObj     attr                    = getObjectFieldF(attrs, attrName);
     ContextAttribute*  caP                     = NULL;
     ContextAttribute   ca;
-    bool               noLocationMetadata      = true;
 
     // Name and type
     ca.name           = dbDecode(attrName);
@@ -347,10 +343,6 @@ void ContextAttributeVector::fill
       {
       case orion::String:
         ca.stringValue = getStringFieldF(attr, ENT_ATTRS_VALUE);
-        if (!includeEmpty && ca.stringValue.empty())
-        {
-          continue;
-        }
         caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
         break;
 
@@ -410,33 +402,6 @@ void ContextAttributeVector::fill
       {
         std::string currentMd = *i;
         Metadata*   md = new Metadata(dbDecode(currentMd), getObjectFieldF(mds, currentMd));
-
-        /* The flag below indicates that a location metadata with WGS84 was found during iteration.
-        *  It needs to the NGSIV1 check below, in order to add it if the flag is false
-        *  In addition, adjust old wrong WSG84 metadata value with WGS84 */
-        if (md->name == NGSI_MD_LOCATION)
-        {
-          noLocationMetadata = false;
-
-          if (md->valueType == orion::ValueTypeString && md->stringValue == LOCATION_WGS84_LEGACY)
-          {
-            md->stringValue = LOCATION_WGS84;
-          }
-        }
-
-        caP->metadataVector.push_back(md);
-      }
-    }
-
-    if (apiVersion == V1)
-    {
-      /* Setting location metadata (if location attr found
-       *  and the location metadata was not present or was present but with old wrong WSG84 value) */
-      if ((locAttr == ca.name) && (ca.type != GEO_POINT) && noLocationMetadata)
-      {
-        /* Note that if attribute type is geo:point then the user is using the "new way"
-         * of locating entities in NGSIv1, thus location metadata is not rendered */
-        Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
         caP->metadataVector.push_back(md);
       }
     }
@@ -468,7 +433,7 @@ void ContextAttributeVector::fill
 void ContextAttributeVector::fill(const orion::BSONObj&  attrs)
 {
   StringList emptyList;
-  return fill(attrs, emptyList, true, "", V2);
+  return fill(attrs, emptyList);
 }
 
 

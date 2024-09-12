@@ -278,6 +278,11 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     return badInput(ciP, errorString);
   }
 
+  if (subsP->subject.entities.size() == 0)
+  {
+    return badInput(ciP, "subject entities is empty");
+  }
+
   // Condition
   if (subject.HasMember("condition"))
   {
@@ -520,11 +525,6 @@ static std::string parseCustomPayload
         }
 
         ngsi->id = iter->value.GetString();
-
-        if (forbiddenIdChars(V2, ngsi->id.c_str(), ""))
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID);
-        }
       }
       else if (name == "type")
       {
@@ -534,11 +534,6 @@ static std::string parseCustomPayload
         }
 
         ngsi->type = iter->value.GetString();
-
-        if (forbiddenIdChars(V2, ngsi->type.c_str(), ""))
-        {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE);
-        }
       }
       else  // attribute
       {
@@ -546,7 +541,9 @@ static std::string parseCustomPayload
 
         ngsi->attributeVector.push_back(caP);
 
-        std::string r = parseContextAttribute(ciP, iter, caP, false);
+        // Note we are using relaxForbiddenCheck true in this case, as JEXL expressions typically use forbidden
+        // chars and we don't want to fail in that case
+        std::string r = parseContextAttribute(ciP, iter, caP, false, true);
 
         if (r == "max deep reached")
         {
@@ -557,10 +554,28 @@ static std::string parseCustomPayload
           return badInput(ciP, r);
         }
 
-        // metadadata are now allowed in this case
-        if (caP->metadataVector.size() > 0)
+        // only evalPriority metadadata is allowed in this case
+        for (unsigned ix = 0; ix < caP->metadataVector.size(); ix++)
         {
-          return badInput(ciP, ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF);
+          if (caP->metadataVector[ix]->name != NGSI_MD_EVAL_PRIORITY)
+          {
+            return badInput(ciP, ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF);
+          }
+          else
+          {
+            if (caP->metadataVector[ix]->valueType != orion::ValueTypeNumber)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MUST_BE_A_NUMBER);
+            }
+            if (caP->metadataVector[ix]->numberValue < MIN_PRIORITY)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MIN_ERROR);
+            }
+            if (caP->metadataVector[ix]->numberValue > MAX_PRIORITY)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MAX_ERROR);
+            }
+          }
         }
       }
     }

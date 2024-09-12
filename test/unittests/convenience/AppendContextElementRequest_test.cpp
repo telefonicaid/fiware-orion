@@ -110,7 +110,6 @@ TEST(AppendContextElementRequest, release)
    AppendContextElementRequest  acer;
    std::string                  out;
    ContextAttribute*            caP = new ContextAttribute("caName", "caType", "121");
-   Metadata*                    mdP = new Metadata("mdName", "mdType", "122");
 
    acer.contextAttributeVector.push_back(caP);
 

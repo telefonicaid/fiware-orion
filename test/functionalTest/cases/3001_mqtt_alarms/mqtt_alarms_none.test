@@ -61,6 +61,7 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 echo "02. Upsert three times to trigger three MQTT notifications"
 echo "=========================================================="
@@ -85,7 +86,7 @@ echo
 
 echo "03. Check logs and see three MQTT notifications and no alarms"
 echo "============================================================="
-cat /tmp/contextBroker.log | grep -v 'corr=N/A' | awk -F 'msg=' '{print $2}'
+cat /tmp/contextBroker.log | grep -v 'corr=N/A' | awk -F 'msg=' '{print $2}' | sed -e "s/$SUB_ID/SUB_ID/g"
 echo
 echo
 
@@ -129,11 +130,11 @@ Location: /v2/entities/E?type=T
 #SORT_START
 Request received: POST /v2/subscriptions, request payload (142 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://localhost:1883", "topic": "sub1" } } }, response code: 201
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered REGEX(.*): broker: localhost:1883, topic: sub1
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered REGEX(.*): broker: localhost:1883, topic: sub1
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered REGEX(.*): broker: localhost:1883, topic: sub1
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 #SORT_END
 
 

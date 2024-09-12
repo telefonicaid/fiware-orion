@@ -69,37 +69,32 @@ static struct timespec accTimeStatSemTime = { 0, 0 };
 *  -1 on failure
 *
 */
-int semInit(SemOpType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
+void semInit(SemOpType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
 {
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'req' semaphore: %s)", strerror(errno)));
-    return -1;
+    LM_X(1, ("Fatal Error (error initializing 'req' semaphore: %s)", strerror(errno)));
   }
 
   if (sem_init(&transSem, shared, takenInitially) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'transactionId' semaphore: %s)", strerror(errno)));
-    return -1;
+    LM_X(1, ("Fatal Error (error initializing 'transactionId' semaphore: %s)", strerror(errno)));
   }
 
   if (sem_init(&cacheSem, shared, takenInitially) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'cache' semaphore: %s)", strerror(errno)));
-    return -1;
+    LM_X(1, ("Fatal Error (error initializing 'cache' semaphore: %s)", strerror(errno)));
   }
 
   if (sem_init(&timeStatSem, shared, takenInitially) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'timeStat' semaphore: %s)", strerror(errno)));
-    return -1;
+    LM_X(1, ("Fatal Error (error initializing 'timeStat' semaphore: %s)", strerror(errno)));
   }
 
   reqPolicy = _reqPolicy;
 
   // Measure accumulated semaphore waiting time?
   semWaitStatistics = semTimeStat;
-  return 0;
 }
 
 

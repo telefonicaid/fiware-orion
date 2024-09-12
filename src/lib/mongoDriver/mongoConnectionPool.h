@@ -47,17 +47,9 @@ extern void mongoVersionGet(int* mayor, int* minor);
 extern int mongoConnectionPoolInit
 (
   const char* dbURI,
-  const char* host,
   const char* db,
-  const char* rplSet,
-  const char* username,
   const char* passwd,
-  const char* mechanism,
-  const char* authDb,
-  bool        dbSSL,
-  bool        dbDisableRetryWrites,
   bool        mtenant,
-  int64_t     timeout,
   int         writeConcern = 1,
   int         poolSize = 10,
   bool        semTimeStat = false

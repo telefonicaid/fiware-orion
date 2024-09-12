@@ -44,17 +44,15 @@ brokerStart CB 0 IPv4 -statCounters
 #
 # All counters has 1 hit.
 #
-# As a kind of checksum note there are 60 orionCurl ocurrences in this file
-# (it can be checked with grep) and that:
+# As a kind of checksum note there are 53 orionCurl ocurrences in this file
+# (it can be checked with grep orionCurl | grep '\-\-url' | wc -l) and that:
 #
-# - jsonRequests:        16
-# - noPayloadRequests:   42
+# - jsonRequests:        11
+# - noPayloadRequests:   40
 # - textRequest:          1
 # - (comented orionCurl)  1
 #
-# which sum 131
-
-# Not legacy
+# which sum 53
 
 orionCurl --url /admin/log                     > /dev/null
 
@@ -207,49 +205,9 @@ orionCurl --url /v2/types/T -X OPTIONS  > /dev/null
 
 orionCurl --url /version                > /dev/null
 
-# Legacy
-
-payload='{}'
-orionCurl --url /v1/contextEntities/E -X DELETE                     > /dev/null
-orionCurl --url /v1/contextEntities/E -X PUT        --payload "$payload"  > /dev/null
-
-orionCurl --url /v1/contextEntities/E/attributes/A                           > /dev/null
-
-payload='{
-  "entities": [
-    {
-      "type": "T",
-      "isPattern": "false",
-      "id": "E"
-    }
-  ]
-}'
-orionCurl --url /ngsi10/queryContext -X POST --payload "$payload"  > /dev/null
-orionCurl --url /v1/queryContext -X POST --payload "$payload"  > /dev/null
-
-payload='{
-  "contextElements": [
-  {
-    "type": "T",
-    "isPattern": "false",
-    "id": "E",
-    "attributes": [
-    {
-      "name": "A",
-      "type": "Text",
-      "value": "foo"
-    }
-    ]
-  }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /ngsi10/updateContext            -X POST --payload "$payload"  > /dev/null
-orionCurl --url /v1/updateContext                -X POST --payload "$payload"  > /dev/null
-
 # Get statistics
 
-orionCurl --url /statistics?options
+orionCurl --url /statistics
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -260,8 +218,8 @@ Content-Length: REGEX(\d+)
 
 {
     "counters": {
-        "jsonRequests": 16,
-        "noPayloadRequests": 42,
+        "jsonRequests": 11,
+        "noPayloadRequests": 40,
         "requests": {
             "/admin/log": {
                 "GET": 1,
@@ -354,27 +312,6 @@ Content-Length: REGEX(\d+)
             },
             "/version": {
                 "GET": 1
-            }
-        },
-        "requestsLegacy": {
-            "/ngsi10/queryContext": {
-                "POST": 1
-            },
-            "/ngsi10/updateContext": {
-                "POST": 1
-            },
-            "/v1/contextEntities/{id}": {
-                "DELETE": 1,
-                "PUT": 1
-            },
-            "/v1/contextEntities/{id}/attributes/{name}": {
-                "GET": 1
-            },
-            "/v1/queryContext": {
-                "POST": 1
-            },
-            "/v1/updateContext": {
-                "POST": 1
             }
         },
         "textRequests": 1

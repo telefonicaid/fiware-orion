@@ -8,6 +8,7 @@
 
 推奨されなくなった機能のリストと、廃止された機能のバージョンは次のとおりです :
 
+* Orion 3.12.0 での CLI パラメータ (および関連する環境変数): `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites`。MongoDB URI を構築するために必要な情報が必要な場合は、[このセクション](#mapping-to-mongouri-from-old-cli-parameters) をチェックして、代わりに `dbURI` を使用してください (Orion 4.0.0 で削除されました)
 * Orion 3.10.0 での `geo:point`, `geo:line`, `geo:box` および `geo:polygon` 属性タイプ。代わりに `geo:json` を使用してください
 * Orion 3.8.0 での `GET /v2` 操作。この操作はかなり役に立たず、実際には使用されません。
 * Orion 3.1.0 のサブスクリプションでの初期通知 (`skipInitialNotification` オプションと共に)。(Orion 3.2.0 で削除)。初期通知の
@@ -27,6 +28,8 @@
         * `POST /NGSI10/updateContext`
         * `POST /v1/queryContext`
         * `POST /NGSI10/queryContext`
+    * サブスクリプション通知の NGSIv1 形式 (`notification.atttrsFormat` が `legacy` に設定) は Orion 4.0.0 で削除されました
+    * 最後に、Orion 4.0.0 では、残りの NGSIv1 操作が削除されました。
 * `POST /v2/op/query` の `attributes` フィールドは、Orion 1.15.0 にあります。これらの属性を持つエンティティのみを返すためには、クエリに対するレスポンスにどの属性を含めるかを選択する `attrs` と、`expression` 内の `q` の単項属性フィルタ (unary attribute filter) の組み合わせです。それらを代わりに指定していください
 * Orion 1.14.0 では `POST /v2/op/update` の `APPEND`, `APPEND_STRICT`, `UPDATE`, `DELETE`,  `REPLACE` の使用は非推奨です。`append`, `appendStrict`, `update`, `delete`, `replace` を代わりに使ってください
 * Orion 1.13.0 ではメタデータ ID が推奨されていません (Orion 2.2.0 で削除されました)。一方、この機能は NGSIv2 と互換性がありません。JSON 表現形式の属性名は JSON オブジェクトのキーとして使用されるため、名前を複製することはできません。一方、IDs は、属性名にプレフィックス/サフィックスを使用して簡単に実装することができます。たとえば、`temperature:ground` および `temperature:ceiling` です。 この非推奨の結果、次のオペレーションも非推奨になりました :
@@ -40,7 +43,7 @@
 * Orion 1.5.0 では、NGSIv2 で `dateCreated` および/または `dateModified` 属性を含めるために `optionsURL` パラメータ使用することは推奨されていません。代わりに `attrs`URI パラメータを使用してください
 * パス・プレフィックスとして /ngsi10 そして /ngsi9URL は、orion 1.2.0 で廃止されました。代わりに `/v1` と `/v1/registry` を使用してください
     * `/ngsi9` URL パスは Orion 3.8.0 で削除されました
-* エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です。エンティティの場所を指定する新しい方法は、属性の `geo:json` 型を使用することです。[Orion API の対応するセクション](orion-api.md#geospatial-properties-of-entities)を参照してください)
+* エンティティの場所を指定する `location` メタデータは、Orion 1.1.0 では非推奨です (Orion 3.11.0 で削除されました)。エンティティの場所を指定する新しい方法は、属性の `geo:json` 型を使用することです。[Orion API の対応するセクション](orion-api.md#geospatial-properties-of-entities)を参照してください)
 * Orion 0.26.1 のコマンドライン引数は廃止されました。Orion 1.0.0 で削除されました
     * **--silent** : エラー以外のすべてのログ出力を抑止します。代わりに `-logLevel ERROR` を使用してください
 * ONTIMEINTERVAL サブスクリプションは Orion 0.26.0 以降で廃止されました。Orion 1.0.0 では削除されました。ONTIMEINTERVAL サブスクリプションにはいくつかの問題があります。CB に状態 (state) を導入するため、水平スケーリングの設定をより困難にし、ページネーション/フィルタリングの導入を困難にします。実際には、ONTIMEINTERVAL 通知に基づくユース・ケースは、レセプタが queryContext を同じ頻度で実行する等価なユース・ケースに変換できるため、実際には必要ありません。ページ区切りやフィルタリングなどの queryContext の機能を利用してください
@@ -51,6 +54,31 @@
     * **-fwdPort <port>** : broker が "ConfMan モード" で動作している場合の NGIS9 registerContext の転送ポートです
 * Configuration Manager のロールは、0.21.0 で非推奨になり、0.25.0 で削除されました
 * Associations は、0.21.0 で非推奨になり、0.25.0 で削除されました
+
+<a name="mapping-to-mongouri-from-old-cli-parameters"></a>
+
+### 古い CLI パラメータから MongoURI へのマッピング
+
+次の CLI パラメータがあることを考慮します:
+
+* `-dbhost HOST`
+* `-rplSet RPLSET`
+* `-dbTimeout TIMEOUT`
+* `-dbuser USER`
+* `-dbpass PASS`
+* `-dbAuthMech AUTHMECH`
+* `-dbAuthDb AUTHDB`
+* `-dbSSL`
+* `-dbDisableRetryWrites`
+
+結果の MongoURI (つまり、`-dbURI` の値) は次のようになります:
+
+> mongodb://[USER:PASS@]HOST/[AUTHDB][?replicaSet=RPLSET[&authMechanism=AUTHMECH][&tls=true&tlsAllowInvalidCertificates=true][&retryWrites=false][&connectTimeoutMS=TIMEOUT]
+Notes:
+
+* `-dbSSL` が使用される場合、`&tls=true&tlsAllowInvalidCertificates=true` トークンが追加されます
+* `-dbDisableRetryWrites` が使用される場合、`&retryWrites=false` トークンが追加されます
+* その他の `[...]` は、対応するパラメータが使用されているかどうかに応じて、オプションのトークンを意味します
 
 <a name="log-deprecation-warnings"></a>
 
@@ -83,6 +111,8 @@
 | エンティティのロケーションを指定する `location` メタデータ                           | まだ定義されていません                          | まだ定義されていません     |
 | `GET /v2` 操作                                                                       | まだ定義されていません                          | まだ定義されていません     |
 | `geo:point`, `geo:line`, `geo:box` および `geo:polygon` 属性タイプ                   | まだ定義されていません                          | まだ定義されていません     |
+| CLI `-dbhost`、`-rplSet`、`-dbTimeout`、`-dbuser`、`-dbAuthMech`、`-dbAuthDb`、`-dbSSL`、および `-dbDisableRetryWrites` (および関連する環境変数) | 3.12.0 | 2024年2月29日 |
+| エンティティの場所を指定するための `location` メタデータ                             | 3.10.1                                          | 2023年6月12日              |
 | NGSIv1 (関連する CLI パラメータ : `-strictNgsiv1Ids`, `-ngsiv1Autocast`)             | 3.9.0 (*)                                       | 2023年6月2日               |
 | `/ngsi10` および `/ngsi9` URL プレフィックス                                         | 3.7.0 (*)                                       | 2022年5月26日              |
 |サブスクリプションの作成または更新時の初期通知                                        | 3.1.0                                           | 2021年6月9日               |

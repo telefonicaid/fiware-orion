@@ -35,6 +35,8 @@
 
 #include "mongoDriver/BSONElement.h"
 
+#include "expressions/ExprContext.h"
+
 
 namespace orion
 {
@@ -117,7 +119,10 @@ class CompoundValueNode
   bool                equal(const orion::BSONElement& be);
   std::string         finish(void);
 
-  std::string         toJson(std::map<std::string, std::string>* replacementsP = NULL);
+  std::string         toJson(ExprContextObject* exprContextObjectP = NULL);
+
+  ExprContextObject   toExprContextObject(void);
+  ExprContextList     toExprContextList(void);
 
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);

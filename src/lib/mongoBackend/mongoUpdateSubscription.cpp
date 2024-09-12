@@ -31,6 +31,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
@@ -368,7 +369,6 @@ std::string mongoUpdateSubscription
   if (subUp.coveredProvided)       setCovered(subUp, &setB);
   if (subUp.notifyOnMetadataChangeProvided) setNotifyOnMetadataChange(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
-
 
   // Description is special, as "" value removes the field
   if (subUp.descriptionProvided)

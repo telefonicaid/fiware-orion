@@ -1,0 +1,392 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check number of days in 'days' field for a month
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create a subscription with the wrong days value for 'Jan' month, see error
+# 02. Create a subscription with the valid days value for 'Jan' month, (success case)
+# 03. Create a subscription with the wrong days value for 'Feb' month (Non-leap year), see error
+# 04. Create a subscription with the valid days value for 'Feb' month (Non-leap year), (success case)
+# 05. Create a subscription with the wrong days value for 'Feb' month (Leap Year), see error
+# 06. Create a subscription with the valid days value for 'Feb' month (Leap-Year), (success case)
+# 07. Create a subscription with the wrong days value for 'June' month, see error
+# 08. Create a subscription with the valid days value for 'June' month, (success case)
+#
+
+
+echo "01. Create a subscription with the wrong days value for 'Jan' month, see error"
+echo "=============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2022-01-32T17:16:03.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create a subscription with the valid days value for 'Jan' month, (success case)"
+echo "==================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2022-01-31T17:15:03.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create a subscription with the wrong days value for 'Feb' month (Non-leap year), see error"
+echo "=============================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2100-02-29T12:16:11.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create a subscription with the valid days value for 'Feb' month (Non-leap year), (success case)"
+echo "==================================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2022-02-28T17:16:23.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create a subscription with the wrong days value for 'Feb' month (Leap Year), see error"
+echo "=========================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2024-02-30T17:16:43.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create a subscription with the valid days value for 'Feb' month (Leap-Year), (success case)"
+echo "==============================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2024-02-29T17:16:23.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create a subscription with the wrong days value for 'June' month, see error"
+echo "==============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2025-06-31T23:59:59.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Create a subscription with the valid days value for 'June' month, (success case)"
+echo "===================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "Room1",
+        "type": "Room"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "pressure"
+      ]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrs": [
+      "pressure"
+    ]
+  },
+  "expires": "2025-06-30T23:59:59.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a subscription with the wrong days value for 'Jan' month, see error
+==============================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "description": "expires has an invalid format",
+    "error": "BadRequest"
+}
+
+
+02. Create a subscription with the valid days value for 'Jan' month, (success case)
+===================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Create a subscription with the wrong days value for 'Feb' month (Non-leap year), see error
+==============================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "description": "expires has an invalid format",
+    "error": "BadRequest"
+}
+
+
+04. Create a subscription with the valid days value for 'Feb' month (Non-leap year), (success case)
+===================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+05. Create a subscription with the wrong days value for 'Feb' month (Leap Year), see error
+==========================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "description": "expires has an invalid format",
+    "error": "BadRequest"
+}
+
+
+06. Create a subscription with the valid days value for 'Feb' month (Leap-Year), (success case)
+===============================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+07. Create a subscription with the wrong days value for 'June' month, see error
+===============================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 68
+
+{
+    "description": "expires has an invalid format",
+    "error": "BadRequest"
+}
+
+
+08. Create a subscription with the valid days value for 'June' month, (success case)
+====================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

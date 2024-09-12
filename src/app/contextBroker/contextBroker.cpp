@@ -105,6 +105,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "mqtt/mqttMgr.h"
 #include "metricsMgr/metricsMgr.h"
+#include "expressions/exprMgr.h"
 #include "logSummary/logSummary.h"
 
 #include "contextBroker/orionRestServices.h"
@@ -139,15 +140,8 @@ static bool isFatherProcess = false;
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
-char            dbHost[256];
-char            rplSet[64];
 char            dbName[64];
-char            user[256];
 char            pwd[256];
-char            authMech[64];
-char            authDb[64];
-bool            dbSSL;
-bool            dbDisableRetryWrites;
 char            dbURI[1024];
 char            pidPath[256];
 bool            harakiri;
@@ -159,7 +153,6 @@ bool            https;
 bool            mtenant;
 char            allowedOrigin[64];
 int             maxAge;
-long            dbTimeout;
 long            httpTimeout;
 long            mqttTimeout;
 int             dbPoolSize;
@@ -216,7 +209,6 @@ bool            logDeprecate;
 */
 #define PIDPATH                _i "/tmp/contextBroker.pid"
 #define IP_ALL                 _i "0.0.0.0"
-#define LOCALHOST              _i "localhost"
 #define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
 #define FG_DESC                "don't start as daemon"
@@ -297,19 +289,10 @@ PaArgument paArgs[] =
   { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            1,    65535,                  PORT_DESC                    },
   { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
-  { "-dbURI",                       dbURI,                  "MONGO_URI",                PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBURI_DESC                   },
-  { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,                  DBHOST_DESC                  },
-  { "-rplSet",                      rplSet,                 "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  RPLSET_DESC                  },
-  { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBUSER_DESC                  },
+  { "-dbURI",                       dbURI,                  "MONGO_URI",                PaString, PaOpt, _i "mongodb://localhost:27017",                           PaNL,  PaNL,                  DBURI_DESC                   },
   { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBPASSWORD_DESC              },
 
-  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHMECH_DESC              },
-  { "-dbAuthDb",                    authDb,                 "MONGO_AUTH_SOURCE",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHDB_DESC                },
-  { "-dbSSL",                       &dbSSL,                 "MONGO_SSL",                PaBool,   PaOpt, false,                           false, true,                  DBSSL_DESC                   },
-  { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,                  DBDISABLERETRYWRITES_DESC    },
-
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,                  DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,              DB_TMO_DESC                  },
   { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,                 DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV4_DESC                 },
@@ -596,6 +579,8 @@ void exitFunc(void)
 
   curl_context_cleanup();
   curl_global_cleanup();
+
+  exprMgr.release();
 
 #ifdef DEBUG
   // valgrind pass is done using DEBUG compilation, so we have to take care with
@@ -979,13 +964,17 @@ static void logEnvVars(void)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
       }
+      else if (aP->type == PaULong)
+      {
+        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((unsigned long*) aP->varP)));
+      }
       else if (aP->type == PaDouble)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
       }
       else
       {
-        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option));
+        LM_E(("cannot show env var ORION_%s (%s) due to unrecognized type: %d", aP->envName, aP->option, aP->type));
       }
     }
   }
@@ -1037,6 +1026,12 @@ int main(int argC, char* argV[])
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
 
   std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
+
+  #ifdef EXPR_BASIC
+  versionString += " flavours: basic-expr";
+  #else
+  versionString += " flavours: jexl-expr";
+  #endif
 
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
@@ -1129,11 +1124,6 @@ int main(int argC, char* argV[])
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
-  if ((strlen(authMech) > 0) && (strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "SCRAM-SHA-256", strlen("SCRAM-SHA-256")) != 0))
-  {
-    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or SCRAM-SHA-256"));
-  }
-
   if (useOnlyIPv6 && useOnlyIPv4)
   {
     LM_X(1, ("Fatal Error (-ipv4 and -ipv6 can not be activated at the same time. They are incompatible)"));
@@ -1215,8 +1205,9 @@ int main(int argC, char* argV[])
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
   mqttMgr.init(mqttTimeout);
+  exprMgr.init();
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbURI, dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mongoInit(dbURI, dbName, pwd, mtenant, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 

@@ -4,6 +4,8 @@ Orion Context Broker のリファレンス配布は Debian 12 です。これは
 
 公式以外のディストリビューションで Docker コンテナ・イメージをビルドする方法は、Docker ドキュメントの [3.1 非公式ディストリビューションでのビルド](../../../docker/README.jp.md#31-building-in-not-official-distributions)・セクションで確認できます。
 
+*注:* このドキュメントで説明されているビルド プロセスには cjexl ライブラリは含まれていません。これは、基本的なビルド プロセスの観点からはオプションであると見なされているためです。
+
 ## Debian 12 (正式サポート)
 
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
@@ -11,7 +13,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 * boost: 1.74
 * libmicrohttpd: 0.9.76 (ソースから)
 * libcurl: 7.88.1
-* openssl: 3.0.9
+* openssl: 3.0.13
 * libuuid: 2.38.1
 * libmosquitto: 2.0.15 (ソースから)
 * Mongo C driver: 1.24.3 (ソースから)
@@ -108,13 +110,7 @@ Orion Context Broker には、次の手順に従って実行できる一連の�
 
 aarch64 アーキテクチャの場合、apt-get を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
 
-* MongoDB をインストールします (テストはローカル・ホストで実行されている mongod に依存します)。詳細については、[MongoDB の公式ドキュメント](hhttps://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/) を確認してください。推奨バージョンは 4.4 です (以前のバージョンでも動作する可能性がありますが、お勧めしません)。
-    * mongo レガシー・シェル (`mongo` コマンド) は MongoDB 5 で非推奨となり、MongoDB 6 では新しいシェル (`mongosh` コマンド) が優先されて削除されたことに注意してください。一部の機能テスト (ftest) は、`mongosh` ではなく `mongo` を使用しているため、MongoDB 6 以降を使用している場合、これが原因で失敗します。
-    * Debian 12 は libssl3 に移行しましたが、一部の MongoDB バージョンでは libssl1 が必要な場合があります。`Depends: libssl1.1 (>= 1.1.1) but it is not installable` エラーが発生した場合は、次のことをテストできます ([こちら](https://askubuntu.com/a/1421959) を参照))
-
-        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-        rm libssl1.1_1.1.1f-1ubuntu2_amd64.deb     # optional, for cleanness
+* MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。 詳細については、[MongoDB の公式ドキュメント](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/)を確認してください。推奨バージョンは 6.0 です (以前のバージョンでも動作する可能性がありますが、お勧めしません)。
 
 * ユニット・テストを実行します
 
@@ -153,3 +149,5 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 * カバレッジを実行します
 
         make coverage INSTALL_DIR=~
+
+*注意*: デバッグ・トレースに依存する機能テストは、カバレッジ実行で失敗すると予想されます (例: notification_different_sizes または not_posix_regex_idpattern.test)。これは、デバッグ トレースで使用される LM_T マクロが条件カバレッジに "ノイズ" を追加するため、カバレッジ・コード・ビルドで無効になっているためです。この方法では、カバレッジ・レポートがより有用になります。

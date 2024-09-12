@@ -44,7 +44,6 @@ TEST(UpdateContextResponse, jsonRender)
 
   UpdateContextResponse*   ucrP;
   ContextElementResponse*  cerP;
-  Metadata*                mdP;
   ContextAttribute*        caP;
   std::string              out;
 

@@ -62,7 +62,7 @@
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID    "Invalid JSON type for entity id"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE  "Invalid JSON type for entity type"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_SCOPE    "invalid JSON type for scope value: must be string"
-#define ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT    "invalid attrsFormat, accepted values: legacy, normalized, simplifiedNormalized, keyValues, simplifiedkeyValues, values"
+#define ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT    "invalid attrsFormat, accepted values: normalized, simplifiedNormalized, keyValues, simplifiedkeyValues, values"
 #define ERROR_DESC_BAD_REQUEST_INVALID_STATUS         "status is not valid: it has to be either active, inactive or oneshot"
 #define ERROR_DESC_BAD_REQUEST_INVALID_RANGE          "ranges only valid for equal and not equal ops"
 #define ERROR_DESC_BAD_REQUEST_INVALID_LIST           "lists only valid for equal and not equal ops"
@@ -87,7 +87,11 @@
 #define ERROR_DESC_BAD_REQUEST_FORMAT_INVALID                 "invalid render format for notifications"
 #define ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND              "Service not found. Check your URL as probably it is wrong."
 #define ERROR_DESC_BAD_REQUEST_WRONG_GEOJSON                  "Wrong GeoJson"
-#define ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF "metadata are not allowed in ngsi field in custom notifications"
+#define ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF "only evalPriority metadata is allowed in ngsi field in custom notifications"
+
+#define ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MUST_BE_A_NUMBER  "evalPriority metadata must be a number"
+#define ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MIN_ERROR         "evalPriority metadata minimum priority is " STR(MIN_PRIORITY)
+#define ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MAX_ERROR         "evalPriority metadata maximum priority is "  STR(MAX_PRIORITY)
 
 #define ERROR_NOT_FOUND                               "NotFound"
 #define ERROR_DESC_NOT_FOUND_ENTITY                   "The requested entity has not been found. Check type and id"
@@ -98,7 +102,11 @@
 #define ERROR_DESC_NOT_FOUND_REGISTRATION             "The requested registration has not been found. Check id"
 
 #define ERROR_UNPROCESSABLE                           "Unprocessable"
+#define ERROR_PARTIAL_UPDATE                          "PartialUpdate"
 #define ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS       "Already Exists"
+#define ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS  "one or more of the attributes in the request already exist: "
+
+#define ERROR_DESC_DO_NOT_EXIT                        "do not exist: "
 
 #define ERROR_NO_RESOURCES_AVAILABLE                  "NoResourcesAvailable"
 #define ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC      "You cannot use more than one geo location attribute when creating an entity. Use ignoreType metadata if you want to add additional informative locations."

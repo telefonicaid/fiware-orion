@@ -49,9 +49,12 @@ TEST(commonMacroSubstitute, simple)
   const char* correct = "Entity E1/T1, attribute 'attr1'";
   std::string result;
 
-  std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, "", "", &replacements);
-  b = macroSubstitute(&result, s1, &replacements, "");
+  ExprContextObject exprContext(true);
+  exprContext.add("id", en.id);
+  exprContext.add("type", en.type);
+  exprContext.add(caP->name, caP->stringValue);
+
+  b = macroSubstitute(&result, s1, &exprContext, "", true);
   EXPECT_TRUE(b);
   EXPECT_STREQ(correct, result.c_str());
 }
@@ -88,9 +91,12 @@ TEST(commonMacroSubstitute, withRealloc)
   std::string correct = std::string(base) + "Now, finally something to substitute: Entity E1/T1, attribute 'attr1'";
   std::string result;
 
-  std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, "", "", &replacements);
-  b = macroSubstitute(&result, s1, &replacements, "");
+  ExprContextObject exprContext(true);
+  exprContext.add("id", en.id);
+  exprContext.add("type", en.type);
+  exprContext.add(caP->name, caP->stringValue);
+
+  b = macroSubstitute(&result, s1, &exprContext, "", true);
   EXPECT_TRUE(b);
   EXPECT_STREQ(correct.c_str(), result.c_str());
 }
@@ -120,9 +126,12 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
   // correct          = std::string(base) + "EntityId000001/EntityType000001";
   std::string result;
 
-  std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, "", "", &replacements);
-  b = macroSubstitute(&result, s1, &replacements, "");
+  ExprContextObject exprContext;
+  exprContext.add("id", en.id);
+  exprContext.add("type", en.type);
+  exprContext.add(caP->name, caP->stringValue);
+
+  b = macroSubstitute(&result, s1, &exprContext, "", true);
   EXPECT_FALSE(b);
   EXPECT_STREQ("", result.c_str());
 
@@ -158,9 +167,12 @@ TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
   //          correct = std::string(base) + "EntityId000001/EntityType000001"; // > 8MB after substitutions
   std::string result;
 
-  std::map<std::string, std::string> replacements;
-  buildReplacementsMap(en, "", "", &replacements);
-  b = macroSubstitute(&result, s1, &replacements, "");
+  ExprContextObject exprContext(true);
+  exprContext.add("id", en.id);
+  exprContext.add("type", en.type);
+  exprContext.add(caP->name, caP->stringValue);
+
+  b = macroSubstitute(&result, s1, &exprContext, "", true);
   EXPECT_FALSE(b);
   EXPECT_STREQ("", result.c_str());
 

@@ -1,0 +1,189 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Update forwarding was not working when entity type is not included in the request
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+#
+# 01. Create device:wt:13 attribute profile_config in CP1
+# 02. Create device:wt:13 attribute profile in CB
+# 03. Register device:wt:13 attribute profile_config in CB, provApp: CP1
+# 04. Update device:wt:13 attribute profile_config in CB
+# 05. Check no Runtime Error occur
+# 06. Query device:wt:13 attribute profile_config in CP1
+#
+
+echo "01. Create device:wt:13 attribute profile_config in CP1"
+echo "======================================================="
+payload='{
+  "id": "device:wt:13",
+  "type": "Device",
+  "profile_config": {
+    "type": "command",
+    "value": "init"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "02. Create device:wt:13 attribute profile in CB"
+echo "==============================================="
+payload='{
+  "id": "device:wt:13",
+  "type": "Device",
+  "profile": {
+    "type": "Text",
+    "value": "prof01"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Register device:wt:13 attribute profile_config in CB, provApp: CP1"
+echo "======================================================================"
+payload='{
+  "dataProvided": {
+    "entities": [
+      {
+        "type": "Device",
+        "id": "device:wt:13"
+      }
+    ],
+    "attrs": [ "profile_config" ]
+  },
+  "provider": {
+    "http": {
+      "url": "http://localhost:'${CP1_PORT}'/v2"
+    }
+  }
+}'
+orionCurl --url /v2/registrations --payload "$payload"
+echo
+echo
+
+
+echo "04. Update device:wt:13 attribute profile_config in CB"
+echo "======================================================"
+payload='{
+  "type": "command",
+  "value": "foobar"
+}'
+orionCurl --url /v2/entities/device:wt:13/attrs/profile_config --payload "$payload" -X PUT
+echo
+echo
+
+
+echo "05. Check no Runtime Error occur"
+echo "================================"
+cat /tmp/contextBroker.log | grep "Runtime Error" | wc -l
+echo
+echo
+
+
+echo "06. Query device:wt:13 attribute profile_config in CP1 and see foobar"
+echo "====================================================================="
+orionCurl --url /v2/entities/device:wt:13 --port $CP1_PORT
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create device:wt:13 attribute profile_config in CP1
+=======================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/device:wt:13?type=Device
+Content-Length: 0
+
+
+
+02. Create device:wt:13 attribute profile in CB
+===============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/device:wt:13?type=Device
+Content-Length: 0
+
+
+
+03. Register device:wt:13 attribute profile_config in CB, provApp: CP1
+======================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+04. Update device:wt:13 attribute profile_config in CB
+======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Check no Runtime Error occur
+================================
+0
+
+
+06. Query device:wt:13 attribute profile_config in CP1 and see foobar
+=====================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 104
+
+{
+    "id": "device:wt:13",
+    "profile_config": {
+        "metadata": {},
+        "type": "command",
+        "value": "foobar"
+    },
+    "type": "Device"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1
