@@ -1,3 +1,15 @@
+4.1.0 (September 12th, 2024)
+
+- Add: custom notification ngsi patching evaluation priority based in evalPriority builtin metadata (#4556)
+- Add: attribute metadata to JEXL context (#4594, #4560)
+- Fix: $max and $min operators were not supported with DateTime attributes (#4585)
+- Fix: wrong date values should not allowed in subscription's expires field (#4541)
+- Fix: do not raise DB alarm in case of wrong GeoJSON in client request
+- Fix: metadata modifications are not considered as change (with regards to subscription alterationTypes) if notifyOnMetadataChange is false (#4605)
+- Fix: invalid date in expires field of subscription (#2303)
+- Upgrade cjexl version from 0.3.0 to 0.4.0 (new transformations: now, getTime and toIsoString)
+- Upgrade Debian version from 12.4 to 12.6 in Dockerfile
+
 4.0.0 (June 6th, 2024)
 
 - Add: JEXL expression support in custom notification macro replacement (using cjexl 0.3.0) (#4004)
