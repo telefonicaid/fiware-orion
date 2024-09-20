@@ -4454,15 +4454,15 @@ db.getSiblingDB("orion-validation").entities.insertMany([
 
 db.getSiblingDB("orion-validation").csubs.insertMany([
     {
-      "expiration": 9223372036854775807,
+      "expiration": NumberLong("9223372036854775807"),
       "reference": "http://notify-receptor:5055/notify",
       "custom": true,
-      "timeout": 0,
+      "timeout": NumberLong("0"),
       "headers": {
         "fiware-servicepath": "/SS1"
       },
-      "throttling": 0,
-      "maxFailsLimit": -1,
+      "throttling": NumberLong("0"),
+      "maxFailsLimit": NumberLong("-1"),
       "servicePath": "/SS2",
       "status": "active",
       "statusLastChange": 1682640509.6958137,
