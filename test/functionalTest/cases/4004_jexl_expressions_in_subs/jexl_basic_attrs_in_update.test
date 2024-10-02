@@ -108,11 +108,11 @@ echo "04. Update entity E1 with A=2.1 and B=-3.8"
 echo "=========================================="
 payload='{
   "A": {
-    "value": 2.1,
+    "value":2.1,
     "type": "Number"
   },
   "B": {
-    "value": -3.8,
+    "value":-3.8,
     "type": "Number"
   }
 }'
