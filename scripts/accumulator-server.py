@@ -42,6 +42,7 @@ __author__ = 'fermin'
 # * This script requires at least Flask 2.0.2, which comes with Werkzeug 2.0.2.
 
 from flask import Flask, request, Response
+import logging
 from getopt import getopt, GetoptError
 from datetime import datetime
 from math import trunc
@@ -375,7 +376,8 @@ def record_request(request):
                 s += json.dumps(raw, indent=4, sort_keys=True)
                 s += '\n'
             except ValueError as e:
-                s += str(e)
+                log_error(str(e))  # Log the error details
+                s += "An error occurred while processing the request."
         else:
             s += request.data.decode("utf-8")
 
@@ -389,6 +391,13 @@ def record_request(request):
         print(s)
 
 
+def log_error(error_message):
+    """
+    Log the error message to a file or standard output.
+
+    :param error_message: The error message to log
+    """
+    logging.error(error_message)
 def send_continue(request):
     """
     Inspect request header in order to look if we have to continue or not
