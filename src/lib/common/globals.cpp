@@ -670,7 +670,7 @@ double parse8601Time(const std::string& ss)
   const int minMonth = 0;
   const int maxMonth = 11;
   const int minDay = 1;
-  const int maxDay = daysInMonth(y, time.tm_mon);;
+  const int maxDay = daysInMonth(y, time.tm_mon);
   const int minHour = 0;
   const int maxHour = 23;
   const int minMinute = 0;
