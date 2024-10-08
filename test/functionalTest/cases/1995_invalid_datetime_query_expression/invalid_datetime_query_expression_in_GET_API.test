@@ -1,0 +1,319 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Invalid DateTime expression in query parameter with GET entities API
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create an entity E1 with attribute 'mytime' of type DateTime
+# 02. Create an entity E2 with attribute 'mytime' of type DateTime
+# 03. GET all entities (success case)
+# 04. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:4XX.00Z (see error)
+# 05. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:4X.00Z (see error)
+# 06. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:00**;**00Z (see error)
+# 07. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:00.j00Z (see error)
+# 08. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14**;**10:00.00Z (see error)
+# 09. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:00:XX00.00Z (see error)
+# 10. GET entities with correct datetime value in query parameter i.e. q=mytime>=2016-08-08T17:09:24.238Z (success case)
+# 11. GET entities with correct datetime value in query parameter i.e. q=mytime<=2016-08-08T17:09:24.238Z (success case)
+#
+
+
+echo "01. Create an entity E1 with attribute 'mytime' of type DateTime"
+echo "================================================================"
+payload='{
+    "id": "E1",
+    "type": "E",
+    "mytime": {
+      "value": "2010-01-01T17:09:24.238Z",
+      "type": "DateTime"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create an entity E2 with attribute 'mytime' of type DateTime"
+echo "================================================================"
+payload='{
+    "id": "E2",
+    "type": "E",
+    "mytime": {
+      "value": "2024-07-16T11:08:22.127Z",
+      "type": "DateTime"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. GET all entities (success case)"
+echo "==================================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "04. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:4XX.00Z (see error)"
+echo "======================================================================================================================="
+orionCurl --url '/v2/entities?q=mytime<=2016-04-05T14:10:4XX.00Z'
+echo
+echo
+
+
+echo "05. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:4X.00Z (see error)"
+echo "======================================================================================================================"
+orionCurl --url '/v2/entities?q=mytime<=2016-04-05T14:10:4X.00Z'
+echo
+echo
+
+
+echo "06. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:00**;**00Z (see error)"
+echo "=========================================================================================================================="
+orionCurl --url '/v2/entities?q=mytime<=2016-04-05T14:10:00**;**00Z'
+echo
+echo
+
+
+echo "07. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:00.j00Z (see error)"
+echo "======================================================================================================================="
+orionCurl --url '/v2/entities?q=mytime<=2016-04-05T14:10:00.j00Z'
+echo
+echo
+
+
+echo "08. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14**;**10:00.00Z (see error)"
+echo "=========================================================================================================================="
+orionCurl --url '/v2/entities?q=mytime<=2016-04-05T14**;**10:00.00Z'
+echo
+echo
+
+
+echo "09. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:00:XX00.00Z (see error)"
+echo "========================================================================================================================"
+orionCurl --url '/v2/entities?q=mytime<=2016-04-05T14:00:XX00.00Z'
+echo
+echo
+
+
+echo "10. GET entities with correct datetime value in query parameter i.e. q=mytime>=2016-08-08T17:09:24.238Z (success case)"
+echo "======================================================================================================================"
+orionCurl --url '/v2/entities?q=mytime>=2016-08-08T17:09:24.238Z'
+echo
+echo
+
+
+echo "11. GET entities with correct datetime value in query parameter i.e. q=mytime<=2016-08-08T17:09:24.238Z (success case)"
+echo "======================================================================================================================"
+orionCurl --url '/v2/entities?q=mytime<=2016-08-08T17:09:24.238Z'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create an entity E1 with attribute 'mytime' of type DateTime
+================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=E
+Content-Length: 0
+
+
+
+02. Create an entity E2 with attribute 'mytime' of type DateTime
+================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=E
+Content-Length: 0
+
+
+
+03. GET all entities (success case)
+===================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 203
+
+[
+    {
+        "id": "E1",
+        "mytime": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2010-01-01T17:09:24.238Z"
+        },
+        "type": "E"
+    },
+    {
+        "id": "E2",
+        "mytime": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2024-07-16T11:08:22.127Z"
+        },
+        "type": "E"
+    }
+]
+
+
+04. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:4XX.00Z (see error)
+=======================================================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "invalid characters in query parameter",
+    "error": "BadRequest"
+}
+
+
+05. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:4X.00Z (see error)
+======================================================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "invalid characters in query parameter",
+    "error": "BadRequest"
+}
+
+
+06. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:00**;**00Z (see error)
+==========================================================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "invalid characters in query parameter",
+    "error": "BadRequest"
+}
+
+
+07. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:10:00.j00Z (see error)
+=======================================================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "invalid characters in query parameter",
+    "error": "BadRequest"
+}
+
+
+08. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14**;**10:00.00Z (see error)
+==========================================================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "invalid characters in query parameter",
+    "error": "BadRequest"
+}
+
+
+09. GET entities with invalid character in DateTime query parameter i.e. q=mytime<=2016-04-05T14:00:XX00.00Z (see error)
+========================================================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "invalid characters in query parameter",
+    "error": "BadRequest"
+}
+
+
+10. GET entities with correct datetime value in query parameter i.e. q=mytime>=2016-08-08T17:09:24.238Z (success case)
+======================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 102
+
+[
+    {
+        "id": "E2",
+        "mytime": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2024-07-16T11:08:22.127Z"
+        },
+        "type": "E"
+    }
+]
+
+
+11. GET entities with correct datetime value in query parameter i.e. q=mytime<=2016-08-08T17:09:24.238Z (success case)
+======================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 102
+
+[
+    {
+        "id": "E1",
+        "mytime": {
+            "metadata": {},
+            "type": "DateTime",
+            "value": "2010-01-01T17:09:24.238Z"
+        },
+        "type": "E"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
