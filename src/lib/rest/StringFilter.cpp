@@ -438,6 +438,11 @@ bool StringFilterItem::valueGet
   {
     *valueTypeP = SfvtDate;
   }
+  else if (*doubleP == -1)
+  {
+    *errorStringP = std::string("invalid characters in query parameter");
+    return false;
+  }
   else if (strcmp(s, "true") == 0)
   {
     *valueTypeP = SfvtBool;

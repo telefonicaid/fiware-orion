@@ -1,0 +1,1 @@
+- Fix: invalid characters in date values with query parameter in GET API should not allowed (#1995)
