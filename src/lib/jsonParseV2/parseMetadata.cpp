@@ -133,8 +133,8 @@ static std::string parseMetadataObject(const rapidjson::Value& start, Metadata* 
 
     if (mdP->numberValue == -1)
     {
-      alarmMgr.badInput(clientIp, "date has invalid format", mdP->stringValue);
-      return "date has invalid format";
+      alarmMgr.badInput(clientIp, "date has invalid format in metadata value", mdP->stringValue);
+      return "date has invalid format in metadata value";
     }
 
     // Probably reseting stringValue is not needed, but let's do it for cleanliness

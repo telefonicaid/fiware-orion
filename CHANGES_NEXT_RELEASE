@@ -1,0 +1,1 @@
+- Fix: improve attribute and metadata invalid format dates for DateTime types in logs (#4616)
