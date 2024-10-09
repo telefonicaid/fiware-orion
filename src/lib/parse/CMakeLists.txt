@@ -22,16 +22,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET (SOURCES
     CompoundValueNode.cpp
-    compoundValue.cpp
-    nullTreat.cpp
     forbiddenChars.cpp
     textParse.cpp
 )
 
 SET (HEADERS
     CompoundValueNode.h
-    compoundValue.h
-    nullTreat.h
     forbiddenChars.h
     textParse.h
 )

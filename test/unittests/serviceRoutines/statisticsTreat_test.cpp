@@ -168,6 +168,7 @@ TEST(statisticsTreat, badVerb)
 {
   ConnectionInfo ci("/statistics",  "POLLUTE", "1.1");
   std::string    out;
+  std::string    expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   RestService    restService = { StatisticsRequest, 1, { "statistics" }, NULL };
 
   utInit();
@@ -178,7 +179,7 @@ TEST(statisticsTreat, badVerb)
   ci.restServiceP = &restService;
   out = orion::requestServe(&ci);
 
-  EXPECT_EQ("", out);
+  EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow",        ci.httpHeader[0]);
   EXPECT_EQ("GET, DELETE",  ci.httpHeaderValue[0]);
 

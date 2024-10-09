@@ -28,10 +28,10 @@
 #include "logMsg/logMsg.h"
 
 #include "common/string.h"
-#include "common/tag.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi10/QueryContextResponse.h"
 
 
@@ -42,38 +42,6 @@
 */
 QueryContextResponse::QueryContextResponse()
 {
-  errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::QueryContextResponse -
-*/
-QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
-{
-  errorCode.fill(&_errorCode);
-  errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::QueryContextResponse -
-*/
-QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
-{
-  ContextElementResponse* cerP = new ContextElementResponse();
-  ContextAttribute*       caP  = new ContextAttribute(aP);
-
-  cerP->entity.fill(eP->id, eP->type, eP->isPattern);
-  cerP->entity.attributeVector.push_back(caP);
-  cerP->statusCode.fill(SccOk);
-
-  contextElementResponseVector.push_back(cerP);
-  errorCode.fill(SccOk);
 }
 
 
@@ -84,102 +52,7 @@ QueryContextResponse::QueryContextResponse(EntityId* eP, ContextAttribute* aP)
 */
 QueryContextResponse::~QueryContextResponse()
 {
-  errorCode.release();
   contextElementResponseVector.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::toJsonV1 -
-*/
-std::string QueryContextResponse::toJsonV1(bool asJsonObject)
-{
-  std::string  out               = "";
-  bool         errorCodeRendered = false;
-
-  //
-  // 01. Decide whether errorCode should be rendered
-  //
-  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
-  {
-    errorCodeRendered = true;
-  }
-  else if (contextElementResponseVector.size() == 0)
-  {
-    errorCodeRendered = true;
-  }
-  else if (!errorCode.details.empty())
-  {
-    if (errorCode.code == SccNone)
-    {
-      errorCode.code = SccOk;
-    }
-
-    errorCodeRendered = true;
-  }
-
-
-  //
-  // 02. render
-  //
-  out += startTag();
-
-  if (contextElementResponseVector.size() > 0)
-  {
-    out += contextElementResponseVector.toJsonV1(asJsonObject, QueryContext, false, errorCodeRendered);
-  }
-
-  if (errorCodeRendered == true)
-  {
-    out += errorCode.toJsonV1(false);
-  }
-
-
-  //
-  // 03. Safety Check
-  //
-  // If neither errorCode nor CER vector was filled by mongoBackend, then we
-  // report a special kind of error.
-  //
-  if ((errorCode.code == SccNone) && (contextElementResponseVector.size() == 0))
-  {
-    LM_E(("Runtime Error (Both error-code and response vector empty)"));
-    errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-    out += errorCode.toJsonV1(false);
-  }
-
-  out += endTag();
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextResponse::check -
-*/
-std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
-{
-  std::string  res;
-
-  if (!predetectedError.empty())
-  {
-    errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK")
-  {
-    alarmMgr.badInput(clientIp, res);
-    errorCode.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
-
-  return toJsonV1(asJsonObject);
 }
 
 
@@ -191,7 +64,6 @@ std::string QueryContextResponse::check(ApiVersion apiVersion, bool asJsonObject
 void QueryContextResponse::release(void)
 {
   contextElementResponseVector.release();
-  errorCode.release();
 }
 
 
@@ -200,46 +72,66 @@ void QueryContextResponse::release(void)
 *
 * QueryContextResponse::fill -
 */
-void QueryContextResponse::fill(QueryContextResponse* qcrsP)
+void QueryContextResponse::fill(const EntityVector& entities)
 {
-  errorCode.fill(qcrsP->errorCode);
-
-  for (unsigned int cerIx = 0; cerIx < qcrsP->contextElementResponseVector.size(); ++cerIx)
+  for (unsigned int eIx = 0; eIx < entities.vec.size(); eIx++)
   {
-    ContextElementResponse* cerP = new ContextElementResponse();
-
-    cerP->fill(qcrsP->contextElementResponseVector[cerIx]);
-
+    ContextElementResponse* cerP = new ContextElementResponse(entities.vec[eIx]);
     contextElementResponseVector.push_back(cerP);
   }
 }
 
 
-
 /* ****************************************************************************
 *
-* QueryContextResponse::fill -
+* QueryContextResponse::getAttr -
+*
+* If attribute is found:
+* - It is returned by the function
+* - The OrionError is set to SccNone
+*
+* If attribute is not found
+* - Function returns NULL
+* - The OrionError is not touched
+*
 */
-void QueryContextResponse::fill(const Entities& entities)
+ContextAttribute* QueryContextResponse::getAttr(const std::string& attrName, OrionError* oeP)
 {
-  for (int eIx = 0; eIx < entities.size(); eIx++)
+  if (error.code == SccContextElementNotFound)
   {
-    ContextElementResponse* cerP = new ContextElementResponse(entities.vec.vec[eIx]);
-    contextElementResponseVector.push_back(cerP);
+    oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+    return NULL;
   }
-}
 
+  if (error.code != SccOk)
+  {
+    //
+    // any other error distinct from Not Found
+    //
+    oeP->fill(error.code, error.description, error.error);
+    return NULL;
+  }
 
+  if (contextElementResponseVector.size() > 1)  // error.code == SccOk
+  {
+    //
+    // If there are more than one entity, we return an error
+    //
+    oeP->fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    return NULL;
+  }
 
-/* ****************************************************************************
-*
-* QueryContextResponse::clone -
-*/
-QueryContextResponse* QueryContextResponse::clone(void)
-{
-  QueryContextResponse* clon = new QueryContextResponse();
+  // Look for the attribute by name
+  ContextElementResponse* cerP = contextElementResponseVector[0];
 
-  clon->fill(this);
+  for (std::size_t i = 0; i < cerP->entity.attributeVector.size(); ++i)
+  {
+    if (cerP->entity.attributeVector[i]->name == attrName)
+    {
+      return cerP->entity.attributeVector[i];
+    }
+  }
 
-  return clon;
+  oeP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ATTRIBUTE, ERROR_NOT_FOUND);
+  return NULL;
 }

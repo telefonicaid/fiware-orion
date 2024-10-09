@@ -36,7 +36,6 @@
 #include "ngsi10/SubscribeContextResponse.h"
 
 #include "ngsi/EntityId.h"
-#include "ngsi/NotifyCondition.h"
 #include "apiTypesV2/HttpInfo.h"
 
 #include "mongo/client/dbclient.h"

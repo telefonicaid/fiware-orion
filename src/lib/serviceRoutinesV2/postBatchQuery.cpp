@@ -32,12 +32,76 @@
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "apiTypesV2/Entities.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
+
+
+
+/* ****************************************************************************
+*
+* fillEntityVector -
+*
+* NOTE
+*   The errorCode field from qcrsP is not used at all if errorCode::code equals SccOk.
+*   This means that e.g. the "Count:" in errorCode::details (from v1 logic) will not be
+*   present in the Entities for v2 (that number is in the HTTP header Fiware-Total-Count for v2).
+*   Other values for "details" are lost as well, if errorCode::code equals SccOk.
+*
+*  FIXME PR: v1 is mentioned above... review this closely
+*  FIXME PR: copied from getEntities.cpp. Move to common place
+*/
+static void fillEntityVector(const QueryContextResponse& qcrs, EntityVector* enVP, OrionError* oeP)
+{
+  if (qcrs.error.code == SccContextElementNotFound)
+  {
+    //
+    // If no entities are found, we respond with a 200 OK
+    // and an empty vector of entities ( [] )
+    //
+
+    oeP->fill(SccOk, "", "OK");
+    return;
+  }
+  else if (qcrs.error.code != SccOk)
+  {
+    //
+    // If any other error - use the error for the response
+    //
+
+    oeP->fill(qcrs.error.code, qcrs.error.description, qcrs.error.error);
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
+  {
+    Entity* eP = &qcrs.contextElementResponseVector[ix]->entity;
+
+    if ((&qcrs.contextElementResponseVector[ix]->error)->code == SccReceiverInternalError)
+    {
+      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
+      // think so, as the releasing logic in the upper layer will deal with that but
+      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
+      // cannot help here and it is better to ensure)
+      oeP->fill(&qcrs.contextElementResponseVector[ix]->error);
+      enVP->release();
+      return;
+    }
+    else
+    {
+      Entity*         newP  = new Entity();
+
+      newP->entityId = eP->entityId;
+      newP->creDate  = eP->creDate;
+      newP->modDate  = eP->modDate;
+
+      newP->attributeVector.fill(eP->attributeVector);
+      enVP->push_back(newP);
+    }
+  }
+}
 
 
 
@@ -65,7 +129,7 @@ std::string postBatchQuery
 {
   BatchQuery*           bqP  = &parseDataP->bq.res;
   QueryContextRequest*  qcrP = &parseDataP->qcr.res;
-  Entities              entities;
+  EntityVector          entities;
   std::string           answer;
 
   // To be used later in the render stage
@@ -89,7 +153,7 @@ std::string postBatchQuery
   else
   {
     OrionError oe;
-    entities.fill(parseDataP->qcrs.res, &oe);
+    fillEntityVector(parseDataP->qcrs.res, &entities, &oe);
 
     TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
                                           filterAttrs.stringV, false, qcrP->metadataList.stringV));

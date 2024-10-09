@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
+#include "common/MimeType.h"
 
 #include "expressions/exprMgr.h"
 

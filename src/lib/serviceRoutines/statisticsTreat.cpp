@@ -30,7 +30,6 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/statistics.h"
 #include "common/sem.h"
 #include "metricsMgr/metricsMgr.h"
@@ -91,7 +90,6 @@ static void resetStatistics(void)
   noOfNotificationsSent        = -1;
   noOfSimulatedNotifications   = -1;
 
-  noOfDprNgsiv1Request         = -1;
   noOfDprLegacyForwarding      = -1;
   noOfDprGeoformat             = -1;
 
@@ -174,13 +172,6 @@ std::string renderCounterStats(bool fullCounters)
         (noOfRequestCounters[ix].patch != -1) || (noOfRequestCounters[ix].put != -1) ||
         (noOfRequestCounters[ix]._delete != -1) || (noOfRequestCounters[ix].options != -1))
     {
-      // FIXME: in 3.9.0 most of the NGSIv1/NGSI10 requests were removed. We have invented and speciall value "skip"
-      // for these cases. This "skip" hack should be removed when we definitively remove all that code
-      if (requestTypeForCounter(noOfRequestCounters[ix].request, std::string(noOfRequestCounters[ix].prefix)) == "skip")
-      {
-        continue;
-      }
-
       // We add in the accumulator corresponing do the request kind
       if (((strncmp(noOfRequestCounters[ix].prefix, "v1", strlen("v1"))) == 0) || (strncmp(noOfRequestCounters[ix].prefix, "ngsi10", strlen("ngsi10")) == 0))
       {
@@ -218,7 +209,6 @@ std::string renderCounterStats(bool fullCounters)
   renderUsedCounter(&js, "notificationsSent", noOfNotificationsSent, fullCounters);
 
   JsonObjectHelper jsDeprecated;
-  renderUsedCounter(&jsDeprecated, "ngsiv1Requests", noOfDprNgsiv1Request, fullCounters);
   renderUsedCounter(&jsDeprecated, "ngsiv1Forwarding", noOfDprLegacyForwarding, fullCounters);
   renderUsedCounter(&jsDeprecated, "geoFormat", noOfDprGeoformat, fullCounters);
 

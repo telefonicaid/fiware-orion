@@ -48,7 +48,6 @@ class SubscriptionUpdate : public Subscription
   bool  onlyChangedProvided;
   bool  coveredProvided;
   bool  notifyOnMetadataChangeProvided;
-  bool  fromNgsiv1;          // to support a special case when the SubscriptionUpdate comes from NGSIv1
 
   SubscriptionUpdate():
     subjectProvided(false),
@@ -60,8 +59,7 @@ class SubscriptionUpdate : public Subscription
     blacklistProvided(false),
     onlyChangedProvided(false),
     coveredProvided(false),
-    notifyOnMetadataChangeProvided(true),
-    fromNgsiv1(false)
+    notifyOnMetadataChangeProvided(true)
   {
     descriptionProvided = false;
   }

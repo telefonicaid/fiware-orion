@@ -53,7 +53,8 @@ std::string badRequest
 
   alarmMgr.badInput(ciP->ip, details);
 
-  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
+  OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND);
+  ciP->httpStatusCode = SccBadRequest;
 
-  return answer;
+  return oe.toJson();
 }
