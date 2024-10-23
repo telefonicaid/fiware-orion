@@ -398,6 +398,8 @@ def log_error(error_message):
     :param error_message: The error message to log
     """
     logging.error(error_message)
+
+
 def send_continue(request):
     """
     Inspect request header in order to look if we have to continue or not
