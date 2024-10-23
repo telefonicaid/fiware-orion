@@ -35,7 +35,9 @@ accumulatorStart --pretty-print
 # 02. Create sub for entity E
 # 03. Update A with $push: $each: [2, 3, 4]
 # 04. Get entity, see E-A=[1,2,3,4]
-# 05. Dump accumulator, see E-A=[1,2,3,4]
+# 05. Update A with $push: $each: [-1, 0], $position: 0
+# 06. Get entity, see E-A=[-1,0,1,2,3,4]
+# 07. Dump accumulator, see E-A=[1,2,3,4] and E-A=[-1,0,1,2,3,4]
 #
 
 
@@ -96,8 +98,28 @@ echo
 echo
 
 
-echo '05. Dump accumulator, see E-A=[1,2,3,4]'
-echo '======================================='
+echo '05. Update A with $push: $each: [-1, 0], $position: 0'
+echo '====================================================='
+payload='{
+  "A": {
+    "value": { "$push": { "$each": [-1, 0], "$position": 0} },
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo '06. Get entity, see E-A=[-1,0,1,2,3,4]'
+echo '======================================'
+orionCurl --url /v2/entities/E
+echo
+echo
+
+
+echo '07. Dump accumulator, see E-A=[1,2,3,4] and E-A=[-1,0,1,2,3,4]'
+echo '=============================================================='
 accumulatorDump
 echo
 echo
@@ -156,8 +178,42 @@ Content-Length: 84
 }
 
 
-05. Dump accumulator, see E-A=[1,2,3,4]
-=======================================
+05. Update A with $push: $each: [-1, 0], $position: 0
+=====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Get entity, see E-A=[-1,0,1,2,3,4]
+======================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: x
+
+{
+    "A": {
+        "metadata": {},
+        "type": "StructuredValue",
+        "value": [
+            -1,
+            0,
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+07. Dump accumulator, see E-A=[1,2,3,4] and E-A=[-1,0,1,2,3,4]
+==============================================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 139
@@ -175,6 +231,38 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "StructuredValue",
                 "value": [
+                    1,
+                    2,
+                    3,
+                    4
+                ]
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f\-]{24})"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: x
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "StructuredValue",
+                "value": [
+                    -1,
+                    0
                     1,
                     2,
                     3,
