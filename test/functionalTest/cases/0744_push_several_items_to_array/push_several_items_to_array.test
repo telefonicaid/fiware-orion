@@ -192,7 +192,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: x
+Content-Length: 89
 
 {
     "A": {
@@ -246,7 +246,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: x
+Content-Length: 144
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:REGEX(\d+)
@@ -262,7 +262,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "type": "StructuredValue",
                 "value": [
                     -1,
-                    0
+                    0,
                     1,
                     2,
                     3,
