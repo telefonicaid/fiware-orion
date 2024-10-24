@@ -1337,6 +1337,30 @@ PUT /v2/entities/E/attrs/A
 
 属性Aの値を `[1, 2, 3, 3]` に変更します。
 
+前回の結果の後に次のリクエストが実行される場合:
+
+```
+PUT /v2/entities/E/attrs/A
+{
+  "value": { "$push": { "$each": [4, 5]} },
+  "type": "Array"
+}
+```
+
+属性 A の値は `[1, 2, 3, 3, 4, 5]` に変更されます。
+
+前の結果の後に次のリクエストが実行される場合:
+
+```
+PUT /v2/entities/E/attrs/A
+{
+  "value": { "$push": { "$each": [ -1, 0 ], "$position": 0} },
+  "type": "Array"
+}
+```
+
+属性 A の値は `[-1, 0, 1, 2, 3, 3, 4, 5]` に変更されます。
+
 <a name="addtoset"></a>
 
 #### `$addToSet`
