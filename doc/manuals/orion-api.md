@@ -1379,6 +1379,31 @@ PUT /v2/entities/E/attrs/A
 
 would change the value of attribute A to `[1, 2, 3, 3]`
 
+If after the previous result the following request is done:
+
+```
+PUT /v2/entities/E/attrs/A
+{
+  "value": { "$push": { "$each": [4, 5]} },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[1, 2, 3, 3, 4, 5]`.
+
+If after the previous result the following request is done:
+
+```
+PUT /v2/entities/E/attrs/A
+{
+  "value": { "$push": { "$each": [ -1, 0 ], "$position": 0} },
+  "type": "Array"
+}
+```
+
+would change the value of attribute A to `[-1, 0, 1, 2, 3, 3, 4, 5]`
+
+
 #### `$addToSet`
 
 Similar to push but avoids duplications.
