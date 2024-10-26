@@ -40,7 +40,12 @@ headers = {
 page_size = 500
 
 # WARNING! use this filter or you will remove *all* subscriptions
-filter = 'offset=0'
+# FIXME: Note that filtering is not supported in the GET /v2/subscriptions. If, at some point it gets
+# implemented (https://github.com/telefonicaid/fiware-orion/issues/1145 or additional issues),
+# we should adjust this point of the script with a valid example filter
+#filter = '&type=device'
+# For now we can keep filter variable empty.
+filter = ''
 
 # END of the configuration part (don't touch below this line ;)
 ##############################################################
@@ -52,7 +57,7 @@ def delete_subscriptions():
     """
     try:
         # Fetching subscriptions with pagination
-        response = requests.get(f"{cb_endpoint}?limit={page_size}&{filter}", headers=headers, verify=False)
+        response = requests.get(f"{cb_endpoint}?limit={page_size}{filter}", headers=headers, verify=False)
 
         if response.status_code == 200:
             subscriptions = response.json()
