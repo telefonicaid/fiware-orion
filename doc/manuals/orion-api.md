@@ -3255,7 +3255,7 @@ It can be checked at https://www.epochconverter.com that 1720606949 corresponds 
 As failsafe behaviour, evaluation returns `null` in the following cases:
 
 * Some of the transformation used in the expression is unknown (e.g. `A|undefinedExpression`)
-* Operations with identifiers that are not defined in the context are used. For instance, `(A==null)?0:A` will result in `null` (and not `0`) if `A` is not in the context, due to `==` is an operation that cannot be done on undefined identifiers. However, `A||0` will work (i.e. `0` will result if `A` is not in the context), as `||` is not considered an operation on `A`. Another possibility is to use the != operator which behaves differently than == . In this case A != null ? 1: 0 if A is not in the context it will be assigned the value 0.
+* Operations with identifiers that are not defined in the context are used. For instance, `(A==null)?0:A` will result in `null` (and not `0`) if `A` is not in the context, due to `==` is an operation that cannot be done on undefined identifiers. However, `A||0` will work (i.e. `0` will result if `A` is not in the context), as `||` is not considered an operation on `A`. Another possibility is to use the `!=` operator which behaves differently than `==`. In this case `A != null ? 1: 0`, if `A` is not in the context it will be assigned the value `0`.
 * Syntax error in the JEXL expression (e.g. `A[0|uppercase`)
 
 ### Known limitations
