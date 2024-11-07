@@ -61,18 +61,18 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       libgcrypt-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
-    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz && \
-    tar xvf libmicrohttpd-0.9.76.tar.gz && \
-    cd libmicrohttpd-0.9.76 && \
+    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz && \
+    tar xvf libmicrohttpd-1.0.1.tar.gz && \
+    cd libmicrohttpd-1.0.1 && \
     ./configure --disable-messages --disable-postprocessor --disable-dauth && \
     make && \
     make install && \
     ldconfig && \
     # Install mosquitto from source
     cd /opt && \
-    curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz && \
-    tar xvf mosquitto-2.0.15.tar.gz && \
-    cd mosquitto-2.0.15 && \
+    curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz && \
+    tar xvf mosquitto-2.0.20.tar.gz && \
+    cd mosquitto-2.0.20 && \
     sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
     sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
     sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
@@ -81,9 +81,9 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
-    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz && \
-    tar xfvz mongo-c-driver-1.24.3.tar.gz && \
-    cd mongo-c-driver-1.24.3 && \
+    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz && \
+    tar xfvz mongo-c-driver-1.29.0.tar.gz && \
+    cd mongo-c-driver-1.29.0 && \
     mkdir cmake-build && \
     cd cmake-build && \
     # Different from ci/deb/build-dep.sh and build from source documentation, we add here also
@@ -116,14 +116,14 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # cleanup sources, dev tools and locales to reduce the final image size
     # FIXME: this could need more tunning. Have a look to old CentOS Docerkile and try to
     # reproduce the same steps
-    rm -rf /opt/libmicrohttpd-0.9.76.tar.gz \
+    rm -rf /opt/libmicrohttpd-1.0.1.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
-           /opt/libmicrohttpd-0.9.76 \
-           /opt/mosquitto-2.0.15.tar.gz \
-           /opt/mosquitto-2.0.15 \
-           /opt/mongo-c-driver-1.24.3.tar.gz \
-           /opt/mongo-c-driver-1.24.3 \
+           /opt/libmicrohttpd-1.0.1 \
+           /opt/mosquitto-2.0.20.tar.gz \
+           /opt/mosquitto-2.0.20 \
+           /opt/mongo-c-driver-1.29.0.tar.gz \
+           /opt/mongo-c-driver-1.29.0 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /usr/local/lib/libcjexl.a \
