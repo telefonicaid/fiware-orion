@@ -394,7 +394,7 @@ std::string parseContextAttribute
     }
     else if (r != "OK") // other error cases get a general treatment
     {
-      alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r);
+      alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r + extraForLog);
       ciP->httpStatusCode = SccBadRequest;
       return r;
     }
