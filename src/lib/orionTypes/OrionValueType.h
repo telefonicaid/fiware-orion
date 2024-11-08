@@ -33,13 +33,7 @@ namespace orion
 
 /* ****************************************************************************
 *
-* ValueType - 
-*
-* Note that ValueTypeNotGiven is only used by NGSIv1 parsing logic. In NGSIv2 parsing,
-* attribute or metatadata value is implicit if omitted (in particular, it
-* takes null value in that case). However, this could change if we implement at
-* some point PATCH on attribute and metadata. In that case, we would need to
-* use ValueTypeNotGiven also in the cases value is omitted.
+* ValueType -
 *
 */
 typedef enum ValueType

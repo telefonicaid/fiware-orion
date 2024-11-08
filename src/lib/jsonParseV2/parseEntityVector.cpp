@@ -30,7 +30,7 @@
 
 #include "ngsi/ContextAttribute.h"
 
-#include "apiTypesV2/Entities.h"
+#include "apiTypesV2/EntityVector.h"
 #include "rest/ConnectionInfo.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseEntityObject.h"
@@ -46,7 +46,7 @@ std::string parseEntityVector
 (
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
-  Entities*                                     evP,
+  EntityVector*                                 evP,
   bool                                          idPatternAllowed,
   bool                                          attributesAllowed
 )

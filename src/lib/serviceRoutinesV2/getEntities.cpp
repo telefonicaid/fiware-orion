@@ -35,11 +35,74 @@
 #include "rest/uriParamNames.h"
 #include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
+
+
+
+/* ****************************************************************************
+*
+* fillEntityVector -
+*
+* NOTE
+*   The errorCode field from qcrsP is not used at all if errorCode::code equals SccOk.
+*   This means that e.g. the "Count:" in errorCode::details (from v1 logic) will not be
+*   present in the Entities for v2 (that number is in the HTTP header Fiware-Total-Count for v2).
+*   Other values for "details" are lost as well, if errorCode::code equals SccOk.
+*
+*  FIXME PR: v1 is mentioned above... review this closely
+*/
+static void fillEntityVector(const QueryContextResponse& qcrs, EntityVector* enVP, OrionError* oeP)
+{
+  if (qcrs.error.code == SccContextElementNotFound)
+  {
+    //
+    // If no entities are found, we respond with a 200 OK
+    // and an empty vector of entities ( [] )
+    //
+
+    oeP->fill(SccOk, "", "OK");
+    return;
+  }
+  else if (qcrs.error.code != SccOk)
+  {
+    //
+    // If any other error - use the error for the response
+    //
+
+    oeP->fill(qcrs.error.code, qcrs.error.description, qcrs.error.error);
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
+  {
+    Entity* eP = &qcrs.contextElementResponseVector[ix]->entity;
+
+    if ((&qcrs.contextElementResponseVector[ix]->error)->code == SccReceiverInternalError)
+    {
+      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
+      // think so, as the releasing logic in the upper layer will deal with that but
+      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
+      // cannot help here and it is better to ensure)
+      oeP->fill(&qcrs.contextElementResponseVector[ix]->error);
+      enVP->release();
+      return;
+    }
+    else
+    {
+      Entity*         newP  = new Entity();
+
+      newP->entityId = eP->entityId;
+      newP->creDate  = eP->creDate;
+      newP->modDate  = eP->modDate;
+
+      newP->attributeVector.fill(eP->attributeVector);
+      enVP->push_back(newP);
+    }
+  }
+}
 
 
 
@@ -82,7 +145,7 @@ std::string getEntities
   ParseData*                 parseDataP
 )
 {
-  Entities     entities;
+  EntityVector entities;
   std::string  answer;
   std::string  pattern     = ".*";  // all entities, default value
   std::string  id          = ciP->uriParam["id"];
@@ -184,7 +247,7 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
+    if (scopeP->fill(geometry, coords, georel, &errorString) != 0)
     {
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, ERROR_BAD_REQUEST);
 
@@ -197,7 +260,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -227,7 +290,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -256,7 +319,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -272,22 +335,16 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-    bool      isIdPattern = (!idPattern.empty() || pattern == ".*");
-    EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
-
+    EntityId* entityId = new EntityId("", pattern, "", typePattern);
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
   }
   else if (ciP->uriParamTypes.size() == 0)
   {
-    parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, "", EntityTypeEmptyOrNotEmpty, "");
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
-  }
-  else if (ciP->uriParamTypes.size() == 1)
-  {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, type, EntityTypeNotEmpty, "");
   }
   else
   {
@@ -297,7 +354,7 @@ std::string getEntities
     //
     for (unsigned int ix = 0; ix < ciP->uriParamTypes.size(); ++ix)
     {
-      EntityId* entityId = new EntityId(pattern, ciP->uriParamTypes[ix], "true");
+      EntityId* entityId = new EntityId("", pattern, ciP->uriParamTypes[ix], "");
 
       parseDataP->qcr.res.entityIdVector.push_back(entityId);
     }
@@ -308,14 +365,14 @@ std::string getEntities
   setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  postQueryContext(ciP, components, compV, parseDataP);
 
   // 03. Check Internal Errors
-  if (parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError)
+  if (parseDataP->qcrs.res.error.code == SccReceiverInternalError)
   {
     OrionError oe;
-    entities.fill(parseDataP->qcrs.res, &oe);
-    TIMED_RENDER(answer = oe.smartRender(V2));
+    fillEntityVector(parseDataP->qcrs.res, &entities, &oe);
+    TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = oe.code;
   }
   // 04. Render Entities response
@@ -327,7 +384,7 @@ std::string getEntities
   else
   {
     OrionError oe;
-    entities.fill(parseDataP->qcrs.res, &oe);
+    fillEntityVector(parseDataP->qcrs.res, &entities, &oe);
 
     if (oe.code != SccNone)
     {

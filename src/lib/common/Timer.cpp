@@ -39,9 +39,9 @@
 Timer::~Timer(void)
 {
   //
-  // FIXME: This destructor is needed to avoid warning message.
-  // Compilation fails when a warning occurs, and it is enabled
-  // compilation option -Werror "warnings being treated as errors"
+  // If we don't implement this destructor in unittest we get a fail when "delete timerMock;" is done:
+  //
+  // error: deleting object of polymorphic class type ‘TimerMock’ which has non-virtual destructor might cause undefined behavior [-Werror=delete-non-virtual-dtor]
   //
   LM_T(LmtNotImplemented, ("Timer destructor not implemented"));
 }
