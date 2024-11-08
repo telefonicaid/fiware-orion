@@ -106,7 +106,8 @@ static std::string parseContextAttributeObject
   const rapidjson::Value&  start,
   ContextAttribute*        caP,
   bool*                    compoundVector,
-  bool                     checkAttrSpecialTypes
+  bool                     checkAttrSpecialTypes,
+  std::string*             extraForLog
 )
 {
   // This is NGSIv2 parsing and in NGSIv2, no value means implicit null. Note that
@@ -229,7 +230,8 @@ static std::string parseContextAttributeObject
 
         if (upOp->numberValue == -1)
         {
-          return "date has invalid format";
+          *extraForLog = ": " +  upOp->stringValue;
+          return "date has invalid format in attribute value";
         }
 
         // Probably reseting stringValue is not needed, but let's do it for cleanliness
@@ -238,7 +240,8 @@ static std::string parseContextAttributeObject
       }
       else
       {
-        return "date has invalid format";
+        *extraForLog = ": must be string or object with max or min operator";
+        return "date has invalid format in attribute value";
       }
     }
     else
@@ -247,7 +250,8 @@ static std::string parseContextAttributeObject
 
       if (caP->numberValue == -1)
       {
-        return "date has invalid format";
+        *extraForLog = ": " + caP->stringValue;
+        return "date has invalid format in attribute value";
       }
 
       // Probably reseting stringValue is not needed, but let's do it for cleanliness
@@ -380,10 +384,11 @@ std::string parseContextAttribute
       return details;
     }
 
-    std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector, checkAttrSpecialTypes);
+    std::string extraForLog = "";
+    std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector, checkAttrSpecialTypes, &extraForLog);
     if (r == "max deep reached")
     {
-      alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
+      alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object" + extraForLog);
       ciP->httpStatusCode = SccBadRequest;
       return "max deep reached";
     }
@@ -445,13 +450,14 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, bo
   }
 
   bool         compoundVector = false;
-  std::string  r = parseContextAttributeObject(document, caP, &compoundVector, checkAttrSpecialTypes);
+  std::string extraForLog = "";
+  std::string  r = parseContextAttributeObject(document, caP, &compoundVector, checkAttrSpecialTypes, &extraForLog);
 
   if (r == "max deep reached")
   {
     OrionError oe(SccBadRequest, ERROR_DESC_PARSE_MAX_JSON_NESTING, ERROR_PARSE);
 
-    alarmMgr.badInput(clientIp, "max deep reached", r);
+    alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();
@@ -460,7 +466,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP, bo
   {
     OrionError oe(SccBadRequest, r, ERROR_BAD_REQUEST);
 
-    alarmMgr.badInput(clientIp, "JSON Parse Error", r);
+    alarmMgr.badInput(clientIp, "JSON Parse Error", r + extraForLog);
     ciP->httpStatusCode = SccBadRequest;
 
     return oe.toJson();

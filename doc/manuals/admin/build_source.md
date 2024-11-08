@@ -11,12 +11,12 @@ You can also have a look to [3.1 Building in not official distributions](../../.
 The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.74
-* libmicrohttpd: 0.9.76 (from source)
+* libmicrohttpd: 1.0.1 (from source)
 * libcurl: 7.88.1
-* openssl: 3.0.13
+* openssl: 3.0.14
 * libuuid: 2.38.1
-* libmosquitto: 2.0.15 (from source)
-* Mongo C driver: 1.24.3 (from source)
+* libmosquitto: 2.0.20 (from source)
+* Mongo C driver: 1.29.0 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
@@ -34,9 +34,9 @@ commands that require root privilege):
 
 * Install the Mongo Driver from source.
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz
-        tar xfvz mongo-c-driver-1.24.3.tar.gz
-        cd mongo-c-driver-1.24.3
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz
+        tar xfvz mongo-c-driver-1.29.0.tar.gz
+        cd mongo-c-driver-1.29.0
         mkdir cmake-build
         cd cmake-build
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
@@ -51,19 +51,19 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz
-        tar xvf libmicrohttpd-0.9.76.tar.gz
-        cd libmicrohttpd-0.9.76
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz
+        tar xvf libmicrohttpd-1.0.1.tar.gz
+        cd libmicrohttpd-1.0.1
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.15/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.20/ can be modified to fine tune the build)
 
-        wget https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz
-        tar xvf mosquitto-2.0.15.tar.gz
-        cd mosquitto-2.0.15
+        wget https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz
+        tar xvf mosquitto-2.0.20.tar.gz
+        cd mosquitto-2.0.20
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk

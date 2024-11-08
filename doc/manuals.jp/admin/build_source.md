@@ -11,12 +11,12 @@ Orion Context Broker のリファレンス配布は Debian 12 です。これは
 Orion Context Broker は、以下のライブラリをビルドの依存関係として使用します :
 
 * boost: 1.74
-* libmicrohttpd: 0.9.76 (ソースから)
+* libmicrohttpd: 1.0.1 (ソースから)
 * libcurl: 7.88.1
-* openssl: 3.0.13
+* openssl: 3.0.14
 * libuuid: 2.38.1
-* libmosquitto: 2.0.15 (ソースから)
-* Mongo C driver: 1.24.3 (ソースから)
+* libmosquitto: 2.0.20 (ソースから)
+* Mongo C driver: 1.29.0 (ソースから)
 * rapidjson: 1.1.0 (ソースから)
 * gtest (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
 * gmock (`make unit_test` ビルディング・ターゲットのみ) : 1.5 (ソースから)
@@ -33,9 +33,9 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから Mongo Driver をインストールします
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.24.3/mongo-c-driver-1.24.3.tar.gz
-        tar xfvz mongo-c-driver-1.24.3.tar.gz
-        cd mongo-c-driver-1.24.3
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz
+        tar xfvz mongo-c-driver-1.29.0.tar.gz
+        cd mongo-c-driver-1.29.0
         mkdir cmake-build
         cd cmake-build
         cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
@@ -50,19 +50,19 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz
-        tar xvf libmicrohttpd-0.9.76.tar.gz
-        cd libmicrohttpd-0.9.76
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz
+        tar xvf libmicrohttpd-1.0.1.tar.gz
+        cd libmicrohttpd-1.0.1
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.15/ の下の config.mk ファイルを変更してビルドを微調整できます)
+* ソースから mosquitto をインストールします (WITH_CJSON, WITH_STATIC_LIBRARIES, WITH_SHARED_LIBRARIES の設定を変更することで、mosquitto-2.0.20/ の下の config.mk ファイルを変更してビルドを微調整できます)
 
-        wget https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz
-        tar xvf mosquitto-2.0.15.tar.gz
-        cd mosquitto-2.0.15
+        wget https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz
+        tar xvf mosquitto-2.0.20.tar.gz
+        cd mosquitto-2.0.20
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk

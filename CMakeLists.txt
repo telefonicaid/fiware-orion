@@ -229,8 +229,8 @@ SET (BOOST_MT
 
 # See http://mongoc.org/libmongoc/current/tutorial.html#cmake
 # This find_package() command provides the mongo::mongoc_static used in
-# SET for common static libs. We use 1.24.3 as reference version.
-find_package (mongoc-1.0 1.24.3 EXACT)
+# SET for common static libs. We use 1.29.0 as reference version.
+find_package (mongoc-1.0 1.29.0 EXACT)
 
 # Is cjexl lib available?
 find_library (HAVE_CJEXL cjexl PATHS /usr/lib /usr/lib64 /usr/local/lib64 /usr/local/lib)

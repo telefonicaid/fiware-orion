@@ -239,10 +239,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 62
+Content-Length: 81
 
 {
-    "description": "date has invalid format",
+    "description": "date has invalid format in attribute value",
     "error": "BadRequest"
 }
 
@@ -253,10 +253,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 62
+Content-Length: 81
 
 {
-    "description": "date has invalid format",
+    "description": "date has invalid format in attribute value",
     "error": "BadRequest"
 }
 
