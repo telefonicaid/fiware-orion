@@ -30,10 +30,12 @@ brokerStart CB 0 IPV4
 --SHELL--
 
 #
-# FIXME: this test relies on an external service (mqtt.flespi.io) which we don't control
-# It would be better to use a MQTT broker running by us (docker?)
-# Given the MQTT broker is a remote system in the Internet, we have to wait at some points
-# so subscription status and logs get consolidated before checking it
+# This test requires a MQTT broker with authentication enabled. This may help:
+#
+# sudo cp /path/to/test/functionalTest/mosquitto_conf_for_tests.conf /etc/mosquitto/conf.d/local.conf
+# sudo mosquitto_passwd -c /etc/mosquitto/passwd user1
+# sudo chmod 640 /etc/mosquitto/passwd
+# sudo chown root:mosquitto /etc/mosquitto/passwd
 #
 # 01. Create MQTT sub with wrong user/pass
 # 02. Upsert to trigger first MQTT notification, which fails and raises alarm
@@ -59,8 +61,8 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mqtt.flespi.io:1883",
-      "user": "user",
+      "url": "mqtt://localhost:1883",
+      "user": "user_noexist",
       "passwd": "xxxx",
       "topic": "sub1"
     }
@@ -125,8 +127,8 @@ echo "========================================"
 payload='{
   "notification": {
     "mqtt": {
-      "url": "mqtt://mqtt.flespi.io:1883",
-      "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ",
+      "url": "mqtt://localhost:1883",
+      "user": "user1",
       "passwd": "xxxx",
       "topic": "sub1"
     }
@@ -193,7 +195,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 482
+Content-Length: 485
 
 [
     {
@@ -210,8 +212,8 @@ Content-Length: 482
                 "qos": 0,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://mqtt.flespi.io:1883",
-                "user": "user"
+                "url": "mqtt://localhost:1883",
+                "user": "user_noexist"
             },
             "onlyChangedAttrs": false,
             "timesSent": 1
@@ -248,7 +250,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 482
+Content-Length: 485
 
 [
     {
@@ -265,8 +267,8 @@ Content-Length: 482
                 "qos": 0,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://mqtt.flespi.io:1883",
-                "user": "user"
+                "url": "mqtt://localhost:1883",
+                "user": "user_noexist"
             },
             "onlyChangedAttrs": false,
             "timesSent": 2
@@ -311,7 +313,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 502
 
 [
     {
@@ -328,8 +330,8 @@ Content-Length: 566
                 "qos": 0,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://mqtt.flespi.io:1883",
-                "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ"
+                "url": "mqtt://localhost:1883",
+                "user": "user1"
             },
             "onlyChangedAttrs": false,
             "timesSent": 3
@@ -354,16 +356,16 @@ Content-Length: 566
 09. Check logs and see 1 raised alarm and 1 released alarm
 ==========================================================
 #SORT_START
-Request received: POST /v2/subscriptions, request payload (181 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://mqtt.flespi.io:1883", "user": "user", "passwd": "xxxx", "topic": "sub1" } } }, response code: 201
+Request received: POST /v2/subscriptions, request payload (184 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://localhost:1883", "user": "user_noexist", "passwd": "xxxx", "topic": "sub1" } } }, response code: 201
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-Raising alarm MqttConnectionError mqtt.flespi.io:1883: Connection Refused: bad user name or password.
+Raising alarm MqttConnectionError localhost:1883: Connection Refused: not authorised.
 Request received: GET /v2/subscriptions, response code: 200
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
 Request received: GET /v2/subscriptions, response code: 200
-Request received: PATCH /v2/subscriptions/SUB_ID, request payload (182 bytes): { "notification": { "mqtt": { "url": "mqtt://mqtt.flespi.io:1883", "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ", "passwd": "xxxx", "topic": "sub1" } } }, response code: 204
+Request received: PATCH /v2/subscriptions/SUB_ID, request payload (118 bytes): { "notification": { "mqtt": { "url": "mqtt://localhost:1883", "user": "user1", "passwd": "xxxx", "topic": "sub1" } } }, response code: 204
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-Releasing alarm MqttConnectionError mqtt.flespi.io:1883
-MQTT Notif delivered (subId: SUB_ID): broker: mqtt.flespi.io:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
+Releasing alarm MqttConnectionError localhost:1883
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: GET /v2/subscriptions, response code: 200
 #SORT_END
 

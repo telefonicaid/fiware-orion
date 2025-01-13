@@ -32,6 +32,9 @@ jobs:
         image: eclipse-mosquitto:1.6.15
         ports:
         - 1883:1883
+        volumes:
+          - ./test/functionalTest/mosquitto_conf_for_tests.conf:/mosquitto/config/mosquitto.conf
+          - ./test/functionalTest/mosquitto_passwd:/mosquitto/config/passwd
 
       mosquitto-extra:
         # Needed by MQTT notification tests (multi broker)
