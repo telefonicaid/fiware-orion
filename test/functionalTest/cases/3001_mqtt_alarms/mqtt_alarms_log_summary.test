@@ -34,7 +34,7 @@ brokerStart CB 0 IPv4 -logSummary 5
 #
 # This test requires a MQTT broker with authentication enabled. This may help:
 #
-# sudo cp /path/to/test/functionalTest/mosquitto_conf_for_tests.conf /etc/mosquitto/conf.d/local.conf
+# sudo cp /path/to/repo/test/functionalTest/mosquittoConf/mosquitto.conf /etc/mosquitto/conf.d/local.conf
 # sudo mosquitto_passwd -c /etc/mosquitto/passwd user1
 # sudo chmod 640 /etc/mosquitto/passwd
 # sudo chown root:mosquitto /etc/mosquitto/passwd

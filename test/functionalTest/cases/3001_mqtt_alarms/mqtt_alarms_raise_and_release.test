@@ -32,7 +32,7 @@ brokerStart CB 0 IPV4
 #
 # This test requires a MQTT broker with authentication enabled. This may help:
 #
-# sudo cp /path/to/test/functionalTest/mosquitto_conf_for_tests.conf /etc/mosquitto/conf.d/local.conf
+# sudo cp /path/to/repo/test/functionalTest/mosquittoConf/mosquitto.conf /etc/mosquitto/conf.d/local.conf
 # sudo mosquitto_passwd -c /etc/mosquitto/passwd user1
 # sudo chmod 640 /etc/mosquitto/passwd
 # sudo chown root:mosquitto /etc/mosquitto/passwd
@@ -93,7 +93,6 @@ echo
 
 echo "03. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)"
 echo "===================================================================================="
-sleep 1s
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -116,7 +115,6 @@ echo
 
 echo "05. Get sub and see timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)"
 echo "===================================================================================="
-sleep 1s
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -156,7 +154,6 @@ echo
 
 echo "08. Get sub and see timesSent:3, lastFailure (old) and lastSuccess but not failsCounter"
 echo "======================================================================================="
-sleep 1s
 orionCurl --url /v2/subscriptions
 echo
 echo
