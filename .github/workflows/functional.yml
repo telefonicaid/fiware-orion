@@ -27,13 +27,6 @@ jobs:
         ports:
           - 27017:27017
 
-      #mosquitto-extra:
-      #  # Needed by MQTT notification tests (multi broker)
-      #  #image: eclipse-mosquitto:2.0.11
-      #  image: eclipse-mosquitto:1.6.15
-      #  ports:
-      # - 1884:1883
-
     name: functional - ${{ matrix.payload.name }}
 
     strategy:

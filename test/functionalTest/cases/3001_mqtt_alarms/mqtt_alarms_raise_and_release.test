@@ -30,12 +30,7 @@ brokerStart CB 0 IPV4
 --SHELL--
 
 #
-# This test requires a MQTT broker with authentication enabled. This may help:
-#
-# sudo cp /path/to/repo/test/functionalTest/mosquittoConf/mosquitto.conf /etc/mosquitto/conf.d/local.conf
-# sudo mosquitto_passwd -c /etc/mosquitto/passwd user1
-# sudo chmod 640 /etc/mosquitto/passwd
-# sudo chown root:mosquitto /etc/mosquitto/passwd
+# This test requires a MQTT broker with authentication enabled. See test/functionalTest/mosquittoConf/README.md
 #
 # 01. Create MQTT sub with wrong user/pass
 # 02. Upsert to trigger first MQTT notification, which fails and raises alarm

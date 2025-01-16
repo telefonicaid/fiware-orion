@@ -32,7 +32,7 @@ brokerStart CB 0 IPV4
 #
 # Hint: use this to run the MQTT broker needed for this .test:
 #
-#   docker run -d -p 1883:1883 eclipse-mosquitto:1.6.7
+#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 #
 # 01. Create MQTT sub with right enpdoint (localhost:1883)
 # 02. Upsert three times to trigger three MQTT notifications
