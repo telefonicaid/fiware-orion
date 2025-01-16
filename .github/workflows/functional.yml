@@ -62,7 +62,7 @@ jobs:
         # Note we are reusing the same volume (although the extra broker does not require authenticated user). We use a service in the past
         # to implement this (using eclipse-mosquitto:1.6.15) but in eclipse-mosquitto:2.0.11 it seems something in the internal configuration
         # has changed and it doesn't work if we don't provide the configuration files in the volume. Again, feedback is welcome! :)
-        run: docker run -d --name mosquitto -p 1883:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
+        run: docker run -d --name mosquitto-extra -p 1884:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 
       - name: Run functional test
         run: |
