@@ -2,7 +2,7 @@ version: "3"
 
 services:
   orion:
-    image: telefonicaiot/fiware-orion
+    image: orionnewdeb
     ports:
       - "1026:1026"
     depends_on:
