@@ -138,7 +138,7 @@ def ignore(root, file):
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'Changelog', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
                    'mkdocs.yml', 'fiware-ngsiv2-reference.errata', 'ServiceRoutines.txt', '.readthedocs.yml', 'uncrustify.cfg',
-                   'requirements.txt']
+                   'requirements.txt', 'mosquitto_passwd' ]
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
