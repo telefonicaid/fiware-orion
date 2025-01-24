@@ -23,7 +23,6 @@
 * Author: Ken Zangelin
 */
 
-#include <limits>     // numeric_limits
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -951,14 +950,6 @@ bool str2double(const char* s, double* dP)
   return true;
 }
 
-#if 0
-std::string double2string(double value)
-{
-  char buffer[32];
-  snprintf(buffer, sizeof(buffer), "%.17g", value);
-  return std::string(buffer);
-}
-#endif
 
 
 /* ****************************************************************************
