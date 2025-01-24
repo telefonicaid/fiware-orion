@@ -951,14 +951,16 @@ bool str2double(const char* s, double* dP)
   return true;
 }
 
+#if 0
 std::string double2string(double value)
 {
   char buffer[32];
   snprintf(buffer, sizeof(buffer), "%.17g", value);
   return std::string(buffer);
 }
+#endif
 
-#if 0
+
 /* ****************************************************************************
 *
 * double2string
@@ -976,7 +978,12 @@ std::string double2string(double f)
   // abs value for 'diff'
   diff = (diff < 0)? -diff : diff;
 
-  if (diff > 0.9999999998)
+  if (diff > 1)
+  {
+    // this is an overflow situation, pe. f = 1.79e308
+    isInteger = false;
+  }
+  else if (diff > 0.9999999998)
   {
     intPart += 1;
     isInteger = true;
@@ -992,7 +999,8 @@ std::string double2string(double f)
   }
   else
   {
-    snprintf(buf, bufSize, "%.9f", f);
+    //snprintf(buf, bufSize, "%.9f", f);
+    snprintf(buf, bufSize, "%.17g", f);
 
     // Clear out any unwanted trailing zeroes
     char* last = &buf[strlen(buf) - 1];
@@ -1014,7 +1022,7 @@ std::string double2string(double f)
 
   return std::string(buf);
 }
-#endif
+
 
 
 /*****************************************************************************
