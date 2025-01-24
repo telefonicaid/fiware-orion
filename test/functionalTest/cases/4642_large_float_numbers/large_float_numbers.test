@@ -31,9 +31,8 @@ brokerStart CB
 
 # We are using the the limits included in the IEEE754 standard. However, note that
 # min non zero cases are rounded to 0 due to how double2string() function is implemented
-# (ten digits precision). We could remove that rounding, but consecuences may not be7
+# (ten digits precision). We could remove that rounding, but consequences may not be
 # backward compatible (eg. places where we have now 1.7 could become in 1.666666666666666666669)
-# 
 #
 # 01. Create entity with large float number
 # 02. Retrieve entity with large float numbers
