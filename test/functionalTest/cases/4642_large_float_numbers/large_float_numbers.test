@@ -1,0 +1,91 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Large float numbers in attributes
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPV4 -relogAlarms
+
+--SHELL--
+
+#
+# 01. Create entity with large float number
+# 02. Retrieve entity with large float numbers
+#
+
+echo "01. 01. Create entity with large float number"
+echo "============================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1.79e308,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "02. Retrieve entity with large float numbers"
+echo "============================================"
+orionCurl --url '/v2/entities/E'
+echo
+echo
+
+
+--REGEXPECT--
+01. 01. Create entity with large float number
+=============================================
+HTTP/1.1 201 Created
+Date: Fri, 24 Jan 2025 13:07:04 GMT
+Fiware-Correlator: 1b79d82c-da54-11ef-9ba0-080027cd35f1
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. Retrieve entity with large float numbers
+============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
+
+{
+    "A": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1.79e+308
+    },
+    "id": "E",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+#dbDrop CB

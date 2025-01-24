@@ -974,6 +974,7 @@ std::string double2string(double f)
   long long  intPart   = (long long) f;
   double     diff      = f - intPart;
   bool       isInteger = false;
+  bool       large     = false;
 
   // abs value for 'diff'
   diff = (diff < 0)? -diff : diff;
@@ -981,7 +982,7 @@ std::string double2string(double f)
   if (diff > 1)
   {
     // this is an overflow situation, pe. f = 1.79e308
-    isInteger = false;
+    large = true;
   }
   else if (diff > 0.9999999998)
   {
@@ -999,8 +1000,14 @@ std::string double2string(double f)
   }
   else
   {
-    //snprintf(buf, bufSize, "%.9f", f);
-    snprintf(buf, bufSize, "%.17g", f);
+    if (large)
+    {
+      snprintf(buf, bufSize, "%.17g", f);
+    }
+    else
+    {
+      snprintf(buf, bufSize, "%.9f", f);
+    }
 
     // Clear out any unwanted trailing zeroes
     char* last = &buf[strlen(buf) - 1];
