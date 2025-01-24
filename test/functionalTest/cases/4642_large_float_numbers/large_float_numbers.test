@@ -25,7 +25,7 @@ Large float numbers in attributes
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPV4 -relogAlarms
+brokerStart CB
 
 --SHELL--
 
