@@ -953,9 +953,9 @@ bool str2double(const char* s, double* dP)
 
 std::string double2string(double value)
 {
-  std::ostringstream oss;
-  oss << std::setprecision(std::numeric_limits<double>::max_digits10) << value;
-  return oss.str();
+  char buffer[32];
+  snprintf(buffer, sizeof(buffer), "%.17g", value);
+  return std::string(buffer);
 }
 
 #if 0
