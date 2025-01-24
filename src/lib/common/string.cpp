@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+
+#include <limits>     // numeric_limits
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -949,8 +951,14 @@ bool str2double(const char* s, double* dP)
   return true;
 }
 
+std::string double2string(double value)
+{
+  std::ostringstream oss;
+  oss << std::setprecision(std::numeric_limits<double>::max_digits10) << value;
+  return oss.str();
+}
 
-
+#if 0
 /* ****************************************************************************
 *
 * double2string
@@ -1006,7 +1014,7 @@ std::string double2string(double f)
 
   return std::string(buf);
 }
-
+#endif
 
 
 /*****************************************************************************
