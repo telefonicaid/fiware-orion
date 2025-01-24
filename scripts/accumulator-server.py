@@ -458,6 +458,207 @@ def record_2871():
         '''
         return r
 
+
+# In NGSIv1 the response for queryContext and updateContext has the same structure, so we reuse
+# this function for boths
+@app.route("/cpr/queryContext", methods=['POST'])
+@app.route("/cpr/updateContext", methods=['POST'])
+def cpr_simulation():
+
+    # Store request
+    record_request(request)
+
+    if send_continue(request):
+        return Response(status=100)
+    else:
+        # Ad hoc response to test new NGSIv1 parsing logic in PR #4603
+        r = Response(status=200)
+        r.data = '''
+            {
+                "contextResponses": [
+                    {
+                        "contextElement": {
+                            "attributes": [
+                                {
+                                    "name": "lightstatus",
+                                    "type": "light",
+                                    "value": {
+                                      "x": 1,
+                                      "y": 2
+                                    }
+                                },
+                                {
+                                    "name": "pressure",
+                                    "type": "clima",
+                                    "value": [ "a", "b", "c" ]
+                                },
+                                {
+                                    "name": "temperature",
+                                    "type": "degree",
+                                    "value": "14",
+                                    "metadatas": [
+                                        {
+                                            "name": "ID1",
+                                            "type": "Text",
+                                            "value": {
+                                                "x": 1,
+                                                "y": 2
+                                            }
+                                        },
+                                        {
+                                            "name": "ID2",
+                                            "type": "Text",
+                                            "value": [ "a", "b", "c" ]
+                                        },
+                                        {
+                                            "name": "ID3",
+                                            "type": "Text",
+                                            "value": "ThisIsID"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "id": "ConferenceRoom",
+                            "isPattern": "false",
+                            "type": "Room"
+                        },
+                        "statusCode": {
+                            "code": "200",
+                            "reasonPhrase": "OK"
+                        }
+                    },
+                    {
+                        "contextElement": {
+                            "attributes": [
+                                {
+                                    "name": "temperature",
+                                    "type": "degree",
+                                    "value": "14"
+                                }
+                            ],
+                            "id": "ConferenceRoom2",
+                            "isPattern": "false",
+                            "type": "Room"
+                        },
+                        "statusCode": {
+                            "code": "200",
+                            "reasonPhrase": "OK"
+                        }
+                    },
+                    {
+                        "contextElement": {
+                            "attributes": [
+                                {
+                                    "name": "pressure",
+                                    "type": "degree",
+                                    "value": "14"
+                                }
+                            ],
+                            "id": "ConferenceRoom3",
+                            "isPattern": "false",
+                            "type": "Room"
+                        },
+                        "statusCode": {
+                            "code": "200",
+                            "reasonPhrase": "OK"
+                        }
+                    }
+                ]
+            }
+        '''
+        return r
+
+
+
+@app.route("/cprfail/updateContext", methods=['POST'])
+def cpr_simulation_fail():
+
+    # Store request
+    record_request(request)
+
+    if send_continue(request):
+        return Response(status=100)
+    else:
+        # Ad hoc response to test new NGSIv1 parsing logic in PR #4603
+        r = Response(status=200)
+        r.data = '''
+            {
+                "contextResponses": [
+                    {
+                        "contextElement": {
+                            "attributes": [
+                                {
+                                    "name": "lightstatus",
+                                    "type": "light",
+                                    "value": {
+                                      "x": 1,
+                                      "y": 2
+                                    }
+                                },
+                                {
+                                    "name": "pressure",
+                                    "type": "clima",
+                                    "value": [ "a", "b", "c" ]
+                                },
+                                {
+                                    "name": "temperature",
+                                    "type": "degree",
+                                    "value": "14",
+                                    "metadatas": [
+                                        {
+                                            "name": "ID1",
+                                            "type": "Text",
+                                            "value": {
+                                                "x": 1,
+                                                "y": 2
+                                            }
+                                        },
+                                        {
+                                            "name": "ID2",
+                                            "type": "Text",
+                                            "value": [ "a", "b", "c" ]
+                                        },
+                                        {
+                                            "name": "ID3",
+                                            "type": "Text",
+                                            "value": "ThisIsID"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "id": "ConferenceRoom",
+                            "isPattern": "false",
+                            "type": "Room"
+                        },
+                        "statusCode": {
+                            "code": "200",
+                            "reasonPhrase": "OK"
+                        }
+                    },
+                    {
+                        "contextElement": {
+                            "attributes": [
+                                {
+                                    "name": "temperature",
+                                    "type": "degree",
+                                    "value": "14"
+                                }
+                            ],
+                            "id": "ConferenceRoom2",
+                            "isPattern": "false",
+                            "type": "Room"
+                        },
+                        "statusCode": {
+                            "code": "422",
+                            "reasonPhrase": "this is a fail"
+                        }
+                    }
+                ]
+            }
+        '''
+        return r
+
+
 # Next 6 ones are for testing subscription status and failure logic. They are used by test
 # 1126_GET_v2_subscriptions/lastsuccesscode_and_lastfailurereason.test
 

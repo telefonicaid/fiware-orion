@@ -28,7 +28,6 @@
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/mongoCreateSubscription.h"
 #include "ngsi/ParseData.h"
-#include "ngsi10/SubscribeContextResponse.h"
 #include "common/statistics.h"
 #include "rest/HttpHeaders.h"
 #include "rest/uriParamNames.h"
@@ -53,7 +52,6 @@ extern std::string postSubscriptions
   ParseData*                 parseDataP
 )
 {
-  SubscribeContextResponse  scr;
   std::string               answer = "";
 
   if (ciP->servicePathV.size() > 1)
@@ -64,10 +62,11 @@ extern std::string postSubscriptions
 
     snprintf(errMsg, MSG_SIZE, "max *one* service-path allowed for subscriptions (%lu given)",
              (unsigned long) ciP->servicePathV.size());
-    alarmMgr.badInput(clientIp, errMsg);
-    scr.subscribeError.errorCode.fill(SccBadRequest, "max one service-path allowed for subscriptions");
 
-    TIMED_RENDER(answer = scr.toJson());
+    OrionError oe(SccBadRequest, "max one service-path allowed for subscriptions");
+    alarmMgr.badInput(clientIp, errMsg);
+
+    TIMED_RENDER(answer = oe.toJson());
   }
   else  // ciP->servicePathV.size() == 1
   {
@@ -75,7 +74,7 @@ extern std::string postSubscriptions
     std::string subsID;
 
     TIMED_MONGO(subsID = mongoCreateSubscription(
-                            parseDataP->subsV2,
+                            parseDataP->sub,
                             &beError,
                             ciP->tenant,
                             ciP->servicePathV));
@@ -97,7 +96,7 @@ extern std::string postSubscriptions
   }
 
   // free sub memory associated to subscriptions
-  parseDataP->subsV2.release();
+  parseDataP->sub.release();
 
   return answer;
 }

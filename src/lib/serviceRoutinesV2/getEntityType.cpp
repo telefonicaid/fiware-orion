@@ -76,8 +76,7 @@ std::string getEntityType
                                            ciP->tenant,
                                            ciP->servicePathV,
                                            ciP->uriParam,
-                                           noAttrDetail,
-                                           ciP->apiVersion));
+                                           noAttrDetail));
 
   if (response.entityType.count == 0)
   {

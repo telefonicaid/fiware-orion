@@ -30,11 +30,10 @@
 
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/ContextElementResponse.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi10/UpdateContextResponse.h"
 
 
@@ -45,20 +44,6 @@
 */
 UpdateContextResponse::UpdateContextResponse()
 {
-  errorCode.keyNameSet("errorCode");
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextResponse::UpdateContextResponse -
-*/
-UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
-{
-  errorCode.fill(&_errorCode);
-  errorCode.keyNameSet("errorCode");
-  LM_T(LmtDestructor, ("destroyed"));
 }
 
 
@@ -69,75 +54,8 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 */
 UpdateContextResponse::~UpdateContextResponse()
 {
-  errorCode.release();
   contextElementResponseVector.release();
   LM_T(LmtDestructor, ("destroyed"));
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextResponse::toJsonV1 -
-*/
-std::string UpdateContextResponse::toJsonV1(bool asJsonObject)
-{
-  std::string out = "";
-
-  out += startTag();
-
-  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
-  {
-    out += errorCode.toJsonV1(false);
-  }
-  else
-  {
-    if (contextElementResponseVector.size() == 0)
-    {
-      errorCode.fill(SccContextElementNotFound, errorCode.details);
-      out += errorCode.toJsonV1(false);
-    }
-    else
-    {      
-      out += contextElementResponseVector.toJsonV1(asJsonObject, RtUpdateContextResponse, false, false);
-    }
-  }
-  
-  out += endTag();
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextResponse::check -
-*/
-std::string UpdateContextResponse::check
-(
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  const std::string&  predetectedError
-)
-{
-  std::string  res;
-
-  if (!predetectedError.empty())
-  {
-    errorCode.fill(SccBadRequest, predetectedError);
-  }  
-  else if (contextElementResponseVector.check(apiVersion, UpdateContext, predetectedError, 0) != "OK")
-  {
-    alarmMgr.badInput(clientIp, res);
-    errorCode.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
-
-  return toJsonV1(asJsonObject);
 }
 
 
@@ -150,7 +68,6 @@ void UpdateContextResponse::release(void)
 {
   LM_T(LmtRelease, ("In UpdateContextResponse::release"));
   contextElementResponseVector.release();
-  errorCode.release();
 }
 
 
@@ -163,7 +80,7 @@ void UpdateContextResponse::release(void)
 * 2. If not found: create a new one.
 *
 */
-void UpdateContextResponse::notFoundPush(Entity* eP, ContextAttribute* aP, StatusCode* scP)
+void UpdateContextResponse::notFoundPush(Entity* eP, ContextAttribute* aP, OrionError* oeP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccContextElementNotFound);
 
@@ -171,20 +88,21 @@ void UpdateContextResponse::notFoundPush(Entity* eP, ContextAttribute* aP, Statu
   {
     // Build ContextElementResponse
     cerP = new ContextElementResponse();
-    cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+    EntityId enId(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
+    cerP->entity.fill(enId);
     if (aP != NULL)
     {
       // We copy ContextAttribute given Entity destructor does release() on the vector
       cerP->entity.attributeVector.push_back(new ContextAttribute(aP));
     }
 
-    if (scP != NULL)
+    if (oeP != NULL)
     {
-      cerP->statusCode.fill(scP);
+      cerP->error.fill(oeP);
     }
     else
     {
-      cerP->statusCode.fill(SccContextElementNotFound, eP->id);
+      cerP->error.fill(SccContextElementNotFound, eP->entityId.id);
     }
 
     contextElementResponseVector.push_back(cerP);
@@ -214,14 +132,15 @@ void UpdateContextResponse::foundPush(Entity* eP, ContextAttribute* aP)
   {
     // Build ContextElementResponse
     cerP = new ContextElementResponse();
-    cerP->entity.fill(eP->id, eP->type, eP->isPattern);
+    EntityId enId(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
+    cerP->entity.fill(enId);
     if (aP != NULL)
     {
       // We copy ContextAttribute given Entity destructor does release() on the vector
       cerP->entity.attributeVector.push_back(new ContextAttribute(aP));
     }
 
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
     contextElementResponseVector.push_back(cerP);
   }
   else
@@ -239,7 +158,7 @@ void UpdateContextResponse::foundPush(Entity* eP, ContextAttribute* aP)
 void UpdateContextResponse::fill(UpdateContextResponse* upcrsP)
 {
   contextElementResponseVector.fill(upcrsP->contextElementResponseVector);
-  errorCode.fill(upcrsP->errorCode);
+  error.fill(upcrsP->error);
 }
 
 
@@ -251,8 +170,9 @@ void UpdateContextResponse::fill(UpdateContextRequest* upcrP, HttpStatusCode sc)
 {
   contextElementResponseVector.fill(upcrP->entityVector, sc);
 
-  // Note that "external" StatusCode is always SccOk, sc is not used here
-  errorCode.fill(SccOk);
+  // Note that "external" OrionError is always SccOk, sc is not used here
+  // FIXME PR: internal error should be avoided. Review this
+  error.fill(sc, "");
 }
 
 
@@ -270,28 +190,28 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
   if (upcrsP->contextElementResponseVector.size() == 0)
   {
     // If no contextElementResponses, copy errorCode if empty
-    if ((errorCode.code == SccNone) || (errorCode.code == SccOk))
+    if ((error.code == SccNone) || (error.code == SccOk))
     {
-      errorCode.fill(upcrsP->errorCode);
+      error.fill(upcrsP->error);
     }
-    else if (errorCode.details.empty())
+    else if (error.description.empty())
     {
-      errorCode.details = upcrsP->errorCode.details;
+      error.description = upcrsP->error.description;
     }
   }
 
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
     Entity*      eP = &upcrsP->contextElementResponseVector[cerIx]->entity;
-    StatusCode*  scP = &upcrsP->contextElementResponseVector[cerIx]->statusCode;
+    OrionError*  oeP = &upcrsP->contextElementResponseVector[cerIx]->error;
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
     {
       ContextAttribute* aP = eP->attributeVector[aIx];
 
-      if (scP->code != SccOk)
+      if (oeP->code != SccOk)
       {
-        notFoundPush(eP, aP, scP);
+        notFoundPush(eP, aP, oeP);
       }
       else
       {

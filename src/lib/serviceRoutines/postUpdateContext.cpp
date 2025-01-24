@@ -37,7 +37,7 @@
 #include "common/logTracing.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "jsonParse/jsonRequest.h"
+#include "jsonParseV2/parseEntitiesResponseV1.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -74,7 +74,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (!aP->providingApplication.get().empty())
+      if (!aP->provider.http.url.empty())
       {
         return true;
       }
@@ -98,7 +98,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 * 3. Send the request to the providing application (and await the response)
 * 4. Parse the response and fill in a binary UpdateContextResponse
 * 5. Fill in the response from the redirection into the response of this function
-* 6. 'Fix' StatusCode
+* 6. 'Fix' OrionError
 * 7. Freeing memory
 *
 */
@@ -115,8 +115,6 @@ static bool updateForward
   int              port;
   std::string      prefix;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
@@ -130,7 +128,7 @@ static bool updateForward
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
     //
-    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    upcrsP->error.fill(SccContextElementNotFound, "");
     return false;
   }
 
@@ -152,17 +150,14 @@ static bool updateForward
   std::string     out;
   int             r;
 
-  if (upcrP->providerFormat == PfJson)
+  if (upcrP->legacyProviderFormat)
   {
-    TIMED_RENDER(payload = upcrP->toJsonV1(asJsonObject));
+    TIMED_RENDER(payload = upcrP->toJsonV1());
 
     op = "/updateContext";
 
-    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated usage of legacyForwarding mode in update forwarding operation (regId: %s)", regId.c_str()));
-    }
+    // Note we don't include log deprecation here as it would cause double-loging
+    // (this flow involves Registration::fromBson() which already logs that)
   }
   else
   {
@@ -235,7 +230,7 @@ static bool updateForward
 
   if (r != 0)
   {
-    upcrsP->errorCode.fill(SccContextElementNotFound, "error forwarding update");
+    upcrsP->error.fill(SccContextElementNotFound, "error forwarding update");
     logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", out.c_str());
     alarmMgr.forwardingError(url, "forwarding failure for sender-thread: " + out);
     return false;
@@ -247,25 +242,27 @@ static bool updateForward
   
   LM_T(LmtCPrForwardResponsePayload, ("forward updateContext response payload: %s", out.c_str()));
 
+  cleanPayload = jsonPayloadClean(out.c_str());
+
   //
-  // If NGSIv1 (providerFormat == PfJson):
+  // If NGSIv1 (legacyProviderFormat):
   //   4. Parse the response and fill in a binary UpdateContextResponse
   //   5. Fill in the response from the redirection into the response of this function
-  //   6. 'Fix' StatusCode
+  //   6. 'Fix' OrionError
   //   7. Free up memory
   //
   // If NGSIv2:
   //   4. Look for "204 No Content" in the response of the forwarded request
   //   5. If found: OK, else, error
   //
-  if (upcrP->providerFormat == PfJson)
+  if (upcrP->legacyProviderFormat)
   {
     //
     // 4. Parse the response and fill in a binary UpdateContextResponse
     //
-    std::string  s;
-
-    cleanPayload = jsonPayloadClean(out.c_str());
+    bool result;
+    EntityVector  entities;
+    OrionError    oe;
 
     if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
     {
@@ -274,7 +271,7 @@ static bool updateForward
       // It is not in the orion broker though, so 404 is returned
       //
       alarmMgr.forwardingError(url, "context provider response to UpdateContext is empty");
-      upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+      upcrsP->error.fill(SccContextElementNotFound, "invalid context provider response");
       return false;
     }
 
@@ -292,14 +289,14 @@ static bool updateForward
     ciP->verb   = POST;
     ciP->method = "POST";
 
-    parseData.upcrs.res.errorCode.fill(SccOk);
+    parseData.upcrs.res.error.fill(SccOk);
 
-    s = jsonTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, NULL);
+    result = parseEntitiesResponseV1(ciP, cleanPayload, &entities, &oe);
 
-    if (s != "OK")
+    if (!result)
     {
-      alarmMgr.forwardingError(url, "error parsing reply from prov app: " + s);
-      upcrsP->errorCode.fill(SccContextElementNotFound, "");
+      alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.error + " (" + oe.description + ")");
+      upcrsP->error.fill(SccContextElementNotFound, "");
       parseData.upcr.res.release();
       parseData.upcrs.res.release();
       return false;
@@ -313,16 +310,16 @@ static bool updateForward
 
 
     //
-    // 6. 'Fix' StatusCode
+    // 6. 'Fix' OrionError
     //
-    if (upcrsP->errorCode.code == SccNone)
+    if (upcrsP->error.code == SccNone)
     {
-      upcrsP->errorCode.fill(SccOk);
+      upcrsP->error.fill(SccOk);
     }
 
-    if ((upcrsP->contextElementResponseVector.size() == 1) && (upcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
+    if ((upcrsP->contextElementResponseVector.size() == 1) && (upcrsP->contextElementResponseVector[0]->error.code == SccContextElementNotFound))
     {
-      upcrsP->errorCode.fill(SccContextElementNotFound);
+      upcrsP->error.fill(SccContextElementNotFound);
     }
 
     //
@@ -337,7 +334,7 @@ static bool updateForward
   {
     // NGSIv2 forward - no payload to be received
 
-    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), "", statusCode);
+    logInfoFwdRequest(regId.c_str(), verb.c_str(), (upcrP->contextProvider + op).c_str(), payload.c_str(), cleanPayload, statusCode);
 
     if (statusCode == SccNoContent)
     {
@@ -352,7 +349,7 @@ static bool updateForward
     }
 
     alarmMgr.forwardingError(url, "unexpected response from context provider: %s" + out);
-    upcrsP->errorCode.fill(SccReceiverInternalError);
+    upcrsP->error.fill(SccReceiverInternalError);
     return false;
   }
 
@@ -401,9 +398,9 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     if ((noOfFounds == 0) && (noOfNotFounds > 0))
     {
-      if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))
+      if ((cerP->error.code == SccOk) || (cerP->error.code == SccNone))
       {
-        cerP->statusCode.fill(SccContextElementNotFound, cerP->entity.id);
+        cerP->error.fill(SccContextElementNotFound, cerP->entity.entityId.id);
       }
     }
     else if ((noOfFounds > 0) && (noOfNotFounds > 0))
@@ -411,17 +408,17 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       // Adding a ContextElementResponse for the 'Not-Founds'
 
       ContextElementResponse* notFoundCerP = new ContextElementResponse();
-      notFoundCerP->entity.fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
+      notFoundCerP->entity.fill(cerP->entity.entityId);
 
       //
-      // Filling in StatusCode (SccContextElementNotFound) for NotFound
+      // Filling in OrionError (SccContextElementNotFound) for NotFound
       //
-      notFoundCerP->statusCode.fill(SccContextElementNotFound, cerP->entity.id);
+      notFoundCerP->error.fill(SccContextElementNotFound, cerP->entity.entityId.id);
 
       //
-      // Setting StatusCode to OK for Found
+      // Setting OrionError to OK for Found
       //
-      cerP->statusCode.fill(SccOk);
+      cerP->error.fill(SccOk);
 
       //
       // And, pushing to NotFound-vector
@@ -449,11 +446,11 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     }
 
     //
-    // Add EntityId::id to StatusCode::details if 404, but only if StatusCode::details is empty
+    // Add EntityId::id to OrionError::details if 404, but only if OrionError::description is empty
     //
-    if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details.empty()))
+    if ((cerP->error.code == SccContextElementNotFound) && (cerP->error.description.empty()))
     {
-      cerP->statusCode.details = cerP->entity.id;
+      cerP->error.description = cerP->entity.entityId.id;
     }
   }
 
@@ -476,9 +473,9 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   {
     if (upcrsP->contextElementResponseVector.size() == 0)
     {
-      if (upcrsP->errorCode.code == SccOk)
+      if (upcrsP->error.code == SccOk)
       {
-        upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->entityVector[0]->id);
+        upcrsP->error.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
       }
     }
   }
@@ -488,17 +485,19 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   // Add entityId::id to details if Not Found and only one element in response.
   // And, if 0 elements in response, take entityId::id from the request.
   //
-  if (upcrsP->errorCode.code == SccContextElementNotFound)
+  // FIXME PR: this should be no longer needed. == 0 is redundant (the previous fill does that)
+  // == 1 is no longer needed is we remove the "internal" OrionError
+  /*if (upcrsP->error.code == SccContextElementNotFound)
   {
     if (upcrsP->contextElementResponseVector.size() == 1)
     {
-      upcrsP->errorCode.details = upcrsP->contextElementResponseVector[0]->entity.id;
+      upcrsP->error.description = upcrsP->contextElementResponseVector[0]->entity.entityId.id;
     }
     else if (upcrsP->contextElementResponseVector.size() == 0)
     {
-      upcrsP->errorCode.details = upcrP->entityVector[0]->id;
+      upcrsP->error.description = upcrP->entityVector[0]->entityId.id;
     }
-  }
+  }*/
 }
 
 
@@ -528,13 +527,12 @@ static void attributesToNotFound(UpdateContextRequest* upcrP)
 *
 * postUpdateContext -
 *
-* POST /v1/updateContext
-* POST /ngsi10/updateContext
+* Internal functions used by serviceRoutinesV2 functions
 *
 * Payload In:  UpdateContextRequest
 * Payload Out: UpdateContextResponse
 */
-std::string postUpdateContext
+void postUpdateContext
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -545,9 +543,7 @@ std::string postUpdateContext
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
   UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
-  std::string             answer;
 
-  bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
   bool forcedUpdate = ciP->uriParamOptions[OPT_FORCEDUPDATE];
   bool overrideMetadata = ciP->uriParamOptions[OPT_OVERRIDEMETADATA];
   bool flowControl  = ciP->uriParamOptions[OPT_FLOW_CONTROL];
@@ -561,13 +557,12 @@ std::string postUpdateContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
+    upcrsP->error.fill(SccBadRequest, "more than one service path in context update request");
     alarmMgr.badInput(clientIp, "more than one service path for an update request");
 
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
     upcrP->release();
 
-    return answer;
+    return;
   }
   else if (ciP->servicePathV[0].empty())
   {
@@ -577,19 +572,15 @@ std::string postUpdateContext
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
   if (res != "OK")
   {
-    upcrsP->errorCode.fill(SccBadRequest, res);
-
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
-
+    upcrsP->error.fill(SccBadRequest, res);
     upcrP->release();
-    return answer;
+    return;
   }
 
 
   //
   // 02. Send the request to mongoBackend/mongoUpdateContext
   //
-  upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
 
   HttpStatusCode httpStatusCode;
@@ -603,7 +594,6 @@ std::string postUpdateContext
                                                   ciP->httpHeaders.ngsiv2AttrsFormat,
                                                   forcedUpdate,
                                                   overrideMetadata,
-                                                  ciP->apiVersion,
                                                   ngsiV2Flavour,
                                                   flowControl));
 
@@ -624,10 +614,8 @@ std::string postUpdateContext
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
-    TIMED_RENDER(answer = upcrsP->toJsonV1(asJsonObject));
-
     upcrP->release();
-    return answer;
+    return;
   }
 
 
@@ -676,7 +664,7 @@ std::string postUpdateContext
 
   std::vector<std::string>    regIdsV;
 
-  response.errorCode.fill(SccOk);
+  response.error.fill(SccOk);
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
@@ -699,7 +687,7 @@ std::string postUpdateContext
       //
       // 1. If the attribute is found locally - just add the attribute to the outgoing response
       //
-      if (aP->providingApplication.get().empty())
+      if (aP->provider.http.url.empty())
       {
         ContextAttribute ca(aP);
         response.foundPush(&cerP->entity, &ca);
@@ -708,26 +696,26 @@ std::string postUpdateContext
 
 
       //
-      // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
+      // 2. Lookup UpdateContextRequest in requestV according to provider.
       //    If not found, add one.
-      UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
+      UpdateContextRequest*  reqP = requestV.lookup(aP->provider.http.url);
       if (reqP == NULL)
       {
-        reqP = new UpdateContextRequest(aP->providingApplication.get(), aP->providingApplication.providerFormat, &cerP->entity);
+        reqP = new UpdateContextRequest(aP->provider.http.url, aP->provider.legacyForwardingMode, &cerP->entity);
         reqP->updateActionType = ActionTypeUpdate;
         requestV.push_back(reqP);
-        regIdsV.push_back(aP->providingApplication.getRegId());
+        regIdsV.push_back(aP->providerRegId);
       }
 
       //
       // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
       //    If not found, add one (to the EntityVector of the UpdateContextRequest).
       //
-      Entity* eP = reqP->entityVector.lookup(cerP->entity.id, cerP->entity.type);
+      Entity* eP = reqP->entityVector.lookup(cerP->entity.entityId.id, cerP->entity.entityId.type);
       if (eP == NULL)
       {
         eP = new Entity();
-        eP->fill(cerP->entity.id, cerP->entity.type, cerP->entity.isPattern);
+        eP->fill(cerP->entity.entityId);
         reqP->entityVector.push_back(eP);
       }
 
@@ -792,73 +780,59 @@ std::string postUpdateContext
   transactionIdSet(prevTransId.c_str());
 
   //
-  // Note this is a slight break in the separation of concerns among the different layers (i.e.
-  // serviceRoutine/ logic should work in a "NGSIv1 isolated context"). However, it seems to be
-  // a smart way of dealing with partial update situations
+  // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
+  // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
+  // two different CER (maybe using the same entity)
   //
-  if (ciP->apiVersion == V2)
+  std::string failing = "";
+  unsigned int failures = 0;
+
+  for (unsigned int ix = 0; ix < response.contextElementResponseVector.size(); ++ix)
   {
-    //
-    // Adjust OrionError response in the case of partial updates. This may happen in CPr forwarding
-    // scenarios. Note that mongoBackend logic "splits" successfull updates and failing updates in
-    // two different CER (maybe using the same entity)
-    //
-    std::string failing = "";
-    unsigned int failures  = 0;
+    ContextElementResponse *cerP = response.contextElementResponseVector[ix];
 
-    for (unsigned int ix = 0; ix < response.contextElementResponseVector.size(); ++ix)
+    if (cerP->error.code != SccOk)
     {
-      ContextElementResponse* cerP = response.contextElementResponseVector[ix];
+      failures++;
 
-      if (cerP->statusCode.code != SccOk)
+      std::string failingPerCer = "";
+      for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); ++jx)
       {
-        failures++;
-
-        std::string failingPerCer = "";
-        for (unsigned int jx = 0; jx < cerP->entity.attributeVector.size(); ++jx)
+        failingPerCer += cerP->entity.attributeVector[jx]->name;
+        if (jx != cerP->entity.attributeVector.size() - 1)
         {
-          failingPerCer += cerP->entity.attributeVector[jx]->name;
-          if (jx != cerP->entity.attributeVector.size() - 1)
-          {
-            failingPerCer +=", ";
-          }
+          failingPerCer += ", ";
         }
-
-        failing += cerP->entity.id + "-" + cerP->entity.type + " : [" + failingPerCer + "], ";
       }
-    }
 
-    //
-    // Note that we modify parseDataP->upcrs.res.oe and not response.oe, as the former is the
-    // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
-    //
-    if ((forwardOk == true) && (failures == 0))
-    {
-      parseDataP->upcrs.res.oe.fill(SccNone, "");
-    }
-    else if (failures == response.contextElementResponseVector.size())
-    {
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
-    }
-    else if (failures > 0)
-    {
-      // Removing trailing ", "
-      failing = failing.substr(0, failing.size() - 2);
-
-      // If some CER (but not all) fail, then it is a partial update
-      parseDataP->upcrs.res.oe.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", ERROR_PARTIAL_UPDATE);
-    }
-    else  // failures == 0
-    {
-      // No failure, so invalidate any possible OrionError filled by mongoBackend on the mongoUpdateContext step
-      parseDataP->upcrs.res.oe.fill(SccNone, "");
+      failing += cerP->entity.entityId.id + "-" + cerP->entity.entityId.type + " : [" + failingPerCer + "], ";
     }
   }
-  else  // v1
+
+  //
+  // Note that we modify parseDataP->upcrs.res.error and not response.oe, as the former is the
+  // one used by the calling postBatchUpdate() function at serviceRoutineV2 library
+  //
+  if ((forwardOk == true) && (failures == 0))
   {
-    // Note that v2 case doesn't use an actual response (so no need to waste time rendering it).
-    // We render in the v1 case only
-    TIMED_RENDER(answer = response.toJsonV1(asJsonObject));
+    parseDataP->upcrs.res.error.fill(SccNone, "");
+  }
+  else if (failures == response.contextElementResponseVector.size())
+  {
+    parseDataP->upcrs.res.error.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+  }
+  else if (failures > 0)
+  {
+    // Removing trailing ", "
+    failing = failing.substr(0, failing.size() - 2);
+
+    // If some CER (but not all) fail, then it is a partial update
+    parseDataP->upcrs.res.error.fill(SccContextElementNotFound, "Some of the following attributes were not updated: { " + failing + " }", ERROR_PARTIAL_UPDATE);
+  }
+  else // failures == 0
+  {
+    // No failure, so invalidate any possible OrionError filled by mongoBackend on the mongoUpdateContext step
+    parseDataP->upcrs.res.error.fill(SccNone, "");
   }
 
   //
@@ -867,8 +841,7 @@ std::string postUpdateContext
   upcrP->release();
   requestV.release();
   upcrsP->release();
-  upcrsP->fill(&response);
   response.release();
 
-  return answer;
+  return;
 }

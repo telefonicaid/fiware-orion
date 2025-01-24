@@ -37,7 +37,7 @@
 *
 * postUpdateContext - 
 */
-extern std::string postUpdateContext
+extern void postUpdateContext
 (
   ConnectionInfo*            ciP,
   int                        components,

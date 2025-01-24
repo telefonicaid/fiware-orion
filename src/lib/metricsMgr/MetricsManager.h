@@ -65,7 +65,6 @@
 // The following counters are still under discussion
 //
 #define METRIC_TRANSACTIONS                        "transactions"
-#define METRIC_NGSIV1_TRANSACTIONS                 "ngsiv1Transactions"
 #define METRIC_NGSIV2_TRANSACTIONS                 "ngsiv2Transactions"
 #define METRIC_AVERAGE_TRANSACTION_TIME            "averageTransactionTime"
 #define METRIC_OK_TRANSACTIONS                     "okTransactions"

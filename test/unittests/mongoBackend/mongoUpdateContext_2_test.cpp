@@ -2013,7 +2013,7 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     req.updateActionType = ActionTypeUpdate;
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2884,7 +2884,7 @@ TEST(mongoUpdateContextRequest, tooManyEntitiesNGSIv2)
 
   bool forcedUpdate = false;
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate, V2);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -3034,7 +3034,7 @@ TEST(mongoUpdateContextRequest, onlyOneEntityNGSIv2)
   req.updateActionType = ActionTypeUpdate;
 
   /* Invoke the function in mongoBackend library (note the 2 to activate NGSIv2 special behaviours) */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

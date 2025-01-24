@@ -30,60 +30,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ScopeVector.h"
-
-
-
-/* ****************************************************************************
-*
-* ScopeVector::toJsonV1 -
-*/
-std::string ScopeVector::toJsonV1(bool comma)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("scope", true);
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-     out += vec[ix]->toJsonV1(ix != vec.size() - 1);
-  }
-  out += endTag(comma, true);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* ScopeVector::check -
-*/
-std::string ScopeVector::check(void)
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check()) != "OK")
-    {
-      char ixV[STRING_SIZE_FOR_INT];
-      snprintf(ixV, sizeof(ixV), "%d", ix);
-      std::string details = std::string("error in scope ") + ixV + ": " + res;
-      alarmMgr.badInput(clientIp, details);
-      return res;
-    }
-  }
-
-  return "OK";
-}
 
 
 

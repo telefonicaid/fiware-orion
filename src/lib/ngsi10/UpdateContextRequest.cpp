@@ -29,15 +29,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
-#include "convenience/UpdateContextElementRequest.h"
-#include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "convenience/UpdateContextAttributeRequest.h"
 
 
 
@@ -55,11 +51,12 @@ UpdateContextRequest::UpdateContextRequest()
 *
 * UpdateContextRequest::UpdateContextRequest -
 */
-UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, ProviderFormat _providerFormat, Entity* eP)
+UpdateContextRequest::UpdateContextRequest(const std::string& _contextProvider, bool _legacyProviderFormat, Entity* eP)
 {
-  contextProvider = _contextProvider;
-  providerFormat  = _providerFormat;
-  Entity* neweP = new Entity(eP->id, eP->type, eP->isPattern);
+  contextProvider      = _contextProvider;
+  legacyProviderFormat = _legacyProviderFormat;
+
+  Entity* neweP = new Entity(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
   neweP->renderId = eP->renderId;
   entityVector.push_back(neweP);
 }
@@ -76,7 +73,7 @@ std::string UpdateContextRequest::toJson(void)
 
   jh.addRaw("entities", entityVector.toJson(NGSI_V2_NORMALIZED));
 
-  jh.addString("actionType", actionTypeString(V2, updateActionType));
+  jh.addString("actionType", actionTypeString(updateActionType));
 
   return jh.str();
 }
@@ -86,47 +83,116 @@ std::string UpdateContextRequest::toJson(void)
 /* ****************************************************************************
 *
 * UpdateContextRequest::toJsonV1 -
-*/
-std::string UpdateContextRequest::toJsonV1(bool asJsonObject)
-{
-  std::string  out = "";
-
-  //
-  // About JSON commas:
-  //   Both fields are MANDATORY, so, always comma after "entityVector"
-  //
-  out += startTag();
-  out += entityVector.toJsonV1(asJsonObject, UpdateContext, true);
-  out += valueTag("updateAction", actionTypeString(V1, updateActionType), false);
-  out += endTag(false);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
 *
-* UpdateContextRequest::check -
+* This is used only in the legacyForwarding:true logic. It would remove once that deprecated feature
+* would be removed
+*
+* Example:
+*
+* {
+*   "contextElements": [
+*     {
+*       "type": "Room",
+*       "isPattern": "false",
+*       "id": "ConferenceRoom",
+*       "attributes": [
+*       {
+*         "name": "temperature",
+*         "type": "degree",
+*         "value": "c23",
+*         "metadatas": [
+*           {
+*             "name": "ID",
+*             "type": "integer",
+*             "value": "3"
+*           }
+*         ]
+*       }
+*      ]
+*    }
+*  ],
+*  "updateAction": "APPEND"
+* }
 */
-std::string UpdateContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
+std::string UpdateContextRequest::toJsonV1(void)
 {
-  std::string            res;
-  UpdateContextResponse  response;
+  JsonObjectHelper jh;
 
-  if (!predetectedError.empty())
+  JsonVectorHelper jhContextElements;
+  for (unsigned int ix = 0; ix < entityVector.size(); ++ix)
   {
-    response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.toJsonV1(asJsonObject);
+    JsonObjectHelper jhEntity;
+    Entity* eP = entityVector[ix];
+
+    if (eP->entityId.idPattern.empty())
+    {
+      jhEntity.addString("id", eP->entityId.id);
+      jhEntity.addString("isPattern", "false");
+    }
+    else
+    {
+      jhEntity.addString("id", eP->entityId.idPattern);
+      jhEntity.addString("isPattern", "true");
+    }
+    jhEntity.addString("type", eP->entityId.type);
+
+    JsonVectorHelper jhAttributes;
+    for (unsigned int jx = 0; jx < eP->attributeVector.size(); ++jx)
+    {
+      JsonObjectHelper jhAttribute;
+      ContextAttribute* caP = eP->attributeVector[jx];
+
+      jhAttribute.addString("name", caP->name);
+      jhAttribute.addString("type", caP->type);
+      jhAttribute.addRaw("value", caP->toJsonValue());
+
+      if (caP->metadataVector.size() > 0)
+      {
+        JsonVectorHelper jhMetadatas;
+        for (unsigned int kx = 0; kx < caP->metadataVector.size(); ++kx)
+        {
+          JsonObjectHelper jhMetadata;
+          Metadata *mdP = caP->metadataVector[kx];
+
+          jhMetadata.addString("name", mdP->name);
+          jhMetadata.addString("type", mdP->type);
+          jhMetadata.addRaw("value", mdP->toJson());
+
+          jhMetadatas.addRaw(jhMetadata.str());
+        }
+        jhAttribute.addRaw("metadatas", jhMetadatas.str());
+      }
+
+      jhAttributes.addRaw(jhAttribute.str());
+    }
+    jhEntity.addRaw("attributes", jhAttributes.str());
+
+    jhContextElements.addRaw(jhEntity.str());
+  }
+  jh.addRaw("contextElements", jhContextElements.str());
+
+  switch (updateActionType)
+  {
+  case ActionTypeUpdate:
+    jh.addString("updateAction", "UPDATE");
+    break;
+  case ActionTypeAppend:
+    jh.addString("updateAction", "APPEND");
+    break;
+  case ActionTypeAppendStrict:
+    jh.addString("updateAction", "APPEND_STRICT");
+    break;
+  case ActionTypeDelete:
+    jh.addString("updateAction", "DELETE");
+    break;
+  case ActionTypeReplace:
+    jh.addString("updateAction", "REPLACE");
+    break;
+  default:
+    jh.addString("updateAction", "UNKNOWN");
   }
 
-  if ((res = entityVector.check(apiVersion, UpdateContext)) != "OK")
-  {
-    response.errorCode.fill(SccBadRequest, res);
-    return response.toJsonV1(asJsonObject);
-  }
-
-  return "OK";
+  return jh.str();
 }
 
 
@@ -148,59 +214,18 @@ void UpdateContextRequest::release(void)
 */
 void UpdateContextRequest::fill
 (
-  const UpdateContextElementRequest* ucerP,
-  const std::string&                 entityId,
-  const std::string&                 entityType
-)
-{
-  Entity* eP = new Entity(entityId, entityType, "false");
-
-  eP->attributeVector.fill(ucerP->contextAttributeVector);
-
-  entityVector.push_back(eP);
-
-  updateActionType = ActionTypeUpdate;  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::fill -
-*/
-void UpdateContextRequest::fill
-(
-  const AppendContextElementRequest*  acerP,
-  const std::string&                  entityId,
-  const std::string&                  entityType
-)
-{
-  Entity* eP = new Entity(entityId, entityType, "false");
-
-  eP->attributeVector.fill(acerP->contextAttributeVector);
-
-  entityVector.push_back(eP);
-  updateActionType = ActionTypeAppend;  // Coming from an AppendContextElementRequest (POST), must be APPEND
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::fill -
-*/
-void UpdateContextRequest::fill
-(
   const std::string& entityId,
+  const std::string& entityIdPattern,
   const std::string& entityType,
-  const std::string& isPattern,
   const std::string& attributeName,
   ActionType         _updateActionType
 )
 {
   Entity* eP = new Entity();
 
-  eP->fill(entityId, entityType, isPattern);
+  EntityId enId(entityId, entityIdPattern, entityType, "");
+
+  eP->fill(enId);
   entityVector.push_back(eP);
 
   updateActionType = _updateActionType;
@@ -218,45 +243,9 @@ void UpdateContextRequest::fill
 *
 * UpdateContextRequest::fill -
 */
-void UpdateContextRequest::fill
-(
-  const UpdateContextAttributeRequest* ucarP,
-  const std::string&                   entityId,
-  const std::string&                   entityType,
-  const std::string&                   attributeName,  
-  ActionType                           _updateActionType
-)
-{
-  Entity*           eP = new Entity(entityId, entityType, "false");
-  ContextAttribute* caP;
-
-  if (ucarP->compoundValueP != NULL)
-  {
-    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->compoundValueP);
-  }
-  else
-  {
-    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->contextValue);
-    caP->valueType = ucarP->valueType;
-  }
-
-  caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
-  eP->attributeVector.push_back(caP);
-
-  entityVector.push_back(eP);
-
-  updateActionType = _updateActionType;
-}
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextRequest::fill -
-*/
 void UpdateContextRequest::fill(const Entity* entP, ActionType _updateActionType)
 {
-  Entity*  eP = new Entity(entP->id, entP->type, "false");
+  Entity*  eP = new Entity(entP->entityId.id, "", entP->entityId.type, "");
 
   eP->attributeVector.fill(entP->attributeVector);
 
@@ -278,7 +267,7 @@ void UpdateContextRequest::fill
   const std::string&   type
 )
 {
-  Entity*           eP = new Entity(entityId, type, "false");
+  Entity*           eP = new Entity(entityId, "", type, "");
   ContextAttribute* aP = new ContextAttribute(attributeP);
 
   eP->attributeVector.push_back(aP);
@@ -298,8 +287,8 @@ void UpdateContextRequest::fill
 */
 void UpdateContextRequest::fill
 (
-  Entities*    entities,
-  ActionType  _updateActionType
+  EntityVector*  entities,
+  ActionType     _updateActionType
 )
 {
   updateActionType = _updateActionType;
@@ -307,7 +296,7 @@ void UpdateContextRequest::fill
   for (unsigned int eIx = 0; eIx < entities->vec.size(); ++eIx)
   {
     Entity*  eP    = entities->vec[eIx];
-    Entity*  neweP = new Entity(eP->id, eP->type, eP->isPattern);
+    Entity*  neweP = new Entity(eP->entityId.id, eP->entityId.idPattern, eP->entityId.type, eP->entityId.typePattern);
 
     for (unsigned int aIx = 0; aIx < eP->attributeVector.size(); ++aIx)
     {
@@ -333,7 +322,7 @@ ContextAttribute* UpdateContextRequest::attributeLookup(Entity* eP, const std::s
     Entity* enP = entityVector[ceIx];
 
     // empty type in request (enP) is always a match
-    if ((enP->id != eP->id) || ((enP->type != "") && (enP->type != eP->type)))
+    if ((enP->entityId.id != eP->entityId.id) || ((enP->entityId.type != "") && (enP->entityId.type != eP->entityId.type)))
     {
       continue;
     }

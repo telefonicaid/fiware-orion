@@ -29,7 +29,6 @@
 
 #include "rapidjson/document.h"
 
-#include "apiTypesV2/Entities.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -42,7 +41,7 @@ extern std::string parseEntityVector
 (
   ConnectionInfo*                               ciP,
   const rapidjson::Value::ConstMemberIterator&  iter,
-  Entities*                                     evP,
+  EntityVector*                                 evP,
   bool                                          idPatternAllowed,
   bool                                          attributesAllowed
 );

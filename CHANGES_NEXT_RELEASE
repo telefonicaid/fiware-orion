@@ -1,3 +1,4 @@
+- Fix: registrations with more than one contextRegistration element (not possible in NGSIv2) are logged as Runtime Errors
 - Fix: improve attribute and metadata invalid format dates for DateTime types in logs (#4616)
 - Hardening: upgrade microhttpd dependency from 0.9.76 to 1.0.1
 - Hardening: upgrade libmosquitto dependency from 2.0.15 to 2.0.20

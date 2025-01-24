@@ -132,8 +132,13 @@ HTTP/1.1 405 Method Not Allowed
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Allow: PUT, DELETE
-Content-Length: 0
+Content-Type: application/json
+Content-Length: 63
 
+{
+    "description": "method not allowed",
+    "error": "MethodNotAllowed"
+}
 
 
 === 5. PUT trace level

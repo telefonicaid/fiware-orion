@@ -37,7 +37,7 @@
 *
 * renderFormatToString - 
 */
-const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLegacyWord)
+const char* renderFormatToString(RenderFormat format)
 {
   switch (format)
   {
@@ -48,15 +48,7 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
   case NGSI_V2_CUSTOM:              return "custom";
   case NGSI_V2_SIMPLIFIEDNORMALIZED:return "simplifiedNormalized";
   case NGSI_V2_SIMPLIFIEDKEYVALUES: return "simplifiedKeyValues";
-  case NO_FORMAT:
-    if (noDefault == true)
-    {
-      return "no render format";
-    }
-    else
-    {
-      return useLegacyWord ? "legacy" : "JSON";
-    }
+  case NO_FORMAT:                   return "no render format";
   }
 
   return "Unknown render format";
