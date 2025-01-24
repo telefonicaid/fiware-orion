@@ -29,18 +29,39 @@ brokerStart CB 0 IPV4 -relogAlarms
 
 --SHELL--
 
+# We are using the the limits included in the IEEE754 standard. However, note that
+# min non zero cases are rounded to 0 due to how double2string() function is implemented
+# (ten digits precision). We could remove that rounding, but consecuences may not be7
+# backward compatible (eg. places where we have now 1.7 could become in 1.666666666666666666669)
+# 
 #
 # 01. Create entity with large float number
 # 02. Retrieve entity with large float numbers
 #
 
-echo "01. 01. Create entity with large float number"
-echo "============================================="
+echo "01. Create entity with large float number"
+echo "========================================="
 payload='{
   "id": "E",
   "type": "T",
   "A": {
     "value": 1.79e308,
+    "type": "Number"
+  },
+  "maxPositive": {
+    "value": 1.7976931348623157e308,
+    "type": "Number"
+  },
+  "minNonZeroPositive": {
+    "value": 4.9406564584124654e-324,
+    "type": "Number"
+  },
+  "maxNegative": {
+    "value": -1.7976931348623157e308,
+    "type": "Number"
+  },
+  "minNonZeroNegative": {
+    "value": -4.9406564584124654e-324,
     "type": "Number"
   }
 }'
@@ -57,11 +78,11 @@ echo
 
 
 --REGEXPECT--
-01. 01. Create entity with large float number
-=============================================
+01. Create entity with large float number
+=========================================
 HTTP/1.1 201 Created
-Date: Fri, 24 Jan 2025 13:07:04 GMT
-Fiware-Correlator: 1b79d82c-da54-11ef-9ba0-080027cd35f1
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
 Content-Length: 0
 
@@ -73,7 +94,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 75
+Content-Length: 358
 
 {
     "A": {
@@ -82,10 +103,30 @@ Content-Length: 75
         "value": 1.79e+308
     },
     "id": "E",
+    "maxNegative": {
+        "metadata": {},
+        "type": "Number",
+        "value": -1.7976931348623157e+308
+    },
+    "maxPositive": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1.7976931348623157e+308
+    },
+    "minNonZeroNegative": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
+    "minNonZeroPositive": {
+        "metadata": {},
+        "type": "Number",
+        "value": 0
+    },
     "type": "T"
 }
 
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
