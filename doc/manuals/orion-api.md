@@ -3429,6 +3429,10 @@ update takes place. The elements in the `alterationTypes` array are interpreted 
 Default `alterationTypes` (i.e. the one for subscription not explicitly specifying it)
 is `["entityCreate", "entityChange"]`.
 
+In the case of using `entityChange` and `entityUpdate` at the same time, `entityUpdate` takes precedence
+(in other words, using `"alterationTypes": [ "entityUpdate", "entityChange" ]` is equivalente to
+use "alterationTypes": [ "entityUpdate" ]`).
+
 The particular alteration type can be got in notifications using the
 [`alterationType` builtin attribute](#builtin-attributes).
 
