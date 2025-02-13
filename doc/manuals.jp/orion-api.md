@@ -683,7 +683,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。Orion がエンティティの有効期限を制御
     する方法については、[一時エンティティのセクション](#transient-entities) で説明されています
 -   `alterationType` (タイプ: `Text`): 通知をトリガーする変更を指定します。これは、変更タイプの機能に基づく
-    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions_alttype)のセクションを
+    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを
     参照)
     この属性は通知でのみ使用できます。クエリ (`GET /v2/entities?attrs=alterationType`) を実行しても表示されず、次の値を
     取ることができます:
