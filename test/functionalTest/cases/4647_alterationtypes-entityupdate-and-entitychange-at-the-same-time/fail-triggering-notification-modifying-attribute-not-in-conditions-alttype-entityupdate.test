@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-alterationTypes entityUpdate and entityChange at the same time with extra attribute modified
+Fail triggering notification when attribute out of condition.attrs is actually changed and alterationType entityUpdate is used
 
 --SHELL-INIT--
 dbInit CB
@@ -30,8 +30,6 @@ accumulatorStart --pretty-print
 
 --SHELL--
 
-#
-# FIXME PR: only 1 notification is being received. Fix it
 #
 # 01. Create testing entity
 # 02. Create sub with entityChange and entityUpdate at the same time
@@ -76,8 +74,7 @@ payload='{
         "TimeInstant"
       ],
       "alterationTypes": [
-        "entityUpdate",
-        "entityChange"
+        "entityUpdate"
       ]
     }
   },
@@ -177,6 +174,36 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 05. Dump accumulator (see 2 notifications)
 ==========================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 238
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "TimeInstant": {
+                "metadata": {},
+                "type": "DateTime",
+                "value": "2025-02-10T16:41:00.000Z"
+            },
+            "id": "contador1",
+            "type": "WaterMeter",
+            "waterConsumption": {
+                "metadata": {},
+                "type": "Number",
+                "value": 23
+            }
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 238
