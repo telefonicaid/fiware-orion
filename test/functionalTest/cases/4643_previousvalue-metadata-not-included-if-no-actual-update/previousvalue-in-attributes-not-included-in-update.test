@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-previousValue metadata is not included in notifications in case of no actual update in subs using entityUpdate alterationType
+previousValue metadata in attributes not included in update
 
 --SHELL-INIT--
 dbInit CB
@@ -29,88 +29,63 @@ brokerStart CB
 accumulatorStart --pretty-print
 
 --SHELL--
-
-# FIXME PR: previousValue field in subs is probably irrelevant. Remove it at the end.
-# FIXME PR: alterationType can be simplified to just entityUpdate
-
 #
-# 01. Create testing entity
-# 02. Create sub
-# 03. Update entity
+# 01. Create entity with attributes A1=1, A2=2, A3=3, A4=4, A5=5
+# 02. Create sub with previousValue enabled
+# 03. Update entity A2=20 and A4=40
 # 04. Dump accumulator
 #
 
-echo "01. Create testing entity"
-echo "========================="
+echo "01. Create entity with attributes A1=1, A2=2, A3=3, A4=4, A5=5"
+echo "=============================================================="
 payload='{
-  "id": "contador1",
-  "type": "WaterMeter",
-  "TimeInstant": {
-    "type": "DateTime",
-    "value": "2025-02-10T16:41:00.000Z",
-    "metadata": {}
-  },
-  "waterConsumption": {
+  "id": "E",
+  "type": "T",
+  "A1": {
     "type": "Number",
-    "value": 20,
-    "metadata": {}
-  }
+    "value": 1
+  },
+  "A2": {
+    "type": "Number",
+    "value": 2
+  },
+  "A3": {
+    "type": "Number",
+    "value": 3
+  },
+  "A4": {
+    "type": "Number",
+    "value": 4
+  },
+  "A5": {
+    "type": "Number",
+    "value": 5
+  }   
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "02. Create sub"
-echo "=============="
+echo "02. Create sub with previousValue enabled"
+echo "========================================="
 payload='{
   "subject": {
     "entities": [
       {
-        "idPattern": ".*",
-        "type": "WaterMeter"
+        "id": "E",
+        "type": "T"
       }
-    ],
-    "condition": {
-      "attrs": [
-        "TimeInstant"
-      ],
-      "alterationTypes": [
-        "entityCreate",
-        "entityUpdate",
-        "entityDelete"
-      ],
-      "notifyOnMetadataChange": true
-    }
+    ]
   },
   "notification": {
-    "attrs": [
-      "TimeInstant",
-      "vol",
-      "waterConsumption"
-    ],
-    "onlyChangedAttrs": false,
-    "attrsFormat": "normalized",
-    "httpCustom": {
-      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
-      "ngsi": {
-        "vol": {
-          "type": "Number",
-          "value": "${waterConsumption - metadata.waterConsumption.previousValue}",
-          "metadata": {
-            "evalPriority": {
-              "type": "Number",
-              "value": 1
-            }
-          }
-        }
-      }
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
     },
     "metadata": [
       "previousValue",
       "*"
-    ],
-    "covered": false
+    ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -118,16 +93,19 @@ echo
 echo
 
 
-echo "03. Update entity"
-echo "================="
+echo "03. Update entity A2=20 and A4=40"
+echo "================================="
 payload='{
-  "TimeInstant": {
-    "type": "DateTime",
-    "value": "2025-02-10T16:41:00.000Z",
-    "metadata": {}
+  "A2": {
+    "value": 20,
+    "type": "Number"
+  },
+  "A4": {
+    "value": 40,
+    "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/contador1/attrs -X PATCH --payload "$payload"
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
 echo
 echo
 
@@ -140,18 +118,18 @@ echo
 
 
 --REGEXPECT--   
-01. Create testing entity
-=========================
+01. Create entity with attributes A1=1, A2=2, A3=3, A4=4, A5=5
+==============================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/contador1?type=WaterMeter
+Location: /v2/entities/E?type=T
 Content-Length: 0
 
 
 
-02. Create sub
-==============
+02. Create sub with previousValue enabled
+=========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -160,8 +138,8 @@ Content-Length: 0
 
 
 
-03. Update entity
-=================
+03. Update entity A2=20 and A4=40
+=================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -172,7 +150,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 442
+Content-Length: 528
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -183,38 +161,58 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "TimeInstant": {
+            "A1": {
                 "metadata": {
                     "previousValue": {
-                        "type": "DateTime",
-                        "value": "2025-02-10T16:41:00.000Z"
-                    }
-                },
-                "type": "DateTime",
-                "value": "2025-02-10T16:41:00.000Z"
-            },
-            "id": "contador1",
-            "type": "WaterMeter",
-            "vol": {
-                "metadata": {
-                    "evalPriority": {
                         "type": "Number",
                         "value": 1
                     }
                 },
                 "type": "Number",
-                "value": 0
+                "value": 1
             },
-            "waterConsumption": {
+            "A2": {
                 "metadata": {
                     "previousValue": {
                         "type": "Number",
-                        "value": 20
+                        "value": 2
                     }
                 },
                 "type": "Number",
                 "value": 20
-            }
+            },
+            "A3": {
+                "metadata": {
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 3
+                    }
+                },
+                "type": "Number",
+                "value": 3
+            },
+            "A4": {
+                "metadata": {
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 4
+                    }
+                },
+                "type": "Number",
+                "value": 40
+            },
+            "A5": {
+                "metadata": {
+                    "previousValue": {
+                        "type": "Number",
+                        "value": 5
+                    }
+                },
+                "type": "Number",
+                "value": 5
+            },
+            "id": "E",
+            "type": "T"
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"

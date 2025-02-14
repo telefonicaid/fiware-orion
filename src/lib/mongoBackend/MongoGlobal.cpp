@@ -1213,6 +1213,59 @@ static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
     return;
   }
 
+  // in this case previousValue is filled with caP value
+  if (caP->previousValue == NULL)
+  {
+    Metadata* mdP = NULL;
+    if (caP->compoundValueP == NULL)
+    {
+      switch (caP->valueType)
+      {
+      case orion::ValueTypeString:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->stringValue);
+        break;
+
+      case orion::ValueTypeBoolean:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->boolValue);
+        break;
+
+      case orion::ValueTypeNumber:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->numberValue);
+        break;
+
+      case orion::ValueTypeNull:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, "");
+        mdP->valueType = orion::ValueTypeNull;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given for metadata)"));
+        return;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", caP->valueType));
+        return;
+      }
+    }
+    else
+    {
+      mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, "");
+      mdP->valueType = caP->valueType;
+
+      // Different with the case when previousValue is not NULL, we cannot
+      // steal the value here, as the caP->compoundValueP has its own memory
+      // independent memory lifecyel
+      mdP->compoundValueP = caP->compoundValueP->clone();
+    }
+
+    // Add it to the vector (shadowed)
+    // FIXME PR: refactor this and avoid duplicating code an early return
+    mdP->shadowed = true;
+    caP->metadataVector.push_back(mdP);
+
+    return;
+  }
+
   // Created the metadata
   Metadata* mdP = NULL;
   ContextAttribute* previousValueP = caP->previousValue;
@@ -1334,10 +1387,11 @@ void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType
     }
 
     // previousValue
-    if (caP->previousValue != NULL)
+    /*if (caP->previousValue != NULL)
     {
       addIfNotPresentPreviousValueMetadata(caP);
-    }
+    }*/
+     addIfNotPresentPreviousValueMetadata(caP);
   }
 }
 
