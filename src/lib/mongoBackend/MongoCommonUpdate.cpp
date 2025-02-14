@@ -1478,6 +1478,33 @@ static void fill_idPtypeP
 
 /* ****************************************************************************
 *
+* subHasAltType
+*
+*/
+static bool subHasAltType(orion::BSONObj sub, ngsiv2::SubAltType targetAltType)
+{
+  std::vector<std::string> altTypeStrings;
+  if (sub.hasField(CSUB_ALTTYPES))
+  {
+    setStringVectorF(sub, CSUB_ALTTYPES, &altTypeStrings);
+  }
+  if (altTypeStrings.size() != 0)
+  {
+    for (unsigned int ix = 0; ix < altTypeStrings.size(); ix++)
+    {
+      if (parseAlterationType(altTypeStrings[ix]) == targetAltType)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * matchAltType
 *
 */
@@ -1658,7 +1685,9 @@ static bool addTriggeredSubscriptions_noCache
 
       // Depending of the alteration type, we use the list of attributes in the request or the list
       // with effective modifications. Note that EntityDelete doesn't check the list
-      if (targetAltType == ngsiv2::EntityUpdate)
+      // The second part of the || (i.e. isChangeAltType and sub alt types include entityUpdate) is due to issue #4647
+      // (not sure if a smarter and cleaner solution is possible...)
+      if ((targetAltType == ngsiv2::EntityUpdate) || ((isChangeAltType(targetAltType)) && (subHasAltType(sub, ngsiv2::EntityUpdate))))
       {
         if (!condValueAttrMatch(sub, attributes))
         {

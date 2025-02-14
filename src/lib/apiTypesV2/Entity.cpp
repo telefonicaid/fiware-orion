@@ -318,13 +318,13 @@ std::string Entity::toJson
   switch (renderFormat)
   {
   case NGSI_V2_VALUES:
-    out = toJsonValues(orderedAttrs);
+    out = toJsonValues(orderedAttrs); // FIXME PR: exprContextObjectP should be taken into account. Add test case
     break;
   case NGSI_V2_UNIQUE_VALUES:
-    out = toJsonUniqueValues(orderedAttrs);
+    out = toJsonUniqueValues(orderedAttrs);  // FIXME PR: exprContextObjectP should be taken into account. Add test case
     break;
   case NGSI_V2_KEYVALUES:
-    out = toJsonKeyvalues(orderedAttrs);
+    out = toJsonKeyvalues(orderedAttrs); // FIXME PR: exprContextObjectP should be taken into account
     break;
   default:  // NGSI_V2_NORMALIZED
     out = toJsonNormalized(orderedAttrs, metadataFilter, renderNgsiField, exprContextObjectP);
