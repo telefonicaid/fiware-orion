@@ -178,7 +178,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 442
+Content-Length: 226
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: keyValues
 Host: 127.0.0.1:REGEX(\d+)
@@ -189,38 +189,11 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "TimeInstant": {
-                "metadata": {
-                    "previousValue": {
-                        "type": "DateTime",
-                        "value": "2025-02-10T16:41:00.000Z"
-                    }
-                },
-                "type": "DateTime",
-                "value": "2025-02-10T16:41:00.000Z"
-            },
+            "TimeInstant": "2025-02-10T16:41:00.000Z",
             "id": "contador1",
             "type": "WaterMeter",
-            "vol": {
-                "metadata": {
-                    "evalPriority": {
-                        "type": "Number",
-                        "value": 1
-                    }
-                },
-                "type": "Number",
-                "value": 3
-            },
-            "waterConsumption": {
-                "metadata": {
-                    "previousValue": {
-                        "type": "Number",
-                        "value": 20
-                    }
-                },
-                "type": "Number",
-                "value": 23
-            }
+            "vol": "${waterConsumption - metadata.waterConsumption.previousValue}",
+            "waterConsumption": 23
         }
     ],
     "subscriptionId": "REGEX([0-9a-f]{24})"

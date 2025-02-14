@@ -2,6 +2,7 @@
 - Fix: notification was not triggered in subs using entityUpdate alterationType when some attribute not included in condition.attrs has an actual value change (#4647)
 - Fix: previousValue metadata was not taken into account in attributes not in the update that triggers the notification (#4643)
 - Fix: improve attribute and metadata invalid format dates for DateTime types in logs (#4616)
+- Fix: attrsFormat keyValues was not working in notifications (#4644)
 - Hardening: upgrade microhttpd dependency from 0.9.76 to 1.0.1
 - Hardening: upgrade libmosquitto dependency from 2.0.15 to 2.0.20
 - Hardening: upgrade libmongoc dependency from 1.24.3 to 1.29.0
