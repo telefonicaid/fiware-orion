@@ -30,10 +30,6 @@ accumulatorStart --pretty-print
 
 --SHELL--
 
-# FIXME PR: this test is aligned with the wrong behaviour. It would "break" when we fix the issue
-# FIXME PR: previousValue field in subs is probably irrelevant. Remove it at the end.
-# FIXME PR: alterationType can be simplified to just entityUpdate
-
 #
 # 01. Create testing entity
 # 02. Create sub
@@ -77,9 +73,7 @@ payload='{
         "TimeInstant"
       ],
       "alterationTypes": [
-        "entityCreate",
-        "entityUpdate",
-        "entityDelete"
+        "entityUpdate"
       ],
       "notifyOnMetadataChange": true
     }
@@ -107,10 +101,6 @@ payload='{
         }
       }
     },
-    "metadata": [
-      "previousValue",
-      "*"
-    ],
     "covered": false
   }
 }'
