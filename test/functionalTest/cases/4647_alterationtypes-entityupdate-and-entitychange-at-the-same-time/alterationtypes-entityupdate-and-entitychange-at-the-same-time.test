@@ -126,7 +126,7 @@ echo
 echo
 
 
---REGEXPECT--   
+--REGEXPECT--
 01. Create testing entity
 =========================
 HTTP/1.1 201 Created

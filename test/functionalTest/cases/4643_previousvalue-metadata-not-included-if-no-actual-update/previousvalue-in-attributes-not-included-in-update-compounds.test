@@ -117,7 +117,7 @@ echo
 echo
 
 
---REGEXPECT--   
+--REGEXPECT--
 01. Create entity with attributes A1=[1], A2={x:2}, A3=[3,3], A4={x:4,y:4}, A5=[5,{x:5}]
 ========================================================================================
 HTTP/1.1 201 Created

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-JEXL expressions are not working in simplifiedKeyValues notifications
+ values notification format is not working in notifications
 
 --SHELL-INIT--
 dbInit CB
@@ -91,7 +91,7 @@ payload='{
       "waterConsumption"
     ],
     "onlyChangedAttrs": false,
-    "attrsFormat": "simplifiedKeyValues",
+    "attrsFormat": "values",
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
@@ -178,20 +178,23 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 171
+Content-Length: 150
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: simplifiedKeyValues
+Ngsiv2-Attrsformat: values
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
 {
-    "TimeInstant": "2025-02-10T16:41:00.000Z",
-    "id": "contador1",
-    "type": "WaterMeter",
-    "vol": "${waterConsumption - metadata.waterConsumption.previousValue}",
-    "waterConsumption": 23
+    "data": [
+        [
+            "2025-02-10T16:41:00.000Z",
+            "${waterConsumption - metadata.waterConsumption.previousValue}",
+            23
+        ]
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
 
