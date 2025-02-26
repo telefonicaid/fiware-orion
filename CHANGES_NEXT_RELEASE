@@ -3,6 +3,7 @@
 - Fix: previousValue metadata was not taken into account in attributes not in the update that triggers the notification (#4643)
 - Fix: improve attribute and metadata invalid format dates for DateTime types in logs (#4616)
 - Fix: attrsFormat keyValues and values were not working in custom notifications using ngsi payloads (#4644)
+- Fix: JEXL expressions were not working in attrsFormat simplifiedKeyValues, keyValues or values (#4645)
 - Hardening: upgrade microhttpd dependency from 0.9.76 to 1.0.1
 - Hardening: upgrade libmosquitto dependency from 2.0.15 to 2.0.20
 - Hardening: upgrade libmongoc dependency from 1.24.3 to 1.29.0

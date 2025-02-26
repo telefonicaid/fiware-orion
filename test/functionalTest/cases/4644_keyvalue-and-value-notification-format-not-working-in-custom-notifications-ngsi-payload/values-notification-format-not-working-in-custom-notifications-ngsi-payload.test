@@ -178,7 +178,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ====================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 150
+Content-Length: 88
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: values
 Host: 127.0.0.1:REGEX(\d+)
@@ -190,7 +190,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
     "data": [
         [
             "2025-02-10T16:41:00.000Z",
-            "${waterConsumption - metadata.waterConsumption.previousValue}",
+            3,
             23
         ]
     ],
