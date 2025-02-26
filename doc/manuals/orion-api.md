@@ -362,7 +362,7 @@ representations of entities.
 [ 'Ford', 'black', 78.3 ]
 ```
 
-* *unique mode*. This mode is just like *values mode*, except that values are not repeated. Note this mode is not supported in `attrsFormat` in subscriptions (see [Notification Messages section](#notification-essages)).
+* *unique mode*. This mode is just like *values mode*, except that values are not repeated. Note this mode is not supported in `attrsFormat` in subscriptions (see [Notification Messages section](#notification-messages)).
 
 ## Partial Representations
 
