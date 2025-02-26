@@ -3431,7 +3431,7 @@ is `["entityCreate", "entityChange"]`.
 
 In the case of using `entityChange` and `entityUpdate` at the same time, `entityUpdate` takes precedence
 (in other words, using `"alterationTypes": [ "entityUpdate", "entityChange" ]` is equivalente to
-use "alterationTypes": [ "entityUpdate" ]`).
+use `"alterationTypes": [ "entityUpdate" ]`).
 
 The particular alteration type can be got in notifications using the
 [`alterationType` builtin attribute](#builtin-attributes).
