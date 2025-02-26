@@ -321,7 +321,8 @@ std::string Entity::toJson
     out = toJsonValues(orderedAttrs); // FIXME PR: exprContextObjectP should be taken into account. Add test case
     break;
   case NGSI_V2_UNIQUE_VALUES:
-    out = toJsonUniqueValues(orderedAttrs);  // FIXME PR: exprContextObjectP should be taken into account. Add test case
+    // FIXME PR: not current test with uniqueValues. Dead code/funcationality???
+    out = toJsonUniqueValues(orderedAttrs);  // FIXME PR: exprContextObjectP should be taken into account. Add test case.
     break;
   case NGSI_V2_KEYVALUES:
     out = toJsonKeyvalues(orderedAttrs); // FIXME PR: exprContextObjectP should be taken into account
