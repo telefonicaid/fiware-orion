@@ -362,7 +362,7 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 [ 'Ford', 'black', 78.3 ]
 ```
 
--   *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モードと同じです
+-   *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モードと同じです。このモードはサブスクリプションの `attrsFormat` ではサポートされていないことに注意してください ([通知メッセージのセクション](#notification-messages)を参照)
 
 <a name="partial-representations"></a>
 
@@ -683,7 +683,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。Orion がエンティティの有効期限を制御
     する方法については、[一時エンティティのセクション](#transient-entities) で説明されています
 -   `alterationType` (タイプ: `Text`): 通知をトリガーする変更を指定します。これは、変更タイプの機能に基づく
-    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions_alttype)のセクションを
+    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを
     参照)
     この属性は通知でのみ使用できます。クエリ (`GET /v2/entities?attrs=alterationType`) を実行しても表示されず、次の値を
     取ることができます:
@@ -3508,6 +3508,8 @@ EOF
 
 デフォルトの `alterationTypes` (つまり、明示的に指定されていないサブスクリプション用のもの) は
 `["entityCreate", "entityChange"]` です。
+
+`entityChange` と `entityUpdate` を同時に使用する場合、`entityUpdate` が優先されます (つまり、`"alterationTypes": [ "entityUpdate", "entityChange" ]` を使用することは、`"alterationTypes": [ "entityUpdate" ]` を使用することと同等です)。
 
 特定の変更タイプは、[`alterationType` 組み込み属性](#builtin-attributes)を使用して通知で取得できます。
 

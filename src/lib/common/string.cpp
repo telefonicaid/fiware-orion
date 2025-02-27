@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -878,11 +879,17 @@ std::string double2string(double f)
   long long  intPart   = (long long) f;
   double     diff      = f - intPart;
   bool       isInteger = false;
+  bool       large     = false;
 
   // abs value for 'diff'
   diff = (diff < 0)? -diff : diff;
 
-  if (diff > 0.9999999998)
+  if (diff > 1)
+  {
+    // this is an overflow situation, pe. f = 1.79e308
+    large = true;
+  }
+  else if (diff > 0.9999999998)
   {
     intPart += 1;
     isInteger = true;
@@ -898,7 +905,14 @@ std::string double2string(double f)
   }
   else
   {
-    snprintf(buf, bufSize, "%.9f", f);
+    if (large)
+    {
+      snprintf(buf, bufSize, "%.17g", f);
+    }
+    else
+    {
+      snprintf(buf, bufSize, "%.9f", f);
+    }
 
     // Clear out any unwanted trailing zeroes
     char* last = &buf[strlen(buf) - 1];

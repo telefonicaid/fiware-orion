@@ -362,7 +362,7 @@ representations of entities.
 [ 'Ford', 'black', 78.3 ]
 ```
 
-* *unique mode*. This mode is just like *values mode*, except that values are not repeated.
+* *unique mode*. This mode is just like *values mode*, except that values are not repeated. Note this mode is not supported in `attrsFormat` in subscriptions (see [Notification Messages section](#notification-messages)).
 
 ## Partial Representations
 
@@ -714,7 +714,7 @@ The list of builtin attributes is as follows:
   controls entity expiration is described in [Transient entities section](#transient-entities).
 
 * `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with
-the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
+the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions-based-in-alteration-type) section). This attribute
 
   can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
    * `entityCreate` if the update that triggers the notification is a entity creation operation
@@ -3428,6 +3428,10 @@ update takes place. The elements in the `alterationTypes` array are interpreted 
 
 Default `alterationTypes` (i.e. the one for subscription not explicitly specifying it)
 is `["entityCreate", "entityChange"]`.
+
+In the case of using `entityChange` and `entityUpdate` at the same time, `entityUpdate` takes precedence
+(in other words, using `"alterationTypes": [ "entityUpdate", "entityChange" ]` is equivalente to
+use `"alterationTypes": [ "entityUpdate" ]`).
 
 The particular alteration type can be got in notifications using the
 [`alterationType` builtin attribute](#builtin-attributes).

@@ -13,7 +13,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * boost: 1.74
 * libmicrohttpd: 1.0.1 (from source)
 * libcurl: 7.88.1
-* openssl: 3.0.14
+* openssl: 3.0.15
 * libuuid: 2.38.1
 * libmosquitto: 2.0.20 (from source)
 * Mongo C driver: 1.29.0 (from source)

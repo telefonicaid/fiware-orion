@@ -1062,48 +1062,94 @@ static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
     return;
   }
 
-  // Created the metadata
   Metadata* mdP = NULL;
-  ContextAttribute* previousValueP = caP->previousValue;
 
-  if (previousValueP->compoundValueP == NULL)
+  if (caP->previousValue == NULL)
   {
-    switch (previousValueP->valueType)
+    // in this case previousValue is filled with caP value
+    if (caP->compoundValueP == NULL)
     {
-    case orion::ValueTypeString:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->stringValue);
-      break;
+      switch (caP->valueType)
+      {
+      case orion::ValueTypeString:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->stringValue);
+        break;
 
-    case orion::ValueTypeBoolean:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->boolValue);
-      break;
+      case orion::ValueTypeBoolean:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->boolValue);
+        break;
 
-    case orion::ValueTypeNumber:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
-      break;
+      case orion::ValueTypeNumber:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->numberValue);
+        break;
 
-    case orion::ValueTypeNull:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-      mdP->valueType = orion::ValueTypeNull;
-      break;
+      case orion::ValueTypeNull:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, "");
+        mdP->valueType = orion::ValueTypeNull;
+        break;
 
-    case orion::ValueTypeNotGiven:
-      LM_E(("Runtime Error (value not given for metadata)"));
-      return;
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given for metadata)"));
+        return;
 
-    default:
-      LM_E(("Runtime Error (unknown value type: %d)", previousValueP->valueType));
-      return;
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", caP->valueType));
+        return;
+      }
+    }
+    else
+    {
+      mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, "");
+      mdP->valueType = caP->valueType;
+
+      // Different with the case when previousValue is not NULL, we cannot
+      // steal the value here, as the caP->compoundValueP has its own memory
+      // independent memory lifecyel
+      mdP->compoundValueP = caP->compoundValueP->clone();
     }
   }
   else
   {
-    mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-    mdP->valueType = previousValueP->valueType;
+    ContextAttribute* previousValueP = caP->previousValue;
+    if (previousValueP->compoundValueP == NULL)
+    {
+      switch (previousValueP->valueType)
+      {
+      case orion::ValueTypeString:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->stringValue);
+        break;
 
-    // Steal the compound
-    mdP->compoundValueP = previousValueP->compoundValueP;
-    previousValueP->compoundValueP = NULL;
+      case orion::ValueTypeBoolean:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->boolValue);
+        break;
+
+      case orion::ValueTypeNumber:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
+        break;
+
+      case orion::ValueTypeNull:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+        mdP->valueType = orion::ValueTypeNull;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given for metadata)"));
+        return;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", previousValueP->valueType));
+        return;
+      }
+    }
+    else
+    {
+      mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+      mdP->valueType = previousValueP->valueType;
+
+      // Steal the compound
+      mdP->compoundValueP = previousValueP->compoundValueP;
+      previousValueP->compoundValueP = NULL;
+    }
   }
 
   // Add it to the vector (shadowed)
@@ -1182,8 +1228,8 @@ void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType
       addIfNotPresentMetadata(caP, NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
     }
 
-    // previousValue
-    if (caP->previousValue != NULL)
+    // previousValue (except in entityCreate case)
+    if (alterationType != "entityCreate")
     {
       addIfNotPresentPreviousValueMetadata(caP);
     }

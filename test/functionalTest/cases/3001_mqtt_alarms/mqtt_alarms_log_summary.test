@@ -32,8 +32,7 @@ brokerStart CB 0 IPv4 -logSummary 5
 --SHELL--
 
 #
-# FIXME: this test relies on an external service (mqtt.flespi.io) which we don't control
-# It would be better to use a MQTT broker running by us (docker?)
+# This test requires a MQTT broker with authentication enabled. See test/functionalTest/mosquittoConf/README.md
 #
 # 01. Sleep 6 and see 0-0 raised and 0-0 released
 # 02. Create MQTT sub with wrong user/pass
@@ -67,8 +66,8 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mqtt.flespi.io:1883",
-      "user": "user",
+      "url": "mqtt://localhost:1883",
+      "user": "user_noexist",
       "passwd": "xxxx",
       "topic": "sub1"
     }
@@ -118,8 +117,8 @@ echo "========================================"
 payload='{
   "notification": {
     "mqtt": {
-      "url": "mqtt://mqtt.flespi.io:1883",
-      "user": "SeY7oD5XPa1UENBiOLPHqWXmj4r4OZHu4tsgWn1AmTkQuMW6lCDCmqMvi1oURVfJ",
+      "url": "mqtt://localhost:1883",
+      "user": "user1",
       "passwd": "xxxx",
       "topic": "sub1"
     }

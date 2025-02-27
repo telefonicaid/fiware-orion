@@ -392,6 +392,28 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 
 /* ****************************************************************************
 *
+* subHasAltType
+*
+*/
+static bool subHasAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAltType)
+{
+  if (cSubP->subAltTypeV.size() != 0)
+  {
+    for (unsigned int ix = 0; ix < cSubP->subAltTypeV.size(); ix++)
+    {
+      if (cSubP->subAltTypeV[ix] == targetAltType)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * matchAltType -
 *
 */
@@ -501,7 +523,9 @@ static bool subMatch
   //
   // Depending of the alteration type, we use the list of attributes in the request or the list
   // with effective modifications. Note that EntityDelete doesn't check the list
-  if (targetAltType == ngsiv2::EntityUpdate)
+  // The second part of the || (i.e. isChangeAltType and sub alt types include entityUpdate) is due to issue #4647
+  // (not sure if a smarter and cleaner solution is possible...)
+  if ((targetAltType == ngsiv2::EntityUpdate) || ((isChangeAltType(targetAltType)) && (subHasAltType(cSubP, ngsiv2::EntityUpdate))))
   {
     if (!attributeMatch(cSubP, attributes))
     {
