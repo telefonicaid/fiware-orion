@@ -3509,6 +3509,8 @@ EOF
 デフォルトの `alterationTypes` (つまり、明示的に指定されていないサブスクリプション用のもの) は
 `["entityCreate", "entityChange"]` です。
 
+`entityChange` と `entityUpdate` を同時に使用する場合、`entityUpdate` が優先されます (つまり、`"alterationTypes": [ "entityUpdate", "entityChange" ]` を使用することは、`"alterationTypes": [ "entityUpdate" ]` を使用することと同等です)。
+
 特定の変更タイプは、[`alterationType` 組み込み属性](#builtin-attributes)を使用して通知で取得できます。
 
 <a name="pagination"></a>
