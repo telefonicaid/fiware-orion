@@ -362,7 +362,7 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 [ 'Ford', 'black', 78.3 ]
 ```
 
--   *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モードと同じです
+-   *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モードと同じです。このモードはサブスクリプションの `attrsFormat` ではサポートされていないことに注意してください ([通知メッセージのセクション](#notification-messages)を参照)
 
 <a name="partial-representations"></a>
 
