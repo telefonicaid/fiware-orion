@@ -318,13 +318,14 @@ std::string Entity::toJson
   switch (renderFormat)
   {
   case NGSI_V2_VALUES:
-    out = toJsonValues(orderedAttrs);
+    out = toJsonValues(orderedAttrs, exprContextObjectP);
     break;
   case NGSI_V2_UNIQUE_VALUES:
+    // unique is not allowed in attrsFormat, so no need of passing exprContextObjectP here
     out = toJsonUniqueValues(orderedAttrs);
     break;
   case NGSI_V2_KEYVALUES:
-    out = toJsonKeyvalues(orderedAttrs);
+    out = toJsonKeyvalues(orderedAttrs, exprContextObjectP);
     break;
   default:  // NGSI_V2_NORMALIZED
     out = toJsonNormalized(orderedAttrs, metadataFilter, renderNgsiField, exprContextObjectP);
@@ -357,14 +358,14 @@ std::string Entity::toJson(RenderFormat renderFormat, bool renderNgsiField)
 *
 * Entity::toJsonValues -
 */
-std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs)
+std::string Entity::toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs, ExprContextObject* exprContextObjectP)
 {
   JsonVectorHelper jh;
 
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
     ContextAttribute* caP = orderedAttrs[ix];
-    jh.addRaw(caP->toJsonValue());
+    jh.addRaw(caP->toJsonValue(exprContextObjectP));
   }
 
   return jh.str();
@@ -409,7 +410,7 @@ std::string Entity::toJsonUniqueValues(const std::vector<ContextAttribute*>& ord
 *
 * Entity::toJsonKeyvalues -
 */
-std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs)
+std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs, ExprContextObject* exprContextObjectP)
 {
   JsonObjectHelper jh;
 
@@ -424,7 +425,7 @@ std::string Entity::toJsonKeyvalues(const std::vector<ContextAttribute*>& ordere
   for (unsigned int ix = 0; ix < orderedAttrs.size(); ix++)
   {
     ContextAttribute* caP = orderedAttrs[ix];
-    jh.addRaw(caP->name, caP->toJsonValue());
+    jh.addRaw(caP->name, caP->toJsonValue(exprContextObjectP));
   }
 
   return jh.str();
