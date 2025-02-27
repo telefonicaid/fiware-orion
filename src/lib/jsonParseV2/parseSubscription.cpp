@@ -59,7 +59,6 @@
 * USING
 */
 using ngsiv2::SubscriptionUpdate;
-using ngsiv2::EntID;
 using rapidjson::Value;
 
 
@@ -524,7 +523,7 @@ static std::string parseCustomPayload
           return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
         }
 
-        ngsi->id = iter->value.GetString();
+        ngsi->entityId.id = iter->value.GetString();
       }
       else if (name == "type")
       {
@@ -533,7 +532,7 @@ static std::string parseCustomPayload
           return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
         }
 
-        ngsi->type = iter->value.GetString();
+        ngsi->entityId.type = iter->value.GetString();
       }
       else  // attribute
       {
@@ -1330,7 +1329,7 @@ static std::string parseNotifyConditionVector
   // Expression
   if (condition.HasMember("expression"))
   {
-    std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
+    std::string r = parseExpression(condition["expression"], &subsP->scopeVector, subsP);
 
     if (r != "OK")
     {

@@ -38,7 +38,7 @@
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/Metadata.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 

@@ -34,6 +34,8 @@
 */
 TEST(MetadataVector, render)
 {
+  utInit();
+
   Metadata        m("Name", "Type", "Value");
   Metadata        m2("Name2", "Type2", "Value2");
   MetadataVector  mV;
@@ -41,22 +43,20 @@ TEST(MetadataVector, render)
   const char*     outfile2 = "ngsi.metadataVector.render3.middle.json";
   std::string     out;
 
-  utInit();
-
   mV.push_back(&m);
 
   std::vector<Metadata*>  metadataFilter;
 
   metadataFilter.push_back(&m);
 
-  out = mV.toJsonV1(metadataFilter, false);
+  out = mV.toJson(metadataFilter);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   metadataFilter.push_back(&m2);
 
   mV.push_back(&m2); 
-  out = mV.toJsonV1(metadataFilter, false);
+  out = mV.toJson(metadataFilter);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

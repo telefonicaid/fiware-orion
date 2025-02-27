@@ -47,14 +47,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 129
+Content-Length: 97
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "Service not found. Check your URL as probably it is wrong.",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "Service not found. Check your URL as probably it is wrong.",
+    "error": "BadRequest"
 }
 
 

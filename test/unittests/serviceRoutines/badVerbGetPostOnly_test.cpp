@@ -38,8 +38,8 @@
 */
 static RestService badVerbV[] =
 {
-  { ContextEntitiesByEntityId, 3, { "ngsi9", "contextEntities", "*" }, badVerbGetPostOnly },
-  { InvalidRequest,            0, {                                 }, NULL               }
+  { EntitiesRequest,           2, { "v2", "entities"                }, badVerbGetPostOnly  },
+  { InvalidRequest,            0, {                                 }, NULL                }
 };
 
 
@@ -50,12 +50,11 @@ static RestService badVerbV[] =
 */
 TEST(badVerbGetPostOnly, ok)
 {
-  ConnectionInfo  ci("/ngsi9/contextEntities/aaa",  "PUT", "1.1");
-  std::string     expected = "";  // no payload for bad verb, only http headers to indicate the error
+  ConnectionInfo  ci("/v2/entities",  "PUT", "1.1");
+  std::string     expected = "{\"error\":\"MethodNotAllowed\",\"description\":\"method not allowed\"}";
   std::string     out;
-  RestService     restService = { VersionRequest, 3, { "ngsi9", "contextEntities", "aaa" }, NULL };
+  RestService     restService = { VersionRequest, 3, { "foo", "bar", "aaa" }, NULL };
 
-  ci.apiVersion   = V1;
   ci.restServiceP = &restService;
 
   serviceVectorsSet(NULL, NULL, NULL, NULL, NULL, NULL, badVerbV);

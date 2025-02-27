@@ -24,7 +24,6 @@
 */
 #include <string>
 
-#include "common/tag.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
 
@@ -36,11 +35,10 @@
 */
 std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const std::string& value)
 {
-   std::string out = "";
+   JsonObjectHelper jh;
 
-   out += '{';
-   out += valueTag(what, value);
-   out += '}';
+   jh.addString(what, value);
+   std::string out = jh.str();
 
    ciP->httpStatusCode = SccOk;
    restReply(ciP, out);

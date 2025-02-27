@@ -31,17 +31,6 @@
 #include "apiTypesV2/EntityVector.h"
 #include "orionTypes/UpdateActionType.h"
 #include "apiTypesV2/Entity.h"
-#include "apiTypesV2/Entities.h"
-
-
-
-/* ****************************************************************************
-*
-* Forward declarations
-*/
-struct UpdateContextElementRequest;
-struct AppendContextElementRequest;
-struct UpdateContextAttributeRequest;
 
 
 
@@ -55,37 +44,21 @@ typedef struct UpdateContextRequest
   ActionType              updateActionType;      // Mandatory
 
   std::string             contextProvider;       // Not part of the payload - used internally only
-  ProviderFormat          providerFormat;        // Not part of the payload - used internally only
+  bool                    legacyProviderFormat;  // Not part of the payload - used internally only
 
   UpdateContextRequest();
-  UpdateContextRequest(const std::string& _contextProvider, ProviderFormat _providerFormat, Entity* eP);
+  UpdateContextRequest(const std::string& _contextProvider, bool _providerFormat, Entity* eP);
 
-  std::string        toJsonV1(bool asJsonObject);
+  std::string        toJsonV1(void);
   std::string        toJson(void);
-  std::string        check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void               release(void);
   ContextAttribute*  attributeLookup(Entity* eP, const std::string& attributeName);
 
-
-  void         fill(const UpdateContextElementRequest* ucerP,
-                    const std::string&                 entityId,
-                    const std::string&                 entityType);
-
-  void         fill(const AppendContextElementRequest* acerP,
-                    const std::string&                 entityId,
-                    const std::string&                 entityType);
-
   void         fill(const std::string& entityId,
+                    const std::string& entityIdPattern,
                     const std::string& entityType,
-                    const std::string& isPattern,
                     const std::string& attributeName,
                     ActionType         _updateActionType);
-
-  void         fill(const UpdateContextAttributeRequest* ucarP,
-                    const std::string&                   entityId,
-                    const std::string&                   entityType,
-                    const std::string&                   attributeName,
-                    ActionType                           _updateActionType);
 
   void         fill(const Entity* entP, ActionType _updateActionType);
   void         fill(const std::string&   entityId,
@@ -93,7 +66,7 @@ typedef struct UpdateContextRequest
                     ActionType           _updateActionType,
                     const std::string&   type = "");
 
-  void         fill(Entities* entities, ActionType _updateActionType);
+  void         fill(EntityVector* entities, ActionType _updateActionType);
 } UpdateContextRequest;
 
 #endif  // SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_

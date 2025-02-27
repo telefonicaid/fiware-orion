@@ -31,7 +31,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
+#include "common/MimeType.h"
 #include "ngsi/Request.h"
 #include "orionTypes/EntityType.h"
 #include "orionTypes/EntityTypeVector.h"
@@ -48,56 +48,6 @@ EntityTypeVector::EntityTypeVector()
 }
 
 
-/* ****************************************************************************
-*
-* EntityTypeVector::toJsonV1 -
-*/
-std::string EntityTypeVector::toJsonV1
-(
-  bool        asJsonObject,
-  bool        asJsonOut,
-  bool        collapsed,
-  bool        comma
-)
-{
-  std::string out  = "";
-
-  if (vec.size() > 0)
-  {
-    out += startTag("types", true);
-
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      out += vec[ix]->toJsonV1(asJsonObject, asJsonOut, collapsed, ix != vec.size() - 1);
-    }
-    out += endTag(comma, true);
-  }
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVector::check -
-*/
-std::string EntityTypeVector::check(ApiVersion apiVersion, const std::string& predetectedError)
-{
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(apiVersion, predetectedError)) != "OK")
-    {
-     return res;
-    }
-  }
-
-  return "OK";
-}
-
-
 
 /* ****************************************************************************
 *
@@ -106,32 +56,6 @@ std::string EntityTypeVector::check(ApiVersion apiVersion, const std::string& pr
 void EntityTypeVector::push_back(EntityType* item)
 {
   vec.push_back(item);
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVector::operator[] -
-*/
-EntityType* EntityTypeVector::operator[] (unsigned int ix) const
-{
-   if (ix < vec.size())
-   {
-     return vec[ix];
-   }
-   return NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeVector::size -
-*/
-unsigned int EntityTypeVector::size(void)
-{
-  return vec.size();
 }
 
 
