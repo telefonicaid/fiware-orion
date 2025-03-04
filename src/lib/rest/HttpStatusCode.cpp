@@ -36,25 +36,19 @@ std::string httpStatusCodeString(HttpStatusCode code)
   {
   case SccOk:                                return "OK";
   case SccCreated:                           return "Created";
-  case SccBadRequest:                        return "Bad Request";
+  case SccBadRequest:                        return "BadRequest";
   case SccForbidden:                         return "Forbidden";
-  case SccContextElementNotFound:            return "No context element found"; // Standard HTTP for 404: "Not Found"
-  case SccBadVerb:                           return "Method Not Allowed";
-  case SccNotAcceptable:                     return "Not Acceptable";
-  case SccConflict:                          return "Too Many Results";
-  case SccContentLengthRequired:             return "Content Length Required";
-  case SccRequestEntityTooLarge:             return "Request Entity Too Large";
-  case SccUnsupportedMediaType:              return "Unsupported Media Type";
-  case SccInvalidModification:               return "Invalid Modification";
-  case SccSubscriptionIdNotFound:            return "subscriptionId does not correspond to an active subscription"; // FI-WARE
-  case SccMissingParameter:                  return "parameter missing in the request";                             // FI-WARE
-  case SccInvalidParameter:                  return "request parameter is invalid/not allowed";                     // FI-WARE
-  case SccErrorInMetadata:                   return "Generic error in metadata";
-  case SccEntityIdReNotAllowed:              return "Regular Expression for EntityId is not allowed by receiver";
-  case SccEntityTypeRequired:                return "EntityType required by the receiver";
-  case SccAttributeListRequired:             return "Attribute List required by the receiver";
-  case SccReceiverInternalError:             return "Internal Server Error";
-  case SccNotImplemented:                    return "Not Implemented";
+  case SccContextElementNotFound:            return "NotFound";
+  case SccBadVerb:                           return "MethodNotAllowed";
+  case SccNotAcceptable:                     return "NotAcceptable";
+  case SccConflict:                          return "TooManyResults";
+  case SccContentLengthRequired:             return "ContentLengthRequired";
+  case SccRequestEntityTooLarge:             return "RequestEntityTooLarge";
+  case SccUnsupportedMediaType:              return "UnsupportedMediaType";
+  case SccInvalidModification:               return "InvalidModification";
+  case SccInvalidParameter:                  return "request parameter is invalid/not allowed";                     // FI-WARE // FIXME PR: remove
+  case SccReceiverInternalError:             return "InternalServerError";
+  case SccNotImplemented:                    return "NotImplemented";
   default:                                   return "Undefined";
   }
 }

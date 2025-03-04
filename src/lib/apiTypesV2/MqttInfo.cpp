@@ -49,16 +49,6 @@ MqttInfo::MqttInfo() : qos(0), custom(false), json(NULL), payloadType(Text), inc
 
 /* ****************************************************************************
 *
-* MqttInfo::MqttInfo - 
-*/
-MqttInfo::MqttInfo(const std::string& _url) : url(_url), qos(0), custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
-{
-}
-
-
-
-/* ****************************************************************************
-*
 * MqttInfo::toJson -
 */
 std::string MqttInfo::toJson()
@@ -205,11 +195,11 @@ void MqttInfo::fill(const orion::BSONObj& bo)
       orion::BSONObj ngsiObj = getObjectFieldF(bo, CSUB_NGSI);
       if (ngsiObj.hasField(ENT_ENTITY_ID))
       {
-        this->ngsi.id = getStringFieldF(ngsiObj, ENT_ENTITY_ID);
+        this->ngsi.entityId.id = getStringFieldF(ngsiObj, ENT_ENTITY_ID);
       }
       if (ngsiObj.hasField(ENT_ENTITY_TYPE))
       {
-        this->ngsi.type = getStringFieldF(ngsiObj, ENT_ENTITY_TYPE);
+        this->ngsi.entityId.type = getStringFieldF(ngsiObj, ENT_ENTITY_TYPE);
       }
       if (ngsiObj.hasField(ENT_ATTRS))
       {

@@ -29,11 +29,8 @@
 #include <vector>
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi/StatusCode.h"
-#include "ngsi10/UpdateContextRequest.h"
-
 #include "rest/OrionError.h"
-
+#include "ngsi10/UpdateContextRequest.h"
 
 
 /* ****************************************************************************
@@ -43,20 +40,15 @@
 typedef struct UpdateContextResponse
 {
   ContextElementResponseVector  contextElementResponseVector;  // Optional
-  StatusCode                    errorCode;                     // Optional
-
-  OrionError                    oe;                            // Used by NGSIv2
+  OrionError                    error;
 
   UpdateContextResponse();
-  UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
-  std::string   toJsonV1(bool asJsonObject);
-  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);
   void          fill(UpdateContextRequest* upcrP, HttpStatusCode sc);   // Needed by NGSIv2 forwarding logic
-  void          notFoundPush(Entity* eP, ContextAttribute* aP, StatusCode* scP);
+  void          notFoundPush(Entity* eP, ContextAttribute* aP, OrionError* oeP);
   void          foundPush(Entity* eP, ContextAttribute* aP);
   void          merge(UpdateContextResponse* upcrsP);
 } UpdateContextResponse;

@@ -8,14 +8,11 @@
 * [src/lib/rest/](#srclibrest) (REST interface, using external library microhttpd)
 * [src/lib/ngsi/](#srclibngsi) (Common NGSI types)
 * [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types, NGSI10 = context management)
-* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types, NGSI9 = context management availability)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
-* [src/lib/jsonParse/](#srclibjsonparse) (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
 * [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
-* [src/lib/convenience/](#srclibconvenience) (Convenience operations in NGSIv1)
 * [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
 * [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI notifications)
@@ -200,6 +197,8 @@ The JSON parse implementations reside in dedicated libraries while the text pars
 ## src/lib/ngsi/
 The **ngsi** library contains a collection of classes for the different payloads that constitutes the common part of the ngsi9 and ngsi10 protocols. Here you find basic classes like:
 
+FIXME PR: no point in aving ngsi/ and ngsi10/ separately (now that ngsi9/ has been removed)
+
 * `EntityId`
 * `EntityIdVector`
 * `ContextAttribute`
@@ -209,12 +208,11 @@ The **ngsi** library contains a collection of classes for the different payloads
 
 ### Methods and hierarchy
 
-These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
+These classes (as well as the classes in the library `ngsi10`) all have a standard set of methods:
 
-* `toJson()`, to render the object to a JSON string (for NGSIv2). This method levarages `JsonObjectHelper` and `JsonVectorHelper`
+* `toJson()`, to render the object to a JSON string. This method levarages `JsonObjectHelper` and `JsonVectorHelper`
   in order to simplify the rendering process. This way you just add the elements you needs to print using `add*()` methods and don't
   need to bother with starting/ending brackets, quotes and comma control.
-* `toJsonV1()`, to render the object to a JSON string (for NGSIv1)
 * `present()`, for debugging (the object is dumped as text to the log file)
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
@@ -250,8 +248,8 @@ The **ngsi10** library contains the top hierarchy classes for NGSI10 (NGSIv1) re
 * `QueryContextResponse`
 * `SubscribeContextRequest`
 * `SubscribeContextResponse`
-* `UpdateContextSubscriptionRequest`
-* `UpdateContextSubscriptionResponse`
+* `UpdateContextSubscriptionRequest` - FIXME PR: removed
+* `UpdateContextSubscriptionResponse` - FIXME PR: removed
 * `UnsubscribeContextRequest`
 * `UnsubscribeContextResponse`
 * `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
@@ -262,21 +260,8 @@ See the explanation of methods and hierarchy of the [**ngsi** library](#methods-
 [Top](#top)
 
 
-## src/lib/ngsi9/
-Just like the ngsi10 library, the **ngsi9** library contains the top hierarchy classes for NGSI9 (NGSIv1) requests:
-
-* `RegisterContextRequest`
-* `RegisterContextResponse`
-* `DiscoverContextAvailabilityRequest`
-* `DiscoverContextAvailabilityResponse`
-
-See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
-
-[Top](#top)
-
-
 ## src/lib/apiTypesV2/
-The **apiTypesV2** library, just like the ngsi* libraries, contains classes; both basic classes (like the library **ngsi**) and top hierarchy classes (like the libraries **ngsi9** and **ngsi10**), for NGSIv2, the improved NGSI protocol.
+The **apiTypesV2** library, just like the ngsi* libraries, contains classes; both basic classes (like the library **ngsi**) and top hierarchy classes (like the library **ngsi10**), for NGSIv2, the improved NGSI protocol.
 
 The hierarchical methods `release()`, `toJson()`, `check()`, etc. are found in these classes as well.
 
@@ -296,16 +281,6 @@ _PP-02: Parsing a text payload_
 
 * `payloadParse()` calls `textRequestTreat()` (step 1) which contains a switch that calls the correct treat function depending on the type of the request (step 2). As of the moment of writing this document, Orion supports TEXT payloads only for one single type of request, so there is only one treat function to choose from (or ERROR if the request type is not `EntityAttributeValueRequest`).
 * `textParseAttributeValue()` extracts the string and checks for special strings such as true, false, and null and also examines the string to see whether it is a Number. Then this value along with the type of the value is set to the attribute that is a parameter for the function.
-
-[Top](#top)
-
-
-## src/lib/jsonParse/
-This library takes care of the JSON parsing of payload for NGSIv1 requests. It depends on the [Boost library property_tree](https://theboostcpplibraries.com/boost.propertytree) and uses SAX to translate the incoming JSON text into the ngsi classes.
-
-This library contains a vector of the type `JsonRequest`, that defines how to parse the different requests. The function `jsonTreat()` picks the parsing method and `jsonParse()` takes care of the parsing, with help from the Boost property_tree library.
-
-See detailed explanation of the V1 JSON parse implementation in its [dedicated document](jsonParse.md).
 
 [Top](#top)
 
@@ -371,14 +346,6 @@ So, for the rest library to find the service routine of an incoming request, it 
 Similar to the **serviceRoutines** library described above, the **serviceRoutinesV2** library contains the service routines for NGSIv2 requests.
 
 Some NGSIv2 service routines invoke [**mongoBackend**](#srclibmongobackend) directly. Others rely on a lower level service routine. See [the service routines mapping document](ServiceRoutines.txt) for details.
-
-[Top](#top)
-
-
-## src/lib/convenience/
-The **convenience** library contains top hierarchy classes for the NGSIv1 convenience operations. For a complete list of these requests (and the service routines in which they are based), kindly see [the service routines mapping document](ServiceRoutines.txt).
-
-This library is similar to the [**ngsi9**](#srclibngsi9) and [**ngsi10**](#srclibngsi10) libraries.
 
 [Top](#top)
 

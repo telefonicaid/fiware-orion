@@ -30,7 +30,8 @@
 
 #include "orionTypes/UpdateActionType.h"
 #include "ngsi/Request.h"
-#include "apiTypesV2/Entities.h"
+
+#include "apiTypesV2/EntityVector.h"
 
 
 
@@ -42,7 +43,7 @@ class BatchUpdate
 {
  public:
   ActionType        updateActionType;   // Mandatory
-  Entities          entities;           // Mandatory
+  EntityVector      entities;           // Mandatory
 
   BatchUpdate();
   ~BatchUpdate();

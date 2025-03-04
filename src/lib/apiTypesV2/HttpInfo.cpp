@@ -193,11 +193,11 @@ void HttpInfo::fill(const orion::BSONObj& bo)
       orion::BSONObj ngsiObj = getObjectFieldF(bo, CSUB_NGSI);
       if (ngsiObj.hasField(ENT_ENTITY_ID))
       {
-        this->ngsi.id = getStringFieldF(ngsiObj, ENT_ENTITY_ID);
+        this->ngsi.entityId.id = getStringFieldF(ngsiObj, ENT_ENTITY_ID);
       }
       if (ngsiObj.hasField(ENT_ENTITY_TYPE))
       {
-        this->ngsi.type = getStringFieldF(ngsiObj, ENT_ENTITY_TYPE);
+        this->ngsi.entityId.type = getStringFieldF(ngsiObj, ENT_ENTITY_TYPE);
       }
       if (ngsiObj.hasField(ENT_ATTRS))
       {

@@ -33,7 +33,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Scope.h"
 #include "ngsi10/UpdateContextRequest.h"
