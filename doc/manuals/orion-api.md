@@ -3168,7 +3168,7 @@ This transformation will return `null` in the following cases:
 
 * The input is not an array
 * The array is empty
-* The array containts some non numeric item
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3192,7 +3192,7 @@ This transformation will return `null` in the following cases:
 
 * The input is not an array
 * The array is empty
-* The array containts some non numeric item
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3216,7 +3216,7 @@ This transformation will return `null` in the following cases:
 
 * The input is not an array
 * The array is empty
-* The array containts some non numeric item
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3240,7 +3240,7 @@ This transformation will return `null` in the following cases:
 
 * The input is not an array
 * The array is empty
-* The array containts some non numeric item
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3264,7 +3264,7 @@ This transformation will return `null` in the following cases:
 
 * The input is not an array
 * The array is empty
-* The array containts some non numeric item
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 3, 3, 6, 7, 8, 9]}`):
 
@@ -3299,7 +3299,7 @@ Extra arguments: none
 This transformation will return `null` in the following cases:
 
 * The input is not an array
-* The array containts some non numeric item
+* The array contains some non numeric item
 
 Example (being context `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
 
