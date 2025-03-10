@@ -54,7 +54,7 @@ import signal
 import json
 import paho.mqtt.client as mqtt
 import threading
-
+import html
 
 def usage_and_exit(msg):
     """
@@ -353,9 +353,9 @@ def record_request(request):
     params = ''
     for k in request.args:
         if (params == ''):
-            params = k + '=' + request.args[k]
+            params = html.escape(k) + '=' + html.escape(request.args[k])
         else:
-            params += '&' + k + '=' + request.args[k]
+            params += '&' + html.escape(k) + '=' + html.escape(request.args[k])
 
     if (params == ''):
         s += '\n'
@@ -364,7 +364,7 @@ def record_request(request):
 
     # Store headers (according to pre-defined order)
     for h in sort_headers(request.headers.keys()):
-        s += h + ': ' + request.headers[h] + '\n'
+        s += h + ': ' + html.escape(request.headers[h]) + '\n'
 
     # Store payload
     if ((request.data is not None) and (len(request.data) != 0)):
@@ -377,7 +377,7 @@ def record_request(request):
             except ValueError as e:
                 s += str(e)
         else:
-            s += request.data.decode("utf-8")
+            s += html.escape(request.data.decode("utf-8"))
 
     # Separator
     s += '=======================================\n'
