@@ -50,7 +50,7 @@ services:
     command: -dbURI mongodb://mongo
 
   mongo:
-    image: mongo:6.0
+    image: mongo:8.0
     command: --nojournal
 ```
 
