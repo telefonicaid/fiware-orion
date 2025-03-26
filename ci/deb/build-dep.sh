@@ -51,7 +51,7 @@ apt-get -y install \
 
 echo "INSTALL: MongoDB shell" \
 && curl -L https://www.mongodb.org/static/pgp/server-8.0.asc | apt-key add - \
-&& echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/8.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list \
+&& echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list \
 && apt-get -y update \
 && apt-get -y install mongodb-mongosh
 
