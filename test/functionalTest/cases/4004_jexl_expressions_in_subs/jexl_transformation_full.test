@@ -33,7 +33,7 @@ accumulatorStart --pretty-print
 
 #
 # 01. Create custom sub using all transformations
-# 02. Create entity E1 with A to AD attributes
+# 02. Create entity E1 with A to AL attributes
 # 03. Dump accumulator and see expected notification
 #
 
@@ -84,7 +84,12 @@ payload='{
       "AD",
       "AE",
       "AF",
-      "AG"
+      "AG",
+      "AH",
+      "AI",
+      "AJ",
+      "AK",
+      "AL"
     ],
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
@@ -220,6 +225,26 @@ payload='{
         "AG": {
           "type": "Number",
           "value": "${AG|getTime}"
+        },
+        "AH": {
+          "type": "Number",
+          "value": "${AH|arrMin}"
+        },
+        "AI": {
+          "type": "Number",
+          "value": "${AI|arrMax}"
+        },
+        "AJ": {
+          "type": "Number",
+          "value": "${AJ|arrMed}"
+        },
+        "AK": {
+          "type": "Number",
+          "value": "${AK|arrSort}"
+        },
+        "AL": {
+          "type": "Number",
+          "value": "${AL|arrReverse}"
         }
       }
     }
@@ -230,7 +255,7 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A to AD attributes"
+echo "02. Create entity E1 with A to AL attributes"
 echo "============================================"
 payload='{
   "id": "E1",
@@ -371,6 +396,26 @@ payload='{
   "AG": {
     "type": "Number",
     "value": "1979-11-13T18:01:14+00:00"
+  },
+  "AH": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
+  },
+  "AI": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3]
+  },
+  "AJ": {
+    "type": "StructuredValue",
+    "value": [3, 1, 3, 9, 7, 8, 6]
+  },
+  "AK": {
+    "type": "StructuredValue",
+    "value": [3, 1, 3, 9, 7, 8, 6]
+  },
+  "AL": {
+    "type": "StructuredValue",
+    "value": [1, 2, 3, "foo", true]
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -396,7 +441,7 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A to AD attributes
+02. Create entity E1 with A to AL attributes
 ============================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -410,7 +455,7 @@ Content-Length: 0
 ==================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 1809
+Content-Length: 2075
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -463,6 +508,45 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Number",
                 "value": 311364074
+            },
+            "AH": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "AI": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "AJ": {
+                "metadata": {},
+                "type": "Number",
+                "value": 6
+            },
+            "AK": {
+                "metadata": {},
+                "type": "Number",
+                "value": [
+                    1,
+                    3,
+                    3,
+                    6,
+                    7,
+                    8,
+                    9
+                ]
+            },
+            "AL": {
+                "metadata": {},
+                "type": "Number",
+                "value": [
+                    true,
+                    "foo",
+                    3,
+                    2,
+                    1
+                ]
             },
             "B": {
                 "metadata": {},

@@ -109,6 +109,11 @@
         - [`keys`](#keys)
         - [`arrSum`](#arrsum)
         - [`arrAvg`](#arravg)
+        - [`arrMax`](#arrmax)
+        - [`arrMin`](#arrmin)
+        - [`arrMed`](#arrmed)
+        - [`arrSort`](#arrsort)
+        - [`arrReverse`](#arrreverse)
         - [`now`](#now)
         - [`toIsoString`](#toisostring)
         - [`getTime`](#gettime)
@@ -362,7 +367,7 @@ representations of entities.
 [ 'Ford', 'black', 78.3 ]
 ```
 
-* *unique mode*. This mode is just like *values mode*, except that values are not repeated.
+* *unique mode*. This mode is just like *values mode*, except that values are not repeated. Note this mode is not supported in `attrsFormat` in subscriptions (see [Notification Messages section](#notification-messages)).
 
 ## Partial Representations
 
@@ -714,7 +719,7 @@ The list of builtin attributes is as follows:
   controls entity expiration is described in [Transient entities section](#transient-entities).
 
 * `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with
-the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
+the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions-based-in-alteration-type) section). This attribute
 
   can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
    * `entityCreate` if the update that triggers the notification is a entity creation operation
@@ -3155,9 +3160,15 @@ results in
 
 #### arrSum
 
-Returns the sum of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+Returns the sum of the elements of an array.
 
 Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3173,9 +3184,15 @@ results in
 
 #### arrAvg
 
-Returns the average of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+Returns the average of the elements of an array
 
 Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3187,6 +3204,135 @@ results in
 
 ```
 3
+```
+
+#### arrMax
+
+Returns the maximum of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrMax
+```
+
+results in
+
+```
+5
+```
+
+#### arrMin
+
+Returns the minimum of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrMin
+```
+
+results in
+
+```
+1
+```
+
+#### arrMed
+
+Returns the median value of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 3, 3, 6, 7, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+results in
+
+```
+6
+```
+
+Example (being context `{"c": [1, 2, 3, 4, 5, 6, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+results in
+
+```
+4.5
+```
+
+#### arrSort
+
+Returns the sorted version of the array used as input
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array contains some non numeric item
+
+Example (being context `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrSort
+```
+
+results in
+
+```
+[1, 3, 3, 6, 7, 8, 9]
+```
+
+#### arrReverse
+
+Returns the the reserved version of the array used as input
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+
+Example (being context `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrReverse
+```
+
+results in
+
+```
+[6, 8, 7, 9, 3, 1, 3]
 ```
 
 #### now
@@ -3428,6 +3574,10 @@ update takes place. The elements in the `alterationTypes` array are interpreted 
 
 Default `alterationTypes` (i.e. the one for subscription not explicitly specifying it)
 is `["entityCreate", "entityChange"]`.
+
+In the case of using `entityChange` and `entityUpdate` at the same time, `entityUpdate` takes precedence
+(in other words, using `"alterationTypes": [ "entityUpdate", "entityChange" ]` is equivalente to
+use `"alterationTypes": [ "entityUpdate" ]`).
 
 The particular alteration type can be got in notifications using the
 [`alterationType` builtin attribute](#builtin-attributes).

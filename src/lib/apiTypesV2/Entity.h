@@ -140,9 +140,9 @@ class Entity
 
   void addAllAttrsExceptFiltered(std::vector<ContextAttribute*>*  orderedAttrs);
 
-  std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs, ExprContextObject* exprContextObjectP = NULL);
   std::string toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs);
-  std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
+  std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs, ExprContextObject* exprContextObjectP = NULL);
   std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
                                const std::vector<std::string>&        metadataFilter,
                                bool                                   renderNgsiField   = false,

@@ -315,7 +315,8 @@ static bool setNgsiPayload
   ncr.subscriptionId  = subscriptionId;
   ncr.contextElementResponseVector.push_back(&cer);
 
-  if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES))
+  if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES) ||
+      (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_VALUES) )
   {
     *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
   }

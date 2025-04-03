@@ -110,7 +110,7 @@ Orion Context Broker には、次の手順に従って実行できる一連の�
 
 aarch64 アーキテクチャの場合、apt-get を使用して libxslt をインストールし、`--build=arm-linux` オプションを指定して `/configure` を実行します。
 
-* MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。 詳細については、[MongoDB の公式ドキュメント](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/)を確認してください。推奨バージョンは 6.0 です (以前のバージョンでも動作する可能性がありますが、お勧めしません)。
+* MongoDB をインストールします (テストはローカルホストで実行されている mongod に依存します)。 詳細については、[MongoDB の公式ドキュメント](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-debian/)を確認してください。推奨バージョンは 8.0 です (以前のバージョンでも動作する可能性がありますが、お勧めしません)。
 
 * ユニット・テストを実行します
 

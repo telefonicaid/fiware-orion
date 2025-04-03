@@ -21,7 +21,7 @@
 <a name="mongodb-configuration"></a>
 ##  MongoDB の設定
 
-パフォーマンスの観点から、特に Update-Intensive シナリオでは、WireTiger で MongoDB 6.0 を使用することをお勧めします。
+パフォーマンスの観点から、特に Update-Intensive シナリオでは、WireTiger で MongoDB 8.0 を使用することをお勧めします。
 
 さらに、パフォーマンスに影響を与える可能性があるため、公式の MongoDB のドキュメントから次の情報を考慮してください :
 
