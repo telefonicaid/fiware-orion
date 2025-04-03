@@ -71,6 +71,15 @@ bool ServiceQueue::try_push(SenderThreadParams* item)
 }
 
 
+/* ****************************************************************************
+*
+* ServiceQueue::countSubIds -
+*/
+std::string ServiceQueue::countSubIds() const
+{
+  return queue.countSubIds();
+}
+
 
 /* ****************************************************************************
 *

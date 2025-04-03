@@ -27,6 +27,7 @@
 */
 
 #include <queue>
+#include <map>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -49,6 +50,7 @@ public:
     bool try_push(Data element, bool unstoppable = false);
     Data pop();
     size_t size() const;
+    std::string countSubIds() const;
 };
 
 /* ****************************************************************************
@@ -68,6 +70,38 @@ bool SyncQOverflow<Data>::try_push(Data element, bool unstoppable)
       return true;
     }
   return false;
+}
+
+/* ****************************************************************************
+*
+* SyncQOverflow<Data>::countSubIds -
+*/
+template <typename Data>
+std::string SyncQOverflow<Data>::countSubIds() const
+{
+  boost::mutex::scoped_lock lock(mtx);
+  std::map<std::string, size_t> occurrences;
+
+  // FIXME PR: unsure about this solution. Copying the full queue each time seem to be overkill....
+  std::queue<Data> tempQueue = queue;
+  while (!tempQueue.empty())
+  {
+    Data element = tempQueue.front();
+    ++occurrences[element->subscriptionId];
+    tempQueue.pop();
+  }
+
+  std::string result;
+  for (const auto& pair : occurrences)
+  {
+    if (!result.empty())
+    {
+      result += ", ";
+    }
+    result += pair.first + " (" + std::to_string(pair.second) + ")";
+  }
+
+  return result;
 }
 
 /* ****************************************************************************
