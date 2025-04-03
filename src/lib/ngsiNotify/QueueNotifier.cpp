@@ -180,7 +180,7 @@ void QueueNotifier::sendNotifyContextRequest
   if (!enqueued)
   {
     QueueStatistics::incReject(1);
-    LM_E(("Runtime Error (%s notification queue is full)", queueName.c_str()));
+    LM_E(("Runtime Error (%s notification queue is full for sub %s, queue occupancy is: %s)", queueName.c_str(), nsf.subId.c_str(), sq->countSubIds().c_str()));
     delete paramsP;
 
     return;

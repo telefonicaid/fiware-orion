@@ -43,6 +43,8 @@ public:
   int stop(void);
   bool try_push(SenderThreadParams* item);
   size_t size() const;
+  std::string countSubIds() const;
+
 
 private:
   SyncQOverflow<SenderThreadParams*>  queue;
