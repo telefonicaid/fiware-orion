@@ -48,6 +48,7 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
+- Orion Kafka based notifications ([#4666](https://github.com/telefonicaid/fiware-orion/issues/4666))
 - Permissions attribute on entities ([#4514](https://github.com/telefonicaid/fiware-orion/issues/4514))
 - Advanced query language ([#4395](https://github.com/telefonicaid/fiware-orion/issues/4395))
 - Signed entities ([#4398](https://github.com/telefonicaid/fiware-orion/issues/4398))
