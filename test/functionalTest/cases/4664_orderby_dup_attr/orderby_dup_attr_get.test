@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Order by with dupplicate atribute (POST /v2/op/query variant)
+Order by with dupplicate atribute (GET /v2/entities variant)
 
 --SHELL-INIT--
 dbInit CB
@@ -102,90 +102,55 @@ echo
 
 echo "05. Get sorted by age, age: error"
 echo "================================="
-payload='{
-  "entities": [
-    {
-      "idPattern": ".*"
-    }
-  ]
-}'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=age,age' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=age,age'
 echo
 echo
 
 
 echo "06. Get sorted by age in reserve order, age in reverse order: error"
 echo "==================================================================="
-payload='{
-  "entities": [
-    {
-      "idPattern": ".*"
-    }
-  ]
-}'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=!age,!age' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=!age,!age'
 echo
 echo
 
 
 echo "07. Get sorted by name, name, then age: error"
 echo "============================================="
-payload='{
-  "entities": [
-    {
-      "idPattern": ".*"
-    }
-  ]
-}'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,name,age' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=name,name,age'
 echo
 echo
 
 
 echo "08. Get sorted by reverse name, reverse name, then age: error"
 echo "============================================================="
-payload='{
-  "entities": [
-    {
-      "idPattern": ".*"
-    }
-  ]
-}'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=!name,!name,age' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=!name,!name,age'
 echo
 echo
 
 
 echo "09. Get sorted by name, then reserve age, reverse age: error"
 echo "============================================================"
-payload='{
-  "entities": [
-    {
-      "idPattern": ".*"
-    }
-  ]
-}'
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age,!age' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=name,!age,!age'
 echo
 echo
 
 echo "10. Get sorted by name, then reserve age, name: error"
 echo "====================================================="
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age,name' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=name,!age,name'
 echo
 echo
 
 
 echo "11. Get sorted by name, then reserve age, then reverse name: error"
 echo "=================================================================="
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age,!name' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=name,!age,!name'
 echo
 echo
 
 
 echo "12. Get sorted by age, then reserve age: error"
 echo "=============================================="
-orionCurl --url '/v2/op/query?options=keyValues&orderBy=age,!age' --payload "$payload"
+orionCurl --url '/v2/entities?orderBy=age,!age'
 echo
 echo
 
@@ -237,11 +202,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
@@ -251,11 +216,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
@@ -265,11 +230,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
@@ -279,11 +244,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
@@ -293,11 +258,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
@@ -307,11 +272,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
@@ -321,11 +286,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
@@ -335,11 +300,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 69
+Content-Length: 71
 
 {
-    "description": "duplicate sort token detected",
-    "error": "Bad Request"
+    "description": "duplicate orderBy token detected",
+    "error": "BadRequest"
 }
 
 
