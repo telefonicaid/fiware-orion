@@ -217,11 +217,11 @@ extern bool entitiesQuery
   OrionError*                      oeP,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
+  const std::vector<std::string>&  sortOrderList,
   int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit          = DEFAULT_PAGINATION_LIMIT_INT,
   bool*                            limitReached   = NULL,
-  long long*                       countP         = NULL,
-  const std::string&               sortOrderList  = ""
+  long long*                       countP         = NULL
 );
 
 

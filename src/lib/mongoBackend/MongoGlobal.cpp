@@ -1275,11 +1275,11 @@ bool entitiesQuery
   OrionError*                      oeP,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
+  const std::vector<std::string>&  sortOrderV,
   int                              offset,
   int                              limit,
   bool*                            limitReached,
-  long long*                       countP,
-  const std::string&               sortOrderList
+  long long*                       countP
 )
 {
   /* Query structure is as follows
@@ -1434,13 +1434,13 @@ bool entitiesQuery
   orion::BSONObj countQuery = finalCountQuery.obj();
   orion::BSONObj sort;
 
-  if (sortOrderList.empty())
+  if (sortOrderV.size() == 0)
   {
     orion::BSONObjBuilder bobSort;
     bobSort.append(ENT_CREATION_DATE, 1);
     sort = bobSort.obj();
   }
-  else if ((sortOrderList == ORDER_BY_PROXIMITY))
+  else if ((sortOrderV[0] == ORDER_BY_PROXIMITY))
   {
     // In this case the solution is not setting any query.sort(), as the $near operator will do the
     // sorting itself. Of course, using orderBy=geo:distance without using georel=near will return
@@ -1448,24 +1448,22 @@ bool entitiesQuery
   }
   else
   {
-    std::vector<std::string>  sortedV;
-    int                       components = stringSplit(sortOrderList, ',', sortedV);
     orion::BSONObjBuilder     sortOrder;
 
-    for (int ix = 0; ix < components; ix++)
+    for (unsigned int ix = 0; ix < sortOrderV.size(); ix++)
     {
       std::string  sortToken;
       int          sortDirection;
 
-      if (sortedV[ix][0] == '!')
+      if (sortOrderV[ix][0] == '!')
       {
         // reverse
-        sortToken     = sortedV[ix].substr(1);
+        sortToken     = sortOrderV[ix].substr(1);
         sortDirection = -1;
       }
       else
       {
-        sortToken     = sortedV[ix];
+        sortToken     = sortOrderV[ix];
         sortDirection = 1;
       }
 

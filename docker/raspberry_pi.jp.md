@@ -50,8 +50,7 @@ services:
     command: -dbURI mongodb://mongo
 
   mongo:
-    image: mongo:6.0
-    command: --nojournal
+    image: mongo:8.0
 ```
 
 Orion を実行するには、`docker compose up -d` を実行します。`curl localhost:1026/version` コマンドを実行して、

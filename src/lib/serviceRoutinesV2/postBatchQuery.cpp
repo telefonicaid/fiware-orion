@@ -27,6 +27,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/errorMessages.h"
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
@@ -141,22 +142,35 @@ std::string postBatchQuery
   postQueryContext(ciP, components, compV, parseDataP);
 
   // Whichever the case, 200 OK is always returned (in the case of fail with CPr 200 OK [] may be returned)
-  // FIXME P7: what about of 5xx situationes (e.g. MongoDB errores). They should progress to
-  // the client as errors
-  ciP->httpStatusCode = SccOk;
-
-  // 03. Render Entities response
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
+  // except for some error situations (e.g. duplicated sort tokens in orderBy)
+  // (I don't like this code very much, as we are using de description of the error to decide, but
+  // I guess that until CPrs functionality gets dropped we cannot do it better...)
+  if (parseDataP->qcrs.res.error.description == ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY)
   {
-    answer = "[]";
+    // FIXME P7: what about of 5xx situationes (e.g. MongoDB errores). They should progress to
+    // the client as errors in a similar way
+
+    ciP->httpStatusCode = SccBadRequest;
+    OrionError oe(SccBadRequest, parseDataP->qcrs.res.error.description);
+    TIMED_RENDER(answer = oe.toJson());
   }
   else
   {
-    OrionError oe;
-    fillEntityVector(parseDataP->qcrs.res, &entities, &oe);
+    ciP->httpStatusCode = SccOk;
 
-    TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
-                                          filterAttrs.stringV, false, qcrP->metadataList.stringV));
+    // 03. Render Entities response
+    if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
+    {
+      answer = "[]";
+    }
+    else
+    {
+      OrionError oe;
+      fillEntityVector(parseDataP->qcrs.res, &entities, &oe);
+
+      TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
+                                            filterAttrs.stringV, false, qcrP->metadataList.stringV));
+    }
   }
 
   // 04. Cleanup and return result

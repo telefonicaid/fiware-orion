@@ -953,9 +953,17 @@ static void logEnvVars(void)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
       }
+      else if (aP->type == PaUInt)
+      {
+        LM_I(("env var ORION_%s (%s): %u", aP->envName, aP->option, *((unsigned int*) aP->varP)));
+      }      
+      else if (aP->type == PaLong)
+      {
+        LM_I(("env var ORION_%s (%s): %ld", aP->envName, aP->option, *((long*) aP->varP)));
+      }
       else if (aP->type == PaULong)
       {
-        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((unsigned long*) aP->varP)));
+        LM_I(("env var ORION_%s (%s): %lu", aP->envName, aP->option, *((unsigned long*) aP->varP)));
       }
       else if (aP->type == PaDouble)
       {

@@ -109,6 +109,11 @@
         - [`keys`](#keys)
         - [`arrSum`](#arrsum)
         - [`arrAvg`](#arravg)
+        - [`arrMax`](#arrmax)
+        - [`arrMin`](#arrmin)
+        - [`arrMed`](#arrmed)
+        - [`arrSort`](#arrsort)
+        - [`arrReverse`](#arrreverse)
         - [`now`](#now)
         - [`toIsoString`](#toisostring)
         - [`getTime`](#gettime)
@@ -3155,9 +3160,15 @@ results in
 
 #### arrSum
 
-Returns the sum of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+Returns the sum of the elements of an array.
 
 Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3173,9 +3184,15 @@ results in
 
 #### arrAvg
 
-Returns the average of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+Returns the average of the elements of an array
 
 Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3187,6 +3204,135 @@ results in
 
 ```
 3
+```
+
+#### arrMax
+
+Returns the maximum of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrMax
+```
+
+results in
+
+```
+5
+```
+
+#### arrMin
+
+Returns the minimum of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrMin
+```
+
+results in
+
+```
+1
+```
+
+#### arrMed
+
+Returns the median value of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 3, 3, 6, 7, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+results in
+
+```
+6
+```
+
+Example (being context `{"c": [1, 2, 3, 4, 5, 6, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+results in
+
+```
+4.5
+```
+
+#### arrSort
+
+Returns the sorted version of the array used as input
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array contains some non numeric item
+
+Example (being context `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrSort
+```
+
+results in
+
+```
+[1, 3, 3, 6, 7, 8, 9]
+```
+
+#### arrReverse
+
+Returns the the reserved version of the array used as input
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+
+Example (being context `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrReverse
+```
+
+results in
+
+```
+[6, 8, 7, 9, 3, 1, 3]
 ```
 
 #### now
@@ -3518,6 +3664,17 @@ in the case of temperature ties.
 Note that the [builtin attributes](#builtin-attributes) `dateCreated` and `dateModified` can be used as
 elements in the `orderBy` comma-separated list (including the `!` syntax) to mean
 entity creation time and entity modification time respectively.
+
+Note that the same ordering token cannot be repeated in `orderBy`. For instance, the following requests are not allowed
+and would result in 400 Bad Request response:
+
+```
+GET /v2/entities?orderBy=age,age
+GET /v2/entities?orderBy=!age,!age
+GET /v2/entities?orderBy=age,!age
+GET /v2/entities?orderBy=age,name,age
+GET /v2/entities?orderBy=age,name,!age
+```
 
 With regards of the ordering of attributes which values belong to several JSON types, Orion
 uses the same criteria as the one used by the underlying implementation (MongoDB). See

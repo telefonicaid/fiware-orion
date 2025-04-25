@@ -20,7 +20,7 @@
 #
 
 ARG  IMAGE_NAME=debian
-ARG  IMAGE_TAG=12.9-slim
+ARG  IMAGE_TAG=12.10-slim
 FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -102,7 +102,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
-    bash get_cjexl.sh 0.4.0 $(cat /run/secrets/repo_token) && \
+    bash get_cjexl.sh 0.5.0 $(cat /run/secrets/repo_token) && \
     make && \
     make install && \
     # reduce size of installed binaries
