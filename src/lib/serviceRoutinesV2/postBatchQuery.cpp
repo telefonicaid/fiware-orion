@@ -79,7 +79,7 @@ std::string postBatchQuery
   // Whichever the case, 200 OK is always returned (in the case of fail with CPr 200 OK [] may be returned)
   // FIXME P7: what about of 5xx situationes (e.g. MongoDB errores). They should progress to
   // the client as errors
-  ciP->httpStatusCode = SccOk;
+  //ciP->httpStatusCode = SccOk;
 
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
