@@ -357,6 +357,24 @@ HttpStatusCode mongoQueryContext
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
 
+  // FIXME PR: refactor this
+  std::vector<std::string>  sortedV;
+  stringSplit(sortOrderList, ',', sortedV);
+
+  // Check for duplicate tokens (with or without "!" prefix)
+  std::set<std::string> uniqueTokens;
+  for (const auto& token : sortedV) {
+    std::string normalizedToken = (token[0] == '!') ? token.substr(1) : token;
+    if (!uniqueTokens.insert(normalizedToken).second) {
+      LM_E(("Runtime Error (duplicate sort token detected: '%s')", normalizedToken.c_str()));
+      responseP->errorCode.fill(SccBadRequest, "duplicate sort token detected");
+
+      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+
+      return SccBadRequest;
+    }
+  }
+
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
                      requestP->restriction,
