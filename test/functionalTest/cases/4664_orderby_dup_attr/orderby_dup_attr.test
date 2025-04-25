@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Order by with dupplicate atribute
+Order by with dupplicate atribute (POST /v2/op/query variant)
 
 --SHELL-INIT--
 dbInit CB
@@ -233,90 +233,114 @@ Content-Length: 0
 
 05. Get sorted by age, age: error
 =================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 06. Get sorted by age in reserve order, age in reverse order: error
 ===================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 07. Get sorted by name, name, then age: error
 =============================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 08. Get sorted by reverse name, reverse name, then age: error
 =============================================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 09. Get sorted by name, then reserve age, reverse age: error
 ============================================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 10. Get sorted by name, then reserve age, name: error
 =====================================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 11. Get sorted by name, then reserve age, then reverse name: error
 ==================================================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 12. Get sorted by age, then reserve age: error
 ==============================================
-HTTP/1.1 200 OK
+HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 69
 
-[]
+{
+    "description": "duplicate sort token detected",
+    "error": "Bad Request"
+}
 
 
 --TEARDOWN--

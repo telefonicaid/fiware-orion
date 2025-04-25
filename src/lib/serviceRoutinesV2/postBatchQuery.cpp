@@ -79,20 +79,29 @@ std::string postBatchQuery
   // Whichever the case, 200 OK is always returned (in the case of fail with CPr 200 OK [] may be returned)
   // FIXME P7: what about of 5xx situationes (e.g. MongoDB errores). They should progress to
   // the client as errors
-  //ciP->httpStatusCode = SccOk;
-
-  // 03. Render Entities response
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
+  if (parseDataP->qcrs.res.errorCode.details == "duplicate sort token detected")
   {
-    answer = "[]";
+    ciP->httpStatusCode = SccBadRequest;
+    OrionError oe(SccBadRequest, parseDataP->qcrs.res.errorCode.details);
+    TIMED_RENDER(answer = oe.toJson());
   }
   else
   {
-    OrionError oe;
-    entities.fill(parseDataP->qcrs.res, &oe);
+    ciP->httpStatusCode = SccOk;
 
-    TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
-                                          filterAttrs.stringV, false, qcrP->metadataList.stringV));
+    // 03. Render Entities response
+    if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
+    {
+      answer = "[]";
+    }
+    else
+    {
+      OrionError oe;
+      entities.fill(parseDataP->qcrs.res, &oe);
+
+      TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
+                                            filterAttrs.stringV, false, qcrP->metadataList.stringV));
+    }
   }
 
   // 04. Cleanup and return result
