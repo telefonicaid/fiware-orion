@@ -30,6 +30,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -357,6 +358,23 @@ HttpStatusCode mongoQueryContext
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
 
+  std::vector<std::string>  sortedV;
+  stringSplit(sortOrderList, ',', sortedV);
+
+  // Check for duplicate tokens (with or without "!" prefix)
+  std::set<std::string> uniqueTokens;
+  for (const auto& token : sortedV) {
+    std::string normalizedToken = (token[0] == '!') ? token.substr(1) : token;
+    if (!uniqueTokens.insert(normalizedToken).second) {
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
+      responseP->errorCode.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
+
+      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+
+      return SccOk;
+    }
+  }
+
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
                      requestP->restriction,
@@ -364,11 +382,11 @@ HttpStatusCode mongoQueryContext
                      &err,
                      tenant,
                      servicePathV,
+                     sortedV,
                      offset,
                      limit,
                      &limitReached,
                      countP,
-                     sortOrderList,
                      apiVersion);
 
   if (!ok)

@@ -3665,6 +3665,17 @@ Note that the [builtin attributes](#builtin-attributes) `dateCreated` and `dateM
 elements in the `orderBy` comma-separated list (including the `!` syntax) to mean
 entity creation time and entity modification time respectively.
 
+Note that the same ordering token cannot be repeated in `orderBy`. For instance, the following requests are not allowed
+and would result in 400 Bad Request response:
+
+```
+GET /v2/entities?orderBy=age,age
+GET /v2/entities?orderBy=!age,!age
+GET /v2/entities?orderBy=age,!age
+GET /v2/entities?orderBy=age,name,age
+GET /v2/entities?orderBy=age,name,!age
+```
+
 With regards of the ordering of attributes which values belong to several JSON types, Orion
 uses the same criteria as the one used by the underlying implementation (MongoDB). See
 [the following link](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort)

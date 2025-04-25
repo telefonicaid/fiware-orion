@@ -67,6 +67,7 @@
 #define ERROR_DESC_BAD_REQUEST_INVALID_RANGE          "ranges only valid for equal and not equal ops"
 #define ERROR_DESC_BAD_REQUEST_INVALID_LIST           "lists only valid for equal and not equal ops"
 #define ERROR_DESC_BAD_REQUEST_PARTIAL_GEOEXPRESSION  "partial geo expression: geometry, georel and coords have to be provided together"
+#define ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY     "duplicate orderBy token detected"
 
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTIDPATTERN     "Invalid JSON type for entity idPattern"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPEPATTERN   "Invalid JSON type for entity typePattern"

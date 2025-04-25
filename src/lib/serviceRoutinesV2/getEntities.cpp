@@ -66,6 +66,7 @@
 *   - attrs
 *   - metadata
 *   - options=keyValues
+*   - orderBy
 *   - type=TYPE
 *   - type=TYPE1,TYPE2,...TYPEN
 *
@@ -311,7 +312,9 @@ std::string getEntities
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
   // 03. Check Internal Errors
-  if (parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError)
+  // (I don't like this code very much, as for the second case we are using de description of the error to decide, but
+  // I guess that until CPrs functionality gets dropped we cannot do it better...)
+  if ((parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError) || (parseDataP->qcrs.res.errorCode.details == ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY))
   {
     OrionError oe;
     entities.fill(parseDataP->qcrs.res, &oe);
