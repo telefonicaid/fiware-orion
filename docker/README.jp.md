@@ -37,11 +37,8 @@ Orion Context Broker を試してみたいし、データベースについて�
 
 		  mongo:
 		    image: mongo:8.0
-		    command: --nojournal
 
 3. コマンドラインを使用して作成したディレクトリで、`sudo docker-compose up` を実行します
-
-> `--nojournal` に関しては、それはプロダクション利用では推奨されていませんが、Orion コンテナが高速で、DB が見つからず準備ができていない場合に、mongo コンテナの起動を高速化し、いくつかの競合状態の問題を回避します。
 
 数秒後、Context Broker が実行され、ポート 1026 をリッスンします。
 
