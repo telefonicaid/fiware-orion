@@ -39,11 +39,8 @@ Follow these steps:
 		
 		  mongo:
 		    image: mongo:8.0
-		    command: --nojournal
 
 3. Using the command-line and within the directory you created type: `sudo docker-compose up`.
-
-> Regarding --nojournal it is not recommened for production, but it speeds up mongo container start up and avoids some race conditions problems if Orion container is faster and doesn't find the DB up and ready.
 
 After a few seconds you should have your Context Broker running and listening on port `1026`.
 

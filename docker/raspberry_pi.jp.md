@@ -51,7 +51,6 @@ services:
 
   mongo:
     image: mongo:8.0
-    command: --nojournal
 ```
 
 Orion を実行するには、`docker compose up -d` を実行します。`curl localhost:1026/version` コマンドを実行して、

@@ -11,5 +11,4 @@ services:
 
   mongo:
     image: mongo:8.0
-    command: --nojournal
 

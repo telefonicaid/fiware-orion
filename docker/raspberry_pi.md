@@ -50,7 +50,6 @@ services:
 
   mongo:
     image: mongo:8.0
-    command: --nojournal
 ```
 
 To start up Orion, you run `docker-compose up -d`. Run the `curl localhost:1026/version` command
