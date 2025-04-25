@@ -367,12 +367,12 @@ HttpStatusCode mongoQueryContext
   for (const auto& token : sortedV) {
     std::string normalizedToken = (token[0] == '!') ? token.substr(1) : token;
     if (!uniqueTokens.insert(normalizedToken).second) {
-      LM_E(("Runtime Error (duplicate sort token detected: '%s')", normalizedToken.c_str()));
+      alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
       responseP->errorCode.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
 
       reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
 
-      return SccBadRequest;
+      return SccOk;
     }
   }
 
@@ -383,11 +383,11 @@ HttpStatusCode mongoQueryContext
                      &err,
                      tenant,
                      servicePathV,
+                     sortedV,
                      offset,
                      limit,
                      &limitReached,
                      countP,
-                     sortOrderList,
                      apiVersion);
 
   if (!ok)
