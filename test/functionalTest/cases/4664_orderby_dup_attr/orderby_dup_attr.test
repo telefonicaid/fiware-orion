@@ -34,11 +34,14 @@ brokerStart CB
 # 02. Create entity User2: name=John, surname=Smith,    age=37
 # 03. Create entity User3: name=Jane, surname=Simpson,  age=27
 # 04. Create entity User4: name=Jane, surname=Thompson, age=18
-# 05. Get sorted by age, age: User4, User3, User1, User2
-# 06. Get sorted by age in reserve order, age in reverse order: User2, User1, User3, User4
-# 07. Get sorted by name, name, then age: User4, User3, User1, User2
-# 08. Get sorted by reverse name, reverse name, then age: User1, User2, User4, User3
-# 09. Get sorted by name, then reserve age, reverse age: User3, User4, User2, User1
+# 05. Get sorted by age, age (see error)
+# 06. Get sorted by age in reserve order, age in reverse order: error
+# 07. Get sorted by name, name, then age: error
+# 08. Get sorted by reverse name, reverse name, then age: error
+# 09. Get sorted by name, then reserve age, reverse age: error
+# 10. Get sorted by name, then reserve age, name: error
+# 11. Get sorted by name, then reserve age, then reverse name: error
+# 12. Get sorted by age, then reserve age: error
 #
 
 echo "01. Create entity User1: name=John, surname=Doe, age=36"
@@ -97,8 +100,8 @@ echo
 echo
 
 
-echo "05. Get sorted by age, age: User4, User3, User1, User2"
-echo "======================================================"
+echo "05. Get sorted by age, age: error"
+echo "================================="
 payload='{
   "entities": [
     {
@@ -111,8 +114,8 @@ echo
 echo
 
 
-echo "06. Get sorted by age in reserve order, age in reverse order: User2, User1, User3, User4"
-echo "========================================================================================"
+echo "06. Get sorted by age in reserve order, age in reverse order: error"
+echo "==================================================================="
 payload='{
   "entities": [
     {
@@ -125,8 +128,8 @@ echo
 echo
 
 
-echo "07. Get sorted by name, name, then age: User4, User3, User1, User2"
-echo "=================================================================="
+echo "07. Get sorted by name, name, then age: error"
+echo "============================================="
 payload='{
   "entities": [
     {
@@ -139,8 +142,8 @@ echo
 echo
 
 
-echo "08. Get sorted by reverse name, reverse name, then age: User1, User2, User4, User3"
-echo "=================================================================================="
+echo "08. Get sorted by reverse name, reverse name, then age: error"
+echo "============================================================="
 payload='{
   "entities": [
     {
@@ -153,8 +156,8 @@ echo
 echo
 
 
-echo "09. Get sorted by name, then reserve age, reverse age: User3, User4, User2, User1"
-echo "================================================================================="
+echo "09. Get sorted by name, then reserve age, reverse age: error"
+echo "============================================================"
 payload='{
   "entities": [
     {
@@ -163,6 +166,26 @@ payload='{
   ]
 }'
 orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age,!age' --payload "$payload"
+echo
+echo
+
+echo "10. Get sorted by name, then reserve age, name: error"
+echo "====================================================="
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age,name' --payload "$payload"
+echo
+echo
+
+
+echo "11. Get sorted by name, then reserve age, then reverse name: error"
+echo "=================================================================="
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=name,!age,!name' --payload "$payload"
+echo
+echo
+
+
+echo "12. Get sorted by age, then reserve age: error"
+echo "=============================================="
+orionCurl --url '/v2/op/query?options=keyValues&orderBy=age,!age' --payload "$payload"
 echo
 echo
 
@@ -208,8 +231,8 @@ Content-Length: 0
 
 
 
-05. Get sorted by age, age: User4, User3, User1, User2
-======================================================
+05. Get sorted by age, age: error
+=================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -219,8 +242,8 @@ Content-Length: 2
 []
 
 
-06. Get sorted by age in reserve order, age in reverse order: User2, User1, User3, User4
-========================================================================================
+06. Get sorted by age in reserve order, age in reverse order: error
+===================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -230,7 +253,51 @@ Content-Length: 2
 []
 
 
-07. Get sorted by name, name, then age: User4, User3, User1, User2
+07. Get sorted by name, name, then age: error
+=============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+08. Get sorted by reverse name, reverse name, then age: error
+=============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+09. Get sorted by name, then reserve age, reverse age: error
+============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+10. Get sorted by name, then reserve age, name: error
+=====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+11. Get sorted by name, then reserve age, then reverse name: error
 ==================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -241,19 +308,8 @@ Content-Length: 2
 []
 
 
-08. Get sorted by reverse name, reverse name, then age: User1, User2, User4, User3
-==================================================================================
-HTTP/1.1 200 OK
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 2
-
-[]
-
-
-09. Get sorted by name, then reserve age, reverse age: User3, User4, User2, User1
-=================================================================================
+12. Get sorted by age, then reserve age: error
+==============================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
