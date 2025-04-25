@@ -358,7 +358,6 @@ HttpStatusCode mongoQueryContext
 
   reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
 
-  // FIXME PR: refactor this
   std::vector<std::string>  sortedV;
   stringSplit(sortOrderList, ',', sortedV);
 
