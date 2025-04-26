@@ -3738,6 +3738,28 @@ GET /v2/entities?orderBy=temperature,!humidity
     たとえば、`temperature,!humidity`。結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなどの順序で
     並べられます。フィールド名の前の "!" は、順序が逆になっていることを示します
 
+例:
+
+```
+GET /v2/entities?orderBy=temperature,!humidity
+```
+
+は、まず temperature の昇順で並べ替え、temperature が同点の場合は humidity の降順で並べ替えます。
+
+[組み込み属性](#builtin-attributes) `dateCreated` と `dateModified` は、`orderBy` のコンマ区切りリスト
+(`!` 構文を含む) の要素として使用でき、それぞれエンティティの作成時刻と変更時刻を表します。
+
+`orderBy` では同じ順序トークンを繰り返すことはできません。例えば、以下のリクエストは許可されておらず、
+400 Bad Request レスポンスが返されます:
+
+```
+GET /v2/entities?orderBy=age,age
+GET /v2/entities?orderBy=!age,!age
+GET /v2/entities?orderBy=age,!age
+GET /v2/entities?orderBy=age,name,age
+GET /v2/entities?orderBy=age,name,!age
+```
+
 値が複数の JSON タイプに属する属性の順序に関して、Orion は、基礎となる実装 (MongoDB) で使用される基準と同じ基準を
 使用します。詳細については、
 [次のリンク](https://docs.mongodb.com/manual/reference/method/cursor.sort/#ascending-descending-sort)を
