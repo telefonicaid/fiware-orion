@@ -113,7 +113,7 @@ static MHD_Result uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* 
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
-  if (val == NULL || *val == 0)
+  if (value.empty())
   {
     std::string  errorString = std::string("Empty right-hand-side for URI param /") + ckey + "/";
 
