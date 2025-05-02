@@ -3,6 +3,7 @@
 - Fix: previousValue metadata was not taken into account in attributes not in the update that triggers the notification (#4643)
 - Fix: detects duplication in orderBy tokens responding with 400 Bad Request in that case (#4664)
 - Fix: improve attribute and metadata invalid format dates for DateTime types in logs (#4616)
+- Fix: improve notification queue full log error including subscription id
 - Fix: attrsFormat keyValues and values were not working in custom notifications using ngsi payloads (#4644)
 - Fix: JEXL expressions were not working in attrsFormat simplifiedKeyValues, keyValues or values (#4645)
 - Fix: env vars values with unsigned int or long types where not correctly printed at startup time in INFO log level (#4668)
