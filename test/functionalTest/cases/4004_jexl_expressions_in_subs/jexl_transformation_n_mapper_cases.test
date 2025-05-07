@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-JEXL expression in custom notification (mapper transformation cases)
+JEXL expression in custom notification (nMapper transformation cases)
 
 --SHELL-INIT--
 dbInit CB
@@ -62,7 +62,7 @@ payload='{
       "ngsi": {
         "R": {
           "type": "Text",
-          "value": "${T|mapper([0, 1, 2, 3, 4, 5, 6],['\''No data'\'', '\''Good'\'', '\''Somehow good'\'', '\''So-so'\'', '\''Bad'\'', '\''Very bad'\'', '\''Extremenly bad'\''])}"
+          "value": "${T|nMapper([0, 1, 2, 3, 4, 5, 6],['\''No data'\'', '\''Good'\'', '\''Somehow good'\'', '\''So-so'\'', '\''Bad'\'', '\''Very bad'\'', '\''Extremenly bad'\''])}"
         }
       }
     }
@@ -177,7 +177,6 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {},
                 "type": "Text",
                 "value": "No data"
-                         
             },
             "T": {
                 "metadata": {},
@@ -207,7 +206,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             "R": {
                 "metadata": {},
                 "type": "Text",
-                "value": "Extremenly bad"
+                "value": "Bad"
             },
             "T": {
                 "metadata": {},
