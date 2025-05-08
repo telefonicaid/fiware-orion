@@ -188,7 +188,7 @@ unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
 bool            disableNgsiv1;
 bool            disableFileLog;
-long            reqTimeout;       // FIXME PR: missmatch in paArgs[] (where PaLong is used for this)
+long            reqTimeout;
 bool            insecureNotif;
 bool            ngsiv1Autocast;
 
