@@ -30,7 +30,6 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/compileInfo.h"
 #include "common/defaultValues.h"
 #include "rest/HttpHeaders.h"
@@ -163,7 +162,6 @@ std::string versionTreat
   }
   
   std::string out     = "";
-  std::string indent  = "";
 
 #ifdef UNIT_TEST
   std::string uptime = "0 d, 0 h, 0 m, 0 s";

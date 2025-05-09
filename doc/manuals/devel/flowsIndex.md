@@ -16,7 +16,7 @@ Related to request management (RQ management):
 
 Related to parsing (PP prefix):
 
-* [PP-01: Parsing an NGSIv1 payload](jsonParse.md#flow-pp-01)
+* [PP-01: Parsing an NGSIv1 payload](jsonParse.md#flow-pp-01) - FIXME PR: review this
     * Continues from RQ-02, FW-02 or FW-04 
 * [PP-02: Parsing a text payload](sourceCode.md#flow-pp-02)
 	* Continues from RQ-02
@@ -78,15 +78,15 @@ Related to mongoBackend logic (MB and MD prefixes):
 	* Continues from RQ-02
 * [MB-15: mongoUnsbuscribeContext](mongoBackend.md#flow-mb-15)
 	* Continues from RQ-02
-* [MB-16: mongoSubscribeContext](mongoBackend.md#flow-mb-16)
+* [MB-16: mongoSubscribeContext](mongoBackend.md#flow-mb-16) - FIXME PR: probably deleted
 	* Continues from RQ-02
 	* Continues in MB-11
-* [MB-17: mongoUpdateContextSubscription](mongoBackend.md#flow-mb-17)
+* [MB-17: mongoUpdateContextSubscription](mongoBackend.md#flow-mb-17) - FIXME PR: probably deleted
 	* Continues from RQ-02
 	* Continues in MB-12
-* [MB-18: mongoRegisterContext](mongoBackend.md#flow-mb-18)
+* [MB-18: mongoRegisterContext](mongoBackend.md#flow-mb-18) - FIXME PR: probably deleted
 	* Continues from RQ-02
-* [MB-19: mongoDiscoverContextAvailability](mongoBackend.md#flow-mb-19)
+* [MB-19: mongoDiscoverContextAvailability](mongoBackend.md#flow-mb-19) - FIXME PR: probably deleted
 	* Continues from RQ-02
 * [MB-23: mongoRegistrationGet](mongoBackend.md#flow-mb-23)
 	* Continues from RQ-02

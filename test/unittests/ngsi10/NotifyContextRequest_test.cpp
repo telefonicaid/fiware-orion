@@ -25,10 +25,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "jsonParse/jsonRequest.h"
-
 #include "ngsi/ParseData.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
@@ -38,143 +36,52 @@
 
 /* ****************************************************************************
 *
-* json_ok -
-*/
-TEST(NotifyContextRequest, json_ok)
-{
-  ParseData              reqData;
-  ConnectionInfo         ci("", "POST", "1.1");
-  NotifyContextRequest*  ncrP      = &reqData.ncr.res;
-  const char*            infile    = "notifyContextRequest_ok.json";
-  const char*            outfile   = "ngsi10.notifyContextRequest_ok.expected1.valid.json";
-  std::string            rendered;
-
-  utInit();
-
-  ci.outMimeType = JSON;
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-
-  lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
-  EXPECT_EQ("OK", result);
-  lmTraceLevelSet(LmtDump, false);
-
-  //
-  // With the data obtained, render, present and release methods are exercised
-  //
-  std::vector<std::string> emptyV;
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
-
-  ncrP->release();
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* json_badIsPattern -
-*/
-TEST(NotifyContextRequest, json_badIsPattern)
-{
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile   = "ngsi10.notifyContextRequest.badIsPattern.invalid.json";
-  const char*     outfile  = "ngsi10.notifyContextResponse.badIsPattern.valid.json";
-
-  utInit();
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
-  ci.inMimeType  = JSON;
-  ci.outMimeType = JSON;
-
-  std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, NULL);
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* Constructor -
-*/
-TEST(NotifyContextResponse, Constructor)
-{
-  StatusCode sc(SccOk, "2");
-  NotifyContextResponse ncr(sc);
-
-  utInit();
-
-  EXPECT_EQ(SccOk, ncr.responseCode.code);
-  ncr.release();
-
-  StatusCode ec(SccOk, "4");
-  NotifyContextResponse ncr2(ec);
-  EXPECT_EQ(SccOk, ncr2.responseCode.code);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * json_render -
 */
 TEST(NotifyContextRequest, json_render)
 {
+  utInit();
+
   const char*              filename1  = "ngsi10.notifyContextRequest.jsonRender1.valid.json";
   const char*              filename2  = "ngsi10.notifyContextRequest.jsonRender2.valid.json";
   const char*              filename3  = "ngsi10.notifyContextRequest.jsonRender3.valid.json";
   NotifyContextRequest*    ncrP;
   ContextElementResponse*  cerP;
-  std::string              rendered;
-
-  utInit();
+  std::string              rendered;  
 
   // Preparation
   ncrP = new NotifyContextRequest();
-  ncrP->subscriptionId.set("012345678901234567890123");
-  ncrP->originator.set("http://www.tid.es/NotifyContextRequestUnitTest");
+  ncrP->subscriptionId = "012345678901234567890123";
 
   std::vector<std::string> emptyV;
 
   // 1. Without ContextResponseList
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
+  rendered = ncrP->toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
   // 2. With ContextResponseList
   cerP = new ContextElementResponse();
-  cerP->entity.fill("E01", "EType", "false");
+  EntityId enId1("E01", "", "EType", "");
+  cerP->entity.fill(enId1);
   ncrP->contextElementResponseVector.push_back(cerP);
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
+  rendered = ncrP->toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
   // 3. ContextResponseList with two instances
   cerP = new ContextElementResponse();
-  cerP->entity.fill("E02", "EType", "false");
+  EntityId enId2("E02", "", "EType", "");
+  cerP->entity.fill(enId2);
   ncrP->contextElementResponseVector.push_back(cerP);
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ncrP->toJsonV1(false, emptyV, false, emptyV);
+  rendered = ncrP->toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

@@ -31,7 +31,7 @@
 #include "rapidjson/document.h"
 
 #include "rest/ConnectionInfo.h"
-#include "apiTypesV2/EntID.h"
+#include "ngsi/EntityId.h"
 
 
 
@@ -41,10 +41,10 @@
 */
 extern bool parseEntitiesVector
 (
-  ConnectionInfo*              ciP,
-  std::vector<ngsiv2::EntID>*  eivP,
-  const rapidjson::Value&      entities,
-  std::string*                 errorStringP
+  ConnectionInfo*          ciP,
+  std::vector<EntityId>*   eivP,
+  const rapidjson::Value&  entities,
+  std::string*             errorStringP
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEENTITIESVECTOR_H_

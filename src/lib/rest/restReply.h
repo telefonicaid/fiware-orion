@@ -40,10 +40,4 @@ extern void restReply(ConnectionInfo* ciP, const std::string& answer);
 
 
 
-/* ****************************************************************************
-*
-* restErrorReplyGet - 
-*/
-extern void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::string& detail, std::string* outStringP);
-
 #endif

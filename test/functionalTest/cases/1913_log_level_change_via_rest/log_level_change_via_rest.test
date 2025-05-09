@@ -146,10 +146,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 55
+Content-Length: 82
 
 {
-    "error": "Empty right-hand-side for URI param /level/"
+    "description": "Empty right-hand-side for URI param /level/",
+    "error": "BadRequest"
 }
 
 

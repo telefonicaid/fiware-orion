@@ -9,10 +9,10 @@
 	* [`mongoUpdateSubscription` (SR2)](#mongoupdatesubscription-sr2)
 	* [`mongoGetSubscriptions` (SR2)](#mongogetsubscriptions-sr2)
 	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2)
-	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
-	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
-	* [`mongoRegisterContext` (SR)](#mongoregistercontext-sr)
-	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)
+	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr) - FIXME PR: probably deleted
+	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr) - FIXME PR: probably deleted
+	* [`mongoRegisterContext` (SR)](#mongoregistercontext-sr) - FIXME PR: probably deleted
+	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr) - FIXME PR: probably deleted
 	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
 	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
 * [Low-level modules related to DB interaction](#low-level-modules-related-to-db-interaction)
@@ -50,7 +50,7 @@ These modules implement the different Context Broker requests. They are called d
 
 This section also describes the `MongoCommonRegister` and `MongoCommonUpdate` modules which provide common functionality highly coupled with several other request processing modules. In particular:
 
-* `MongoCommonRegister` provides common functionality for the `mongoRegisterContext` modules.
+* `MongoCommonRegister` provides common functionality for the `mongoRegisterContext` modules. - FIXME PR: probably deleted
 * `MongoCommonUpdate` provides common functionality for the `mongoUpdateContext` and `mongoNotifyContext` modules.
 
 [Top](#top)
@@ -283,7 +283,7 @@ The detail for `mongoEntityTypes()` is as shown in the following diagram.
 
 _MB-08: mongoEntityTypes_
 
-* `mongoEntityTypes()` is invoked from a service routine (step 1). This can be from either `getEntityTypes()` (which resides in `lib/serviceRoutines/getEntityTypes.cpp`) or `getEntityAllTypes()` (which resides in `lib/serviceRoutinesV2/getEntityAllTypes.cpp`).
+* `mongoEntityTypes()` is invoked from a service routine (step 1). This is from `getEntityAllTypes()` (which resides in `lib/serviceRoutinesV2/getEntityAllTypes.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * A list of entity types and of attributes belonging to each of those entity types is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module, to run an aggregation command (steps 3 and 4).
 * If attribute detail is enabled (i.e. `noAttrDetail` set to `false`) a loop iterates on every attribute of every entity type, in order to:
@@ -310,7 +310,7 @@ The detail for `mongoAttributesForEntityType()` is as shown in the following dia
 
 _MB-10: mongoAttributesForEntityType_
 
-* `mongoAttributesForEntityType()` is invoked from a service routine (step 1). This can be from either `getEntityType()` (which resides in `lib/serviceRoutinesV2/getEntityType.cpp`) or `getAttributesForEntityType()` (which resides in `lib/serviceRoutines/getAttributesForEntityType.cpp`).
+* `mongoAttributesForEntityType()` is invoked from a service routine (step 1). This can be from either `getEntityType()` (which resides in `lib/serviceRoutinesV2/getEntityType.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * A list of entity attributes corresponding to the entity type is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module to run an aggregation command (steps 3 and 4).
 * If attribute detail is enabled (i.e. `noAttrDetail` set to `false`) a loop iterates on every attribute in order to:
@@ -337,7 +337,7 @@ The header file contains only the function `mongoCreateSubscription()` whose wor
 
 _MB-11: mongoCreateSubscription_
 
-* `mongoCreateSubscription()` is invoked from a service routine (step 1). This can be from either `postSubscriptions()` (which resides in `lib/serviceRoutinesV2/postSubscriptions.cpp`) or `mongoSubscribeContext()` (which resides in `lib/mongoBackend/mongoSubscribeContext.cpp`).
+* `mongoCreateSubscription()` is invoked from a service routine (step 1). This is `postSubscriptions()` (which resides in `lib/serviceRoutinesV2/postSubscriptions.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).  
 * This function builds a BSON object that will be at the end the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setHttpInfo()`, etc.) (step 3).
 * The BSON object corresponding to the new subscription is inserted in the database using `collectionInsert()` in the `connectionOperations` module (steps 4 and 5).
@@ -359,7 +359,7 @@ The header file contains only a function named `mongoUpdateSubscription()` whose
 
 _MB-12: mongoUpdateSubscription_
 
-* `mongoUpdateSubscription()` is invoked from a service routine (step 1). This can be from either `patchSubscription()` (which resides in `lib/serviceRoutinesV2/patchSubscription.cpp`) or `mongoUpdateContextSubscription()` (which resides in `lib/mongoBackend/mongoUpdateContextSubscription.cpp`).
+* `mongoUpdateSubscription()` is invoked from a service routine (step 1). This is from `patchSubscription()` (which resides in `lib/serviceRoutinesV2/patchSubscription.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The subscription is updated in DB using MongoDB `$set`/`$unset` operators. This operation is done in the function `colletionFindAndModify()` in the `connectionOperations` module (steps 3 and 4).
 * In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the subscription is updated in the subscription cache based in the result from `collectionFindAndModify()` in the previous step (step 5). `updateInCache()` uses the subscription cache semaphore internally.
@@ -423,7 +423,7 @@ Its work is to remove from the database the document associated to the subscript
 
 _MB-15: mongoUnsubscribeContext_
 
-* `mongoUnsubscribeContext()` is invoked from a service routine (step 1). This can be from either `postUnsubscribeContext()` (which resides in `lib/serviceRoutines/postUnsubscribeContext.cpp`) or `mongoUpdateContextSubscription()` (which resides in `lib/serviceRoutinesV2/deleteSubscription.cpp`).
+* `mongoUnsubscribeContext()` is invoked from a service routine (step 1). This is from `mongoUnsubscribeContext()` (which resides in `lib/serviceRoutinesV2/deleteSubscription.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
 * The subscription is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
 * The subscription is removed from the database using `collectionRemove()` in the `connectionOperations` module (steps 5 and 6).
@@ -435,6 +435,8 @@ Note that steps 6 and 7 are done no matter the value of `noCache`. This works bu
 [Top](#top)
 
 #### `mongoSubscribeContext` (SR)
+
+FIXME PR: probably deleted
 
 `mongoSubscribeContext` encapsulates the logic for subscribe context (NGSIv1) operation.
 
@@ -454,6 +456,8 @@ _MB-16: mongoSubscribeContext_
 
 #### `mongoUpdateContextSubscription` (SR)
 
+FIXME PR: probably deleted
+
 `mongoUpdateContextSubscription` encapsulates the logic for update context subscription (NGSIv1) operation.
 
 The header file contains only a function named `mongoUpdateContextSubscription()` which uses an `UpdateContextSubscriptionRequest` object as input parameter and an `UpdateContextSubscriptionResponse` as output parameter.
@@ -472,6 +476,8 @@ _MB-17: mongoUpdateContextSubscription_
 
 #### `mongoRegisterContext` (SR)
 
+FIXME PR: probably deleted
+
 The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of `mongoRegisterContext()` defined in its header file).
 
 <a name="flow-mb-18"></a>
@@ -489,6 +495,8 @@ _MB-18: mongoRegisterContext_
 [Top](#top)
 
 #### `mongoDiscoverContextAvailability` (SR)
+
+FIXME PR: probably deleted
 
 `mongoDiscoverContextAvailability` encapsulates the logic for the context availability discovery (NGSIv1) operation.
 
@@ -633,7 +641,7 @@ This function basically searches for existing registrations in the (`registratio
 
 It is used by several functions:
 
-* `mongoDiscoverContextAvailability()` (in the `mongoDiscoverContextAvailability` module), as "core" of the discovery operation.
+* `mongoDiscoverContextAvailability()` (in the `mongoDiscoverContextAvailability` module), as "core" of the discovery operation. - FIXME PR: probably deleted
 * `mongoQueryContext()` in the `mongoQueryContext` module, in order to locate Context Providers for forwarding of the query. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 * `searchContextProviders()` in the `MongoCommonUpdate` module, in order to locate Context Providers for forwarding of the update. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 

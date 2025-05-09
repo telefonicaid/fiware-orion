@@ -68,22 +68,22 @@ static void insertInCache
   //
   // StringFilter in Scope?
   //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.restriction.scopeVector?
+  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.scopeVector?
   // If so, set it as string filter to the sub-cache item
   //
   StringFilter*  stringFilterP   = NULL;
   StringFilter*  mdStringFilterP = NULL;
 
-  for (unsigned int ix = 0; ix < sub.restriction.scopeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < sub.scopeVector.size(); ++ix)
   {
-    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
+    if (sub.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
-      stringFilterP = sub.restriction.scopeVector[ix]->stringFilterP;
+      stringFilterP = sub.scopeVector[ix]->stringFilterP;
     }
 
-    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
+    if (sub.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
     {
-      mdStringFilterP = sub.restriction.scopeVector[ix]->mdStringFilterP;
+      mdStringFilterP = sub.scopeVector[ix]->mdStringFilterP;
     }
   }
 

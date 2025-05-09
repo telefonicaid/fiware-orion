@@ -64,7 +64,7 @@ std::string exitTreat
     OrionError orionError(SccBadRequest, "no such service");
 
     ciP->httpStatusCode = SccOk;
-    out = orionError.toJsonV1();
+    out = orionError.toJson();
     return out;
   }
 
@@ -77,13 +77,13 @@ std::string exitTreat
   {
     OrionError orionError(SccBadRequest, "Password requested");
     ciP->httpStatusCode = SccOk;
-    out = orionError.toJsonV1();
+    out = orionError.toJson();
   }
   else if (password != "harakiri")
   {
     OrionError orionError(SccBadRequest, "Request denied - password erroneous");
     ciP->httpStatusCode = SccOk;
-    out = orionError.toJsonV1();
+    out = orionError.toJson();
   }
   else
   {

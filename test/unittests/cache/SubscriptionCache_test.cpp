@@ -27,9 +27,7 @@
 
 #include "gtest/gtest.h"
 
-#include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
-#include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextAttribute.h"
 #include "cache/SubscriptionCache.h"
@@ -50,7 +48,6 @@ extern void setMongoConnectionForUnitTest(orion::DBClientBase _connection);
 */
 TEST(cache, SubscriptionCache)
 {
-  LM_M(("In SubscriptionCache test"));
   utInit();
 
   std::vector<EntityInfo*>  entityIdInfos;

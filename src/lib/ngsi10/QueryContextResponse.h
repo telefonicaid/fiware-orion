@@ -30,8 +30,7 @@
 #include <sstream>
 
 #include "ngsi/ContextElementResponseVector.h"
-#include "apiTypesV2/Entities.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 
 
 
@@ -46,19 +45,14 @@
 typedef struct QueryContextResponse
 {
   ContextElementResponseVector  contextElementResponseVector;  // Optional
-  StatusCode                    errorCode;                     // Optional
+  OrionError                    error;                         // Optional
 
   QueryContextResponse();
-  QueryContextResponse(EntityId* eP, ContextAttribute* aP);
-  QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string            toJsonV1(bool asJsonObject);
-  std::string            check(ApiVersion apiVersion, bool asJsonObject, const std::string&  predetectedError);
   void                   release(void);
-  void                   fill(QueryContextResponse* qcrsP);
-  void                   fill(const Entities& entities);
-  QueryContextResponse*  clone(void);
+  void                   fill(const EntityVector& entities);
+  ContextAttribute*      getAttr(const std::string& attrName, OrionError* oeP);
 } QueryContextResponse;
 
 #endif  // SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_

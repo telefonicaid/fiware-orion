@@ -204,6 +204,7 @@ clean:
 	rm -rf BUILD_DEBUG
 	rm -rf BUILD_COVERAGE
 	rm -rf BUILD_UNITTEST
+	rm -rf BUILD_FUNCTIONAL
 
 style:
 	./scripts/style_check_in_makefile.sh

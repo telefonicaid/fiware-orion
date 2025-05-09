@@ -71,21 +71,10 @@ RestService* restServiceLookup(ConnectionInfo* ciP, bool* badVerbP)
         continue;
       }
 
-      if (ciP->apiVersion == V1)
+      if (strcmp(component, compV[compNo].c_str()) != 0)
       {
-        if (strcasecmp(component, compV[compNo].c_str()) != 0)
-        {
-          match = false;
-          break;
-        }
-      }
-      else
-      {
-        if (strcmp(component, compV[compNo].c_str()) != 0)
-        {
-          match = false;
-          break;
-        }
+        match = false;
+        break;
       }
     }
 

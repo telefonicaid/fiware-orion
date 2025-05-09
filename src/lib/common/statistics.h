@@ -311,7 +311,6 @@
 */
 typedef struct TimeStat
 {
-  struct timespec  jsonV1ParseTime;
   struct timespec  jsonV2ParseTime;
   struct timespec  mongoBackendTime;
   struct timespec  mongoReadWaitTime;
@@ -378,7 +377,6 @@ extern int noOfNotificationsSent;
 extern int noOfSimulatedNotifications;
 
 // Deprecated features
-extern int noOfDprNgsiv1Request;
 extern int noOfDprLegacyForwarding;
 extern int noOfDprLegacyNotif;
 extern int noOfDprGeoformat;
