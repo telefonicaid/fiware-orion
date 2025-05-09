@@ -185,7 +185,7 @@ unsigned long   logLineMaxSize;
 unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
 bool            disableFileLog;
-int             reqTimeout;
+long            reqTimeout;
 bool            insecureNotif;
 
 bool            fcEnabled;
@@ -332,8 +332,8 @@ PaArgument paArgs[] =
 
   { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,                  DISABLE_FILE_LOG             },
   { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,                  LOG_FOR_HUMANS_DESC          },
-  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,                  LOG_LINE_MAX_SIZE_DESC       },
-  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
+  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaULong,  PaOpt, (32 * 1024),                     100,   PaNL,                  LOG_LINE_MAX_SIZE_DESC       },
+  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaULong,  PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
 
   { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  DISABLE_METRICS_DESC         },
 

@@ -104,6 +104,7 @@
         - [`replaceRegex`](#replaceregex)
         - [`matchRegex`](#matchregex)
         - [`mapper`](#mapper)
+        - [`nMapper`](#nmapper)
         - [`thMapper`](#thmapper)
         - [`values`](#values)
         - [`keys`](#keys)
@@ -3080,13 +3081,19 @@ results in
 
 #### mapper
 
-Returns a value among several choices based in one to one mapping. This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
-
-This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, the input is not an string, etc.)
+Returns a value among several choices based in one to one mapping (for strings). This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
 
 Extra arguments:
 * values array
 * choices array
+
+Note that:
+
+* Input has to be a string
+* `values` elements have to be strings
+* `choices` elements can be of any type
+
+This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, etc.)
 
 Example (being context `{"c": "fr", "values": ["es", "fr", "de"], "choices": ["Spain", "France", "Germany"]}`):
 
@@ -3098,6 +3105,35 @@ results in
 
 ```
 "France"
+```
+
+#### nMapper
+
+Returns a value among several choices based in one to one mapping (for numbers). This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
+
+Extra arguments:
+* values array
+* choices array
+
+Note that:
+
+* Input has to be a number
+* `values` elements have to be numbers
+* `choices` elements can be of any type
+* Numbers are supposed to be integers (in the insane case of using floats, they are rounded to closest integer)
+
+This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, etc.)
+
+Example (being context `{"c": 20, "values": [10, 20, 30], "choices": ["low", "medium", "high"]}`):
+
+```
+c|mapper(values,choices)
+```
+
+results in
+
+```
+"medium"
 ```
 
 #### thMapper

@@ -93,8 +93,8 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20240911/271735060)
-    [(jp)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20240912/271755441)
+    [(en)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20250509/278901687)
+    [(jp)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20250509/278904445)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
     [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220523)
     [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220526)
