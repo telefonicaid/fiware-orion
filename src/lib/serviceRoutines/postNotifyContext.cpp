@@ -64,5 +64,7 @@ std::string postNotifyContext
                                                        ciP->httpHeaders.ngsiv2AttrsFormat));
   TIMED_RENDER(answer = ncr.toJsonV1());
 
+  parseDataP->ncr.res.release();
+
   return answer;
 }
