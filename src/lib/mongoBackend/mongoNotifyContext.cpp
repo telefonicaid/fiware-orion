@@ -71,7 +71,7 @@ HttpStatusCode mongoNotifyContext
   }
 
   reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
-  responseP->responseCode.fill(SccOk);
+  responseP->oe.fill(SccOk, "");
 
   return SccOk;
 }

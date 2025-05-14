@@ -25,7 +25,7 @@ POST /v2/op/notify
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -statCounters
+brokerStart CB
 
 --SHELL--
 
@@ -65,15 +65,8 @@ echo
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 51
+Content-Length: 0
 
-{
-    "responseCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-    }
-}
 
 
 02. GET /v2/entities

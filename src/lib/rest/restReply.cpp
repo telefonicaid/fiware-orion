@@ -207,7 +207,7 @@ void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::stri
   else if (ciP->restServiceP->request == NotifyContext)
   {
     NotifyContextResponse ncr(errorCode);
-    *outStringP = ncr.toJsonV1();
+    *outStringP = ncr.oe.toJson();
   }
   else
   {
