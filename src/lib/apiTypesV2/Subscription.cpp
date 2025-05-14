@@ -116,16 +116,16 @@ namespace ngsiv2
 */
 Subscription::~Subscription()
 {
-  unsigned int sz = restriction.scopeVector.size();
+  unsigned int sz = scopeVector.size();
 
   if (sz > 0)
   {
     for (unsigned i = 0; i != sz; i++ )
     {
-      restriction.scopeVector[i]->release();
-      delete restriction.scopeVector[i];
+      scopeVector[i]->release();
+      delete scopeVector[i];
     }
-    restriction.scopeVector.vec.clear();
+    scopeVector.vec.clear();
   }
 }
 
@@ -157,7 +157,7 @@ std::string Subscription::toJson(void)
   jh.addString("status", this->status);
 
   jh.addRaw("subject", this->subject.toJson());
-  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
+  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat)));
 
   if (this->throttling > 0)
   {

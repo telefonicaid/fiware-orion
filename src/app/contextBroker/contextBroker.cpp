@@ -80,7 +80,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
@@ -180,17 +179,14 @@ bool            statTiming;
 bool            statNotifQueue;
 int             lsPeriod;
 bool            relogAlarms;
-bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
 unsigned long   logLineMaxSize;
 unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
-bool            disableNgsiv1;
 bool            disableFileLog;
 long            reqTimeout;
 bool            insecureNotif;
-bool            ngsiv1Autocast;
 
 bool            fcEnabled;
 double          fcGauge;
@@ -256,17 +252,14 @@ bool            logDeprecate;
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 #define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
-#define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
 #define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
 #define DISABLE_METRICS_DESC   "turn off the 'metrics' feature"
-#define DISABLE_NGSIV1_DESC    "turn off NGSIv1 request endpoints"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF_DESC    "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
-#define NGSIV1_AUTOCAST_DESC   "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
 #define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
 #define DBURI_DESC             "complete URI for database connection"
@@ -335,7 +328,6 @@ PaArgument paArgs[] =
   { "-logSummary",                  &lsPeriod,              "LOG_SUMMARY_PERIOD",       PaInt,    PaOpt, 0,                               0,     ONE_MONTH_PERIOD,      LOG_SUMMARY_DESC             },
   { "-relogAlarms",                 &relogAlarms,           "RELOG_ALARMS",             PaBool,   PaOpt, false,                           false, true,                  RELOGALARMS_DESC             },
 
-  { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,                  CHECK_v1_ID_DESC             },
   { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,                  DISABLE_CUSTOM_NOTIF         },
 
   { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,                  DISABLE_FILE_LOG             },
@@ -344,11 +336,8 @@ PaArgument paArgs[] =
   { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaULong,  PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
 
   { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  DISABLE_METRICS_DESC         },
-  { "-disableNgsiv1",               &disableNgsiv1,         "DISABLE_NGSIV1",           PaBool,   PaOpt, false,                           false, true,                  DISABLE_NGSIV1_DESC          },
 
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF_DESC          },
-
-  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,                  NGSIV1_AUTOCAST_DESC         },
 
   { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
 
@@ -384,8 +373,8 @@ static const char* validLogLevels[] =
 * to treat the incoming request.
 *
 * The URL path is divided into components (Using '/' as field separator) so that the URL
-* "/ngsi9/registerContext" becomes a component vector of the two components
-* "ngsi9" and "registerContext".
+* "/v2/entities" becomes a component vector of the two components
+* "v2" and "entities".
 *
 * Each line contains the necessary information for ONE service:
 *   RequestType   request     - The type of the request
@@ -1214,7 +1203,7 @@ int main(int argC, char* argV[])
   alarmMgr.init(relogAlarms);
   mqttMgr.init(mqttTimeout);
   exprMgr.init();
-  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
   mongoInit(dbURI, dbName, pwd, mtenant, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
@@ -1292,7 +1281,6 @@ int main(int argC, char* argV[])
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
-                          disableNgsiv1,
                           httpsPrivateServerKey,
                           httpsCertificate);
 
@@ -1311,7 +1299,6 @@ int main(int argC, char* argV[])
                           allowedOrigin,
                           maxAge,
                           reqTimeout,
-                          disableNgsiv1,
                           NULL,
                           NULL);
   }

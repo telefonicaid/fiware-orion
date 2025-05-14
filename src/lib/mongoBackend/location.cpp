@@ -182,7 +182,7 @@ orion::CompoundValueNode* getGeometry(orion::CompoundValueNode* compoundValueP)
 * Checked:
 * - geometry field exists and it's an object
 */
-static void isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
+static void isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geoJson, std::string* errP)
 {
   for (unsigned int ix = 0; ix < feature->childV.size(); ++ix)
   {
@@ -195,7 +195,7 @@ static void isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geo
         return;
       }
 
-      compoundValueBson(childP->childV, *geoJson, apiVersion == V1);
+      compoundValueBson(childP->childV, *geoJson, false);
       return;
     }
   }
@@ -220,7 +220,7 @@ static void isFeatureType(CompoundValueNode* feature, orion::BSONObjBuilder* geo
 *   * the feature field is an array with exactly one item
 *   * the feature field item has a geometry field and it's an object
 */
-static void isFeatureCollectionType(CompoundValueNode* featureCollection, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
+static void isFeatureCollectionType(CompoundValueNode* featureCollection, orion::BSONObjBuilder* geoJson, std::string* errP)
 {
   for (unsigned int ix = 0; ix < featureCollection->childV.size(); ++ix)
   {
@@ -244,7 +244,7 @@ static void isFeatureCollectionType(CompoundValueNode* featureCollection, orion:
       }
       else
       {
-        isFeatureType(featureCollection->childV[ix]->childV[0], geoJson, apiVersion, errP);
+        isFeatureType(featureCollection->childV[ix]->childV[0], geoJson, errP);
         return;
       }
     }
@@ -263,7 +263,7 @@ static void isFeatureCollectionType(CompoundValueNode* featureCollection, orion:
 *
 * Return false if no special GeoJSON type was found
 */
-static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuilder* geoJson, ApiVersion apiVersion, std::string* errP)
+static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuilder* geoJson, std::string* errP)
 {
   *errP = "";
 
@@ -280,12 +280,12 @@ static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuil
      {
        if (childP->stringValue == "Feature")
        {
-         isFeatureType(caP->compoundValueP, geoJson, apiVersion, errP);
+         isFeatureType(caP->compoundValueP, geoJson, errP);
          return true;
        }
        if (childP->stringValue == "FeatureCollection")
        {
-         isFeatureCollectionType(caP->compoundValueP, geoJson, apiVersion, errP);
+         isFeatureCollectionType(caP->compoundValueP, geoJson, errP);
          return true;
        }
      }
@@ -304,8 +304,6 @@ static bool isSpecialGeoJsonType(const ContextAttribute* caP, orion::BSONObjBuil
 *
 * It returns true, except in the case of error (in which in addition errDetail gets filled)
 *
-* FIXME P6: try to avoid apiVersion
-*
 * FIXME P6: review the cases in which this function returns false. Maybe many cases (or all them)
 * can be moved to checkGeoJson() in the parsing layer, as preconditions.
 */
@@ -313,8 +311,7 @@ static bool getGeoJson
 (
   const ContextAttribute*  caP,
   orion::BSONObjBuilder*   geoJson,
-  std::string*             errDetail,
-  ApiVersion               apiVersion
+  std::string*             errDetail
 )
 {
   std::vector<double>      coordLat;
@@ -367,7 +364,7 @@ static bool getGeoJson
 
     // Feature and FeatureCollection has an special treatment, done insise isSpecialGeoJsonType()
     // For other cases (i.e. when isSpecialGeoJsonType() returns false) do it in the "old way"
-    if (isSpecialGeoJsonType(caP, geoJson, apiVersion, errDetail))
+    if (isSpecialGeoJsonType(caP, geoJson, errDetail))
     {
       // Feature or FeatureCollection was found, but some error may happen
       if (!errDetail->empty())
@@ -377,9 +374,8 @@ static bool getGeoJson
     }
     else
     {
-      // Autocast doesn't make sense in this context, strings2numbers enabled in the case of NGSIv1
       // FIXME P7: boolean return value should be managed?
-      caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "", true, apiVersion == V1);
+      caP->valueBson(std::string(ENT_ATTRS_VALUE), &bo, "");
       geoJson->appendElements(getObjectFieldF(bo.obj(), ENT_ATTRS_VALUE));
     }
 
@@ -524,7 +520,6 @@ bool processLocationAtEntityCreation
   std::string*                   locAttr,
   orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  ApiVersion                     apiVersion,
   OrionError*                    oe
 )
 {
@@ -546,7 +541,7 @@ bool processLocationAtEntityCreation
       return false;
     }
 
-    if (!getGeoJson(caP, geoJson, errDetail, apiVersion))
+    if (!getGeoJson(caP, geoJson, errDetail))
     {
       oe->fill(SccBadRequest, "error parsing location attribute: " + *errDetail, ERROR_BAD_REQUEST);
       return false;
@@ -571,7 +566,6 @@ bool processLocationAtUpdateAttribute
   const ContextAttribute*        targetAttr,
   orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  ApiVersion                     apiVersion,
   OrionError*                    oe
 )
 {
@@ -589,7 +583,7 @@ bool processLocationAtUpdateAttribute
     //
     if (*currentLocAttrName == "")
     {
-      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr))
       {
         *errDetail = "error parsing location attribute: " + subErr;
         oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
@@ -607,26 +601,14 @@ bool processLocationAtUpdateAttribute
     //
     if (*currentLocAttrName != targetAttr->name)
     {
-      if (apiVersion == V1)
+      if (!getGeoJson(targetAttr, geoJson, &subErr))
       {
-        *errDetail = "attempt to define a geo location attribute [" + targetAttr->name + "]" +
-                     " when another one has been previously defined [" + *currentLocAttrName + "]";
-
-        oe->fill(SccRequestEntityTooLarge, ERROR_DESC_NO_RESOURCES_AVAILABLE_GEOLOC, ERROR_NO_RESOURCES_AVAILABLE);
-
+        *errDetail = "error parsing location attribute: " + subErr;
+        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
         return false;
       }
-      else
-      {
-        if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-        {
-          *errDetail = "error parsing location attribute: " + subErr;
-          oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
-          return false;
-        }
-        *currentLocAttrName = targetAttr->name;
-        return true;
-      }
+      *currentLocAttrName = targetAttr->name;
+      return true;
     }
     //
     // Case 1c:
@@ -635,7 +617,7 @@ bool processLocationAtUpdateAttribute
     //
     if (*currentLocAttrName == targetAttr->name)
     {
-      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr))
       {
         *errDetail = "error parsing location attribute: " + subErr;
         oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
@@ -652,22 +634,8 @@ bool processLocationAtUpdateAttribute
   //
   else if (*currentLocAttrName == targetAttr->name)
   {
-    if (apiVersion == V1)
-    {
-      /* In this case, no-location means that the target attribute doesn't have the "location" metadata. In order
-       * to mantain backwards compabitibility, this is interpreted as a location update */
-      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
-      {
-        *errDetail = "error parsing location attribute: " + subErr;
-        oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
-        return false;
-      }
-    }
-    else  // v2
-    {
-      // Location is null-ified
-      *currentLocAttrName = "";
-    }
+    // Location is null-ified
+    *currentLocAttrName = "";
   }
 
   return true;
@@ -687,7 +655,6 @@ bool processLocationAtAppendAttribute
   bool                           actualAppend,
   orion::BSONObjBuilder*         geoJson,
   std::string*                   errDetail,
-  ApiVersion                     apiVersion,
   OrionError*                    oe
 )
 {
@@ -710,7 +677,7 @@ bool processLocationAtAppendAttribute
     /* Case 1b: there isn't any previous location attribute -> new attribute becomes the location attribute */
     else
     {
-      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr))
       {
         *errDetail = "error parsing location attribute for new attribute: " + subErr;
         oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
@@ -736,7 +703,7 @@ bool processLocationAtAppendAttribute
     /* Case 2b: there isn't any previous location attribute -> the updated attribute becomes the location attribute */
     if (*currentLocAttrName == "")
     {
-      if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+      if (!getGeoJson(targetAttr, geoJson, &subErr))
       {
         *errDetail = "error parsing location attribute for existing attribute: " + subErr;
         oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);
@@ -746,7 +713,7 @@ bool processLocationAtAppendAttribute
     }
 
     /* Case 2c: all pre-conditions ok -> update location with the new value */
-    if (!getGeoJson(targetAttr, geoJson, &subErr, apiVersion))
+    if (!getGeoJson(targetAttr, geoJson, &subErr))
     {
       *errDetail = "error parsing location attribute: " + subErr;
       oe->fill(SccBadRequest, *errDetail, ERROR_BAD_REQUEST);

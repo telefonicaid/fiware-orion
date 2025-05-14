@@ -39,7 +39,7 @@
 */
 TEST(commonMacroSubstitute, simple)
 {
-  Entity             en("E1", "T1", "false");
+  Entity             en("E1", "", "T1", "");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
   bool               b;
 
@@ -50,8 +50,8 @@ TEST(commonMacroSubstitute, simple)
   std::string result;
 
   ExprContextObject exprContext(true);
-  exprContext.add("id", en.id);
-  exprContext.add("type", en.type);
+  exprContext.add("id", en.entityId.id);
+  exprContext.add("type", en.entityId.type);
   exprContext.add(caP->name, caP->stringValue);
 
   b = macroSubstitute(&result, s1, &exprContext, "", true);
@@ -67,7 +67,7 @@ TEST(commonMacroSubstitute, simple)
 */
 TEST(commonMacroSubstitute, withRealloc)
 {
-  Entity             en("E1", "T1", "false");
+  Entity             en("E1", "", "T1", "");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
   bool               b;
 
@@ -92,8 +92,8 @@ TEST(commonMacroSubstitute, withRealloc)
   std::string result;
 
   ExprContextObject exprContext(true);
-  exprContext.add("id", en.id);
-  exprContext.add("type", en.type);
+  exprContext.add("id", en.entityId.id);
+  exprContext.add("type", en.entityId.type);
   exprContext.add(caP->name, caP->stringValue);
 
   b = macroSubstitute(&result, s1, &exprContext, "", true);
@@ -112,7 +112,7 @@ TEST(commonMacroSubstitute, withRealloc)
 TEST(commonMacroSubstitute, bufferTooBigInitially)
 {
   bool               b;
-  Entity             en("EntityId000001", "EntityType000001", "false");
+  Entity             en("EntityId000001", "", "EntityType000001", "");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
 
   en.attributeVector.push_back(caP);
@@ -127,8 +127,8 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
   std::string result;
 
   ExprContextObject exprContext;
-  exprContext.add("id", en.id);
-  exprContext.add("type", en.type);
+  exprContext.add("id", en.entityId.id);
+  exprContext.add("type", en.entityId.type);
   exprContext.add(caP->name, caP->stringValue);
 
   b = macroSubstitute(&result, s1, &exprContext, "", true);
@@ -152,7 +152,7 @@ TEST(commonMacroSubstitute, bufferTooBigInitially)
 TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
 {
   bool               b;
-  Entity             en("EntityId000001", "EntityType000001", "false");
+  Entity             en("EntityId000001", "", "EntityType000001", "");
   ContextAttribute*  caP = new ContextAttribute("A1", "T1", "attr1");
 
   en.attributeVector.push_back(caP);
@@ -168,8 +168,8 @@ TEST(commonMacroSubstitute, bufferTooBigAfterSubstitution)
   std::string result;
 
   ExprContextObject exprContext(true);
-  exprContext.add("id", en.id);
-  exprContext.add("type", en.type);
+  exprContext.add("id", en.entityId.id);
+  exprContext.add("type", en.entityId.type);
   exprContext.add(caP->name, caP->stringValue);
 
   b = macroSubstitute(&result, s1, &exprContext, "", true);

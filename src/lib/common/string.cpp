@@ -472,34 +472,6 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
 /* ****************************************************************************
 *
-* validUrl - check validity of a URL
-*/
-bool validUrl(const std::string& url)
-{
-  std::string  host;
-  int          port;
-  std::string  path;
-  std::string  protocol;
-
-  return parseUrl(url, host, port, path, protocol);
-}
-
-
-
-/* ****************************************************************************
-*
-* i2s - integer to string
-*/
-char* i2s(int i, char* placeholder, int placeholderSize)
-{
-  snprintf(placeholder, placeholderSize, "%d", i);
-  return placeholder;
-}
-
-
-
-/* ****************************************************************************
-*
 * parsedUptime
 */
 std::string parsedUptime(int uptime)
@@ -521,32 +493,6 @@ std::string parsedUptime(int uptime)
 
   snprintf(s, sizeof(s), "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
-}
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - 
-*/
-bool onlyWs(const char* s)
-{
-  if (*s == 0)
-  {
-    return true;
-  }
-
-  while (*s != 0)
-  {
-    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
-    {
-      return false;
-    }
-
-    ++s;
-  }
-
-  return true;
 }
 
 
@@ -808,38 +754,6 @@ char* strToLower(char* to, const char* from, int toSize)
   to[ix] = 0;
 
   return to;
-}
-
-
-
-/* ****************************************************************************
-*
-* strReplace - 
-*/
-void strReplace(char* to, int toLen, const char* from, const char* oldString, const char* newString)
-{
-  int toIx   = 0;
-  int fromIx = 0;
-  int oldLen = strlen(oldString);
-  int newLen = strlen(newString);
-
-  while (from[fromIx] != 0)
-  {
-    if (strncmp(&from[fromIx], oldString, oldLen) == 0)
-    {
-      strncat(to, newString, toLen - strlen(to));
-      toIx   += newLen;
-      fromIx += oldLen;
-    }
-    else
-    {
-      to[toIx] = from[fromIx];
-      toIx   += 1;
-      fromIx += 1;
-    }
-  }
-
-  to[toIx] = 0;
 }
 
 
@@ -1152,4 +1066,114 @@ bool regComp(regex_t* re, const char* pattern, int flags)
   LM_T(LmtRegexError, ("regcomp() failed for pattern '%s': %s", pattern, buffer));
 
   return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* htmlEscape - 
+*
+* Allocate a new buffer to hold an escaped version of the input buffer 's'.
+* Escaping characters demands more space in the buffer, for some characters up to six
+* characters - double-quote (") needs SIX chars: &quot;
+* So, when allocating room for the output (escaped) buffer, we need to consider the worst case
+* and six times the length of the input buffer is allocated (plus one byte for the zero-termination.
+*
+* See http://www.anglesanddangles.com/asciichart.php for more info on the 'html-escpaing' of ASCII chars.
+*/
+char* htmlEscape(const char* s)
+{
+  int   newLen  = strlen(s) * 6 + 1;  // See function header comment
+  char* out     = (char*) calloc(1, newLen);
+  int   sIx     = 0;
+  int   outIx   = 0;
+  
+  if (out == NULL)
+  {
+    LM_E(("Runtime Error (allocating %d bytes: %s)", newLen, strerror(errno)));
+    return NULL;
+  }
+
+  while (s[sIx] != 0)
+  {
+    switch (s[sIx])
+    {
+    case '<':
+      out[outIx++] = '&';
+      out[outIx++] = 'l';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '>':
+      out[outIx++] = '&';
+      out[outIx++] = 'g';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '(':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '0';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ')':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '=':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '6';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '\'':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '3';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '"':
+      out[outIx++] = '&';
+      out[outIx++] = 'q';
+      out[outIx++] = 'u';
+      out[outIx++] = 'o';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ';':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '5';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    default:
+      out[outIx++] = s[sIx++];
+    }
+  }
+
+  return out;
 }

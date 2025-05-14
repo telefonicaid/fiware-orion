@@ -28,45 +28,12 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "common/JsonHelper.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextRequest::toJsonV1 -
-*/
-std::string NotifyContextRequest::toJsonV1
-(
-  bool                             asJsonObject,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter
-)
-{
-  std::string  out                                  = "";
-  bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
-
-  //
-  // Note on JSON commas:
-  //   subscriptionId and originator are MANDATORY.
-  //   The only doubt here if whether originator should end in a comma.
-  //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
-  //
-  out += startTag();
-  out += subscriptionId.toJsonV1(NotifyContext, true);
-  out += originator.toJsonV1(contextElementResponseVectorRendered);
-  out += contextElementResponseVector.toJsonV1(asJsonObject, NotifyContext, attrsFilter, blacklist, metadataFilter, false);
-  out += endTag();
-
-  return out;
-}
 
 
 
@@ -122,7 +89,7 @@ std::string NotifyContextRequest::toJson
   {
     JsonObjectHelper jh;
 
-    jh.addString("subscriptionId", subscriptionId.get());
+    jh.addString("subscriptionId", subscriptionId);
     jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP));
     return jh.str();
   }
@@ -132,56 +99,12 @@ std::string NotifyContextRequest::toJson
 
 /* ****************************************************************************
 *
-* NotifyContextRequest::check
-*/
-std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string& predetectedError)
-{
-  std::string            res;
-  NotifyContextResponse  response;
-
-  if (!predetectedError.empty())
-  {
-    response.oe.fill(SccBadRequest, predetectedError);
-  }
-  else if (((res = subscriptionId.check())                    != "OK") ||
-           ((res = originator.check())                        != "OK") ||
-           ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK"))
-  {
-    response.oe.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
-
-  return response.oe.toJson();
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextRequest::release -
+*
+* FIXME PR: this method is not called (it can be removed without compilation errors). Possible memory leak?
 */
 void NotifyContextRequest::release(void)
 {
   contextElementResponseVector.release();
 }
 
-
-
-/* ****************************************************************************
-*
-* NotifyContextRequest::clone -
-*/
-NotifyContextRequest* NotifyContextRequest::clone(void)
-{
-  NotifyContextRequest* ncrP = new NotifyContextRequest();
-
-  ncrP->subscriptionId = subscriptionId;
-  ncrP->originator     = originator;
-
-  ncrP->contextElementResponseVector.fill(contextElementResponseVector);
-
-  return ncrP;
-}

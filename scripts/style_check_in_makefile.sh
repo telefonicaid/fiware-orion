@@ -59,8 +59,6 @@ style_check src/lib/alarmMgr
 style_check src/lib/metricsMgr
 style_check src/lib/expressions
 style_check test/unittests
-style_check test/unittests/orionTypes
-style_check test/unittests/jsonParse
 style_check test/unittests/apiTypesV2
 style_check test/unittests/cache
 style_check test/unittests/mongoBackend
@@ -75,18 +73,13 @@ style_check test/unittests/serviceRoutines
 # style_check src/lib/rest (3 files)
 # style_check src/lib/common (6 files)
 # style_check src/lib/orionTypes (9 files)
-# style_check src/lib/convenience (17 files)
-# style_check src/lib/jsonParse (19 files)
 # style_check src/lib/ngsi10 (24 files)
-# style_check src/lib/ngsi9 (24 files)
 # style_check src/lib/serviceRoutines (46 files)
 # style_check src/lib/ngsi (74 files)
 
 # style_check test/unittests/common (1 file)
 # style_check test/unittests/parse (2 files)
-# style_check test/unittests/convenience (8 files)
 # style_check test/unittests/ngsi10 (9 files)
-# style_check test/unittests/ngsi9 (10 files)
 # style_check test/unittests/ngsi (32 files)
 #
 # style_check test/unittests (1 file, but already done)
@@ -109,8 +102,6 @@ style_check test/unittests/serviceRoutines
 # o common/string.h                                                          (haderding/remove_ngsiv1_indent: 1 include, 1 external declaration)
 # o common/globals.h                                                         (feature/mqtt_notifications_poc: 1 external declaration)
 # o common/globals.h                                                         (haderding/remove_ngsiv1_indent: 1 new external declaration)
-# o common/tag.cpp                                                           (haderding/remove_ngsiv1_indent: 'indent' removed from 6 signatures, slight change in 6 functions)
-# o common/tag.h                                                             (haderding/remove_ngsiv1_indent: 'indent' removed from 6 signatures)
 # o common/macroSubstitute.cpp                                               (haderding/remove_ngsiv1_indent: 2 lines: a param added to toJson())
 #
 # o rest/httpRequestSend.cpp                                                 (feature/mqtt_notifications_poc: 1 include, 1 new function, addition in httpRequestSendWithCurl())
@@ -170,16 +161,6 @@ style_check test/unittests/serviceRoutines
 # o ngsi/ContextElementResponseVector.h                                      (haderding/remove_ngsiv1_indent: 7 lines)
 # o ngsi/ContextElementVector.cpp                                            (haderding/remove_ngsiv1_indent: 13 lines)
 # o ngsi/ContextElementVector.h                                              (haderding/remove_ngsiv1_indent: 8 lines)
-# o ngsi/ContextRegistration.cpp                                             (haderding/remove_ngsiv1_indent: 10 lines)
-# o ngsi/ContextRegistration.h                                               (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi/ContextRegistrationAttribute.cpp                                    (haderding/remove_ngsiv1_indent: 7 lines)
-# o ngsi/ContextRegistrationAttribute.h                                      (haderding/remove_ngsiv1_indent: 1 line)
-# o ngsi/ContextRegistrationAttributeVector.cpp                              (haderding/remove_ngsiv1_indent: 4 lines)
-# o ngsi/ContextRegistrationAttributeVector.h                                (haderding/remove_ngsiv1_indent: 1 line)
-# o ngsi/ContextRegistrationResponse.cpp                                     (haderding/remove_ngsiv1_indent: 7 lines)
-# o ngsi/ContextRegistrationResponse.h                                       (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi/ContextRegistrationResponseVector.cpp                               (haderding/remove_ngsiv1_indent: 6 lines)
-# o ngsi/ContextRegistrationResponseVector.h                                 (haderding/remove_ngsiv1_indent: 2 lines)
 # o ngsi/ContextRegistrationVector.cpp                                       (haderding/remove_ngsiv1_indent: 6 lines)
 # o ngsi/ContextRegistrationVector.h                                         (haderding/remove_ngsiv1_indent: 2 lines)
 # o ngsi/Duration.cpp                                                        (haderding/remove_ngsiv1_indent: 9 lines)
@@ -198,8 +179,6 @@ style_check test/unittests/serviceRoutines
 # o ngsi/NotifyConditionVector.h                                             (haderding/remove_ngsiv1_indent: 2 lines)
 # o ngsi/Originator.cpp                                                      (haderding/remove_ngsiv1_indent: 9 lines)
 # o ngsi/Originator.h                                                        (haderding/remove_ngsiv1_indent: 5 lines)
-# o ngsi/ProvidingApplication.cpp                                            (haderding/remove_ngsiv1_indent: 9 lines)
-# o ngsi/ProvidingApplication.h                                              (haderding/remove_ngsiv1_indent: 5 lines)
 # o ngsi/Reference.cpp                                                       (haderding/remove_ngsiv1_indent: 9 lines)
 # o ngsi/Reference.h                                                         (haderding/remove_ngsiv1_indent: 5 lines)
 # o ngsi/RegistrationId.cpp                                                  (haderding/remove_ngsiv1_indent: 9 lines)
@@ -281,53 +260,16 @@ style_check test/unittests/serviceRoutines
 #                                                                                                               alt exec-part in restReply(),
 #                                                                                                               'indent' removed from 13 calls to render())
 #
-# o serviceRoutines/deleteAllEntitiesWithTypeAndId.cpp                       (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/deleteAttributeValueInstance.cpp                         (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.cpp            (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/deleteIndividualContextEntity.cpp                        (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/deleteIndividualContextEntityAttribute.cpp               (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.cpp  (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/getAllEntitiesWithTypeAndId.cpp                          (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getAttributeValueInstance.cpp                            (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getAttributeValueInstanceWithTypeAndId.cpp               (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getAttributesForEntityType.cpp                           (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getContextEntitiesByEntityIdAndType.cpp                  (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/getEntityByIdAttributeByNameWithTypeAndId.cpp            (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/getEntityTypes.cpp                                       (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getIndividualContextEntity.cpp                           (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getIndividualContextEntityAttribute.cpp                  (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getIndividualContextEntityAttributeWithTypeAndId.cpp     (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/getNgsi10ContextEntityTypes.cpp                          (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/getNgsi10ContextEntityTypesAttribute.cpp                 (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/postAllEntitiesWithTypeAndId.cpp                         (haderding/remove_ngsiv1_indent: 4 TIMED_RENDER)
-# o serviceRoutines/postAttributeValueInstanceWithTypeAndId.cpp              (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/postContextEntitiesByEntityIdAndType.cpp                 (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/postDiscoverContextAvailability.cpp                      (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/postEntityByIdAttributeByNameWithTypeAndId.cpp           (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/postIndividualContextEntity.cpp                          (haderding/remove_ngsiv1_indent: 5 TIMED_RENDER)
-# o serviceRoutines/postIndividualContextEntityAttribute.cpp                 (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.cpp    (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
+
 # o serviceRoutines/postNotifyContext.cpp                                    (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/postQueryContext.cpp                                     (haderding/remove_ngsiv1_indent: 3 includes, 2 TIMED_RENDER, 35 lines in queryForward())
-# o serviceRoutines/postRegisterContext.cpp                                  (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/postSubscribeContext.cpp                                 (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/postUnsubscribeContext.cpp                               (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/postUpdateContext.cpp                                    (haderding/remove_ngsiv1_indent: 3 includes, 5 TIMED_RENDER, 35 lines in updateForward)
-# o serviceRoutines/postUpdateContextSubscription.cpp                        (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/putAllEntitiesWithTypeAndId.cpp                          (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/putAttributeValueInstance.cpp                            (haderding/remove_ngsiv1_indent: 2 TIMED_RENDER)
-# o serviceRoutines/putAttributeValueInstanceWithTypeAndId.cpp               (haderding/remove_ngsiv1_indent: 3 TIMED_RENDER)
-# o serviceRoutines/putIndividualContextEntity.cpp                           (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/putIndividualContextEntityAttribute.cpp                  (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.cpp     (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutines/versionTreat.cpp                                         (haderding/remove_ngsiv1_indent: 8 lines in versionTreat())
 # o serviceRoutinesV2/getEntityAttributeValue.cpp                            (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutinesV2/postSubscriptions.cpp                                  (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 #
 #
 # o unittests/main_UnitTest.cpp                                              (haderding/remove_ngsiv1_indent: 1 variable)
-#
-# o unittests/common/commonTag_test.cpp                                      (haderding/remove_ngsiv1_indent: 24 lineas)
 #
 # o unittests/convenience/AppendContextElementRequest_test.cpp               (haderding/remove_ngsiv1_indent: 1 render(), 4 check())
 # o unittests/convenience/AppendContextElementResponse_test.cpp              (haderding/remove_ngsiv1_indent: 2 render(), 3 check())
@@ -348,8 +290,6 @@ style_check test/unittests/serviceRoutines
 # o unittests/ngsi/ContextElement_test.cpp                                   (haderding/remove_ngsiv1_indent: 8 check())
 # o unittests/ngsi/ContextRegistrationAttributeVector_test.cpp               (haderding/remove_ngsiv1_indent: 4 render()
 # o unittests/ngsi/ContextRegistrationAttribute_test.cpp                     (haderding/remove_ngsiv1_indent: 1 render()
-# o unittests/ngsi/ContextRegistrationResponseVector_test.cpp                (haderding/remove_ngsiv1_indent: 1 render(), 3 check())
-# o unittests/ngsi/ContextRegistrationResponse_test.cpp                      (haderding/remove_ngsiv1_indent: 2 render(), 1 check())
 # o unittests/ngsi/ContextRegistrationVector_test.cpp                        (haderding/remove_ngsiv1_indent: 1 render()
 # o unittests/ngsi/Duration_test.cpp                                         (haderding/remove_ngsiv1_indent: 3 check())
 # o unittests/ngsi/EntityId_test.cpp                                         (haderding/remove_ngsiv1_indent: 1 render()

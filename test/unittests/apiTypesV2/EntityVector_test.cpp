@@ -31,56 +31,27 @@
 
 /* ****************************************************************************
 *
-* check
-*/
-TEST(EntityVector, check)
-{
-  utInit();
-
-  Entity* enP;
-
-  // EntityVector with ok Entity inside
-  enP            = new Entity();
-  enP->id        = "E";
-  enP->type      = "T";
-  enP->isPattern = "false";
-  EntityVector enV1;
-  enV1.push_back(enP);
-
-  // EntityVector with nok Entity inside
-  enP            = new Entity();
-  enP->id        = "";
-  enP->type      = "T";
-  enP->isPattern = "false";
-  EntityVector enV2;
-  enV2.push_back(enP);
-
-  EXPECT_EQ("OK", enV1.check(V2, EntitiesRequest));
-  EXPECT_EQ("entity id length: 0, min length supported: 1", enV2.check(V2, EntitiesRequest));
-
-  utExit();
-}
-
-
-/* ****************************************************************************
-*
 * render -
 *
 */
 TEST(EntityVector, render)
 {
+  utInit();
+
   Entity*       eP = new Entity();
   std::string   rendered;
   EntityVector  eV;
 
-  rendered = eV.toJsonV1(false, UpdateContextElement, false);
-  EXPECT_STREQ("", rendered.c_str());
+  rendered = eV.toJson(NGSI_V2_NORMALIZED);
+  EXPECT_STREQ("[]", rendered.c_str());
 
-  eP->id   = "E_ID";
-  eP->type = "E_TYPE";
+  eP->entityId.id   = "E_ID";
+  eP->entityId.type = "E_TYPE";
   eV.push_back(eP);
 
-  rendered = eV.toJsonV1(false, UpdateContextElement, false);
+  rendered = eV.toJson(NGSI_V2_NORMALIZED);
 
   eV.release();
+
+  utExit();
 }

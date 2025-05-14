@@ -53,7 +53,6 @@ extern void orionRestServicesInit
    const char*         _allowedOrigin,
    int                 _corsMaxAge,
    int                 _mhdTimeoutInSeconds,
-   bool                _disableNgsiv1,
    const char*         _httpsKey,
    const char*         _httpsCert
 );

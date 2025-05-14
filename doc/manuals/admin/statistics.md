@@ -56,8 +56,7 @@ The counter block provides information about counters for the times a particular
   "counters": {
     "deprecatedFeatures": {
       "geoFormat": 2,
-      "ngsiv1Forwarding": 4,
-      "ngsiv1Requests": 4
+      "ngsiv1Forwarding": 4
     },
     "invalidRequests": 2,
     "jsonRequests": 4,
@@ -127,7 +126,6 @@ Provides timing information, i.e. the time that CB passes executing in different
   ...
   "timing": {
     "accumulated": {
-      "jsonV1Parse": 7.860908311,
       "jsonV2Parse": 120.680244446,
       "mongoBackend": 12778.52734375,
       "mongoReadWait": 7532.301757812,
@@ -159,7 +157,6 @@ The particular counters are as follows:
 
 * `total`: processing time for the whole request, excluding the time that the HTTP library
   takes for request/response dispatching (pseudo end-to-end time)
-* `jsonV1Parse`: time passed in NGSIv1 JSON parsing module (pseudo self-time)
 * `jsonV2Parse`: time passed in NGSIv2 JSON parsing module (pseudo self-time)
 * `mongoBackend`: time passed in mongoBackend module (pseduo self-time)
 * `render`: time passed in rendering module (pseudo self-time)

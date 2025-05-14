@@ -45,10 +45,6 @@
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-
 *
-* We use the same class for both NGSI10 and NGSI9 subscription. The only difference
-* is that throttling and lastNotification are not needed in the second case (note
-* that there are different constructor depending the case)
-*
 */
 class TriggeredSubscription
 {
@@ -94,7 +90,6 @@ class TriggeredSubscription
   void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
   bool         stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
   bool         mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
-  std::string  toString(const std::string& delimiter);
 };
 
 #endif  // SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_

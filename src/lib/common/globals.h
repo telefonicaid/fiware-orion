@@ -36,10 +36,8 @@
 
 /* ****************************************************************************
 *
-* FIWARE_LOCATION - 
+* FIWARE_LOCATION_V2 - 
 */
-#define FIWARE_LOCATION             "FIWARE::Location"
-#define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 #define FIWARE_LOCATION_V2          "FIWARE::Location::NGSIv2"
 
 #define EARTH_RADIUS_METERS         6371000
@@ -154,20 +152,6 @@ typedef enum Ngsiv2Flavour
 
 /* ****************************************************************************
 *
-*  NGSI API version -
-*/
-typedef enum ApiVersion
-{
-  NO_VERSION  = -1,
-  ADMIN_API   = 0,
-  V1          = 1,
-  V2          = 2
-} ApiVersion;
-
-
-
-/* ****************************************************************************
-*
 * PERMANENT_EXPIRES_DATETIME - date for permanent subscriptions/registrations
 */
 #define PERMANENT_EXPIRES_DATETIME  LLONG_MAX
@@ -217,11 +201,9 @@ extern bool               timingStatistics;
 extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
-extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
-extern bool               ngsiv1Autocast;
 extern unsigned long long inReqPayloadMaxSize;
 extern unsigned long long outReqMsgMaxSize;
 
@@ -246,8 +228,7 @@ extern void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics,
-  bool               _checkIdv1
+  bool               _notifQueueStatistics
 );
 
 
@@ -285,31 +266,9 @@ extern double getCurrentTime(void);
 
 
 
-/* ****************************************************************************
-*
-* toSeconds -
-*/
-extern int64_t toSeconds(int value, char what, bool dayPart);
-
-
-
-/*****************************************************************************
-*
-* parse8601 -
-*
-* This is common code for Duration and Throttling (at least)
-*
-*/
-extern int64_t parse8601(const std::string& s);
-
-
-
 /*****************************************************************************
 *
 * parse8601Time -
-*
-* This is common code for Duration and Throttling (at least)
-*
 */
 extern double parse8601Time(const std::string& s);
 

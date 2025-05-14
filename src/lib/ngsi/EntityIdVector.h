@@ -49,18 +49,16 @@ typedef struct EntityIdVector
 {
   std::vector<EntityId*>  vec;
 
-  std::string  toJsonV1(bool comma);
   std::string  toJson(void);
   void         push_back(EntityId* item);
   bool         push_back_if_absent(EntityId* item);
   unsigned int size(void) const;
-  EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
+  EntityId*    lookup(const std::string& id, const std::string& idPattern, const std::string& type, const std::string& typePattern);
   void         release();
   void         fill(EntityVector& _vec);
 
   EntityId* operator[](unsigned int ix) const;
 
-  std::string  check(RequestType requestType);
 } EntityIdVector;
 
 #endif  // SRC_LIB_NGSI_ENTITYIDVECTOR_H_

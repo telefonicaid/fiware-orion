@@ -28,9 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/globals.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/HttpStatusCode.h"
 
@@ -43,15 +42,4 @@
 NotifyContextResponse::NotifyContextResponse()
 {
   oe.fill(SccOk, "");
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextResponse::NotifyContextResponse - 
-*/
-NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
-{
-   oe.fill(sc);
 }
