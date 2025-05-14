@@ -39,17 +39,19 @@
 #include "serviceRoutines/postNotifyContext.h"
 
 /* ****************************************************************************
- *
- * postNotifyContext -
- */
-std::string postNotifyContext(
-    ConnectionInfo *ciP,
-    int components,
-    std::vector<std::string> &compV,
-    ParseData *parseDataP)
+*
+* postNotifyContext -
+*/
+std::string postNotifyContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
-  NotifyContextResponse ncr;
-  std::string answer;
+  NotifyContextResponse  ncr;
+  std::string            answer;
 
   TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
                                                        &ncr,
