@@ -1,2 +1,2 @@
 - Fix: memory leak in POST /v2/op/notify operation (#4261)
-- Fix: POST /v2/op/notify proper response (formarly it was using NSGIv1 format payload) (#4681)
+- Fix: POST /v2/op/notify proper response (formerly it was using NSGIv1 format payload) (#4681)
