@@ -64,7 +64,7 @@ std::string postNotifyContext
   // Check potential error
   if (ncr.oe.code != SccOk)
   {
-    TIMED_RENDER(answer = ncr.oe.toJson());
+    TIMED_RENDER(answer = ncr.oe.smartRender(V2));
     ciP->httpStatusCode = ncr.oe.code;
   }
   else

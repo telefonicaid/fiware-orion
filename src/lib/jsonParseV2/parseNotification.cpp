@@ -271,5 +271,5 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
     return "OK";  // FIXME #3151: parseNotification should return bool and have an input param "OrionError* oeP"
   }
 
-  return oe.toJson();
+  return oe.smartRender(V2);
 }

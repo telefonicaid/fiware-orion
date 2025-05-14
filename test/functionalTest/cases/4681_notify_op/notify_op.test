@@ -36,6 +36,7 @@ brokerStart CB
 #
 # 01. POST /v2/op/notify
 # 02. GET /v2/entities
+# 03. POST /v2/op/notify with error
 #
 
 echo "01. POST /v2/op/notify"
@@ -58,6 +59,23 @@ echo
 echo "02. GET /v2/entities"
 echo "===================="
 orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "03. POST /v2/op/notify with error"
+echo "================================="
+payload='{
+  "subscriptionId": "1231",
+  "data": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {"value": "(forbiden chars)", "type": "Number"}
+    }
+  ]
+}'
+orionCurl --url /v2/op/notify -X POST  --payload "$payload"
 echo
 echo
 
@@ -91,6 +109,20 @@ Content-Length: 69
         "type": "T"
     }
 ]
+
+
+03. POST /v2/op/notify with error
+=================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "Invalid characters in attribute value",
+    "error": "BadRequest"
+}
 
 
 --TEARDOWN--
