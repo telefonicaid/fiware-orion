@@ -116,12 +116,11 @@ TEST(NotifyContextResponse, Constructor)
 
   utInit();
 
-  EXPECT_EQ(SccOk, ncr.responseCode.code);
-  ncr.release();
+  EXPECT_EQ(SccOk, ncr.oe.code);
 
   StatusCode ec(SccOk, "4");
   NotifyContextResponse ncr2(ec);
-  EXPECT_EQ(SccOk, ncr2.responseCode.code);
+  EXPECT_EQ(SccOk, ncr2.oe.code);
 
   utExit();
 }

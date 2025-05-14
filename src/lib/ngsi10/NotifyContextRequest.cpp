@@ -141,20 +141,20 @@ std::string NotifyContextRequest::check(ApiVersion apiVersion, const std::string
 
   if (!predetectedError.empty())
   {
-    response.responseCode.fill(SccBadRequest, predetectedError);
+    response.oe.fill(SccBadRequest, predetectedError);
   }
   else if (((res = subscriptionId.check())                    != "OK") ||
            ((res = originator.check())                        != "OK") ||
            ((res = contextElementResponseVector.check(apiVersion, QueryContext, predetectedError, 0)) != "OK"))
   {
-    response.responseCode.fill(SccBadRequest, res);
+    response.oe.fill(SccBadRequest, res);
   }
   else
   {
     return "OK";
   }
 
-  return response.toJsonV1();
+  return response.oe.toJson();
 }
 
 

@@ -38,8 +38,6 @@
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postNotifyContext.h"
 
-
-
 /* ****************************************************************************
 *
 * postNotifyContext -
@@ -62,7 +60,17 @@ std::string postNotifyContext
                                                        ciP->servicePathV,
                                                        ciP->httpHeaders.correlator,
                                                        ciP->httpHeaders.ngsiv2AttrsFormat));
-  TIMED_RENDER(answer = ncr.toJsonV1());
+
+  // Check potential error
+  if (ncr.oe.code != SccOk)
+  {
+    TIMED_RENDER(answer = ncr.oe.smartRender(V2));
+    ciP->httpStatusCode = ncr.oe.code;
+  }
+  else
+  {
+    ciP->httpStatusCode = SccOk;
+  }
 
   parseDataP->ncr.res.release();
 
