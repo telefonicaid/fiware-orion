@@ -31,6 +31,8 @@
 #include "ngsi/Request.h"
 #include "rest/OrionError.h"
 
+#include "rest/OrionError.h"
+
 
 
 /* ****************************************************************************
@@ -41,7 +43,7 @@
 */
 typedef struct NotifyContextResponse
 {
-  OrionError    error;              // Mandatory
+  OrionError    oe;              // Mandatory
 
   NotifyContextResponse();
 

@@ -41,5 +41,5 @@
 */
 NotifyContextResponse::NotifyContextResponse()
 {
-  error.fill(SccOk);
+  oe.fill(SccOk, "");
 }

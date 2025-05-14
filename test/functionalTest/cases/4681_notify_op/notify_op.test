@@ -1,0 +1,130 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST /v2/op/notify
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# This is not an operation commonly used, but as long it is part of the NGISv2 API
+# (https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md#notify-post-v2opnotify)
+# it is a good idea to have a .test covering it
+#
+# 01. POST /v2/op/notify
+# 02. GET /v2/entities
+# 03. POST /v2/op/notify with error
+#
+
+echo "01. POST /v2/op/notify"
+echo "======================"
+payload='{
+  "subscriptionId": "1231",
+  "data": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {"value": 1, "type": "Number"}
+    }
+  ]
+}'
+orionCurl --url /v2/op/notify -X POST  --payload "$payload" 
+echo
+echo
+
+
+echo "02. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities
+echo
+echo
+
+
+echo "03. POST /v2/op/notify with error"
+echo "================================="
+payload='{
+  "subscriptionId": "1231",
+  "data": [
+    {
+      "id": "E",
+      "type": "T",
+      "A": {"value": "(forbiden chars)", "type": "Number"}
+    }
+  ]
+}'
+orionCurl --url /v2/op/notify -X POST  --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/op/notify
+======================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Length: 0
+
+
+
+02. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
+
+[
+    {
+        "A": {
+            "metadata": {},
+            "type": "Number",
+            "value": 1
+        },
+        "id": "E",
+        "type": "T"
+    }
+]
+
+
+03. POST /v2/op/notify with error
+=================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "Invalid characters in attribute value",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
