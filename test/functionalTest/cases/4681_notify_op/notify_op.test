@@ -34,6 +34,9 @@ brokerStart CB
 # (https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/orion-api.md#notify-post-v2opnotify)
 # it is a good idea to have a .test covering it
 #
+# 01. POST /v2/op/notify
+# 02. GET /v2/entities
+#
 
 echo "01. POST /v2/op/notify"
 echo "======================"
