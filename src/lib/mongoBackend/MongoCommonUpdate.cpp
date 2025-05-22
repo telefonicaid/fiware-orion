@@ -4010,14 +4010,6 @@ static bool contextElementPreconditionsCheck
     }
   }
 
-  /* Not supporting idPattern currently */
-  if (!eP->entityId.idPattern.empty())
-  {
-    // No need of filling responseP->error, this cannot happen in NGSIv2
-    // FIXME PR: check this
-    return false;  // Error already in responseP
-  }
-
   return true;
 }
 
