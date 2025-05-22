@@ -35,7 +35,6 @@ badVerbPutDeleteOnly.cpp
 badVerbGetPutDeleteOnly.cpp
 badVerbPutOnly.cpp
 badRequest.cpp
-postNotifyContext.cpp
 statisticsTreat.cpp
 optionsVersionRequest.cpp
 )
@@ -54,7 +53,6 @@ badVerbPutDeleteOnly.h
 badVerbGetPutDeleteOnly.h
 badVerbPutOnly.h
 badRequest.h
-postNotifyContext.h
 statisticsTreat.h
 optionsVersionRequest.h
 )

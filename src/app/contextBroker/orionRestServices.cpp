@@ -39,8 +39,6 @@
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badRequest.h"
 
-// FIXME PR: postNotifyContext.h should be in serviceRoutinesV2 as it is for a v2 operation
-#include "serviceRoutines/postNotifyContext.h"
 
 #include "serviceRoutinesV2/badVerbGetPutOnly.h"
 #include "serviceRoutinesV2/badVerbGetDeletePatchOnly.h"
@@ -83,6 +81,7 @@
 #include "serviceRoutinesV2/deleteRegistration.h"
 #include "serviceRoutinesV2/getRegistrations.h"
 #include "serviceRoutinesV2/postRegistration.h"
+#include "serviceRoutinesV2/postNotifyContext.h"
 
 #include "rest/RestService.h"
 #include "rest/rest.h"
