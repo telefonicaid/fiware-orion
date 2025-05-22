@@ -76,7 +76,7 @@ std::string getEntityAttributeValue
   }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill("", compV[2], type, EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill("", compV[2], type, EntityTypeEmptyOrNotEmpty);
 
   // Call standard op postQueryContext
   OrionError oe;

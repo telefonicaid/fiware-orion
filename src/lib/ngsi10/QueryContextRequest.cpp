@@ -183,8 +183,7 @@ void QueryContextRequest::fill
   const std::string& entityId,
   const std::string& entityIdPattern,
   const std::string& entityType,
-  EntityTypeInfo     typeInfo,
-  const std::string& attributeName
+  EntityTypeInfo     typeInfo
 )
 {
   EntityId* eidP = new EntityId(entityId, entityIdPattern, entityType, "");
@@ -198,11 +197,6 @@ void QueryContextRequest::fill
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
 
     scopeVector.push_back(scopeP);
-  }
-
-  if (!attributeName.empty())
-  {
-    attributeList.push_back(attributeName);
   }
 }
 

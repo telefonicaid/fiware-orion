@@ -32,7 +32,6 @@
 *
 * EntityTypeInfo - entity::type empty, not empty OR either
 *
-* FIXME PR: review usage of this class
 */
 typedef enum EntityTypeInfo
 {

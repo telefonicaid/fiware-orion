@@ -341,11 +341,11 @@ std::string getEntities
   }
   else if (ciP->uriParamTypes.size() == 0)
   {
-    parseDataP->qcr.res.fill("", pattern, "", EntityTypeEmptyOrNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, "", EntityTypeEmptyOrNotEmpty);
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill("", pattern, type, EntityTypeNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, type, EntityTypeNotEmpty);
   }
   else
   {

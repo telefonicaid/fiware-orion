@@ -70,8 +70,7 @@ typedef struct QueryContextRequest
   void          fill(const std::string&  entityId,
                      const std::string&  entityIdPattern,
                      const std::string&  entityType,
-                     EntityTypeInfo      typeInfo,
-                     const std::string&  attributeName);
+                     EntityTypeInfo      typeInfo);
   void          fill(BatchQuery* bqP);
 
 } QueryContextRequest;
