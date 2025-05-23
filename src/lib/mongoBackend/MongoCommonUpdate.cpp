@@ -2442,11 +2442,11 @@ static bool updateContextAttributeItem
       // another .fill() in this function caller. We keep it by the moment, but it probably
       // will removed when we refactor this function
       //
-      std::string details = std::string("action: UPDATE") +
+      /*std::string details = std::string("action: UPDATE") +
                             " - entity: [" + entityDetail + "]" +
-                            " - offending attribute: " + targetAttr->getName();
+                            " - offending attribute: " + targetAttr->getName();*/
 
-      cerP->error.fill(SccInvalidParameter, details);
+      //cerP->error.fill(SccInvalidParameter, details);
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
@@ -2458,12 +2458,12 @@ static bool updateContextAttributeItem
   if (!processLocationAtUpdateAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, geoJson, &err, oe)
     || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
-    std::string details = std::string("action: UPDATE") +
+    /*std::string details = std::string("action: UPDATE") +
                           " - entity: [" + entityDetail + "]" +
                           " - offending attribute: " + targetAttr->getName() +
-                          " - " + err;
+                          " - " + err;*/
 
-    cerP->error.fill(SccInvalidParameter, details);
+    //cerP->error.fill(SccInvalidParameter, details);
     // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
 
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
@@ -2517,12 +2517,12 @@ static bool appendContextAttributeItem
                                         &err, oe)
       || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
-    std::string details = std::string("action: APPEND") +
+    /*std::string details = std::string("action: APPEND") +
                           " - entity: [" + entityDetail + "]" +
                           " - offending attribute: " + targetAttr->getName() +
-                          " - " + err;
+                          " - " + err;*/
 
-    cerP->error.fill(SccInvalidParameter, details);
+    //cerP->error.fill(SccInvalidParameter, details);
     // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
 
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
@@ -2569,13 +2569,13 @@ static bool deleteContextAttributeItem
     /* Check aspects related with location */
     if (targetAttr->getLocation(&attrs))
     {
-      std::string details = std::string("action: DELETE") +
+      /*std::string details = std::string("action: DELETE") +
                             " - entity: [" + entityDetail + "]" +
                             " - offending attribute: " + targetAttr->getName() +
-                            " - location attribute has to be defined at creation time, with APPEND";
+                            " - location attribute has to be defined at creation time, with APPEND";*/
 
-      cerP->error.fill(SccInvalidParameter, details);
-      oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
+      //cerP->error.fill(SccInvalidParameter, details);
+      //oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
 
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time", targetAttr->getName());
       return false;
@@ -2603,12 +2603,12 @@ static bool deleteContextAttributeItem
     /* If deleteAttribute() returns false, then that particular attribute has not
      * been found. In this case, we interrupt the processing and early return with
      * a OrionError */
-    std::string details = std::string("action: DELETE") +
+    /*std::string details = std::string("action: DELETE") +
                           " - entity: [" + entityDetail + "]" +
                           " - offending attribute: " + targetAttr->getName() +
-                          " - attribute not found";
+                          " - attribute not found";*/
 
-    cerP->error.fill(SccInvalidParameter, details);
+    //cerP->error.fill(SccInvalidParameter, details);
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
@@ -2743,10 +2743,10 @@ static bool processContextAttributeVector
     }
     else
     {
-      std::string details = std::string("unknown actionType");
+      //std::string details = std::string("unknown actionType");
 
-      cerP->error.fill(SccInvalidParameter, details);
-      oe->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
+      //cerP->error.fill(SccInvalidParameter, details);
+      //oe->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
 
       // If we reach this point, there's a BUG in the parse layer checks
       LM_E(("Runtime Error (unknown actionType)"));
@@ -4311,7 +4311,7 @@ unsigned int processContextElement
                         ngsiv2Flavour == NGSIV2_NO_FLAVOUR,
                         &(responseP->error)))
       {
-        cerP->error.fill(SccInvalidParameter, errDetail);
+        //cerP->error.fill(SccInvalidParameter, errDetail);
         // In this case, responseP->error is not filled, as createEntity() deals internally with that
       }
       else

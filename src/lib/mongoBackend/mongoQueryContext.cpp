@@ -455,41 +455,14 @@ HttpStatusCode mongoQueryContext
   /* Prune "not found" CERs */
   pruneContextElements(requestP->attrsList, rawCerV, &responseP->contextElementResponseVector);
 
-  /* Pagination stuff */
+  /* Set responseP error */
   if (responseP->contextElementResponseVector.size() == 0)
   {
-    //
-    // If the query has an empty response, we have to fill in the status code part in the response.
-    //
-    // However, if the response was empty due to a too high pagination offset,
-    // and if the user has asked for 'details' (as URI parameter, then the response should include information about
-    // the number of hits without pagination.
-    //
-
-    if ((countP != NULL) && (*countP > 0) && (offset >= *countP))
-    {
-      char details[256];
-
-      snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", *countP, offset); // FIXME PR: this could be removed??
-      responseP->error.fill(SccContextElementNotFound, details);
-    }
-    else
-    {
-      responseP->error.fill(SccContextElementNotFound);
-    }
+    responseP->error.fill(SccContextElementNotFound);
   }
-  else if (countP != NULL)
+  else
   {
-    // FIXME PR: Count: is a NGSIv1 thing... remove this
-    //
-    // If all was OK, but the details URI param was set to 'on', then the responses error code details
-    // 'must' contain the total count of hits.
-    //
-
-    char details[64];
-
-    snprintf(details, sizeof(details), "Count: %lld", *countP);
-    responseP->error.fill(SccOk, details);
+    responseP->error.fill(SccOk);
   }
 
   rawCerV.release();
