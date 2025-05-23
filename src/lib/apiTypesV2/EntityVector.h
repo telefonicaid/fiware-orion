@@ -53,6 +53,9 @@ typedef struct EntityVector
   Entity*       lookup(const std::string& name, const std::string& type);
   void          release();
 
+  void          fill(const QueryContextResponse& qcrs, OrionError* oeP);
+
+
   Entity*  operator[](unsigned int ix) const;
 } EntityVector;
 

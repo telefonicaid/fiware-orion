@@ -43,64 +43,6 @@
 
 /* ****************************************************************************
 *
-* fillEntityVector -
-*
-*  FIXME PR: copied from getEntities.cpp. Move to common place
-*/
-static void fillEntityVector(const QueryContextResponse& qcrs, EntityVector* enVP, OrionError* oeP)
-{
-  if (qcrs.error.code == SccContextElementNotFound)
-  {
-    //
-    // If no entities are found, we respond with a 200 OK
-    // and an empty vector of entities ( [] )
-    //
-
-    oeP->fill(SccOk, "", "OK");
-    return;
-  }
-  else if (qcrs.error.code != SccOk)
-  {
-    //
-    // If any other error - use the error for the response
-    //
-
-    oeP->fill(qcrs.error.code, qcrs.error.description, qcrs.error.error);
-    return;
-  }
-
-  for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
-  {
-    Entity* eP = &qcrs.contextElementResponseVector[ix]->entity;
-
-    if ((&qcrs.contextElementResponseVector[ix]->error)->code == SccReceiverInternalError)
-    {
-      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
-      // think so, as the releasing logic in the upper layer will deal with that but
-      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
-      // cannot help here and it is better to ensure)
-      oeP->fill(&qcrs.contextElementResponseVector[ix]->error);
-      enVP->release();
-      return;
-    }
-    else
-    {
-      Entity*         newP  = new Entity();
-
-      newP->entityId = eP->entityId;
-      newP->creDate  = eP->creDate;
-      newP->modDate  = eP->modDate;
-
-      newP->attributeVector.fill(eP->attributeVector);
-      enVP->push_back(newP);
-    }
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * postBatchQuery -
 *
 * POST /v2/op/query
@@ -159,7 +101,7 @@ std::string postBatchQuery
     else
     {
       OrionError oe;
-      fillEntityVector(parseDataP->qcrs.res, &entities, &oe);
+      entities.fill(parseDataP->qcrs.res, &oe);
 
       TIMED_RENDER(answer = entities.toJson(getRenderFormat(ciP->uriParamOptions),
                                             filterAttrs.stringV, false, qcrP->metadataList.stringV));
