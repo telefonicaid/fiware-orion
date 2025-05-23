@@ -48,7 +48,6 @@ typedef enum HttpStatusCode
   SccRequestEntityTooLarge  = 413,   // Request Entity Too Large - over 1Mb of payload
   SccUnsupportedMediaType   = 415,   // Unsupported Media Type (only support and application/json and -in some cases- text/plain)
   SccInvalidModification    = 422,   // InvalidModification (unprocessable entity)
-  //SccInvalidParameter       = 472,   // A parameter of the request is invalid/not allowed
   SccReceiverInternalError  = 500,   // An unknown error at the receiver has occurred
   SccNotImplemented         = 501    // The given operation is not implemented
 } HttpStatusCode;

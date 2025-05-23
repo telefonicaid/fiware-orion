@@ -46,7 +46,6 @@ std::string httpStatusCodeString(HttpStatusCode code)
   case SccRequestEntityTooLarge:             return "RequestEntityTooLarge";
   case SccUnsupportedMediaType:              return "UnsupportedMediaType";
   case SccInvalidModification:               return "InvalidModification";
-  //case SccInvalidParameter:                  return "request parameter is invalid/not allowed";                     // FI-WARE // FIXME PR: remove
   case SccReceiverInternalError:             return "InternalServerError";
   case SccNotImplemented:                    return "NotImplemented";
   default:                                   return "Undefined";

@@ -2405,7 +2405,6 @@ static bool updateContextAttributeItem
   orion::BSONObj*           attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
@@ -2437,17 +2436,6 @@ static bool updateContextAttributeItem
        * been found. In this case, we interrupt the processing and early return with
        * an error OrionError */
 
-      //
-      // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
-      // another .fill() in this function caller. We keep it by the moment, but it probably
-      // will removed when we refactor this function
-      //
-      /*std::string details = std::string("action: UPDATE") +
-                            " - entity: [" + entityDetail + "]" +
-                            " - offending attribute: " + targetAttr->getName();*/
-
-      //cerP->error.fill(SccInvalidParameter, details);
-
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
     }
@@ -2458,14 +2446,6 @@ static bool updateContextAttributeItem
   if (!processLocationAtUpdateAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, geoJson, &err, oe)
     || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
-    /*std::string details = std::string("action: UPDATE") +
-                          " - entity: [" + entityDetail + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - " + err;*/
-
-    //cerP->error.fill(SccInvalidParameter, details);
-    // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
-
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
     return false;
   }
@@ -2490,7 +2470,6 @@ static bool appendContextAttributeItem
   orion::BSONObj*           attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
@@ -2517,14 +2496,6 @@ static bool appendContextAttributeItem
                                         &err, oe)
       || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
-    /*std::string details = std::string("action: APPEND") +
-                          " - entity: [" + entityDetail + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - " + err;*/
-
-    //cerP->error.fill(SccInvalidParameter, details);
-    // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
-
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
     return false;
   }
@@ -2552,7 +2523,6 @@ static bool deleteContextAttributeItem
   orion::BSONObj&           attrs,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  const std::string&        entityDetail,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesRemove,
   std::string*              currentLocAttrName,
@@ -2569,14 +2539,6 @@ static bool deleteContextAttributeItem
     /* Check aspects related with location */
     if (targetAttr->getLocation(&attrs))
     {
-      /*std::string details = std::string("action: DELETE") +
-                            " - entity: [" + entityDetail + "]" +
-                            " - offending attribute: " + targetAttr->getName() +
-                            " - location attribute has to be defined at creation time, with APPEND";*/
-
-      //cerP->error.fill(SccInvalidParameter, details);
-      //oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
-
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time", targetAttr->getName());
       return false;
     }
@@ -2601,14 +2563,7 @@ static bool deleteContextAttributeItem
   else
   {
     /* If deleteAttribute() returns false, then that particular attribute has not
-     * been found. In this case, we interrupt the processing and early return with
-     * a OrionError */
-    /*std::string details = std::string("action: DELETE") +
-                          " - entity: [" + entityDetail + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - attribute not found";*/
-
-    //cerP->error.fill(SccInvalidParameter, details);
+     * been found. In this case, we interrupt the processing and early return */
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
@@ -2651,7 +2606,6 @@ static bool processContextAttributeVector
 {
   std::string               entityId        = cerP->entity.entityId.id;
   std::string               entityType      = cerP->entity.entityId.type;
-  std::string               entityDetail    = cerP->entity.toString();
   bool                      entityModified  = false;
   std::vector<std::string>  attrsWithModifiedValue;
   std::vector<std::string>  attrsWithModifiedMd;
@@ -2683,7 +2637,6 @@ static bool processContextAttributeVector
                                       &attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      entityDetail,
                                       toSet,
                                       toUnset,
                                       attrNamesAdd,
@@ -2707,7 +2660,6 @@ static bool processContextAttributeVector
                                       &attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      entityDetail,
                                       toSet,
                                       toUnset,
                                       attrNamesAdd,
@@ -2730,7 +2682,6 @@ static bool processContextAttributeVector
                                       attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      entityDetail,
                                       toUnset,
                                       attrNamesRemove,
                                       currentLocAttrName,
@@ -2743,11 +2694,6 @@ static bool processContextAttributeVector
     }
     else
     {
-      //std::string details = std::string("unknown actionType");
-
-      //cerP->error.fill(SccInvalidParameter, details);
-      //oe->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
-
       // If we reach this point, there's a BUG in the parse layer checks
       LM_E(("Runtime Error (unknown actionType)"));
       return false;
@@ -4301,7 +4247,7 @@ unsigned int processContextElement
 
       // upsert condition is based on ngsiv2Flavour. It happens that when upsert is on,
       // ngsiv2Flavour is NGSIV2_NO_FLAVOUR (see postEntities.cpp code)
-      if (!createEntity(eP,
+      if (createEntity(eP,
                         eP->attributeVector,
                         now,
                         &errDetail,
@@ -4310,11 +4256,6 @@ unsigned int processContextElement
                         fiwareCorrelator,
                         ngsiv2Flavour == NGSIV2_NO_FLAVOUR,
                         &(responseP->error)))
-      {
-        //cerP->error.fill(SccInvalidParameter, errDetail);
-        // In this case, responseP->error is not filled, as createEntity() deals internally with that
-      }
-      else
       {
         cerP->error.fill(SccOk);
 
