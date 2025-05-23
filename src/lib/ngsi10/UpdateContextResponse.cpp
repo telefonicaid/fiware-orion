@@ -172,7 +172,7 @@ void UpdateContextResponse::fill(UpdateContextRequest* upcrP, HttpStatusCode sc)
 
   // Note that "external" OrionError is always SccOk, sc is not used here
   // FIXME PR: internal error should be avoided. Review this
-  error.fill(sc, "");
+  //error.fill(sc, "");
 }
 
 
