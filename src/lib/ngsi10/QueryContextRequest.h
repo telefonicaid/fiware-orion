@@ -30,7 +30,7 @@
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/Restriction.h"
+#include "ngsi/ScopeVector.h"
 #include "rest/EntityTypeInfo.h"
 
 
@@ -54,27 +54,23 @@ typedef struct QueryContextRequest
   EntityIdVector    entityIdVector;  // Mandatory
   StringList        attributeList;   // Optional
   StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
-  Restriction       restriction;     // Optional
+  ScopeVector       scopeVector;     // Optional
 
-  int               restrictions;
-  StringList        metadataList;     // From URI param 'metadata'
-  std::string       contextProvider;  // Not part of the payload - used internally only
-  ProviderFormat    providerFormat;   // Not part of the payload - used internally only
+  StringList        metadataList;          // From URI param 'metadata'
+  std::string       contextProvider;       // Not part of the payload - used internally only
+  bool              legacyProviderFormat;  // Not part of the payload - used internally only
 
   QueryContextRequest();
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, ProviderFormat _providerFormat);
-  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList&  attributeList, ProviderFormat _providerFormat);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, bool _legacyProviderFormat);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList&  attributeList, bool _legacyProviderFormat);
 
   std::string   toJsonV1(void);
   std::string   toJson(void);
-  std::string   check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError);
   void          release(void);
-  void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);
   void          fill(const std::string&  entityId,
+                     const std::string&  entityIdPattern,
                      const std::string&  entityType,
-                     const std::string&  isPattern,
-                     EntityTypeInfo      typeInfo,
-                     const std::string&  attributeName);
+                     EntityTypeInfo      typeInfo);
   void          fill(BatchQuery* bqP);
 
 } QueryContextRequest;

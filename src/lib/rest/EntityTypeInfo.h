@@ -31,6 +31,7 @@
 /* ****************************************************************************
 *
 * EntityTypeInfo - entity::type empty, not empty OR either
+*
 */
 typedef enum EntityTypeInfo
 {

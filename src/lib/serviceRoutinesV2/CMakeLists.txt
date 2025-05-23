@@ -55,6 +55,7 @@ getRegistrations.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
 postRegistration.cpp
+postNotifyContext.cpp
 optionsGetDeleteOnly.cpp
 optionsAllNotDelete.cpp
 optionsGetPutOnly.cpp
@@ -99,6 +100,7 @@ getRegistration.h
 deleteRegistration.h
 getRegistrations.h
 postRegistration.h
+postNotifyContext.h
 serviceRoutinesCommon.h
 )
 

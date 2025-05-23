@@ -79,7 +79,8 @@ static bool parseContextElementResponse
     return false;
   }
 
-  cerP->entity.fill(entity.id, entity.type, entity.isPattern);
+  EntityId enId(entity.entityId.id, entity.entityId.idPattern, entity.entityId.type, entity.entityId.typePattern);
+  cerP->entity.fill(enId);
   cerP->entity.attributeVector.push_back(entity.attributeVector);
   entity.release();
 
@@ -196,7 +197,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         return false;
       }
 
-      ncrP->subscriptionId.set(iter->value.GetString());
+      ncrP->subscriptionId = iter->value.GetString();
     }
     else if (name == "data")
     {
@@ -271,5 +272,5 @@ std::string parseNotification(ConnectionInfo* ciP, NotifyContextRequest* ncrP)
     return "OK";  // FIXME #3151: parseNotification should return bool and have an input param "OrionError* oeP"
   }
 
-  return oe.smartRender(V2);
+  return oe.toJson();
 }

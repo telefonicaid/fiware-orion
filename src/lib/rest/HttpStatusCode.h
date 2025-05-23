@@ -48,13 +48,6 @@ typedef enum HttpStatusCode
   SccRequestEntityTooLarge  = 413,   // Request Entity Too Large - over 1Mb of payload
   SccUnsupportedMediaType   = 415,   // Unsupported Media Type (only support and application/json and -in some cases- text/plain)
   SccInvalidModification    = 422,   // InvalidModification (unprocessable entity)
-  SccSubscriptionIdNotFound = 470,   // The subscriptionId does not correspond to an active subscription
-  SccMissingParameter       = 471,   // A parameter is missing in the request
-  SccInvalidParameter       = 472,   // A parameter of the request is invalid/not allowed
-  SccErrorInMetadata        = 473,   // Generic error in metadata (e.g. 'expires' older than 'timestamp')
-  SccEntityIdReNotAllowed   = 480,   // Regular Expression for EntityId is not allowed by receiver
-  SccEntityTypeRequired     = 481,   // The EntityType is required by the receiver
-  SccAttributeListRequired  = 482,   // The Attribute List is required by the receiver
   SccReceiverInternalError  = 500,   // An unknown error at the receiver has occurred
   SccNotImplemented         = 501    // The given operation is not implemented
 } HttpStatusCode;

@@ -25,7 +25,7 @@ Not POSIX regex in idPattern result in error
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 56 IPv4
+brokerStart CB 55 IPv4
 
 --SHELL--
 

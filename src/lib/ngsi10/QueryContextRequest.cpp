@@ -28,12 +28,10 @@
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/JsonHelper.h"
-#include "common/tag.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/Restriction.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "rest/EntityTypeInfo.h"
@@ -45,12 +43,9 @@
 *
 * QueryContextRequest::QueryContextRequest
 *
-* Explicit constructor needed to initialize primitive types so they don't get
-* random values from the stack
 */
 QueryContextRequest::QueryContextRequest()
 {
-  restrictions = 0;
 }
 
 
@@ -59,10 +54,10 @@ QueryContextRequest::QueryContextRequest()
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, ProviderFormat _providerFormat)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName, bool _legacyProviderFormat)
 {
-  contextProvider = _contextProvider;
-  providerFormat  = _providerFormat;
+  contextProvider       = _contextProvider;
+  legacyProviderFormat  = _legacyProviderFormat;
 
   entityIdVector.push_back(new EntityId(eP));
 
@@ -70,8 +65,6 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
   {
     attributeList.push_back(attributeName);
   }
-
-  restrictions = 0;
 }
 
 
@@ -80,16 +73,14 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList, ProviderFormat _providerFormat)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const StringList& _attributeList, bool _legacyProviderFormat)
 {
-  contextProvider = _contextProvider;
-  providerFormat  = _providerFormat;
+  contextProvider       = _contextProvider;
+  legacyProviderFormat  = _legacyProviderFormat;
 
   entityIdVector.push_back(new EntityId(eP));
 
   attributeList.clone(_attributeList);
-
-  restrictions = 0;
 }
 
 
@@ -113,52 +104,60 @@ std::string QueryContextRequest::toJson(void)
 /* ****************************************************************************
 *
 * QueryContextRequest::toJsonV1 -
+*
+* This is used only in the legacyForwarding:true logic. It would remove once that deprecated feature
+* would be removed.
+*
+* Example:
+* {
+*   "entities": [
+*     {
+*       "type": "Room",
+*       "isPattern": "true",
+*       "id": "ConferenceRoom.*"
+*     }
+*   ],
+*   "attributes": [
+*     "temperature",
+*     "pressure",
+*     "lightstatus"
+*   ]
+}
 */
 std::string QueryContextRequest::toJsonV1(void)
 {
-  std::string   out                      = "";
-  bool          attributeListRendered    = attributeList.size() != 0;
-  bool          restrictionRendered      = restrictions != 0;
-  bool          commaAfterAttributeList  = restrictionRendered;
-  bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
+  // Diferent from original toJsonV1() we don't render restriction field (as it is not needed in the forwarding functionality)
 
-  out += startTag();
-  out += entityIdVector.toJsonV1(commaAfterEntityIdVector);
-  out += attributeList.toJsonV1(commaAfterAttributeList, "attributes");
-  out += restriction.toJsonV1(restrictions, false);
-  out += endTag();
+  JsonObjectHelper jh;
 
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextRequest::check -
-*/
-std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject, const std::string& predetectedError)
-{
-  std::string           res;
-  QueryContextResponse  response;
-
-  if (!predetectedError.empty())
+  JsonVectorHelper jhEntities;
+  for (unsigned int ix = 0; ix < entityIdVector.size(); ++ix)
   {
-    response.errorCode.fill(SccBadRequest, predetectedError);
-  }
-  else if (((res = entityIdVector.check(QueryContext)) != "OK") ||
-           ((res = attributeList.check())              != "OK") ||
-           ((res = restriction.check(restrictions))    != "OK"))
-  {
-    alarmMgr.badInput(clientIp, res);
-    response.errorCode.fill(SccBadRequest, res);
-  }
-  else
-  {
-    return "OK";
-  }
+    JsonObjectHelper jhEntity;
+    if (entityIdVector[ix]->idPattern.empty())
+    {
+      jhEntity.addString("id", entityIdVector[ix]->id);
+      jhEntity.addString("isPattern", "false");
+    }
+    else
+    {
+      jhEntity.addString("id", entityIdVector[ix]->idPattern);
+      jhEntity.addString("isPattern", "true");
+    }
+    jhEntity.addString("type", entityIdVector[ix]->type);
 
-  return response.toJsonV1(asJsonObject);
+    jhEntities.addRaw(jhEntity.str());
+  }
+  jh.addRaw("entities", jhEntities.str());
+
+  JsonVectorHelper jhAttributes;
+  for (unsigned int ix = 0; ix < attributeList.size(); ++ix)
+  {
+    jhAttributes.addString(attributeList[ix]);
+  }
+  jh.addRaw("attributes", jhAttributes.str());
+
+  return jh.str();
 }
 
 
@@ -170,25 +169,7 @@ std::string QueryContextRequest::check(ApiVersion apiVersion, bool asJsonObject,
 void QueryContextRequest::release(void)
 {
   entityIdVector.release();
-  restriction.release();
-}
-
-
-
-/* ****************************************************************************
-*
-* QueryContextRequest::fill -
-*/
-void QueryContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName)
-{
-  EntityId* eidP = new EntityId(entityId, entityType, "true");
-
-  entityIdVector.push_back(eidP);
-
-  if (!attributeName.empty())
-  {
-    attributeList.push_back(attributeName);
-  }
+  scopeVector.release();
 }
 
 
@@ -200,13 +181,12 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
 void QueryContextRequest::fill
 (
   const std::string& entityId,
+  const std::string& entityIdPattern,
   const std::string& entityType,
-  const std::string& isPattern,
-  EntityTypeInfo     typeInfo,
-  const std::string& attributeName
+  EntityTypeInfo     typeInfo
 )
 {
-  EntityId* eidP = new EntityId(entityId, entityType, isPattern);
+  EntityId* eidP = new EntityId(entityId, entityIdPattern, entityType, "");
 
   entityIdVector.push_back(eidP);
 
@@ -216,12 +196,7 @@ void QueryContextRequest::fill
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
 
-    restriction.scopeVector.push_back(scopeP);
-  }
-
-  if (!attributeName.empty())
-  {
-    attributeList.push_back(attributeName);
+    scopeVector.push_back(scopeP);
   }
 }
 
@@ -241,17 +216,17 @@ void QueryContextRequest::fill(BatchQuery* bqP)
 {
   if (bqP->entities.vec.size() != 0)
   {
-    entityIdVector.fill(bqP->entities.vec);
+    entityIdVector.fill(bqP->entities);
   }
   else
   {
-    EntityId* eP = new EntityId(".*", "", "true");
+    EntityId* eP = new EntityId("", ".*", "", "");
     entityIdVector.push_back(eP);
   }
 
   attributeList.fill(bqP->attributeV.stringV);  // attributeV is deprecated
   attrsList.fill(bqP->attrsV.stringV);
   metadataList.fill(bqP->metadataV.stringV);
-  restriction.scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
-  bqP->scopeV.vec.clear();  // QueryContextRequest::restriction.scopeVector has taken over the Scopes from bqP
+  scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
+  bqP->scopeV.vec.clear();  // QueryContextRequest::scopeVector has taken over the Scopes from bqP
 }

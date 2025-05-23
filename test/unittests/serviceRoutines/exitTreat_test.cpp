@@ -66,7 +66,6 @@ TEST(exitTreat, error)
   utInit();
 
   harakiri = true;
-  ci.apiVersion   = V1;
   ci.restServiceP = &restService;
 
   serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, NULL);

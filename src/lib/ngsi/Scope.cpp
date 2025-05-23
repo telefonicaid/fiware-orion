@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
@@ -100,7 +99,6 @@ static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
 */
 int Scope::fill
 (
-  ApiVersion          apiVersion,
   const std::string&  geometryString,
   const std::string&  coordsString,
   const std::string&  georelString,
@@ -112,13 +110,13 @@ int Scope::fill
   int                         points;
   std::vector<orion::Point*>  pointV;
 
-  type = (apiVersion == V1)? FIWARE_LOCATION : FIWARE_LOCATION_V2;
+  type = FIWARE_LOCATION_V2;
 
   //
   // parse geometry
   //
   std::string errorString;
-  if (geometry.parse(apiVersion, geometryString.c_str(), &errorString) != 0)
+  if (geometry.parse(geometryString.c_str(), &errorString) != 0)
   {
     *errorStringP = std::string("error parsing geometry: ") + errorString;
     return -1;
@@ -229,48 +227,11 @@ int Scope::fill
     pointV.push_back(pointP);
   }
 
-
-  if (geometry.areaType == "circle")
-  {
-    if (apiVersion == V2)
-    {
-      *errorStringP = "circle geometry is not supported by Orion API v2";
-      pointVectorRelease(pointV);
-      pointV.clear();
-      return -1;
-    }
-    else
-    {
-      if (pointV.size() != 1)
-      {
-        *errorStringP = "Too many coordinates for circle";
-        pointVectorRelease(pointV);
-        pointV.clear();
-        return -1;
-      }
-
-      areaType = orion::CircleType;
-
-      circle.radiusSet(geometry.radius);
-      circle.invertedSet(geometry.external);
-      circle.centerSet(pointV[0]);
-
-      pointVectorRelease(pointV);
-      pointV.clear();
-    }
-  }
-  else if (geometry.areaType == "polygon")
+  if (geometry.areaType == "polygon")
   {
     areaType = orion::PolygonType;
     
-    if ((apiVersion == V1) && (pointV.size() < 3))
-    {
-      *errorStringP = "Too few coordinates for polygon";
-      pointVectorRelease(pointV);
-      pointV.clear();
-      return -1;
-    }
-    else if ((apiVersion == V2) && (pointV.size() < 4))
+    if (pointV.size() < 4)
     {
       *errorStringP = "Too few coordinates for polygon";
       pointVectorRelease(pointV);
@@ -279,17 +240,15 @@ int Scope::fill
     }
 
     //
-    // If v2, first and last point must be identical
+    // First and last point must be identical
     //
-    if ((apiVersion == V2) && (pointV[0]->equals(pointV[pointV.size() - 1]) == false))
+    if (pointV[0]->equals(pointV[pointV.size() - 1]) == false)
     {
       *errorStringP = "First and last point in polygon not the same";
       pointVectorRelease(pointV);
       pointV.clear();
       return -1;
     }
-
-    polygon.invertedSet(geometry.external);
 
     for (unsigned int ix = 0; ix < pointV.size(); ++ix)
     {
@@ -384,213 +343,11 @@ int Scope::fill
 
 /* ****************************************************************************
 *
-* Scope::toJsonV1 -
-*/
-std::string Scope::toJsonV1(bool notLastInVector)
-{
-  std::string out      = "";
-  const char* tTag     = "type";
-  const char* vTag     = "value";
-
-  out += startTag();
-  out += valueTag(tTag, type, true);
-  out += valueTag(vTag, value);
-  out += endTag(notLastInVector);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* Scope::check -
-*/
-std::string Scope::check(void)
-{
-  //
-  // Check for forbidden characters
-  //
-  if (forbiddenChars(type.c_str()))
-  {
-    alarmMgr.badInput(clientIp, "found a forbidden character in the type of a scope", type);
-    return "illegal chars in scope type";
-  }
-
-  if ((type != SCOPE_TYPE_SIMPLE_QUERY) && (type != SCOPE_TYPE_SIMPLE_QUERY_MD))
-  {
-    if (forbiddenChars(value.c_str()))
-    {
-      alarmMgr.badInput(clientIp, "found a forbidden character in the value of a scope", value);
-      return "illegal chars in scope";
-    }
-  }
-
-  if (type == FIWARE_LOCATION || type == FIWARE_LOCATION_DEPRECATED)
-  {
-    if (areaType == orion::CircleType)
-    {
-      if (circle.radiusString() == "0")
-      {
-        alarmMgr.badInput(clientIp, "radius zero for a circle area");
-        return "Radius zero for a circle area";
-      }
-      else if (circle.radiusString().empty())
-      {
-        alarmMgr.badInput(clientIp, "missing radius for circle area");
-        return "Missing radius for circle area";
-      }
-      else if (!circle.invertedString().empty())
-      {
-        if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
-        {
-          std::string details = std::string("bad value for circle/inverted: '") + circle.invertedString() + "'"; 
-          alarmMgr.badInput(clientIp, details);
-          return "bad value for circle/inverted: /" + circle.invertedString() + "/";
-        }
-      }
-      else if (circle.center.latitudeString().empty())
-      {
-        alarmMgr.badInput(clientIp, "missing latitude for circle center");
-        return "Missing latitude for circle center";
-      }
-      else if (circle.center.longitudeString().empty())
-      {
-        alarmMgr.badInput(clientIp, "missing longitude for circle center");
-        return "Missing longitude for circle center";
-      }
-
-      double latitude;
-      double longitude;
-      bool   ok;
-
-      ok = str2double(circle.center.latitudeString().c_str(), &latitude);
-      if ((ok == false) || (latitude > 90) || (latitude < -90))
-      {
-        std::string details = std::string("invalid value for latitude (") + circle.center.latitudeString() + ")";
-        alarmMgr.badInput(clientIp, details);
-        return "invalid value for latitude";
-      }
-
-      ok = str2double(circle.center.longitudeString().c_str(), &longitude);
-      if ((ok == false) || (longitude > 180) || (longitude < -180))
-      {
-        std::string details = std::string("invalid value for longitude: '") + circle.center.longitudeString() + "'";
-        alarmMgr.badInput(clientIp, details);
-        return "invalid value for longitude";
-      }
-    }
-    else if (areaType == orion::PolygonType)
-    {
-      if (polygon.vertexList.size() < 3)
-      {
-        char noOfV[STRING_SIZE_FOR_INT];
-
-        snprintf(noOfV, sizeof(noOfV), "%lu", polygon.vertexList.size());
-        std::string details = std::string("too few vertices for a polygon (") + noOfV + " is less than three)";
-        alarmMgr.badInput(clientIp, details);
-
-        return "too few vertices for a polygon";
-      }
-      else if (!polygon.invertedString().empty())
-      {
-        if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
-        {
-          std::string details = std::string("bad value for polygon/inverted: '") + polygon.invertedString() + "'";
-          alarmMgr.badInput(clientIp, details);
-          return "bad value for polygon/inverted: /" + polygon.invertedString() + "/";
-        }
-      }
-
-      for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
-      {
-        if (polygon.vertexList[ix]->latitudeString().empty())
-        {
-          alarmMgr.badInput(clientIp, "missing latitude value for polygon vertex");
-          return std::string("missing latitude value for polygon vertex");
-        }
-
-        if (polygon.vertexList[ix]->longitudeString().empty())
-        {
-          alarmMgr.badInput(clientIp, "missing longitude value for polygon vertex");
-          return std::string("missing longitude value for polygon vertex");
-        }
-
-        double latitude;
-        double longitude;
-        bool   ok;
-
-
-        ok = str2double(polygon.vertexList[ix]->latitudeString().c_str(), &latitude);
-        if ((ok == false) || (latitude > 90) || (latitude < -90))
-        {
-          std::string details = std::string("invalid value for latitude: '") + polygon.vertexList[ix]->latitudeString() + "'";
-          alarmMgr.badInput(clientIp, details);
-          return "invalid value for latitude";
-        }
-
-        ok = str2double(polygon.vertexList[ix]->longitudeString().c_str(), &longitude);
-        if ((ok == false) || (longitude > 180) || (longitude < -180))
-        {
-          std::string details = std::string("invalid value for longitude: '") + polygon.vertexList[ix]->longitudeString() + "'";
-          alarmMgr.badInput(clientIp, details);
-          return "invalid value for longitude";
-        }
-      }
-    }
-  }
-
-  if ((type != FIWARE_LOCATION) && (type != FIWARE_LOCATION_DEPRECATED))
-  {
-    if (type.empty())
-    {
-      alarmMgr.badInput(clientIp, "empty type in restriction scope");
-      return "Empty type in restriction scope";
-    }
-
-    if (value.empty())
-    {
-      alarmMgr.badInput(clientIp, "empty value in restriction scope");
-      return "Empty value in restriction scope";
-    }
-  }
-
-  if (type == FIWARE_LOCATION_V2)
-  {
-    if ((areaType == orion::PointType) && (georel.type == "coveredBy"))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: point geometry cannot be used with coveredBy georel");
-      return "Query not supported: point geometry cannot be used with coveredBy georel";
-    }
-    else if ((areaType == orion::LineType) && (georel.type == "coveredBy"))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: line  geometry cannot be used with coveredBy georel");
-      return "Query not supported: line geometry cannot be used with coveredBy georel";
-    }
-    else if ((areaType == orion::LineType) && (line.pointList.size() < 2))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: not enough points for a line");
-      return "Query not supported: not enough points for a line";
-    }
-    else if ((areaType == orion::PolygonType) && (polygon.vertexList.size() < 4))
-    {
-      alarmMgr.badInput(clientIp, "Query not supported: not enough vertices for a polygon");
-      return "Query not supported: not enough vertices for a polygon";
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * release -
 */
 void Scope::release(void)
 {  
-  // NOTE: georel, circle, box, and point don't use dynamic memory, so they don't need release methods
+  // NOTE: georel, box, and point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
 
@@ -607,18 +364,3 @@ void Scope::release(void)
   }
 }
 
-
-
-/* ****************************************************************************
-*
-* Scope::areaTypeSet -
-*/
-void Scope::areaTypeSet(const std::string& areaTypeString)
-{
-  if      (areaTypeString == "line")    areaType = orion::LineType;
-  else if (areaTypeString == "polygon") areaType = orion::PolygonType;
-  else if (areaTypeString == "circle")  areaType = orion::CircleType;
-  else if (areaTypeString == "point")   areaType = orion::PointType;
-  else if (areaTypeString == "box")     areaType = orion::BoxType;
-  else                                  areaType = orion::NoArea;       
-}
