@@ -479,25 +479,6 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       }
     }
   }
-
-
-  //
-  // Add entityId::id to details if Not Found and only one element in response.
-  // And, if 0 elements in response, take entityId::id from the request.
-  //
-  // FIXME PR: this should be no longer needed. == 0 is redundant (the previous fill does that)
-  // == 1 is no longer needed is we remove the "internal" OrionError
-  /*if (upcrsP->error.code == SccContextElementNotFound)
-  {
-    if (upcrsP->contextElementResponseVector.size() == 1)
-    {
-      upcrsP->error.description = upcrsP->contextElementResponseVector[0]->entity.entityId.id;
-    }
-    else if (upcrsP->contextElementResponseVector.size() == 0)
-    {
-      upcrsP->error.description = upcrP->entityVector[0]->entityId.id;
-    }
-  }*/
 }
 
 

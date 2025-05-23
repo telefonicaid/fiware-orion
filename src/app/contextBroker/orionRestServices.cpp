@@ -95,31 +95,31 @@
 */
 static RestService getServiceV[] =
 {
-  { EntryPointsRequest,                            1, { "v2"                                                                           },  entryPointsTreat                                 },
-  { EntitiesRequest,                               2, { "v2", "entities"                                                               },  getEntities                                      },
-  { EntityRequest,                                 3, { "v2", "entities", "*"                                                          },  getEntity                                        },
-  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 },  getEntity                                        },
-  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                   },  getEntityAttributeValue                          },
-  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                            },  getEntityAttribute                               },
-  { EntityTypeRequest,                             3, { "v2", "types", "*"                                                             },  getEntityType                                    },
-  { EntityAllTypesRequest,                         2, { "v2", "types"                                                                  },  getEntityAllTypes                                },
-  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          },  getAllSubscriptions                              },
-  { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                     },  getSubscription                                  },
-  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     },  getRegistration                                  },
-  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          },  getRegistrations                                 },
-  { LogTraceRequest,                               2, { "log", "trace"                                                                 },  logTraceTreat                                    },
-  { StatisticsRequest,                             1, { "statistics"                                                                   },  statisticsTreat                                  },
-  { StatisticsRequest,                             2, { "cache", "statistics"                                                          },  statisticsCacheTreat                             },
-  { VersionRequest,                                1, { "version"                                                                      },  versionTreat                                     },
-  { LogLevelRequest,                               2, { "admin", "log"                                                                 },  getLogConfig                                     },
-  { SemStateRequest,                               2, { "admin", "sem"                                                                 },  semStateTreat                                    },
-  { MetricsRequest,                                2, { "admin", "metrics"                                                             },  getMetrics                                       },
+  { EntryPointsRequest,          1, { "v2"                                         }, entryPointsTreat        },
+  { EntitiesRequest,             2, { "v2", "entities"                             }, getEntities             },
+  { EntityRequest,               3, { "v2", "entities", "*"                        }, getEntity               },
+  { EntityRequest,               4, { "v2", "entities", "*", "attrs"               }, getEntity               },
+  { EntityAttributeValueRequest, 6, { "v2", "entities", "*", "attrs", "*", "value" }, getEntityAttributeValue },
+  { EntityAttributeRequest,      5, { "v2", "entities", "*", "attrs", "*"          }, getEntityAttribute      },
+  { EntityTypeRequest,           3, { "v2", "types", "*"                           }, getEntityType           },
+  { EntityAllTypesRequest,       2, { "v2", "types"                                }, getEntityAllTypes       },
+  { SubscriptionsRequest,        2, { "v2", "subscriptions"                        }, getAllSubscriptions     },
+  { SubscriptionRequest,         3, { "v2", "subscriptions", "*"                   }, getSubscription         },
+  { RegistrationRequest,         3, { "v2", "registrations", "*"                   }, getRegistration         },
+  { RegistrationsRequest,        2, { "v2", "registrations"                        }, getRegistrations        },
+  { LogTraceRequest,             2, { "log", "trace"                               }, logTraceTreat           },
+  { StatisticsRequest,           1, { "statistics"                                 }, statisticsTreat         },
+  { StatisticsRequest,           2, { "cache", "statistics"                        }, statisticsCacheTreat    },
+  { VersionRequest,              1, { "version"                                    }, versionTreat            },
+  { LogLevelRequest,             2, { "admin", "log"                               }, getLogConfig            },
+  { SemStateRequest,             2, { "admin", "sem"                               }, semStateTreat           },
+  { MetricsRequest,              2, { "admin", "metrics"                           }, getMetrics              },
 
 #ifdef DEBUG
-  { ExitRequest,                                   2, { "exit", "*"                                                                    },  exitTreat                                        },
-  { ExitRequest,                                   1, { "exit"                                                                         },  exitTreat                                        },
-  { LeakRequest,                                   2, { "leak", "*"                                                                    },  leakTreat                                        },
-  { LeakRequest,                                   1, { "leak"                                                                         },  leakTreat                                        },
+  { ExitRequest,                 2, { "exit", "*"                                  }, exitTreat               },
+  { ExitRequest,                 1, { "exit"                                       }, exitTreat               },
+  { LeakRequest,                 2, { "leak", "*"                                  }, leakTreat               },
+  { LeakRequest,                 1, { "leak"                                       }, leakTreat               },
 #endif
 
   ORION_REST_SERVICE_END
@@ -133,13 +133,13 @@ static RestService getServiceV[] =
 */
 static RestService postServiceV[] =
 {
-  { EntitiesRequest,                               2, { "v2", "entities"                                                               }, postEntities                                      },
-  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 }, postEntity                                        },
-  { NotifyContext,                                 3, { "v2", "op", "notify"                                                           }, postNotifyContext                                 },
-  { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, postBatchQuery                                    },
-  { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, postBatchUpdate                                   },
-  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, postSubscriptions                                 },
-  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, postRegistration                                  },  
+  { EntitiesRequest,      2, { "v2", "entities"               }, postEntities      },
+  { EntityRequest,        4, { "v2", "entities", "*", "attrs" }, postEntity        },
+  { NotifyContext,        3, { "v2", "op", "notify"           }, postNotifyContext },
+  { BatchQueryRequest,    3, { "v2", "op", "query"            }, postBatchQuery    },
+  { BatchUpdateRequest,   3, { "v2", "op", "update"           }, postBatchUpdate   },
+  { SubscriptionsRequest, 2, { "v2", "subscriptions"          }, postSubscriptions },
+  { RegistrationsRequest, 2, { "v2", "registrations"          }, postRegistration  },
 
   ORION_REST_SERVICE_END
 };
@@ -151,11 +151,11 @@ static RestService postServiceV[] =
 */
 static RestService putServiceV[] =
 {
-  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                               }, putEntity                                        },
-  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                 }, putEntityAttributeValue                          },
-  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, putEntityAttribute                               },
-  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, logTraceTreat                                    },
-  { LogLevelRequest,                               2, { "admin", "log"                                                               }, changeLogConfig                                  },
+  { EntityRequest,               4, { "v2", "entities", "*", "attrs"               }, putEntity               },
+  { EntityAttributeValueRequest, 6, { "v2", "entities", "*", "attrs", "*", "value" }, putEntityAttributeValue },
+  { EntityAttributeRequest,      5, { "v2", "entities", "*", "attrs", "*"          }, putEntityAttribute      },
+  { LogTraceRequest,             3, { "log", "trace",      "*"                     }, logTraceTreat           },
+  { LogLevelRequest,             2, { "admin", "log"                               }, changeLogConfig         },
 
   ORION_REST_SERVICE_END
 };
@@ -180,15 +180,15 @@ static RestService patchServiceV[] =
 */
 static RestService deleteServiceV[] =
 {
-  { EntityRequest,                                 3, { "v2", "entities", "*"                                                        }, deleteEntity                                        },
-  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                          }, deleteEntity                                        },
-  { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                   }, deleteSubscription                                  },
-  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                   }, deleteRegistration                                  },
-  { LogTraceRequest,                               2, { "log", "trace"                                                               }, logTraceTreat                                       },
-  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                     }, logTraceTreat                                       },
-  { StatisticsRequest,                             1, { "statistics"                                                                 }, statisticsTreat                                     },
-  { StatisticsRequest,                             2, { "cache", "statistics"                                                        }, statisticsCacheTreat                                },
-  { MetricsRequest,                                2, { "admin", "metrics"                                                           }, deleteMetrics                                       },
+  { EntityRequest,          3, { "v2", "entities", "*"               }, deleteEntity         },
+  { EntityAttributeRequest, 5, { "v2", "entities", "*", "attrs", "*" }, deleteEntity         },
+  { SubscriptionRequest,    3, { "v2", "subscriptions", "*"          }, deleteSubscription   },
+  { RegistrationRequest,    3, { "v2", "registrations", "*"          }, deleteRegistration   },
+  { LogTraceRequest,        2, { "log", "trace"                      }, logTraceTreat        },
+  { LogTraceRequest,        3, { "log", "trace",      "*"            }, logTraceTreat        },
+  { StatisticsRequest,      1, { "statistics"                        }, statisticsTreat      },
+  { StatisticsRequest,      2, { "cache", "statistics"               }, statisticsCacheTreat },
+  { MetricsRequest,         2, { "admin", "metrics"                  }, deleteMetrics        },
 
   ORION_REST_SERVICE_END
 };
@@ -200,31 +200,31 @@ static RestService deleteServiceV[] =
 */
 static RestService badVerbV[] =
 {
-  { EntryPointsRequest,                            1, { "v2"                                                                           }, badVerbGetOnly            },
-  { EntitiesRequest,                               2, { "v2", "entities"                                                               }, badVerbGetPostOnly        },
-  { EntityRequest,                                 3, { "v2", "entities", "*"                                                          }, badVerbGetDeleteOnly      },
-  { EntityRequest,                                 4, { "v2", "entities", "*", "attrs"                                                 }, badVerbAllNotDelete       },
-  { EntityAttributeValueRequest,                   6, { "v2", "entities", "*", "attrs", "*", "value"                                   }, badVerbGetPutOnly         },
-  { EntityAttributeRequest,                        5, { "v2", "entities", "*", "attrs", "*"                                            }, badVerbGetPutDeleteOnly   },
-  { EntityTypeRequest,                             3, { "v2", "types", "*"                                                             }, badVerbGetOnly            },
-  { EntityAllTypesRequest,                         2, { "v2", "types"                                                                  }, badVerbGetOnly            },
-  { SubscriptionsRequest,                          2, { "v2", "subscriptions"                                                          }, badVerbGetPostOnly        },
-  { SubscriptionRequest,                           3, { "v2", "subscriptions", "*"                                                     }, badVerbGetDeletePatchOnly },
-  { BatchQueryRequest,                             3, { "v2", "op", "query"                                                            }, badVerbPostOnly           },
-  { BatchUpdateRequest,                            3, { "v2", "op", "update"                                                           }, badVerbPostOnly           },
-  { RegistrationRequest,                           3, { "v2", "registrations", "*"                                                     }, badVerbGetDeleteOnly      },
-  { RegistrationsRequest,                          2, { "v2", "registrations"                                                          }, badVerbGetPostOnly        },
-  { LogTraceRequest,                               2, { "log", "trace"                                                                 }, badVerbGetDeleteOnly      },
-  { LogTraceRequest,                               3, { "log", "trace",      "*"                                                       }, badVerbPutDeleteOnly      },
-  { StatisticsRequest,                             1, { "statistics"                                                                   }, badVerbGetDeleteOnly      },
-  { StatisticsRequest,                             2, { "cache", "statistics"                                                          }, badVerbGetDeleteOnly      },
-  { VersionRequest,                                1, { "version"                                                                      }, badVerbGetOnly            },
-  { LogLevelRequest,                               2, { "admin", "log"                                                                 }, badVerbPutOnly            },
-  { SemStateRequest,                               2, { "admin", "sem"                                                                 }, badVerbGetOnly            },
-  { MetricsRequest,                                2, { "admin", "metrics"                                                             }, badVerbGetDeleteOnly      },
+  { EntryPointsRequest,          1, { "v2"                                         }, badVerbGetOnly            },
+  { EntitiesRequest,             2, { "v2", "entities"                             }, badVerbGetPostOnly        },
+  { EntityRequest,               3, { "v2", "entities", "*"                        }, badVerbGetDeleteOnly      },
+  { EntityRequest,               4, { "v2", "entities", "*", "attrs"               }, badVerbAllNotDelete       },
+  { EntityAttributeValueRequest, 6, { "v2", "entities", "*", "attrs", "*", "value" }, badVerbGetPutOnly         },
+  { EntityAttributeRequest,      5, { "v2", "entities", "*", "attrs", "*"          }, badVerbGetPutDeleteOnly   },
+  { EntityTypeRequest,           3, { "v2", "types", "*"                           }, badVerbGetOnly            },
+  { EntityAllTypesRequest,       2, { "v2", "types"                                }, badVerbGetOnly            },
+  { SubscriptionsRequest,        2, { "v2", "subscriptions"                        }, badVerbGetPostOnly        },
+  { SubscriptionRequest,         3, { "v2", "subscriptions", "*"                   }, badVerbGetDeletePatchOnly },
+  { BatchQueryRequest,           3, { "v2", "op", "query"                          }, badVerbPostOnly           },
+  { BatchUpdateRequest,          3, { "v2", "op", "update"                         }, badVerbPostOnly           },
+  { RegistrationRequest,         3, { "v2", "registrations", "*"                   }, badVerbGetDeleteOnly      },
+  { RegistrationsRequest,        2, { "v2", "registrations"                        }, badVerbGetPostOnly        },
+  { LogTraceRequest,             2, { "log", "trace"                               }, badVerbGetDeleteOnly      },
+  { LogTraceRequest,             3, { "log", "trace",      "*"                     }, badVerbPutDeleteOnly      },
+  { StatisticsRequest,           1, { "statistics"                                 }, badVerbGetDeleteOnly      },
+  { StatisticsRequest,           2, { "cache", "statistics"                        }, badVerbGetDeleteOnly      },
+  { VersionRequest,              1, { "version"                                    }, badVerbGetOnly            },
+  { LogLevelRequest,             2, { "admin", "log"                               }, badVerbPutOnly            },
+  { SemStateRequest,             2, { "admin", "sem"                               }, badVerbGetOnly            },
+  { MetricsRequest,              2, { "admin", "metrics"                           }, badVerbGetDeleteOnly      },
 
-  { InvalidRequest,                                0, { "*", "*", "*", "*", "*", "*"                                                   }, badRequest                },
-  { InvalidRequest,                                0, {                                                                                }, NULL                      },
+  { InvalidRequest,              0, { "*", "*", "*", "*", "*", "*"                 }, badRequest                },
+  { InvalidRequest,              0, {                                              }, NULL                      },
 
   ORION_REST_SERVICE_END
 };

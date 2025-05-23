@@ -227,7 +227,6 @@ HttpStatusCode mongoUpdateContext
     /* Note that although individual processContextElements() invocations return ConnectionError, this
        error gets "encapsulated" in the OrionError of the corresponding ContextElementResponse and we
        consider the overall mongoUpdateContext() as OK.
-       FIXME PR: we are removing the "corresponding ContextElementResposne" error. Review this wording
     */
     if (responseP->error.code == SccNone)
     {

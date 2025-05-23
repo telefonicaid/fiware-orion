@@ -35,7 +35,6 @@ struct ConnectionInfo;
 *
 * RequestType - 
 *
-* FIXME PR: review this
 */
 typedef enum RequestType
 {
