@@ -367,7 +367,7 @@ HttpStatusCode mongoQueryContext
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
       responseP->error.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
 
-      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+      reqSemGive(__FUNCTION__, "ngsi query request", reqSemTaken);
 
       return SccOk;
     }

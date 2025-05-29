@@ -136,9 +136,7 @@ std::string renderCounterStats(bool fullCounters)
   renderUsedCounter(&js, "noPayloadRequests", noOfRequestsWithoutPayload, fullCounters);
 
   JsonObjectHelper jsRequests;
-  JsonObjectHelper jsRequestsLegacy;
   bool             touchedRequests      = false;
-  bool             touchedRquestsLegacy = false;
   for (unsigned int ix = 0; ; ++ix)
   {
     JsonObjectHelper jsRequest;
@@ -172,17 +170,8 @@ std::string renderCounterStats(bool fullCounters)
         (noOfRequestCounters[ix].patch != -1) || (noOfRequestCounters[ix].put != -1) ||
         (noOfRequestCounters[ix]._delete != -1) || (noOfRequestCounters[ix].options != -1))
     {
-      // We add in the accumulator corresponing do the request kind
-      if (((strncmp(noOfRequestCounters[ix].prefix, "v1", strlen("v1"))) == 0) || (strncmp(noOfRequestCounters[ix].prefix, "ngsi10", strlen("ngsi10")) == 0))
-      {
-        touchedRquestsLegacy = true;
-        jsRequestsLegacy.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request, std::string(noOfRequestCounters[ix].prefix)), jsRequest.str());
-      }
-      else
-      {
-        touchedRequests = true;
-        jsRequests.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request, std::string(noOfRequestCounters[ix].prefix)), jsRequest.str());
-      }
+      touchedRequests = true;
+      jsRequests.addRaw(requestTypeForCounter(noOfRequestCounters[ix].request, std::string(noOfRequestCounters[ix].prefix)), jsRequest.str());
     }
 
     // We know that LeakRequest is the last request type in the array, by construction
@@ -195,10 +184,6 @@ std::string renderCounterStats(bool fullCounters)
   if (touchedRequests)
   {
     js.addRaw("requests", jsRequests.str());
-  }
-  if (touchedRquestsLegacy)
-  {
-    js.addRaw("requestsLegacy", jsRequestsLegacy.str());
   }
 
   renderUsedCounter(&js, "missedVerb",      noOfMissedVerb, fullCounters);
