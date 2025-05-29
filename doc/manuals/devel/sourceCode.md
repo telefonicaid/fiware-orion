@@ -102,6 +102,8 @@ The library also contains a few other modules, namely:
 * OrionValueType, that is a type used to keep track of the 'JSON type' that an attribute/metadata-value is of.
 * areas, containing geometrical shapes, such as Point, Line, Box, Circle and Polygon.
 
+There is a [pending task](architecture.md#still-pending) to merge **ngsi**, **orionTypes** and **apiTypesV2** into a single set of types.
+
 [Top](#top)
 
 
@@ -194,7 +196,7 @@ The JSON parse implementations reside in dedicated libraries while the text pars
 ## src/lib/ngsi/
 The **ngsi** library contains a collection of classes for the different payloads that comes from the old version of the NGSI API (named NGSIv1).
 
-There is a [pending task](architecture.md#still-pending) to merge this and **apiTypesV2** into a single set of types.
+There is a [pending task](architecture.md#still-pending) to merge **ngsi**, **orionTypes** and **apiTypesV2** into a single set of types.
 
 It contains the top hierarchy classes for requests (and responses):
 
@@ -254,7 +256,7 @@ The **apiTypesV2** library, just like the ngsi library contains classes; both ba
 
 The hierarchical methods `release()`, `toJson()`, `check()`, etc. are found in these classes as well.
 
-There is a [pending task](architecture.md#still-pending) to merge this and **apiTypesV2** into a single set of types.
+There is a [pending task](architecture.md#still-pending) to merge **ngsi**, **orionTypes** and **apiTypesV2** into a single set of types.
 
 [Top](#top)
 

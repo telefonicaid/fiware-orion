@@ -51,7 +51,7 @@ Although NGSIv1 was removed from an API point of view in Orion 4.0.0, the consol
 
 Some high level task are pending:
 
-1. Consolidate NGSI types (**ngsi** and **apiTypesV2** should be re-designed and merged). Most of old type comming from NGSIv1 are in **ngsi**
+1. Consolidate NGSI types (**orionType**, **ngsi** and **apiTypesV2** should be re-designed and merged). Most of old type comming from NGSIv1 are in **ngsi**
 2. Adapt **serviceRoutinesV2** and **mongoBackend** to the new types
 
 [Top](#top)
