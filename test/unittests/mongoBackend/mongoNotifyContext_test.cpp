@@ -185,7 +185,6 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
 
     HttpStatusCode         ms;
     NotifyContextRequest   req;
-    NotifyContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
@@ -323,7 +322,6 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
 {
     HttpStatusCode         ms;
     NotifyContextRequest   req;
-    NotifyContextResponse  res;
 
     utInit();
 
@@ -465,7 +463,6 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
 {
     HttpStatusCode         ms;
     NotifyContextRequest   req;
-    NotifyContextResponse  res;
 
     utInit();
 
@@ -612,7 +609,6 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
 {
     HttpStatusCode         ms;
     NotifyContextRequest   req;
-    NotifyContextResponse  res;
 
     utInit();
 
@@ -763,7 +759,6 @@ TEST(mongoNotifyContextRequest, createEntity)
 {
     HttpStatusCode         ms;
     NotifyContextRequest   req;
-    NotifyContextResponse  res;
 
     utInit();
 

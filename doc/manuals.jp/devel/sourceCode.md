@@ -235,7 +235,6 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 * `UnsubscribeContextRequest`
 * `UnsubscribeContextResponse`
 * `NotifyContextRequest` (Orion から送信された、発信者からの通知リクエスト)
-* `NotifyContextResponse` (サブスクライバーからの着信レスポンス)
 
 [**ngsi** ライブラリ](#methods-and-hierarchy)のメソッドと階層の説明を参照してください。
 

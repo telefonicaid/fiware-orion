@@ -46,7 +46,7 @@
 HttpStatusCode mongoNotifyContext
 (
   NotifyContextRequest*            requestP,
-  NotifyContextResponse*           responseP,
+  OrionError*                      oeP,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -71,7 +71,7 @@ HttpStatusCode mongoNotifyContext
   }
 
   reqSemGive(__FUNCTION__, "notification", reqSemTaken);
-  responseP->oe.fill(SccOk, "");
+  oeP->fill(SccOk, "");
 
   return SccOk;
 }

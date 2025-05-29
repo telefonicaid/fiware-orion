@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "ngsi/NotifyContextRequest.h"
-#include "ngsi/NotifyContextResponse.h"
 
 
 
@@ -40,7 +39,7 @@
 extern HttpStatusCode mongoNotifyContext
 (
   NotifyContextRequest*            requestP,
-  NotifyContextResponse*           responseP,
+  OrionError*                      oeP,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,

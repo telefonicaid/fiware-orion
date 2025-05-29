@@ -207,7 +207,6 @@ It contains the top hierarchy classes for requests (and responses):
 * `UnsubscribeContextRequest`
 * `UnsubscribeContextResponse`
 * `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
-* `NotifyContextResponse` (incoming response from subscriber)
 
 And basic classes:
 

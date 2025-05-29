@@ -34,7 +34,6 @@
 #include "mongoBackend/mongoNotifyContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/NotifyContextRequest.h"
-#include "ngsi/NotifyContextResponse.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutinesV2/postNotifyContext.h"
 
@@ -50,11 +49,11 @@ std::string postNotifyContext
   ParseData*                 parseDataP
 )
 {
-  NotifyContextResponse  ncr;
-  std::string            answer;
+  OrionError   oe;
+  std::string  answer;
 
   TIMED_MONGO(ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res,
-                                                       &ncr,
+                                                       &oe,
                                                        ciP->tenant,
                                                        ciP->httpHeaders.xauthToken,
                                                        ciP->servicePathV,
@@ -62,10 +61,10 @@ std::string postNotifyContext
                                                        ciP->httpHeaders.ngsiv2AttrsFormat));
 
   // Check potential error
-  if (ncr.oe.code != SccOk)
+  if (oe.code != SccOk)
   {
-    TIMED_RENDER(answer = ncr.oe.toJson());
-    ciP->httpStatusCode = ncr.oe.code;
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
   }
   else
   {

@@ -34,7 +34,6 @@ SET (SOURCES
     ScopeVector.cpp
     StringList.cpp
     NotifyContextRequest.cpp
-    NotifyContextResponse.cpp
     QueryContextRequest.cpp
     QueryContextResponse.cpp
     UpdateContextRequest.cpp
@@ -53,7 +52,6 @@ SET (HEADERS
     Scope.h
     StringList.h
     NotifyContextRequest.h
-    NotifyContextResponse.h
     QueryContextRequest.h
     QueryContextResponse.h
     UpdateContextRequest.h

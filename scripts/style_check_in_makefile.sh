@@ -204,8 +204,6 @@ style_check test/unittests/serviceRoutinesV2
 #
 # o ngsi/NotifyContextRequest.cpp                                          (haderding/remove_ngsiv1_indent: 11 lines)
 # o ngsi/NotifyContextRequest.h                                            (haderding/remove_ngsiv1_indent: 2 lines)
-# o ngsi/NotifyContextResponse.cpp                                         (haderding/remove_ngsiv1_indent: 4 lines)
-# o ngsi/NotifyContextResponse.h                                           (haderding/remove_ngsiv1_indent: 1 line)
 # o ngsi/QueryContextRequest.cpp                                           (haderding/remove_ngsiv1_indent: 11 lines)
 # o ngsi/QueryContextRequest.h                                             (haderding/remove_ngsiv1_indent: 2 lines)
 # o ngsi/QueryContextResponse.cpp                                          (haderding/remove_ngsiv1_indent: 9 lines)

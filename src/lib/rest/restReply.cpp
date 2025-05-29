@@ -32,7 +32,6 @@
 
 #include "ngsi/QueryContextResponse.h"
 #include "ngsi/UpdateContextResponse.h"
-#include "ngsi/NotifyContextResponse.h"
 
 #include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
