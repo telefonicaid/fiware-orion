@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_
-#define SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_
+#ifndef SRC_LIB_NGSI_UPDATECONTEXTREQUEST_H_
+#define SRC_LIB_NGSI_UPDATECONTEXTREQUEST_H_
 
 /*
 *
@@ -69,4 +69,4 @@ typedef struct UpdateContextRequest
   void         fill(EntityVector* entities, ActionType _updateActionType);
 } UpdateContextRequest;
 
-#endif  // SRC_LIB_NGSI10_UPDATECONTEXTREQUEST_H_
+#endif  // SRC_LIB_NGSI_UPDATECONTEXTREQUEST_H_

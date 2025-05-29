@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_
-#define SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_
+#ifndef SRC_LIB_NGSI_QUERYCONTEXTRESPONSE_H_
+#define SRC_LIB_NGSI_QUERYCONTEXTRESPONSE_H_
 
 /*
 *
@@ -55,4 +55,4 @@ typedef struct QueryContextResponse
   ContextAttribute*      getAttr(const std::string& attrName, OrionError* oeP);
 } QueryContextResponse;
 
-#endif  // SRC_LIB_NGSI10_QUERYCONTEXTRESPONSE_H_
+#endif  // SRC_LIB_NGSI_QUERYCONTEXTRESPONSE_H_
