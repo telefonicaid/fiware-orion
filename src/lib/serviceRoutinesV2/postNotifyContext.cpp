@@ -33,8 +33,8 @@
 
 #include "mongoBackend/mongoNotifyContext.h"
 #include "ngsi/ParseData.h"
-#include "ngsi10/NotifyContextRequest.h"
-#include "ngsi10/NotifyContextResponse.h"
+#include "ngsi/NotifyContextRequest.h"
+#include "ngsi/NotifyContextResponse.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutinesV2/postNotifyContext.h"
 

@@ -39,7 +39,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"

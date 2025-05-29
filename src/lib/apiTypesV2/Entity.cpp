@@ -35,7 +35,7 @@
 #include "rest/uriParamNames.h"
 #include "alarmMgr/alarmMgr.h"
 #include "parse/forbiddenChars.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextResponse.h"
 #include "mongoBackend/dbFieldEncoding.h"
 #include "rest/OrionError.h"
 

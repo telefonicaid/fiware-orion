@@ -36,7 +36,7 @@
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextResponse.h"
 
 #include "apiTypesV2/EntityVector.h"
 

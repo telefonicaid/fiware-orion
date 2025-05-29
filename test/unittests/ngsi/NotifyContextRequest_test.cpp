@@ -27,8 +27,8 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
-#include "ngsi10/NotifyContextRequest.h"
-#include "ngsi10/NotifyContextResponse.h"
+#include "ngsi/NotifyContextRequest.h"
+#include "ngsi/NotifyContextResponse.h"
 
 #include "unittest.h"
 

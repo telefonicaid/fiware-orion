@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextResponse.h"
 
 
 

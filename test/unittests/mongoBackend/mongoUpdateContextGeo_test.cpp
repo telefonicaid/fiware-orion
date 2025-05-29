@@ -35,8 +35,8 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/EntityId.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "ngsi/UpdateContextResponse.h"
 
 #include "unittests/unittest.h"
 

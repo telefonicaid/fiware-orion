@@ -59,7 +59,7 @@ static RestService badVerbV[] =
 */
 TEST(putIndividualContextEntityAttributes, notFound)
 {
-  ConnectionInfo ci("/ngsi10/contextEntities/entity101/attributes",  "PUT", "1.1");
+  ConnectionInfo ci("/ngsi/contextEntities/entity101/attributes",  "PUT", "1.1");
   const char*    infile    = "ngsi10.updateContextElementRequest.valid.xml";
   const char*    outfile   = "ngsi10.updateContextElementResponse.notFound.valid.xml";
   std::string    out;

@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "orionTypes/UpdateActionType.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 
 
 

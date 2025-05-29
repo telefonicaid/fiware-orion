@@ -47,17 +47,11 @@ However, this led to a "parallel" architecture with some inefficient aspects (in
 
 Although NGSIv1 was removed from an API point of view in Orion 4.0.0, the consolidation took place in Orion 4.3.0, unifying some parts of the internal architecture (e.g. `serviceRoutines` was merged into `serviceRoutinesV2` and `ngsi10` was merged into `ngsi`). A lot of NGSIv1 related dead code was fully removed.
 
-## Target architecture
+## Still pending
 
-Once that moment comes, the steps (from a high level perspective) would be as follow:
+Some high level task are pending:
 
-1. Consolidate NGSI types (although NGSIv1 has been removed, some "structural legacy" remains in the design of NGSI types)
-3. Adapt **serviceRoutinesV2** and **mongoBackend** to the new types
-
-The following picture shows that target architecture, taking into account the changes described above:
-
-![Orion target internal architecture](images/target_architecture.png)
-
-_Orion target internal architecture_
+1. Consolidate NGSI types (**ngsi** and **apiTypesV2** should be re-designed and merged). Most of old type comming from NGSIv1 are in **ngsi**
+2. Adapt **serviceRoutinesV2** and **mongoBackend** to the new types
 
 [Top](#top)

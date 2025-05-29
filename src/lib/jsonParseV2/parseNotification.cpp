@@ -29,7 +29,7 @@
 #include "common/errorMessages.h"
 #include "apiTypesV2/Entity.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"

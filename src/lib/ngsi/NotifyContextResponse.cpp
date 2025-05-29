@@ -30,7 +30,7 @@
 
 #include "common/globals.h"
 #include "rest/OrionError.h"
-#include "ngsi10/NotifyContextResponse.h"
+#include "ngsi/NotifyContextResponse.h"
 #include "rest/HttpStatusCode.h"
 
 

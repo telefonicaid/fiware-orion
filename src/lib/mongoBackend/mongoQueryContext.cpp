@@ -32,8 +32,8 @@
 #include "common/sem.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextRequest.h"
+#include "ngsi/QueryContextResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"

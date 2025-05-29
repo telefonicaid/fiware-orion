@@ -34,7 +34,7 @@
 
 #include "ngsi/ContextElementResponse.h"
 #include "rest/OrionError.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 
 
 

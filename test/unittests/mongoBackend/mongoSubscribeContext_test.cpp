@@ -32,8 +32,8 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoSubscribeContext.h"
-#include "ngsi10/SubscribeContextRequest.h"
-#include "ngsi10/SubscribeContextResponse.h"
+#include "ngsi/SubscribeContextRequest.h"
+#include "ngsi/SubscribeContextResponse.h"
 
 #include "ngsi/EntityId.h"
 #include "apiTypesV2/HttpInfo.h"

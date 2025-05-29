@@ -7,7 +7,6 @@
 * [src/lib/orionTypes/](#srcliboriontypes) (Common types)
 * [src/lib/rest/](#srclibrest) (REST interface, using external library microhttpd)
 * [src/lib/ngsi/](#srclibngsi) (Common NGSI types)
-* [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types, NGSI10 = context management)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
@@ -193,9 +192,24 @@ The JSON parse implementations reside in dedicated libraries while the text pars
 
 
 ## src/lib/ngsi/
-The **ngsi** library contains a collection of classes for the different payloads that constitutes the common part of the ngsi9 and ngsi10 protocols. Here you find basic classes like:
+The **ngsi** library contains a collection of classes for the different payloads that comes from the old version of the NGSI API (named NGSIv1).
 
-FIXME PR: no point in aving ngsi/ and ngsi10/ separately (now that ngsi9/ has been removed)
+There is a [pending task](architecture.md#still-pending) to merge this and **apiTypesV2** into a single set of types.
+
+It contains the top hierarchy classes for requests (and responses):
+
+* `UpdateContextRequest`
+* `UpdateContextResponse`
+* `QueryContextRequest`
+* `QueryContextResponse`
+* `SubscribeContextRequest`
+* `SubscribeContextResponse`
+* `UnsubscribeContextRequest`
+* `UnsubscribeContextResponse`
+* `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
+* `NotifyContextResponse` (incoming response from subscriber)
+
+And basic classes:
 
 * `EntityId`
 * `EntityIdVector`
@@ -203,10 +217,11 @@ FIXME PR: no point in aving ngsi/ and ngsi10/ separately (now that ngsi9/ has be
 * `ContextAttributeVector`
 * `Metadata`
 * `MetadataVector`
+* etc.
 
 ### Methods and hierarchy
 
-These classes (as well as the classes in the library `ngsi10`) all have a standard set of methods:
+These classes all have a standard set of methods:
 
 * `toJson()`, to render the object to a JSON string. This method levarages `JsonObjectHelper` and `JsonVectorHelper`
   in order to simplify the rendering process. This way you just add the elements you needs to print using `add*()` methods and don't
@@ -215,7 +230,7 @@ These classes (as well as the classes in the library `ngsi10`) all have a standa
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
 
-The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi10 library) contains a
+The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi library) contains a
 `EntityVector`. `EntityVector` is of course a vector of `Entity`.
 
 Note that both `EntityVector` and `Entity` classes doesn't belong to this library, but to [`src/lib/apiTypesV2`](#srclibapitypesv2).
@@ -235,35 +250,14 @@ Each class invokes the method for its underlying classes. The example above was 
 [Top](#top)
 
 
-## src/lib/ngsi10/
-
-FIXME PR: unify this into ngsi/
-
-The **ngsi10** library contains the top hierarchy classes for NGSI10 (NGSIv1) requests (and responses):
-
-* `UpdateContextRequest`
-* `UpdateContextResponse`
-* `QueryContextRequest`
-* `QueryContextResponse`
-* `SubscribeContextRequest`
-* `SubscribeContextResponse`
-* `UnsubscribeContextRequest`
-* `UnsubscribeContextResponse`
-* `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
-* `NotifyContextResponse` (incoming response from subscriber)
-
-See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
-
-[Top](#top)
-
-
 ## src/lib/apiTypesV2/
-The **apiTypesV2** library, just like the ngsi* libraries, contains classes; both basic classes (like the library **ngsi**) and top hierarchy classes (like the library **ngsi10**), for NGSIv2, the improved NGSI protocol.
+The **apiTypesV2** library, just like the ngsi library contains classes; both basic classes and top hierarchy classes.
 
 The hierarchical methods `release()`, `toJson()`, `check()`, etc. are found in these classes as well.
 
-[Top](#top)
+There is a [pending task](architecture.md#still-pending) to merge this and **apiTypesV2** into a single set of types.
 
+[Top](#top)
 
 ## src/lib/parse/
 The **parse** library contains types and functions that are common to all types of payload parsing.

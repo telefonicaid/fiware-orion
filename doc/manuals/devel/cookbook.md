@@ -485,7 +485,7 @@ The output of the valgrind run is saved to a file with the same name as the test
 
 Normally, the broker has no memory leaks, so to make an exercise **with** a memory leak, we'll have to temporarily add one:
 
-* Open the file `src/lib/ngsi10/UpdateContextRequest.cpp` in your favorite editor
+* Open the file `src/lib/ngsi/UpdateContextRequest.cpp` in your favorite editor
 * Find the method `UpdateContextRequest::release()` and comment the call to `contextElementVector.release()`:
   ```
   void UpdateContextRequest::release(void)  

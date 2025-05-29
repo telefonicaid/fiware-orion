@@ -194,7 +194,6 @@ SET (ORION_LIBS
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
                   # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o
     mongoBackend
-    ngsi10
     ngsi
     cache
     mongoBackend  # repeated (probably due to some circular dependency between mongoBackend and ngsi)
@@ -321,7 +320,6 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionTypes)
   ADD_SUBDIRECTORY(src/lib/ngsi)
   ADD_SUBDIRECTORY(src/lib/serviceRoutinesV2)
-  ADD_SUBDIRECTORY(src/lib/ngsi10)
   ADD_SUBDIRECTORY(src/lib/ngsiNotify)
   ADD_SUBDIRECTORY(src/lib/apiTypesV2)
   ADD_SUBDIRECTORY(src/lib/parse)

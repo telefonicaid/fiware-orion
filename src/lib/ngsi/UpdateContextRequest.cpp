@@ -32,8 +32,8 @@
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextAttribute.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "ngsi/UpdateContextResponse.h"
 
 
 

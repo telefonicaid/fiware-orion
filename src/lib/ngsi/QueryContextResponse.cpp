@@ -32,7 +32,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/OrionError.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextResponse.h"
 
 
 

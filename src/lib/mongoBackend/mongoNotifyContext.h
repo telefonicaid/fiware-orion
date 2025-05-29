@@ -28,8 +28,8 @@
 #include <string>
 #include <vector>
 
-#include "ngsi10/NotifyContextRequest.h"
-#include "ngsi10/NotifyContextResponse.h"
+#include "ngsi/NotifyContextRequest.h"
+#include "ngsi/NotifyContextResponse.h"
 
 
 

@@ -38,8 +38,8 @@
 
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextRequest.h"
+#include "ngsi/QueryContextResponse.h"
 #include "orionTypes/QueryContextRequestVector.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"

@@ -35,8 +35,8 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextRequest.h"
+#include "ngsi/QueryContextResponse.h"
 
 #include "mongo/client/dbclient.h"
 

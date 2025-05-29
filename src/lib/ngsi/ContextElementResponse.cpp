@@ -31,7 +31,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/StringList.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextResponse.h"
 
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/dbFieldEncoding.h"

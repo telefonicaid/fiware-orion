@@ -34,8 +34,8 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
-#include "ngsi10/UpdateContextSubscriptionRequest.h"
-#include "ngsi10/UpdateContextSubscriptionResponse.h"
+#include "ngsi/UpdateContextSubscriptionRequest.h"
+#include "ngsi/UpdateContextSubscriptionResponse.h"
 #include "ngsi/EntityId.h"
 
 #include "unittests/testInit.h"

@@ -30,8 +30,8 @@
 #include <map>
 
 #include "common/globals.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextRequest.h"
+#include "ngsi/QueryContextResponse.h"
 #include "rest/StringFilter.h"
 
 

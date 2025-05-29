@@ -35,7 +35,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoNotifyContext.h"
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 
 #include "unittests/testInit.h"
 #include "unittests/commonMocks.h"

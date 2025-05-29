@@ -32,8 +32,8 @@
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/QueryContextRequest.h"
+#include "ngsi/QueryContextResponse.h"
+#include "ngsi/QueryContextRequest.h"
 #include "rest/EntityTypeInfo.h"
 #include "apiTypesV2/BatchQuery.h"
 

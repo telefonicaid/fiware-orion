@@ -34,8 +34,8 @@
 #include "common/limits.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "ngsi/UpdateContextResponse.h"
 #include "rest/HttpStatusCode.h"
 
 #include "ngsiNotify/QueueNotifier.h"

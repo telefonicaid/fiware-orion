@@ -24,14 +24,14 @@
 */
 #include <string>
 
-#include "unittests/unittest.h"
-
 #include "logMsg/logMsg.h"
 
-#include "serviceRoutinesV2/getIndividualContextEntityAttributes.h"
+#include "serviceRoutinesV2/postIndividualContextEntityAttributes.h"
 #include "serviceRoutinesV2/badRequest.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
+
+#include "unittests/unittest.h"
 
 
 
@@ -39,43 +39,52 @@
 *
 * service vectors -
 */
-#define ICEA   IndividualContextEntityAttributes
+#define ICEA   IndividualContextEntityAttribute
 #define IR     InvalidRequest
 
-static RestService getV[] =
+static RestService postV[] =
 {
-  { ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, getIndividualContextEntityAttributes },
-  { IR,   0, {                                                }, NULL                                 }
+  { ICEA, 4, { "ngsi10", "contextEntities", "*", "attributes" }, postIndividualContextEntityAttributes },
+  { IR,   0, {                                                }, NULL                                  }
 };
 
 static RestService badVerbV[] =
 {
-  { IR,   0, { "*", "*", "*", "*", "*", "*"                   }, badRequest                           },
-  { IR,   0, {                                                }, NULL                                 }
+  { IR,   0, { "*", "*", "*", "*", "*", "*"                   }, badRequest                            },
+  { IR,   0, {                                                }, NULL                                  }
 };
 
 
 
 /* ****************************************************************************
 *
-* notFound -
+* createEntity -
 */
-TEST(getIndividualContextEntityAttributes, notFound)
+TEST(postIndividualContextEntityAttributes, createEntity)
 {
-  ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes",  "GET", "1.1");
-  const char*    outfile = "ngsi10.contextElementResponse.getIndividualContextEntityAttributes.notFound.valid.xml";
+  ConnectionInfo ci("/ngsi/contextEntities/entity11/attributes",  "POST", "1.1");
+  const char*    infile  = "ngsi10.appendContextElementRequest.ok.valid.xml";
+  const char*    outfile = "ngsi10.appendContextElementResponse.ok.valid.xml";
   std::string    out;
 
   utInit();
 
-  ci.outMimeType = JSON;
-
-  serviceVectorsSet(getV, NULL, NULL, NULL, NULL, NULL, badVerbV);
-  out = orionServe(&ci);
+  EXPECT_EQ("OK", testDataFromFile(testBuf,
+                                   sizeof(testBuf),
+                                   infile)) << "Error getting test data from '" << infile << "'";
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile)) << "Error getting test data from '" << outfile << "'";
+
+  ci.outMimeType    = JSON;
+  ci.inMimeType     = JSON;
+  ci.payload        = testBuf;
+  ci.payloadSize    = strlen(testBuf);
+
+  serviceVectorsSet(NULL, NULL, postV, NULL, NULL, NULL, badVerbV);
+  out = orionServe(&ci);
+
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

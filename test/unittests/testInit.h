@@ -25,7 +25,7 @@
 *
 * Author: Fermin Galan
 */
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 
 
 

@@ -84,7 +84,7 @@ SET (SOURCES
     common/commonWsStrip_test.cpp
     common/commonMacroSubstitute_test.cpp
 
-    ngsi10/NotifyContextRequest_test.cpp
+    ngsi/NotifyContextRequest_test.cpp
 
     ngsi/ContextAttribute_test.cpp
     ngsi/AttributeList_test.cpp

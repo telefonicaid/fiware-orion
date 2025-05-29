@@ -28,7 +28,7 @@
 
 #include "common/sem.h"
 
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"

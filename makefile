@@ -142,14 +142,6 @@ post_install_libs:
 	cp src/lib/ngsi/*.h /usr/local/include/contextBroker/ngsi         
 	cp $(CMAKE_BUILD_TYPE)/src/lib/ngsi/libngsi.a  /usr/local/lib 
 
-	cd /usr/local/include/contextBroker  && rm -rf ngsi10 && mkdir -p ngsi10
-	cp src/lib/ngsi10/*.h /usr/local/include/contextBroker/ngsi10         
-	cp $(CMAKE_BUILD_TYPE)/src/lib/ngsi10/libngsi10.a  /usr/local/lib 
-
-	cd /usr/local/include/contextBroker  && rm -rf ngsi9 && mkdir -p ngsi9
-	cp src/lib/ngsi9/*.h /usr/local/include/contextBroker/ngsi9         
-	cp $(CMAKE_BUILD_TYPE)/src/lib/ngsi9/libngsi9.a  /usr/local/lib 
-
 	cd /usr/local/include/contextBroker  && rm -rf ngsiNotify && mkdir -p ngsiNotify
 	cp src/lib/ngsiNotify/*.h /usr/local/include/contextBroker/ngsiNotify         
 	cp $(CMAKE_BUILD_TYPE)/src/lib/ngsiNotify/libngsiNotify.a  /usr/local/lib 

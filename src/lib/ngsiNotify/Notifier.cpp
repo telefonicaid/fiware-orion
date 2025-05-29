@@ -38,7 +38,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/CustomPayloadType.h"
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"

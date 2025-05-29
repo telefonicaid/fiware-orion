@@ -40,7 +40,7 @@
 #include "jsonParseV2/parseEntitiesResponseV1.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 #include "orionTypes/UpdateContextRequestVector.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"

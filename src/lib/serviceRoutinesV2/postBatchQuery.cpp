@@ -33,7 +33,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "ngsi10/QueryContextRequest.h"
+#include "ngsi/QueryContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
 #include "serviceRoutinesV2/postQueryContext.h"
 #include "serviceRoutinesV2/postBatchQuery.h"

@@ -33,6 +33,12 @@ SET (SOURCES
     Scope.cpp
     ScopeVector.cpp
     StringList.cpp
+    NotifyContextRequest.cpp
+    NotifyContextResponse.cpp
+    QueryContextRequest.cpp
+    QueryContextResponse.cpp
+    UpdateContextRequest.cpp
+    UpdateContextResponse.cpp
 )
 
 SET (HEADERS
@@ -46,9 +52,13 @@ SET (HEADERS
     MetadataVector.h
     Scope.h
     StringList.h
+    NotifyContextRequest.h
+    NotifyContextResponse.h
+    QueryContextRequest.h
+    QueryContextResponse.h
+    UpdateContextRequest.h
+    UpdateContextResponse.h
 )
-
-
 
 # Include directories
 # -----------------------------------------------------------------
