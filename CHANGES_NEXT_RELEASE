@@ -1,4 +1,5 @@
 - Fix: registrations with more than one contextRegistration element (not possible in NGSIv2) are logged as Runtime Errors
 - Fix: memory leak in POST /v2/op/notify operation (#4261)
 - Fix: POST /v2/op/notify proper response (formerly it was using NSGIv1 format payload) (#4681)
+- Fix: some error messages in corner case situations (405, 406, 415 and some cases of 400) were not strictly following NGSIv2 error response syntax
 - Hardening: remove a huge amount of NGSIv1 related dead-code
