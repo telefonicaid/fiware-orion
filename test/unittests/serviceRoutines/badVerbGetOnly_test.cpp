@@ -26,8 +26,8 @@
 
 #include "gtest/gtest.h"
 
-#include "serviceRoutines/badVerbGetOnly.h"
-#include "serviceRoutines/versionTreat.h"
+#include "serviceRoutinesV2/badVerbGetOnly.h"
+#include "serviceRoutinesV2/versionTreat.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 

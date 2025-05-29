@@ -28,27 +28,22 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/globals.h"
-#include "mongoBackend/MongoGlobal.h"
+#include "common/errorMessages.h"
+#include "alarmMgr/alarmMgr.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
-#include "rest/rest.h"
-#include "rest/restReply.h"
-#include "serviceRoutines/exitTreat.h"
-#include "cache/subCache.h"
+#include "serviceRoutinesV2/badVerbPutDeleteOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* exitTreat -
-*
-* FIXME P5: this function maybe is no longer needed. The only known user was the exit logic
-* in valgrind test pass (functional test has been using SIGTERM since a long term or maybe
-* always) that has changed to SIGTERM due to issue https://github.com/telefonicaid/fiware-orion/issues/3809
+* badVerbPutDeleteOnly - 
 */
-std::string exitTreat
+std::string badVerbPutDeleteOnly
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -56,40 +51,12 @@ std::string exitTreat
   ParseData*                 parseDataP
 )
 {
-  std::string password = "XXX";
-  std::string out;
+  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
+  OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
-  if (harakiri == false)
-  {
-    OrionError orionError(SccBadRequest, "no such service");
+  ciP->httpHeader.push_back(HTTP_ALLOW);
+  ciP->httpHeaderValue.push_back("PUT, DELETE");
+  ciP->httpStatusCode = SccBadVerb;
 
-    ciP->httpStatusCode = SccOk;
-    out = orionError.toJson();
-    return out;
-  }
-
-  if (components > 1)
-  {
-    password = compV[1];
-  }
-
-  if (components == 1)
-  {
-    OrionError orionError(SccBadRequest, "Password requested");
-    ciP->httpStatusCode = SccOk;
-    out = orionError.toJson();
-  }
-  else if (password != "harakiri")
-  {
-    OrionError orionError(SccBadRequest, "Request denied - password erroneous");
-    ciP->httpStatusCode = SccOk;
-    out = orionError.toJson();
-  }
-  else
-  {
-    compV.clear();
-    return "DIE";
-  }
-
-  return out;
+  return oe.toJson();
 }

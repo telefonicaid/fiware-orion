@@ -26,8 +26,8 @@
 
 #include "common/Timer.h"
 #include "common/globals.h"
-#include "serviceRoutines/statisticsTreat.h"
-#include "serviceRoutines/badVerbGetDeleteOnly.h"
+#include "serviceRoutinesV2/statisticsTreat.h"
+#include "serviceRoutinesV2/badVerbGetDeleteOnly.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 

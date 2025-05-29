@@ -37,7 +37,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/rest.h"
 #include "rest/curlSem.h"
-#include "serviceRoutines/statisticsTreat.h"
+#include "serviceRoutinesV2/statisticsTreat.h"
 #include "mongoDriver/mongoConnectionPool.h"
 #include "cache/subCache.h"
 #include "ngsiNotify/QueueStatistics.h"

@@ -26,8 +26,8 @@
 
 #include "logMsg/logMsg.h"
 
-#include "serviceRoutines/postIndividualContextEntityAttributes.h"
-#include "serviceRoutines/badRequest.h"
+#include "serviceRoutinesV2/postIndividualContextEntityAttributes.h"
+#include "serviceRoutinesV2/badRequest.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 

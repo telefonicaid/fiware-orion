@@ -65,14 +65,14 @@ SET (SOURCES
     testInit.cpp
     unittest.cpp
 
-    serviceRoutines/badVerbGetOnly_test.cpp
-    serviceRoutines/badVerbPostOnly_test.cpp
-    serviceRoutines/badVerbGetPostOnly_test.cpp
-    serviceRoutines/badVerbGetDeleteOnly_test.cpp
-    serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/versionTreat_test.cpp
-    serviceRoutines/exitTreat_test.cpp
-    serviceRoutines/statisticsTreat_test.cpp
+    serviceRoutinesV2/badVerbGetOnly_test.cpp
+    serviceRoutinesV2/badVerbPostOnly_test.cpp
+    serviceRoutinesV2/badVerbGetPostOnly_test.cpp
+    serviceRoutinesV2/badVerbGetDeleteOnly_test.cpp
+    serviceRoutinesV2/badVerbGetPutDeleteOnly_test.cpp
+    serviceRoutinesV2/versionTreat_test.cpp
+    serviceRoutinesV2/exitTreat_test.cpp
+    serviceRoutinesV2/statisticsTreat_test.cpp
 
     common/commonFormat_test.cpp
     common/commonGlobals_test.cpp

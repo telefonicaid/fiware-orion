@@ -26,7 +26,7 @@
 
 #include "unittests/unittest.h"
 
-#include "serviceRoutines/exitTreat.h"
+#include "serviceRoutinesV2/exitTreat.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 

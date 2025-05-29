@@ -35,7 +35,7 @@
 #include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntities.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 
 static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
 

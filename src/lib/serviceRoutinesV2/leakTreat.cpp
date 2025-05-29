@@ -27,20 +27,25 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/errorMessages.h"
-#include "alarmMgr/alarmMgr.h"
+
+#include "common/statistics.h"
+#include "common/clockFunctions.h"
+
+#include "common/globals.h"
+#include "mongoBackend/MongoGlobal.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
-#include "serviceRoutines/badRequest.h"
+#include "rest/OrionError.h"
+#include "rest/rest.h"
+#include "serviceRoutinesV2/leakTreat.h"
 
 
 
 /* ****************************************************************************
 *
-* badRequest - 
+* leakTreat - 
 */
-std::string badRequest
+std::string leakTreat
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -48,13 +53,45 @@ std::string badRequest
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
-  std::string  details = std::string("service '") + ciP->url + "' not found";
+  std::string password = "XXX";
+  std::string out;
 
-  alarmMgr.badInput(ciP->ip, details);
+  if (harakiri == false)
+  {
+    OrionError orionError(SccBadRequest, "no such service");
 
-  OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND);
-  ciP->httpStatusCode = SccBadRequest;
+    ciP->httpStatusCode = SccOk;
+    TIMED_RENDER(out = orionError.toJson());
+    return out;
+  }
 
-  return oe.toJson();
+  if (components > 1)
+  {
+    password = compV[1];
+  }
+
+  if (components == 1)
+  {
+    OrionError orionError(SccBadRequest, "Password requested");
+    ciP->httpStatusCode = SccOk;
+
+    TIMED_RENDER(out = orionError.toJson());
+  }
+  else if (password != "harakiri")
+  {
+    OrionError orionError(SccBadRequest, "Request denied - password erroneous");
+    ciP->httpStatusCode = SccOk;
+
+    TIMED_RENDER(out = orionError.toJson());
+  }
+  else
+  {
+    // No Cleanup for valgrind, and just in case another malloc
+    std::string pwd = strdup("Leak test done");
+    OrionError orionError(SccOk, "Leak test: " + pwd);
+
+    TIMED_RENDER(out = orionError.toJson());
+  }
+
+  return out;
 }

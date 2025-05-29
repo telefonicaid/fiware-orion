@@ -189,7 +189,6 @@ SET (ORION_LIBS
     common
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     serviceRoutinesV2
-    serviceRoutines
     ngsiNotify
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
@@ -321,7 +320,6 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/common)
   ADD_SUBDIRECTORY(src/lib/orionTypes)
   ADD_SUBDIRECTORY(src/lib/ngsi)
-  ADD_SUBDIRECTORY(src/lib/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/serviceRoutinesV2)
   ADD_SUBDIRECTORY(src/lib/ngsi10)
   ADD_SUBDIRECTORY(src/lib/ngsiNotify)

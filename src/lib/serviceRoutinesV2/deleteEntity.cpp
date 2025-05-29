@@ -35,7 +35,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
 
 

@@ -26,7 +26,7 @@
 
 #include "gtest/gtest.h"
 
-#include "serviceRoutines/badVerbPostOnly.h"
+#include "serviceRoutinesV2/badVerbPostOnly.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 

@@ -28,8 +28,8 @@
 
 #include "logMsg/logMsg.h"
 
-#include "serviceRoutines/getIndividualContextEntityAttributes.h"
-#include "serviceRoutines/badRequest.h"
+#include "serviceRoutinesV2/getIndividualContextEntityAttributes.h"
+#include "serviceRoutinesV2/badRequest.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 

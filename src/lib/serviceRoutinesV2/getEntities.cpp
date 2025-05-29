@@ -37,7 +37,7 @@
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
 
 

@@ -36,7 +36,7 @@
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "rest/OrionError.h"
-#include "serviceRoutines/badVerbGetPutDeleteOnly.h"
+#include "serviceRoutinesV2/badVerbGetPutDeleteOnly.h"
 
 
 

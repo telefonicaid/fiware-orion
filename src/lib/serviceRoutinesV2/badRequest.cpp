@@ -27,24 +27,20 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
-
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpHeaders.h"
-#include "rest/rest.h"
-#include "rest/OrionError.h"
-#include "serviceRoutines/badVerbGetOnly.h"
+#include "rest/restReply.h"
+#include "serviceRoutinesV2/badRequest.h"
 
 
 
 /* ****************************************************************************
 *
-* badVerbGetOnly -
+* badRequest - 
 */
-std::string badVerbGetOnly
+std::string badRequest
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -52,20 +48,13 @@ std::string badVerbGetOnly
   ParseData*                 parseDataP
 )
 {
-  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
-  OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
+  std::string  answer;
+  std::string  details = std::string("service '") + ciP->url + "' not found";
 
-  ciP->httpHeader.push_back(HTTP_ALLOW);
-  std::string headerValue = "GET";
-  //OPTIONS verb is only available for V2 API, e.g. not available for GET /version
-  if ((corsEnabled == true) && (ciP->url.compare(0, 3, "/v2") == 0))
-  {
-    headerValue = headerValue + ", OPTIONS";
-  }
-  ciP->httpHeaderValue.push_back(headerValue);
-  ciP->httpStatusCode = SccBadVerb;
+  alarmMgr.badInput(ciP->ip, details);
 
-  alarmMgr.badInput(clientIp, details);
+  OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND);
+  ciP->httpStatusCode = SccBadRequest;
 
   return oe.toJson();
 }

@@ -1203,7 +1203,7 @@ typedef struct CachedSubSaved
 *   execute until the point where the temporal objects are deleted (See '6. Free the vector savedSubV').
 *   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
 *   the sub-cache synchronization is working.
-*   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
+*   In serviceRoutinesV2/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
 *   sleep for a few seconds is performed before the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)

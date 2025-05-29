@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2016 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -34,17 +34,16 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpHeaders.h"
-#include "rest/rest.h"
 #include "rest/OrionError.h"
-#include "serviceRoutines/badVerbPostOnly.h"
+#include "serviceRoutinesV2/badVerbPutOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* badVerbPostOnly -
+* badVerbPutOnly - 
 */
-std::string badVerbPostOnly
+std::string badVerbPutOnly
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -56,13 +55,7 @@ std::string badVerbPostOnly
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
-  std::string headerValue = "POST";
-  //OPTIONS verb is only available for V2 API, e.g. not available for GET /version
-  if ((corsEnabled == true) && (ciP->url.compare(0, 3, "/v2") == 0))
-  {
-    headerValue = headerValue + ", OPTIONS";
-  }
-  ciP->httpHeaderValue.push_back(headerValue);
+  ciP->httpHeaderValue.push_back("PUT");
   ciP->httpStatusCode = SccBadVerb;
 
   alarmMgr.badInput(clientIp, details);

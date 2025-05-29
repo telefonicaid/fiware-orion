@@ -39,7 +39,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rapidjson/rapidjson.h"
-#include "serviceRoutines/versionTreat.h"
+#include "serviceRoutinesV2/versionTreat.h"
 
 #include <boost/version.hpp>
 #include <mongoc/mongoc.h>

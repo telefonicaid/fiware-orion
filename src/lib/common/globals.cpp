@@ -36,7 +36,7 @@
 #include "common/globals.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
-#include "serviceRoutines/versionTreat.h"     // For orionInit()
+#include "serviceRoutinesV2/versionTreat.h"     // For orionInit()
 #include "mongoBackend/MongoGlobal.h"         // For orionInit()
 #include "mongoBackend/dbConstants.h"         // For mongoInit()
 

@@ -26,7 +26,7 @@
 
 #include "gtest/gtest.h"
 
-#include "serviceRoutines/logTreat.h"
+#include "serviceRoutinesV2/logTreat.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 

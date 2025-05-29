@@ -35,7 +35,7 @@
 #include "rest/uriParamNames.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
 

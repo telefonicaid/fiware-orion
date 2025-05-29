@@ -47,7 +47,7 @@
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "jsonParseV2/parseEntitiesResponse.h"
 #include "jsonParseV2/parseEntitiesResponseV1.h"
 

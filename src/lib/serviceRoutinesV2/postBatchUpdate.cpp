@@ -36,7 +36,7 @@
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postBatchUpdate.h"
 #include "ngsi10/UpdateContextRequest.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 
 #include "alarmMgr/alarmMgr.h"
 

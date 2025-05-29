@@ -171,8 +171,8 @@ post_install_libs:
 	cp $(CMAKE_BUILD_TYPE)/src/lib/logMsg/liblm.a  /usr/local/lib 
 
 	cd /usr/local/include/contextBroker  && rm -rf serviceRoutines && mkdir -p serviceRoutines
-	cp src/lib/serviceRoutines/*.h /usr/local/include/contextBroker/serviceRoutines
-	cp $(CMAKE_BUILD_TYPE)/src/lib/serviceRoutines/libserviceRoutines.a  /usr/local/lib
+	cp src/lib/serviceRoutinesV2/*.h /usr/local/include/contextBroker/serviceRoutines
+	cp $(CMAKE_BUILD_TYPE)/src/lib/serviceRoutinesV2/libserviceRoutines.a  /usr/local/lib
 
 	cd /usr/local/include/contextBroker  && rm -rf orionTypes && mkdir -p orionTypes
 	cp src/lib/orionTypes/*.h /usr/local/include/contextBroker/orionTypes

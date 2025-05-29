@@ -34,7 +34,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
 

@@ -36,15 +36,15 @@
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "rest/OrionError.h"
-#include "serviceRoutines/badVerbGetPostOnly.h"
+#include "serviceRoutinesV2/badVerbPostOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* badVerbGetPostOnly -
+* badVerbPostOnly -
 */
-std::string badVerbGetPostOnly
+std::string badVerbPostOnly
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -52,11 +52,11 @@ std::string badVerbGetPostOnly
   ParseData*                 parseDataP
 )
 {
-  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method+ "'";
+  std::string  details = std::string("bad verb for url '") + ciP->url + "', method '" + ciP->method + "'";
   OrionError   oe(SccBadVerb, ERROR_DESC_BAD_VERB);
 
   ciP->httpHeader.push_back(HTTP_ALLOW);
-  std::string headerValue = "POST, GET";
+  std::string headerValue = "POST";
   //OPTIONS verb is only available for V2 API, e.g. not available for GET /version
   if ((corsEnabled == true) && (ciP->url.compare(0, 3, "/v2") == 0))
   {

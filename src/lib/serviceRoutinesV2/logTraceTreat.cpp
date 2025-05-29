@@ -35,7 +35,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/orionLogReply.h"
 #include "rest/OrionError.h"
-#include "serviceRoutines/logTraceTreat.h"
+#include "serviceRoutinesV2/logTraceTreat.h"
 
 
 

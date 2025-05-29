@@ -261,10 +261,10 @@ style_check test/unittests/serviceRoutines
 #                                                                                                               'indent' removed from 13 calls to render())
 #
 
-# o serviceRoutines/postNotifyContext.cpp                                    (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
-# o serviceRoutines/postQueryContext.cpp                                     (haderding/remove_ngsiv1_indent: 3 includes, 2 TIMED_RENDER, 35 lines in queryForward())
-# o serviceRoutines/postUpdateContext.cpp                                    (haderding/remove_ngsiv1_indent: 3 includes, 5 TIMED_RENDER, 35 lines in updateForward)
-# o serviceRoutines/versionTreat.cpp                                         (haderding/remove_ngsiv1_indent: 8 lines in versionTreat())
+# o serviceRoutinesV2/postNotifyContext.cpp                                  (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
+# o serviceRoutinesV2/postQueryContext.cpp                                   (haderding/remove_ngsiv1_indent: 3 includes, 2 TIMED_RENDER, 35 lines in queryForward())
+# o serviceRoutinesV2/postUpdateContext.cpp                                  (haderding/remove_ngsiv1_indent: 3 includes, 5 TIMED_RENDER, 35 lines in updateForward)
+# o serviceRoutinesV2/versionTreat.cpp                                       (haderding/remove_ngsiv1_indent: 8 lines in versionTreat())
 # o serviceRoutinesV2/getEntityAttributeValue.cpp                            (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 # o serviceRoutinesV2/postSubscriptions.cpp                                  (haderding/remove_ngsiv1_indent: 1 TIMED_RENDER)
 #

@@ -26,8 +26,8 @@
 
 #include "gtest/gtest.h"
 
-#include "serviceRoutines/badVerbGetDeleteOnly.h"
-#include "serviceRoutines/statisticsTreat.h"
+#include "serviceRoutinesV2/badVerbGetDeleteOnly.h"
+#include "serviceRoutinesV2/statisticsTreat.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 
