@@ -8,23 +8,21 @@ The Orion Context Broker, as explained in [the User & Programmers Manual](../use
 
 ## Forwarding of update requests
 
-In NGSIv1 (deprecated), the request `POST /v1/updateContext` has a field called `updateActionType`. This field can take on five different values:
+In NGSIv2 there are the following update semantics. Using the equivalence to `POST /v2/op/update` field `actionType`:
 
-* UPDATE
-* APPEND
-* DELETE
-* APPEND_STRICT
-* REPLACE
+* update
+* append
+* delete
+* appendStrict
+* replace
 
-> Side-node: The first three are "standard NGSIv1" while the second two were added for NGSIv2.
-
-* Requests with `UPDATE` or `REPLACE` may provoke forwarding of the request.
+* Requests with `update` or `replace` may provoke forwarding of the request.
   Only if **not found locally but found in a registration**.
-* If `APPEND` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created (locally).
-* `APPEND_STRICT` fails if the entity/attribute already exists (locally) and if not, the entity/attribute is created locally.
-* `DELETE` is always local.
+* If `append` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created (locally).
+* `appendStrict` fails if the entity/attribute already exists (locally) and if not, the entity/attribute is created locally.
+* `delete` is always local.
 
-Note that an update request with multiple context elements (and with `updateActionType` as `UPDATE` or `REPLACE`) may be split into a number of forwards to different context providers plus local updates for entity/attributes that are found locally. The response to the initial request is not sent until each and every response from context providers have arrived.
+Note that an update request with multiple context elements (and with `actionType` as `update` or `replace`) may be split into a number of forwards to different context providers plus local updates for entity/attributes that are found locally. The response to the initial request is not sent until each and every response from context providers have arrived.
 
 <a name="flow-fw-01"></a>
 ![Forward an update to Context Providers](images/Flow-FW-01.png)
@@ -48,7 +46,7 @@ Note that there is a number of service routines that end up calling `postUpdateC
 * The responses from the context providers are merged into the total response to the client issuing the request that provoked the forwarding (step 7). Note that the forwards are serialized, each forward awaiting its response before continuing.
 
 <a name="flow-fw-02"></a>
-![`updateForward()` function detail](images/Flow-FW-02.png) - FIXME PR: render again
+![`updateForward()` function detail](images/Flow-FW-02.png)
 
 _FW-02: `updateForward()` function detail_
 

@@ -6,23 +6,22 @@ This document provides a high level introduction of the internal architecture of
 
 The following figure shows the main information flow and how program control passes from one module to another. For a more detailed list of internal flows see [this section](flowsIndex.md).
 
-![Orion current internal architecture](images/current_architecture.png)
+![Orion current internal architecture](images/current_architecture.png) - FIXME PR: render again
 
 _Current Orion internal architecture_
 
 * At start-up, Orion Context Broker starts an HTTP server listening for incoming requests. The [**rest** library](sourceCode.md#srclibrest) deals with these requests and the library is based on the [microhttpd](https://www.gnu.org/software/libmicrohttpd/) external library, which spawns a new thread per request.
 
-* The `connectionTreat()` function is the entry point for new requests (see [RQ-01 diagram](sourceCode.md#flow-rq-01) for details). Depending on the version of the NGSI API to which the request belongs (basically, depending whether the request URL prefix is `/v1` or `/v2`) the execution flow goes in one "branch" or another, of the execution logic.
-
+* The `connectionTreat()` function is the entry point for new requests (see [RQ-01 diagram](sourceCode.md#flow-rq-01) for details).
 * The logic is as follows:
 	* First, the [**jsonParseV2** library](sourceCode.md#srclibjsonparsev2) takes the request payload as input and generates a set of objects. The NGSIv2 parsing logic is based in [rapidjson](http://rapidjson.org).
-	* Next, similar to NGSIv1, a service routine is called to process the request. Each request type (in terms of HTTP and URL pattern) has a service routine. These "NGSIv2 service routines" reside in the library [**serviceRoutinesV2**](sourceCode.md#srclibserviceroutinesv2). Note that some V2 service routines may call NGSIv1 service routines (see [the mapping document](ServiceRoutines.txt) for details).
-	* At the end, the **mongoBackend** library is invoked. Depending on the case, this can be done directly from a V2 service routine or indirectly via a V1 service routine, as shown in the figure above.
-* The [**mongoBackend** library](sourceCode.md#srclibmongobackend) is in some way the "brain" of Orion. It contains a set of functions, aimed at the different operations that Orion performs (e.g. retrieve entity information, update entities, create subscriptions, etc.). This library interfaces with MongoDB using the **mongoDriver** library (which "wraps" the corresponding [MongoDB C driver](http://mongoc.org) driver). For historic reasons, most of the MongoDB backend is NGSIv1-based (thus, accessed from V1 service routines). The exceptions are those operations that are NGSIv2-only (e.g. subscription listing), which are invoked directly from V2 service routines.
+	* Next, a service routine is called to process the request. Each request type (in terms of HTTP and URL pattern) has a service routine, which reside in the library [**serviceRoutinesV2**](sourceCode.md#srclibserviceroutinesv2). Note that some service routines may call other service routines (see [the mapping document](ServiceRoutines.txt) for details).
+	* At the end, the **mongoBackend** library is invoked.
+* The [**mongoBackend** library](sourceCode.md#srclibmongobackend) is in some way the "brain" of Orion. It contains a set of functions, aimed at the different operations that Orion performs (e.g. retrieve entity information, update entities, create subscriptions, etc.). This library interfaces with MongoDB using the **mongoDriver** library (which "wraps" the corresponding [MongoDB C driver](http://mongoc.org) driver).
 * Whenever a notification is triggered (e.g. as a consequence of updating an entity covered by an existing subscription), the notifier module (residing in the [**ngsiNotify** library](sourceCode.md#srclibngsinotify) is invoked from **mongoBackend** in order to send such a notification. Orion supports two notification types:
 	* HTTP notifications. In this case, the `httpRequestSend()` function (part of the **rest** library) is in charge of sending HTTP requests. It is based on the [libcurl](https://curl.haxx.se/libcurl/) external library.
 	* MQTT notifications. In this case, the `sendMqttNotification()` function (part of the **mqtt** library) is in charge of publishing the MQTT notification in the corresponding MQTT broker. It is based on the [mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) external library.
-* The `httpRequestSend()` function is also called by **serviceRoutines** functions capable of forwarding queries/updates to [Context Providers](../user/context_providers.md) under some conditions.
+* The `httpRequestSend()` function is also called by **serviceRoutinesV2** functions capable of forwarding queries/updates to [Context Providers](../user/context_providers.md) under some conditions.
 
 [Top](#top)
 
@@ -40,17 +39,20 @@ Note that in the architectural figure above, the new additions related to NGSIv2
 
 Another architectural evolution (this time related to communications) was going from dealing with outgoing HTTP request directly (i.e. writing the request directly to the TCP socket) to using libcurl as full-fledged HTTP oriented library. This was done in Orion 0.14.1 (August 1st, 2014). That way we ensured that all the subtle details of the HTTP protocol are taken into account (in fact, Orion 0.14.1 solved [problems sending notifications to some backends](https://github.com/telefonicaid/fiware-orion/issues/442)).
 
-## Target architecture
+## NGSIv1 removal
 
 One important achievement of the architectural evolution has been to be able to develop an entire new version of the API (NGSIv2) keeping at the same time full backward compatibility with the NGSIv1 API (except for the XML rendering, that was declared obsolete and finally removed in Orion 1.0.0... leaving property_tree as an awful legacy behind it :)
 
-However, this has lead to a "parallel" architecture with some inefficient aspects (in particular, the "chain" of service routine invocations, instead of a more direct flow toward **mongoBackend**). Thus, it should be consolidated in some moment, once NGSIv1 is declared deprecated and the target of Orion would be to support only NGSIv2 (in a similar way XML rendering was deprecated and finally removed).
+However, this led to a "parallel" architecture with some inefficient aspects (in particular, the "chain" of service routine invocations, instead of a more direct flow toward **mongoBackend**). Thus, there was a need to consolidated in some moment, once NGSIv1 is declared deprecated and the target of Orion would be to support only NGSIv2 (in a similar way XML rendering was deprecated and finally removed).
+
+Although NGSIv1 was removed from an API point of view in Orion 4.0.0, the consolidation took place in Orion 4.3.0, unifying some parts of the internal architecture (e.g. `serviceRoutines` was merged into `serviceRoutinesV2` and `ngsi10` was merged into `ngsi`). A lot of NGSIv1 related dead code was fully removed.
+
+## Target architecture
 
 Once that moment comes, the steps (from a high level perspective) would be as follow:
 
-1. Remove NGSIv1 JSON functionality and adjust functional tests. That includes removing all property_tree dependencies.
-2. Consolidate NGSIv2 and NGSIv1 internal types into a single NGSI types family
-3. Adapt **serviceRoutines** and **mongoBackend** to the single NGSI types family
+1. Consolidate NGSI types (although NGSIv1 has been removed, some "structural legacy" remains in the design of NGSI types)
+3. Adapt **serviceRoutinesV2** and **mongoBackend** to the new types
 
 The following picture shows that target architecture, taking into account the changes described above:
 

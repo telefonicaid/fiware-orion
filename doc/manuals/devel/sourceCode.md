@@ -11,7 +11,6 @@
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
-* [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
 * [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
 * [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
@@ -169,7 +168,7 @@ _RQ-02: Treatment of a request_
 
 * `orion::requestServe()` calls `restService()` (step 1).
 * Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in the diagram [PP-01](#flow-pp-01).
-* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vectors in [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker)).
+* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceRoutinesV2, please see the `RestService` vectors in [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker)).
 * The service function may invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for details (step 4).
 * Finally, a function in [the **mongoBackend** library](#srclibmongobackend) is invoked (step 5). The MB diagrams provide detailed descriptions for the different cases.
 * A response string is created by the Service Routine and returned to `restService()` (step 6).
@@ -179,15 +178,14 @@ _RQ-02: Treatment of a request_
 
 ### `payloadParse()`
 
-The payload to Orion can be of three different types:
+The payload to Orion can be of two different types:
 
-* V1 JSON,
 * V2 JSON,
 * Plain Text
 
 The function `payloadParse()`, that resides in the rest library, in `lib/rest/RestService.cpp`, serves as a fork and calls the appropriate parse function, as shown in the diagram below:
 
-![Parsing alternatives](images/parsing-alternatives.png)
+![Parsing alternatives](images/parsing-alternatives.png) - FIXME PR: render again
 
 The JSON parse implementations reside in dedicated libraries while the text parse, as it is pretty simple, is a part of the [**parse** library](#srclibparse).
 
@@ -221,8 +219,6 @@ The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class
 `EntityVector`. `EntityVector` is of course a vector of `Entity`.
 
 Note that both `EntityVector` and `Entity` classes doesn't belong to this library, but to [`src/lib/apiTypesV2`](#srclibapitypesv2).
-In general, given that NGSIv1 is now deprecated, we try to use NGSIv2 classes as much as possible, reducing the number
-of equivalente classes within `src/lib/ngsi`.
 
 The methods `toJson()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
 
@@ -240,6 +236,9 @@ Each class invokes the method for its underlying classes. The example above was 
 
 
 ## src/lib/ngsi10/
+
+FIXME PR: unify this into ngsi/
+
 The **ngsi10** library contains the top hierarchy classes for NGSI10 (NGSIv1) requests (and responses):
 
 * `UpdateContextRequest`
@@ -293,8 +292,8 @@ See detailed explanation of the V2 JSON parse implementation in its [dedicated d
 [Top](#top)
 
 
-## src/lib/serviceRoutines/
-The **serviceRoutines** library is where the incoming requests are treated and sent to [**mongoBackend** library](#srclibmongobackend) for final processing.
+## src/lib/serviceRoutinesV2/
+The **serviceRoutinesV2** library is where the incoming requests are treated and sent to [**mongoBackend** library](#srclibmongobackend) for final processing.
 
 Two service routines are especially important as many other service routines end up calling them (see [the service routines mapping document](ServiceRoutines.txt) for details]):
 
@@ -336,17 +335,9 @@ typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vecto
 
 So, for the rest library to find the service routine of an incoming request, it uses the vectors of `RestService` as passed as the first seven parameters to `restInit()`, which are searched until an item matching the verb/method and the URL PATH and when the `RestService` item is found, the service routine is also found, as it is a part of a `RestService` item.
 
+Note some service routines invoke other service routines. See [the service routines mapping document](ServiceRoutines.txt) for details.
 
 [Top](#top)
-
-
-## src/lib/serviceRoutinesV2/
-Similar to the **serviceRoutines** library described above, the **serviceRoutinesV2** library contains the service routines for NGSIv2 requests.
-
-Some NGSIv2 service routines invoke [**mongoBackend**](#srclibmongobackend) directly. Others rely on a lower level service routine. See [the service routines mapping document](ServiceRoutines.txt) for details.
-
-[Top](#top)
-
 
 ## src/lib/mongoBackend/
 

@@ -2,15 +2,15 @@
 
 * [Introduction](#introduction)
 * [Request processing modules](#request-processing-modules)
-	* [`mongoUpdateContext` (SR) and `mongoNotifyContext` (SR)](#mongoupdatecontext-sr-and-mongonotifycontext-sr)
-	* [`mongoQueryContext` (SR)](#mongoquerycontext-sr)
-	* [`mongoQueryTypes` (SR and SR2)](#mongoquerytypes-sr-and-sr2)
-	* [`mongoCreateSubscription` (SR2)](#mongocreatesubscription-sr2)
-	* [`mongoUpdateSubscription` (SR2)](#mongoupdatesubscription-sr2)
-	* [`mongoGetSubscriptions` (SR2)](#mongogetsubscriptions-sr2)
-	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2) - FIXME PR review "SR"
-	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
-	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
+	* [`mongoUpdateContext` and `mongoNotifyContext`](#mongoupdatecontext-and-mongonotifycontext)
+	* [`mongoQueryContext`](#mongoquerycontext)
+	* [`mongoQueryTypes`](#mongoquerytypes-and)
+	* [`mongoCreateSubscription`](#mongocreatesubscription)
+	* [`mongoUpdateSubscription`)](#mongoupdatesubscription)
+	* [`mongoGetSubscriptions`](#mongogetsubscriptions)
+	* [`mongoUnsubscribeContext`](#mongounsubscribecontext)
+	* [`mongoRegistrationGet`](#mongoregistrationget)
+	* [`mongoRegistrationCreate`](#mongoregistrationcreate) 
 * [Low-level modules related to DB interaction](#low-level-modules-related-to-db-interaction)
 * [Specific purpose modules](#specific-purpose-modules)
 * [The `MongoGlobal` module](#the-mongoglobal-module)
@@ -24,7 +24,7 @@ The **mongoBackend** library is where all the database interaction takes place. 
 
 The entry points of this library are:
 
-* From [serviceRoutines](sourceCode.md#srclibserviceroutines) and [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2). Those are the most important entry points.
+* From [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2). Those are the most important entry points.
 * Other entry points from other places as initialization routines and helpers methods.
 
 This library makes an extensive use of **mongoDriver** library for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations).
@@ -42,13 +42,13 @@ The different modules included in this library are analyzed in the following sec
 
 ### Request processing modules
 
-These modules implement the different Context Broker requests. They are called during the overall request processing flow by service routine libraries (either the **serviceRoutines** or the **serviceRoutinesV2** libraries). Nextcoming subsections describe each module (SR means the module is called from **serviceRoutines** and SR2 means the module is called from  **serviceRoutineV2**; note that no module is called from *both* libraries).
+These modules implement the different Context Broker requests. They are called during the overall request processing flow by service routine libraries (in**serviceRoutinesV2** libraries). Nextcoming subsections describe each module.
 
 This section also describes the `MongoCommonUpdate` module which provide common functionality highly coupled with several other request processing modules. In particular provides common functionality for the `mongoUpdateContext` and `mongoNotifyContext` modules.
 
 [Top](#top)
 
-#### `mongoUpdateContext` (SR) and `mongoNotifyContext` (SR)
+#### `mongoUpdateContext` and `mongoNotifyContext`
 
 The `mongoUpdateContext` module provides the entry point for the update context operation processing logic (by means of `mongoUpdateContext()` defined in its header file `lib/mongoBackend/mongoUpdateContext.h`) while the `mongoNotifyContext` module provides the entry point for the context notification processing logic (by means of `mongoNotifyContext()` defined in its header file `lib/mongoBackend/mongoNotifyContext.h`). However, given that a context  notification is processed in the same way as an update context of "APPEND" action type, both `mongoUpdateContext()` and `mongoNotifyContext()` are in the end basically wrapper functions for `processContextElement()` (single external function in the `MongoCommonUpdate` module), which does the real work.
 
@@ -216,7 +216,7 @@ _MD-02: `searchContextProviders()` function detail_
 
 [Top](#top)
 
-#### `mongoQueryContext` (SR)
+#### `mongoQueryContext`
 
 `mongoQueryContext` encapsulates the logic for the query context operation.
 
@@ -259,15 +259,15 @@ By *generic entities* above we mean one of the following:
 
 [Top](#top)
 
-#### `mongoQueryTypes` (SR and SR2)
+#### `mongoQueryTypes`
 
 `mongoQueryTypes` encapsulates the logic for the different operations in the NGSIv1 and NGSIv2 APIs that allow type browsing.
 
 The header file contains three functions:
 
-* `mongoEntityTypes()` (SR and SR2): it serves the `GET /v1/contextTypes` and `GET /v2/types` (without `options=values`) operations.
-* `mongoEntityTypesValues()` (SR2): it serves the `GET /v2/types?options=values` operation.
-* `mongoAttributesForEntityType()` (SR and SR2): it serves the `GET /v1/contextTypes/{type}` and `GET /v2/types/{type}` operations.
+* `mongoEntityTypes()`: it serves `GET /v2/types` (without `options=values`) operations.
+* `mongoEntityTypesValues()`: it serves the `GET /v2/types?options=values` operation.
+* `mongoAttributesForEntityType()`: it serves `GET /v2/types/{type}` operations.
 
 The detail for `mongoEntityTypes()` is as shown in the following diagram.
 
@@ -319,7 +319,7 @@ All the above functions heavily rely on the MongoDB aggregation framework. You s
 
 [Top](#top)
 
-#### `mongoCreateSubscription` (SR2)
+#### `mongoCreateSubscription`
 
 `mongoCreateSubscription` encapsulates the context subscription creation logic.
 
@@ -341,7 +341,7 @@ Note that potential notifications are sent before inserting the subscription in 
 
 [Top](#top)
 
-#### `mongoUpdateSubscription` (SR2)
+#### `mongoUpdateSubscription`
 
 `mongoUpdateSubscription` encapsulates the context subscription update logic.
 
@@ -362,7 +362,7 @@ Note that potential notifications are sent before updating the subscription in t
 
 [Top](#top)
 
-#### `mongoGetSubscriptions` (SR2)
+#### `mongoGetSubscriptions`
 
 `mongoGetSubscriptions` encapsulates the logic for getting subscriptions.
 
@@ -403,7 +403,7 @@ _MB-14: mongoListSubscriptions_
 
 [Top](#top)
 
-#### `mongoUnsubscribeContext` (SR and SR2)
+#### `mongoUnsubscribeContext`
 
 `mongoUnsubscribeContext` encapsulates the logic for unsubscribe context operation (NGSIv1) and remove subscription (NGSIv2).
 
@@ -427,7 +427,7 @@ Note that steps 6 and 7 are done no matter the value of `noCache`. This works bu
 
 [Top](#top)
 
-#### `mongoRegistrationGet` (SR2)
+#### `mongoRegistrationGet`
 
 `mongoRegistrationGet` encapsulates the logic for getting context registrations for NGSIv2 API.
 
@@ -468,7 +468,7 @@ _MB-24: mongoRegistrationsGet_
 
 [Top](#top)
 
-#### `mongoRegistrationCreate` (SR2)
+#### `mongoRegistrationCreate`
 
 `mongoRegistrationCreate` encapsulates the context registration creation logic for NGSIv2 API.
 
@@ -486,7 +486,7 @@ _MB-25: mongoRegistrationCreate_
 
 [Top](#top)
 
-#### `mongoRegistrationDelete` (SR2)
+#### `mongoRegistrationDelete`
 
 `mongoRegistrationDelete` encapsulates the logic for removing registrations.
 
