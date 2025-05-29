@@ -48,14 +48,14 @@ Note that there is a number of service routines that end up calling `postUpdateC
 * The responses from the context providers are merged into the total response to the client issuing the request that provoked the forwarding (step 7). Note that the forwards are serialized, each forward awaiting its response before continuing.
 
 <a name="flow-fw-02"></a>
-![`updateForward()` function detail](images/Flow-FW-02.png)
+![`updateForward()` function detail](images/Flow-FW-02.png) - FIXME PR: render again
 
 _FW-02: `updateForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1)
-* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v1/updateContext`. In the case of NGSIv2,  `POST /v2/op/updated` is used.
+* The request to forward has to be built (step 2). We need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v2/op/updated`.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3), that in its turn uses [libcurl](https://curl.haxx.se/libcurl/) (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
-* The textual response from the Context Provider is parsed and an `UpdateContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01). - FIXME PR: review this
+* The textual response from the Context Provider is parsed and an `UpdateContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-03](jsonParseV2.md#flow-pp-03).
 
 [Top](#top)
 
@@ -84,14 +84,14 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
 * Respond to the initiating client with a merge of all the responses from the Context Providers and the local response part (attributes found locally).
 
 <a name="flow-fw-04"></a>
-![`queryForward()` function detail](images/Flow-FW-04.png)
+![`queryForward()` function detail](images/Flow-FW-04.png) - FIXME PR: render again
 
 _FW-04: `queryForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
-* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v1/queryContext`. In the case of NGSIv2, `POST /v2/op/query` is used.
+* The request to forward has to be built (step 2). We need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v2/op/query`.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
-* The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01). - FIXME PR: review this
+* The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-03](jsonParseV2.md#flow-pp-03).
 
 ## A Caveat about shadowing of entities
 The Context Provider mechanism is implemented using standard registration requests and this might lead to unwanted situations.

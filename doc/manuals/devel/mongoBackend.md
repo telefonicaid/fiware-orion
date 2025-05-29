@@ -8,11 +8,7 @@
 	* [`mongoCreateSubscription` (SR2)](#mongocreatesubscription-sr2)
 	* [`mongoUpdateSubscription` (SR2)](#mongoupdatesubscription-sr2)
 	* [`mongoGetSubscriptions` (SR2)](#mongogetsubscriptions-sr2)
-	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2)
-	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr) - FIXME PR: probably deleted
-	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr) - FIXME PR: probably deleted
-	* [`mongoRegisterContext` (SR)](#mongoregistercontext-sr) - FIXME PR: probably deleted
-	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr) - FIXME PR: probably deleted
+	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2) - FIXME PR review "SR"
 	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
 	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
 * [Low-level modules related to DB interaction](#low-level-modules-related-to-db-interaction)
@@ -48,10 +44,7 @@ The different modules included in this library are analyzed in the following sec
 
 These modules implement the different Context Broker requests. They are called during the overall request processing flow by service routine libraries (either the **serviceRoutines** or the **serviceRoutinesV2** libraries). Nextcoming subsections describe each module (SR means the module is called from **serviceRoutines** and SR2 means the module is called from  **serviceRoutineV2**; note that no module is called from *both* libraries).
 
-This section also describes the `MongoCommonRegister` and `MongoCommonUpdate` modules which provide common functionality highly coupled with several other request processing modules. In particular:
-
-* `MongoCommonRegister` provides common functionality for the `mongoRegisterContext` modules. - FIXME PR: probably deleted
-* `MongoCommonUpdate` provides common functionality for the `mongoUpdateContext` and `mongoNotifyContext` modules.
+This section also describes the `MongoCommonUpdate` module which provide common functionality highly coupled with several other request processing modules. In particular provides common functionality for the `mongoUpdateContext` and `mongoNotifyContext` modules.
 
 [Top](#top)
 
@@ -434,87 +427,6 @@ Note that steps 6 and 7 are done no matter the value of `noCache`. This works bu
 
 [Top](#top)
 
-#### `mongoSubscribeContext` (SR)
-
-FIXME PR: probably deleted
-
-`mongoSubscribeContext` encapsulates the logic for subscribe context (NGSIv1) operation.
-
-The header file contains only a function named `mongoSubscribeContext()` which uses a `SubscribeContextRequest` object as input parameter and a `SubscribeContextResponse` as output parameter.
-
-Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. `mongoCreateSubscription()` in the [mongoCreateSubscription module](#mongocreatesubscription-sr2).
-
-<a name="flow-mb-16"></a>
-![mongoSubscribeContext](images/Flow-MB-16.png)
-
-_MB-16: mongoSubscribeContext_
-
-* `mongoSubscribeContext()` is invoked from a service routine (step 1).
-* The execution flow is passed to `mongoCreateSubscription()` (step 2). See diagram [MB-11](#flow-mb-11).
-
-[Top](#top)
-
-#### `mongoUpdateContextSubscription` (SR)
-
-FIXME PR: probably deleted
-
-`mongoUpdateContextSubscription` encapsulates the logic for update context subscription (NGSIv1) operation.
-
-The header file contains only a function named `mongoUpdateContextSubscription()` which uses an `UpdateContextSubscriptionRequest` object as input parameter and an `UpdateContextSubscriptionResponse` as output parameter.
-
-Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. `mongoUpdateSubscription()` in the [mongoUpdateSubscription module](#mongoupdatesubscription-sr2).
-
-<a name="flow-mb-17"></a>
-![mongoSubscribeContext](images/Flow-MB-17.png)
-
-_MB-17: mongoUpdateContextSubscription_
-
-* `mongoUpdateContextSubscription()` is invoked from a service routine (step 1).
-* The execution flow is passed to `mongoUpdateSubscription()` (setp 2). See diagram [MB-12](#flow-mb-12).
-
-[Top](#top)
-
-#### `mongoRegisterContext` (SR)
-
-FIXME PR: probably deleted
-
-The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of `mongoRegisterContext()` defined in its header file).
-
-<a name="flow-mb-18"></a>
-![mongoRegisterContext](images/Flow-MB-18.png)
-
-_MB-18: mongoRegisterContext_
-
-* `mongoRegisterContext()` is invoked from a service routine (step 1).
-* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* In the case of `mongoRegisterContext()` if a registration id was provided in the request, it indicates a registration *update*. Thus, the `registrations` document is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
-* `processRegisterContext()` is called to process the registration (step 5).
-* The `registration` document is created or updated in the database. In order to do so, `collectionUpdate()` in the `connectionOperations` module is used, setting the `upsert` parameter to `true` (steps 6 and 7).
-* If the request semaphore was taken in step 2, then it is released before returning (step 8).
-
-[Top](#top)
-
-#### `mongoDiscoverContextAvailability` (SR)
-
-FIXME PR: probably deleted
-
-`mongoDiscoverContextAvailability` encapsulates the logic for the context availability discovery (NGSIv1) operation.
-
-The header file contains only a function named `mongoDiscoverContextAvailability()` which uses a `DiscoverContextAvailabilityRequest` object as input parameter and a `DiscoverContextAvailabilityResponse` as output parameter. Its work is to build a response object based on the input request object and the registration existing in the database.
-
-<a name="flow-mb-19"></a>
-![mongoDiscoverContextAvailability](images/Flow-MB-19.png)
-
-_MB-19: mongoDiscoverContextAvailability_
-
-* `mongoDiscoverContextAvailability()` is invoked from service routine (step 1)
-* Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* Execution flow passes to `processDiscoverContextAvailability()` (step 3)
-* Registration search is done using `registrationQuery()` (steps 4). This function in sequence uses `collectionRangedQuery()` in order to retrieve registrations from the database (steps 5 and 6).
-* If the request semaphore was taken in step 2, then it is released before returning (step 7).  
-
-[Top](#top)
-
 #### `mongoRegistrationGet` (SR2)
 
 `mongoRegistrationGet` encapsulates the logic for getting context registrations for NGSIv2 API.
@@ -641,7 +553,6 @@ This function basically searches for existing registrations in the (`registratio
 
 It is used by several functions:
 
-* `mongoDiscoverContextAvailability()` (in the `mongoDiscoverContextAvailability` module), as "core" of the discovery operation. - FIXME PR: probably deleted
 * `mongoQueryContext()` in the `mongoQueryContext` module, in order to locate Context Providers for forwarding of the query. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 * `searchContextProviders()` in the `MongoCommonUpdate` module, in order to locate Context Providers for forwarding of the update. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 
