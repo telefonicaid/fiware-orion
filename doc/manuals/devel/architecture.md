@@ -6,7 +6,7 @@ This document provides a high level introduction of the internal architecture of
 
 The following figure shows the main information flow and how program control passes from one module to another. For a more detailed list of internal flows see [this section](flowsIndex.md).
 
-![Orion current internal architecture](images/current_architecture.png) - FIXME PR: render again
+![Orion current internal architecture](images/current_architecture.png)
 
 _Current Orion internal architecture_
 

@@ -9,7 +9,7 @@ Related to request management (RQ management):
 
 * [RQ-01: Reception of a request](sourceCode.md#flow-rq-01)
 	* Continues in RQ-02
-* [RQ-02: Treatment of a request](sourceCode.md#flow-rq-02) - FIXME PR: render again
+* [RQ-02: Treatment of a request](sourceCode.md#flow-rq-02)
 	* Continues from RQ-01
 	* Continues in PP-*
 	* Continues in MB-*
@@ -23,42 +23,42 @@ Related to parsing (PP prefix):
 
 Related to forwarding (FW prefix):
 
-* [FW-01: Forward an update to Context Providers](cprs.md#flow-fw-01) - FIXME PR: render again
+* [FW-01: Forward an update to Context Providers](cprs.md#flow-fw-01)
 	* Continues in MB-01 or MB-02
 	* Continues in FW-02
-* [FW-02: `updateForward()` function detail](cprs.md#flow-fw-02) - FIXME PR: render again
+* [FW-02: `updateForward()` function detail](cprs.md#flow-fw-02)
 	* Continues from FW-01
 	* Continues in PP-01
-* [FW-03: Forward a query to Context Provider](cprs.md#flow-fw-03) - FIXME PR: render again
+* [FW-03: Forward a query to Context Provider](cprs.md#flow-fw-03)
 	* Continues in MB-07
 	* Continues in FW-04
-* [FW-04: `queryForward()` function detail](cprs.md#flow-fw-04) - FIXME PR: render again
+* [FW-04: `queryForward()` function detail](cprs.md#flow-fw-04)
 	* Continues from FW-03
 	* Continues in PP-01
 	
 Related to mongoBackend logic (MB and MD prefixes):
 
-* [MB-01: mongoUpdate - UPDATE/REPLACE - entity found](mongoBackend.md#flow-mb-01) - FIXME PR: render again
+* [MB-01: mongoUpdate - update/replace - entity found](mongoBackend.md#flow-mb-01)
     * Continues from RQ-02 or FW-01
     * Continues in MD-01
     * Continues in MD-02
-* [MB-02: mongoUpdate - UPDATE/REPLACE - entity not found](mongoBackend.md#flow-mb-02) - FIXME PR: render again
+* [MB-02: mongoUpdate - update/replace - entity not found](mongoBackend.md#flow-mb-02)
     * Continues from RQ-02 or FW-01   
     * Continues in MD-02 
-* [MB-03: mongoUpdate - APPEND/APPEND_STRICT - existing entity](mongoBackend.md#flow-mb-03) - FIXME PR: render again
+* [MB-03: mongoUpdate - append/appendStrict - existing entity](mongoBackend.md#flow-mb-03)
     * Continues from RQ-02
     * Continues in MD-01
     * Continues in MD-02 
-* [MB-04: mongoUpdate - APPEND/APPEND_STRICT - new entity](mongoBackend.md#flow-mb-04) - FIXME PR: render again
+* [MB-04: mongoUpdate - append/appendStrict - new entity](mongoBackend.md#flow-mb-04)
     * Continues from RQ-02
     * Continues in MD-01
-* [MB-05: mongoUpdate - DELETE - not remove entity](mongoBackend.md#flow-mb-05) - FIXME PR: render again
+* [MB-05: mongoUpdate - delete - not remove entity](mongoBackend.md#flow-mb-05)
     * Continues from RQ-02
     * Continues in MD-01
     * Continues in MD-02  
-* [MB-06: mongoUpdate - DELETE - remove entity](mongoBackend.md#flow-mb-06) - FIXME PR: render again
+* [MB-06: mongoUpdate - delete - remove entity](mongoBackend.md#flow-mb-06)
 	* Continues from RQ-02 
-* [MB-07: mongoQueryContext](mongoBackend.md#flow-mb-07) - FIXME PR: render again
+* [MB-07: mongoQueryContext](mongoBackend.md#flow-mb-07)
 	* Continues from RQ-02 or FW-03
 * [MB-08: mongoEntityTypes](mongoBackend.md#flow-mb-08)
 	* Continues from RQ-02 
@@ -84,7 +84,7 @@ Related to mongoBackend logic (MB and MD prefixes):
 	* Continues from RQ-02
 * MB-26: mongoRegistrationUpdate (*pending*)
 	* Continues from RQ-02
-* [MB-27: mongoRegistrationDelete](mongoBackend.md#flow-mb-27) - FIXME PR: render again
+* [MB-27: mongoRegistrationDelete](mongoBackend.md#flow-mb-27)
 	* Continues from RQ-02
 * [MD-01: `processSubscriptions()` function detail](mongoBackend.md#flow-md-01)
 	* Continues from MB-01, MB-03, MB-04 or MB-05

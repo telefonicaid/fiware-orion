@@ -50,25 +50,25 @@ This section also describes the `MongoCommonUpdate` module which provide common 
 
 #### `mongoUpdateContext` and `mongoNotifyContext`
 
-The `mongoUpdateContext` module provides the entry point for the update context operation processing logic (by means of `mongoUpdateContext()` defined in its header file `lib/mongoBackend/mongoUpdateContext.h`) while the `mongoNotifyContext` module provides the entry point for the context notification processing logic (by means of `mongoNotifyContext()` defined in its header file `lib/mongoBackend/mongoNotifyContext.h`). However, given that a context  notification is processed in the same way as an update context of "APPEND" action type, both `mongoUpdateContext()` and `mongoNotifyContext()` are in the end basically wrapper functions for `processContextElement()` (single external function in the `MongoCommonUpdate` module), which does the real work.
+The `mongoUpdateContext` module provides the entry point for the update context operation processing logic (by means of `mongoUpdateContext()` defined in its header file `lib/mongoBackend/mongoUpdateContext.h`) while the `mongoNotifyContext` module provides the entry point for the context notification processing logic (by means of `mongoNotifyContext()` defined in its header file `lib/mongoBackend/mongoNotifyContext.h`). However, given that a context  notification is processed in the same way as an update context of "append" action type, both `mongoUpdateContext()` and `mongoNotifyContext()` are in the end basically wrapper functions for `processContextElement()` (single external function in the `MongoCommonUpdate` module), which does the real work.
 
 The execution flow in this module depends on a few conditions which, for the sake of clarity, are describe based on five different subcases:
 
-* Case 1: action type is "UPDATE" or "REPLACE" and the entity is found.
-* Case 2: action type is "UPDATE" or "REPLACE" and the entity is not found.
-* Case 3: action type is "APPEND" or "APPEND_STRICT" and the entity is found.
-* Case 4: action type is "APPEND" or "APPEND_STRICT" and the entity is not found.
-* Case 5: action type is "DELETE" to partially delete some attributes of an entity.
-* Case 6: action type is "DELETE" to remove an entity.
+* Case 1: action type is "update" or "replace" and the entity is found.
+* Case 2: action type is "update" or "replace" and the entity is not found.
+* Case 3: action type is "append" or "appendStrict" and the entity is found.
+* Case 4: action type is "append" or "appendStrict" and the entity is not found.
+* Case 5: action type is "delete" to partially delete some attributes of an entity.
+* Case 6: action type is "delete" to remove an entity.
 
 Note that `mongoUpdateContext()` applies to all 6 cases, while `mongoNotifyContext()` only applies to cases 3 and 4.
 
-Case 1: action type is "UPDATE" or "REPLACE" and the entity is found.
+Case 1: action type is "update" or "replace" and the entity is found.
 
 <a name="flow-mb-01"></a>
-![mongoUpdate UPDATE/REPLACE case with entity found](images/Flow-MB-01.png)
+![mongoUpdate update/replace case with entity found](images/Flow-MB-01.png)
 
-_MB-01: mongoUpdate UPDATE/REPLACE case with entity found_  
+_MB-01: mongoUpdate update/replace case with entity found_  
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -82,12 +82,12 @@ _MB-01: mongoUpdate UPDATE/REPLACE case with entity found_
 * Finally, `searchContextProviders()` is called to try to find a suitable context provider for each attribute in the Entity that was not found in the database (step 14). This information would be used by the calling service routine in order to forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on `searchContextProviders()` in (diagram [MD-02](#flow-md-02)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 15).
 
-Case 2: action type is "UPDATE" or "REPLACE" and the entity is not found.
+Case 2: action type is "update" or "replace" and the entity is not found.
 
 <a name="flow-mb-02"></a>
-![mongoUpdate UPDATE/REPLACE case with entity not found](images/Flow-MB-02.png)
+![mongoUpdate update/replace case with entity not found](images/Flow-MB-02.png)
 
-_MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
+_MB-02: mongoUpdate update/replace case with entity not found_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -96,12 +96,12 @@ _MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
 * `searchContextProviders()` is called in order to try to find a suitable context provider for the entity (step 7). This information would be used by the calling service routine to forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on `searchContextProviders()` implementation in (diagram [MD-02](#flow-md-02)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 8).
 
-Case 3: action type is "APPEND" or "APPEND_STRICT" and the entity is found.
+Case 3: action type is "append" or "appendStrict" and the entity is found.
 
 <a name="flow-mb-03"></a>
-![mongoUpdate APPEND/APPEND_STRICT case with existing entity](images/Flow-MB-03.png)
+![mongoUpdate append/appendStrict case with existing entity](images/Flow-MB-03.png)
 
-_MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
+_MB-03: mongoUpdate append/appendStrict case with existing entity_
 
 * `mongoUpdateContext()` or `mongoNotifyContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -115,12 +115,12 @@ _MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
 * The next step is to send the notifications triggered by the update operation, which is done by `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 14).
 
-Case 4: action type is "APPEND" or "APPEND_STRICT" and the entity is not found.
+Case 4: action type is "append" or "appendStrict" and the entity is not found.
 
 <a name="flow-mb-04"></a>
-![mongoUpdate APPEND/APPEND_STRICT case with new entity](images/Flow-MB-04.png)
+![mongoUpdate append/appendStrict case with new entity](images/Flow-MB-04.png)
 
-_MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
+_MB-04: mongoUpdate append/appendStrict case with new entity_
 
 * `mongoUpdateContext()` or `mongoNotifyContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -131,12 +131,12 @@ _MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
 * The next step is to send notifications triggered by the update operation, by calling `processSubscriptions()` (step 11). More details on this in (diagram [MD-01](#flow-md-01)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 12). 
 
-Case 5: action type is "DELETE" to partially delete some attributes of an entity.
+Case 5: action type is "delete" to partially delete some attributes of an entity.
 
 <a name="flow-mb-05"></a>
-![mongoUpdate DELETE not remove entity](images/Flow-MB-05.png)
+![mongoUpdate delete not remove entity](images/Flow-MB-05.png)
 
-_MB-05: mongoUpdate DELETE not remove entity_
+_MB-05: mongoUpdate delete not remove entity_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -149,12 +149,12 @@ _MB-05: mongoUpdate DELETE not remove entity_
 * The next step is to send notifications triggered by the update operation, by invoking `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 14). 
 
-Case 6: action type is "DELETE" to remove an entity
+Case 6: action type is "delete" to remove an entity
 
 <a name="flow-mb-06"></a>
-![mongoUpdate DELETE remove entity](images/Flow-MB-06.png)
+![mongoUpdate delete remove entity](images/Flow-MB-06.png)
 
-_MB-06: mongoUpdate DELETE remove entity_
+_MB-06: mongoUpdate delete remove entity_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
@@ -181,9 +181,9 @@ These variables are returned to `updateEntity()` as output parameters, to be use
 
 In order to fill `toSet`, `toUnset`, etc. `processContextAttributeVector()` processes the attributes in the incoming Entity. Execution for each attribute processing is delegated to a per-attribute processing function:
 
-* `updateContextAttributeItem()`, if action type is UPDATE or REPLACE. `updateAttribute()` is used internally as a helper function (which in its turn may use `mergeAttrInfo()` to merge the attribute information in the database and in the incoming Entity).
-* `appendContextAttributeItem()`, if action type is APPEND or APPEND_STRICT. `appendAttribute()` is used internally as a helper function, passing the ball to `updateAttribute()` if the attribute already exists in the entity and it isn't an actual append.
-* `deleteContextAttributeItem()`, if action type is DELETE. `deleteAttribute()` is used internally as a helper function.
+* `updateContextAttributeItem()`, if action type is update or replace. `updateAttribute()` is used internally as a helper function (which in its turn may use `mergeAttrInfo()` to merge the attribute information in the database and in the incoming Entity).
+* `appendContextAttributeItem()`, if action type is append or appendStrict. `appendAttribute()` is used internally as a helper function, passing the ball to `updateAttribute()` if the attribute already exists in the entity and it isn't an actual append.
+* `deleteContextAttributeItem()`, if action type is delete. `deleteAttribute()` is used internally as a helper function.
 
 During the update process, either in the case of creating new entities or updating existing ones, context subscriptions may be triggered, so notifications would be sent. In order for this to work, the update logic keeps a map `subsToNotify` to hold triggered subscriptions. `addTriggeredSubscriptions()`  is in charge of adding new subscriptions to the map, while `processSubscriptions()` is in charge of sending the notifications once the process has ended, based on the content of the map `subsToNotify`. Both `addTriggeredSubscriptions()` and `processSubscriptions()` invocations are shown in the context of the different execution flow cases in the diagrams above.
 
@@ -201,7 +201,7 @@ _MD-01: `processSubscriptions()` function detail_
     * If subscription cache is not being used, then the last notification time and count in the database are updated in the database, using `collectionUpdate()` in the `connectionOperations` module (steps 4 and 5).
     * If subscription cache is being used, then the subscription is retrieved from the subscription cache calling `subCacheItemLookup()` (step 7). Next, last notification time and count are modified in the subscription cache (they will be consolidated in the database in the next subscription cache refresh, see details in [this document](subscriptionCache.md#subscription-cache-refresh)). The access to the subscription cache is protected by the subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)), which is taken and released in steps 6 and 8 respectively.
 
-Finally, in the case of action type "UPDATE/REPLACE", the context update logic is able to "fill the gaps" for missing entities/attributes in the local database with Context Provider information. This is done in `searchContextProviders()`. The detail is shown in the sequence diagram below.
+Finally, in the case of action type "update/replace", the context update logic is able to "fill the gaps" for missing entities/attributes in the local database with Context Provider information. This is done in `searchContextProviders()`. The detail is shown in the sequence diagram below.
 
 <a name="flow-md-02"></a>
 ![`searchContextProviders()` function detail](images/Flow-MD-02.png)

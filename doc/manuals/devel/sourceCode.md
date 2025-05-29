@@ -184,7 +184,7 @@ The payload to Orion can be of two different types:
 
 The function `payloadParse()`, that resides in the rest library, in `lib/rest/RestService.cpp`, serves as a fork and calls the appropriate parse function, as shown in the diagram below:
 
-![Parsing alternatives](images/parsing-alternatives.png) - FIXME PR: render again
+![Parsing alternatives](images/parsing-alternatives.png)
 
 The JSON parse implementations reside in dedicated libraries while the text parse, as it is pretty simple, is a part of the [**parse** library](#srclibparse).
 

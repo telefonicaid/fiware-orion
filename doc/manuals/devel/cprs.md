@@ -82,7 +82,7 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
 * Respond to the initiating client with a merge of all the responses from the Context Providers and the local response part (attributes found locally).
 
 <a name="flow-fw-04"></a>
-![`queryForward()` function detail](images/Flow-FW-04.png) - FIXME PR: render again
+![`queryForward()` function detail](images/Flow-FW-04.png)
 
 _FW-04: `queryForward()` function detail_
 
@@ -100,7 +100,7 @@ Imagine the following scenario:
 * We have a Context Provider CP1 that supplies an Entity E1 with attribute A1.
   A registration about E1/A1 of CP1 is sent to the Context Broker.
 * A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result.
-* Now, a request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
+* Now, a request enters the Context Broker to create (append) an Entity E1 with attribute A1.
 * And the problem: a client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done.
 
 E1/A1 on Context Provider CP1 can no longer be seen via the Context Broker as it has been shadowed.

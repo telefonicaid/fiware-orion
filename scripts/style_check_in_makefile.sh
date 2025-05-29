@@ -63,7 +63,7 @@ style_check test/unittests/apiTypesV2
 style_check test/unittests/cache
 style_check test/unittests/mongoBackend
 style_check test/unittests/rest
-style_check test/unittests/serviceRoutines
+style_check test/unittests/serviceRoutinesV2
 
 # FIXME: Just keep adding directories here until all of them are included:
 
