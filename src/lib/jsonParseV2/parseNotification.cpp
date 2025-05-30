@@ -194,6 +194,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING);
         ciP->httpStatusCode = SccBadRequest;
 
+        ncrP->release();
         return false;
       }
 
@@ -208,6 +209,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
         ciP->httpStatusCode = SccBadRequest;
 
+        ncrP->release();
         return false;
       }
 
@@ -216,6 +218,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         alarmMgr.badInput(clientIp, oeP->description);
         ciP->httpStatusCode = SccBadRequest;
 
+        ncrP->release();
         return false;
       }
     }
@@ -227,6 +230,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
       oeP->fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 
+      ncrP->release();
       return false;
     }
   }

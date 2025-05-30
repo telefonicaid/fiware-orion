@@ -297,8 +297,11 @@ static bool updateForward
     {
       alarmMgr.forwardingError(url, "error parsing reply from context provider: " + oe.error + " (" + oe.description + ")");
       upcrsP->error.fill(SccContextElementNotFound, "");
+
       parseData.upcr.res.release();
       parseData.upcrs.res.release();
+      entities.release();
+
       return false;
     }
 
@@ -327,6 +330,7 @@ static bool updateForward
     //
     parseData.upcr.res.release();
     parseData.upcrs.res.release();
+    entities.release();
 
     return true;
   }
