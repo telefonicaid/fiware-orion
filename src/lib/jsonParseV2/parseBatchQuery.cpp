@@ -95,7 +95,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       std::string r = parseEntityVector(ciP, iter, &bqrP->entities, true, false);
 
       if (r != "OK")
-      {        
+      {
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
