@@ -2,20 +2,15 @@
 
 * [イントロダクション](#introduction)
 * [リクエスト処理モジュール](#request-processing-modules)
-	* [`mongoUpdateContext` (SR) および `mongoNotifyContext` (SR)](#mongoupdatecontext-sr-and-mongonotifycontext-sr)
-	* [`mongoQueryContext` (SR)](#mongoquerycontext-sr)
-	* [`mongoQueryTypes` (SR および SR2)](#mongoquerytypes-sr-and-sr2)
-	* [`mongoCreateSubscription` (SR2)](#mongocreatesubscription-sr2)
-	* [`mongoUpdateSubscription` (SR2)](#mongoupdatesubscription-sr2)
-	* [`mongoGetSubscriptions` (SR2)](#mongogetsubscriptions-sr2)
-	* [`mongoUnsubscribeContext` (SR および SR2)](#mongounsubscribecontext-sr-and-sr2)
-	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
-	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
-	* [`mongoRegisterContext` (SR)](#mongoregistercontext-sr)
-	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)	
-	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
-	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
-	* [`mongoRegistrationDelete` (SR2)](#mongoregistrationdelete-sr2) 
+	* [`mongoUpdateContext` and `mongoNotifyContext`](#mongoupdatecontext-and-mongonotifycontext)
+	* [`mongoQueryContext`](#mongoquerycontext)
+	* [`mongoQueryTypes`](#mongoquerytypes-and)
+	* [`mongoCreateSubscription`](#mongocreatesubscription)
+	* [`mongoUpdateSubscription`)](#mongoupdatesubscription)
+	* [`mongoGetSubscriptions`](#mongogetsubscriptions)
+	* [`mongoUnsubscribeContext`](#mongounsubscribecontext)
+	* [`mongoRegistrationGet`](#mongoregistrationget)
+	* [`mongoRegistrationCreate`](#mongoregistrationcreate)
 * [DB インタラクションに関連するロー・レベルのモジュール](#low-level-modules-related-to-db-interaction)
 * [特定目的のモジュール](#specific-purpose-modules)
 * [`MongoGlobal` モジュール](#the-mongoglobal-module)
@@ -30,7 +25,7 @@
 
 このライブラリのエントリ・ポイントは次のとおりです :
 
-* [serviceRoutines](sourceCode.md#srclibserviceroutines) と [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2)。これらは最も重要なエントリ・ポイントです
+* [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2)。これらは最も重要なエントリ・ポイントです
 * 初期化ルーチンやヘルパーメソッドなど他の場所からの他のエントリ・ポイント
 
 このライブラリは、**mongoDriver** ライブラリ を大量に使用し、データベースに操作を送信し、BSONデータ (これらの操作で使用される基本的な構造体のデータ・タイプ) を処理します。
@@ -49,37 +44,34 @@
 <a name="request-processing-modules"></a>
 ## リクエスト処理モジュール
 
-これらのモジュールは、さまざまな Context Broker のリクエストを実装します。これらは、サービス・ルーチン・ライブラリの、**serviceRoutines** または**serviceRoutinesV2** ライブラリのいずれかによってリクエスト処理フロー全体の中で呼び出されます。次のサブセクションでは、各モジュールについて説明します。SR はモジュールが **serviceRoutines** から呼び出されたことを意味し、SR2 はモジュールが **serviceRoutineV2** から呼び出されたことを意味します。両方のライブラリからモジュールが呼び出されないことに注意してください。
+これらのモジュールは、Context Broker のさまざまなリクエストを実装します。これらのモジュールは、リクエスト処理フロー全体の中で、サービス・ルーチンライブラリ (**serviceRoutinesV2** ライブラリ内 によって呼び出されます。次のサブセクションでは、各モジュールについて説明します。
 
-このセクションでは、いくつかの他のリクエスト処理モジュールと高度に結合された共通の機能を提供する、`MongoCommonRegister` および `MongoCommonUpdate` モジュールについても説明します。特に : 
-
-* `MongoCommonRegister` は、`mongoRegisterContext` モジュールに共通の機能を提供します
-* `MongoCommonUpdate` は、`mongoUpdateContext` および `mongoNotifyContext` モジュールに共通の機能を提供します
+このセクションでは、他のリクエスト処理モジュールと密接に連携した共通機能を提供する `MongoCommonUpdate` モジュールについても説明します。特に、`mongoUpdateContext` モジュールと `mongoNotifyContext` モジュールに共通する機能を提供します。
 
 [Top](#top)
 
 <a name="mongoupdatecontext-sr-and-mongonotifycontext-sr"></a>
-#### `mongoUpdateContext(SR)` および `mongoNotifyContext(SR)`
+#### `mongoUpdateContext` および `mongoNotifyContext`
 
-`mongoUpdateContext` モジュールは、ヘッダファイル `lib/mongoBackend/mongoUpdateContext.h` で定義された `mongoUpdateContext()` によって更新コンテキスト操作処理ロジックのエントリ・ポイントを提供しますが、`mongoNotifyContext` モジュールは、 ヘッダファイル `lib/ mongoBackend/mongoNotifyContext.h`に定義されている `mongoNotifyContext()` によってコンテキスト通知処理ロジックを呼び出します。しかし、コンテキスト通知は "APPEND" アクション・タイプの更新コンテキストと同じ方法で処理されるので、`mongoUpdateContext()` と `mongoNotifyContext()` は基本的に  `processContextElement()` (実際の作業を行うのは  `MongoCommonUpdate` モジュールの単一の外部関数) のラッパー関数の最後にあります。
+`mongoUpdateContext` モジュールは、更新コンテキスト操作の処理ロジック (ヘッダファイル `lib/mongoBackend/mongoUpdateContext.h` で定義されている `mongoUpdateContext()` を使用) のエントリポイントを提供します。一方、`mongoNotifyContext` モジュールは、コンテキスト通知の処理ロジック（ヘッダファイル `lib/mongoBackend/mongoNotifyContext.h` で定義されている `mongoNotifyContext()` を使用) のエントリポイントを提供します。ただし、コンテキスト通知は "append" アクション・タイプの更新コンテキストと同じように処理されるため、`mongoUpdateContext()` と `mongoNotifyContext()` はどちらも、最終的には実際の処理を行う `processContextElement()` (`MongoCommonUpdate` モジュール内の単一の外部関数) のラッパー関数となります。
 
 このモジュールの実行フローは、明確にするために5つの異なるサブケースに基づいて記述されているいくつかの条件に依存します :
 
-* ケース1 : アクション・タイプが "UPDATE "または "REPLACE" であり、エンティティが見つかった場合
-* ケース2 : アクション・タイプが "UPDATE" または "REPLACE" であり、エンティティが見つからない場合
-* ケース3 : アクション・タイプが "APPEND" または "APPEND_STRICT" で、エンティティが見つかった場合
-* ケース4 : アクション・タイプが "APPEND" または "APPEND_STRICT" で、エンティティが見つからない場合
-* ケース5 : アクション・タイプは、エンティティの一部の属性を部分的に削除するための "DELETE" です
-* ケース6 : アクション・タイプは、エンティティを削除する "DELETE" です
+* ケース1 : アクション・タイプが "update "または "replace" であり、エンティティが見つかった場合
+* ケース2 : アクション・タイプが "update" または "replace" であり、エンティティが見つからない場合
+* ケース3 : アクション・タイプが "append" または "appendStrict" で、エンティティが見つかった場合
+* ケース4 : アクション・タイプが "append" または "appendStrict" で、エンティティが見つからない場合
+* ケース5 : アクション・タイプは、エンティティの一部の属性を部分的に削除するための "delete" です
+* ケース6 : アクション・タイプは、エンティティを削除する "delete" です
 
 `mongoUpdateContext()` は6つすべてのケースに適用されますが、`mongoNotifyContext()` はケース3と4にのみ適用されます。
 
-ケース1 : アクション・タイプが "UPDATE" または "REPLACE" であり、エンティティが見つかった場合。
+ケース1 : アクション・タイプが "update" または "replace" であり、エンティティが見つかった場合。
 
 <a name="flow-mb-01"></a>
-![mongoUpdate UPDATE/REPLACE case with entity found](../../manuals/devel/images/Flow-MB-01.png)
+![mongoUpdate update/replace case with entity found](../../manuals/devel/images/Flow-MB-01.png)
 
-_MB-01: エンティティが見つかった、mongoUpdate UPDATE/REPLACE のケース_
+_MB-01: エンティティが見つかった、mongoUpdate update/replace のケース_
 
 * `mongoUpdateContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
@@ -93,12 +85,12 @@ _MB-01: エンティティが見つかった、mongoUpdate UPDATE/REPLACE のケ
 * 最後に、`searchContextProviders()`が呼び出されて、データベース内に見つからなかったエンティティの各属性に対して適切なコンテキスト・プロバイダを見つけます (ステップ14)。この情報は、[コンテキスト・プロバイダのドキュメント](cprs.md) で説明されているように、更新処理をコンテキスト・プロバイダに転送するために、呼び出し側のサービス・ルーチンによって使用されます。詳細は、図 [MD-02](＃flow-md-02) の  `searchContextProviders()` です。
 * ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ15)
 
-ケース2 : アクション・タイプが "UPDATE" または "REPLACE" であり、エンティティが見つからない場合
+ケース2 : アクション・タイプが "update" または "replace" であり、エンティティが見つからない場合
 
 <a name="flow-mb-02"></a>
-![mongoUpdate UPDATE/REPLACE case with entity not found](../../manuals/devel/images/Flow-MB-02.png)
+![mongoUpdate update/replace case with entity not found](../../manuals/devel/images/Flow-MB-02.png)
 
-_MB-02: エンティティが見つからない場合の、mongoUpdate UPDATE/REPLACE のケース_
+_MB-02: エンティティが見つからない場合の、mongoUpdate update/replace のケース_
 
 * `mongoUpdateContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
@@ -107,12 +99,12 @@ _MB-02: エンティティが見つからない場合の、mongoUpdate UPDATE/RE
 * `searchContextProviders()` は、エンティティの適切なコンテキスト・プロバイダを見つけるために呼び出されます (ステップ7)。この情報は、[コンテキスト・プロバイダのドキュメント](cprs.md)で説明されているように、コール・サービス・ルーチンが更新オペレーションをコンテキスト・プロバイダに転送するために使用されます。詳細は、図 [MD-02](#flow-md-02) の `searchContextProviders()` 実装を参照してください
 * リクエスト・セマフォがステップ2で取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ8)
 
-ケース3 : アクション・タイプが "APPEND" または "APPEND_STRICT" で、エンティティが見つかった場合
+ケース3 : アクション・タイプが "append" または "appendStrict" で、エンティティが見つかった場合
 
 <a name="flow-mb-03"></a>
-![mongoUpdate APPEND/APPEND_STRICT case with existing entity](../../manuals/devel/images/Flow-MB-03.png)
+![mongoUpdate append/appendStrict case with existing entity](../../manuals/devel/images/Flow-MB-03.png)
 
-_MB-03: エンティティが見つかった場合の mongoUpdate APPEND/APPEND_STRICT のケース_
+_MB-03: エンティティが見つかった場合の mongoUpdate append/appendStrict のケース_
 
 * `mongoUpdateContext()` または `mongoNotifyContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエストセマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
@@ -125,12 +117,12 @@ _MB-03: エンティティが見つかった場合の mongoUpdate APPEND/APPEND_
 * 次のステップは、更新オペレーションによってトリガされた通知を送信することです。これは  `processSubscriptions()` によって行われます (ステップ13)。これに関する詳細は、図 [MD-01](#flow-md-01) を参照してください
 * ステップ2でリクエスト・セマフォが取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ14)
 
-ケース4 : アクション・タイプが"APPEND"または"APPEND_STRICT"で、エンティティが見つからない場合
+ケース4 : アクション・タイプが"append"または"appendStrict"で、エンティティが見つからない場合
 
 <a name="flow-mb-04"></a>
-![mongoUpdate APPEND/APPEND_STRICT case with new entity](../../manuals/devel/images/Flow-MB-04.png)
+![mongoUpdate append/appendStrict case with new entity](../../manuals/devel/images/Flow-MB-04.png)
 
-_MB-04: 新しいエンティティの場合での mongoUpdate APPEND/APPEND_STRICT のケース_
+_MB-04: 新しいエンティティの場合での mongoUpdate append/appendStrict のケース_
 
 * `mongoUpdateContext()` または `mongoNotifyContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
@@ -141,12 +133,12 @@ _MB-04: 新しいエンティティの場合での mongoUpdate APPEND/APPEND_STR
 * 次のステップは、 `processSubscriptions()` を呼び出すことによって、更新オペレーションによってトリガーされた通知を送信することです (ステップ11)。これに関する詳細は、図 [MD-01](#flow-md-01) を参照してください
 * リクエスト・セマフォがステップ2で取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ12)
 
-ケース5 : アクション・タイプは、エンティティの一部の属性を部分的に削除するための "DELETE" です
+ケース5 : アクション・タイプは、エンティティの一部の属性を部分的に削除するための "delete" です
 
 <a name="flow-mb-05"></a>
-![mongoUpdate DELETE not remove entity](../../manuals/devel/images/Flow-MB-05.png)
+![mongoUpdate delete not remove entity](../../manuals/devel/images/Flow-MB-05.png)
 
-_MB-05: エンティティを削除しない mongoUpdate DELETE_
+_MB-05: エンティティを削除しない mongoUpdate delete_
 
 * `mongoUpdateContext()` は、サービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` にしたがって、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
@@ -159,14 +151,14 @@ _MB-05: エンティティを削除しない mongoUpdate DELETE_
 * 次のステップは、`processSubscriptions()` を呼び出すことによって、更新オペレーションによって引き起こされた通知を送信することです (ステップ13)。これに関する詳細は、図 [MD-01](#flow-md-01) を参照してください
 * ステップ2でリクエスト・セマフォが取得された場合、リクエスト・セマフォは戻される前に解放されます (ステップ14)
 
-ケース6 : アクション・タイプは、エンティティを削除する "DELETE" です
+ケース6 : アクション・タイプは、エンティティを削除する "delete" です
 
 <a name="flow-mb-06"></a>
-![mongoUpdate DELETE remove entity](../../manuals/devel/images/Flow-MB-06.png)
+![mongoUpdate delete remove entity](../../manuals/devel/images/Flow-MB-06.png)
 
-_MB-06: エンティティを削除する mongoUpdate DELETE_
+_MB-06: エンティティを削除する mongoUpdate delete_
 
-* `mongoUpdateContext()` はサービスルーチンから呼び出されます (ステップ1)
+* `mongoUpdateContext()` はサービス・ルーチンから呼び出されます (ステップ1)
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * ループの中では、`processContextElement()` が着信リクエストの各 `Entity` オブジェクト (要するにエンティティ) に対して呼び出されます (ステップ3)
 * 前提条件のチェックの後、`processContextElement()` は個々のエンティティを処理します。まず、そのエンティティに対応するエンティティは、`connectionOperations` モジュールで `collectionQuery()` を呼び出すことによってデータベース内で検索されます (ステップ4と5)。エンティティが見つかったとしましょう (ステップ6)
@@ -192,9 +184,9 @@ _MB-06: エンティティを削除する mongoUpdate DELETE_
 
 `toSet`, `toUnset` などを満たすために `processContextAttributeVector()` は着信エンティティの属性を処理します。各属性処理の実行は、属性ごとの処理関数に委譲されます。
 
-* `updateContextAttributeItem()`、アクション・タイプが UPDATE または REPLACE の場合。`updateAttribute()` はヘルパー関数として内部的に使用されます。データベースの属性情報と着信エンティティをマージするために `mergeAttrInfo()` を使用します
-* `appendContextAttributeItem()`、アクション・タイプが APPEND または APPEND_STRICT の場合 `appendAttribute()` は内部的にヘルパー関数として使用され、属性がエンティティに既に存在し、実際の追加でない場合は、ボールを `updateAttribute()` に渡します
-* `deleteContextAttributeItem()`、アクション・タイプがDELETEの場合。`deleteAttribute()` はヘルパー関数として内部的に使用されます
+* `updateContextAttributeItem()`、アクション・タイプが update または replace の場合。`updateAttribute()` はヘルパー関数として内部的に使用されます。データベースの属性情報と着信エンティティをマージするために `mergeAttrInfo()` を使用します
+* `appendContextAttributeItem()`、アクション・タイプが append または appendStrict の場合 `appendAttribute()` は内部的にヘルパー関数として使用され、属性がエンティティに既に存在し、実際の追加でない場合は、ボールを `updateAttribute()` に渡します
+* `deleteContextAttributeItem()`、アクション・タイプが delete の場合。`deleteAttribute()` はヘルパー関数として内部的に使用されます
 
 更新プロセス中に、新しいエンティティを作成する場合や既存のエンティティを更新する場合は、コンテキスト・サブスクリプションがトリガされるため、通知が送信されます。これを有効にするために、更新ロジックはトリガーされたサブスクリプションを保持するマップ  `subsToNotify` を保持します。`addTriggeredSubscriptions()` は新しいサブスクリプションをマップに追加する役割を担いますが、`subsToNotify` マップの内容に基づいてプロセスが終了すると、`processSubscriptions()` は通知を送信します。上記の図のさまざまな実行フローの場合、 `addTriggeredSubscriptions()` と `processSubscriptions()`の両方の呼び出しが表示されます。
 
@@ -213,7 +205,7 @@ _MD-01: `processSubscriptions()` 機能の詳細_
     * サブスクリプション・キャッシュが使用されていない場合、データベースの最後の通知時間とカウントは `connectionOperations` モジュールの `collectionUpdate()` を使ってデータベース内で更新されます (ステップ4と5)
     * サブスクリプション・キャッシュが使用されている場合、サブスクリプションはサブスクリプション・キャッシュから  `subCacheItemLookup()` を呼び出して取得されます (ステップ7)。次に、最後の通知時間とカウントがサブスクリプション・キャッシュで変更されます。次のサブスクリプション・キャッシュの最新表示時にデータベースに統合されます。詳細は[このドキュメント](subscriptionCache.md#subscription-cache-refresh)を参照してください。サブスクリプション・キャッシュへのアクセスは、サブスクリプション・キャッシュ・セマフォによって保護されます。サブスクリプション・キャッシュ・セマフォは、それぞれステップ6と8で取得され、解放されます。[詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore)を参照してください。
 
-最後に、アクション・タイプ "UPDATE/REPLACE" の場合、コンテキスト更新のロジックは、コンテキスト・プロバイダ情報を有するローカル・データベース内の存在しないエンティティ/属性について "ギャップを埋める" ことができる。これは `searchContextProviders()` で行われます。詳細は以下のシーケンス図に示されています。
+最後に、アクション・タイプ "update/replace" の場合、コンテキスト更新のロジックは、コンテキスト・プロバイダ情報を有するローカル・データベース内の存在しないエンティティ/属性について "ギャップを埋める" ことができる。これは `searchContextProviders()` で行われます。詳細は以下のシーケンス図に示されています。
 
 <a name="flow-md-02"></a>
 ![`searchContextProviders()` function detail](../../manuals/devel/images/Flow-MD-02.png)
@@ -228,8 +220,8 @@ _MD-02: `searchContextProviders()` 機能の詳細_
 
 [Top](#top)
 
-<a name="mongoquerycontext-sr"></a>
-#### `mongoQueryContext` (SR)
+<a name="mongoquerycontext"></a>
+#### `mongoQueryContext`
 
 `mongoQueryContext`は、コンテキストのクエリ・オペレーションのロジックをカプセル化します。
 
@@ -272,16 +264,16 @@ _MB-07: mongoQueryContext_
 
 [Top](#top)
 
-<a name="mongoquerytypes-sr-and-sr2"></a>
-#### `mongoQueryTypes` (SR and SR2)
+<a name="mongoquerytypes"></a>
+#### `mongoQueryTypes`
 
 `mongoQueryTypes` は、タイプ・ブラウジングを可能にする NGSIv1 および NGSIv2 API の様々なオペレーションのロジックをカプセル化します。
 
 ヘッダファイルには、次の3つの機能があります :
 
-* `mongoEntityTypes()` (SR と SR2) : `GET /v1/contextTypes` と `options = values` を持たない、`GET /v2/types` オペレーションを提供します
-* `mongoEntityTypesValues()` (SR2)： `GET /v2/types?options=values` オペレーションを提供します
-* `mongoAttributesForEntityType()` (SRとSR2)： `GET /v1/contextTypes/{type}` と `GET /v2/types/{type}` のオペレーションを行います
+* `mongoEntityTypes()`: `options = values` を持たない、`GET /v2/types` オペレーションを提供します
+* `mongoEntityTypesValues()`: `GET /v2/types?options=values` オペレーションを提供します
+* `mongoAttributesForEntityType()`: `GET /v2/types/{type}` のオペレーションを行います
 
 `mongoEntityTypes()` の詳細は次の図のとおりです。
 
@@ -290,7 +282,7 @@ _MB-07: mongoQueryContext_
 
 _MB-08: mongoEntityTypes_
 
-* `mongoEntityTypes()` は、サービス・ルーチンから呼び出されます (ステップ1)。これは、`lib/serviceRoutines/getEntityTypes.cpp`にある `getEntityTypes()` や `lib/serviceRoutinesV2/getEntityAllTypes.cpp` にある `getEntityAllTypes()` のいずれかである可能性があります
+* `mongoEntityTypes()` はサービス・ルーチン (ステップ 1) から呼び出されます。これは `getEntityAllTypes()` (`lib/serviceRoutinesV2/getEntityAllTypes.cpp` 内) から呼び出されます
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (読み取りモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * それぞれのエンティティ・タイプに属するエンティティ・タイプと属性のリストは、`connectionOperations` モジュールで ` runCollectionCommand()` を使ってデータベースから検索され、集約コマンドを実行します (ステップ3と4)
 * 属性の詳細が有効になっている場合 (つまり、`noAttrDetail` が `false` に設定されている場合)、ループはすべてのエンティティ・タイプのすべての属性を反復します
@@ -317,8 +309,8 @@ _MB-09: mongoEntityTypesValues_
 
 _MB-10: mongoAttributesForEntityType_
 
-* `mongoAttributesForEntityType()` は、サービス・ルーチンから呼び出されます (ステップ1)。これは、`lib/serviceRoutinesV2/getEntityType.cpp`にある `getEntityType()` や、`lib/serviceRoutines/getAttributesForEntityType.cpp` にある `getAttributesForEntityType()` のいずれかである可能性があります
-* `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (読み取りモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください。
+* `mongoAttributesForEntityType()` はサービス・ルーチン (ステップ 1) から呼び出されます。これは、`getEntityType()` (`lib/serviceRoutinesV2/getEntityType.cpp` 内) から呼び出される場合があります
+* `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (読み取りモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * エンティティ・タイプに対応するエンティティ属性のリストはデータベースから検索され、`connectionOperations` モジュールで `runCollectionCommand()`を使用して、集約コマンドを実行します (ステップ3と4)
 * 属性の詳細が有効になっている場合 (つまり、`noAttrDetail` が `false` に設定されている場合)、ループはすべての属性を繰り返し処理します
    * `getAttributeTypes()` を呼び出して、同じエンティティ・タイプのエンティティと一緒にさまざまなタイプの属性を取得します (ステップ5)
@@ -333,8 +325,8 @@ _MB-10: mongoAttributesForEntityType_
 
 [Top](#top)
 
-<a name="mongocreatesubscription-sr2"></a>
-#### `mongoCreateSubscription` (SR2)
+<a name="mongocreatesubscription"></a>
+#### `mongoCreateSubscription`
 
 `mongoCreateSubscription` は、コンテキスト・サブスクリプションの作成ロジックをカプセル化します。
 
@@ -345,7 +337,7 @@ _MB-10: mongoAttributesForEntityType_
 
 _MB-11: mongoCreateSubscription_
 
-* `mongoCreateSubscription()`は、サービス・ルーチンから呼び出されます(ステップ1)。これは `lib/serviceRoutinesV2/postSubscriptions.cpp` の `postSubscriptions()` または ` lib/mongoBackend/mongoSubscribeContext.cpp` の `mongoSubscribeContext()` のいずれかです
+* `mongoAttributesForEntityType()` はサービス・ルーチン (ステップ 1) から呼び出されます。これは、`getEntityType()` (`lib/serviceRoutinesV2/getEntityType.cpp` 内) から呼び出される場合があります
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください。
 * この関数は、さまざまな `set*()` 関数 (`setExpiration()`, `setHttpInfo()` など) を使用して、最終的にデータベースに保存される BSON オブジェクトになる BSON オブジェクトを構築します (ステップ3)
 * 新しいサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionInsert()` を使用してデータベースに挿入されます (ステップ4 および5)
@@ -356,8 +348,8 @@ _MB-11: mongoCreateSubscription_
 
 [Top](#top)
 
-<a name="mongoupdatesubscription-sr2"></a>
-#### `mongoUpdateSubscription` (SR2)
+<a name="mongoupdatesubscription"></a>
+#### `mongoUpdateSubscription`
 
 `mongoUpdateSubscription` は、コンテキスト・サブスクリプションの更新ロジックをカプセル化します。
 
@@ -368,7 +360,7 @@ _MB-11: mongoCreateSubscription_
 
 _MB-12: mongoUpdateSubscription_
 
-* `mongoUpdateSubscription()` は、サービス・ルーチンから呼び出されます (ステップ1)。これは、 `lib/serviceRoutinesV2/patchSubscription.cpp` の `patchSubscription()` または ` lib/mongoBackend/mongoUpdateContextSubscription.cpp` の `mongoUpdateContextSubscription()` のいずれかです
+* `mongoUpdateSubscription()` はサービス・ルーチン (ステップ 1) から呼び出されます。これは `patchSubscription()` (`lib/serviceRoutinesV2/patchSubscription.cpp` 内) から呼び出されます
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * サブスクリプションは、MongoDB の `$set`/`$unset` 演算子を使用して DB で更新されます。この操作は、`connectionOperations` モジュールの関数 `colletionFindAndModify()` で実行されます (ステップ3および4)
 * サブスクリプションキャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプションは、前のステップ (ステップ5) の `collectionFindAndModify()` の結果に基づいてサブスクリプション・キャッシュで更新されます。`updateInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します。
@@ -379,8 +371,8 @@ _MB-12: mongoUpdateSubscription_
 [Top](#top)
 
 
-<a name="mongogetsubscriptions-sr2"></a>
-#### `mongoGetSubscriptions` (SR2)
+<a name="mongogetsubscriptions"></a>
+#### `mongoGetSubscriptions`
 
 `mongoGetSubscriptions` は、サブスクリプションを取得するロジックをカプセル化します。
 
@@ -421,8 +413,8 @@ _MB-14: mongoListSubscriptions_
 
 [Top](#top)
 
-<a name="mongounsubscribecontext-sr-and-sr2"></a>
-#### `mongoUnsubscribeContext` (SR and SR2)
+<a name="mongounsubscribecontext"></a>
+#### `mongoUnsubscribeContext`
 
 `mongoUnsubscribeContext` は、サブスクライブ解除コンテキストオペレーション (NGSIv1) およびサブスクリプション削除 (NGSIv2) のロジックをカプセル化します。
 
@@ -435,7 +427,7 @@ _MB-14: mongoListSubscriptions_
 
 _MB-15: mongoUnsubscribeContext_
 
-* `mongoUnsubscribeContext()` は、サービス・ルーチンから呼び出されます (ステップ1)。これは `lib/serviceRoutines/postUnsubscribeContext.cpp` の `postUnsubscribeContext()` または `lib/serviceRoutinesV2/deleteSubscription.cpp` の `mongoUpdateContextSubscription()` のいずれかになります
+* `mongoUnsubscribeContext()` はサービス・ルーチン (ステップ 1) から呼び出されます。これは `mongoUnsubscribeContext()` (`lib/serviceRoutinesV2/deleteSubscription.cpp` 内) から呼び出されます
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
 * サブスクリプションは、`connectionOperations` モジュールの `collectionFindOne()` を使ってデータベースから取得します (ステップ3と4)
 * subscriptionは `connectionOperations` モジュールの `collectionRemove()` を使ってデータベースから削除されます (ステップ5と6)
@@ -446,86 +438,8 @@ _MB-15: mongoUnsubscribeContext_
 
 [Top](#top)
 
-<a name="mongosubscribecontext-sr"></a>
-#### `mongoSubscribeContext` (SR)
-
-`mongoSubscribeContext` は、サブスクライブ・コンテキスト (NGSIv1 )オペレーションのロジックをカプセル化します。
-
-ヘッダ・ファイルには、`SubscribeContextRequest` オブジェクトを入力パラメータとして使用し、`SubscribeContextResponse` を出力パラメータとして使用する `mongoSubscribeContext()` という関数のみが含まれています。
-
-実際、この関数はこのオペレーションの NGSIv2 バージョンのラッパーです。つまり、[mongoCreateSubscription module](#mongocreatesubscription-sr2) の `mongoCreateSubscription()` です。
-
-<a name="flow-mb-16"></a>
-![mongoSubscribeContext](../../manuals/devel/images/Flow-MB-16.png)
-
-_MB-16: mongoSubscribeContext_
-
-* `mongoSubscribeContext()` は、 サービス・ルーチンから呼び出されます (ステップ1)
-* 実行フローは、`mongoCreateSubscription()` に渡されます (ステップ2)。図 [MB-11](#flow-mb-11) を参照してください
-
-[Top](#top)
-
-<a name="mongoupdatecontextsubscription-sr"></a>
-#### `mongoUpdateContextSubscription` (SR)
-
-`mongoUpdateContextSubscription` は、更新コンテキスト・サブスクリプション (NGSIv1) オペレーションのロジックをカプセル化します。
-
-ヘッダ・ファイルには、`UpdateContextSubscriptionRequest` オブジェクトを入力パラメータとして使用し、`UpdateContextSubscriptionResponse` を出力パラメータとして使用する `mongoUpdateContextSubscription()` という関数だけが含まれています。
-
-実際、この関数はこのオペレーションの NGSIv2 バージョンのラッパーです。つまり、[mongoUpdateSubscriptionモジュール](#mongoupdatesubscription-sr2) の `mongoUpdateSubscription()` です。
-
-<a name="flow-mb-17"></a>
-![mongoSubscribeContext](../../manuals/devel/images/Flow-MB-17.png)
-
-_MB-17: mongoUpdateContextSubscription_
-
-* `mongoUpdateContextSubscription()` は、サービス・ルーチンから呼び出されます (ステップ1)
-* 実行フローは、`mongoUpdateSubscription()` に渡されます (setp 2)。図 [MB-12](#flow-mb-12) を参照してください
-
-[Top](#top)
-
-<a name="mongoregistercontext-sr-and-mongonotifycontextavailability-sr"></a>
-#### `mongoRegisterContext` (SR)
-
-`mongoRegisterContext`モジュールは、(ヘッダ・ファイルで定義された `mongoRegisterContext()` によって)
-レジスタ・コンテキスト・オペレーション処理ロジックのエントリポイントを提供します。
-
-<a name="flow-mb-18"></a>
-![mongoRegisterContext](../../manuals/devel/images/Flow-MB-18.png)
-
-_MB-18: mongoRegisterContext_
-
-* `mongoRegisterContext()` がサービス・ルーチンから呼び出されます (ステップ1)
-* `-reqMutexPolicy` に応じて、リクエスト・セマフォ が取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* `mongoRegisterContext()` の場合、リクエストにレジストレーション ID が指定されていれば、レジストレーション*更新*を示します。したがって、`registrations` モジュールは `collectionFindOne()` を使ってデータベースから検索されます (ステップ3と4)
-* `processRegisterContext()` がレジストレーションを処理するために呼び出されます (ステップ5)
-* `registration` ドキュメントはデータベースで作成または更新されます。これを行うには、`connectionOperations` モジュールの `collectionUpdate()` を使用して、`upsert` パラメータを `true` に設定します（ステップ6および7)
-* リクエスト・セマフォがステップ2で取得された場合、戻る前に解放されます (ステップ8)
-
-[Top](#top)
-
-<a name="mongodiscovercontextavailability-sr"></a>
-#### `mongoDiscoverContextAvailability` (SR)
-
-`mongoDiscoverContextAvailability` は、コンテキスト・アベイラビリティ・ディスカバリー (NGSIv1) オペレーションのロジックをカプセル化します。
-
-ヘッダ・ファイルには、`DiscoverContextAvailabilityRequest` オブジェクトを入力パラメータとして使用し、`DiscoverContextAvailabilityResponse` を出力パラメータとして使用する `mongoDiscoverContextAvailability()` という関数のみが含まれています。その作業は、入力リクエスト・オブジェクトとデータベースに存在するレジストレーションに基づいてレスポンス・オブジェクトを構築することです。
-
-<a name="flow-mb-19"></a>
-![mongoDiscoverContextAvailability](../../manuals/devel/images/Flow-MB-19.png)
-
-_MB-19: mongoDiscoverContextAvailability_
-
-* `mongoDiscoverContextAvailability()` がサービス・ルーチンから呼び出されます (ステップ1)
-* `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (読み取りモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* 実行フローは `processDiscoverContextAvailability()` に渡されます (ステップ3)
-* レジストレーション検索は `registrationQuery()` を使って行います (ステップ4)。この関数はデータベースからレジストレーションを取り出すために `collectionRangedQuery()` を使います (ステップ5と6)
-* ステップ2でリクエスト・セマフォが取得された場合は、リクエスト・セマフォが戻される前に解放されます (ステップ7)
-
-[Top](#top)
-
-<a name="mongoregistrationget-sr2"></a>
-#### `mongoRegistrationGet` (SR2)
+<a name="mongoregistrationget"></a>
+#### `mongoRegistrationGet`
 
 `mongoRegistrationGet` は、NGSIv2 API のコンテキスト・レジストレーションを取得するためのロジックをカプセル化します。
 
@@ -566,8 +480,8 @@ _MB-24: mongoRegistrationsGet_
 
 [Top](#top)
 
-<a name="mongoregistrationcreate-sr2"></a>
-#### `mongoRegistrationCreate` (SR2)
+<a name="mongoregistrationcreate"></a>
+#### `mongoRegistrationCreate`
 
 `mongoRegistrationCreate` は、NGSIv2 API 用のコンテキスト・レジストレーション作成ロジックをカプセル化します。
 
@@ -585,8 +499,8 @@ _MB-25: mongoRegistrationCreate_
 
 [Top](#top)
 
-<a name="mongoregistrationdelete-sr2"></a>
-#### `mongoRegistrationDelete` (SR2)
+<a name="mongoregistrationdelete"></a>
+#### `mongoRegistrationDelete`
 
 `mongoRegistrationDelete` は、レジストレーションを削除するロジックをカプセル化します。
 
@@ -659,7 +573,6 @@ _MB-27: mongoRegistrationDelete_
 
 これはいくつかの関数によって使用されます : 
 
-* `mongoDiscoverContextAvailability()` (`mongoDiscoverContextAvailability`モジュール内で) ディスカバリー・オペレーションの "コア" として使用します
 * `mongoQueryContext` モジュールの `mongoQueryContext()`, クエリの転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
 * `MongoCommonUpdate` モジュールの `searchContextProviders()`, 更新の転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
 

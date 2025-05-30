@@ -47,11 +47,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 60
+Content-Length: 59
 
 {
     "description": "metrics desactivated",
-    "error": "Bad Request"
+    "error": "BadRequest"
 }
 
 

@@ -124,14 +124,9 @@ class CompoundValueNode
   ExprContextObject   toExprContextObject(void);
   ExprContextList     toExprContextList(void);
 
-  void                shortShow(const std::string& indent);
-  void                show(const std::string& indent);
-
   bool                isVector(void);
   bool                isObject(void);
   bool                isString(void);
-
-  const char*         cname(void);
 };
 
 }  // namespace orion

@@ -38,7 +38,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/Subscription.h"
 #include "apiTypesV2/CustomPayloadType.h"
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 #include "ngsiNotify/senderThread.h"
 #include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
@@ -119,7 +119,7 @@ static bool setPayload
 (
   bool                             includePayload,
   const std::string&               notifPayload,
-  const SubscriptionId&            subscriptionId,
+  const std::string&               subscriptionId,
   Entity&                          en,
   ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
@@ -140,13 +140,15 @@ static bool setPayload
     NotifyContextRequest   ncr;
     ContextElementResponse cer;
 
-    cer.entity.fill(en.id, en.type, en.isPattern, en.servicePath);
+    EntityId enId(en.entityId.id, en.entityId.idPattern, en.entityId.type, en.entityId.typePattern);
+
+    cer.entity.fill(enId, en.servicePath);
 
     // cloneCompount set to true. Otherwise nasty things as the one
     // described in issue #4263 will happend
     cer.entity.attributeVector.push_back(en.attributeVector, true);
 
-    cer.statusCode.code = SccOk;
+    cer.error.code = SccOk;
 
     ncr.subscriptionId  = subscriptionId;
     ncr.contextElementResponseVector.push_back(&cer);
@@ -247,7 +249,7 @@ static void orderByPriority
 static bool setNgsiPayload
 (
   const Entity&                    ngsi,
-  const SubscriptionId&            subscriptionId,
+  const std::string&               subscriptionId,
   Entity&                          en,
   ExprContextObject*               exprContextObjectP,
   const std::vector<std::string>&  attrsFilter,
@@ -262,28 +264,29 @@ static bool setNgsiPayload
   ContextElementResponse cer;
 
   std::string effectiveId;
-  if (ngsi.id.empty())
+  if (ngsi.entityId.id.empty())
   {
-    effectiveId = en.id;
+    effectiveId = en.entityId.id;
   }
   else
   {
     // If id is not found in the replacements macro, we use en.id.
-    effectiveId = removeQuotes(smartStringValue(ngsi.id, exprContextObjectP, '"' + en.id + '"'));
+    effectiveId = removeQuotes(smartStringValue(ngsi.entityId.id, exprContextObjectP, '"' + en.entityId.id + '"'));
   }
 
   std::string effectiveType;
-  if (ngsi.type.empty())
+  if (ngsi.entityId.type.empty())
   {
-    effectiveType = en.type;
+    effectiveType = en.entityId.type;
   }
   else
   {
     // If type is not found in the replacements macro, we use en.type.
-    effectiveType = removeQuotes(smartStringValue(ngsi.type, exprContextObjectP, '"' + en.type + '"'));
+    effectiveType = removeQuotes(smartStringValue(ngsi.entityId.type, exprContextObjectP, '"' + en.entityId.type + '"'));
   }
 
-  cer.entity.fill(effectiveId, effectiveType, en.isPattern, en.servicePath);
+  EntityId entId(effectiveId, "", effectiveType, "");
+  cer.entity.fill(entId, en.servicePath);
 
   // First we add attributes in the ngsi field, adding calculated expressions to context in order of priority
   std::vector<ContextAttribute*>  orderedNgsiAttrs;
@@ -310,7 +313,7 @@ static bool setNgsiPayload
     }
   }
 
-  cer.statusCode.code = SccOk;
+  cer.error.code = SccOk;
 
   ncr.subscriptionId  = subscriptionId;
   ncr.contextElementResponseVector.push_back(&cer);
@@ -336,7 +339,7 @@ static bool setNgsiPayload
 */
 static SenderThreadParams* buildSenderParamsCustom
 (
-    const SubscriptionId&            subscriptionId,
+    const std::string&               subscriptionId,
     ContextElementResponse*          notifyCerP,
     const ngsiv2::Notification&      notification,
     const std::string&               tenant,
@@ -376,8 +379,8 @@ static SenderThreadParams* buildSenderParamsCustom
   // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
   // over the ones comming from headers of the same name, we conditionally add them depending the case
   TIME_EXPR_CTXBLD_START();
-  exprContext.add("id", en.id);
-  exprContext.add("type", en.type);
+  exprContext.add("id", en.entityId.id);
+  exprContext.add("type", en.entityId.type);
 
   if (!basic)
   {
@@ -604,7 +607,7 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->renderFormat     = renderFormatToString(renderFormat);
   paramsP->extraHeaders     = headers;
   paramsP->registration     = false;
-  paramsP->subscriptionId   = subscriptionId.get();
+  paramsP->subscriptionId   = subscriptionId;
   paramsP->qos              = notification.mqttInfo.qos;     // unspecified in case of HTTP notifications
   paramsP->retain           = notification.mqttInfo.retain;  // unspecified in case of HTTP notifications
   paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
@@ -714,16 +717,12 @@ SenderThreadParams* Notifier::buildSenderParams
     /* Note we use cloneCompound=true in cer.entity.fill(). This is due to
      * cer.entity destructor does release() on the attrs vector */
     cer.entity.fill(notifyCerP->entity, false, true);
-    cer.statusCode.fill(SccOk);
+    cer.error.fill(SccOk);
 
     ncr.contextElementResponseVector.push_back(&cer);
 
     /* Complete the fields in NotifyContextRequest */
-    ncr.subscriptionId.set(subId);
-    // FIXME: we use a proper origin name
-    ncr.originator.set("localhost");
-
-    ncr.subscriptionId.set(subId);
+    ncr.subscriptionId = subId;
 
     //
     // Creating the value of the Fiware-ServicePath HTTP header.
@@ -778,7 +777,7 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->content          = payloadString;
     paramsP->mimeType         = JSON;
     paramsP->renderFormat     = renderFormatToString(renderFormat);
-    paramsP->subscriptionId   = ncr.subscriptionId.get();
+    paramsP->subscriptionId   = ncr.subscriptionId;
     paramsP->registration     = false;
     paramsP->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
     paramsP->retain           = notification.mqttInfo.retain; // unspecified in case of HTTP notifications

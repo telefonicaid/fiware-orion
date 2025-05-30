@@ -355,8 +355,7 @@ static ChangeType mergeAttrInfo
   orion::BSONObjBuilder*  toSet,
   orion::BSONObjBuilder*  toUnset,
   const bool&             forcedUpdate,
-  const bool&             overrideMetadata,
-  ApiVersion              apiVersion
+  const bool&             overrideMetadata
 )
 {
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
@@ -368,7 +367,7 @@ static ChangeType mergeAttrInfo
     if (!isSomeCalculatedOperatorUsed(caP))
     {
       // FIXME P7: boolean return value should be managed?
-      caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE), ngsiv1Autocast && (apiVersion == V1));
+      caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, getStringFieldF(attr, ENT_ATTRS_TYPE));
     }
   }
   else
@@ -430,7 +429,7 @@ static ChangeType mergeAttrInfo
   {
     Metadata* mdP = caP->metadataVector[ix];
 
-    mdP->appendToBsoN(&mdBuilder, &mdNamesBuilder, apiVersion == V2);
+    mdP->appendToBsoN(&mdBuilder, &mdNamesBuilder, true);
   }
 
 
@@ -456,7 +455,7 @@ static ChangeType mergeAttrInfo
 
       mdSize++;
 
-      if (apiVersion != V2 || caP->onlyValue || !overrideMetadata)
+      if (caP->onlyValue || !overrideMetadata)
       {
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
@@ -591,8 +590,7 @@ static bool updateAttribute
   ChangeType*               changeType,
   bool                      isReplace,
   const bool&               forcedUpdate,
-  const bool&               overrideMetadata,
-  ApiVersion                apiVersion
+  const bool&               overrideMetadata
 )
 {
   *changeType = NO_CHANGE;
@@ -608,7 +606,7 @@ static bool updateAttribute
     *changeType = CHANGE_VALUE_AND_MD;
 
     std::string attrType;
-    if (!caP->typeGiven && (apiVersion == V2))
+    if (!caP->typeGiven)
     {
       if ((caP->compoundValueP == NULL) || (caP->compoundValueP->valueType != orion::ValueTypeVector))
       {
@@ -629,13 +627,13 @@ static bool updateAttribute
     newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
 
     // FIXME P7: boolean return value should be managed?
-    caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
+    caP->valueBson(std::string(ENT_ATTRS_VALUE), &newAttr, attrType);
 
     /* Custom metadata */
     orion::BSONObjBuilder    md;
     orion::BSONArrayBuilder  mdNames;
 
-    caP->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    caP->metadataVector.toBson(&md, &mdNames, true);
     if (mdNames.arrSize() > 0)
     {
       newAttr.append(ENT_ATTRS_MD, md.obj());
@@ -655,7 +653,7 @@ static bool updateAttribute
     orion::BSONObj newAttr;
     orion::BSONObj attr = getObjectFieldF(*attrsP, effectiveName);
 
-    *changeType = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, overrideMetadata, apiVersion);
+    *changeType = mergeAttrInfo(attr, caP, composedName, toSet, toUnset, forcedUpdate, overrideMetadata);
   }
 
   return true;
@@ -689,8 +687,7 @@ static bool appendAttribute
   ContextAttribute*         caP,
   ChangeType*               changeType,
   const bool&               forcedUpdate,
-  const bool&               overrideMetadata,
-  ApiVersion                apiVersion
+  const bool&               overrideMetadata
 )
 {
   std::string effectiveName = dbEncode(caP->name);
@@ -699,7 +696,7 @@ static bool appendAttribute
   /* APPEND with existing attribute equals to UPDATE */
   if (attrsP->hasField(effectiveName))
   {
-    updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, changeType, false, forcedUpdate, overrideMetadata, apiVersion);
+    updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, caP, changeType, false, forcedUpdate, overrideMetadata);
     return false;
   }
 
@@ -709,11 +706,11 @@ static bool appendAttribute
   if (!isSomeCalculatedOperatorUsed(caP))
   {
     // FIXME P7: boolean return value should be managed?
-    caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, caP->type, ngsiv1Autocast && (apiVersion == V1));
+    caP->valueBson(composedName + "." + ENT_ATTRS_VALUE, toSet, caP->type);
   }
 
   /* 2. Type */
-  if ((apiVersion == V2) && !caP->typeGiven)
+  if (!caP->typeGiven)
   {
     std::string attrType;
 
@@ -737,7 +734,7 @@ static bool appendAttribute
   orion::BSONObjBuilder   md;
   orion::BSONArrayBuilder mdNames;
 
-  caP->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+  caP->metadataVector.toBson(&md, &mdNames, true);
   if (mdNames.arrSize() > 0)
   {
     toSet->append(composedName + "." + ENT_ATTRS_MD, md.obj());
@@ -1709,14 +1706,11 @@ static bool addTriggeredSubscriptions_noCache
 
       LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
-      //
-      // NOTE: renderFormatString: NGSIv1 JSON is 'default' (for old db-content)
-      //
       long long         throttling         = sub.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING)       : -1;
       long long         maxFailsLimit      = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
       long long         failsCounter       = sub.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(sub, CSUB_FAILSCOUNTER)     : -1;
       long long         lastNotification   = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-      std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "legacy";
+      std::string       renderFormatString = sub.hasField(CSUB_FORMAT)? getStringFieldF(sub, CSUB_FORMAT) : "normalized";
       bool              onlyChanged        = sub.hasField(CSUB_ONLYCHANGED)? getBoolFieldF(sub, CSUB_ONLYCHANGED) : false;
       bool              blacklist          = sub.hasField(CSUB_BLACKLIST)? getBoolFieldF(sub, CSUB_BLACKLIST) : false;
       bool              covered            = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
@@ -2017,7 +2011,7 @@ static unsigned int processSubscriptions
       Scope        geoScope;
       std::string  filterErr;
 
-      if (geoScope.fill(V2, tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
+      if (geoScope.fill(tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
       {
         // This has been already checked at subscription creation/update parsing time. Thus, the code cannot reach
         // this part.
@@ -2043,8 +2037,8 @@ static unsigned int processSubscriptions
       std::string  keyType = "_id." ENT_ENTITY_TYPE;
       std::string  keySp   = "_id." ENT_SERVICE_PATH;
 
-      std::string  id      = notifyCerP->entity.id;
-      std::string  type    = notifyCerP->entity.type;
+      std::string  id      = notifyCerP->entity.entityId.id;
+      std::string  type    = notifyCerP->entity.entityId.type;
       std::string  sp      = notifyCerP->entity.servicePath;
 
       bobCountQuery.append(keyId, id);
@@ -2194,39 +2188,6 @@ static unsigned int processSubscriptions
   releaseTriggeredSubscriptions(&subs);
 
   return notifSent;
-}
-
-
-
-/* ****************************************************************************
-*
-* buildGeneralErrorResponse -
-*/
-static void buildGeneralErrorResponse
-(
-  Entity*                 ceP,
-  ContextAttribute*       caP,
-  UpdateContextResponse*  responseP,
-  HttpStatusCode          code,
-  std::string             details = "",
-  ContextAttributeVector* cavP    = NULL
-)
-{
-  ContextElementResponse* cerP = new ContextElementResponse();
-
-  cerP->entity.fill(ceP->id, ceP->type, ceP->isPattern);
-
-  if (caP != NULL)
-  {
-    cerP->entity.attributeVector.push_back(caP);
-  }
-  else if (cavP != NULL)
-  {
-    cerP->entity.attributeVector.fill(*cavP);
-  }
-
-  cerP->statusCode.fill(code, details);
-  responseP->contextElementResponseVector.push_back(cerP);
 }
 
 
@@ -2444,7 +2405,6 @@ static bool updateContextAttributeItem
   orion::BSONObj*           attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
@@ -2457,13 +2417,12 @@ static bool updateContextAttributeItem
   bool                      isReplace,
   const bool&               forcedUpdate,
   const bool&               overrideMetadata,
-  ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  if (updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, changeType, isReplace, forcedUpdate, overrideMetadata, apiVersion))
+  if (updateAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, changeType, isReplace, forcedUpdate, overrideMetadata))
   {
     // Attribute was found
     *entityModified = *entityModified || (*changeType != NO_CHANGE);
@@ -2475,18 +2434,7 @@ static bool updateContextAttributeItem
     {
       /* If updateAttribute() returns false, then that particular attribute has not
        * been found. In this case, we interrupt the processing and early return with
-       * an error StatusCode */
-
-      //
-      // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
-      // another .fill() in this function caller. We keep it by the moment, but it probably
-      // will removed when we refactor this function
-      //
-      std::string details = std::string("action: UPDATE") +
-                            " - entity: [" + entityDetail + "]" +
-                            " - offending attribute: " + targetAttr->getName();
-
-      cerP->statusCode.fill(SccInvalidParameter, details);
+       * an error OrionError */
 
       /* Although 'ca' has been already pushed into cerP, the pointer is still valid, of course */
       ca->found = false;
@@ -2495,22 +2443,14 @@ static bool updateContextAttributeItem
   /* Check aspects related with location and date expiration */
   /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
    * i.e. if overrideMetadata is not in use */
-  if (!processLocationAtUpdateAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, geoJson, &err, apiVersion, oe)
+  if (!processLocationAtUpdateAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, geoJson, &err, oe)
     || !processDateExpirationAtUpdateAttribute(targetAttr, dateExpiration, dateExpirationInPayload, &err, oe))
   {
-    std::string details = std::string("action: UPDATE") +
-                          " - entity: [" + entityDetail + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - " + err;
-
-    cerP->statusCode.fill(SccInvalidParameter, details);
-    // oe->fill() not used, as this is done internally in processLocationAtUpdateAttribute()
-
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, NGSI_MD_ACTIONTYPE_UPDATE, overrideMetadata);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, true, NGSI_MD_ACTIONTYPE_UPDATE, overrideMetadata);
 
   return true;
 }
@@ -2530,7 +2470,6 @@ static bool appendContextAttributeItem
   orion::BSONObj*           attrsP,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  const std::string&        entityDetail,
   orion::BSONObjBuilder*    toSet,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesAdd,
@@ -2541,13 +2480,12 @@ static bool appendContextAttributeItem
   orion::BSONDate*          dateExpiration,
   const bool&               forcedUpdate,
   const bool&               overrideMetadata,
-  ApiVersion                apiVersion,
   OrionError*               oe
 )
 {
   std::string err;
 
-  bool actualAppend = appendAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, changeType, forcedUpdate, overrideMetadata, apiVersion);
+  bool actualAppend = appendAttribute(attrsP, toSet, toUnset, attrNamesAdd, targetAttr, changeType, forcedUpdate, overrideMetadata);
 
   *entityModified = *entityModified || (*changeType != NO_CHANGE);
 
@@ -2555,17 +2493,9 @@ static bool appendContextAttributeItem
   /* attrP is passed only if existing metadata has to be inspected for ignoreType in geo-location
    * i.e. if overrideMetadata is not in use */
   if (!processLocationAtAppendAttribute(currentLocAttrName, overrideMetadata? NULL : attrsP, targetAttr, actualAppend, geoJson,
-                                        &err, apiVersion, oe)
+                                        &err, oe)
       || !processDateExpirationAtAppendAttribute(dateExpiration, targetAttr, actualAppend, &err, oe))
   {
-    std::string details = std::string("action: APPEND") +
-                          " - entity: [" + entityDetail + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - " + err;
-
-    cerP->statusCode.fill(SccInvalidParameter, details);
-    // oe->fill() is not used here as it is managed by processLocationAtAppendAttribute()
-
     alarmMgr.badInput(clientIp, err, targetAttr->getName());
     return false;
   }
@@ -2575,7 +2505,7 @@ static bool appendContextAttributeItem
   // to be called after the location processing logic (as this logic may need the compoundValueP
 
   std::string actionType = (actualAppend == true)? NGSI_MD_ACTIONTYPE_APPEND : NGSI_MD_ACTIONTYPE_UPDATE;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, apiVersion == V2, actionType, overrideMetadata);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, true, actionType, overrideMetadata);
 
   return true;
 }
@@ -2593,7 +2523,6 @@ static bool deleteContextAttributeItem
   orion::BSONObj&           attrs,
   ContextAttribute*         targetAttr,
   ContextElementResponse*   notifyCerP,
-  const std::string&        entityDetail,
   orion::BSONObjBuilder*    toUnset,
   orion::BSONArrayBuilder*  attrNamesRemove,
   std::string*              currentLocAttrName,
@@ -2610,14 +2539,6 @@ static bool deleteContextAttributeItem
     /* Check aspects related with location */
     if (targetAttr->getLocation(&attrs))
     {
-      std::string details = std::string("action: DELETE") +
-                            " - entity: [" + entityDetail + "]" +
-                            " - offending attribute: " + targetAttr->getName() +
-                            " - location attribute has to be defined at creation time, with APPEND";
-
-      cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccInvalidModification, details, ERROR_UNPROCESSABLE);
-
       alarmMgr.badInput(clientIp, "location attribute has to be defined at creation time", targetAttr->getName());
       return false;
     }
@@ -2642,14 +2563,7 @@ static bool deleteContextAttributeItem
   else
   {
     /* If deleteAttribute() returns false, then that particular attribute has not
-     * been found. In this case, we interrupt the processing and early return with
-     * a error StatusCode */
-    std::string details = std::string("action: DELETE") +
-                          " - entity: [" + entityDetail + "]" +
-                          " - offending attribute: " + targetAttr->getName() +
-                          " - attribute not found";
-
-    cerP->statusCode.fill(SccInvalidParameter, details);
+     * been found. In this case, we interrupt the processing and early return */
 
     alarmMgr.badInput(clientIp, "attribute to be deleted is not found", targetAttr->getName());
     ca->found = false;
@@ -2686,14 +2600,12 @@ static bool processContextAttributeVector
   const std::vector<std::string>&                 servicePathV,
   const bool&                                     forcedUpdate,
   const bool&                                     overrideMetadata,
-  ApiVersion                                      apiVersion,
   bool                                            loopDetected,
   OrionError*                                     oe
 )
 {
-  std::string               entityId        = cerP->entity.id;
-  std::string               entityType      = cerP->entity.type;
-  std::string               entityDetail    = cerP->entity.toString();
+  std::string               entityId        = cerP->entity.entityId.id;
+  std::string               entityType      = cerP->entity.entityId.type;
   bool                      entityModified  = false;
   std::vector<std::string>  attrsWithModifiedValue;
   std::vector<std::string>  attrsWithModifiedMd;
@@ -2725,7 +2637,6 @@ static bool processContextAttributeVector
                                       &attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      entityDetail,
                                       toSet,
                                       toUnset,
                                       attrNamesAdd,
@@ -2738,7 +2649,6 @@ static bool processContextAttributeVector
                                       action == ActionTypeReplace,
                                       forcedUpdate,
                                       overrideMetadata,
-                                      apiVersion,
                                       oe))
       {
         return false;
@@ -2750,7 +2660,6 @@ static bool processContextAttributeVector
                                       &attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      entityDetail,
                                       toSet,
                                       toUnset,
                                       attrNamesAdd,
@@ -2761,7 +2670,6 @@ static bool processContextAttributeVector
                                       dateExpiration,
                                       forcedUpdate,
                                       overrideMetadata,
-                                      apiVersion,
                                       oe))
       {
         return false;
@@ -2774,7 +2682,6 @@ static bool processContextAttributeVector
                                       attrs,
                                       targetAttr,
                                       notifyCerP,
-                                      entityDetail,
                                       toUnset,
                                       attrNamesRemove,
                                       currentLocAttrName,
@@ -2787,11 +2694,6 @@ static bool processContextAttributeVector
     }
     else
     {
-      std::string details = std::string("unknown actionType");
-
-      cerP->statusCode.fill(SccInvalidParameter, details);
-      oe->fill(SccBadRequest, details, ERROR_BAD_REQUEST);
-
       // If we reach this point, there's a BUG in the parse layer checks
       LM_E(("Runtime Error (unknown actionType)"));
       return false;
@@ -2843,7 +2745,7 @@ static bool processContextAttributeVector
   }
   else if (!addTriggeredSubscriptions(entityId, entityType, attributes, attrsWithModifiedValue, attrsWithModifiedMd, subsToNotify, err, tenant, servicePathV, targetAltType))
   {
-    cerP->statusCode.fill(SccReceiverInternalError, err);
+    cerP->error.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
     return false;
   }
@@ -2857,14 +2759,14 @@ static bool processContextAttributeVector
 
     // FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
 
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
   }
 #endif
 
   /* If the status code was not touched (filled with an error), then set it with Ok */
-  if (cerP->statusCode.code == SccNone)
+  if (cerP->error.code == SccNone)
   {
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
   }
 
   return entityModified;
@@ -2884,7 +2786,6 @@ static bool createEntity
   std::string*                     errDetail,
   std::string                      tenant,
   const std::vector<std::string>&  servicePathV,
-  ApiVersion                       apiVersion,
   const std::string&               fiwareCorrelator,
   bool                             upsert,
   OrionError*                      oeP
@@ -2902,7 +2803,7 @@ static bool createEntity
   std::string            locAttr;
   orion::BSONObjBuilder  geoJson;
 
-  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, apiVersion, oeP))
+  if (!processLocationAtEntityCreation(attrsV, &locAttr, &geoJson, errDetail, oeP))
   {
     // oe->fill() already managed by processLocationAtEntityCreation()
     return false;
@@ -2926,7 +2827,7 @@ static bool createEntity
 
     std::string attrType;
 
-    if (!attrsV[ix]->typeGiven && (apiVersion == V2))
+    if (!attrsV[ix]->typeGiven)
     {
       if ((attrsV[ix]->compoundValueP == NULL) || (attrsV[ix]->compoundValueP->valueType != orion::ValueTypeVector))
       {
@@ -2942,7 +2843,7 @@ static bool createEntity
       attrType = attrsV[ix]->type;
     }
 
-    if (!attrsV[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1)))
+    if (!attrsV[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType))
     {
       // nothing added to bsonAttr, so attribute is not going to be included in the update to the MongoDB
       // (for example, when $unset:1 is used)
@@ -2963,7 +2864,7 @@ static bool createEntity
     /* Custom metadata */
     orion::BSONObjBuilder   md;
     orion::BSONArrayBuilder mdNames;
-    attrsV[ix]->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    attrsV[ix]->metadataVector.toBson(&md, &mdNames, true);
     if (mdNames.arrSize() > 0)
     {
       bsonAttr.append(ENT_ATTRS_MD, md.obj());
@@ -2976,19 +2877,15 @@ static bool createEntity
 
   orion::BSONObjBuilder bsonIdBuilder;
 
-  bsonIdBuilder.append(ENT_ENTITY_ID, eP->id);
+  bsonIdBuilder.append(ENT_ENTITY_ID, eP->entityId.id);
 
-  if (eP->type.empty())
+  if (eP->entityId.type.empty())
   {
-    if (apiVersion == V2)
-    {
-      // NGSIv2 uses default entity type
-      bsonIdBuilder.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
-    }
+    bsonIdBuilder.append(ENT_ENTITY_TYPE, DEFAULT_ENTITY_TYPE);
   }
   else
   {
-    bsonIdBuilder.append(ENT_ENTITY_TYPE, eP->type);
+    bsonIdBuilder.append(ENT_ENTITY_TYPE, eP->entityId.type);
   }
 
   bsonIdBuilder.append(ENT_SERVICE_PATH, servicePathV[0].empty()? SERVICE_PATH_ROOT : servicePathV[0]);
@@ -3117,12 +3014,12 @@ static bool removeEntity
   std::string err;
   if (!collectionRemove(composeDatabaseName(tenant), COL_ENTITIES, bob.obj(), &err))
   {
-    cerP->statusCode.fill(SccReceiverInternalError, err);
+    cerP->error.fill(SccReceiverInternalError, err);
     oe->fill(SccReceiverInternalError, err, "InternalServerError");
     return false;
   }
 
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
   return true;
 }
 
@@ -3141,7 +3038,7 @@ static void searchContextProviders
   ContextElementResponse*         cerP
 )
 {
-  ContextRegistrationResponseVector  crrV;
+  std::vector<ngsiv2::Registration>  regV;
   EntityIdVector                     enV;
   StringList                         attrL;
   std::string                        err;
@@ -3156,11 +3053,11 @@ static void searchContextProviders
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrL, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrL, ngsiv2::ForwardUpdate, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        fillContextProviders(cerP, crrV);
+        fillContextProviders(cerP, regV);
       }
     }
     else
@@ -3171,18 +3068,17 @@ static void searchContextProviders
       //
       alarmMgr.dbError(err);
     }
-    crrV.release();
   }
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
   StringList attrNullList;
   if (someContextElementNotFound(*cerP))
   {
-    if (registrationsQuery(enV, attrNullList, ngsiv2::ForwardUpdate, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    if (registrationsQuery(enV, attrNullList, ngsiv2::ForwardUpdate, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        fillContextProviders(cerP, crrV);
+        fillContextProviders(cerP, regV);
       }
     }
     else
@@ -3193,7 +3089,6 @@ static void searchContextProviders
       //
       alarmMgr.dbError(err);
     }
-    crrV.release();
   }
 }
 
@@ -3213,7 +3108,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->entity.attributeVector[aIx];
 
-      if (!aP->providingApplication.get().empty())
+      if (!aP->provider.http.url.empty())
       {
         return true;
       }
@@ -3265,13 +3160,13 @@ static bool calculateOperator(ContextElementResponse* cerP, const std::string& o
         else if (child0->valueType == orion::ValueTypeVector)
         {
           orion::BSONArrayBuilder ba;
-          compoundValueBson(child0->childV, ba, false, false);
+          compoundValueBson(child0->childV, ba, false);
           b->append(valueKey, ba.arr());
         }
         else if (child0->valueType == orion::ValueTypeObject)
         {
           orion::BSONObjBuilder bo;
-          compoundValueBson(child0->childV, bo, false, false);
+          compoundValueBson(child0->childV, bo, false);
           b->append(valueKey, bo.obj());
         }
         else if (child0->valueType == orion::ValueTypeNotGiven)
@@ -3375,13 +3270,13 @@ static bool calculateSetOperator(ContextElementResponse* cerP, orion::BSONObjBui
         else if (child->valueType == orion::ValueTypeVector)
         {
           orion::BSONArrayBuilder ba;
-          compoundValueBson(child->childV, ba, false, false);
+          compoundValueBson(child->childV, ba, false);
           b->append(valueKey, ba.arr());
         }
         else if (child->valueType == orion::ValueTypeObject)
         {
           orion::BSONObjBuilder bo;
-          compoundValueBson(child->childV, bo, false, false);
+          compoundValueBson(child->childV, bo, false);
           b->append(valueKey, bo.obj());
         }
         else if (child->valueType == orion::ValueTypeNotGiven)
@@ -3522,7 +3417,6 @@ static unsigned int updateEntity
   std::string*                    attributeNotExistingList,
   const bool&                     forcedUpdate,
   const bool&                     overrideMetadata,
-  ApiVersion                      apiVersion,
   const std::string&              fiwareCorrelator,
   unsigned int                    notifStartCounter,
   const std::string&              ngsiV2AttrsFormat
@@ -3544,12 +3438,13 @@ static unsigned int updateEntity
   std::string        entityType        = idField.hasField(ENT_ENTITY_TYPE) ? getStringFieldF(idField, ENT_ENTITY_TYPE) : "";
   std::string        entitySPath       = getStringFieldF(idField, ENT_SERVICE_PATH);
 
-  EntityId en(entityId, entityType);
+  EntityId en(entityId, "", entityType, "");
 
   LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
   ContextElementResponse* cerP = new ContextElementResponse();
-  cerP->entity.fill(entityId, entityType, "false");
+  EntityId enId(entityId, "", entityType, "");
+  cerP->entity.fill(enId);
 
   /* Build CER used for notifying (if needed) */
   StringList               emptyAttrL;
@@ -3568,7 +3463,7 @@ static unsigned int updateEntity
   if ((action == ActionTypeDelete) && (eP->attributeVector.size() == 0))
   {
     LM_T(LmtServicePath, ("Removing entity"));
-    removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->oe));
+    removeEntity(entityId, entityType, cerP, tenant, entitySPath, &(responseP->error));
     responseP->contextElementResponseVector.push_back(cerP);
 
     /* EntityDelete subscriptions may be triggered */
@@ -3582,8 +3477,8 @@ static unsigned int updateEntity
 
     // Note we cannot use eP->type for the type, as it may be blank in the request
     // (that would break the cases/1494_subscription_alteration_types/sub_alteration_type_entity_delete2.test case)
-    if (!addTriggeredSubscriptions(notifyCerP->entity.id,
-                                   notifyCerP->entity.type,
+    if (!addTriggeredSubscriptions(notifyCerP->entity.entityId.id,
+                                   notifyCerP->entity.entityId.type,
                                    attrNames,
                                    attrNames,
                                    attrNames,
@@ -3594,8 +3489,8 @@ static unsigned int updateEntity
                                    ngsiv2::SubAltType::EntityDelete))
     {
       releaseTriggeredSubscriptions(&subsToNotify);
-      cerP->statusCode.fill(SccReceiverInternalError, err);
-      responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
+      cerP->error.fill(SccReceiverInternalError, err);
+      responseP->error.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
       responseP->contextElementResponseVector.push_back(cerP);
       return 0;  // Error already in responseP
@@ -3725,9 +3620,8 @@ static unsigned int updateEntity
                                      servicePathV,
                                      forcedUpdate,
                                      overrideMetadata,
-                                     apiVersion,
                                      loopDetected,
-                                     &(responseP->oe)))
+                                     &(responseP->error)))
   {
     // The entity wasn't actually modified, so we don't need to update it and we can continue with the next one
 
@@ -3979,8 +3873,8 @@ static unsigned int updateEntity
   }
   if (!success)
   {
-    cerP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
+    cerP->error.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err, "InternalServerError");
 
     responseP->contextElementResponseVector.push_back(cerP);
 
@@ -3994,8 +3888,7 @@ static unsigned int updateEntity
 
   /* Send notifications for each one of the subscriptions accumulated by
    * previous addTriggeredSubscriptions() invocations. Before that, we add
-   * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
-   * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
+   * builtin attributes and metadata */
   addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityChangeBothValueAndMetadata));
   unsigned int notifSent = processSubscriptions(subsToNotify,
                                                 notifyCerP,
@@ -4023,11 +3916,11 @@ static unsigned int updateEntity
     searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
   }
 
-  // StatusCode may be set already (if so, we keep the existing value)
+  // OrionError may be set already (if so, we keep the existing value)
 
-  if (cerP->statusCode.code == SccNone)
+  if (cerP->error.code == SccNone)
   {
-    cerP->statusCode.fill(SccOk);
+    cerP->error.fill(SccOk);
   }
 
   responseP->contextElementResponseVector.push_back(cerP);
@@ -4045,8 +3938,7 @@ static bool contextElementPreconditionsCheck
 (
   Entity*                 eP,
   UpdateContextResponse*  responseP,
-  ActionType              action,
-  ApiVersion              apiVersion
+  ActionType              action
 )
 {
   /* Checking there aren't duplicate attributes */
@@ -4057,49 +3949,8 @@ static bool contextElementPreconditionsCheck
     {
       if ((name == eP->attributeVector[jx]->name))
       {
-        ContextAttribute* ca = new ContextAttribute(eP->attributeVector[ix]);
         alarmMgr.badInput(clientIp, "duplicated attribute name", name);
-        buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification,
-                                  "duplicated attribute /" + name + "/");
-        responseP->oe.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
-        return false;  // Error already in responseP
-      }
-    }
-  }
-
-  /* Not supporting isPattern = true currently */
-  if (isTrue(eP->isPattern))
-  {
-    buildGeneralErrorResponse(eP, NULL, responseP, SccNotImplemented);
-    // No need of filling responseP->oe, this cannot happen in NGSIv2
-    return false;  // Error already in responseP
-  }
-
-  /* Check that UPDATE or APPEND is not used with empty attributes (i.e. no value, no type, no metadata) */
-  /* Only wanted for API version v1                                                                      */
-  if (((action == ActionTypeUpdate) ||
-       (action == ActionTypeAppend) ||
-       (action == ActionTypeAppendStrict) ||
-       (action == ActionTypeReplace)) && (apiVersion == V1))
-  {
-    // FIXME: Careful, in V2, this check is not wanted ...
-
-    for (unsigned int ix = 0; ix < eP->attributeVector.size(); ++ix)
-    {
-      ContextAttribute* aP = eP->attributeVector[ix];
-      if (aP->valueType == orion::ValueTypeNotGiven && aP->type.empty() && (aP->metadataVector.size() == 0))
-      {
-        ContextAttribute* ca = new ContextAttribute(aP);
-
-        std::string details = std::string("action: ") + actionTypeString(apiVersion, action) +
-            " - entity: [" + eP->toString(true) + "]" +
-            " - offending attribute: " + aP->name +
-            " - empty attribute not allowed in APPEND or UPDATE";
-
-        buildGeneralErrorResponse(eP, ca, responseP, SccInvalidModification, details);
-        responseP->oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
-
-        alarmMgr.badInput(clientIp, "empty attribute not allowed in APPEND or UPDATE", aP->name);
+        responseP->error.fill(SccBadRequest, "duplicated attribute /" + name + "/", ERROR_BAD_REQUEST);
         return false;  // Error already in responseP
       }
     }
@@ -4149,7 +4000,6 @@ unsigned int processContextElement
   const bool&                          forcedUpdate,
   const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
-  ApiVersion                           apiVersion,
   Ngsiv2Flavour                        ngsiv2Flavour,
   UpdateCoverage*                      updateCoverageP
 )
@@ -4161,7 +4011,7 @@ unsigned int processContextElement
   }
 
   /* Check preconditions */
-  if (!contextElementPreconditionsCheck(eP, responseP, action, apiVersion))
+  if (!contextElementPreconditionsCheck(eP, responseP, action))
   {
     return 0;  // Error already in responseP
   }
@@ -4171,15 +4021,15 @@ unsigned int processContextElement
   const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
   orion::BSONObjBuilder  bob;
-  EntityId               en(eP->id, eP->type);
-  std::string            enStr = eP->id;
+  EntityId               en(eP->entityId.id, "", eP->entityId.type, "");
+  std::string            enStr = eP->entityId.id;
 
-  bob.append(idString, eP->id);
+  bob.append(idString, eP->entityId.id);
 
-  if (!eP->type.empty())
+  if (!eP->entityId.type.empty())
   {
-    bob.append(typeString, eP->type);
-    enStr += '/' + eP->type;
+    bob.append(typeString, eP->entityId.type);
+    enStr += '/' + eP->entityId.type;
   }
 
   // Service path
@@ -4209,48 +4059,38 @@ unsigned int processContextElement
   orion::BSONObj   query = bob.obj();
   orion::DBCursor  cursor;
 
-  // Several checks related to NGSIv2
-  if (apiVersion == V2)
+  // Several checks
+  unsigned long long entitiesNumber;
+  std::string err;
+
+  if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, query, &entitiesNumber, &err))
   {
-    unsigned long long entitiesNumber;
-    std::string        err;
-
-    if (!orion::collectionCount(composeDatabaseName(tenant), COL_ENTITIES, query, &entitiesNumber, &err))
-    {
-      buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
-      responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
-      return 0;
-    }
-
-    // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
-    if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
-    {
-      buildGeneralErrorResponse(eP, NULL, responseP, SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS);
-      responseP->oe.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
-      return 0;
-    }
-
-    // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
-    // both for regular case and when ?options=append is used
-    if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
-    {
-      buildGeneralErrorResponse(eP, NULL, responseP, SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY);
-      responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
-      return 0;
-    }
-
-    // Next block is to avoid that several entities with the same ID get updated at the same time, which is
-    // not allowed in NGSIv2. Note that multi-update has been allowed in NGSIv1 (maybe without
-    // thinking too much about it, but NGSIv1 behaviour has to be preserved to keep backward compatibility)
-    if (entitiesNumber > 1)
-    {
-      buildGeneralErrorResponse(eP, NULL, responseP, SccConflict, ERROR_DESC_TOO_MANY_ENTITIES);
-      responseP->oe.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
-      return 0;
-    }
+    responseP->error.fill(SccReceiverInternalError, err, "InternalServerError");
+    return 0;
   }
 
-  std::string err;
+  // This is the case of POST /v2/entities, in order to check that entity doesn't previously exist
+  if ((entitiesNumber > 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONCREATE))
+  {
+    responseP->error.fill(SccInvalidModification, ERROR_DESC_UNPROCESSABLE_ALREADY_EXISTS, ERROR_UNPROCESSABLE);
+    return 0;
+  }
+
+  // This is the case of POST /v2/entities/<id>, in order to check that entity previously exist
+  // both for regular case and when ?options=append is used
+  if ((entitiesNumber == 0) && (ngsiv2Flavour == NGSIV2_FLAVOUR_ONAPPEND))
+  {
+    responseP->error.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_ENTITY, ERROR_NOT_FOUND);
+    return 0;
+  }
+
+  // Next block is to avoid that several entities with the same ID get updated at the same time, which is
+  // not allowed in NGSIv2
+  if (entitiesNumber > 1)
+  {
+    responseP->error.fill(SccConflict, ERROR_DESC_TOO_MANY_ENTITIES, ERROR_TOO_MANY);
+    return 0;
+  }
 
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
@@ -4259,8 +4099,7 @@ unsigned int processContextElement
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
-    buildGeneralErrorResponse(eP, NULL, responseP, SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, "InternalServerError");
+    responseP->error.fill(SccReceiverInternalError, err, "InternalServerError");
 
     return 0;
   }
@@ -4331,7 +4170,6 @@ unsigned int processContextElement
                              &attributeNotExistingList,
                              forcedUpdate,
                              overrideMetadata,
-                             apiVersion,
                              fiwareCorrelator,
                              notifStartCounter,
                              ngsiV2AttrsFormat);
@@ -4351,7 +4189,8 @@ unsigned int processContextElement
     /* Creating the common part of the response that doesn't depend on the case */
     ContextElementResponse* cerP = new ContextElementResponse();
 
-    cerP->entity.fill(eP->id, eP->type, "false");
+    EntityId enId(eP->entityId.id, "", eP->entityId.type, "");
+    cerP->entity.fill(enId);
 
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
@@ -4371,7 +4210,7 @@ unsigned int processContextElement
     {
       /* In the case of UPDATE or REPLACE we look for context providers */
       searchContextProviders(tenant, servicePathV, en, eP->attributeVector, cerP);
-      cerP->statusCode.fill(SccOk);
+      cerP->error.fill(SccOk);
       responseP->contextElementResponseVector.push_back(cerP);
 
       //
@@ -4379,29 +4218,22 @@ unsigned int processContextElement
       //
       if (forwardsPending(responseP) == false)
       {
-        cerP->statusCode.fill(SccContextElementNotFound);
+        cerP->error.fill(SccContextElementNotFound);
 
-        if (apiVersion == V1)
+        std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
+        responseP->error.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
+        if (updateCoverageP != NULL)
         {
-          responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_CONTEXT_ELEMENT, ERROR_NOT_FOUND);
-        }
-        else
-        {
-          std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
-          responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
-          if (updateCoverageP != NULL)
-          {
-            *updateCoverageP = UC_ENTITY_NOT_FOUND;
-          }
+          *updateCoverageP = UC_ENTITY_NOT_FOUND;
         }
       }
     }
     else if (action == ActionTypeDelete)
     {
-      cerP->statusCode.fill(SccContextElementNotFound);
+      cerP->error.fill(SccContextElementNotFound);
 
       std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - [entity itself]";
-      responseP->oe.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
+      responseP->error.fillOrAppend(SccContextElementNotFound, details, ", " + enStr + " [entity itself]", ERROR_NOT_FOUND);
       responseP->contextElementResponseVector.push_back(cerP);
       if (updateCoverageP != NULL)
       {
@@ -4415,23 +4247,17 @@ unsigned int processContextElement
 
       // upsert condition is based on ngsiv2Flavour. It happens that when upsert is on,
       // ngsiv2Flavour is NGSIV2_NO_FLAVOUR (see postEntities.cpp code)
-      if (!createEntity(eP,
+      if (createEntity(eP,
                         eP->attributeVector,
                         now,
                         &errDetail,
                         tenant,
                         servicePathV,
-                        apiVersion,
                         fiwareCorrelator,
                         ngsiv2Flavour == NGSIV2_NO_FLAVOUR,
-                        &(responseP->oe)))
+                        &(responseP->error)))
       {
-        cerP->statusCode.fill(SccInvalidParameter, errDetail);
-        // In this case, responseP->oe is not filled, as createEntity() deals internally with that
-      }
-      else
-      {
-        cerP->statusCode.fill(SccOk);
+        cerP->error.fill(SccOk);
 
         /* Successful creation: send potential notifications */
         std::map<std::string, TriggeredSubscription*>  subsToNotify;
@@ -4442,8 +4268,8 @@ unsigned int processContextElement
           attrNames.push_back(eP->attributeVector[ix]->name);
         }
 
-        if (!addTriggeredSubscriptions(eP->id,
-                                       eP->type,
+        if (!addTriggeredSubscriptions(eP->entityId.id,
+                                       eP->entityId.type,
                                        attrNames,
                                        attrNames,
                                        attrNames,
@@ -4454,8 +4280,8 @@ unsigned int processContextElement
                                        ngsiv2::SubAltType::EntityCreate))
         {
           releaseTriggeredSubscriptions(&subsToNotify);
-          cerP->statusCode.fill(SccReceiverInternalError, err);
-          responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
+          cerP->error.fill(SccReceiverInternalError, err);
+          responseP->error.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
 
           responseP->contextElementResponseVector.push_back(cerP);
           return 0;  // Error already in responseP
@@ -4465,7 +4291,7 @@ unsigned int processContextElement
         // Build CER used for notifying (if needed). Service Path vector shouldn't have more than
         // one item, so it should be safe to get item 0
         //
-        ContextElementResponse* notifyCerP = new ContextElementResponse(eP, apiVersion == V2);
+        ContextElementResponse* notifyCerP = new ContextElementResponse(eP, true);
         notifyCerP->applyUpdateOperators();
 
         // Set action type
@@ -4485,8 +4311,7 @@ unsigned int processContextElement
         notifyCerP->entity.servicePath = servicePathV.size() > 0? servicePathV[0] : "";
         /* Send notifications for each one of the subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations. Before that, we add
-         * builtin attributes and metadata (both NGSIv1 and NGSIv2 as this is
-         * for notifications and NGSIv2 builtins can be used in NGSIv1 notifications) */
+         * builtin attributes and metadata */
         addBuiltins(notifyCerP, subAltType2string(ngsiv2::SubAltType::EntityCreate));
         notifSent = processSubscriptions(subsToNotify,
                                          notifyCerP,
@@ -4507,15 +4332,13 @@ unsigned int processContextElement
   if ((attributeAlreadyExistsNumber > 0) && (action == ActionTypeAppendStrict))
   {
     std::string details = ERROR_DESC_UNPROCESSABLE_ATTR_ALREADY_EXISTS + enStr + " - " + attributeAlreadyExistsList;
-    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
+    responseP->error.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeAlreadyExistsList, ERROR_UNPROCESSABLE);
   }
 
-  if ((apiVersion == V2) && (attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
+  if ((attributeNotExistingNumber > 0) && ((action == ActionTypeUpdate) || (action == ActionTypeDelete)))
   {
     std::string details = ERROR_DESC_DO_NOT_EXIT + enStr + " - " + attributeNotExistingList;
-    buildGeneralErrorResponse(eP, NULL, responseP, SccBadRequest, details);
-    responseP->oe.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
+    responseP->error.fillOrAppend(SccInvalidModification, details, ", " + enStr + " - " + attributeNotExistingList, ERROR_UNPROCESSABLE);
   }
 
   // The following check makes sense only when there are at least one attribute in the request

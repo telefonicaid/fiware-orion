@@ -8,23 +8,21 @@ The Orion Context Broker, as explained in [the User & Programmers Manual](../use
 
 ## Forwarding of update requests
 
-In NGSIv1 (deprecated), the request `POST /v1/updateContext` has a field called `updateActionType`. This field can take on five different values:
+In NGSIv2 there are the following update semantics. Using the equivalence to `POST /v2/op/update` field `actionType`:
 
-* UPDATE
-* APPEND
-* DELETE
-* APPEND_STRICT
-* REPLACE
+* update
+* append
+* delete
+* appendStrict
+* replace
 
-> Side-node: The first three are "standard NGSIv1" while the second two were added for NGSIv2.
-
-* Requests with `UPDATE` or `REPLACE` may provoke forwarding of the request.
+* Requests with `update` or `replace` may provoke forwarding of the request.
   Only if **not found locally but found in a registration**.
-* If `APPEND` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created (locally).
-* `APPEND_STRICT` fails if the entity/attribute already exists (locally) and if not, the entity/attribute is created locally.
-* `DELETE` is always local.
+* If `append` is used, the action will always be local. If the entity/attribute already exists it will be updated. If not, it is created (locally).
+* `appendStrict` fails if the entity/attribute already exists (locally) and if not, the entity/attribute is created locally.
+* `delete` is always local.
 
-Note that an update request with multiple context elements (and with `updateActionType` as `UPDATE` or `REPLACE`) may be split into a number of forwards to different context providers plus local updates for entity/attributes that are found locally. The response to the initial request is not sent until each and every response from context providers have arrived.
+Note that an update request with multiple context elements (and with `actionType` as `update` or `replace`) may be split into a number of forwards to different context providers plus local updates for entity/attributes that are found locally. The response to the initial request is not sent until each and every response from context providers have arrived.
 
 <a name="flow-fw-01"></a>
 ![Forward an update to Context Providers](images/Flow-FW-01.png)
@@ -53,9 +51,9 @@ Note that there is a number of service routines that end up calling `postUpdateC
 _FW-02: `updateForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1)
-* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v1/updateContext`. In the case of NGSIv2,  `POST /v2/op/updated` is used.
+* The request to forward has to be built (step 2). We need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v2/op/updated`.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3), that in its turn uses [libcurl](https://curl.haxx.se/libcurl/) (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
-* The textual response from the Context Provider is parsed and an `UpdateContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
+* The textual response from the Context Provider is parsed and an `UpdateContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-03](jsonParseV2.md#flow-pp-03).
 
 [Top](#top)
 
@@ -89,9 +87,9 @@ The `QueryContextRequest` items are filled in based on the output of the [**mong
 _FW-04: `queryForward()` function detail_
 
 * Parse the context provider string to extract IP, port, URI path, etc. (step 1).
-* The request to forward has to be built (step 2). In the case of NGSIv1, we need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v1/queryContext`. In the case of NGSIv2, `POST /v2/op/query` is used.
+* The request to forward has to be built (step 2). We need to extract information of the binary object into text to be able to send the REST request (plain text) to the Context Provider using `POST /v2/op/query`.
 * The request to forward is sent with the help of `httpRequestSend()` (step 3) which uses [libcurl](https://curl.haxx.se/libcurl/) to forward the request (step 4). libcurl sends in sequence the request to the Context Provider (step 5).
-* The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-01](jsonParse.md#flow-pp-01).
+* The textual response from the Context Provider is parsed and an `QueryContextResponse` object is created (step 6). Parsing details are provided in diagram [PP-03](jsonParseV2.md#flow-pp-03).
 
 ## A Caveat about shadowing of entities
 The Context Provider mechanism is implemented using standard registration requests and this might lead to unwanted situations.
@@ -102,7 +100,7 @@ Imagine the following scenario:
 * We have a Context Provider CP1 that supplies an Entity E1 with attribute A1.
   A registration about E1/A1 of CP1 is sent to the Context Broker.
 * A client queries the Context Broker about E1/A1 and this provokes a forward to CP1 (as E1/A1 is not found locally but in a registration) and the client gets the expected result.
-* Now, a request enters the Context Broker to create (APPEND) an Entity E1 with attribute A1.
+* Now, a request enters the Context Broker to create (append) an Entity E1 with attribute A1.
 * And the problem: a client queries the Context Broker about E1/A1 and as the attribute is now found locally it is simply returned. No forward is being done.
 
 E1/A1 on Context Provider CP1 can no longer be seen via the Context Broker as it has been shadowed.

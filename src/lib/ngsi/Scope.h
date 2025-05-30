@@ -46,7 +46,7 @@
 #define SCOPE_TYPE_SIMPLE_QUERY      "FIWARE::StringQuery"
 #define SCOPE_TYPE_SIMPLE_QUERY_MD   "FIWARE::StringQuery::Metadata"
 
-#define SCOPE_TYPE_LOCATION          FIWARE_LOCATION
+#define SCOPE_TYPE_LOCATION          FIWARE_LOCATION_V2
 
 #define SCOPE_VALUE_ENTITY_TYPE      "entity::type"
 
@@ -64,7 +64,6 @@ typedef struct Scope
   std::string  oper;     // Optional - used for filters
 
   orion::AreaType     areaType;
-  orion::Circle       circle;
   orion::Polygon      polygon;
   orion::Point        point;
   orion::Line         line;
@@ -76,17 +75,13 @@ typedef struct Scope
   Scope();
   Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
 
-  int          fill(ApiVersion          apiVersion,
-                    const std::string&  geometry,
+  int          fill(const std::string&  geometry,
                     const std::string&  coords,
                     const std::string&  georelString,
                     std::string*        errorString);
 
-  std::string  toJsonV1(bool notLastInVector);
   void         release(void);
 
-  std::string  check(void);
-  void         areaTypeSet(const std::string& areaTypeString);
 } Scope;
 
 #endif  // SRC_LIB_NGSI_SCOPE_H_

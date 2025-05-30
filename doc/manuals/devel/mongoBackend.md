@@ -2,19 +2,15 @@
 
 * [Introduction](#introduction)
 * [Request processing modules](#request-processing-modules)
-	* [`mongoUpdateContext` (SR) and `mongoNotifyContext` (SR)](#mongoupdatecontext-sr-and-mongonotifycontext-sr)
-	* [`mongoQueryContext` (SR)](#mongoquerycontext-sr)
-	* [`mongoQueryTypes` (SR and SR2)](#mongoquerytypes-sr-and-sr2)
-	* [`mongoCreateSubscription` (SR2)](#mongocreatesubscription-sr2)
-	* [`mongoUpdateSubscription` (SR2)](#mongoupdatesubscription-sr2)
-	* [`mongoGetSubscriptions` (SR2)](#mongogetsubscriptions-sr2)
-	* [`mongoUnsubscribeContext` (SR and SR2)](#mongounsubscribecontext-sr-and-sr2)
-	* [`mongoSubscribeContext` (SR)](#mongosubscribecontext-sr)
-	* [`mongoUpdateContextSubscription` (SR)](#mongoupdatecontextsubscription-sr)
-	* [`mongoRegisterContext` (SR)](#mongoregistercontext-sr)
-	* [`mongoDiscoverContextAvailability` (SR)](#mongodiscovercontextavailability-sr)
-	* [`mongoRegistrationGet` (SR2)](#mongoregistrationget-sr2)
-	* [`mongoRegistrationCreate` (SR2)](#mongoregistrationcreate-sr2) 
+	* [`mongoUpdateContext` and `mongoNotifyContext`](#mongoupdatecontext-and-mongonotifycontext)
+	* [`mongoQueryContext`](#mongoquerycontext)
+	* [`mongoQueryTypes`](#mongoquerytypes-and)
+	* [`mongoCreateSubscription`](#mongocreatesubscription)
+	* [`mongoUpdateSubscription`)](#mongoupdatesubscription)
+	* [`mongoGetSubscriptions`](#mongogetsubscriptions)
+	* [`mongoUnsubscribeContext`](#mongounsubscribecontext)
+	* [`mongoRegistrationGet`](#mongoregistrationget)
+	* [`mongoRegistrationCreate`](#mongoregistrationcreate) 
 * [Low-level modules related to DB interaction](#low-level-modules-related-to-db-interaction)
 * [Specific purpose modules](#specific-purpose-modules)
 * [The `MongoGlobal` module](#the-mongoglobal-module)
@@ -28,7 +24,7 @@ The **mongoBackend** library is where all the database interaction takes place. 
 
 The entry points of this library are:
 
-* From [serviceRoutines](sourceCode.md#srclibserviceroutines) and [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2). Those are the most important entry points.
+* From [serviceRoutinesV2](sourceCode.md#srclibserviceroutinesv2). Those are the most important entry points.
 * Other entry points from other places as initialization routines and helpers methods.
 
 This library makes an extensive use of **mongoDriver** library for sending operations to database and dealing with BSON data (which is the basic structure datatype used by these operations).
@@ -46,36 +42,33 @@ The different modules included in this library are analyzed in the following sec
 
 ### Request processing modules
 
-These modules implement the different Context Broker requests. They are called during the overall request processing flow by service routine libraries (either the **serviceRoutines** or the **serviceRoutinesV2** libraries). Nextcoming subsections describe each module (SR means the module is called from **serviceRoutines** and SR2 means the module is called from  **serviceRoutineV2**; note that no module is called from *both* libraries).
+These modules implement the different Context Broker requests. They are called during the overall request processing flow by service routine libraries (in**serviceRoutinesV2** libraries). Nextcoming subsections describe each module.
 
-This section also describes the `MongoCommonRegister` and `MongoCommonUpdate` modules which provide common functionality highly coupled with several other request processing modules. In particular:
-
-* `MongoCommonRegister` provides common functionality for the `mongoRegisterContext` modules.
-* `MongoCommonUpdate` provides common functionality for the `mongoUpdateContext` and `mongoNotifyContext` modules.
+This section also describes the `MongoCommonUpdate` module which provide common functionality highly coupled with several other request processing modules. In particular provides common functionality for the `mongoUpdateContext` and `mongoNotifyContext` modules.
 
 [Top](#top)
 
-#### `mongoUpdateContext` (SR) and `mongoNotifyContext` (SR)
+#### `mongoUpdateContext` and `mongoNotifyContext`
 
-The `mongoUpdateContext` module provides the entry point for the update context operation processing logic (by means of `mongoUpdateContext()` defined in its header file `lib/mongoBackend/mongoUpdateContext.h`) while the `mongoNotifyContext` module provides the entry point for the context notification processing logic (by means of `mongoNotifyContext()` defined in its header file `lib/mongoBackend/mongoNotifyContext.h`). However, given that a context  notification is processed in the same way as an update context of "APPEND" action type, both `mongoUpdateContext()` and `mongoNotifyContext()` are in the end basically wrapper functions for `processContextElement()` (single external function in the `MongoCommonUpdate` module), which does the real work.
+The `mongoUpdateContext` module provides the entry point for the update context operation processing logic (by means of `mongoUpdateContext()` defined in its header file `lib/mongoBackend/mongoUpdateContext.h`) while the `mongoNotifyContext` module provides the entry point for the context notification processing logic (by means of `mongoNotifyContext()` defined in its header file `lib/mongoBackend/mongoNotifyContext.h`). However, given that a context  notification is processed in the same way as an update context of "append" action type, both `mongoUpdateContext()` and `mongoNotifyContext()` are in the end basically wrapper functions for `processContextElement()` (single external function in the `MongoCommonUpdate` module), which does the real work.
 
 The execution flow in this module depends on a few conditions which, for the sake of clarity, are describe based on five different subcases:
 
-* Case 1: action type is "UPDATE" or "REPLACE" and the entity is found.
-* Case 2: action type is "UPDATE" or "REPLACE" and the entity is not found.
-* Case 3: action type is "APPEND" or "APPEND_STRICT" and the entity is found.
-* Case 4: action type is "APPEND" or "APPEND_STRICT" and the entity is not found.
-* Case 5: action type is "DELETE" to partially delete some attributes of an entity.
-* Case 6: action type is "DELETE" to remove an entity.
+* Case 1: action type is "update" or "replace" and the entity is found.
+* Case 2: action type is "update" or "replace" and the entity is not found.
+* Case 3: action type is "append" or "appendStrict" and the entity is found.
+* Case 4: action type is "append" or "appendStrict" and the entity is not found.
+* Case 5: action type is "delete" to partially delete some attributes of an entity.
+* Case 6: action type is "delete" to remove an entity.
 
 Note that `mongoUpdateContext()` applies to all 6 cases, while `mongoNotifyContext()` only applies to cases 3 and 4.
 
-Case 1: action type is "UPDATE" or "REPLACE" and the entity is found.
+Case 1: action type is "update" or "replace" and the entity is found.
 
 <a name="flow-mb-01"></a>
-![mongoUpdate UPDATE/REPLACE case with entity found](images/Flow-MB-01.png)
+![mongoUpdate update/replace case with entity found](images/Flow-MB-01.png)
 
-_MB-01: mongoUpdate UPDATE/REPLACE case with entity found_  
+_MB-01: mongoUpdate update/replace case with entity found_  
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -89,12 +82,12 @@ _MB-01: mongoUpdate UPDATE/REPLACE case with entity found_
 * Finally, `searchContextProviders()` is called to try to find a suitable context provider for each attribute in the Entity that was not found in the database (step 14). This information would be used by the calling service routine in order to forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on `searchContextProviders()` in (diagram [MD-02](#flow-md-02)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 15).
 
-Case 2: action type is "UPDATE" or "REPLACE" and the entity is not found.
+Case 2: action type is "update" or "replace" and the entity is not found.
 
 <a name="flow-mb-02"></a>
-![mongoUpdate UPDATE/REPLACE case with entity not found](images/Flow-MB-02.png)
+![mongoUpdate update/replace case with entity not found](images/Flow-MB-02.png)
 
-_MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
+_MB-02: mongoUpdate update/replace case with entity not found_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -103,12 +96,12 @@ _MB-02: mongoUpdate UPDATE/REPLACE case with entity not found_
 * `searchContextProviders()` is called in order to try to find a suitable context provider for the entity (step 7). This information would be used by the calling service routine to forward the update operation to context providers, as described in the [context providers documentation](cprs.md). More information on `searchContextProviders()` implementation in (diagram [MD-02](#flow-md-02)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 8).
 
-Case 3: action type is "APPEND" or "APPEND_STRICT" and the entity is found.
+Case 3: action type is "append" or "appendStrict" and the entity is found.
 
 <a name="flow-mb-03"></a>
-![mongoUpdate APPEND/APPEND_STRICT case with existing entity](images/Flow-MB-03.png)
+![mongoUpdate append/appendStrict case with existing entity](images/Flow-MB-03.png)
 
-_MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
+_MB-03: mongoUpdate append/appendStrict case with existing entity_
 
 * `mongoUpdateContext()` or `mongoNotifyContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -122,12 +115,12 @@ _MB-03: mongoUpdate APPEND/APPEND_STRICT case with existing entity_
 * The next step is to send the notifications triggered by the update operation, which is done by `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 14).
 
-Case 4: action type is "APPEND" or "APPEND_STRICT" and the entity is not found.
+Case 4: action type is "append" or "appendStrict" and the entity is not found.
 
 <a name="flow-mb-04"></a>
-![mongoUpdate APPEND/APPEND_STRICT case with new entity](images/Flow-MB-04.png)
+![mongoUpdate append/appendStrict case with new entity](images/Flow-MB-04.png)
 
-_MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
+_MB-04: mongoUpdate append/appendStrict case with new entity_
 
 * `mongoUpdateContext()` or `mongoNotifyContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -138,12 +131,12 @@ _MB-04: mongoUpdate APPEND/APPEND_STRICT case with new entity_
 * The next step is to send notifications triggered by the update operation, by calling `processSubscriptions()` (step 11). More details on this in (diagram [MD-01](#flow-md-01)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 12). 
 
-Case 5: action type is "DELETE" to partially delete some attributes of an entity.
+Case 5: action type is "delete" to partially delete some attributes of an entity.
 
 <a name="flow-mb-05"></a>
-![mongoUpdate DELETE not remove entity](images/Flow-MB-05.png)
+![mongoUpdate delete not remove entity](images/Flow-MB-05.png)
 
-_MB-05: mongoUpdate DELETE not remove entity_
+_MB-05: mongoUpdate delete not remove entity_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
@@ -156,12 +149,12 @@ _MB-05: mongoUpdate DELETE not remove entity_
 * The next step is to send notifications triggered by the update operation, by invoking `processSubscriptions()` (step 13). More details on this in (diagram [MD-01](#flow-md-01)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 14). 
 
-Case 6: action type is "DELETE" to remove an entity
+Case 6: action type is "delete" to remove an entity
 
 <a name="flow-mb-06"></a>
-![mongoUpdate DELETE remove entity](images/Flow-MB-06.png)
+![mongoUpdate delete remove entity](images/Flow-MB-06.png)
 
-_MB-06: mongoUpdate DELETE remove entity_
+_MB-06: mongoUpdate delete remove entity_
 
 * `mongoUpdateContext()` is invoked from a service routine (step 1).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
@@ -188,9 +181,9 @@ These variables are returned to `updateEntity()` as output parameters, to be use
 
 In order to fill `toSet`, `toUnset`, etc. `processContextAttributeVector()` processes the attributes in the incoming Entity. Execution for each attribute processing is delegated to a per-attribute processing function:
 
-* `updateContextAttributeItem()`, if action type is UPDATE or REPLACE. `updateAttribute()` is used internally as a helper function (which in its turn may use `mergeAttrInfo()` to merge the attribute information in the database and in the incoming Entity).
-* `appendContextAttributeItem()`, if action type is APPEND or APPEND_STRICT. `appendAttribute()` is used internally as a helper function, passing the ball to `updateAttribute()` if the attribute already exists in the entity and it isn't an actual append.
-* `deleteContextAttributeItem()`, if action type is DELETE. `deleteAttribute()` is used internally as a helper function.
+* `updateContextAttributeItem()`, if action type is update or replace. `updateAttribute()` is used internally as a helper function (which in its turn may use `mergeAttrInfo()` to merge the attribute information in the database and in the incoming Entity).
+* `appendContextAttributeItem()`, if action type is append or appendStrict. `appendAttribute()` is used internally as a helper function, passing the ball to `updateAttribute()` if the attribute already exists in the entity and it isn't an actual append.
+* `deleteContextAttributeItem()`, if action type is delete. `deleteAttribute()` is used internally as a helper function.
 
 During the update process, either in the case of creating new entities or updating existing ones, context subscriptions may be triggered, so notifications would be sent. In order for this to work, the update logic keeps a map `subsToNotify` to hold triggered subscriptions. `addTriggeredSubscriptions()`  is in charge of adding new subscriptions to the map, while `processSubscriptions()` is in charge of sending the notifications once the process has ended, based on the content of the map `subsToNotify`. Both `addTriggeredSubscriptions()` and `processSubscriptions()` invocations are shown in the context of the different execution flow cases in the diagrams above.
 
@@ -208,7 +201,7 @@ _MD-01: `processSubscriptions()` function detail_
     * If subscription cache is not being used, then the last notification time and count in the database are updated in the database, using `collectionUpdate()` in the `connectionOperations` module (steps 4 and 5).
     * If subscription cache is being used, then the subscription is retrieved from the subscription cache calling `subCacheItemLookup()` (step 7). Next, last notification time and count are modified in the subscription cache (they will be consolidated in the database in the next subscription cache refresh, see details in [this document](subscriptionCache.md#subscription-cache-refresh)). The access to the subscription cache is protected by the subscription cache semaphore (see [this document for details](semaphores.md#subscription-cache-semaphore)), which is taken and released in steps 6 and 8 respectively.
 
-Finally, in the case of action type "UPDATE/REPLACE", the context update logic is able to "fill the gaps" for missing entities/attributes in the local database with Context Provider information. This is done in `searchContextProviders()`. The detail is shown in the sequence diagram below.
+Finally, in the case of action type "update/replace", the context update logic is able to "fill the gaps" for missing entities/attributes in the local database with Context Provider information. This is done in `searchContextProviders()`. The detail is shown in the sequence diagram below.
 
 <a name="flow-md-02"></a>
 ![`searchContextProviders()` function detail](images/Flow-MD-02.png)
@@ -223,7 +216,7 @@ _MD-02: `searchContextProviders()` function detail_
 
 [Top](#top)
 
-#### `mongoQueryContext` (SR)
+#### `mongoQueryContext`
 
 `mongoQueryContext` encapsulates the logic for the query context operation.
 
@@ -266,15 +259,15 @@ By *generic entities* above we mean one of the following:
 
 [Top](#top)
 
-#### `mongoQueryTypes` (SR and SR2)
+#### `mongoQueryTypes`
 
 `mongoQueryTypes` encapsulates the logic for the different operations in the NGSIv1 and NGSIv2 APIs that allow type browsing.
 
 The header file contains three functions:
 
-* `mongoEntityTypes()` (SR and SR2): it serves the `GET /v1/contextTypes` and `GET /v2/types` (without `options=values`) operations.
-* `mongoEntityTypesValues()` (SR2): it serves the `GET /v2/types?options=values` operation.
-* `mongoAttributesForEntityType()` (SR and SR2): it serves the `GET /v1/contextTypes/{type}` and `GET /v2/types/{type}` operations.
+* `mongoEntityTypes()`: it serves `GET /v2/types` (without `options=values`) operations.
+* `mongoEntityTypesValues()`: it serves the `GET /v2/types?options=values` operation.
+* `mongoAttributesForEntityType()`: it serves `GET /v2/types/{type}` operations.
 
 The detail for `mongoEntityTypes()` is as shown in the following diagram.
 
@@ -283,7 +276,7 @@ The detail for `mongoEntityTypes()` is as shown in the following diagram.
 
 _MB-08: mongoEntityTypes_
 
-* `mongoEntityTypes()` is invoked from a service routine (step 1). This can be from either `getEntityTypes()` (which resides in `lib/serviceRoutines/getEntityTypes.cpp`) or `getEntityAllTypes()` (which resides in `lib/serviceRoutinesV2/getEntityAllTypes.cpp`).
+* `mongoEntityTypes()` is invoked from a service routine (step 1). This is from `getEntityAllTypes()` (which resides in `lib/serviceRoutinesV2/getEntityAllTypes.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * A list of entity types and of attributes belonging to each of those entity types is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module, to run an aggregation command (steps 3 and 4).
 * If attribute detail is enabled (i.e. `noAttrDetail` set to `false`) a loop iterates on every attribute of every entity type, in order to:
@@ -310,7 +303,7 @@ The detail for `mongoAttributesForEntityType()` is as shown in the following dia
 
 _MB-10: mongoAttributesForEntityType_
 
-* `mongoAttributesForEntityType()` is invoked from a service routine (step 1). This can be from either `getEntityType()` (which resides in `lib/serviceRoutinesV2/getEntityType.cpp`) or `getAttributesForEntityType()` (which resides in `lib/serviceRoutines/getAttributesForEntityType.cpp`).
+* `mongoAttributesForEntityType()` is invoked from a service routine (step 1). This can be from either `getEntityType()` (which resides in `lib/serviceRoutinesV2/getEntityType.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * A list of entity attributes corresponding to the entity type is retrieved from the database, using `runCollectionCommand()` in the `connectionOperations` module to run an aggregation command (steps 3 and 4).
 * If attribute detail is enabled (i.e. `noAttrDetail` set to `false`) a loop iterates on every attribute in order to:
@@ -326,7 +319,7 @@ All the above functions heavily rely on the MongoDB aggregation framework. You s
 
 [Top](#top)
 
-#### `mongoCreateSubscription` (SR2)
+#### `mongoCreateSubscription`
 
 `mongoCreateSubscription` encapsulates the context subscription creation logic.
 
@@ -337,7 +330,7 @@ The header file contains only the function `mongoCreateSubscription()` whose wor
 
 _MB-11: mongoCreateSubscription_
 
-* `mongoCreateSubscription()` is invoked from a service routine (step 1). This can be from either `postSubscriptions()` (which resides in `lib/serviceRoutinesV2/postSubscriptions.cpp`) or `mongoSubscribeContext()` (which resides in `lib/mongoBackend/mongoSubscribeContext.cpp`).
+* `mongoCreateSubscription()` is invoked from a service routine (step 1). This is `postSubscriptions()` (which resides in `lib/serviceRoutinesV2/postSubscriptions.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).  
 * This function builds a BSON object that will be at the end the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setHttpInfo()`, etc.) (step 3).
 * The BSON object corresponding to the new subscription is inserted in the database using `collectionInsert()` in the `connectionOperations` module (steps 4 and 5).
@@ -348,7 +341,7 @@ Note that potential notifications are sent before inserting the subscription in 
 
 [Top](#top)
 
-#### `mongoUpdateSubscription` (SR2)
+#### `mongoUpdateSubscription`
 
 `mongoUpdateSubscription` encapsulates the context subscription update logic.
 
@@ -359,7 +352,7 @@ The header file contains only a function named `mongoUpdateSubscription()` whose
 
 _MB-12: mongoUpdateSubscription_
 
-* `mongoUpdateSubscription()` is invoked from a service routine (step 1). This can be from either `patchSubscription()` (which resides in `lib/serviceRoutinesV2/patchSubscription.cpp`) or `mongoUpdateContextSubscription()` (which resides in `lib/mongoBackend/mongoUpdateContextSubscription.cpp`).
+* `mongoUpdateSubscription()` is invoked from a service routine (step 1). This is from `patchSubscription()` (which resides in `lib/serviceRoutinesV2/patchSubscription.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
 * The subscription is updated in DB using MongoDB `$set`/`$unset` operators. This operation is done in the function `colletionFindAndModify()` in the `connectionOperations` module (steps 3 and 4).
 * In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the subscription is updated in the subscription cache based in the result from `collectionFindAndModify()` in the previous step (step 5). `updateInCache()` uses the subscription cache semaphore internally.
@@ -369,7 +362,7 @@ Note that potential notifications are sent before updating the subscription in t
 
 [Top](#top)
 
-#### `mongoGetSubscriptions` (SR2)
+#### `mongoGetSubscriptions`
 
 `mongoGetSubscriptions` encapsulates the logic for getting subscriptions.
 
@@ -410,7 +403,7 @@ _MB-14: mongoListSubscriptions_
 
 [Top](#top)
 
-#### `mongoUnsubscribeContext` (SR and SR2)
+#### `mongoUnsubscribeContext`
 
 `mongoUnsubscribeContext` encapsulates the logic for unsubscribe context operation (NGSIv1) and remove subscription (NGSIv2).
 
@@ -423,7 +416,7 @@ Its work is to remove from the database the document associated to the subscript
 
 _MB-15: mongoUnsubscribeContext_
 
-* `mongoUnsubscribeContext()` is invoked from a service routine (step 1). This can be from either `postUnsubscribeContext()` (which resides in `lib/serviceRoutines/postUnsubscribeContext.cpp`) or `mongoUpdateContextSubscription()` (which resides in `lib/serviceRoutinesV2/deleteSubscription.cpp`).
+* `mongoUnsubscribeContext()` is invoked from a service routine (step 1). This is from `mongoUnsubscribeContext()` (which resides in `lib/serviceRoutinesV2/deleteSubscription.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).
 * The subscription is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
 * The subscription is removed from the database using `collectionRemove()` in the `connectionOperations` module (steps 5 and 6).
@@ -434,80 +427,7 @@ Note that steps 6 and 7 are done no matter the value of `noCache`. This works bu
 
 [Top](#top)
 
-#### `mongoSubscribeContext` (SR)
-
-`mongoSubscribeContext` encapsulates the logic for subscribe context (NGSIv1) operation.
-
-The header file contains only a function named `mongoSubscribeContext()` which uses a `SubscribeContextRequest` object as input parameter and a `SubscribeContextResponse` as output parameter.
-
-Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. `mongoCreateSubscription()` in the [mongoCreateSubscription module](#mongocreatesubscription-sr2).
-
-<a name="flow-mb-16"></a>
-![mongoSubscribeContext](images/Flow-MB-16.png)
-
-_MB-16: mongoSubscribeContext_
-
-* `mongoSubscribeContext()` is invoked from a service routine (step 1).
-* The execution flow is passed to `mongoCreateSubscription()` (step 2). See diagram [MB-11](#flow-mb-11).
-
-[Top](#top)
-
-#### `mongoUpdateContextSubscription` (SR)
-
-`mongoUpdateContextSubscription` encapsulates the logic for update context subscription (NGSIv1) operation.
-
-The header file contains only a function named `mongoUpdateContextSubscription()` which uses an `UpdateContextSubscriptionRequest` object as input parameter and an `UpdateContextSubscriptionResponse` as output parameter.
-
-Actually, this function is a wrapper of the NGSIv2 version of this operation, i.e. `mongoUpdateSubscription()` in the [mongoUpdateSubscription module](#mongoupdatesubscription-sr2).
-
-<a name="flow-mb-17"></a>
-![mongoSubscribeContext](images/Flow-MB-17.png)
-
-_MB-17: mongoUpdateContextSubscription_
-
-* `mongoUpdateContextSubscription()` is invoked from a service routine (step 1).
-* The execution flow is passed to `mongoUpdateSubscription()` (setp 2). See diagram [MB-12](#flow-mb-12).
-
-[Top](#top)
-
-#### `mongoRegisterContext` (SR)
-
-The `mongoRegisterContext` module provides the entry point for the register context operation processing logic (by means of `mongoRegisterContext()` defined in its header file).
-
-<a name="flow-mb-18"></a>
-![mongoRegisterContext](images/Flow-MB-18.png)
-
-_MB-18: mongoRegisterContext_
-
-* `mongoRegisterContext()` is invoked from a service routine (step 1).
-* Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* In the case of `mongoRegisterContext()` if a registration id was provided in the request, it indicates a registration *update*. Thus, the `registrations` document is retrieved from the database using `collectionFindOne()` in the `connectionOperations` module (steps 3 and 4).
-* `processRegisterContext()` is called to process the registration (step 5).
-* The `registration` document is created or updated in the database. In order to do so, `collectionUpdate()` in the `connectionOperations` module is used, setting the `upsert` parameter to `true` (steps 6 and 7).
-* If the request semaphore was taken in step 2, then it is released before returning (step 8).
-
-[Top](#top)
-
-#### `mongoDiscoverContextAvailability` (SR)
-
-`mongoDiscoverContextAvailability` encapsulates the logic for the context availability discovery (NGSIv1) operation.
-
-The header file contains only a function named `mongoDiscoverContextAvailability()` which uses a `DiscoverContextAvailabilityRequest` object as input parameter and a `DiscoverContextAvailabilityResponse` as output parameter. Its work is to build a response object based on the input request object and the registration existing in the database.
-
-<a name="flow-mb-19"></a>
-![mongoDiscoverContextAvailability](images/Flow-MB-19.png)
-
-_MB-19: mongoDiscoverContextAvailability_
-
-* `mongoDiscoverContextAvailability()` is invoked from service routine (step 1)
-* Depending on `-reqMutexPolicy`, the request semaphore may be taken (read mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* Execution flow passes to `processDiscoverContextAvailability()` (step 3)
-* Registration search is done using `registrationQuery()` (steps 4). This function in sequence uses `collectionRangedQuery()` in order to retrieve registrations from the database (steps 5 and 6).
-* If the request semaphore was taken in step 2, then it is released before returning (step 7).  
-
-[Top](#top)
-
-#### `mongoRegistrationGet` (SR2)
+#### `mongoRegistrationGet`
 
 `mongoRegistrationGet` encapsulates the logic for getting context registrations for NGSIv2 API.
 
@@ -548,7 +468,7 @@ _MB-24: mongoRegistrationsGet_
 
 [Top](#top)
 
-#### `mongoRegistrationCreate` (SR2)
+#### `mongoRegistrationCreate`
 
 `mongoRegistrationCreate` encapsulates the context registration creation logic for NGSIv2 API.
 
@@ -566,7 +486,7 @@ _MB-25: mongoRegistrationCreate_
 
 [Top](#top)
 
-#### `mongoRegistrationDelete` (SR2)
+#### `mongoRegistrationDelete`
 
 `mongoRegistrationDelete` encapsulates the logic for removing registrations.
 
@@ -633,7 +553,6 @@ This function basically searches for existing registrations in the (`registratio
 
 It is used by several functions:
 
-* `mongoDiscoverContextAvailability()` (in the `mongoDiscoverContextAvailability` module), as "core" of the discovery operation.
 * `mongoQueryContext()` in the `mongoQueryContext` module, in order to locate Context Providers for forwarding of the query. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 * `searchContextProviders()` in the `MongoCommonUpdate` module, in order to locate Context Providers for forwarding of the update. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 

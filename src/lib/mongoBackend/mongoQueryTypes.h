@@ -61,7 +61,6 @@ extern HttpStatusCode mongoEntityTypes
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  ApiVersion                           apiVersion,
   unsigned int*                        totalTypesP,
   bool                                 noAttrDetail
 );
@@ -94,8 +93,7 @@ extern HttpStatusCode mongoAttributesForEntityType
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  bool                                 noAttrDetail,
-  ApiVersion                           apiVersion
+  bool                                 noAttrDetail
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOQUERYTYPES_H_

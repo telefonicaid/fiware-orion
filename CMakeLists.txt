@@ -187,20 +187,16 @@ ENDIF()
 
 SET (ORION_LIBS
     common
-    serviceRoutinesV2
-    serviceRoutines
-    ngsiNotify
     rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
-    jsonParse
+    serviceRoutinesV2
+    ngsiNotify
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
                   # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o
-    convenience
-    ngsi9
-    ngsi10
+    mongoBackend
     ngsi
     cache
-    mongoBackend
+    mongoBackend  # repeated (probably due to some circular dependency between mongoBackend and ngsi)
     mongoDriver
     parse
     apiTypesV2
@@ -323,15 +319,10 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/common)
   ADD_SUBDIRECTORY(src/lib/orionTypes)
   ADD_SUBDIRECTORY(src/lib/ngsi)
-  ADD_SUBDIRECTORY(src/lib/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/serviceRoutinesV2)
-  ADD_SUBDIRECTORY(src/lib/convenience)
-  ADD_SUBDIRECTORY(src/lib/ngsi9)
-  ADD_SUBDIRECTORY(src/lib/ngsi10)
   ADD_SUBDIRECTORY(src/lib/ngsiNotify)
   ADD_SUBDIRECTORY(src/lib/apiTypesV2)
   ADD_SUBDIRECTORY(src/lib/parse)
-  ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)

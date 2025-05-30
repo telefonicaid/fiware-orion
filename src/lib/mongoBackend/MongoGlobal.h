@@ -35,18 +35,11 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi/ContextRegistrationResponseVector.h"
-#include "ngsi/ConditionValueList.h"
-#include "ngsi/Restriction.h"
-#include "ngsi/NotifyConditionVector.h"
-#include "ngsi10/UpdateContextResponse.h"
-#include "ngsi9/RegisterContextRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
 #include "apiTypesV2/Subscription.h"
@@ -182,7 +175,7 @@ extern void ensureDateExpirationIndex(const std::string& tenant);
 *
 * matchEntity -
 */
-extern bool matchEntity(const EntityId* en1, const EntityId* en2);
+extern bool matchEntity(const EntityId* en1, const EntityId& en2);
 
 
 
@@ -219,17 +212,16 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const Restriction&               res,
+  const ScopeVector&               spV,
   ContextElementResponseVector*    cerV,
-  std::string*                     err,
+  OrionError*                      oeP,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
   const std::vector<std::string>&  sortOrderList,
   int                              offset         = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit          = DEFAULT_PAGINATION_LIMIT_INT,
   bool*                            limitReached   = NULL,
-  long long*                       countP         = NULL,
-  ApiVersion                       apiVersion     = V1
+  long long*                       countP         = NULL
 );
 
 
@@ -240,7 +232,6 @@ extern bool entitiesQuery
 */
 extern void pruneContextElements
 (
-  ApiVersion                           apiVersion,
   const StringList&                    attrsV,
   const ContextElementResponseVector&  oldCerV,
   ContextElementResponseVector*        newCerVP
@@ -257,14 +248,10 @@ extern bool registrationsQuery
   const EntityIdVector&               enV,
   const StringList&                   attrL,
   const ngsiv2::ForwardingMode        forwardingMode,
-  ContextRegistrationResponseVector*  crrV,
+  std::vector<ngsiv2::Registration>*  regV,
   std::string*                        err,
   const std::string&                  tenant,
-  const std::vector<std::string>&     servicePathV,
-  int                                 offset       = DEFAULT_PAGINATION_OFFSET_INT,
-  int                                 limit        = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                                details      = false,
-  long long*                          countP       = NULL
+  const std::vector<std::string>&     servicePathV
 );
 
 
@@ -274,17 +261,6 @@ extern bool registrationsQuery
 * condValueAttrMatch -
 */
 extern bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs);
-
-
-
-/* ****************************************************************************
-*
-* subToEntityIdVector -
-*
-* Extract the entity ID vector from a BSON document (in the format of the csubs
-* collection)
-*/
-extern EntityIdVector subToEntityIdVector(const orion::BSONObj& sub);
 
 
 
@@ -368,7 +344,7 @@ extern orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::
 *
 * fillContextProviders -
 */
-extern void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV);
+extern void fillContextProviders(ContextElementResponse* cer, const std::vector<ngsiv2::Registration>& crrV);
 
 
 
@@ -388,12 +364,10 @@ extern void cprLookupByAttribute
 (
   const Entity&                            en,
   const std::string&                       attrName,
-  const ContextRegistrationResponseVector& crrV,
-  std::string*                             perEntPa,
-  MimeType*                                perEntPaMimeType,
-  std::string*                             perAttrPa,
-  MimeType*                                perAttrPaMimeType,
-  ProviderFormat*                          providerFormatP,
+  const std::vector<ngsiv2::Registration>& regV,
+  std::string*                             perEntProviderP,
+  std::string*                             perAttrProviderP,
+  bool*                                    legacyProviderFormatP,
   std::string*                             regId
 );
 

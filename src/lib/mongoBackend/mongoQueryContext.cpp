@@ -32,9 +32,8 @@
 #include "common/sem.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi/ContextRegistrationResponse.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi/QueryContextRequest.h"
+#include "ngsi/QueryContextResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
@@ -67,29 +66,30 @@ static bool someContextElementNotFound(const ContextElementResponseVector& cerV)
 *
 * fillContextProviders -
 *
-* Looks in the elements of the CER vector passed as argument, searching for a suitable CPr in the CRR
+* Looks in the elements of the CER vector passed as argument, searching for a suitable CPr in the Registrations
 * vector passed as argument. If a suitable CPr is found, it is added to the CER (and the 'found' field
 * is changed to true)
 */
-static void fillContextProviders(ContextElementResponseVector& cerV, const ContextRegistrationResponseVector& crrV)
+static void fillContextProviders(ContextElementResponseVector& cerV, const std::vector<ngsiv2::Registration>& regV)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    fillContextProviders(cerV[ix], crrV);
+    fillContextProviders(cerV[ix], regV);
   }
 }
 
 
 
+
 /* ****************************************************************************
 *
-* addContextProviderEntity -
+* lookupProvider -
 */
-static bool lookupProvidingApplication(const std::vector<ProvidingApplication>& paV, const ProvidingApplication &pa)
+static bool lookupProvider(const std::vector<ngsiv2::Provider>& providerV, const ngsiv2::Provider &provider)
 {
-  for (unsigned int ix = 0; ix < paV.size(); ++ix)
+  for (unsigned int ix = 0; ix < providerV.size(); ++ix)
   {
-    if ((paV[ix].string == pa.string) && (paV[ix].regId == pa.regId))
+    if (providerV[ix].http.url == provider.http.url)
     {
       return true;
     }
@@ -106,18 +106,20 @@ static bool lookupProvidingApplication(const std::vector<ProvidingApplication>& 
 static void addContextProviderEntity
 (
   ContextElementResponseVector&  cerV,
-  EntityId*                      enP,
-  const ProvidingApplication&    pa
+  const EntityId&                regEn,
+  const ngsiv2::Provider&        provider,
+  const std::string&             regId
 )
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->entity.id == enP->id) && (cerV[ix]->entity.type == enP->type))
+    if (cerV[ix]->entity.entityId == regEn)
     {
-      // Avoid duplicate PA in the vector
-      if (!lookupProvidingApplication(cerV[ix]->entity.providingApplicationList, pa))
+      // Avoid duplicate Provider in the vector
+      if (!lookupProvider(cerV[ix]->entity.providerList, provider))
       {
-        cerV[ix]->entity.providingApplicationList.push_back(pa);
+        cerV[ix]->entity.providerList.push_back(provider);
+        cerV[ix]->entity.providerRegIdList.push_back(regId);
       }
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
@@ -126,10 +128,12 @@ static void addContextProviderEntity
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
   ContextElementResponse* cerP = new ContextElementResponse();
 
-  cerP->entity.fill(enP->id, enP->type, enP->isPattern);
-  cerP->entity.providingApplicationList.push_back(pa);
+  EntityId enId(regEn.id, regEn.idPattern, regEn.type, regEn.typePattern);
+  cerP->entity.fill(enId);
+  cerP->entity.providerList.push_back(provider);
+  cerP->entity.providerRegIdList.push_back(regId);
 
-  cerP->statusCode.fill(SccOk);
+  cerP->error.fill(SccOk);
   cerV.push_back(cerP);
 }
 
@@ -145,15 +149,16 @@ static void addContextProviderEntity
 static void addContextProviderAttribute
 (
   ContextElementResponseVector&   cerV,
-  EntityId*                       enP,
-  ContextRegistrationAttribute*   craP,
-  const ProvidingApplication&     pa,
+  EntityId                        regEn,
+  const std::string&              regAttr,
+  const ngsiv2::Provider&         provider,
+  const std::string&              regId,
   bool                            limitReached
 )
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if ((cerV[ix]->entity.id != enP->id) || (cerV[ix]->entity.type != enP->type))
+    if ((cerV[ix]->entity.entityId.id != regEn.id) || (cerV[ix]->entity.entityId.type != regEn.type))
     {
      continue;
     }
@@ -162,7 +167,7 @@ static void addContextProviderAttribute
     {
       std::string attrName = cerV[ix]->entity.attributeVector[jx]->name;
 
-      if (attrName == craP->name)
+      if (attrName == regAttr)
       {
         /* In this case, the attribute has been already found in local database. CPr is unnecessary */
 
@@ -172,9 +177,10 @@ static void addContextProviderAttribute
     }
 
     /* Reached this point, no attribute was found, so adding it with corresponding CPr info */
-    ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
+    ContextAttribute* caP = new ContextAttribute(regAttr, "", "");
 
-    caP->providingApplication = pa;
+    caP->provider = provider;
+    caP->providerRegId = regId;
     cerV[ix]->entity.attributeVector.push_back(caP);
     return;
   }
@@ -184,12 +190,14 @@ static void addContextProviderAttribute
     /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
     ContextElementResponse* cerP            = new ContextElementResponse();
 
-    cerP->entity.fill(enP->id, enP->type, enP->isPattern);
-    cerP->statusCode.fill(SccOk);
+    EntityId enId(regEn.id, regEn.idPattern, regEn.type, regEn.typePattern);
+    cerP->entity.fill(enId);
+    cerP->error.fill(SccOk);
 
-    ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
+    ContextAttribute* caP = new ContextAttribute(regAttr, "", "");
 
-    caP->providingApplication = pa;
+    caP->provider = provider;
+    caP->providerRegId = regId;
     cerP->entity.attributeVector.push_back(caP);
     cerV.push_back(cerP);
   }
@@ -199,15 +207,15 @@ static void addContextProviderAttribute
 
 /* ****************************************************************************
 *
-* matchEntityInCrr -
+* matchEntityInRegistration -
 */
-static bool matchEntityInCrr(const ContextRegistration& cr, const EntityId* enP)
+static bool matchEntityInRegistration(const ngsiv2::Registration& reg, const EntityId* enP)
 {
-  for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < reg.dataProvided.entities.size(); ++ix)
   {
-    EntityId* crEnP = cr.entityIdVector[ix];
+    EntityId entId = reg.dataProvided.entities[ix];
 
-    if (matchEntity(crEnP, enP))
+    if (matchEntity(enP, entId))
     {
       return true;
     }
@@ -222,7 +230,7 @@ static bool matchEntityInCrr(const ContextRegistration& cr, const EntityId* enP)
 *
 * addContextProviders -
 *
-* This function takes a CRR vector and adds the Context Providers in the CER vector
+* This function takes a Registrations vector and adds the Context Providers in the CER vector
 * (except the ones corresponding to some locally found attribute, i.e. info already in the
 * CER vector)
 *
@@ -230,50 +238,50 @@ static bool matchEntityInCrr(const ContextRegistration& cr, const EntityId* enP)
 * limit has been reached with local entities.
 *
 * The enP parameter is optional. If not NULL, then before adding a CPr the function checks that the
-* containting CRR matches the entity (this is used for funcionality related to  "generic queries", see
+* containting Registrations matches the entity (this is used for funcionality related to  "generic queries", see
 * processGenericEntities() function).
 */
 static void addContextProviders
 (
-  ContextElementResponseVector&       cerV,
-  ContextRegistrationResponseVector&  crrV,
-  bool                                limitReached,
-  const EntityId*                     enP = NULL
+  ContextElementResponseVector&            cerV,
+  const std::vector<ngsiv2::Registration>& regV,
+  bool                                     limitReached,
+  const EntityId*                          enP = NULL
 )
 {
-  for (unsigned int ix = 0; ix < crrV.size(); ++ix)
+  for (unsigned int ix = 0; ix < regV.size(); ++ix)
   {
-    ContextRegistration cr = crrV[ix]->contextRegistration;
-    cr.providingApplication.setRegId(crrV[ix]->regId);
+    ngsiv2::Registration reg = regV[ix];
 
     /* In case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
-    if (enP != NULL && !matchEntityInCrr(cr, enP))
+    if (enP != NULL && !matchEntityInRegistration(reg, enP))
     {
       continue;
     }
 
-    if (cr.contextRegistrationAttributeVector.size() == 0)
+    if (reg.dataProvided.attributes.size() == 0)
     {
       if (!limitReached)
       {
         /* Registration without attributes */
-        for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
+        for (unsigned int eIx = 0; eIx < reg.dataProvided.entities.size(); ++eIx)
         {
-          addContextProviderEntity(cerV, cr.entityIdVector[eIx], cr.providingApplication);
+          addContextProviderEntity(cerV, reg.dataProvided.entities[eIx], reg.provider, reg.id);
         }
       }
     }
     else
     {
       /* Registration with attributes */
-      for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
+      for (unsigned int eIx = 0; eIx < reg.dataProvided.entities.size(); ++eIx)
       {
-        for (unsigned int aIx = 0; aIx < cr.contextRegistrationAttributeVector.size(); ++aIx)
+        for (unsigned int aIx = 0; aIx < reg.dataProvided.attributes.size(); ++aIx)
         {
           addContextProviderAttribute(cerV,
-                                      cr.entityIdVector[eIx],
-                                      cr.contextRegistrationAttributeVector[aIx],
-                                      cr.providingApplication,
+                                      reg.dataProvided.entities[eIx],
+                                      reg.dataProvided.attributes[aIx],
+                                      reg.provider,
+                                      reg.id,
                                       limitReached);
         }
       }
@@ -295,18 +303,18 @@ static void addContextProviders
 */
 static void processGenericEntities
 (
-  const EntityIdVector&               enV,
-  ContextElementResponseVector&       cerV,
-  ContextRegistrationResponseVector&  crrV,
-  bool                                limitReached
+  const EntityIdVector&                    enV,
+  ContextElementResponseVector&            cerV,
+  const std::vector<ngsiv2::Registration>& regV,
+  bool                                     limitReached
 )
 {
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     const EntityId* enP = enV[ix];
-    if (enP->type.empty() || isTrue(enP->isPattern))
+    if (enP->type.empty() || !enP->idPattern.empty())
     {
-      addContextProviders(cerV, crrV, limitReached, enP);
+      addContextProviders(cerV, regV, limitReached, enP);
     }
   }
 }
@@ -320,9 +328,6 @@ static void processGenericEntities
 * NOTE
 *   If the in/out-parameter countP is non-NULL then the number of matching entities
 *   must be returned in *countP.
-*
-*   This replaces the 'uriParams[URI_PARAM_PAGINATION_DETAILS]' way of passing this information.
-*   The old method was one-way, using the new method
 */
 HttpStatusCode mongoQueryContext
 (
@@ -332,8 +337,7 @@ HttpStatusCode mongoQueryContext
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
   std::map<std::string, bool>&         options,
-  long long*                           countP,
-  ApiVersion                           apiVersion
+  long long*                           countP
 )
 {
   int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -344,19 +348,13 @@ HttpStatusCode mongoQueryContext
   LM_T(LmtMongo, ("QueryContext Request"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Count: %s", offset, limit, (countP != NULL)? "true" : "false"));
 
-  /* FIXME: restriction not supported for the moment */
-  if (!requestP->restriction.attributeExpression.isEmpty())
-  {
-    alarmMgr.badInput(clientIp, "restriction found, but restrictions are not supported by mongo backend");
-  }
-
   std::string                  err;
   bool                         ok;
   bool                         limitReached = false;
   bool                         reqSemTaken;
   ContextElementResponseVector rawCerV;
 
-  reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "query request", SemReadOp, &reqSemTaken);
 
   std::vector<std::string>  sortedV;
   stringSplit(sortOrderList, ',', sortedV);
@@ -367,9 +365,9 @@ HttpStatusCode mongoQueryContext
     std::string normalizedToken = (token[0] == '!') ? token.substr(1) : token;
     if (!uniqueTokens.insert(normalizedToken).second) {
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
-      responseP->errorCode.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
+      responseP->error.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
 
-      reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+      reqSemGive(__FUNCTION__, "ngsi query request", reqSemTaken);
 
       return SccOk;
     }
@@ -377,56 +375,50 @@ HttpStatusCode mongoQueryContext
 
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
-                     requestP->restriction,
+                     requestP->scopeVector,
                      &rawCerV,
-                     &err,
+                     &responseP->error,
                      tenant,
                      servicePathV,
                      sortedV,
                      offset,
                      limit,
                      &limitReached,
-                     countP,
-                     apiVersion);
+                     countP);
 
   if (!ok)
   {
-    responseP->errorCode.fill(SccReceiverInternalError, err);
     rawCerV.release();
-    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+    reqSemGive(__FUNCTION__, "query request", reqSemTaken);
 
     return SccOk;
   }
 
-  ContextRegistrationResponseVector crrV;
-
   /* In the case of empty response, if only generic processing is needed */
   if (rawCerV.size() == 0)
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    std::vector<ngsiv2::Registration> regV;
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
+        processGenericEntities(requestP->entityIdVector, rawCerV, regV, limitReached);
       }
     }
-
-    crrV.release();
   }
 
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
   if (someContextElementNotFound(rawCerV))
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    std::vector<ngsiv2::Registration> regV;
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        fillContextProviders(rawCerV, crrV);
-        processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
+        fillContextProviders(rawCerV, regV);
+        processGenericEntities(requestP->entityIdVector, rawCerV, regV, limitReached);
       }
     }
-
-    crrV.release();
   }
 
   /* Second CPr lookup (in the case some elements still not being found): looking in E-<null> registrations */
@@ -434,15 +426,14 @@ HttpStatusCode mongoQueryContext
 
   if (someContextElementNotFound(rawCerV))
   {
-    if (registrationsQuery(requestP->entityIdVector, attrNullList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    std::vector<ngsiv2::Registration> regV;
+    if (registrationsQuery(requestP->entityIdVector, attrNullList, ngsiv2::ForwardQuery, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        fillContextProviders(rawCerV, crrV);
+        fillContextProviders(rawCerV, regV);
       }
     }
-
-    crrV.release();
   }
 
   /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
@@ -451,58 +442,31 @@ HttpStatusCode mongoQueryContext
    */
   if (requestP->attributeList.size() == 0)
   {
-    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    std::vector<ngsiv2::Registration> regV;
+    if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, ngsiv2::ForwardQuery, &regV, &err, tenant, servicePathV))
     {
-      if (crrV.size() > 0)
+      if (regV.size() > 0)
       {
-        addContextProviders(rawCerV, crrV, limitReached);
+        addContextProviders(rawCerV, regV, limitReached);
       }
     }
-
-    crrV.release();
   }
 
   /* Prune "not found" CERs */
-  pruneContextElements(apiVersion, requestP->attrsList, rawCerV, &responseP->contextElementResponseVector);
+  pruneContextElements(requestP->attrsList, rawCerV, &responseP->contextElementResponseVector);
 
-  /* Pagination stuff */
+  /* Set responseP error */
   if (responseP->contextElementResponseVector.size() == 0)
   {
-    //
-    // If the query has an empty response, we have to fill in the status code part in the response.
-    //
-    // However, if the response was empty due to a too high pagination offset,
-    // and if the user has asked for 'details' (as URI parameter, then the response should include information about
-    // the number of hits without pagination.
-    //
-
-    if ((countP != NULL) && (*countP > 0) && (offset >= *countP))
-    {
-      char details[256];
-
-      snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", *countP, offset);
-      responseP->errorCode.fill(SccContextElementNotFound, details);
-    }
-    else
-    {
-      responseP->errorCode.fill(SccContextElementNotFound);
-    }
+    responseP->error.fill(SccContextElementNotFound);
   }
-  else if (countP != NULL)
+  else
   {
-    //
-    // If all was OK, but the details URI param was set to 'on', then the responses error code details
-    // 'must' contain the total count of hits.
-    //
-
-    char details[64];
-
-    snprintf(details, sizeof(details), "Count: %lld", *countP);
-    responseP->errorCode.fill(SccOk, details);
+    responseP->error.fill(SccOk);
   }
 
   rawCerV.release();
 
-  reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
+  reqSemGive(__FUNCTION__, "query request", reqSemTaken);
   return SccOk;
 }

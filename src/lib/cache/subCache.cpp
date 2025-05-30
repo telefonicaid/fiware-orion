@@ -38,7 +38,6 @@
 #include "apiTypesV2/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
-#include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/dbConstants.h"
@@ -61,9 +60,7 @@ volatile SubCacheState subCacheState = ScsIdle;
 //
 // The 'mongo part' of the cache is implemented in mongoBackend/mongoSubCache.cpp/h and used in:
 //   - MongoCommonUpdate.cpp               (in function addTriggeredSubscriptions_withCache)
-//   - mongoSubscribeContext.cpp           (in function mongoSubscribeContext)
 //   - mongoUnsubscribeContext.cpp         (in function mongoUnsubscribeContext)
-//   - mongoUpdateContextSubscription.cpp  (in function mongoUpdateContextSubscription)
 //   - contextBroker.cpp                   (to initialize and sybchronize)
 //
 // To manipulate the subscription cache, a semaphore is necessary, as various threads can be
@@ -845,7 +842,7 @@ void subCacheItemInsert
   const char*                             servicePath,
   const ngsiv2::HttpInfo&                 httpInfo,
   const ngsiv2::MqttInfo&                 mqttInfo,
-  const std::vector<ngsiv2::EntID>&       entIdVector,
+  const std::vector<EntityId>&            entIdVector,
   const std::vector<std::string>&         attributes,
   const std::vector<std::string>&         metadata,
   const std::vector<std::string>&         conditionAttrs,
@@ -953,7 +950,7 @@ void subCacheItemInsert
   //
   for (unsigned int ix = 0; ix < entIdVector.size(); ++ix)
   {
-    const ngsiv2::EntID* eIdP = &entIdVector[ix];
+    const EntityId*      eIdP = &entIdVector[ix];
     std::string          isPattern      = (eIdP->id.empty())? "true" : "false";
     bool                 isTypePattern  = (eIdP->type.empty());
     std::string          id             = (eIdP->id.empty())? eIdP->idPattern   : eIdP->id;
@@ -1206,7 +1203,7 @@ typedef struct CachedSubSaved
 *   execute until the point where the temporal objects are deleted (See '6. Free the vector savedSubV').
 *   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
 *   the sub-cache synchronization is working.
-*   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
+*   In serviceRoutinesV2/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
 *   sleep for a few seconds is performed before the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)

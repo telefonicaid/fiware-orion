@@ -157,9 +157,6 @@ The list of available options is the following:
 -   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `infoPayloadMaxSize` field.
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
--   **-disableNgsiv1**. To turn off NGSIv1 operations. Note that only API endpoints are disabled, notifications using
-    [`"attrsFormat": "legacy"`](../orion-api.md#subscriptionnotification) or forward requests corresponding to registrations
-    using [`"legacyForwarding": true`](../orion-api.md#registrationprovider) will work.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
 -   **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
@@ -224,15 +221,12 @@ Two facts have to be taken into account:
 |	ORION_STAT_NOTIF_QUEUE	|	statNotifQueue	|
 |	ORION_LOG_SUMMARY_PERIOD	|	logSummary	|
 |	ORION_RELOG_ALARMS	|	relogAlarms	|
-|	ORION_CHECK_ID_V1	|	strictNgsiv1Ids	|
 |	ORION_DISABLE_CUSTOM_NOTIF	|	disableCustomNotifications	|
 |   ORION_DISABLE_FILE_LOG  |   disableFileLog  |
 |	ORION_LOG_FOR_HUMANS	|	logForHumans	|
 |   ORION_LOG_LINE_MAX_SIZE |   logLineMaxSize  |
 |   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
-|	ORION_DISABLE_NGSIV1	|	disableNgsiv1	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
-|	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
 |       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
 |       ORION_LOG_DEPRECATE |  logDeprecate |

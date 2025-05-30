@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "orionTypes/UpdateActionType.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 
 
 
@@ -67,7 +67,6 @@ extern unsigned int processContextElement
   const bool&                          forcedUpdate,
   const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
-  ApiVersion                           apiVersion       = V1,
   Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR,
   UpdateCoverage*                      updateCoverageP  = NULL
 );

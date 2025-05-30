@@ -30,7 +30,7 @@
 
 #include "apiTypesV2/Subscription.h"
 #include "common/RenderFormat.h"
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 
 #include "ngsiNotify/senderThread.h"
 

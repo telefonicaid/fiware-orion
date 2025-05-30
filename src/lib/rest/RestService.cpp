@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "jsonParse/jsonRequest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -42,7 +40,7 @@
 #include "mongoBackend/mongoSubCache.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "parse/textParse.h"
-#include "serviceRoutines/badRequest.h"
+#include "serviceRoutinesV2/badRequest.h"
 
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
@@ -144,18 +142,6 @@ static void delayedRelease(JsonDelayedRelease* releaseP)
     releaseP->attribute = NULL;
   }
 
-  if (releaseP->scrP != NULL)
-  {
-    releaseP->scrP->release();
-    releaseP->scrP = NULL;
-  }
-
-  if (releaseP->ucsrP != NULL)
-  {
-    releaseP->ucsrP->release();
-    releaseP->ucsrP = NULL;
-  }
-
   if (releaseP->subsP != NULL)
   {
     delete releaseP->subsP;
@@ -174,7 +160,6 @@ std::string payloadParse
   ConnectionInfo*            ciP,
   ParseData*                 parseDataP,
   RestService*               service,
-  JsonRequest**              jsonPP,
   JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
 )
@@ -188,20 +173,11 @@ std::string payloadParse
 
   if (ciP->inMimeType == JSON)
   {
-    if (ciP->apiVersion == V2)
-    {
-      //
-      // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
-      //              Same same for all underlying JSON APIv2 parsing functions
-      //              Not sure the same thing can be done for 'jsonTreat' in the else-part, but this should AT LEAST
-      //              be fixed for V2.
-      //
-      result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
-    }
-    else
-    {
-      result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, jsonPP);
-    }
+    //
+    // FIXME #3151: jsonRequestTreat should return 'bool' and accept an output parameter 'OrionError* oeP'.
+    //              Same same for all underlying JSON APIv2 parsing functions
+    //
+    result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP, compV);
   }
   else if (ciP->inMimeType == TEXT)
   {
@@ -223,6 +199,7 @@ std::string payloadParse
 
   return result;
 }
+
 
 
 
@@ -287,35 +264,19 @@ static void commonFilters
   //
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
   {
-    Restriction* restrictionP = NULL;
+    ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-    //
-    // Lookup the restriction of the correct parseData, where to add the new scope.
-    //
-    if (serviceP->request == EntityTypes)
+    if (scopeVectorP == NULL)
     {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
-    else if (serviceP->request == AllContextEntities)
-    {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
-
-
-    if (restrictionP == NULL)
-    {
-      // There are two possibilities to be here:
-      //   1. A filter given for a request NOT SUPPORTING the filter
-      //   2. The restrictionP-lookup is MISSING (not implemented)
-      //
-      // Either way, we just silently return.
+      // The scopeVectorP-lookup is MISSING (not implemented
+      // We just silently return.
       //
       return;
     }
 
     Scope* scopeP  = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
     scopeP->oper   = SCOPE_OPERATOR_NOT;
-    restrictionP->scopeVector.push_back(scopeP);
+    scopeVectorP->push_back(scopeP);
   }
 
 
@@ -325,34 +286,19 @@ static void commonFilters
   //
   if (ciP->uriParam[URI_PARAM_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
   {
-    Restriction* restrictionP = NULL;
+    ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-    //
-    // Lookup the restriction of the correct parseData, where to add the new scope.
-    //
-    if (serviceP->request == EntityTypes)
+    if (scopeVectorP == NULL)
     {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
-    else if (serviceP->request == AllContextEntities)
-    {
-      restrictionP = &parseDataP->qcr.res.restriction;
-    }
-
-    if (restrictionP == NULL)
-    {
-      // There are two possibilities to be here:
-      //   1. A filter given for a request NOT SUPPORTING the filter
-      //   2. The restrictionP-lookup is MISSING (not implemented)
-      //
-      // Either way, we just silently return.
+      // The scopeVectorP-lookup is MISSING (not implemented)
+      // We just silently return.
       //
       return;
     }
 
     Scope*  scopeP  = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
     scopeP->oper    = "";
-    restrictionP->scopeVector.push_back(scopeP);
+    scopeVectorP->push_back(scopeP);
   }
 }
 
@@ -369,32 +315,11 @@ static void scopeFilter
   RestService*      serviceP
 )
 {
-  Restriction* restrictionP = NULL;
+  ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-  if (ciP->restServiceP->request == DiscoverContextAvailability)
+  for (unsigned int ix = 0; ix < scopeVectorP->size(); ++ix)
   {
-    restrictionP = &parseDataP->dcar.res.restriction;
-  }
-  else if (ciP->restServiceP->request == QueryContext)
-  {
-    restrictionP = &parseDataP->qcr.res.restriction;
-  }
-  else if (ciP->restServiceP->request == SubscribeContext)
-  {
-    restrictionP = &parseDataP->scr.res.restriction;
-  }
-  else if (ciP->restServiceP->request == UpdateContextSubscription)
-  {
-    restrictionP = &parseDataP->ucsr.res.restriction;
-  }
-  else
-  {
-    return;
-  }
-
-  for (unsigned int ix = 0; ix < restrictionP->scopeVector.size(); ++ix)
-  {
-    Scope* scopeP = restrictionP->scopeVector[ix];
+    Scope* scopeP = (*scopeVectorP)[ix];
 
     if (scopeP->type == SCOPE_FILTER_NOT_EXISTENCE)
     {
@@ -412,19 +337,12 @@ static void scopeFilter
 */
 static void filterRelease(ParseData* parseDataP, RequestType request)
 {
-  Restriction* restrictionP = NULL;
+  ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
-  if (request == EntityTypes)
+  if (scopeVectorP != NULL)
   {
-    restrictionP = &parseDataP->qcr.res.restriction;
+    scopeVectorP->release();
   }
-  else if (request == AllContextEntities)
-  {
-    restrictionP = &parseDataP->qcr.res.restriction;
-  }
-
-  if (restrictionP != NULL)
-    restrictionP->release();
 }
 
 
@@ -453,7 +371,6 @@ static bool compCheck(int components, const std::vector<std::string>& compV)
 */
 static bool compErrorDetect
 (
-  ApiVersion                       apiVersion,
   int                              components,
   const std::vector<std::string>&  compV,
   OrionError*                      oeP
@@ -461,7 +378,7 @@ static bool compErrorDetect
 {
   std::string  details;
 
-  if ((apiVersion == V2) && (compV[1] == "entities"))
+  if ((compV[1] == "entities"))
   {
     if ((components == 4) && (compV[3] == "attrs"))  // URL: /v2/entities/<entity-id>/attrs
     {
@@ -528,14 +445,13 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 {
   std::vector<std::string>  compV;
   int                       components;
-  JsonRequest*              jsonReqP   = NULL;
   ParseData                 parseData;
   JsonDelayedRelease        jsonRelease;
 
   if ((ciP->url.empty()) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
-    std::string response = error.toJsonV1();
+    std::string response = error.toJson();
 
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
     restReply(ciP, response);
@@ -554,11 +470,11 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError oe;
 
-    if (compErrorDetect(ciP->apiVersion, components, compV, &oe))
+    if (compErrorDetect(components, compV, &oe))
     {
       alarmMgr.badInput(clientIp, oe.description);
       ciP->httpStatusCode = SccBadRequest;
-      restReply(ciP, oe.smartRender(ciP->apiVersion));
+      restReply(ciP, oe.toJson());
       return "URL PATH component error";
     }
   }
@@ -583,21 +499,10 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         continue;
       }
 
-      if (ciP->apiVersion == V1)
+      if (strcmp(component, compV[compNo].c_str()) != 0)
       {
-        if (strcasecmp(component, compV[compNo].c_str()) != 0)
-        {
-          match = false;
-          break;
-        }
-      }
-      else
-      {
-        if (strcmp(component, compV[compNo].c_str()) != 0)
-        {
-          match = false;
-          break;
-        }
+        match = false;
+        break;
       }
     }
 
@@ -619,7 +524,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       ciP->parseDataP = &parseData;
       metricsMgr.add(ciP->httpHeaders.tenant, spath, METRIC_TRANS_IN_REQ_SIZE, ciP->payloadSize);
       LM_T(LmtPayload, ("Parsing payload '%s'", ciP->payload));
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonReqP, &jsonRelease, compV);
+      response = payloadParse(ciP, &parseData, &serviceV[ix], &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
@@ -627,15 +532,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         alarmMgr.badInput(clientIp, response);
         restReply(ciP, response);
 
-        if (jsonReqP != NULL)
-        {
-          jsonReqP->release(&parseData);
-        }
-
-        if (ciP->apiVersion == V2)
-        {
-          delayedRelease(&jsonRelease);
-        }
+        delayedRelease(&jsonRelease);
 
         compV.clear();
         return response;
@@ -661,24 +558,14 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       OrionError  oe(SccBadRequest, result);
 
-      std::string  response = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      std::string  response = oe.setSCAndRender(&(ciP->httpStatusCode));
 
       alarmMgr.badInput(clientIp, result);
-
       restReply(ciP, response);
 
-      if (jsonReqP != NULL)
-      {
-        jsonReqP->release(&parseData);
-      }
-
-      if (ciP->apiVersion == V2)
-      {
-        delayedRelease(&jsonRelease);
-      }
+      delayedRelease(&jsonRelease);
 
       compV.clear();
-
       return response;
     }
 
@@ -701,15 +588,7 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     filterRelease(&parseData, serviceV[ix].request);
 
-    if (jsonReqP != NULL)
-    {
-      jsonReqP->release(&parseData);
-    }
-
-    if (ciP->apiVersion == V2)
-    {
-      delayedRelease(&jsonRelease);
-    }
+    delayedRelease(&jsonRelease);
 
     compV.clear();
 
@@ -749,9 +628,9 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   // ... and this here is the error that is returned. A 400 Bad Request with "service XXX not recognized" as payload
   //
   std::string  details = std::string("service '") + ciP->url + "' not recognized";
-  std::string  answer;
 
-  restErrorReplyGet(ciP, SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, &answer);
+  OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_SERVICE_NOT_FOUND, ERROR_BAD_REQUEST);
+  std::string answer = oe.toJson();
   alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
   restReply(ciP, answer);

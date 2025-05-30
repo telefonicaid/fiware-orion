@@ -58,7 +58,6 @@ struct MqttInfo
   std::string   passwd;
 
   MqttInfo();
-  explicit MqttInfo(const std::string& _url);
 
   std::string  toJson();
   void         fill(const orion::BSONObj& bo);

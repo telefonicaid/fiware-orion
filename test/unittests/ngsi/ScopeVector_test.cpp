@@ -31,74 +31,17 @@
 
 /* ****************************************************************************
 *
-* renderAndRelease -
-*
-*/
-TEST(ScopeVector, renderAndRelease)
-{
-  Scope*         s = new Scope("Type", "Value");
-  ScopeVector    sV;
-  std::string    out;
-
-  utInit();
-
-  out = sV.toJsonV1(false);
-  EXPECT_STREQ("", out.c_str());
-
-  sV.push_back(s);
-
-  out = sV.toJsonV1(false);
-
-  EXPECT_EQ(sV.size(), 1);
-  sV.release();
-  EXPECT_EQ(sV.size(), 0);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
-* check -
-*/
-TEST(ScopeVector, check)
-{
-  Scope*         s1 = new Scope("Type", "Value");
-  Scope*         s2 = new Scope("", "Value");
-  ScopeVector    sV;
-  std::string    expected1 = "OK";
-  std::string    expected2 = "Empty type in restriction scope";
-  std::string    rendered;
-
-  utInit();
-
-  sV.push_back(s1);
-  rendered = sV.check();
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
-
-  sV.push_back(s2);
-  rendered = sV.check();
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());  
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * getAndSize -
 */
 TEST(ScopeVector, getAndSize)
 {
+  utInit();
+
   ScopeVector   sV;
   Scope         scope0("Type", "Value0");
   Scope         scope1("Type", "Value1");
   Scope         scope2("Type", "Value2");
   Scope*        scopeP;
-
-  utInit();
 
   sV.push_back(&scope0);
   sV.push_back(&scope1);

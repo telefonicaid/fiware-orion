@@ -32,7 +32,7 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttribute.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "rest/OrionError.h"
@@ -52,7 +52,7 @@
 *
 *
 * 01. Fill in UpdateContextRequest
-* 02. Call standard op postQueryContext
+* 02. Call standard op postUpdateContext
 * 03. Check output from mongoBackend - any errors?
 * 04. Prepare HTTP headers
 * 05. Cleanup and return result
@@ -69,8 +69,8 @@ std::string putEntityAttribute
   std::string  attributeName  = compV[4];
   std::string  type           = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion,  entityId.c_str(),      NULL) ||
-      (forbiddenIdChars(ciP->apiVersion, attributeName.c_str(), NULL)))
+  if (forbiddenIdCharsV2( entityId.c_str(),      NULL) ||
+      (forbiddenIdCharsV2(attributeName.c_str(), NULL)))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
@@ -86,15 +86,15 @@ std::string putEntityAttribute
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // Adjust error code if needed
-  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.oe), true);
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.error), true);
 
   // 03. Check error
   std::string  answer = "";
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+  if ((parseDataP->upcrs.res.error.code != SccNone ) && (parseDataP->upcrs.res.error.code != SccOk))
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    alarmMgr.badInput(clientIp, parseDataP->upcrs.res.oe.description);
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.error.toJson());
+    alarmMgr.badInput(clientIp, parseDataP->upcrs.res.error.description);
+    ciP->httpStatusCode = parseDataP->upcrs.res.error.code;
   }
   else
   {

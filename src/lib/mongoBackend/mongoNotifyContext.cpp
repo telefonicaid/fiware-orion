@@ -28,7 +28,7 @@
 
 #include "common/sem.h"
 
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
@@ -46,7 +46,7 @@
 HttpStatusCode mongoNotifyContext
 (
   NotifyContextRequest*            requestP,
-  NotifyContextResponse*           responseP,
+  OrionError*                      oeP,
   const std::string&               tenant,
   const std::string&               xauthToken,
   const std::vector<std::string>&  servicePathV,
@@ -56,7 +56,7 @@ HttpStatusCode mongoNotifyContext
 {
   bool reqSemTaken;
 
-  reqSemTake(__FUNCTION__, "ngsi10 notification", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "notification", SemWriteOp, &reqSemTaken);
 
   // Process each ContextElement
   for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix)
@@ -70,8 +70,8 @@ HttpStatusCode mongoNotifyContext
     processContextElement(eP, &ucr, ActionTypeAppend, tenant, servicePathV, uriParams, xauthToken, fiwareCorrelator, ngsiV2AttrsFormat, forcedUpdate, overrideMetadata, 0);
   }
 
-  reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
-  responseP->oe.fill(SccOk, "");
+  reqSemGive(__FUNCTION__, "notification", reqSemTaken);
+  oeP->fill(SccOk, "");
 
   return SccOk;
 }

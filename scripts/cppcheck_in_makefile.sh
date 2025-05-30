@@ -129,9 +129,6 @@ cpp_check test/unittests/serviceRoutines
 #   cpp_check src/lib/orionTypes
 #   cpp_check src/lib/convenience
 #   cpp_check src/lib/jsonParse
-#   cpp_check src/lib/ngsi10
-#   cpp_check src/lib/ngsi9
-#   cpp_check src/lib/serviceRoutines
 #   cpp_check src/lib/ngsi
 #
 #   cpp_check test/unittests/unittests.cpp
@@ -139,7 +136,5 @@ cpp_check test/unittests/serviceRoutines
 #   cpp_check test/unittests/common
 #   cpp_check test/unittests/parse
 #   cpp_check test/unittests/convenience
-#   cpp_check test/unittests/ngsi10
-#   cpp_check test/unittests/ngsi9
 #   cpp_check test/unittests/ngsi
 #

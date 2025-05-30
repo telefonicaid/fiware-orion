@@ -30,7 +30,6 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 
 #include "ngsi/ParseData.h"

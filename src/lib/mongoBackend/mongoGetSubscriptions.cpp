@@ -51,7 +51,6 @@
 * USING - 
 */
 using ngsiv2::Subscription;
-using ngsiv2::EntID;
 
 
 
@@ -94,7 +93,7 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
     bool           isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
                                      getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
-    EntID en;
+    EntityId en;
     if (isFalse(isPattern))
     {
       en.id = id;

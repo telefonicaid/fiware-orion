@@ -45,10 +45,10 @@
 #define TEST_SIZE (4 * 1024 * 1024)
 TEST(restReply, MHD_create_response_from_data_error)
 {
-  ConnectionInfo  ci("/ngsi/XXX", "GET", "1.1");
-  char*           answer = (char*) malloc(TEST_SIZE);
-
   utInit();
+  
+  ConnectionInfo  ci("/ngsi/XXX", "GET", "1.1");
+  char*           answer = (char*) malloc(TEST_SIZE);  
 
   if (answer != NULL)
   {

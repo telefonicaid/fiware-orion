@@ -33,10 +33,9 @@
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "apiTypesV2/Entities.h"
-#include "ngsi10/QueryContextRequest.h"
+#include "ngsi/QueryContextRequest.h"
 #include "alarmMgr/alarmMgr.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "serviceRoutinesV2/postBatchQuery.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
 
@@ -66,7 +65,7 @@ std::string postBatchQuery
 {
   BatchQuery*           bqP  = &parseDataP->bq.res;
   QueryContextRequest*  qcrP = &parseDataP->qcr.res;
-  Entities              entities;
+  EntityVector          entities;
   std::string           answer;
 
   // To be used later in the render stage
@@ -81,14 +80,14 @@ std::string postBatchQuery
   // except for some error situations (e.g. duplicated sort tokens in orderBy)
   // (I don't like this code very much, as we are using de description of the error to decide, but
   // I guess that until CPrs functionality gets dropped we cannot do it better...)
-  if (parseDataP->qcrs.res.errorCode.details == ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY)
+  if (parseDataP->qcrs.res.error.description == ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY)
   {
     // FIXME P7: what about of 5xx situationes (e.g. MongoDB errores). They should progress to
     // the client as errors in a similar way
 
     ciP->httpStatusCode = SccBadRequest;
-    OrionError oe(SccBadRequest, parseDataP->qcrs.res.errorCode.details);
-    TIMED_RENDER(answer = oe.smartRender(V2));
+    OrionError oe(SccBadRequest, parseDataP->qcrs.res.error.description);
+    TIMED_RENDER(answer = oe.toJson());
   }
   else
   {

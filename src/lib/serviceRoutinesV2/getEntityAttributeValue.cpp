@@ -30,12 +30,11 @@
 #include "common/errorMessages.h"
 #include "common/string.h"
 
-#include "apiTypesV2/Attribute.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/EntityTypeInfo.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "parse/forbiddenChars.h"
@@ -65,12 +64,11 @@ std::string getEntityAttributeValue
   ParseData*                 parseDataP
 )
 {
-  Attribute    attribute;
   std::string  answer;
   std::string  type       = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion,  compV[2].c_str(), NULL) ||
-      (forbiddenIdChars(ciP->apiVersion, compV[4].c_str(), NULL)))
+  if (forbiddenIdCharsV2( compV[2].c_str(), NULL) ||
+      (forbiddenIdCharsV2(compV[4].c_str(), NULL)))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
@@ -78,14 +76,14 @@ std::string getEntityAttributeValue
   }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], type, "false", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill("", compV[2], type, EntityTypeEmptyOrNotEmpty);
 
   // Call standard op postQueryContext
   OrionError oe;
   postQueryContext(ciP, components, compV, parseDataP);
-  attribute.fill(parseDataP->qcrs.res, compV[4], &oe);
+  ContextAttribute* caP = parseDataP->qcrs.res.getAttr(compV[4], &oe);
 
-  if (oe.code != SccNone)
+  if (caP == NULL)
   {
     TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = oe.code;
@@ -93,48 +91,41 @@ std::string getEntityAttributeValue
   else
   {
     // save the original attribute type
-    std::string attributeType = attribute.contextAttributeP->type;
+    std::string attributeType = caP->type;
 
     // the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    ciP->httpStatusCode = parseDataP->qcrs.res.error.code;
 
     // Remove unwanted fields from attribute before rendering
-    attribute.contextAttributeP->type = "";
-    attribute.contextAttributeP->metadataVector.release();
+    caP->type = "";
+    caP->metadataVector.release();
 
     if (ciP->outMimeType == JSON)
     {
       // Do not use attribute name, change to 'value'
-      attribute.contextAttributeP->name = "value";
-
-      StringList metadataFilter;
-      setMetadataFilter(ciP->uriParam, &metadataFilter);
-
-      TIMED_RENDER(answer = attribute.toJson(ciP->httpHeaders.accepted("text/plain"),
-                                             ciP->httpHeaders.accepted("application/json"),
-                                             ciP->httpHeaders.outformatSelect(),
-                                             &(ciP->outMimeType),
-                                             &(ciP->httpStatusCode),
-                                             ciP->uriParamOptions[OPT_KEY_VALUES],
-                                             metadataFilter.stringV,
-                                             EntityAttributeValueRequest));
+      caP->name = "value";
+      TIMED_RENDER(answer = caP->toJsonAsValue(ciP->httpHeaders.accepted("text/plain"),
+                                               ciP->httpHeaders.accepted("application/json"),
+                                               ciP->httpHeaders.outformatSelect(),
+                                               &(ciP->outMimeType),
+                                               &(ciP->httpStatusCode)));
     }
     else
     {
-      if (attribute.contextAttributeP->compoundValueP != NULL)
+      if (caP->compoundValueP != NULL)
       {
-        TIMED_RENDER(answer = attribute.contextAttributeP->compoundValueP->toJson());
+        TIMED_RENDER(answer = caP->compoundValueP->toJson());
       }
       else
       {
         if ((attributeType == DATE_TYPE) || (attributeType == DATE_TYPE_ALT))
         {
-          TIMED_RENDER(answer = isodate2str(attribute.contextAttributeP->numberValue));
+          TIMED_RENDER(answer = isodate2str(caP->numberValue));
         }
         else
         {
-          TIMED_RENDER(answer = attribute.contextAttributeP->getValue());
-          if (attribute.contextAttributeP->valueType == orion::ValueTypeString)
+          TIMED_RENDER(answer = caP->getValue());
+          if (caP->valueType == orion::ValueTypeString)
           {
             answer = '"' + answer + '"';
           }

@@ -32,11 +32,12 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include "ngsi/Request.h"
+#include "ngsi/QueryContextResponse.h"
+
 #include "apiTypesV2/EntityVector.h"
 
 
@@ -98,73 +99,6 @@ std::string EntityVector::toJson(RenderFormat renderFormat)
 
 /* ****************************************************************************
 *
-* EntityVector::toJsonV1 -
-*
-* Ported from old class ContextElementVector
-*/
-std::string EntityVector::toJsonV1
-(
-  bool         asJsonObject,
-  RequestType  requestType,
-  bool         comma
-)
-{
-  std::string  out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("contextElements", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(asJsonObject, requestType, false, ix != vec.size() - 1);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityVector::check -
-*/
-std::string EntityVector::check(ApiVersion apiVersion, RequestType requestType)
-{
-  if ((apiVersion == V1) && (requestType == UpdateContext))
-  {
-    if (vec.size() == 0)
-    {
-      return "No context elements";
-    }
-  }
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
-    {
-      if (apiVersion == V2)
-      {
-        alarmMgr.badInput(clientIp, "invalid vector of Entity", res);
-      }
-      return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityVector::push_back -
 */
 void EntityVector::push_back(Entity* item)
@@ -209,13 +143,69 @@ Entity* EntityVector::lookup(const std::string& name, const std::string& type)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    if ((vec[ix]->id == name) && (vec[ix]->type == type))
+    if ((vec[ix]->entityId.id == name) && (vec[ix]->entityId.type == type))
     {
       return vec[ix];
     }
   }
 
   return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityVector::fill -
+*/
+void EntityVector::fill(const QueryContextResponse& qcrs, OrionError* oeP)
+{
+  if (qcrs.error.code == SccContextElementNotFound)
+  {
+    //
+    // If no entities are found, we respond with a 200 OK
+    // and an empty vector of entities ( [] )
+    //
+
+    oeP->fill(SccOk, "", "OK");
+    return;
+  }
+  else if (qcrs.error.code != SccOk)
+  {
+    //
+    // If any other error - use the error for the response
+    //
+
+    oeP->fill(qcrs.error.code, qcrs.error.description, qcrs.error.error);
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < qcrs.contextElementResponseVector.size(); ++ix)
+  {
+    Entity* eP = &qcrs.contextElementResponseVector[ix]->entity;
+
+    if ((&qcrs.contextElementResponseVector[ix]->error)->code == SccReceiverInternalError)
+    {
+      // FIXME P4: Do we need to release the memory allocated in 'vec' before returning? I don't
+      // think so, as the releasing logic in the upper layer will deal with that but
+      // let's do anyway just in case... (we don't have a ft covering this, so valgrind suite
+      // cannot help here and it is better to ensure)
+      oeP->fill(&qcrs.contextElementResponseVector[ix]->error);
+      release();
+      return;
+    }
+    else
+    {
+      Entity*         newP  = new Entity();
+
+      newP->entityId = eP->entityId;
+      newP->creDate  = eP->creDate;
+      newP->modDate  = eP->modDate;
+
+      newP->attributeVector.fill(eP->attributeVector);
+      push_back(newP);
+    }
+  }
 }
 
 

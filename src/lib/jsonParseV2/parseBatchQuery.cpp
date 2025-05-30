@@ -100,6 +100,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
+        bqrP->entities.release();
         return oe.toJson();
       }
     }
@@ -114,6 +115,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
+        bqrP->entities.release();
         return oe.toJson();
       }
     }
@@ -127,6 +129,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
+        bqrP->entities.release();
         return oe.toJson();
       }
     }
@@ -140,6 +143,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
+        bqrP->entities.release();
         return oe.toJson();
       }
     }
@@ -153,6 +157,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
+        bqrP->entities.release();
         return oe.toJson();
       }
     }
@@ -164,6 +169,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
       oe.fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 
+      bqrP->entities.release();
       return oe.toJson();
     }
   }

@@ -35,8 +35,8 @@
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/EntityId.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "ngsi/UpdateContextResponse.h"
 
 #include "unittests/unittest.h"
 
@@ -520,7 +520,7 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithSameLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -621,7 +621,7 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithDifferentLocAttribute)
     bool forcedUpdate = false;
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate,  V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -722,7 +722,7 @@ TEST(mongoUpdateContextGeoRequest, replaceLocAttributeWithNoLocAttribute)
     bool forcedUpdate = false;
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate,  V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", forcedUpdate);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -819,7 +819,7 @@ TEST(mongoUpdateContextGeoRequest, replaceNoLocAttributeWithLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false, V2);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "", "", "", false);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

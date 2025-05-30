@@ -35,10 +35,9 @@
 #include "rest/uriParamNames.h"
 #include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -83,7 +82,7 @@ std::string getEntities
   ParseData*                 parseDataP
 )
 {
-  Entities     entities;
+  EntityVector entities;
   std::string  answer;
   std::string  pattern     = ".*";  // all entities, default value
   std::string  id          = ciP->uriParam["id"];
@@ -185,7 +184,7 @@ std::string getEntities
     Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
+    if (scopeP->fill(geometry, coords, georel, &errorString) != 0)
     {
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, ERROR_BAD_REQUEST);
 
@@ -198,7 +197,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -228,7 +227,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -257,7 +256,7 @@ std::string getEntities
       return out;
     }
 
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -273,22 +272,16 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-    bool      isIdPattern = (!idPattern.empty() || pattern == ".*");
-    EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
-
+    EntityId* entityId = new EntityId("", pattern, "", typePattern);
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
   }
   else if (ciP->uriParamTypes.size() == 0)
   {
-    parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, "", EntityTypeEmptyOrNotEmpty);
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
-  }
-  else if (ciP->uriParamTypes.size() == 1)
-  {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, type, EntityTypeNotEmpty);
   }
   else
   {
@@ -298,7 +291,7 @@ std::string getEntities
     //
     for (unsigned int ix = 0; ix < ciP->uriParamTypes.size(); ++ix)
     {
-      EntityId* entityId = new EntityId(pattern, ciP->uriParamTypes[ix], "true");
+      EntityId* entityId = new EntityId("", pattern, ciP->uriParamTypes[ix], "");
 
       parseDataP->qcr.res.entityIdVector.push_back(entityId);
     }
@@ -309,16 +302,17 @@ std::string getEntities
   setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  postQueryContext(ciP, components, compV, parseDataP);
 
   // 03. Check Internal Errors
   // (I don't like this code very much, as for the second case we are using de description of the error to decide, but
   // I guess that until CPrs functionality gets dropped we cannot do it better...)
-  if ((parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError) || (parseDataP->qcrs.res.errorCode.details == ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY))
+  if ((parseDataP->qcrs.res.error.code == SccReceiverInternalError) || (parseDataP->qcrs.res.error.description == ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY))
+
   {
     OrionError oe;
     entities.fill(parseDataP->qcrs.res, &oe);
-    TIMED_RENDER(answer = oe.smartRender(V2));
+    TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = oe.code;
   }
   // 04. Render Entities response

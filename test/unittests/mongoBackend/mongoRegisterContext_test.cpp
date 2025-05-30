@@ -35,7 +35,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/mongoRegisterContext.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi/ContextRegistration.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"

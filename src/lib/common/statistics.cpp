@@ -23,7 +23,6 @@
 * Author: Ken Zangelin
 */
 #include "common/statistics.h"
-#include "common/tag.h"
 #include "ngsi/Request.h"
 #include "logMsg/logMsg.h"
 #include "common/JsonHelper.h"
@@ -69,7 +68,7 @@ UrlCounter noOfRequestCounters[] =
   {RegistrationRequest,           "v2", -1, -1, -1, -1, -1, -1, true,  false, true,  false, true,  true},
   {BatchQueryRequest,             "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
   {BatchUpdateRequest,            "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, true},
-  {NotifyContext,                 "v2",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
+  {NotifyContext,                 "v2", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
 
   {LogTraceRequest,               "log", -1, -1, -1, -1, -1, -1, true,  false, false, true,  true,  false},
   {StatisticsRequest,             "statistics", -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
@@ -78,63 +77,6 @@ UrlCounter noOfRequestCounters[] =
   {SemStateRequest,               "admin", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
   {VersionRequest,                "version", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
   {MetricsRequest,                "admin", -1, -1, -1, -1, -1, -1, true,  false, false, false, true,  false},
-
-  // FIXME: disable unused NGSv1 API routes in Orion 3.9.0, to be definetively removed at some point of the future
-  // v1 and ngsi10 legacy                                                           GET    POST   PATCH  PUT    DELET  OPT
-  //{ContextEntitiesByEntityId,                     "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityAttributes,                       "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{EntityByIdAttributeByName,                     "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityTypes,                            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityTypeAttributeContainer,           "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{ContextEntityTypeAttribute,                    "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-
-  //{IndividualContextEntity,                       "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntity,                       "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  {IndividualContextEntity,                       "v1",     -1, -1, -1, -1, -1, -1, false,  false,  false, true,  true,  false},
-
-  //{IndividualContextEntityAttributes,             "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntityAttributes,             "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},ç
-
-  //{IndividualContextEntityAttribute,              "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntityAttribute,              "ngsi10", -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  {IndividualContextEntityAttribute,              "v1",     -1, -1, -1, -1, -1, -1, true,  false,  false, false,  false,  false},
-
-  //{Ngsi10ContextEntityTypes,                      "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{Ngsi10ContextEntityTypes,                      "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-
-  //{Ngsi10ContextEntityTypesAttributeContainer,    "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{Ngsi10ContextEntityTypesAttributeContainer,    "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-
-  //{Ngsi10ContextEntityTypesAttribute,             "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{Ngsi10ContextEntityTypesAttribute,             "ngsi10", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-
-  //{Ngsi10SubscriptionsConvOp,                     "v1",     -1, -1, -1, -1, -1, -1, false,  false, false, true, true,  false},
-  //{Ngsi10SubscriptionsConvOp,                     "ngsi10", -1, -1, -1, -1, -1, -1, false,  false, false, true, true,  false},
-
-  //{EntityTypes,                                   "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{AttributesForEntityType,                       "v1",     -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
-  //{AllContextEntities,                            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{AllEntitiesWithTypeAndId,                      "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{IndividualContextEntityAttributeWithTypeAndId, "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, true,  true,  false},
-  //{ContextEntitiesByEntityIdAndType,              "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-  //{EntityByIdAttributeByNameIdAndType,            "v1",     -1, -1, -1, -1, -1, -1, true,  true,  false, false, false, false},
-
-  //{RegisterContext,                               "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{DiscoverContextAvailability,                   "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-
-  {UpdateContext,                                 "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  {UpdateContext,                                 "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  {QueryContext,                                  "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  {QueryContext,                                  "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{SubscribeContext,                              "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // two URLs: subscribeContext and contextSubscriptions
-  //{SubscribeContext,                              "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // two URLs: subscribeContext and contextSubscriptions
-  //{UpdateContextSubscription,                     "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{UpdateContextSubscription,                     "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{UnsubscribeContext,                            "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-  //{UnsubscribeContext,                            "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},
-
-  //{NotifyContext,                                 "v1",     -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // also in v2
-  //{NotifyContext,                                 "ngsi10", -1, -1, -1, -1, -1, -1, false, true,  false, false, false, false},  // also in v2
 
   // Special ones (LeakRequest MUST be always the last one in the array. See statisticsUpdate() and resetStatistics() comments
   {ExitRequest,                   "exit", -1, -1, -1, -1, -1, -1, true,  false, false, false, false, false},
@@ -150,7 +92,6 @@ int noOfNotificationsSent        = -1;
 int noOfSimulatedNotifications   = -1;
 
 // Deprecated features
-int noOfDprNgsiv1Request         = -1;
 int noOfDprLegacyForwarding      = -1;
 int noOfDprGeoformat             = -1;
 
@@ -174,7 +115,6 @@ inline float timeSpecToFloat(const struct timespec& t)
 * xxxReqTime           - the total time that the LAST request took.
 *                        Measuring from the first MHD callback to 'connectionTreat',
 *                        until the MHD callback to 'requestCompleted'.
-* xxxJsonV1ParseTime   - the time that the JSON parse+treat of the LAST request took.
 * xxxJsonV2ParseTime   - the time that the JSON parse+treat of the LAST request took.
 * xxxMongoBackendTime  - the time that the mongoBackend took to treat the last request
 * xxxReadWaitTime      - 
@@ -188,7 +128,6 @@ std::string renderTimingStatistics(void)
 
   timeStatSemTake(__FUNCTION__, "putting stats together");
 
-  bool accJsonV1ParseTime      = (accTimeStat.jsonV1ParseTime.tv_sec != 0)        || (accTimeStat.jsonV1ParseTime.tv_nsec != 0);
   bool accJsonV2ParseTime      = (accTimeStat.jsonV2ParseTime.tv_sec != 0)        || (accTimeStat.jsonV2ParseTime.tv_nsec != 0);
   bool accMongoBackendTime     = (accTimeStat.mongoBackendTime.tv_sec != 0)       || (accTimeStat.mongoBackendTime.tv_nsec != 0);
   bool accMongoReadWaitTime    = (accTimeStat.mongoReadWaitTime.tv_sec != 0)      || (accTimeStat.mongoReadWaitTime.tv_nsec != 0);
@@ -201,7 +140,6 @@ std::string renderTimingStatistics(void)
   bool accRenderTime           = (accTimeStat.renderTime.tv_sec != 0)             || (accTimeStat.renderTime.tv_nsec != 0);
   bool accReqTime              = (accTimeStat.reqTime.tv_sec != 0)                || (accTimeStat.reqTime.tv_nsec != 0);
 
-  bool lastJsonV1ParseTime      = (lastTimeStat.jsonV1ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV1ParseTime.tv_nsec != 0);
   bool lastJsonV2ParseTime      = (lastTimeStat.jsonV2ParseTime.tv_sec != 0)      || (lastTimeStat.jsonV2ParseTime.tv_nsec != 0);
   bool lastMongoBackendTime     = (lastTimeStat.mongoBackendTime.tv_sec != 0)     || (lastTimeStat.mongoBackendTime.tv_nsec != 0);
   bool lastMongoReadWaitTime    = (lastTimeStat.mongoReadWaitTime.tv_sec != 0)    || (lastTimeStat.mongoReadWaitTime.tv_nsec != 0);
@@ -214,8 +152,8 @@ std::string renderTimingStatistics(void)
   bool lastRenderTime           = (lastTimeStat.renderTime.tv_sec != 0)           || (lastTimeStat.renderTime.tv_nsec != 0);
   bool lastReqTime              = (lastTimeStat.reqTime.tv_sec != 0)              || (lastTimeStat.reqTime.tv_nsec != 0);
 
-  bool last = lastJsonV1ParseTime || lastJsonV2ParseTime || lastMongoBackendTime || lastRenderTime || lastReqTime;
-  bool acc  = accJsonV1ParseTime || accJsonV2ParseTime || accMongoBackendTime || accRenderTime || accReqTime;
+  bool last = lastJsonV2ParseTime || lastMongoBackendTime || lastRenderTime || lastReqTime;
+  bool acc  = accJsonV2ParseTime || accMongoBackendTime || accRenderTime || accReqTime;
 
   if (!acc && !last)
   {
@@ -229,7 +167,6 @@ std::string renderTimingStatistics(void)
   {
     JsonObjectHelper accJh;
 
-    if (accJsonV1ParseTime)      accJh.addNumber("jsonV1Parse",      timeSpecToFloat(accTimeStat.jsonV1ParseTime));
     if (accJsonV2ParseTime)      accJh.addNumber("jsonV2Parse",      timeSpecToFloat(accTimeStat.jsonV2ParseTime));
     if (accMongoBackendTime)     accJh.addNumber("mongoBackend",     timeSpecToFloat(accTimeStat.mongoBackendTime));
     if (accMongoReadWaitTime)    accJh.addNumber("mongoReadWait",    timeSpecToFloat(accTimeStat.mongoReadWaitTime));
@@ -248,7 +185,6 @@ std::string renderTimingStatistics(void)
   {
     JsonObjectHelper lastJh;
 
-    if (lastJsonV1ParseTime)      lastJh.addNumber("jsonV1Parse",      timeSpecToFloat(lastTimeStat.jsonV1ParseTime));
     if (lastJsonV2ParseTime)      lastJh.addNumber("jsonV2Parse",      timeSpecToFloat(lastTimeStat.jsonV2ParseTime));
     if (lastMongoBackendTime)     lastJh.addNumber("mongoBackend",     timeSpecToFloat(lastTimeStat.mongoBackendTime));
     if (lastMongoReadWaitTime)    lastJh.addNumber("mongoReadWait",    timeSpecToFloat(lastTimeStat.mongoReadWaitTime));
@@ -405,7 +341,7 @@ void statisticsUpdate(RequestType request, MimeType inMimeType, Verb verb, const
     }
   }
 
-  // If it is not a NGSIv2 request it has to be NGSIv1 or invalid
+  // If it is not a NGSIv2 request it has to be invalid
   if (!requestFound)
   {
     ++noOfInvalidRequests;

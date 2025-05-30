@@ -115,7 +115,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
 
   for (unsigned int eIx = 0; eIx < regP->dataProvided.entities.size(); ++eIx)
   {
-    ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
+    EntityId* eP = &regP->dataProvided.entities[eIx];
 
     orion::BSONObjBuilder bob;
     if (eP->idPattern.empty())

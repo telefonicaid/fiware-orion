@@ -30,7 +30,6 @@
 
 #include "common/globals.h"
 #include "common/limits.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
@@ -236,63 +235,14 @@ Metadata::Metadata(const std::string& _name, const orion::BSONObj& mdB)
 
 /* ****************************************************************************
 *
-* Metadata::toJsonV1 -
-*/
-std::string Metadata::toJsonV1(bool comma)
-{
-  std::string out     = "";
-  std::string xValue  = toStringValue();
-
-  out += startTag();
-  out += valueTag("name", name, true);
-  out += valueTag("type", type, true);
-
-  if (compoundValueP != NULL)
-  {
-    out += JSON_STR("value") + ":" + compoundValueP->toJson();
-  }
-  else if (valueType == orion::ValueTypeString)
-  {
-    out += valueTag("value", xValue, false);
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    out += JSON_STR("value") + ":" + xValue;
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    out += JSON_STR("value") + ":" + xValue;
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    out += JSON_STR("value") + ":" + xValue;
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {    
-    out += JSON_STR("value") + ":" + JSON_STR("not given");
-  }
-  else
-  {
-    out += JSON_STR("value") + ":" + JSON_STR("unknown json type");
-  }
-
-  out += endTag(comma);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
 * Metadata::check -
 */
-std::string Metadata::check(ApiVersion apiVersion)
+std::string Metadata::check(void)
 {
   size_t len;
   char   errorMsg[128];
 
-  if (apiVersion == V2 && (len = strlen(name.c_str())) < MIN_ID_LEN)
+  if ((len = strlen(name.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata name length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
@@ -312,7 +262,7 @@ std::string Metadata::check(ApiVersion apiVersion)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(apiVersion , name.c_str()))
+  if (forbiddenIdCharsV2(name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata", name);
     return "Invalid characters in metadata name";
@@ -326,14 +276,14 @@ std::string Metadata::check(ApiVersion apiVersion)
   }
 
 
-  if (apiVersion == V2 && (len = strlen(type.c_str())) < MIN_ID_LEN)
+  if ((len = strlen(type.c_str())) < MIN_ID_LEN)
   {
     snprintf(errorMsg, sizeof errorMsg, "metadata type length: %zd, min length supported: %d", len, MIN_ID_LEN);
     alarmMgr.badInput(clientIp, errorMsg);
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdChars(apiVersion, type.c_str()))
+  if (forbiddenIdCharsV2(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata", type);
     return "Invalid characters in metadata type";
@@ -345,12 +295,6 @@ std::string Metadata::check(ApiVersion apiVersion)
     {
       alarmMgr.badInput(clientIp, "found a forbidden character in the value of a Metadata", stringValue);
       return "Invalid characters in metadata value";
-    }
-
-    if (apiVersion == V1 && stringValue.empty())
-    {
-      alarmMgr.badInput(clientIp, "missing metadata value", name);
-      return "missing metadata value";
     }
   }
 
@@ -370,65 +314,6 @@ void Metadata::release(void)
     delete compoundValueP;
     compoundValueP = NULL;
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* fill - 
-*/
-void Metadata::fill(const struct Metadata& md)
-{
-  name         = md.name;
-  type         = md.type;
-  stringValue  = md.stringValue;
-}
-
-
-
-/* ****************************************************************************
-*
-* toStringValue -
-*/
-std::string Metadata::toStringValue(void) const
-{
-  switch (valueType)
-  {
-  case orion::ValueTypeString:
-    return stringValue;
-    break;
-
-  case orion::ValueTypeNumber:
-    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-    {
-      return JSON_STR(isodate2str(numberValue));
-    }
-    else // regular number
-    {
-      return double2string(numberValue);
-    }
-    break;
-
-  case orion::ValueTypeBoolean:
-    return boolValue ? "true" : "false";
-    break;
-
-  case orion::ValueTypeNull:
-    return "null";
-    break;
-
-  case orion::ValueTypeNotGiven:
-    return "<not given>";
-    break;
-
-  default:
-    return "<unknown type>";
-    break;
-  }
-
-  // Added to avoid warning when compiling with -fstack-check -fstack-protector
-  return "";
 }
 
 

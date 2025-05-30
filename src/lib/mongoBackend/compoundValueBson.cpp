@@ -39,13 +39,10 @@
 *
 * compoundValueBson (for arrays) -
 *
-* strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
-* strings are converted to numbers (strings are not allowed in GeoJSON)
-*
 * encode set to true only in the calculateOperator functions, eg. to avoid that
 * "$each" get replaced by ">each" (see https://github.com/telefonicaid/fiware-orion/issues/744#issuecomment-996752938)
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONArrayBuilder& b, bool strings2numbers, bool encode)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONArrayBuilder& b, bool encode)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
@@ -53,15 +50,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
 
     if (child->valueType == orion::ValueTypeString)
     {
-      if ((strings2numbers) && (str2double(child->stringValue.c_str(), &child->numberValue)))
-      {
-        b.append(child->numberValue);
-      }
-      else
-      {
-        // Fails in str2double() means that values is not an actual number, so we do nothing and leave it as it is
-        b.append(child->stringValue);
-      }
+      b.append(child->stringValue);
     }
     else if (child->valueType == orion::ValueTypeNumber)
     {
@@ -79,14 +68,14 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
     {
       orion::BSONArrayBuilder ba;
 
-      compoundValueBson(child->childV, ba, strings2numbers, encode);
+      compoundValueBson(child->childV, ba, encode);
       b.append(ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
       orion::BSONObjBuilder bo;
 
-      compoundValueBson(child->childV, bo, strings2numbers, encode);
+      compoundValueBson(child->childV, bo, encode);
       b.append(bo.obj());
     }
     else if (child->valueType == orion::ValueTypeNotGiven)
@@ -106,13 +95,10 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
 *
 * compoundValueBson (for objects) -
 *
-* strings2numbers is used only for the GEO_JSON generation logic to ensure NGSIv1
-* strings are converted to numbers (strings are not allowed in GeoJSON)
-*
 * encode set to true only in the calculateOperator functions, eg. to avoid that
 * "$each" get replaced by ">each" (see https://github.com/telefonicaid/fiware-orion/issues/744#issuecomment-996752938)
 */
-void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONObjBuilder& b, bool strings2numbers, bool encode)
+void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, orion::BSONObjBuilder& b, bool encode)
 {
   for (unsigned int ix = 0; ix < children.size(); ++ix)
   {
@@ -121,15 +107,7 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
 
     if (child->valueType == orion::ValueTypeString)
     {
-      if ((strings2numbers) && (str2double(child->stringValue.c_str(), &child->numberValue)))
-      {
-        b.append(effectiveName, child->numberValue);
-      }
-      else
-      {
-        // Fails in str2double() means that values is not an actual number, so we do nothing and leave it as it is
-        b.append(effectiveName, child->stringValue);
-      }
+      b.append(effectiveName, child->stringValue);
     }
     else if (child->valueType == orion::ValueTypeNumber)
     {
@@ -147,14 +125,14 @@ void compoundValueBson(const std::vector<orion::CompoundValueNode*>& children, o
     {
       orion::BSONArrayBuilder ba;
 
-      compoundValueBson(child->childV, ba, strings2numbers, encode);
+      compoundValueBson(child->childV, ba, encode);
       b.append(effectiveName, ba.arr());
     }
     else if (child->valueType == orion::ValueTypeObject)
     {
       orion::BSONObjBuilder bo;
 
-      compoundValueBson(child->childV, bo, strings2numbers, encode);
+      compoundValueBson(child->childV, bo, encode);
       b.append(effectiveName, bo.obj());
     }
     else if (child->valueType == orion::ValueTypeNotGiven)

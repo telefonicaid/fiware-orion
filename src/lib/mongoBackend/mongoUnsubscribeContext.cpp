@@ -35,8 +35,6 @@
 #include "mongoBackend/dbConstants.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "cache/subCache.h"
-#include "ngsi10/UnsubscribeContextRequest.h"
-#include "ngsi10/UnsubscribeContextResponse.h"
 
 #include "mongoDriver/safeMongo.h"
 #include "mongoDriver/connectionOperations.h"
@@ -50,28 +48,22 @@
 */
 HttpStatusCode mongoUnsubscribeContext
 (
-  UnsubscribeContextRequest*   requestP,
-  UnsubscribeContextResponse*  responseP,
-  const std::string&           tenant
+  const std::string&  subId,
+  OrionError*         responseP,
+  const std::string&  tenant
 )
 {
   bool         reqSemTaken;
   std::string  err;
 
-  reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "unsubscribe request", SemWriteOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Unsubscribe Context"));
 
-  /* No matter if success or failure, the subscriptionId in the response is always the one
-   * in the request
-   */
-  responseP->subscriptionId = requestP->subscriptionId;
-
-  if (responseP->subscriptionId.get().empty())
+  if (subId.empty())
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
-    responseP->statusCode.fill(SccContextElementNotFound);
-    responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
+    reqSemGive(__FUNCTION__, "unsubscribe request (no subscriptions found)", reqSemTaken);
+    responseP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
     alarmMgr.badInput(clientIp, "no subscriptionId");
 
     return SccOk;
@@ -79,28 +71,24 @@ HttpStatusCode mongoUnsubscribeContext
 
   /* Look for document */
   orion::BSONObj sub;
-  orion::OID     id = orion::OID(requestP->subscriptionId.get());
+  orion::OID     id = orion::OID(subId);
 
   orion::BSONObjBuilder bobId;
   bobId.append("_id", id);
 
   if (!orion::collectionFindOne(composeDatabaseName(tenant), COL_CSUBS, bobId.obj(), &sub, &err) && (err != ""))
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "unsubscribe request (mongo db exception)", reqSemTaken);
 
-    responseP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
-
+    responseP->fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
     return SccOk;
   }
 
   if (sub.isEmpty())
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "unsubscribe request (no subscriptions found)", reqSemTaken);
 
-    responseP->statusCode.fill(SccContextElementNotFound);
-    responseP->oe.fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
-
+    responseP->fill(SccContextElementNotFound, ERROR_DESC_NOT_FOUND_SUBSCRIPTION, ERROR_NOT_FOUND);
     return SccOk;
   }
 
@@ -112,15 +100,13 @@ HttpStatusCode mongoUnsubscribeContext
   //
 
   orion::BSONObjBuilder bobId2;
-  bobId2.append("_id", orion::OID(requestP->subscriptionId.get()));
+  bobId2.append("_id", orion::OID(subId));
 
   if (!orion::collectionRemove(composeDatabaseName(tenant), COL_CSUBS, bobId2.obj(), &err))
   {
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
+    reqSemGive(__FUNCTION__, "unsubscribe request (mongo db exception)", reqSemTaken);
 
-    responseP->statusCode.fill(SccReceiverInternalError, err);
-    responseP->oe.fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
-
+    responseP->fill(SccReceiverInternalError, err, ERROR_INTERNAL_ERROR);
     return SccOk;
   }
 
@@ -130,12 +116,12 @@ HttpStatusCode mongoUnsubscribeContext
   if (!noCache)
   {
     LM_T(LmtSubCache, ("removing subscription '%s' (tenant '%s') from mongo subscription cache",
-                       requestP->subscriptionId.get().c_str(),
+                       subId.c_str(),
                        tenant.c_str()));
 
     cacheSemTake(__FUNCTION__, "Removing subscription from cache");
 
-    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), requestP->subscriptionId.get().c_str());
+    CachedSubscription* cSubP = subCacheItemLookup(tenant.c_str(), subId.c_str());
 
     if (cSubP != NULL)
     {
@@ -145,8 +131,7 @@ HttpStatusCode mongoUnsubscribeContext
     cacheSemGive(__FUNCTION__, "Removing subscription from cache");
   }
 
-  reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
-  responseP->statusCode.fill(SccOk);
+  reqSemGive(__FUNCTION__, "unsubscribe request", reqSemTaken);
 
   return SccOk;
 }

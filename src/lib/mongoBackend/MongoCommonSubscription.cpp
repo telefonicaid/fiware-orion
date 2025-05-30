@@ -45,7 +45,6 @@
 */
 using ngsiv2::Subscription;
 using ngsiv2::HttpInfo;
-using ngsiv2::EntID;
 
 
 
@@ -142,7 +141,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
       if (httpInfo.json->isObject())
       {
         orion::BSONObjBuilder jsonBuilder;
-        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(httpInfo.json->childV, jsonBuilder);
         orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
         logStr = jsonBuilderObj.toString();
         b->append(CSUB_JSON, jsonBuilderObj);
@@ -150,7 +149,7 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
       else  // httpInfo.json->isVector();
       {
         orion::BSONArrayBuilder jsonBuilder;
-        compoundValueBson(httpInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(httpInfo.json->childV, jsonBuilder);
         orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
         logStr = jsonBuilderArr.toString();
         b->append(CSUB_JSON, jsonBuilderArr);
@@ -162,20 +161,20 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
   {
     // id and type (both optional in this case)
     orion::BSONObjBuilder bob;
-    if (!httpInfo.ngsi.id.empty())
+    if (!httpInfo.ngsi.entityId.id.empty())
     {
-      bob.append(ENT_ENTITY_ID, httpInfo.ngsi.id);
+      bob.append(ENT_ENTITY_ID, httpInfo.ngsi.entityId.id);
     }
-    if (!httpInfo.ngsi.type.empty())
+    if (!httpInfo.ngsi.entityId.type.empty())
     {
-      bob.append(ENT_ENTITY_TYPE, httpInfo.ngsi.type);
+      bob.append(ENT_ENTITY_TYPE, httpInfo.ngsi.entityId.type);
     }
 
     // attributes
     // (-1 as date as creDate and modDate are not used in this case)
     orion::BSONObjBuilder    attrsToAdd;  // not actually used
     orion::BSONArrayBuilder  attrNamesToAdd;
-    httpInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+    httpInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd);
 
     // note that although metadata is not needed in the ngsi field logic,
     // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
@@ -214,7 +213,7 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
       if (mqttInfo.json->isObject())
       {
         orion::BSONObjBuilder jsonBuilder;
-        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder);
         orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
         logStr = jsonBuilderObj.toString();
         b->append(CSUB_JSON, jsonBuilderObj);
@@ -222,7 +221,7 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
       else  // httpInfo.json->isVector();
       {
         orion::BSONArrayBuilder jsonBuilder;
-        compoundValueBson(mqttInfo.json->childV, jsonBuilder, false);
+        compoundValueBson(mqttInfo.json->childV, jsonBuilder);
         orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
         logStr = jsonBuilderArr.toString();
         b->append(CSUB_JSON, jsonBuilderArr);
@@ -234,20 +233,20 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
   {
     // id and type (both optional in this case)
     orion::BSONObjBuilder bob;
-    if (!mqttInfo.ngsi.id.empty())
+    if (!mqttInfo.ngsi.entityId.id.empty())
     {
-      bob.append(ENT_ENTITY_ID, mqttInfo.ngsi.id);
+      bob.append(ENT_ENTITY_ID, mqttInfo.ngsi.entityId.id);
     }
-    if (!mqttInfo.ngsi.type.empty())
+    if (!mqttInfo.ngsi.entityId.type.empty())
     {
-      bob.append(ENT_ENTITY_TYPE, mqttInfo.ngsi.type);
+      bob.append(ENT_ENTITY_TYPE, mqttInfo.ngsi.entityId.type);
     }
 
     // attributes
     // (-1 as date as creDate and modDate are not used in this case)
     orion::BSONObjBuilder    attrsToAdd;  // not actually used
     orion::BSONArrayBuilder  attrNamesToAdd;
-    mqttInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd, V2);
+    mqttInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd);
 
     // note that although metadata is not needed in the ngsi field logic,
     // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
@@ -392,13 +391,13 @@ void setStatus(const std::string& _status, orion::BSONObjBuilder* b, double now)
 *
 * setEntities -
 */
-void setEntities(const Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1)
+void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
 {
   orion::BSONArrayBuilder entities;
 
   for (unsigned int ix = 0; ix < sub.subject.entities.size(); ++ix)
   {
-    EntID       en            = sub.subject.entities[ix];
+    EntityId    en            = sub.subject.entities[ix];
     std::string finalId;
     std::string finalType;
     std::string isIdPattern;
@@ -439,15 +438,6 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b, bool fromNgs
       bob.append(CSUB_ENTITY_ISTYPEPATTERN, isTypePattern);
     }
     entities.append(bob.obj());
-  }
-
-  if ((fromNgsiv1) && (entities.arrSize() == 0))
-  {
-    // Special case: in NGSIv1 entities and condition attributes are not
-    // part of the same field (subject, in NGSIv2) so it may happen that
-    // subject only contains condition attributes and entities has to be
-    // left untouched in this case
-    return;
   }
 
   orion::BSONArray entitiesArr = entities.arr();

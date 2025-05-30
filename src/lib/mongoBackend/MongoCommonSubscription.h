@@ -109,7 +109,7 @@ extern void setStatus(const std::string& _status, orion::BSONObjBuilder* b, doub
 *
 * setEntities -
 */
-extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1 = false);
+extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 

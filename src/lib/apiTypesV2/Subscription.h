@@ -28,13 +28,11 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/Duration.h"
-#include "ngsi/Throttling.h"
-#include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
-#include "ngsi/Restriction.h"
+#include "ngsi/EntityId.h"
+#include "ngsi/ScopeVector.h"
 #include "common/RenderFormat.h"
 
 namespace ngsiv2
@@ -142,9 +140,9 @@ struct Condition
 */
 struct Subject
 {
-  std::vector<EntID> entities;
-  Condition          condition;
-  std::string        toJson();
+  std::vector<EntityId> entities;
+  Condition             condition;
+  std::string           toJson();
 };
 
 
@@ -165,7 +163,7 @@ public:
   Notification  notification;
   long long     throttling;
   RenderFormat  attrsFormat;
-  Restriction   restriction;
+  ScopeVector   scopeVector;
   std::string   toJson();
   void          release();
 

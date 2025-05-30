@@ -29,83 +29,18 @@
 
 #include "orionTypes/areas.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/Metadata.h"
-#include "ngsi9/RegisterContextRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
-#include "ngsi9/DiscoverContextAvailabilityRequest.h"
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "ngsi10/SubscribeContextRequest.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/UnsubscribeContextRequest.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
-#include "ngsi10/UpdateContextSubscriptionRequest.h"
-#include "ngsi10/NotifyContextRequest.h"
-#include "convenience/RegisterProviderRequest.h"
-#include "convenience/UpdateContextElementRequest.h"
-#include "convenience/AppendContextElementRequest.h"
-#include "convenience/UpdateContextAttributeRequest.h"
+#include "ngsi/QueryContextRequest.h"
+#include "ngsi/QueryContextResponse.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "ngsi/UpdateContextResponse.h"
+#include "ngsi/NotifyContextRequest.h"
 #include "apiTypesV2/Entity.h"
 #include "apiTypesV2/BatchQuery.h"
 #include "apiTypesV2/BatchUpdate.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "apiTypesV2/Registration.h"
-
-
-
-/* ****************************************************************************
-*
-* RegisterContextData - output data and help pointers for RegisterContextRequest
-*/
-struct RegisterContextData
-{
-  RegisterContextData(): crP(NULL), entityIdP(NULL), attributeP(NULL), attributeMetadataP(NULL), registrationMetadataP(NULL) {}
-  RegisterContextRequest         res;
-  ContextRegistration*           crP;
-  EntityId*                      entityIdP;
-  ContextRegistrationAttribute*  attributeP;
-  Metadata*                      attributeMetadataP;
-  Metadata*                      registrationMetadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* RegisterContextResponseData - output data and help pointers for RegisterContextRequest
-*/
-typedef struct RegisterContextResponseData
-{
-  RegisterContextResponse        res;
-} RegisterContextResponseData;
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityData -
-*/
-struct DiscoverContextAvailabilityData
-{
-  DiscoverContextAvailabilityData(): entityIdP(NULL), scopeP(NULL) {}
-  DiscoverContextAvailabilityRequest  res;
-  EntityId*                           entityIdP;
-  Scope*                              scopeP;
-};
-
-
-
-/* ****************************************************************************
-*
-* DiscoverContextAvailabilityResponseData -
-*/
-typedef struct DiscoverContextAvailabilityResponseData
-{
-  DiscoverContextAvailabilityResponse  res;
-} DiscoverContextAvailabilityResponseData;
 
 
 
@@ -139,35 +74,6 @@ struct QueryContextResponseData
   Metadata*                metadataP;
 
 };
-
-
-
-/* ****************************************************************************
-*
-* SubscribeContextData -
-*/
-struct SubscribeContextData
-{
-  SubscribeContextData():entityIdP(NULL), attributeMetadataP(NULL), restrictionP(NULL), notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
-  SubscribeContextRequest        res;
-  EntityId*                      entityIdP;
-  Metadata*                      attributeMetadataP;
-  Restriction*                   restrictionP;
-  NotifyCondition*               notifyConditionP;
-  Scope*                         scopeP;
-  orion::Point*                  vertexP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UnsubscribeContextData -
-*/
-typedef struct UnsubscribeContextData
-{
-  UnsubscribeContextRequest res;
-} UnsubscribeContextData;
 
 
 
@@ -213,76 +119,6 @@ struct UpdateContextResponseData
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
   Metadata*                metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextSubscriptionData - 
-*/
-struct UpdateContextSubscriptionData
-{
-  UpdateContextSubscriptionData(): notifyConditionP(NULL), scopeP(NULL), vertexP(NULL) {}
-  UpdateContextSubscriptionRequest  res;
-  NotifyCondition*                  notifyConditionP;
-  Scope*                            scopeP;
-  orion::Point*                     vertexP;
-};
-
-
-
-/* ****************************************************************************
-*
-* RegisterProviderRequestData -
-*/
-struct RegisterProviderRequestData
-{
-  RegisterProviderRequestData(): metadataP(NULL) {}
-  RegisterProviderRequest  res;
-  Metadata*                metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextElementData -
-*/
-struct UpdateContextElementData
-{
-  UpdateContextElementData(): attributeP(NULL), metadataP(NULL) {}
-  UpdateContextElementRequest  res;
-  ContextAttribute*            attributeP;
-  Metadata*                    metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* AppendContextElementData -
-*/
-struct AppendContextElementData
-{
-  AppendContextElementData(): attributeP(NULL), metadataP(NULL) {}
-  AppendContextElementRequest  res;
-  ContextAttribute*            attributeP;
-  Metadata*                    metadataP;
-};
-
-
-
-/* ****************************************************************************
-*
-* UpdateContextAttributeData -
-*/
-struct UpdateContextAttributeData
-{
-  UpdateContextAttributeData(): metadataP(NULL) {}
-  UpdateContextAttributeRequest  res;
-  Metadata*                      metadataP;
-  ContextAttribute               attribute;
 };
 
 
@@ -344,41 +180,27 @@ typedef struct BatchUpdateData
 /* ****************************************************************************
 *
 * ParseData -
+*
 */
 typedef struct ParseData
 {
-  ParseData():  lastContextAttribute(NULL) { }
-
-  std::string                                 errorString;
-  ContextAttribute*                           lastContextAttribute;
-  RegisterContextData                         rcr;
-  DiscoverContextAvailabilityData             dcar;
-
-  QueryContextData                            qcr;
-  SubscribeContextData                        scr;
-  UnsubscribeContextData                      uncr;
-  UpdateContextData                           upcr;
-  UpdateContextSubscriptionData               ucsr;
-  NotifyContextData                           ncr;
-
-  RegisterProviderRequestData                 rpr;
-  UpdateContextElementData                    ucer;
-  AppendContextElementData                    acer;
-  UpdateContextAttributeData                  upcar;
-
-  RegisterContextResponseData                 rcrs;
-  DiscoverContextAvailabilityResponseData     dcars;
-  QueryContextResponseData                    qcrs;
-  UpdateContextResponseData                   upcrs;
-
+  // filled by jsonRequestTreat() function in jsonRequestTreat.cpp
   EntityData                                  ent;
   AttributeData                               attr;
   AttributeValueData                          av;
   BatchQueryData                              bq;
   BatchUpdateData                             bu;
-
-  ngsiv2::SubscriptionUpdate                  subsV2;
+  ngsiv2::SubscriptionUpdate                  sub;
   ngsiv2::Registration                        reg;
+  NotifyContextData                           ncr;
+
+    // Used in postQueryContext() function for the forwarding logic
+  QueryContextData                            qcr;
+  QueryContextResponseData                    qcrs;
+
+  // Used in postUpdateContext() function for the forwarding logic
+  UpdateContextData                           upcr;
+  UpdateContextResponseData                   upcrs;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_

@@ -77,10 +77,10 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntitiesRequest)) != "OK")
+    if ((answer = parseDataP->ent.res.check(EntitiesRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setSCAndRender(&(ciP->httpStatusCode));
     }
     break;
 
@@ -92,10 +92,10 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->ent.res.check(ciP->apiVersion, EntityRequest)) != "OK")
+    if ((answer = parseDataP->ent.res.check(EntityRequest)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setSCAndRender(&(ciP->httpStatusCode));
     }
     break;
 
@@ -108,10 +108,10 @@ std::string jsonRequestTreat
       return answer;
     }
 
-    if ((answer = parseDataP->attr.attribute.check(ciP->apiVersion, EntityAttributeRequest)) != "OK")
+    if ((answer = parseDataP->attr.attribute.check(false)) != "OK")
     {
       OrionError oe(SccBadRequest, answer);
-      return oe.setStatusCodeAndSmartRender(ciP->apiVersion, &(ciP->httpStatusCode));
+      return oe.setSCAndRender(&(ciP->httpStatusCode));
     }
     break;
 
@@ -125,7 +125,7 @@ std::string jsonRequestTreat
     break;
 
   case SubscriptionsRequest:
-    answer = parseSubscription(ciP, &parseDataP->subsV2);
+    answer = parseSubscription(ciP, &parseDataP->sub);
     if (answer != "OK")
     {
       return answer;
@@ -133,7 +133,7 @@ std::string jsonRequestTreat
     break;
 
   case SubscriptionRequest:
-    answer = parseSubscription(ciP, &parseDataP->subsV2, true);  // NOTE: partial == true
+    answer = parseSubscription(ciP, &parseDataP->sub, true);  // NOTE: partial == true
     if (answer != "OK")
     {
       return answer;
@@ -174,7 +174,7 @@ std::string jsonRequestTreat
 
   default:
     OrionError error(SccNotImplemented, "Request Treat function not implemented");
-    answer = error.toJsonV1();
+    answer = error.toJson();
     ciP->httpStatusCode = SccNotImplemented;
     break;
   }

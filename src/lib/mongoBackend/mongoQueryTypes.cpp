@@ -268,9 +268,7 @@ static void sortStage(orion::BSONArrayBuilder* pipeline)
 * mongoEntityTypesValues -
 *
 * "Simplified" version of mongoEntityTypes(), using a simpler aggregation command
-* and the processing logic afterwards. Note that apiVersion is not included in this
-* operation as it can be used only in NGSIv2
-*
+* and the processing logic afterwards.
 */
 HttpStatusCode mongoEntityTypesValues
 (
@@ -371,7 +369,7 @@ HttpStatusCode mongoEntityTypesValues
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
-    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -413,7 +411,7 @@ HttpStatusCode mongoEntityTypesValues
     *totalTypesP = docs;
   }
 
-  responseP->statusCode.fill(SccOk);
+  responseP->error.fill(SccOk);
   reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
   return SccOk;
@@ -432,7 +430,6 @@ HttpStatusCode mongoEntityTypes
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,
-  ApiVersion                           apiVersion,
   unsigned int*                        totalTypesP,
   bool                                 noAttrDetail
 )
@@ -560,7 +557,7 @@ HttpStatusCode mongoEntityTypes
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
-    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -617,14 +614,7 @@ HttpStatusCode mongoEntityTypes
         for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
         {
           ContextAttribute* ca = new ContextAttribute(attrName, attrTypes[kx], "");
-
           entityType->contextAttributeVector.push_back(ca);
-
-          // For backward compability, NGSIv1 only accepts one element
-          if (apiVersion == V1)
-          {
-            break;
-          }
         }
       }
       else
@@ -652,11 +642,11 @@ HttpStatusCode mongoEntityTypes
       *totalTypesP = docs;
       char detailsMsg[256];
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %u. Offset is %u", *totalTypesP, offset);
-      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
+      responseP->error.fill(SccContextElementNotFound, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccContextElementNotFound);
+      responseP->error.fill(SccContextElementNotFound);
     }
   }
   else
@@ -666,11 +656,11 @@ HttpStatusCode mongoEntityTypes
       *totalTypesP = docs;
       char detailsMsg[256];
       snprintf(detailsMsg, sizeof(detailsMsg), "Count: %u", *totalTypesP);
-      responseP->statusCode.fill(SccOk, detailsMsg);
+      responseP->error.fill(SccOk, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccOk);
+      responseP->error.fill(SccOk);
     }
   }
 
@@ -693,22 +683,13 @@ HttpStatusCode mongoAttributesForEntityType
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,
-  bool                                  noAttrDetail,
-  ApiVersion                            apiVersion
+  bool                                  noAttrDetail
 )
 {
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   bool           reqSemTaken    = false;
   bool           count          = false;
-
-  // Count only makes sense for this operation in the case of NGSIv1
-  if (apiVersion == V1)
-  {
-    std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-
-    count = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-  }
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
@@ -789,7 +770,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     TIME_STAT_MONGO_COMMAND_WAIT_STOP();
     orion::releaseMongoConnection(connection);
-    responseP->statusCode.fill(SccReceiverInternalError, err);
+    responseP->error.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -849,14 +830,7 @@ HttpStatusCode mongoAttributesForEntityType
       for (unsigned int kx = 0; kx < attrTypes.size(); ++kx)
       {
         ContextAttribute*  ca = new ContextAttribute(attrName, attrTypes[kx], "");
-
         responseP->entityType.contextAttributeVector.push_back(ca);
-
-        // For backward compability, NGSIv1 only accepts one element
-        if (apiVersion == V1)
-        {
-          break;
-        }
       }
     }
     else
@@ -875,7 +849,7 @@ HttpStatusCode mongoAttributesForEntityType
 
   if (docs == 0)
   {
-    responseP->statusCode.fill(SccContextElementNotFound);
+    responseP->error.fill(SccContextElementNotFound);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
     return SccOk;
@@ -888,11 +862,11 @@ HttpStatusCode mongoAttributesForEntityType
     if (count)
     {
       snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) docs);
-      responseP->statusCode.fill(SccOk, detailsMsg);
+      responseP->error.fill(SccOk, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccOk);
+      responseP->error.fill(SccOk);
     }
   }
   else
@@ -900,11 +874,11 @@ HttpStatusCode mongoAttributesForEntityType
     if (count)
     {
       snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %u", docs, offset);
-      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
+      responseP->error.fill(SccContextElementNotFound, detailsMsg);
     }
     else
     {
-      responseP->statusCode.fill(SccContextElementNotFound);
+      responseP->error.fill(SccContextElementNotFound);
     }
   }
 

@@ -23,11 +23,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 SET (SOURCES
     Entity.cpp
     EntityVector.cpp
-    Entities.cpp
-    Attribute.cpp
     Subscription.cpp
     Registration.cpp
-    EntID.cpp
     BatchQuery.cpp
     BatchUpdate.cpp
     HttpInfo.cpp
@@ -37,11 +34,8 @@ SET (SOURCES
 SET (HEADERS
     Entity.h
     EntityVector.h
-    Entities.h    
-    Attribute.h
     Subscription.h
     Registration.h
-    EntID.h
     BatchQuery.h
     BatchUpdate.h
     CustomPayloadType.h

@@ -21,6 +21,22 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
+versionTreat.cpp
+exitTreat.cpp
+leakTreat.cpp
+logTraceTreat.cpp
+postUpdateContext.cpp
+postQueryContext.cpp
+badVerbPostOnly.cpp
+badVerbGetPostOnly.cpp
+badVerbGetOnly.cpp
+badVerbGetDeleteOnly.cpp
+badVerbPutDeleteOnly.cpp
+badVerbGetPutDeleteOnly.cpp
+badVerbPutOnly.cpp
+badRequest.cpp
+statisticsTreat.cpp
+optionsVersionRequest.cpp
 getEntities.cpp
 postEntities.cpp
 entryPointsTreat.cpp
@@ -55,6 +71,7 @@ getRegistrations.cpp
 optionsGetOnly.cpp
 optionsGetPostOnly.cpp
 postRegistration.cpp
+postNotifyContext.cpp
 optionsGetDeleteOnly.cpp
 optionsAllNotDelete.cpp
 optionsGetPutOnly.cpp
@@ -65,6 +82,21 @@ serviceRoutinesCommon.cpp
 )
 
 SET (HEADERS
+versionTreat.h
+exitTreat.h
+logTraceTreat.h
+postUpdateContext.h
+postQueryContext.h
+badVerbPostOnly.h
+badVerbGetPostOnly.h
+badVerbGetOnly.h
+badVerbGetDeleteOnly.h
+badVerbPutDeleteOnly.h
+badVerbGetPutDeleteOnly.h
+badVerbPutOnly.h
+badRequest.h
+statisticsTreat.h
+optionsVersionRequest.h
 getEntities.h
 postEntities.h
 entryPointsTreat.h
@@ -99,9 +131,9 @@ getRegistration.h
 deleteRegistration.h
 getRegistrations.h
 postRegistration.h
+postNotifyContext.h
 serviceRoutinesCommon.h
 )
-
 
 
 # Include directories

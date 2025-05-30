@@ -384,29 +384,19 @@ std::string parseContextAttribute
       return details;
     }
 
-    // Attribute has a regular structure, in which 'value' is mandatory (except in v2)
-    if (iter->value.HasMember("value") || ciP->apiVersion == V2)
+    std::string extraForLog = "";
+    std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector, checkAttrSpecialTypes, &extraForLog);
+    if (r == "max deep reached")
     {
-      std::string extraForLog = "";
-      std::string r = parseContextAttributeObject(iter->value, caP, &compoundVector, checkAttrSpecialTypes, &extraForLog);
-      if (r == "max deep reached")
-      {
-        alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object");
-        ciP->httpStatusCode = SccBadRequest;
-        return "max deep reached";
-      }
-      else if (r != "OK")  // other error cases get a general treatment
-      {
-        alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r + extraForLog);
-        ciP->httpStatusCode = SccBadRequest;
-        return r;
-      }
-    }
-    else
-    {
-      alarmMgr.badInput(clientIp, "JSON Parse Error", "no 'value' for ContextAttribute without keyValues");
+      alarmMgr.badInput(clientIp, "max deep reached", "found in ContextAttributeObject::Object" + extraForLog);
       ciP->httpStatusCode = SccBadRequest;
-      return "no 'value' for ContextAttribute without keyValues";
+      return "max deep reached";
+    }
+    else if (r != "OK") // other error cases get a general treatment
+    {
+      alarmMgr.badInput(clientIp, "JSON Parse Error in ContextAttribute::Object", r + extraForLog);
+      ciP->httpStatusCode = SccBadRequest;
+      return r;
     }
   }
 
@@ -415,7 +405,7 @@ std::string parseContextAttribute
     caP->type = (compoundVector)? defaultType(orion::ValueTypeVector) : defaultType(caP->valueType);
   }
 
-  std::string r = caP->check(ciP->apiVersion, ciP->requestType, relaxForbiddenCheck);
+  std::string r = caP->check(ciP->requestType == EntityAttributeValueRequest, relaxForbiddenCheck);
   if (r != "OK")
   {
     alarmMgr.badInput(clientIp, "JSON Parse Error", r);

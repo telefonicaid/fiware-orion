@@ -93,7 +93,7 @@ static bool dataProvidedParse
   //
   for (unsigned int eIx = 0; eIx < dataProvidedP->entities.size(); ++eIx)
   {
-    ngsiv2::EntID* eP = &dataProvidedP->entities[eIx];
+    EntityId* eP = &dataProvidedP->entities[eIx];
 
     if ((!eP->idPattern.empty()) && (eP->idPattern != ".*"))
     {

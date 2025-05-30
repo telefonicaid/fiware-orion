@@ -30,14 +30,15 @@
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
+#include "common/MimeType.h"
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/MetadataVector.h"
 #include "ngsi/Request.h"
-#include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoDriver/BSONObjBuilder.h"
 #include "expressions/ExprContext.h"
+#include "apiTypesV2/Registration.h"
 
 
 
@@ -52,18 +53,15 @@ public:
   std::string     type;                    // Optional
   MetadataVector  metadataVector;          // Optional
 
-  //
-  // Value - Optional (FI-WARE changes - MANDATORY in OMA spec)
-  //            Especially for the new convops, value is NOT mandatory
-  //            E.g. /v1/contextTypes
-  //
   orion::ValueType           valueType;    // Type of value: taken from JSON parse
   std::string                stringValue;  // "value" as a String
   double                     numberValue;  // "value" as a Number
   bool                       boolValue;    // "value" as a Boolean  
 
-  ProvidingApplication       providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
-  bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
+  ngsiv2::Provider           provider;                // Used internally for CPr forwarding functionality
+  std::string                providerRegId;          // Side vector to provider, to hold the reg ids where they come (used for login purposes)
+
+  bool                       found;                   // Used internally for CPr forwarding functionality (update case)
                                                       // It means attribute found either locally or remotely in providing application
 
   bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists
@@ -90,32 +88,17 @@ public:
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, bool _value, bool _found = true);
-  ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Check if attribute means a location  */
   bool  getLocation(orion::BSONObj* attrsP) const;
 
   double getEvalPriority(void);
 
-  std::string  toJsonV1(bool                             asJsonObject,
-                        RequestType                      request,
-                        const std::vector<std::string>&  metadataFilter,
-                        bool                             comma = false,
-                        bool                             omitValue = false);
-
-  std::string  toJsonV1AsObject(RequestType                    request,
-                                const std::vector<Metadata*>&  orderedMetadata,
-                                bool                           comma,
-                                bool                           omitValue = false);
-
-  std::string  toJsonV1AsNameString(bool comma);
-
   std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
 
-  std::string  toJsonAsValue(ApiVersion       apiVersion,
-                             bool             acceptedTextPlain,
+  std::string  toJsonAsValue(bool             acceptedTextPlain,
                              bool             acceptedJson,
                              MimeType         outFormatSelection,
                              MimeType*        outMimeTypeP,
@@ -129,15 +112,12 @@ public:
   /* Used to render attribute value to BSON */
   bool valueBson(const std::string&      valueKey,
                  orion::BSONObjBuilder*  bsonAttr,
-                 const std::string&      attrType,
-                 bool                    autocast,
-                 bool                    strings2numbers = false) const;
+                 const std::string&      attrType) const;
 
   /* Helper method to be use in some places wher '%s' is needed */
   std::string  getValue(void) const;
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType, bool relaxForbiddenCheck = false);
-  ContextAttribute* clone();
+  std::string  check(bool asValue, bool relaxForbiddenCheck = false);
   bool              compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
 private:
@@ -146,15 +126,13 @@ private:
 
   void bsonAppendAttrValue(const std::string&      valueKey,
                            orion::BSONObjBuilder*  bsonAttr,
-                           const std::string&      attrType,
-                           bool                    autocast) const;
+                           const std::string&      attrType) const;
 
   bool hasIgnoreType(void) const;
 
   bool calculateOperator(const std::string&         valueKey,
                          orion::CompoundValueNode*  upOp,
-                         orion::BSONObjBuilder*     bsonAttr,
-                         bool                       strings2numbers) const;
+                         orion::BSONObjBuilder*     bsonAttr) const;
 
 } ContextAttribute;
 
