@@ -2,5 +2,6 @@
 - Fix: memory leak in POST /v2/op/notify operation (#4261)
 - Fix: POST /v2/op/notify proper response (formerly it was using NSGIv1 format payload) (#4681)
 - Fix: some error messages in corner case situations (405, 406, 415 and some cases of 400) were not strictly following NGSIv2 error response syntax
+- Fix: admin log operations error responses were not following NGSIv2 error response syntax
 - Fix: memory leaks in parse logic in case of parse error (possibly)
-- Hardening: remove a huge amount of NGSIv1 related dead-code
+- Hardening: remove a huge amount of NGSIv1 related dead-code (#4681)

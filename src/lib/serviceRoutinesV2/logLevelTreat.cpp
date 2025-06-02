@@ -84,7 +84,7 @@ std::string changeLogConfig
   {
     ciP->httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "no log configs in URI param");
-    return "{\"error\":\"log config missing\"}";
+    return "{\"error\":\"BadRequest\",\"description\":\"log config missing\"}";
   }
 
   if (!logSize.empty())
@@ -97,7 +97,7 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid logLineMaxSize in URI param", logSize);
-      return "{\"error\":\"invalid lineMaxSize, lineMaxSize should be an integer number > 0\"}";
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid lineMaxSize, lineMaxSize should be an integer number > 0\"}";
     }
   }
 
@@ -111,7 +111,7 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
-      return "{\"error\":\"invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0\"}";
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0\"}";
     }
   }
 
@@ -148,7 +148,7 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid log level in URI param", level);
-      return "{\"error\":\"invalid log level\"}";
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid log level\"}";
     }
   }
 
