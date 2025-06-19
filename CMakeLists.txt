@@ -209,6 +209,7 @@ SET (ORION_LIBS
     lm
     pa
     mqtt
+    kafka
 )
 
 SET (BOOST
@@ -333,6 +334,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/expressions)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/lib/mqtt)
+  ADD_SUBDIRECTORY(src/lib/kafka)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")
