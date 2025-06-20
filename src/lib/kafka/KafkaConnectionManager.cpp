@@ -23,7 +23,7 @@
 * Author: Fermin Galan (with contributions from Burak Karaboga in old mqtt.cpp file)
 */
 
-#include "mqtt/MqttConnectionManager.h"
+#include "kafka/KafkaConnectionManager.h"
 
 #include <mosquitto.h>
 #include <string>
@@ -38,9 +38,9 @@
 
 /* ****************************************************************************
 *
-* MQTT_DEFAULT_KEEPALIVE -
+* KAFKA_DEFAULT_KEEPALIVE -
 */
-#define MQTT_DEFAULT_KEEPALIVE 60
+#define KAFKA_DEFAULT_KEEPALIVE 60
 
 
 
@@ -63,7 +63,7 @@ inline std::string getEndpoint(const std::string& host, int port)
 */
 void mqttOnConnectCallback(struct mosquitto* mosq, void *userdata, int rc)
 {
-  MqttConnection* cP = (MqttConnection*) userdata;
+  KafkaConnection* cP = (KafkaConnection*) userdata;
 
   // To be used in getConnetion()
   cP->conectionResult = rc;
@@ -82,20 +82,20 @@ void mqttOnConnectCallback(struct mosquitto* mosq, void *userdata, int rc)
 * mqttOnPublishCallback -*/
 void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
 {
-  MqttConnection* cP = (MqttConnection*) userdata;
+  KafkaConnection* cP = (KafkaConnection*) userdata;
 
   // mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level
   // Note this trace use N/A in corrid= and transid=
-  LM_T(LmtMqttNotif, ("MQTT notification successfully published at %s with id %d", cP->endpoint.c_str(), mid));
+  LM_T(LmtMqttNotif, ("KAFKA notification successfully published at %s with id %d", cP->endpoint.c_str(), mid));
 }
 
 
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::MqttConnectionManager -
+* KafkaConnectionManager::KafkaConnectionManager -
 */
-MqttConnectionManager::MqttConnectionManager(void)
+KafkaConnectionManager::KafkaConnectionManager(void)
 {
 }
 
@@ -103,11 +103,11 @@ MqttConnectionManager::MqttConnectionManager(void)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::init -
+* KafkaConnectionManager::init -
 */
-void MqttConnectionManager::init(long _timeout)
+void KafkaConnectionManager::init(long _timeout)
 {
-  LM_T(LmtMqttNotif, ("Initializing MQTT library"));
+  LM_T(LmtMqttNotif, ("Initializing KAFKA library"));
   mosquitto_lib_init();
 
   if (_timeout != -1)
@@ -126,16 +126,16 @@ void MqttConnectionManager::init(long _timeout)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::teardown -
+* KafkaConnectionManager::teardown -
 */
-void MqttConnectionManager::teardown(void)
+void KafkaConnectionManager::teardown(void)
 {
-  LM_T(LmtMqttNotif, ("Teardown MQTT connections"));
+  LM_T(LmtMqttNotif, ("Teardown KAFKA connections"));
 
-  for (std::map<std::string, MqttConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+  for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
     std::string endpoint = iter->first;
-    MqttConnection* cP   = iter->second;
+    KafkaConnection* cP   = iter->second;
 
     disconnect(cP->mosq, endpoint);
     cP->mosq = NULL;
@@ -150,9 +150,9 @@ void MqttConnectionManager::teardown(void)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::semInit -
+* KafkaConnectionManager::semInit -
 */
-void MqttConnectionManager::semInit(void)
+void KafkaConnectionManager::semInit(void)
 {
   if (sem_init(&sem, 0, 1) == -1)
   {
@@ -164,9 +164,9 @@ void MqttConnectionManager::semInit(void)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::semGet -
+* KafkaConnectionManager::semGet -
 */
-const char* MqttConnectionManager::semGet(void)
+const char* KafkaConnectionManager::semGet(void)
 {
   int value;
 
@@ -187,9 +187,9 @@ const char* MqttConnectionManager::semGet(void)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::semTake -
+* KafkaConnectionManager::semTake -
 */
-void MqttConnectionManager::semTake(void)
+void KafkaConnectionManager::semTake(void)
 {
   sem_wait(&sem);
 }
@@ -198,9 +198,9 @@ void MqttConnectionManager::semTake(void)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::semGive -
+* KafkaConnectionManager::semGive -
 */
-void MqttConnectionManager::semGive(void)
+void KafkaConnectionManager::semGive(void)
 {
   sem_post(&sem);
 }
@@ -209,22 +209,22 @@ void MqttConnectionManager::semGive(void)
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::disconnect -
+* KafkaConnectionManager::disconnect -
 */
-void MqttConnectionManager::disconnect(struct mosquitto*  mosq, const std::string& endpoint)
+void KafkaConnectionManager::disconnect(struct mosquitto*  mosq, const std::string& endpoint)
 {
-  LM_T(LmtMqttNotif, ("Disconnecting from MQTT Broker at %s", endpoint.c_str()));
+  LM_T(LmtMqttNotif, ("Disconnecting from KAFKA Broker at %s", endpoint.c_str()));
   int resultCode = mosquitto_disconnect(mosq);
 
   // Sometimes this function is called when connection is not actually stablisehd, so we skip logging
   // the MOSQ_ERR_NO_CONN case
   if ((resultCode != MOSQ_ERR_SUCCESS) && (resultCode != MOSQ_ERR_NO_CONN))
   {
-    LM_E(("Runtime Error (could not disconnect from MQTT Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
+    LM_E(("Runtime Error (could not disconnect from KAFKA Broker (%d): %s)", resultCode, mosquitto_strerror(resultCode)));
   }
   else
   {
-    LM_T(LmtMqttNotif, ("Successfully disconnected from MQTT Broker at %s", endpoint.c_str()));
+    LM_T(LmtMqttNotif, ("Successfully disconnected from KAFKA Broker at %s", endpoint.c_str()));
   }
   mosquitto_loop_stop(mosq, false);
   mosquitto_destroy(mosq);
@@ -234,9 +234,9 @@ void MqttConnectionManager::disconnect(struct mosquitto*  mosq, const std::strin
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::getConnection -
+* KafkaConnectionManager::getConnection -
 */
-MqttConnection* MqttConnectionManager::getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd)
+KafkaConnection* KafkaConnectionManager::getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd)
 {
   // Note we don't take the sem here, as the caller has already done that
   std::string endpoint = getEndpoint(host, port);
@@ -244,9 +244,9 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
   if (connections.find(endpoint) == connections.end())
   {
     // Doesn't exists: create it
-     LM_T(LmtMqttNotif, ("New MQTT broker connection for %s", endpoint.c_str()));
+     LM_T(LmtMqttNotif, ("New KAFKA broker connection for %s", endpoint.c_str()));
 
-     MqttConnection* cP = new MqttConnection();
+     KafkaConnection* cP = new KafkaConnection();
 
      cP->endpoint = endpoint;
 
@@ -272,7 +272,7 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
        int resultCode = mosquitto_username_pw_set(cP->mosq, user.c_str(), passwd.c_str());
        if (resultCode != MOSQ_ERR_SUCCESS)
        {
-         LM_E(("Runtime Error (could not set user/pass in MQTT Broker connection %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
+         LM_E(("Runtime Error (could not set user/pass in KAFKA Broker connection %s (%d): %s)", endpoint.c_str(), resultCode, mosquitto_strerror(resultCode)));
          mosquitto_destroy(cP->mosq);
          cP->mosq = NULL;
          return cP;
@@ -298,9 +298,9 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
     // // Callback de eventos (conexión/errores, similar a mqttOnConnectCallback)
     // conf->set("event_cb", &eventCallback, errstr);
 
-     LM_T(LmtMqttNotif, ("Connecting to MQTT Broker at %s", endpoint.c_str()));
+     LM_T(LmtMqttNotif, ("Connecting to KAFKA Broker at %s", endpoint.c_str()));
 
-     int resultCode = mosquitto_connect(cP->mosq, host.c_str(), port, MQTT_DEFAULT_KEEPALIVE);
+     int resultCode = mosquitto_connect(cP->mosq, host.c_str(), port, KAFKA_DEFAULT_KEEPALIVE);
      if (resultCode != MOSQ_ERR_SUCCESS)
      {
        // Alarm is raised in this case
@@ -333,8 +333,8 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
 
      // Check if the connection went ok (if not, e.g wrong user/pass, alarm is raised)
      // Note a value of 0 means success, check:
-     // - For MQTT v5.0, look at section 3.2.2.2 Connect Reason code: https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html
-     // - For MQTT v3.1.1, look at section 3.2.2.3 Connect Return code: http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html
+     // - For KAFKA v5.0, look at section 3.2.2.2 Connect Reason code: https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html
+     // - For KAFKA v3.1.1, look at section 3.2.2.3 Connect Return code: http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html
      if (cP->conectionResult)
      {
        alarmMgr.mqttConnectionError(endpoint, mosquitto_connack_string(cP->conectionResult));
@@ -346,7 +346,7 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
      }
 
      // If it went ok, it is included in the connection map (and alarm is released)
-     LM_T(LmtMqttNotif, ("MQTT successfull connection for %s", endpoint.c_str()));
+     LM_T(LmtMqttNotif, ("KAFKA successfull connection for %s", endpoint.c_str()));
      alarmMgr.mqttConnectionReset(endpoint);
 
      cP->lastTime = getCurrentTime();
@@ -357,7 +357,7 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
   else
   {
     // Already exists: update the time counter
-    LM_T(LmtMqttNotif, ("Existing MQTT broker connection for %s", endpoint.c_str()));
+    LM_T(LmtMqttNotif, ("Existing KAFKA broker connection for %s", endpoint.c_str()));
     connections[endpoint]->lastTime = getCurrentTime();
 
     return connections[endpoint];
@@ -368,9 +368,9 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::sendMqttNotification -
+* KafkaConnectionManager::sendMqttNotification -
 */
-bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, bool retain)
+bool KafkaConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, bool retain)
 {
   std::string endpoint = getEndpoint(host, port);
 
@@ -380,7 +380,7 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
   // it could happen in theory)
   semTake();
 
-  MqttConnection* cP = getConnection(host, port, user, passwd);
+  KafkaConnection* cP = getConnection(host, port, user, passwd);
   mosquitto* mosq = cP->mosq;
 
   if (mosq == NULL)
@@ -404,7 +404,7 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
     retval = false;
     alarmMgr.mqttConnectionError(endpoint, mosquitto_strerror(resultCode));
     // We destroy the connection in this case so a re-connection is forced next time
-    // a MQTT notification is sent
+    // a KAFKA notification is sent
     disconnect(cP->mosq, endpoint);
     connections.erase(endpoint);
     delete cP;
@@ -412,7 +412,7 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
   else
   {
     retval = true;
-    LM_T(LmtMqttNotif, ("MQTT notification sent to %s:%d on topic %s with qos %d with id %d", host.c_str(), port, topic.c_str(), qos, id));
+    LM_T(LmtMqttNotif, ("KAFKA notification sent to %s:%d on topic %s with qos %d with id %d", host.c_str(), port, topic.c_str(), qos, id));
     alarmMgr.mqttConnectionReset(endpoint);
   }
 
@@ -424,26 +424,26 @@ bool MqttConnectionManager::sendMqttNotification(const std::string& host, int po
 
 /* ****************************************************************************
 *
-* MqttConnectionManager::cleanup -
+* KafkaConnectionManager::cleanup -
 *
 * maxAge parameter is in seconds
 */
-void MqttConnectionManager::cleanup(double maxAge)
+void KafkaConnectionManager::cleanup(double maxAge)
 {
-  LM_T(LmtMqttNotif, ("Checking MQTT connections age"));
+  LM_T(LmtMqttNotif, ("Checking KAFKA connections age"));
 
   semTake();
 
   std::vector<std::string> toErase;
 
-  for (std::map<std::string, MqttConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+  for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
     std::string endpoint = iter->first;
-    MqttConnection* cP   = iter->second;
+    KafkaConnection* cP   = iter->second;
     double age = getCurrentTime() - cP->lastTime;
     if (age > maxAge)
     {
-      LM_T(LmtMqttNotif, ("MQTT connection %s too old (age: %f, maxAge: %f), removing it", endpoint.c_str(), age, maxAge));
+      LM_T(LmtMqttNotif, ("KAFKA connection %s too old (age: %f, maxAge: %f), removing it", endpoint.c_str(), age, maxAge));
 
       toErase.push_back(endpoint);
       disconnect(cP->mosq, endpoint);

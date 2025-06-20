@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_KAFKA_KAFKAMGR_H_
+#define SRC_LIB_KAFKA_KAFKAMGR_H_
+
 /*
 *
 * Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,14 +26,15 @@
 * Author: Fermin Galan
 */
 
-#include "mqtt/MqttConnectionManager.h"
+#include "kafka/KafkaConnectionManager.h"
 
 
 
 /* ****************************************************************************
 *
 * mqttMgr -
-*
 */
-MqttConnectionManager mqttTwoMgr;
+extern KafkaConnectionManager kafkaMgr;
+
+#endif  // SRC_LIB_KAFKA_KAFKAMGR_H_
 

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_
-#define SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_
+#ifndef SRC_LIB_KAFKA_KAFKACONNECTIONMANAGER_H_
+#define SRC_LIB_KAFKA_KAFKACONNECTIONMANAGER_H_
 
 /*
 *
@@ -36,9 +36,9 @@
 
 /* ****************************************************************************
 *
-* MqttConnection -
+* KafkaConnection -
 */
-typedef struct MqttConnection
+typedef struct KafkaConnection
 {
   struct mosquitto*  mosq;
   std::string        endpoint;
@@ -46,23 +46,23 @@ typedef struct MqttConnection
   sem_t              connectionSem;
   int                conectionResult;
   bool               connectionCallbackCalled;
-} MqttConnection;
+} KafkaConnection;
 
 
 
 /* ****************************************************************************
 *
-* MqttConnectionManager -
+* KafkaConnectionManager -
 */
-class MqttConnectionManager
+class KafkaConnectionManager
 {
  private:
-  std::map<std::string, MqttConnection*>  connections;
+  std::map<std::string, KafkaConnection*>  connections;
   long                                    timeout;
   sem_t                                   sem;
 
  public:
-  MqttConnectionManager();
+  KafkaConnectionManager();
 
   void init(long _timeout);
   void teardown(void);
@@ -78,8 +78,8 @@ class MqttConnectionManager
   void semTake(void);
   void semGive(void);
 
-  MqttConnection* getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd);
+  KafkaConnection* getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd);
 };
 
-#endif  // SRC_LIB_MQTT_MQTTCONNECTIONMANAGER_H_
+#endif  // SRC_LIB_KAFKA_KAFKACONNECTIONMANAGER_H_
 

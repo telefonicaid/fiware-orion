@@ -21,13 +21,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
-    MqttConnectionManager.cpp
-    mqttTwoMgr.cpp
+    KafkaConnectionManager.cpp
+    kafkaMgr.cpp
 )
 
 SET (HEADERS
-    MqttConnectionManager.h
-        mqttTwoMgr.h
+    KafkaConnectionManager.h
+        kafkaMgr.h
 )
 
 
