@@ -31,7 +31,7 @@
 
 #include <string>
 #include <map>
-
+#include <rdkafka.h>
 
 
 /* ****************************************************************************
@@ -40,14 +40,13 @@
 */
 typedef struct KafkaConnection
 {
-  struct mosquitto*  mosq;
-  std::string        endpoint;
-  double             lastTime;
-  sem_t              connectionSem;
-  int                conectionResult;
-  bool               connectionCallbackCalled;
+ rd_kafka_t*        producer;       // Similar a mosquitto*
+ std::string        endpoint;       // "broker1:9092,broker2:9092"
+ double             lastTime;       // Timestamp de última actividad
+ sem_t              connectionSem;  // Sincronización (como en MQTT)
+ int                connectionResult; // Código de error (rd_kafka_resp_err_t)
+ bool               connectionCallbackCalled; // Para callbacks
 } KafkaConnection;
-
 
 
 /* ****************************************************************************
@@ -56,29 +55,33 @@ typedef struct KafkaConnection
 */
 class KafkaConnectionManager
 {
- private:
-  std::map<std::string, KafkaConnection*>  connections;
-  long                                    timeout;
-  sem_t                                   sem;
+private:
+ std::map<std::string, KafkaConnection*>  connections;  // Mapa por endpoint
+ long                                    timeout;       // Timeout en ms
+ sem_t                                   sem;           // Semaforo global
 
- public:
-  KafkaConnectionManager();
+public:
+ KafkaConnectionManager();
+ void init(long _timeout);
+ void teardown();
 
-  void init(long _timeout);
-  void teardown(void);
+ const char*  semGet(void);
 
-  const char*  semGet(void);
+ bool sendKafkaNotification(
+   const std::string& brokers,
+   const std::string& topic,
+   const std::string& message,
+   int partition = RD_KAFKA_PARTITION_UA  // Partitioning opcional
+ );
 
-  bool sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, bool retain);
-  void cleanup(double maxAge);
+ void cleanup(double maxAge);  // Limpieza de conexiones inactivas
 
- private:
-  void disconnect(struct mosquitto*  mosq, const std::string& endpoint);
-  void semInit(void);
-  void semTake(void);
-  void semGive(void);
-
-  KafkaConnection* getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd);
+private:
+ void disconnect(rd_kafka_t* producer, const std::string& endpoint);
+ void semInit(void);
+ void semTake(void);
+ void semGive(void);
+ KafkaConnection* getConnection(const std::string& brokers);
 };
 
 #endif  // SRC_LIB_KAFKA_KAFKACONNECTIONMANAGER_H_
