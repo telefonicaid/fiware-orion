@@ -63,7 +63,7 @@ private:
 public:
  KafkaConnectionManager();
  void init(long _timeout);
- void teardown();
+ void teardown(void);
 
  const char*  semGet(void);
 

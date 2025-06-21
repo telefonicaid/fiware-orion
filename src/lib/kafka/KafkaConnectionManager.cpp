@@ -128,23 +128,34 @@ void KafkaConnectionManager::init(long _timeout)
 *
 * KafkaConnectionManager::teardown -
 */
-// void KafkaConnectionManager::teardown(void)
-// {
-//   LM_T(LmtMqttNotif, ("Teardown KAFKA connections"));
-//
-//   for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
-//   {
-//     std::string endpoint = iter->first;
-//     KafkaConnection* cP   = iter->second;
-//
-//     disconnect(cP->mosq, endpoint);
-//     cP->mosq = NULL;
-//
-//     delete cP;
-//   }
-//
-//   mosquitto_lib_cleanup();
-// }
+void KafkaConnectionManager::teardown(void)
+{
+  LM_T(LmtMqttNotif, ("Teardown KAFKA connections"));
+
+  for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+  {
+    std::string endpoint = iter->first;
+    KafkaConnection* cP   = iter->second;
+
+    disconnect(cP->producer, endpoint);
+    cP->producer = NULL;
+
+    delete cP;
+  }
+  connections.clear();
+
+  // 5. Limpieza global de librdkafka (esperar hasta 3 segundos)
+  int wait_time_ms = 3000;
+  while (rd_kafka_wait_destroyed(wait_time_ms) == -1)
+  {
+    LM_I(("Esperando finalización de threads internos de librdkafka..."));
+    wait_time_ms -= 100;
+    if (wait_time_ms <= 0) break;
+  }
+
+  LM_T(LmtKafkaNotif, ("Destrucción de conexiones Kafka completada"));
+
+}
 
 
 
@@ -215,7 +226,12 @@ void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string&
 {
   if (producer)
   {
-    rd_kafka_flush(producer, 1000); // Espera 1s para enviar mensajes pendientes
+    rd_kafka_resp_err_t err = rd_kafka_flush(producer, 1000); // Espera 1s para enviar mensajes pendientes
+    if (err != RD_KAFKA_RESP_ERR_NO_ERROR)
+    {
+      LM_E(("Error al hacer flush de mensajes para %s: %s",
+           endpoint.c_str(), rd_kafka_err2str(err)));
+    }
     rd_kafka_destroy(producer);     // Libera recursos (equivalente a mosquitto_destroy)
   }
   // alarmMgr.kafkaConnectionError(endpoint, "disconnected");
