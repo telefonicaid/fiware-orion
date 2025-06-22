@@ -452,12 +452,12 @@ static SenderThreadParams* buildSenderParamsCustom
   //
   // 3. Payload
   //
-  ngsiv2::CustomPayloadType customPayloadType = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payloadType : notification.mqttInfo.payloadType);
+  ngsiv2::CustomPayloadType customPayloadType = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payloadType : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.payloadType : notification.kafkaInfo.payloadType));
 
   if (customPayloadType == ngsiv2::CustomPayloadType::Text)
   {
     bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.includePayload : notification.kafkaInfo.includePayload));
-    std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
+    std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload :(notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.payload : notification.kafkaInfo.payload));
     if (!setPayload(includePayload, notifPayload, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
@@ -711,7 +711,7 @@ SenderThreadParams* Notifier::buildSenderParams
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
-    bool custom = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.custom : (ngsiv2::MqttNotification ? notification.mqttInfo.custom : notification.kafkaInfo.custom);
+    bool custom = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.custom : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.custom : notification.kafkaInfo.custom);
     if (custom && !disableCusNotif)
     {
       return buildSenderParamsCustom(subId,
@@ -790,7 +790,7 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->failsCounter     = failsCounter;
     paramsP->servicePath      = spath;
     paramsP->xauthToken       = xauthToken;
-    paramsP->resource         = notification.type == ngsiv2::HttpNotification? uriPath : (ngsiv2::MqttNotification? notification.mqttInfo.topic : notification.kafkaInfo.topic);
+    paramsP->resource         = notification.type == ngsiv2::HttpNotification? uriPath : (notification.type == ngsiv2::MqttNotification? notification.mqttInfo.topic : notification.kafkaInfo.topic);
     paramsP->content_type     = content_type;
     paramsP->content          = payloadString;
     paramsP->mimeType         = JSON;
