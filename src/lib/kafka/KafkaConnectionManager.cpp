@@ -77,17 +77,17 @@ inline std::string getEndpoint(const std::string& host, int port)
 
 
 
-/* ****************************************************************************
-*
-* mqttOnPublishCallback -*/
-void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
-{
-  KafkaConnection* cP = (KafkaConnection*) userdata;
-
-  // mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level
-  // Note this trace use N/A in corrid= and transid=
-  LM_T(LmtMqttNotif, ("KAFKA notification successfully published at %s with id %d", cP->endpoint.c_str(), mid));
-}
+// /* ****************************************************************************
+// *
+// * mqttOnPublishCallback -*/
+// void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
+// {
+//   KafkaConnection* cP = (KafkaConnection*) userdata;
+//
+//   // mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level
+//   // Note this trace use N/A in corrid= and transid=
+//   LM_T(LmtMqttNotif, ("KAFKA notification successfully published at %s with id %d", cP->endpoint.c_str(), mid));
+// }
 
 
 
