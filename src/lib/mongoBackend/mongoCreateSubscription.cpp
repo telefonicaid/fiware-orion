@@ -95,6 +95,7 @@ static void insertInCache
                      servicePath.c_str(),
                      sub.notification.httpInfo,
                      sub.notification.mqttInfo,
+                     sub.notification.kafkaInfo,
                      sub.subject.entities,
                      sub.notification.attributes,
                      sub.notification.metadata,

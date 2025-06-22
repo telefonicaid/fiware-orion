@@ -70,6 +70,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_MQTTTOPIC, 1);
     unsetB->append(CSUB_MQTTQOS,   1);
     unsetB->append(CSUB_MQTTRETAIN, 1);
+    unsetB->append(CSUB_KAFKATOPIC, 1);
     unsetB->append(CSUB_USER,      1);
     unsetB->append(CSUB_PASSWD,    1);
 
