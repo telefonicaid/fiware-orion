@@ -427,17 +427,21 @@ static SenderThreadParams* buildSenderParamsCustom
     }
     method = verbName(verb);
   }
-  else  // MqttNotification
+  else  if (notification.type == ngsiv2::MqttNotification) // MqttNotification
+  {
+    // Verb/method is irrelevant in this case
+    method = verbName(NOVERB);
+  }
+  else  if (notification.type == ngsiv2::KafkaNotification) // KafkaNotification
   {
     // Verb/method is irrelevant in this case
     method = verbName(NOVERB);
   }
 
-
   //
   // 2. URL
   //
-  std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
+  std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.url : notification.kafkaInfo.url));
   if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
@@ -452,7 +456,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   if (customPayloadType == ngsiv2::CustomPayloadType::Text)
   {
-    bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
+    bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.includePayload : notification.kafkaInfo.includePayload));
     std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
     if (!setPayload(includePayload, notifPayload, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
@@ -462,14 +466,14 @@ static SenderThreadParams* buildSenderParamsCustom
   }
   else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
   {
-    orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
+    orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.json : notification.kafkaInfo.json));
     setJsonPayload(json, &exprContext, &payload, &mimeType);
     renderFormat = NGSI_V2_CUSTOM;
   }
   else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
-    const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
+    const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.ngsi : notification.kafkaInfo.ngsi));
     if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat, basic))
     {
       // Warning already logged in macroSubstitute()
@@ -577,10 +581,19 @@ static SenderThreadParams* buildSenderParamsCustom
     }
   }
 
-  // 8. Topic (only in the case of MQTT notifications)
+  // 8. Topic (case of MQTT notifications)
   if (notification.type == ngsiv2::MqttNotification)
   {
     if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
+    {
+      // Warning already logged in macroSubstitute()
+      return NULL;
+    }
+  }
+  // 9. Topic (case of KAFKA notifications)
+  if (notification.type == ngsiv2::KafkaNotification)
+  {
+    if (macroSubstitute(&topic, notification.kafkaInfo.topic, &exprContext, "", true) == false)
     {
       // Warning already logged in macroSubstitute()
       return NULL;
@@ -657,7 +670,12 @@ SenderThreadParams* Notifier::buildSenderParams
         verb = POST;
       }
     }
-    else  // MqttNotification
+    else if (notification.type == ngsiv2::MqttNotification) // MqttNotification
+    {
+      // Verb/methodd is irrelevant in this case
+      verb = NOVERB;
+    }
+    else if (notification.type == ngsiv2::KafkaNotification) // KafkaNotification
     {
       // Verb/methodd is irrelevant in this case
       verb = NOVERB;
@@ -693,7 +711,7 @@ SenderThreadParams* Notifier::buildSenderParams
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
-    bool custom = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.custom : notification.mqttInfo.custom;
+    bool custom = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.custom : (ngsiv2::MqttNotification ? notification.mqttInfo.custom : notification.kafkaInfo.custom);
     if (custom && !disableCusNotif)
     {
       return buildSenderParamsCustom(subId,
@@ -749,7 +767,7 @@ SenderThreadParams* Notifier::buildSenderParams
     std::string  uriPath;
     std::string  protocol;
 
-    std::string url = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
+    std::string url = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.url : notification.kafkaInfo.url));
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
@@ -772,7 +790,7 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->failsCounter     = failsCounter;
     paramsP->servicePath      = spath;
     paramsP->xauthToken       = xauthToken;
-    paramsP->resource         = notification.type == ngsiv2::HttpNotification? uriPath : notification.mqttInfo.topic;
+    paramsP->resource         = notification.type == ngsiv2::HttpNotification? uriPath : (ngsiv2::MqttNotification? notification.mqttInfo.topic : notification.kafkaInfo.topic);
     paramsP->content_type     = content_type;
     paramsP->content          = payloadString;
     paramsP->mimeType         = JSON;
