@@ -1,3 +1,4 @@
+- Fix: JEXL expressions evalPriority not working correctly is some cases (#4689)
 - Fix: registrations with more than one contextRegistration element (not possible in NGSIv2) are logged as Runtime Errors
 - Fix: memory leak in POST /v2/op/notify operation (#4261)
 - Fix: POST /v2/op/notify proper response (formerly it was using NSGIv1 format payload) (#4681)
