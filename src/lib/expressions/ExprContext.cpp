@@ -65,10 +65,32 @@ std::map<std::string,std::string>* ExprContextObject::getMap(void)
 
 /* ****************************************************************************
 *
+* ExprContextObject::hasKey -
+*/
+bool ExprContextObject::hasKey(const std::string &key)
+{
+  // Check if the key is already in the context
+  for (const auto &k : keys)
+  {
+    if (k == key)
+    {
+      return true;
+    }
+  }
+
+  // If not found, return false
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * ExprContextObject::add -
 */
 void ExprContextObject::add(const std::string &key, const std::string &_value, bool raw)
 {
+  keys.push_back(key);
   if (basic)
   {
     std::string value = _value;
@@ -102,6 +124,7 @@ void ExprContextObject::add(const std::string &key, const std::string &_value, b
 */
 void ExprContextObject::add(const std::string &key, double _value)
 {
+  keys.push_back(key);
   if (basic)
   {
     LM_T(LmtExpr, ("adding to basic expression context object (double): %s=%f", key.c_str(), _value));
@@ -122,6 +145,7 @@ void ExprContextObject::add(const std::string &key, double _value)
 */
 void ExprContextObject::add(const std::string &key, bool _value)
 {
+  keys.push_back(key);
   if (basic)
   {
     LM_T(LmtExpr, ("adding to basic expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
@@ -142,6 +166,7 @@ void ExprContextObject::add(const std::string &key, bool _value)
 */
 void ExprContextObject::add(const std::string &key)
 {
+  keys.push_back(key);
   if (basic)
   {
     LM_T(LmtExpr, ("adding to basic expression context object (none): %s", key.c_str()));
@@ -162,6 +187,7 @@ void ExprContextObject::add(const std::string &key)
 */
 void ExprContextObject::add(const std::string &key, ExprContextObject exprContextObject)
 {
+  keys.push_back(key);
   if (basic)
   {
     LM_E(("Runtime Error (this method must not be invoked in basic mode)"));
@@ -182,6 +208,7 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
 */
 void ExprContextObject::add(const std::string &key, ExprContextList exprContextList)
 {
+  keys.push_back(key);
   if (basic)
   {
     LM_E(("Runtime Error (this method must not be invoked in basic mode)"));
