@@ -261,6 +261,8 @@ SET (DYNAMIC_LIBS
     gcrypt
     ssl
     uuid
+    rdkafka
+    rdkafka++
     crypto
     sasl2
 )
@@ -283,6 +285,7 @@ endif (UNIT_TEST)
 include_directories("/usr/include")
 
 # Needed for the new C driver
+include_directories("/usr/include/librdkafka")
 include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("/usr/local/include/libbson-1.0")
 

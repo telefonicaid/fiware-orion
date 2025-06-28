@@ -770,7 +770,7 @@ SenderThreadParams* Notifier::buildSenderParams
     std::string url = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.url : notification.kafkaInfo.url));
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
-      LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
+      LM_E(("Runtime Error (not sending notification: malformed URL 2: '%s')", url.c_str()));
       return NULL;
     }
 

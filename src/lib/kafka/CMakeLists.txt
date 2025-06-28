@@ -43,7 +43,7 @@ ADD_LIBRARY(kafka STATIC ${SOURCES} ${HEADERS})
 
 
 # Include directories
-target_include_directories(kafka PUBLIC /usr/include/librdkafka)
+#target_include_directories(kafka PUBLIC /usr/include/librdkafka)
 
 # Linker directories
 target_link_directories(kafka PUBLIC /usr/lib/x86_64-linux-gnu)

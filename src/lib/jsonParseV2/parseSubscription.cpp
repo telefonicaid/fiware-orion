@@ -791,10 +791,10 @@ static std::string parseKafkaTopic(ConnectionInfo* ciP, SubscriptionUpdate* subs
     return badInput(ciP, "empty kafka field /topic/");
   }
 
-  if (forbiddenMqttTopic(topicOpt.value.c_str()))
-  {
-    return badInput(ciP, "+ and # are not allowed in kafka field /topic/");
-  }
+  // if (forbiddenMqttTopic(topicOpt.value.c_str()))
+  // {
+  //   return badInput(ciP, "+ and # are not allowed in kafka field /topic/");
+  // }
 
 
   if (forbiddenChars(topicOpt.value.c_str()))
@@ -1331,7 +1331,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     // }
 
     // topic (same as in not custom mqtt)
-    r = parseMqttTopic(ciP, subsP, kafkaCustom);
+    r = parseKafkaTopic(ciP, subsP, kafkaCustom);
     if (!r.empty())
     {
       return r;

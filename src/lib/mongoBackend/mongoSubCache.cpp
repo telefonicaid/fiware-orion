@@ -137,11 +137,14 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   //
   // Note that the URL of the notification is stored outside the httpInfo object in mongo
   //
+  if (sub.hasField(CSUB_KAFKATOPIC)){
+    cSubP->kafkaInfo.fill(sub);
+  }
+  else
   if (sub.hasField(CSUB_MQTTTOPIC))
   {
     cSubP->mqttInfo.fill(sub);
-  }
-  else
+  } else
   {
     cSubP->httpInfo.fill(sub);
   }

@@ -379,9 +379,9 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
   else if (sub.notification.type == ngsiv2::KafkaNotification) // KafkaNotification
   {
     b->append(CSUB_REFERENCE, sub.notification.kafkaInfo.url);
-    b->append(CSUB_MQTTTOPIC, sub.notification.kafkaInfo.topic);
-    b->append(CSUB_MQTTQOS,   (int) sub.notification.kafkaInfo.qos);
-    b->append(CSUB_MQTTRETAIN, sub.notification.kafkaInfo.retain);
+    b->append(CSUB_KAFKATOPIC, sub.notification.kafkaInfo.topic);
+    // b->append(CSUB_MQTTQOS,   (int) sub.notification.kafkaInfo.qos);
+    // b->append(CSUB_MQTTRETAIN, sub.notification.kafkaInfo.retain);
     b->append(CSUB_CUSTOM,    sub.notification.kafkaInfo.custom);
 
     LM_T(LmtMongo, ("Subscription reference:  %s", sub.notification.kafkaInfo.url.c_str()));
