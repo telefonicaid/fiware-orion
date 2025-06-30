@@ -196,7 +196,7 @@ static void doNotifyKafka(SenderThreadParams* params)
 
   // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
   // lastFailureReason and lastSuccessCode in MQTT notifications (they don't have sense in this case)
-  if (kafkaMgr.sendKafkaNotification(params->ip, params->content, params->resource, 0))
+  if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, 0))
   {
     // MQTT transaction is logged only in the case it was actually published. Upon successful publishing
     // mqttOnPublishCallback is called (by the moment we are not doing nothing there, just printing in

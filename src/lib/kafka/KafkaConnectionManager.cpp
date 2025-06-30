@@ -345,6 +345,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
+    // TODO: Check
     alarmMgr.mqttConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
     disconnect(kConn->producer, endpoint);
     connections.erase(endpoint);
