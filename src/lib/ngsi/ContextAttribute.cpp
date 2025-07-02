@@ -845,7 +845,18 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
+    if ((exprContextObjectP != NULL) && (exprContextObjectP->hasKey(name)))
+    {
+      // This means that the attribute has been already evaluated in the context due to evalPriority processing
+      // so we take its value directly from the context object
+      jh.addRaw("value", smartStringValue("${" + name + "}", exprContextObjectP, "null"));
+    }
+    else
+    {
+      // FIXME PR: maybe this case is no longer needed as all the attributes has been previously calculated in the context ?
+      // (check to disable this and check if the tests pass)
+      jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
+    }
   }
   else if (valueType == orion::ValueTypeBoolean)
   {

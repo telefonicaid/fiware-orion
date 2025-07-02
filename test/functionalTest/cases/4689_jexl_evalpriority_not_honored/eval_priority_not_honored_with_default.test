@@ -1,0 +1,211 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+evalPriority not honored (with default evalPriority)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# Same as eval_priority_not_honored_with_value.test but without specifying evalPriority for NO2Status and SO2Status, so
+# default (100000) will be used, with the same result.
+#
+# 01. Create custom sub
+# 02. Create entity to trigger expressions
+# 03. Dump accumulator and check notif is ok
+#
+
+
+echo "01. Create custom sub"
+echo "====================="
+# NOTE: '\'' is the way of scaping a ' in the payload variable below (see https://stackoverflow.com/a/1250279/1485926)
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "NO2Status": {
+          "type": "Number",
+          "value": "${NO2StatusRaw}"
+        },
+        "SO2Status": {
+          "type": "Number",
+          "value": "${SO2StatusRaw}"
+        },
+        "airQualityIndex": {
+          "type": "Number",
+          "value": "${(SO2Status >= NO2Status) ? SO2Status : NO2Status}",
+          "metadata": {
+            "evalPriority": {
+              "type": "Number",
+              "value": 2
+            }
+          }
+        },
+        "airQualityLevel": {
+          "type": "Text",
+          "value": "${((airQualityIndex == 1) ? '\''Buena'\'' : ((airQualityIndex == 2)  ? '\''Razonablemente Buena'\'' : ((airQualityIndex == 3) ? '\''Regular'\'' :((airQualityIndex == 4) ? '\''Desfavorable'\'' : ((airQualityIndex == 5) ? '\''Muy Desfavorable'\'' : ((airQualityIndex == 6) ? '\''Extremadamente desfavorable'\'' : '\''Sin datos'\''))))))}",
+          "metadata": {
+          "evalPriority": {
+            "type": "Number",
+            "value": 3
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with a=[{b:1},{b:34},{b:4}]"
+echo "================================================"
+payload='{
+  "id": "E1",
+  "type": "T",
+  "NO2StatusRaw": {
+    "value": 2,
+    "type": "Number"
+  },
+  "SO2StatusRaw": {
+    "value": 3,
+    "type": "Number"
+  }  
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator and see notifications (cal=[{b:1},{b:4}], cal=[{b:-1},{b:2}], cal=[{b:-1}], cal=[{b:-1, c:1}])"
+echo "==================================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub
+=====================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1 with a=[{b:1},{b:34},{b:4}]
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+06. Dump accumulator and see notifications (cal=[{b:1},{b:4}], cal=[{b:-1},{b:2}], cal=[{b:-1}], cal=[{b:-1, c:1}])
+===================================================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 514
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "NO2Status": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "NO2StatusRaw": {
+                "metadata": {},
+                "type": "Number",
+                "value": 2
+            },
+            "SO2Status": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "SO2StatusRaw": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "airQualityIndex": {
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 2
+                    }
+                },
+                "type": "Number",
+                "value": null
+            },
+            "airQualityLevel": {
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 3
+                    }
+                },
+                "type": "Text",
+                "value": "Sin datos"
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
