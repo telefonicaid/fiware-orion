@@ -258,6 +258,7 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
       delete kConn;
       return nullptr;
     }
+    rd_kafka_conf_set_opaque(conf, kConn);
 
     // Callback de conexión (similar a MQTT)
     rd_kafka_conf_set_dr_msg_cb(conf, [](rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque) {
