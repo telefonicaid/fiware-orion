@@ -346,8 +346,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
-    // TODO: Check
-    alarmMgr.mqttConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
+    alarmMgr.kafkaConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
     disconnect(kConn->producer, endpoint);
     connections.erase(endpoint);
     delete kConn;
@@ -358,7 +357,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
     kConn->lastTime = getCurrentTime();
     rd_kafka_poll(producer, 0); // Procesar eventos
     LM_T(LmtKafkaNotif, ("Kafka notification sent to %s on topic %s", brokers.c_str(), topic.c_str()));
-    alarmMgr.mqttConnectionReset(endpoint);
+    alarmMgr.kafkaConnectionReset(endpoint);
     retval = true;
   }
 

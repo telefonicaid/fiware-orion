@@ -116,6 +116,7 @@ static void* logSummary(void* vP)
     alarmMgr.notificationErrorGet(&neActive, &neRaised, &neReleased);
     alarmMgr.forwardingErrorGet(&fwdActive, &fwdRaised, &fwdReleased);
     alarmMgr.mqttConnectionErrorGet(&mceActive, &mceRaised, &mceReleased);
+    alarmMgr.kafkaConnectionErrorGet(&mceActive, &mceRaised, &mceReleased);
 
     alarmMgr.semGive();
 
