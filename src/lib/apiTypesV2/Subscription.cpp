@@ -226,7 +226,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
       jh.addRaw("http", this->httpInfo.toJson());
     }
   }
-  else  // MqttNotification
+  else if (this->type == MqttNotification)// MqttNotification
   {
     if (this->mqttInfo.custom)
     {
@@ -235,6 +235,18 @@ std::string Notification::toJson(const std::string& attrsFormat)
     else
     {
       jh.addRaw("mqtt", this->mqttInfo.toJson());
+    }
+  }
+
+  else if (this->type == KafkaNotification)  // Nuevo caso para Kafka
+  {
+    if (this->kafkaInfo.custom)
+    {
+      jh.addRaw("kafkaCustom", this->kafkaInfo.toJson());
+    }
+    else
+    {
+      jh.addRaw("kafka", this->kafkaInfo.toJson());
     }
   }
 
@@ -290,6 +302,7 @@ void Notification::release()
   // than using notification type
   httpInfo.release();
   mqttInfo.release();
+  kafkaInfo.release();
 }
 
 

@@ -30,6 +30,7 @@
 
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
+#include "apiTypesV2/KafkaInfo.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ScopeVector.h"
@@ -44,7 +45,8 @@ namespace ngsiv2
 typedef enum NotificationType
 {
   HttpNotification,
-  MqttNotification
+  MqttNotification,
+  KafkaNotification
 } NotificationType;
 
 
@@ -85,6 +87,7 @@ struct Notification
   long long                lastNotification;
   HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
   MqttInfo                 mqttInfo;
+  KafkaInfo                kafkaInfo;
   NotificationType         type;
   long long                lastFailure;
   long long                lastSuccess;
@@ -105,6 +108,7 @@ struct Notification
     lastNotification(-1),
     httpInfo(),
     mqttInfo(),
+    kafkaInfo(),
     type(HttpNotification),
     lastFailure(-1),
     lastSuccess(-1),

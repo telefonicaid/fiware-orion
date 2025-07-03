@@ -177,9 +177,11 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   {
     subP->notification.type = ngsiv2::MqttNotification;
     subP->notification.mqttInfo.fill(r);
-  }
-  else
-  {
+  } else if (r.hasField(CSUB_KAFKATOPIC)) {
+    subP->notification.type = ngsiv2::KafkaNotification;
+    subP->notification.kafkaInfo.fill(r);
+  } else
+    {
     subP->notification.type = ngsiv2::HttpNotification;
     subP->notification.httpInfo.fill(r);
   }
