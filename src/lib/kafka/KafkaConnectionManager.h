@@ -71,7 +71,10 @@ public:
    const std::string& brokers,
    const std::string& topic,
    const std::string& message,
+   const std::string& tenant,
+   const std::string& servicePath,
    int partition = RD_KAFKA_PARTITION_UA  // Partitioning opcional
+
  );
 
  void cleanup(double maxAge);  // Limpieza de conexiones inactivas

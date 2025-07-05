@@ -34,6 +34,10 @@
 #include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 
+#include <librdkafka/rdkafka.h>
+#include <stdio.h>
+#include <signal.h>
+#include <string.h>
 
 
 /* ****************************************************************************
@@ -317,7 +321,10 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& brokers,
     const std::string& topic,
     const std::string& content,
+    const std::string& tenant,
+    const std::string& servicePath,
     int partition /* = RD_KAFKA_PARTITION_UA */)
+
 {
   std::string endpoint = brokers; // Kafka usa "broker1:9092,broker2:9092"
 
