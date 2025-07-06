@@ -281,6 +281,14 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
       return nullptr;
     }
 
+    // Fuerza UTF-8 y desactiva conversiones
+    rd_kafka_conf_set(conf, "message.encoding", "utf-8", nullptr, 0);
+    rd_kafka_conf_set(conf, "enable.random.seed", "false", nullptr, 0);
+
+    // Configuración de buffers
+    rd_kafka_conf_set(conf, "queue.buffering.max.ms", "10", nullptr, 0);
+    rd_kafka_conf_set(conf, "message.max.bytes", "10000000", nullptr, 0);
+
     // Esperar conexión (como sem_timedwait en MQTT)
     sem_init(&kConn->connectionSem, 0, 0);
     kConn->connectionCallbackCalled = false;
@@ -341,15 +349,30 @@ bool KafkaConnectionManager::sendKafkaNotification(
     return false;
   }
 
+  // std::string clean_content = content;
+  // if (!clean_content.empty() && clean_content.back() == '\n') {
+  //   clean_content.pop_back();
+  // }
+
+  char key[32];
+  /* Create a message key */
+  snprintf(key, sizeof(key), "key-%03d", ::rand() % 100);
+
+
+  // 1. Configurar headers como BINARIOS explícitos
+  rd_kafka_headers_t* headers = rd_kafka_headers_new(3);
+  rd_kafka_header_add(headers, "message-id", -1, "12345", 5); // Longitud explícita (5)
+  rd_kafka_header_add(headers, "content-type", -1, "application/octet-stream", -1);
+
   bool retval = false;
-  int resultCode = rd_kafka_produce(
-      rd_kafka_topic_new(producer, topic.c_str(), nullptr),
-      partition,
-      RD_KAFKA_MSG_F_COPY,
-      const_cast<char*>(content.data()), content.size(),
-      nullptr, 0,
-      nullptr
-  );
+  int resultCode = rd_kafka_producev(
+            producer,
+            RD_KAFKA_V_TOPIC(topic.c_str()),
+            RD_KAFKA_V_KEY(key, strlen(key)),
+            RD_KAFKA_V_VALUE(const_cast<char*>(content.data()), content.size()),
+            RD_KAFKA_V_HEADERS(headers),
+            RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
+            RD_KAFKA_V_END);
 
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
