@@ -164,7 +164,7 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
 {
   if (basic)
   {
-    LM_E(("Runtime Error (this method must not be invoked in basic mode): %s",  key.c_str()));
+    LM_E(("Runtime Error (this method must not be invoked in basic mode)"));
   }
   else
   {

@@ -262,7 +262,6 @@ SET (DYNAMIC_LIBS
     ssl
     uuid
     rdkafka
-    rdkafka++
     crypto
     sasl2
 )
