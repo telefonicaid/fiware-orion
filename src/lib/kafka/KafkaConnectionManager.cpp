@@ -25,6 +25,7 @@
 
 #include "kafka/KafkaConnectionManager.h"
 
+#include <iostream>
 #include <mosquitto.h>
 #include <string>
 #include <vector>
@@ -58,40 +59,6 @@ inline std::string getEndpoint(const std::string& host, int port)
   snprintf(portV, sizeof(portV), "%d", port);
   return host + ":" + portV;
 }
-
-
-
-// /* ****************************************************************************
-// *
-// * mqttOnConnectCallback -
-// */
-// void mqttOnConnectCallback(struct mosquitto* mosq, void *userdata, int rc)
-// {
-//   KafkaConnection* cP = (KafkaConnection*) userdata;
-//
-//   // To be used in getConnetion()
-//   cP->conectionResult = rc;
-//
-//   // Signal that callback has been called
-//   cP->connectionCallbackCalled = true;
-//
-//   // This allows the code waiting in getConnection() to continue
-//   sem_post(&cP->connectionSem);
-// }
-
-
-
-// /* ****************************************************************************
-// *
-// * mqttOnPublishCallback -*/
-// void mqttOnPublishCallback(struct mosquitto *mosq, void *userdata, int mid)
-// {
-//   KafkaConnection* cP = (KafkaConnection*) userdata;
-//
-//   // mid could be used to correlate. By the moment we only print it in log traces at DEBUG log level
-//   // Note this trace use N/A in corrid= and transid=
-//   LM_T(LmtMqttNotif, ("KAFKA notification successfully published at %s with id %d", cP->endpoint.c_str(), mid));
-// }
 
 
 
@@ -264,6 +231,13 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
     }
     rd_kafka_conf_set_opaque(conf, kConn);
 
+    // Fuerza UTF-8 y desactiva conversiones
+    rd_kafka_conf_set(conf, "message.encoding", "utf-8", nullptr, 0);
+
+    // Configuración de buffers
+    rd_kafka_conf_set(conf, "queue.buffering.max.ms", "10", nullptr, 0);
+    rd_kafka_conf_set(conf, "message.max.bytes", "10000000", nullptr, 0);
+
     // Callback de conexión (similar a MQTT)
     rd_kafka_conf_set_dr_msg_cb(conf, [](rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque) {
       KafkaConnection* kConn = static_cast<KafkaConnection*>(opaque);
@@ -281,14 +255,6 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
       return nullptr;
     }
 
-    // Fuerza UTF-8 y desactiva conversiones
-    rd_kafka_conf_set(conf, "message.encoding", "utf-8", nullptr, 0);
-    rd_kafka_conf_set(conf, "enable.random.seed", "false", nullptr, 0);
-
-    // Configuración de buffers
-    rd_kafka_conf_set(conf, "queue.buffering.max.ms", "10", nullptr, 0);
-    rd_kafka_conf_set(conf, "message.max.bytes", "10000000", nullptr, 0);
-
     // Esperar conexión (como sem_timedwait en MQTT)
     sem_init(&kConn->connectionSem, 0, 0);
     kConn->connectionCallbackCalled = false;
@@ -299,14 +265,6 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_sec += timeout / 1000;
     sem_timedwait(&kConn->connectionSem, &ts);
-
-    // if (!kConn->connectionCallbackCalled || kConn->connectionResult != RD_KAFKA_RESP_ERR_NO_ERROR)
-    // {
-    //   LM_E(("Kafka connection error for %s: %s", endpoint.c_str(), rd_kafka_err2str(kConn->connectionResult)));
-    //   disconnect(kConn->producer, endpoint);
-    //   delete kConn;
-    //   return nullptr;
-    // }
 
     connections[endpoint] = kConn;
     return kConn;
@@ -330,8 +288,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& topic,
     const std::string& content,
     const std::string& tenant,
-    const std::string& servicePath,
-    int partition /* = RD_KAFKA_PARTITION_UA */)
+    const std::string& servicePath)
 
 {
   std::string endpoint = brokers; // Kafka usa "broker1:9092,broker2:9092"
@@ -349,20 +306,20 @@ bool KafkaConnectionManager::sendKafkaNotification(
     return false;
   }
 
-  // std::string clean_content = content;
-  // if (!clean_content.empty() && clean_content.back() == '\n') {
-  //   clean_content.pop_back();
-  // }
-
   char key[32];
   /* Create a message key */
   snprintf(key, sizeof(key), "key-%03d", ::rand() % 100);
 
+  rd_kafka_headers_t* headers = rd_kafka_headers_new(0);  // Inicialmente sin headers
 
-  // 1. Configurar headers como BINARIOS explícitos
-  rd_kafka_headers_t* headers = rd_kafka_headers_new(3);
-  rd_kafka_header_add(headers, "message-id", -1, "12345", 5); // Longitud explícita (5)
-  rd_kafka_header_add(headers, "content-type", -1, "application/octet-stream", -1);
+  if (!tenant.empty()) {
+    rd_kafka_header_add(headers, "FIWARE_SERVICE", -1, tenant.c_str(), tenant.size());
+  }
+
+  if (!servicePath.empty()) {
+    rd_kafka_header_add(headers, "FIWARE_SERVICEPATH", -1, servicePath.c_str(), servicePath.size());
+  }
+
 
   bool retval = false;
   int resultCode = rd_kafka_producev(
