@@ -34,6 +34,7 @@
 #include "common/RenderFormat.h"
 #include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
+#include "common/statistics.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
@@ -845,18 +846,12 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   }
   else if (valueType == orion::ValueTypeString)
   {
-    if ((exprContextObjectP != NULL) && (exprContextObjectP->hasKey(name)))
-    {
-      // This means that the attribute has been already evaluated in the context due to evalPriority processing
-      // so we take its value directly from the context object
-      jh.addRaw("value", smartStringValue("${" + name + "}", exprContextObjectP, "null"));
-    }
-    else
-    {
-      // FIXME PR: maybe this case is no longer needed as all the attributes has been previously calculated in the context ?
-      // (check to disable this and check if the tests pass)
-      jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
-    }
+    std::string r = smartStringValue(stringValue, exprContextObjectP, "null");
+    jh.addRaw("value", r);
+
+    //TIME_EXPR_CTXBLD_START();
+    exprContextObjectP->add(name, r, true);
+    //TIME_EXPR_CTXBLD_STOP();
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -920,7 +915,14 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    return smartStringValue(stringValue, exprContextObjectP, "null");
+    std::string r;
+    r = smartStringValue(stringValue, exprContextObjectP, "null");
+
+    //TIME_EXPR_CTXBLD_START();
+    exprContextObjectP->add(name, r, true);
+    //TIME_EXPR_CTXBLD_STOP();
+
+    return r;
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
@@ -940,6 +942,62 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
   }
 
   return "";
+}
+
+
+/* ****************************************************************************
+*
+* setRaw -
+*
+* FIXME PR: very similar to toJsonValue()
+*/
+void ContextAttribute::setRaw(ExprContextObject* exprContextObjectP)
+{
+  if (compoundValueP != NULL)
+  {
+    rawValue = compoundValueP->toJson();
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
+    {
+      std::string out = "\"";
+      out += toJsonString(isodate2str(numberValue));
+      out += '"';
+      rawValue = out;
+    }
+    else // regular number
+    {
+      rawValue = double2string(numberValue);
+    }
+  }
+  else if (valueType == orion::ValueTypeString)
+  {
+    std::string r;
+    r = smartStringValue(stringValue, exprContextObjectP, "null");
+
+    //TIME_EXPR_CTXBLD_START();
+    exprContextObjectP->add(name, r, true);
+    //TIME_EXPR_CTXBLD_STOP();
+
+    rawValue = r;
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    rawValue = boolValue ? "true" : "false";
+  }
+  else if (valueType == orion::ValueTypeNull)
+  {
+    rawValue = "null";
+  }
+  else if (valueType == orion::ValueTypeNotGiven)
+  {
+    LM_E(("Runtime Error (value not given for attribute %s)", name.c_str()));
+  }
+  else
+  {
+    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
+  }
 }
 
 

@@ -295,14 +295,18 @@ static bool setNgsiPayload
   for (unsigned int ix = 0; ix < orderedNgsiAttrs.size(); ix++)
   {
     // Avoid to add context if an attribute with the same name exists in the entity
-    if (en.attributeVector.get(orderedNgsiAttrs[ix]->name) < 0)
+    // FIXME PR: why? seems better to override the original entity with the content of ngsi
+    /*if (en.attributeVector.get(orderedNgsiAttrs[ix]->name) < 0)
     {
       TIME_EXPR_CTXBLD_START();
       exprContextObjectP->add(orderedNgsiAttrs[ix]->name, orderedNgsiAttrs[ix]->toJsonValue(exprContextObjectP), true);
       TIME_EXPR_CTXBLD_STOP();
-    }
+    }*/
 
-    cer.entity.attributeVector.push_back(new ContextAttribute(orderedNgsiAttrs[ix], false, true));
+    ContextAttribute* caP = new ContextAttribute(orderedNgsiAttrs[ix], false, true);
+    caP->setRaw(exprContextObjectP);
+    cer.entity.attributeVector.push_back(caP);
+    LM_W(("FGM: attr <%s>: %s", caP->name.c_str(), caP->rawValue.c_str()));
   }
   // Next, other attributes in the original entity not already added
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
@@ -312,6 +316,8 @@ static bool setNgsiPayload
       cer.entity.attributeVector.push_back(new ContextAttribute(en.attributeVector[ix], false, true));
     }
   }
+
+  LM_W(("FGM: context at this point is %s", exprContextObjectP->getJexlContext().c_str()));
 
   cer.error.code = SccOk;
 

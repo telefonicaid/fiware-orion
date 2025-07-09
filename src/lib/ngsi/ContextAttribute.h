@@ -81,6 +81,9 @@ public:
   bool                      shadowed;                 // shadowed true means that the attribute is rendered only if explicitly required
                                                       // in attrs filter (typically for builtin attributes)
 
+  std::string               rawValue;                 // Pre-calculated value 
+
+
   ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP, bool useDefaultType = false, bool cloneCompound = false);
@@ -97,6 +100,8 @@ public:
   std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
   std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
+
+  void         setRaw(ExprContextObject* exprContextObjectP);
 
   std::string  toJsonAsValue(bool             acceptedTextPlain,
                              bool             acceptedJson,

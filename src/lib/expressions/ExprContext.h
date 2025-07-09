@@ -50,7 +50,6 @@ public:
 
   std::string                          getJexlContext(void);
   std::map<std::string, std::string>*  getMap(void);
-  bool                                 hasKey(const std::string& key);
 
   void      add(const std::string& key, const std::string& value, bool raw = false);
   void      add(const std::string& key, double value);
