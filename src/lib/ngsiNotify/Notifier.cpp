@@ -263,31 +263,6 @@ static bool setNgsiPayload
   NotifyContextRequest   ncr;
   ContextElementResponse cer;
 
-  std::string effectiveId;
-  if (ngsi.entityId.id.empty())
-  {
-    effectiveId = en.entityId.id;
-  }
-  else
-  {
-    // If id is not found in the replacements macro, we use en.id.
-    effectiveId = removeQuotes(smartStringValue(ngsi.entityId.id, exprContextObjectP, '"' + en.entityId.id + '"'));
-  }
-
-  std::string effectiveType;
-  if (ngsi.entityId.type.empty())
-  {
-    effectiveType = en.entityId.type;
-  }
-  else
-  {
-    // If type is not found in the replacements macro, we use en.type.
-    effectiveType = removeQuotes(smartStringValue(ngsi.entityId.type, exprContextObjectP, '"' + en.entityId.type + '"'));
-  }
-
-  EntityId entId(effectiveId, "", effectiveType, "");
-  cer.entity.fill(entId, en.servicePath);
-
   // First we add attributes in the ngsi field, adding calculated expressions to context in order of priority
   std::vector<ContextAttribute*>  orderedNgsiAttrs;
   orderByPriority(ngsi, &orderedNgsiAttrs);
@@ -312,6 +287,31 @@ static bool setNgsiPayload
       cer.entity.attributeVector.push_back(new ContextAttribute(en.attributeVector[ix], false, true));
     }
   }
+
+  std::string effectiveId;
+  if (ngsi.entityId.id.empty())
+  {
+    effectiveId = en.entityId.id;
+  }
+  else
+  {
+    // If id is not found in the replacements macro, we use en.id.
+    effectiveId = removeQuotes(smartStringValue(ngsi.entityId.id, exprContextObjectP, '"' + en.entityId.id + '"'));
+  }
+
+  std::string effectiveType;
+  if (ngsi.entityId.type.empty())
+  {
+    effectiveType = en.entityId.type;
+  }
+  else
+  {
+    // If type is not found in the replacements macro, we use en.type.
+    effectiveType = removeQuotes(smartStringValue(ngsi.entityId.type, exprContextObjectP, '"' + en.entityId.type + '"'));
+  }
+
+  EntityId entId(effectiveId, "", effectiveType, "");
+  cer.entity.fill(entId, en.servicePath);
 
   cer.error.code = SccOk;
 
