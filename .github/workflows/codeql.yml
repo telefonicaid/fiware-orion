@@ -89,6 +89,7 @@ jobs:
         # Ref: https://github.com/telefonicaid/fiware-orion/blob/master/docker/Dockerfile
         export ORION_SRC=$(pwd)
         # Install dependencies
+        sudo apt-get update
         sudo apt-get install make cmake g++ libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev
         # Install libmicrohttpd from source
         cd /opt
