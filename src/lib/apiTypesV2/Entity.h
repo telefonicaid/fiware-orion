@@ -32,7 +32,6 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/EntityId.h"
 #include "rest/OrionError.h"
-#include "expressions/ExprContext.h"
 
 
 
@@ -73,8 +72,7 @@ class Entity
                       const std::vector<std::string>&      attrsFilter,
                       bool                                 blacklist,
                       const std::vector<std::string>&      metadataFilter,
-                      bool                                 renderNgsiField    = false,
-                      ExprContextObject*                   exprContextObjectP = NULL);
+                      bool                                 renderNgsiField    = false);
 
   std::string  toJson(RenderFormat                     renderFormat,
                       bool                             renderNgsiField = false);
@@ -116,13 +114,12 @@ class Entity
 
   void addAllAttrsExceptFiltered(std::vector<ContextAttribute*>*  orderedAttrs);
 
-  std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs, ExprContextObject* exprContextObjectP = NULL);
+  std::string toJsonValues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonUniqueValues(const std::vector<ContextAttribute*>& orderedAttrs);
-  std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs, ExprContextObject* exprContextObjectP = NULL);
+  std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
                                const std::vector<std::string>&        metadataFilter,
-                               bool                                   renderNgsiField   = false,
-                               ExprContextObject*                     exprContextObject = NULL);
+                               bool                                   renderNgsiField   = false);
 
   std::string  checkId(RequestType requestType);
   std::string  checkIdPattern(RequestType requestType);

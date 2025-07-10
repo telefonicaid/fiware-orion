@@ -34,7 +34,6 @@
 #include "common/RenderFormat.h"
 #include "common/JsonHelper.h"
 #include "common/macroSubstitute.h"
-#include "common/statistics.h"
 #include "alarmMgr/alarmMgr.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
@@ -824,7 +823,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   // value
   //
-  jh.addRaw("value", toJsonValue(exprContextObjectP));
+  jh.addRaw("value", toJsonValue());
 
   std::vector<Metadata*> orderedMetadata;
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
@@ -849,74 +848,13 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
 * Also used by the ngsi expression logic
 *
 */
-std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
+std::string ContextAttribute::toJsonValue(void)
 {
   if (!rawValueCalculated)
   {
-    setRaw(exprContextObjectP);
+    setRaw(NULL);
   }
   return rawValue;
-
-#if 0  
-  if (compoundValueP != NULL)
-  {
-    orion::CompoundValueNode* childToRenderP = compoundValueP;
-    if ((type == GEO_JSON) && (!hasIgnoreType()))
-    {
-      childToRenderP = getGeometry(compoundValueP);
-    }
-
-    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
-    // of DB entities) may lead to NULL, so the check is needed
-    if (childToRenderP != NULL)
-    {
-      return childToRenderP->toJson(exprContextObjectP);
-    }
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-    {
-      std::string out = "\"";
-      out += toJsonString(isodate2str(numberValue));
-      out += '"';
-      return out;
-    }
-    else // regular number
-    {
-      return double2string(numberValue);
-    }
-  }
-  else if (valueType == orion::ValueTypeString)
-  {
-    std::string r;
-    r = smartStringValue(stringValue, exprContextObjectP, "null");
-
-    //TIME_EXPR_CTXBLD_START();
-    exprContextObjectP->add(name, r, true);
-    //TIME_EXPR_CTXBLD_STOP();
-
-    return r;
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    return boolValue ? "true" : "false";
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    return "null";
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_E(("Runtime Error (value not given for attribute %s)", name.c_str()));
-  }
-  else
-  {
-    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
-  }
-
-  return "";
-#endif
 }
 
 
@@ -924,7 +862,6 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
 *
 * setRaw -
 *
-* FIXME PR: very similar to toJsonValue()
 */
 void ContextAttribute::setRaw(ExprContextObject* exprContextObjectP)
 {

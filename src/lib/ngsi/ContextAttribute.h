@@ -100,7 +100,7 @@ public:
 
   std::string  toJson(const std::vector<std::string>&  metadataFilter, bool renderNgsiField = false, ExprContextObject* exprContextObjectP = NULL);
 
-  std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
+  std::string  toJsonValue(void);
 
   void         setRaw(ExprContextObject* exprContextObjectP);
 

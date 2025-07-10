@@ -321,11 +321,11 @@ static bool setNgsiPayload
   if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES) ||
       (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_VALUES) )
   {
-    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
   }
   else
   {
-    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter);
   }
 
   return true;
