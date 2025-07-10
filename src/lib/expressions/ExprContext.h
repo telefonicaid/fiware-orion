@@ -43,7 +43,6 @@ private:
   bool                                basic;
   JsonObjectHelper                    jh;       // used in regular (i.e. not basic) mode
   std::map<std::string, std::string>  repl;     // used in basic mode
-  std::vector<std::string>            keys;     // keys already added to context
 
 public:
   ExprContextObject(bool basic = false);
