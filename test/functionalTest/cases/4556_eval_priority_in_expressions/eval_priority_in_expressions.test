@@ -126,8 +126,8 @@ echo
 echo
 
 
-echo "Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)"
-echo "===================================================================================="
+echo "04. Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)"
+echo "========================================================================================"
 accumulatorDump
 echo
 echo
@@ -162,8 +162,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)
-====================================================================================
+04. Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)
+========================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 313

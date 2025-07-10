@@ -81,7 +81,8 @@ public:
   bool                      shadowed;                 // shadowed true means that the attribute is rendered only if explicitly required
                                                       // in attrs filter (typically for builtin attributes)
 
-  std::string               rawValue;                 // Pre-calculated value 
+  std::string               rawValue;                 // Pre-calculated value
+  bool                      rawValueCalculated;       // true if rawValue has been calculated, false otherwise
 
 
   ~ContextAttribute();
@@ -103,11 +104,11 @@ public:
 
   void         setRaw(ExprContextObject* exprContextObjectP);
 
-  std::string  toJsonAsValue(bool             acceptedTextPlain,
-                             bool             acceptedJson,
-                             MimeType         outFormatSelection,
-                             MimeType*        outMimeTypeP,
-                             HttpStatusCode*  scP);
+  std::string  getValueResponse(bool             acceptedTextPlain,
+                                bool             acceptedJson,
+                                MimeType         outFormatSelection,
+                                MimeType*        outMimeTypeP,
+                                HttpStatusCode*  scP);
 
   void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 

@@ -104,7 +104,7 @@ std::string getEntityAttributeValue
     {
       // Do not use attribute name, change to 'value'
       caP->name = "value";
-      TIMED_RENDER(answer = caP->toJsonAsValue(ciP->httpHeaders.accepted("text/plain"),
+      TIMED_RENDER(answer = caP->getValueResponse(ciP->httpHeaders.accepted("text/plain"),
                                                ciP->httpHeaders.accepted("application/json"),
                                                ciP->httpHeaders.outformatSelect(),
                                                &(ciP->outMimeType),
