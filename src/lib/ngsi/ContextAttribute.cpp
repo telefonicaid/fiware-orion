@@ -817,7 +817,9 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   // value
   //
-  if (compoundValueP != NULL)
+  jh.addRaw("value", toJsonValue(exprContextObjectP));
+
+  /*if (compoundValueP != NULL)
   {
     orion::CompoundValueNode* childToRenderP = compoundValueP;
     if ((type == GEO_JSON) && (!hasIgnoreType()))
@@ -862,7 +864,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   else
   {
     LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
-  }
+  }*/
 
   std::vector<Metadata*> orderedMetadata;
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
