@@ -819,53 +819,6 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   jh.addRaw("value", toJsonValue(exprContextObjectP));
 
-  /*if (compoundValueP != NULL)
-  {
-    orion::CompoundValueNode* childToRenderP = compoundValueP;
-    if ((type == GEO_JSON) && (!hasIgnoreType()))
-    {
-      childToRenderP = getGeometry(compoundValueP);
-    }
-
-    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
-    // of DB entities) may lead to NULL, so the check is needed
-    if (childToRenderP != NULL)
-    {
-      jh.addRaw("value", childToRenderP->toJson(exprContextObjectP));
-    }
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-    {
-      jh.addString("value", isodate2str(numberValue));
-    }
-    else // regular number
-    {
-      jh.addNumber("value", numberValue);
-    }
-  }
-  else if (valueType == orion::ValueTypeString)
-  {
-    jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    jh.addBool("value", boolValue);
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    jh.addRaw("value", "null");
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_E(("Runtime Error (value not given for attribute %s)", name.c_str()));
-  }
-  else
-  {
-    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
-  }*/
-
   std::vector<Metadata*> orderedMetadata;
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
 
@@ -947,12 +900,10 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
 
 /* ****************************************************************************
 *
-* toJsonAsValue -
+* getValueResponse -
 *
-* FIXME P7: toJsonValue() and toJsonAsValue() are very similar and may be confusing.
-* Try to find a couple of names different and meaningful enough
 */
-std::string ContextAttribute::toJsonAsValue
+std::string ContextAttribute::getValueResponse
 (
   bool             acceptedTextPlain,   // in parameter
   bool             acceptedJson,        // in parameter
