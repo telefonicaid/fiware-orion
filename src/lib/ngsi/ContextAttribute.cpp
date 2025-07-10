@@ -893,7 +893,18 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
 {
   if (compoundValueP != NULL)
   {
-    return compoundValueP->toJson();
+    orion::CompoundValueNode* childToRenderP = compoundValueP;
+    if ((type == GEO_JSON) && (!hasIgnoreType()))
+    {
+      childToRenderP = getGeometry(compoundValueP);
+    }
+
+    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
+    // of DB entities) may lead to NULL, so the check is needed
+    if (childToRenderP != NULL)
+    {
+      return childToRenderP->toJson(exprContextObjectP);
+    }
   }
   else if (valueType == orion::ValueTypeNumber)
   {
