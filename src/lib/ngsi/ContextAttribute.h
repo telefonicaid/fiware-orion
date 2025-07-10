@@ -98,11 +98,11 @@ public:
 
   std::string  toJsonValue(ExprContextObject* exprContextObjectP = NULL);
 
-  std::string  toJsonAsValue(bool             acceptedTextPlain,
-                             bool             acceptedJson,
-                             MimeType         outFormatSelection,
-                             MimeType*        outMimeTypeP,
-                             HttpStatusCode*  scP);
+  std::string  getValueResponse(bool             acceptedTextPlain,
+                                bool             acceptedJson,
+                                MimeType         outFormatSelection,
+                                MimeType*        outMimeTypeP,
+                                HttpStatusCode*  scP);
 
   void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 
