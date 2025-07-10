@@ -269,11 +269,15 @@ static bool setNgsiPayload
 
   for (unsigned int ix = 0; ix < orderedNgsiAttrs.size(); ix++)
   {
-    // Calculate attribute values in the right order according evalPriority,
-    // adding them to context in secuence    
+    // Pre-calculation of attribute values in the right order according evalPriority,
+    // adding them to context in sequence
     ContextAttribute* caP = new ContextAttribute(orderedNgsiAttrs[ix], false, true);
     caP->setRaw(exprContextObjectP);
+
+    TIME_EXPR_CTXBLD_START();
     exprContextObjectP->add(caP->name, caP->rawValue, true);
+    TIME_EXPR_CTXBLD_STOP();
+
     cer.entity.attributeVector.push_back(caP);
     LM_W(("FGM: attr <%s>: %s", caP->name.c_str(), caP->rawValue.c_str()));
   }

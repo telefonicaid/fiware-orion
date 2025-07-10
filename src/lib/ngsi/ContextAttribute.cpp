@@ -852,6 +852,7 @@ std::string ContextAttribute::toJsonValue(void)
 {
   if (!rawValueCalculated)
   {
+    // For regular attribute rendering (not previously calculated base on ExprContextObject)
     setRaw(NULL);
   }
   return rawValue;
@@ -898,14 +899,7 @@ void ContextAttribute::setRaw(ExprContextObject* exprContextObjectP)
   }
   else if (valueType == orion::ValueTypeString)
   {
-    std::string r;
-    r = smartStringValue(stringValue, exprContextObjectP, "null");
-
-    //TIME_EXPR_CTXBLD_START();
-    //exprContextObjectP->add(name, r, true);
-    //TIME_EXPR_CTXBLD_STOP();
-
-    rawValue = r;
+    rawValue = smartStringValue(stringValue, exprContextObjectP, "null");
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
