@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-evalPriority not honored (with particular value in evalPriority bis)
+evalPriority not honored (with particular value in evalPriority)
 
 --SHELL-INIT--
 dbInit CB
@@ -32,15 +32,8 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# Expressions chain is as follows
-#
-# - NOS2Status and SO2Status
-# - airQualityIndex, which depends on NOS2Status and SO2Status
-# - airQualityLevel, which depends on airQualityIndex
-#
-# We have set evalPriroity NOS2Status and SO2Status higher than airQualityIndex, so airQualityIndex should result in null
-# (thus airQualityLevel result in 'Sin datos'). Previous to the fix, airQualityIndex was calculated (to 3) which is not correct
-# (although airQualityLevel was correctly calculated to 'Sin datos' and not the level corresponding to 3, ie. 'Regular')
+# Same as eval_priority_not_honored_with_value.test but specifying evalPriority 3 for NO2Status and SO2Status instead of 4.
+# Note that evalPriority 3 is used also by airQualityLevel (but anyway higher that 2, used by airQualityIndex)
 #
 # 01. Create custom sub
 # 02. Create entity to trigger expressions
@@ -70,7 +63,7 @@ payload='{
           "metadata": {
             "evalPriority": {
               "type": "Number",
-              "value": 4
+              "value": 3
             }
           }
         },
@@ -80,7 +73,7 @@ payload='{
           "metadata": {
             "evalPriority": {
               "type": "Number",
-              "value": 4
+              "value": 3
             }
           }
         },
@@ -179,7 +172,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {
                     "evalPriority": {
                         "type": "Number",
-                        "value": 4
+                        "value": 3
                     }
                 },
                 "type": "Number",
@@ -194,7 +187,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "metadata": {
                     "evalPriority": {
                         "type": "Number",
-                        "value": 4
+                        "value": 3
                     }
                 },
                 "type": "Number",
