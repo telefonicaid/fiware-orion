@@ -46,7 +46,7 @@ TEST(ContextElementResponseVector, render)
 
   std::vector<std::string> emptyV;  
 
-  out = cerv.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV, NULL);
+  out = cerv.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV);
   EXPECT_STREQ("[]", out.c_str());
 
   cer.entity.entityId.id   = "ID";

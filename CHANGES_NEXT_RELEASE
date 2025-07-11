@@ -1,3 +1,4 @@
+- Fix: JEXL expressions evalPriority not working correctly is some cases (#4689)
 - Fix: id and type wrong calculation in custom notification ngsi payload when they depend on calculated expressions
 - Fix: registrations with more than one contextRegistration element (not possible in NGSIv2) are logged as Runtime Errors
 - Fix: memory leak in POST /v2/op/notify operation (#4261)

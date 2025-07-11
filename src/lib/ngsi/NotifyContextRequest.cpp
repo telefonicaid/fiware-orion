@@ -45,8 +45,7 @@ std::string NotifyContextRequest::toJson
   RenderFormat                        renderFormat,
   const std::vector<std::string>&     attrsFilter,
   bool                                blacklist,
-  const std::vector<std::string>&     metadataFilter,
-  ExprContextObject*                  exprContextObjectP
+  const std::vector<std::string>&     metadataFilter
 )
 {
   if ((renderFormat != NGSI_V2_NORMALIZED) && (renderFormat != NGSI_V2_KEYVALUES) && (renderFormat != NGSI_V2_VALUES) && (renderFormat != NGSI_V2_SIMPLIFIEDKEYVALUES) && (renderFormat != NGSI_V2_SIMPLIFIEDNORMALIZED))
@@ -66,7 +65,7 @@ std::string NotifyContextRequest::toJson
     else
     {
       std::string out;
-      out += contextElementResponseVector[0]->toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+      out += contextElementResponseVector[0]->toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter);
       return out;
     }
   }
@@ -80,7 +79,7 @@ std::string NotifyContextRequest::toJson
     else
     {
       std::string out;
-      out += contextElementResponseVector[0]->toJson(NGSI_V2_KEYVALUES, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+      out += contextElementResponseVector[0]->toJson(NGSI_V2_KEYVALUES, attrsFilter, blacklist, metadataFilter);
       return out;
     }
   }
@@ -89,7 +88,7 @@ std::string NotifyContextRequest::toJson
     JsonObjectHelper jh;
 
     jh.addString("subscriptionId", subscriptionId);
-    jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP));
+    jh.addRaw("data", contextElementResponseVector.toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
     return jh.str();
   }
 }

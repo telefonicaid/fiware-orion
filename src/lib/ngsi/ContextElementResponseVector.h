@@ -31,7 +31,6 @@
 #include "ngsi/ContextElementResponse.h"
 #include "apiTypesV2/EntityVector.h"
 #include "common/RenderFormat.h"
-#include "expressions/ExprContext.h"
 
 
 
@@ -46,8 +45,7 @@ typedef struct ContextElementResponseVector
   std::string              toJson(RenderFormat                         renderFormat,
                                   const std::vector<std::string>&      attrsFilter,
                                   bool                                 blacklist,
-                                  const std::vector<std::string>&      metadataFilter,
-                                  ExprContextObject*                   exprContextObjectP);
+                                  const std::vector<std::string>&      metadataFilter);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);

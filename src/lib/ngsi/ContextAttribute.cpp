@@ -335,6 +335,7 @@ ContextAttribute::ContextAttribute()
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -388,6 +389,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
   previousValue         = NULL;
   actionType            = caP->actionType;
   shadowed              = caP->shadowed;
+  rawValueCalculated    = caP->rawValueCalculated;
 
 #if 0
   // This block seems to be a better alternative to implement cloneCompound. If enabled
@@ -494,6 +496,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -537,6 +540,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -579,6 +583,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -622,6 +627,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -817,7 +823,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   // value
   //
-  jh.addRaw("value", toJsonValue(exprContextObjectP));
+  jh.addRaw("value", toJsonValue());
 
   std::vector<Metadata*> orderedMetadata;
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
@@ -842,8 +848,26 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
 * Also used by the ngsi expression logic
 *
 */
-std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
+std::string ContextAttribute::toJsonValue(void)
 {
+  if (!rawValueCalculated)
+  {
+    // For regular attribute rendering (not previously calculated base on ExprContextObject)
+    setRaw(NULL);
+  }
+  return rawValue;
+}
+
+
+/* ****************************************************************************
+*
+* setRaw -
+*
+*/
+void ContextAttribute::setRaw(ExprContextObject* exprContextObjectP)
+{
+  rawValueCalculated = true;
+
   if (compoundValueP != NULL)
   {
     orion::CompoundValueNode* childToRenderP = compoundValueP;
@@ -856,7 +880,7 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
     // of DB entities) may lead to NULL, so the check is needed
     if (childToRenderP != NULL)
     {
-      return childToRenderP->toJson(exprContextObjectP);
+      rawValue = childToRenderP->toJson(exprContextObjectP);
     }
   }
   else if (valueType == orion::ValueTypeNumber)
@@ -866,24 +890,24 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
       std::string out = "\"";
       out += toJsonString(isodate2str(numberValue));
       out += '"';
-      return out;
+      rawValue = out;
     }
     else // regular number
     {
-      return double2string(numberValue);
+      rawValue = double2string(numberValue);
     }
   }
   else if (valueType == orion::ValueTypeString)
   {
-    return smartStringValue(stringValue, exprContextObjectP, "null");
+    rawValue = smartStringValue(stringValue, exprContextObjectP, "null");
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    return boolValue ? "true" : "false";
+    rawValue = boolValue ? "true" : "false";
   }
   else if (valueType == orion::ValueTypeNull)
   {
-    return "null";
+    rawValue = "null";
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
@@ -893,8 +917,6 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
   {
     LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
   }
-
-  return "";
 }
 
 

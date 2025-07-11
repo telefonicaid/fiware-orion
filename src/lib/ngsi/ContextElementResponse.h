@@ -33,7 +33,6 @@
 #include "ngsi/StringList.h"
 #include "ngsi/ContextAttribute.h"
 #include "apiTypesV2/Entity.h"
-#include "expressions/ExprContext.h"
 
 #include "mongoDriver/BSONObj.h"
 
@@ -61,8 +60,7 @@ typedef struct ContextElementResponse
   std::string  toJson(RenderFormat                         renderFormat,
                       const std::vector<std::string>&      attrsFilter,
                       bool                                 blacklist,
-                      const std::vector<std::string>&      metadataFilter,
-                      ExprContextObject*                   exprContextObjectP);
+                      const std::vector<std::string>&      metadataFilter);
 
   void         applyUpdateOperators(void);
 

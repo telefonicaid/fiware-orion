@@ -53,33 +53,33 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "A1": {
+        "A11": {
           "value": "${A6}",
           "type": "None"
         },
-        "A2": {
+        "A22": {
           "value": "${A5}",
           "type": "Array"
         },
-        "A3": {
+        "A33": {
           "value": "${A4}",
           "type": "Object"
         },
-        "A4": {
+        "A44": {
           "value": "${A3}",
           "type": "Boolean"
         },
-        "A5": {
+        "A55": {
           "value": "${A2}",
           "type": "Number"
         },
-        "A6": {
+        "A66": {
           "value": "${A1}",
           "type": "Text"
         }
       }
     },
-    "attrs": [ "A3", "A4", "A5" ]
+    "attrs": [ "A33", "A44", "A55" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -195,7 +195,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 ===================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 234
+Content-Length: 237
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -206,7 +206,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "A3": {
+            "A33": {
                 "metadata": {},
                 "type": "Object",
                 "value": {
@@ -214,12 +214,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                     "y": 2
                 }
             },
-            "A4": {
+            "A44": {
                 "metadata": {},
                 "type": "Boolean",
                 "value": true
             },
-            "A5": {
+            "A55": {
                 "metadata": {},
                 "type": "Number",
                 "value": 1
@@ -233,7 +233,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 241
+Content-Length: 244
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -244,7 +244,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "A3": {
+            "A33": {
                 "metadata": {},
                 "type": "Object",
                 "value": {
@@ -252,12 +252,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                     "z": 10
                 }
             },
-            "A4": {
+            "A44": {
                 "metadata": {},
                 "type": "Boolean",
                 "value": false
             },
-            "A5": {
+            "A55": {
                 "metadata": {},
                 "type": "Number",
                 "value": 10
