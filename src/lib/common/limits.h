@@ -155,7 +155,7 @@
 */
 #define MAX_HTTP_TIMEOUT     1800000
 #define MAX_MQTT_TIMEOUT     1800000
-
+#define MAX_KAFKA_TIMEOUT     1800000
 
 /* ****************************************************************************
 *

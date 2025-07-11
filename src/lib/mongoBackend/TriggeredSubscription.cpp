@@ -46,6 +46,7 @@ TriggeredSubscription::TriggeredSubscription
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
   const ngsiv2::MqttInfo&  _mqttInfo,
+  const ngsiv2::KafkaInfo&  _kafkaInfo,
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
   const char*              _tenant,
@@ -67,6 +68,7 @@ TriggeredSubscription::TriggeredSubscription
 {
   httpInfo.fill(_httpInfo);
   mqttInfo.fill(_mqttInfo);
+  kafkaInfo.fill(_kafkaInfo);
 }
 
 
@@ -92,6 +94,7 @@ TriggeredSubscription::~TriggeredSubscription()
   // Only one of the release operations will actually do something
   httpInfo.release();
   mqttInfo.release();
+  kafkaInfo.release();
 }
 
 

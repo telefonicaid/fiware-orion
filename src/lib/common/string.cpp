@@ -365,7 +365,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   // Ensuring the scheme is present
   // Note that although mqtt:// is not officially supported it is used de facto (see for instance https://github.com/mqtt/mqtt.org/wiki/URI-Scheme)
   //
-  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:")))
+  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:") && (urlTokens[0] != "kafka:")))
   {
     return false;
   }
