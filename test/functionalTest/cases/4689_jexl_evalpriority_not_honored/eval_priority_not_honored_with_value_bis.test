@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-evalPriority not honored (with particular value in evalPriority)
+evalPriority not honored (with particular value in evalPriority bis)
 
 --SHELL-INIT--
 dbInit CB
