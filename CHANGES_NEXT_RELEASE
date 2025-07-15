@@ -6,4 +6,5 @@
 - Fix: some error messages in corner case situations (405, 406, 415 and some cases of 400) were not strictly following NGSIv2 error response syntax
 - Fix: admin log operations error responses were not following NGSIv2 error response syntax
 - Fix: memory leaks in parse logic in case of parse error (possibly)
+- Fix: csubs and registrations now use isPattern as bool instead of string (legacy from NGSIv1 model), although strings are still supported (#4681)
 - Hardening: remove a huge amount of NGSIv1 related dead-code (#4681)

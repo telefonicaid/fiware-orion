@@ -233,15 +233,6 @@ extern void orionInit
 
 
 
-/* ****************************************************************************
-*
-* isTrue - 
-*/
-extern bool isTrue(const std::string& s);
-extern bool isFalse(const std::string& s);
-
-
-
 /*****************************************************************************
 *
 * getTimer -

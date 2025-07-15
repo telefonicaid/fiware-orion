@@ -400,22 +400,18 @@ void setEntities(const Subscription& sub, orion::BSONObjBuilder* b)
     EntityId    en            = sub.subject.entities[ix];
     std::string finalId;
     std::string finalType;
-    std::string isIdPattern;
+    bool        isIdPattern = false;
     bool        isTypePattern = false;
 
-    //
-    // Note that, due to legacy reasons, isPattern may be "true" or "false" (text)
-    // while isTypePattern may be true or false (boolean).
-    //
     if (!en.idPattern.empty())
     {
       finalId     = en.idPattern;
-      isIdPattern = "true";
+      isIdPattern = true;
     }
     else if (!en.id.empty())
     {
       finalId     = en.id;
-      isIdPattern = "false";
+      isIdPattern = false;
     }
 
     if (!en.typePattern.empty())
