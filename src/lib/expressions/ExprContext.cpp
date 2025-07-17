@@ -124,12 +124,12 @@ void ExprContextObject::add(const std::string &key, bool _value)
 {
   if (basic)
   {
-    LM_T(LmtExpr, ("adding to basic expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
-    repl.insert(std::pair<std::string, std::string>(key, _value? "true": "false"));
+    LM_T(LmtExpr, ("adding to basic expression context object (bool): %s=%s", key.c_str(), FT(_value)));
+    repl.insert(std::pair<std::string, std::string>(key, FT(_value)));
   }
   else
   {
-    LM_T(LmtExpr, ("adding to JEXL expression context object (bool): %s=%s", key.c_str(), _value ? "true" : "false"));
+    LM_T(LmtExpr, ("adding to JEXL expression context object (bool): %s=%s", key.c_str(), FT(_value)));
     jh.addBool(key, _value);
   }
 }

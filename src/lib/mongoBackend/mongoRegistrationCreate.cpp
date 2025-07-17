@@ -129,7 +129,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
     else
     {
       bob.append(REG_ENTITY_ID, eP->idPattern);
-      bob.append(REG_ENTITY_ISPATTERN, "true");
+      bob.append(REG_ENTITY_ISPATTERN, true);
       if (!eP->type.empty())
       {
         bob.append(REG_ENTITY_TYPE, eP->type);

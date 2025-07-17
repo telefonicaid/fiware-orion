@@ -136,36 +136,43 @@ void Registration::setEntities(const orion::BSONObj& cr0)
     EntityId         entity;
     orion::BSONObj   ce = dbEntityV[ix].embeddedObject();
 
+    // id/idPattern
+    bool isIdPattern = false;
     if (ce.hasField(REG_ENTITY_ISPATTERN))
     {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISPATTERN);
-
-      if (isPattern == "true")
+      if (getFieldF(ce, REG_ENTITY_ISPATTERN).type() != orion::Bool)
       {
-        entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
+        // Old versions of the registrations model (previous to Orion 4.3.0) use isPattern as string
+        // Although from 4.3.0 on isPattern is always stored as boolean, we need this guard to avoid
+        // problems with old registrations. Maybe in the future we can clean our database and remove
+        // this guard
+        isIdPattern = (getStringFieldF(ce, REG_ENTITY_ISPATTERN) == "true");
       }
       else
       {
-        entity.id = getStringFieldF(ce, REG_ENTITY_ID);
+        isIdPattern = getBoolFieldF(ce, REG_ENTITY_ISPATTERN);
       }
+    }
+
+    if (isIdPattern)
+    {
+      entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
     }
     else
     {
       entity.id = getStringFieldF(ce, REG_ENTITY_ID);
     }
 
+    // type/typePattern
+    bool isTypePattern = false;
     if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
     {
-      std::string isPattern = getStringFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
+      isTypePattern = getBoolFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
+    }
 
-      if (isPattern == "true")
-      {
-        entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
-      else
-      {
-        entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
-      }
+    if (isTypePattern)
+    {
+      entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
     }
     else
     {

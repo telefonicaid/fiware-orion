@@ -79,14 +79,12 @@ EntityInfo::EntityInfo
 (
   const std::string&  _entityId,
   const std::string&  _entityType,
-  const std::string&  _isPattern,
+  bool                _isPattern,
   bool                _isTypePattern
 )
 :
-entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
+entityId(_entityId), isPattern(_isPattern), entityType(_entityType), isTypePattern(_isTypePattern)
 {
-  isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
-
   if (isPattern)
   {
     if (!regComp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED))
@@ -951,7 +949,7 @@ void subCacheItemInsert
   for (unsigned int ix = 0; ix < entIdVector.size(); ++ix)
   {
     const EntityId*      eIdP = &entIdVector[ix];
-    std::string          isPattern      = (eIdP->id.empty())? "true" : "false";
+    bool                 isPattern      = (eIdP->id.empty());
     bool                 isTypePattern  = (eIdP->type.empty());
     std::string          id             = (eIdP->id.empty())? eIdP->idPattern   : eIdP->id;
     std::string          type           = (eIdP->type.empty())? eIdP->typePattern : eIdP->type;

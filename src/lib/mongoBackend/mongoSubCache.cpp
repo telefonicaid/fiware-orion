@@ -219,8 +219,24 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
       continue;
     }
 
+    bool isPattern = false;
+    if (entity.hasField(CSUB_ENTITY_ISPATTERN))
+    {
+      if (getFieldF(entity, CSUB_ENTITY_ISPATTERN).type() != orion::Bool)
+      {
+        // Old versions of the csubs model (previous to Orion 4.3.0) use isPattern as string
+        // Although from 4.3.0 on isPattern is always stored as boolean, we need this guard to avoid
+        // problems with old csubs. Maybe in the future we can clean our database and remove
+        // this guard
+        isPattern = (getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) == "true");
+      }
+      else
+      {
+        isPattern = getBoolFieldF(entity, CSUB_ENTITY_ISPATTERN);
+      }
+    }
+
     std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
     std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
     bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);
@@ -374,8 +390,24 @@ int mongoSubCacheItemInsert
       continue;
     }
 
+    bool isPattern = false;
+    if (entity.hasField(CSUB_ENTITY_ISPATTERN))
+    {
+      if (getFieldF(entity, CSUB_ENTITY_ISPATTERN).type() != orion::Bool)
+      {
+        // Old versions of the csubs model (previous to Orion 4.3.0) use isPattern as string
+        // Although from 4.3.0 on isPattern is always stored as boolean, we need this guard to avoid
+        // problems with old csubs. Maybe in the future we can clean our database and remove
+        // this guard
+        isPattern = (getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) == "true");
+      }
+      else
+      {
+        isPattern = getBoolFieldF(entity, CSUB_ENTITY_ISPATTERN);
+      }
+    }
+
     std::string id            = getStringFieldF(entity, ENT_ENTITY_ID);
-    std::string isPattern     = entity.hasField(CSUB_ENTITY_ISPATTERN)? getStringFieldF(entity, CSUB_ENTITY_ISPATTERN) : "false";
     std::string type          = entity.hasField(CSUB_ENTITY_TYPE)?      getStringFieldF(entity, CSUB_ENTITY_TYPE)      : "";
     bool        isTypePattern = entity.hasField(CSUB_ENTITY_ISTYPEPATTERN)? getBoolFieldF(entity, CSUB_ENTITY_ISTYPEPATTERN) : false;
     EntityInfo* eiP           = new EntityInfo(id, type, isPattern, isTypePattern);

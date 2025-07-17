@@ -75,7 +75,6 @@ SET (SOURCES
     serviceRoutinesV2/statisticsTreat_test.cpp
 
     common/commonFormat_test.cpp
-    common/commonGlobals_test.cpp
     common/commonString_test.cpp
     common/commonSem_test.cpp
     # FIXME P3: this test is aligned with the old version of the statistics logic for NGSIv1
