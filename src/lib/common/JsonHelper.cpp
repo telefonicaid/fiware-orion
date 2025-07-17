@@ -260,7 +260,7 @@ void JsonObjectHelper::addDate(const std::string& key, double timestamp)
 */
 void JsonObjectHelper::addBool(const std::string& key, bool b)
 {
-  addRaw(key, b? "true" : "false");
+  addRaw(key, FT(b));
 }
 
 
@@ -408,7 +408,7 @@ void JsonVectorHelper::addDate(double timestamp)
 */
 void JsonVectorHelper::addBool(bool b)
 {
-  addRaw(b? "true" : "false");
+  addRaw(FT(b));
 }
 
 

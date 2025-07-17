@@ -612,7 +612,7 @@ ContextAttribute::ContextAttribute
   LM_T(LmtClone, ("Creating a boolean ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
                   _name.c_str(),
                   _type.c_str(),
-                  _value ? "true" : "false"));
+                  FT(_value)));
 
   name                  = _name;
   type                  = _type;
@@ -903,7 +903,7 @@ void ContextAttribute::setRaw(ExprContextObject* exprContextObjectP)
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    rawValue = boolValue ? "true" : "false";
+    rawValue = FT(boolValue);
   }
   else if (valueType == orion::ValueTypeNull)
   {
@@ -962,7 +962,7 @@ std::string ContextAttribute::getValueResponse
         break;
 
       case orion::ValueTypeBoolean:
-        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
+        snprintf(buf, sizeof(buf), "%s", FT(boolValue));
         out = buf;
         break;
 
@@ -1205,7 +1205,7 @@ std::string ContextAttribute::getValue(void) const
     break;
 
   case orion::ValueTypeBoolean:
-    return boolValue ? "true" : "false";
+    return FT(boolValue);
     break;
 
   case orion::ValueTypeNull:

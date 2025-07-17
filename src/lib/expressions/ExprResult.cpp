@@ -269,7 +269,7 @@ std::string ExprResult::toString(void)
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    return boolValue ? "true" : "false";
+    return FT(boolValue);
   }
   else if (valueType == orion::ValueTypeString)
   {
