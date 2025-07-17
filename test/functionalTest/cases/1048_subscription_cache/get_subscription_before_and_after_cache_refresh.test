@@ -40,7 +40,7 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "entities" : [
                 {
                         "id" : "E",
-                        "isPattern" : "false",
+                        "isPattern" : false,
                         "type" : "T",
                         "isTypePattern" : false
                 }
