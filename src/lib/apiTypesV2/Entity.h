@@ -54,7 +54,6 @@ class Entity
   ContextAttributeVector  attributeVector;  // Optional
 
   std::string             servicePath;      // Not part of payload, just an internal field
-  bool                    typeGiven;        // Was 'type' part of the incoming payload?
   bool                    renderId;         // Should id and type be rendered in JSON?
 
   double                  creDate;          // used by dateCreated functionality in NGSIv2
