@@ -69,6 +69,7 @@ std::string parseEntityObject
     return "nor /id/ nor /idPattern/ present";
   }
 
+  bool typeGiven = false;
   for (rapidjson::Value::ConstMemberIterator iter = valueP->MemberBegin(); iter != valueP->MemberEnd(); ++iter)
   {
     std::string name  = iter->name.GetString();
@@ -116,7 +117,7 @@ std::string parseEntityObject
       }
 
       eP->entityId.type  = iter->value.GetString();
-      eP->typeGiven      = true;
+      typeGiven          = true;
 
       if (eP->entityId.type.empty())
       {
@@ -165,6 +166,11 @@ std::string parseEntityObject
         delete caP;
         return r;
       }
+    }
+
+    if (!typeGiven)
+    {
+      eP->entityId.type = DEFAULT_ENTITY_TYPE;
     }
   }
 
