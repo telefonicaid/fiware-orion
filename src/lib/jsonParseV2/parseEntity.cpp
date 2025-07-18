@@ -140,6 +140,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   }
 
   int membersFound = 0;
+  bool typeGiven   = false;
   for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -206,7 +207,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       }
 
       eP->entityId.type      = iter->value.GetString();
-      eP->typeGiven          = true;
+      typeGiven          = true;
 
       if (eP->entityId.type.empty())
       {
@@ -266,7 +267,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     return oe.toJson();
   }
 
-  if (!eP->typeGiven)
+  if (!typeGiven)
   {
     eP->entityId.type = DEFAULT_ENTITY_TYPE;
   }
