@@ -885,9 +885,31 @@ class KafkaConsumerThread(threading.Thread):
                 delta = datetime.now() - t0
                 times.append(trunc(delta.total_seconds()))
 
-            # Construir registro
-            s = f"Kafka message [Topic: {msg.topic()}]:\n"
+            # Construir registro con key y headers
+            s = f"Kafka message at topic {msg.topic()}\n"
 
+            # 1. Imprimir la KEY del mensaje
+            if msg.key() is not None:
+                try:
+                    key_str = msg.key().decode('utf-8')
+                except UnicodeDecodeError:
+                    key_str = msg.key().hex()
+                s += f"Key: {key_str}\n"
+            else:
+                s += "Key: (null)\n"
+
+            # 2. Imprimir los HEADERS del mensaje
+            if msg.headers():
+                s += "Headers:\n"
+                for header_key, header_value in msg.headers():
+                    try:
+                        value_str = header_value.decode('utf-8') if header_value else "(empty)"
+                    except UnicodeDecodeError:
+                        value_str = header_value.hex()
+                    s += f"  {header_key}: {value_str}\n"
+
+            # 3. Imprimir el payload
+            s += "Payload:\n"
             try:
                 payload = json.loads(msg.value().decode('utf-8'))
                 s += json.dumps(payload, indent=4) if pretty else json.dumps(payload)

@@ -71,6 +71,7 @@ public:
   const std::string& brokers,
   const std::string& topic,
   const std::string& content,
+  const std::string& subscriptionId,
   const std::string& tenant,
   const std::string& servicePath
  );

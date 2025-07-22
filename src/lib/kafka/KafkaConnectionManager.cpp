@@ -285,6 +285,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& brokers,
     const std::string& topic,
     const std::string& content,
+    const std::string& subscriptionId,
     const std::string& tenant,
     const std::string& servicePath)
 
@@ -313,13 +314,6 @@ bool KafkaConnectionManager::sendKafkaNotification(
   //Messages with the same key → Same partition (guarantees order).
 
 
-  // this key is random at the moment
-  //suggest that we use “subscriptionId” as the key identifier of the messages to keep the order in the batch sending
-  //another option could be to use a key tenant_servicePath_id
-  char key[32];
-  /* Create a message key */
-  snprintf(key, sizeof(key), "key-%03d", ::rand() % 100);
-
   rd_kafka_headers_t* headers = rd_kafka_headers_new(0); // Initially without headers
 
   if (!tenant.empty()) {
@@ -335,7 +329,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   int resultCode = rd_kafka_producev(
             producer,
             RD_KAFKA_V_TOPIC(topic.c_str()),
-            RD_KAFKA_V_KEY(key, strlen(key)),
+            RD_KAFKA_V_KEY((void*)subscriptionId.data(), subscriptionId.size()),
             RD_KAFKA_V_VALUE(const_cast<char*>(content.data()), content.size()),
             RD_KAFKA_V_HEADERS(headers),
             RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
