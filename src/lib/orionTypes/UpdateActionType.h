@@ -66,9 +66,9 @@ extern ActionType parseActionTypeV1(const std::string& action);
 
 /* ****************************************************************************
 *
-* parseActionTypeV2 -
+* parseActionType -
 */
-extern ActionType parseActionTypeV2(const std::string& actionType);
+extern ActionType parseActionType(const std::string& actionType);
 
 
 

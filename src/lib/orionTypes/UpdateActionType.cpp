@@ -86,9 +86,9 @@ ActionType parseActionTypeV1(const std::string& action)
 
 /* ****************************************************************************
 *
-* parseActionTypeV2 -
+* parseActionType -
 */
-ActionType parseActionTypeV2(const std::string& actionType)
+ActionType parseActionType(const std::string& actionType)
 {
   if (actionType == "update")
   {
