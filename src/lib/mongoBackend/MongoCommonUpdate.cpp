@@ -633,7 +633,7 @@ static bool updateAttribute
     orion::BSONObjBuilder    md;
     orion::BSONArrayBuilder  mdNames;
 
-    caP->metadataVector.toBson(&md, &mdNames, true);
+    caP->metadataVector.toBson(&md, &mdNames);
     if (mdNames.arrSize() > 0)
     {
       newAttr.append(ENT_ATTRS_MD, md.obj());
@@ -734,7 +734,7 @@ static bool appendAttribute
   orion::BSONObjBuilder   md;
   orion::BSONArrayBuilder mdNames;
 
-  caP->metadataVector.toBson(&md, &mdNames, true);
+  caP->metadataVector.toBson(&md, &mdNames);
   if (mdNames.arrSize() > 0)
   {
     toSet->append(composedName + "." + ENT_ATTRS_MD, md.obj());
@@ -2907,7 +2907,7 @@ static bool createEntity
     /* Custom metadata */
     orion::BSONObjBuilder   md;
     orion::BSONArrayBuilder mdNames;
-    attrsV[ix]->metadataVector.toBson(&md, &mdNames, true);
+    attrsV[ix]->metadataVector.toBson(&md, &mdNames);
     if (mdNames.arrSize() > 0)
     {
       bsonAttr.append(ENT_ATTRS_MD, md.obj());
