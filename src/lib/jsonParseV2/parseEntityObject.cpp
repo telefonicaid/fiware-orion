@@ -84,7 +84,7 @@ std::string parseEntityObject
 
       eP->entityId.id = iter->value.GetString();
 
-      if (forbiddenIdCharsV2(eP->entityId.id.c_str(), ""))
+      if (forbiddenIdChars(eP->entityId.id.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
@@ -124,7 +124,7 @@ std::string parseEntityObject
         return ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
       }
 
-      if (forbiddenIdCharsV2(eP->entityId.type.c_str(), ""))
+      if (forbiddenIdChars(eP->entityId.type.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }

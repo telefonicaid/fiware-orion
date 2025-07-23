@@ -1107,7 +1107,7 @@ std::string ContextAttribute::check(bool asValue, bool relaxForbiddenCheck)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdCharsV2(name.c_str()))
+  if (forbiddenIdChars(name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute", name);
     return "Invalid characters in attribute name";
@@ -1128,7 +1128,7 @@ std::string ContextAttribute::check(bool asValue, bool relaxForbiddenCheck)
     return std::string(errorMsg);
   }
 
-  if ((!asValue) && forbiddenIdCharsV2(type.c_str()))
+  if ((!asValue) && forbiddenIdChars(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";

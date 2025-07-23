@@ -108,7 +108,7 @@ bool parseEntitiesVector
           *errorStringP = "/entities/ element id is empty";
           return false;
         }
-        if (forbiddenIdCharsV2(idOpt.value.c_str()))
+        if (forbiddenIdChars(idOpt.value.c_str()))
         {
           *errorStringP = "forbidden characters in /entities/ vector item /id/";
           return false;
@@ -161,7 +161,7 @@ bool parseEntitiesVector
       }
       else if (typeOpt.given)
       {
-        if (forbiddenIdCharsV2(typeOpt.value.c_str()))
+        if (forbiddenIdChars(typeOpt.value.c_str()))
         {
           *errorStringP = "forbidden characters in /entities/ vector item /type/";
           return false;

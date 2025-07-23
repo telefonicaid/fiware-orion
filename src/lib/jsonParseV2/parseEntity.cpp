@@ -174,7 +174,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
           return oe.toJson();
         }
 
-        if (forbiddenIdCharsV2(eP->entityId.id.c_str(), ""))
+        if (forbiddenIdChars(eP->entityId.id.c_str(), ""))
         {
           OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, ERROR_BAD_REQUEST);
 
@@ -220,7 +220,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         return oe.toJson();
       }
 
-      if (forbiddenIdCharsV2(eP->entityId.type.c_str(), ""))
+      if (forbiddenIdChars(eP->entityId.type.c_str(), ""))
       {
         OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, ERROR_BAD_REQUEST);
 

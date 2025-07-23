@@ -449,7 +449,7 @@ std::string Entity::checkId(RequestType requestType)
   }
 
   // Check for forbidden chars for "id", but not for "idPattern" is a pattern
-  if (forbiddenIdCharsV2(entityId.id.c_str()))
+  if (forbiddenIdChars(entityId.id.c_str()))
   {
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, entityId.id);
     return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
@@ -514,7 +514,7 @@ std::string Entity::checkType(RequestType requestType)
   }
 
   // Check for forbidden chars for "type", but not for "typePattern"
-  if (forbiddenIdCharsV2(entityId.type.c_str()))
+  if (forbiddenIdChars(entityId.type.c_str()))
   {
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, entityId.type);
     return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
