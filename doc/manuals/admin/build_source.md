@@ -30,7 +30,7 @@ commands that require root privilege):
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev
+        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev librdkafka-dev zlib1g-dev
 
 * Install the Mongo Driver from source.
 
