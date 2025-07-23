@@ -429,7 +429,7 @@ static ChangeType mergeAttrInfo
   {
     Metadata* mdP = caP->metadataVector[ix];
 
-    mdP->appendToBsoN(&mdBuilder, &mdNamesBuilder, true);
+    mdP->appendToBson(&mdBuilder, &mdNamesBuilder);
   }
 
 
@@ -459,7 +459,7 @@ static ChangeType mergeAttrInfo
       {
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
-          md.appendToBsoN(&mdBuilder, &mdNamesBuilder, false);
+          md.appendToBson(&mdBuilder, &mdNamesBuilder);
         }
       }
 

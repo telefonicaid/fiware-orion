@@ -170,7 +170,7 @@ void MetadataVector::toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* 
 {
   for (unsigned int ix = 0; ix < this->vec.size(); ++ix)
   {
-    this->vec[ix]->appendToBsoN(md, mdNames, true);
+    this->vec[ix]->appendToBson(md, mdNames);
 
     LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                       this->vec[ix]->name.c_str(), this->vec[ix]->type.c_str(), this->vec[ix]->toJson().c_str()));

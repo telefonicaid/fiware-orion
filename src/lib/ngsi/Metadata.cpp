@@ -436,13 +436,13 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
 
 /* ****************************************************************************
 *
-* Metadata::appendToBsoN -
+* Metadata::appendToBson -
 */
-void Metadata::appendToBsoN(orion::BSONObjBuilder* mdBuilder, orion::BSONArrayBuilder* mdNamesBuilder, bool useDefaultType)
+void Metadata::appendToBson(orion::BSONObjBuilder* mdBuilder, orion::BSONArrayBuilder* mdNamesBuilder)
 {
   std::string type = this->type;
 
-  if (!this->typeGiven && useDefaultType)
+  if (!this->typeGiven)
   {
     if ((this->compoundValueP == NULL) || (this->compoundValueP->valueType != orion::ValueTypeVector))
     {
