@@ -2067,11 +2067,11 @@ static unsigned int processSubscriptions
         continue;
       }
 
-      orion::BSONObjBuilder bobQuery;  // used only to keep processAreaScopeV2() signature
+      orion::BSONObjBuilder bobQuery;  // used only to keep processAreaScope() signature
       orion::BSONObjBuilder bobCountQuery;
-      if (!processAreaScopeV2(&geoScope, &bobQuery, &bobCountQuery))
+      if (!processAreaScope(&geoScope, &bobQuery, &bobCountQuery))
       {
-        // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
+        // Error in processAreaScope is interpreted as no-match (conservative approach)
         continue;
       }
 
