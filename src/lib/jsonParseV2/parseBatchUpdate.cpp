@@ -129,7 +129,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
     {
       ActionType   actionType;
       std::string  actionTypeStr = iter->value.GetString();
-      if ((actionType = parseActionTypeV2(actionTypeStr)) == ActionTypeUnknown)
+      if ((actionType = parseActionType(actionTypeStr)) == ActionTypeUnknown)
       {
         std::string details = "invalid update action type: right ones are: "
           "append, appendStric, delete, replace, update";

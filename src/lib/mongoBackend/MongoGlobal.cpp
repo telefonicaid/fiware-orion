@@ -694,7 +694,7 @@ static std::string sortCriteria(const std::string& sortToken)
 
 /* *****************************************************************************
 *
-* processAreaScopeV2 -
+* processAreaScope -
 *
 * Returns true if queryP/countQueryP were filled, false otherwise
 *
@@ -708,7 +708,7 @@ static std::string sortCriteria(const std::string& sortToken)
 *   (see the aforementioned link).
 *
 */
-bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
+bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -1387,7 +1387,7 @@ bool entitiesQuery
       }
       else
       {
-        processAreaScopeV2(scopeP, &finalQuery, &finalCountQuery);
+        processAreaScope(scopeP, &finalQuery, &finalCountQuery);
       }
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)

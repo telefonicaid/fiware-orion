@@ -40,7 +40,7 @@ extern bool forbiddenChars(const char* s, const char* exceptions = NULL);
 *
 * forbiddenIdCharsV2 -
 */
-extern bool forbiddenIdCharsV2(const char* s, const char* exceptions = NULL);
+extern bool forbiddenIdChars(const char* s, const char* exceptions = NULL);
 
 
 

@@ -429,7 +429,7 @@ static ChangeType mergeAttrInfo
   {
     Metadata* mdP = caP->metadataVector[ix];
 
-    mdP->appendToBsoN(&mdBuilder, &mdNamesBuilder, true);
+    mdP->appendToBson(&mdBuilder, &mdNamesBuilder);
   }
 
 
@@ -459,7 +459,7 @@ static ChangeType mergeAttrInfo
       {
         if (!hasMetadata(dbDecode(md.name), md.type, caP))
         {
-          md.appendToBsoN(&mdBuilder, &mdNamesBuilder, false);
+          md.appendToBson(&mdBuilder, &mdNamesBuilder);
         }
       }
 
@@ -633,7 +633,7 @@ static bool updateAttribute
     orion::BSONObjBuilder    md;
     orion::BSONArrayBuilder  mdNames;
 
-    caP->metadataVector.toBson(&md, &mdNames, true);
+    caP->metadataVector.toBson(&md, &mdNames);
     if (mdNames.arrSize() > 0)
     {
       newAttr.append(ENT_ATTRS_MD, md.obj());
@@ -734,7 +734,7 @@ static bool appendAttribute
   orion::BSONObjBuilder   md;
   orion::BSONArrayBuilder mdNames;
 
-  caP->metadataVector.toBson(&md, &mdNames, true);
+  caP->metadataVector.toBson(&md, &mdNames);
   if (mdNames.arrSize() > 0)
   {
     toSet->append(composedName + "." + ENT_ATTRS_MD, md.obj());
@@ -2067,11 +2067,11 @@ static unsigned int processSubscriptions
         continue;
       }
 
-      orion::BSONObjBuilder bobQuery;  // used only to keep processAreaScopeV2() signature
+      orion::BSONObjBuilder bobQuery;  // used only to keep processAreaScope() signature
       orion::BSONObjBuilder bobCountQuery;
-      if (!processAreaScopeV2(&geoScope, &bobQuery, &bobCountQuery))
+      if (!processAreaScope(&geoScope, &bobQuery, &bobCountQuery))
       {
-        // Error in processAreaScopeV2 is interpreted as no-match (conservative approach)
+        // Error in processAreaScope is interpreted as no-match (conservative approach)
         continue;
       }
 
@@ -2265,7 +2265,6 @@ static void updateAttrInNotifyCer
 (
   ContextElementResponse* notifyCerP,
   ContextAttribute*       targetAttr,
-  bool                    useDefaultType,
   const std::string&      actionType,
   const bool&             overrideMetadata
 )
@@ -2380,7 +2379,7 @@ static void updateAttrInNotifyCer
         /* If the attribute in target attr was not found, then it has to be added*/
         if (!matchMd)
         {
-          Metadata* newMdP = new Metadata(targetMdP, useDefaultType);
+          Metadata* newMdP = new Metadata(targetMdP, true);
           caP->metadataVector.push_back(newMdP);
         }
       }
@@ -2390,7 +2389,7 @@ static void updateAttrInNotifyCer
   }
 
   /* Reached this point, it means that it is a new attribute (APPEND case) */
-  ContextAttribute* caP = new ContextAttribute(targetAttr, useDefaultType);
+  ContextAttribute* caP = new ContextAttribute(targetAttr, true);
 
   double now = getCurrentTime();
   caP->creDate = now;
@@ -2494,7 +2493,7 @@ static bool updateContextAttributeItem
     return false;
   }
 
-  updateAttrInNotifyCer(notifyCerP, targetAttr, true, NGSI_MD_ACTIONTYPE_UPDATE, overrideMetadata);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, NGSI_MD_ACTIONTYPE_UPDATE, overrideMetadata);
 
   return true;
 }
@@ -2549,7 +2548,7 @@ static bool appendContextAttributeItem
   // to be called after the location processing logic (as this logic may need the compoundValueP
 
   std::string actionType = (actualAppend == true)? NGSI_MD_ACTIONTYPE_APPEND : NGSI_MD_ACTIONTYPE_UPDATE;
-  updateAttrInNotifyCer(notifyCerP, targetAttr, true, actionType, overrideMetadata);
+  updateAttrInNotifyCer(notifyCerP, targetAttr, actionType, overrideMetadata);
 
   return true;
 }
@@ -2908,7 +2907,7 @@ static bool createEntity
     /* Custom metadata */
     orion::BSONObjBuilder   md;
     orion::BSONArrayBuilder mdNames;
-    attrsV[ix]->metadataVector.toBson(&md, &mdNames, true);
+    attrsV[ix]->metadataVector.toBson(&md, &mdNames);
     if (mdNames.arrSize() > 0)
     {
       bsonAttr.append(ENT_ATTRS_MD, md.obj());

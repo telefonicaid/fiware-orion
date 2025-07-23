@@ -47,7 +47,7 @@
 *
 * Entity::Entity - 
 */
-Entity::Entity(): typeGiven(false), renderId(true), creDate(0), modDate(0)
+Entity::Entity(): renderId(true), creDate(0), modDate(0)
 {
 }
 
@@ -65,7 +65,6 @@ Entity::Entity(const std::string& _id, const std::string& _idPattern, const std:
   entityId.idPattern     = _idPattern;
   entityId.type          = _type;
   entityId.typePattern   = _typePattern;
-  typeGiven              = false;
   renderId               = true;
   creDate                = 0;
   modDate                = 0;
@@ -450,7 +449,7 @@ std::string Entity::checkId(RequestType requestType)
   }
 
   // Check for forbidden chars for "id", but not for "idPattern" is a pattern
-  if (forbiddenIdCharsV2(entityId.id.c_str()))
+  if (forbiddenIdChars(entityId.id.c_str()))
   {
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, entityId.id);
     return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
@@ -507,18 +506,15 @@ std::string Entity::checkType(RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
+  if ((len = strlen(entityId.type.c_str())) < MIN_ID_LEN)
   {
-    if ((len = strlen(entityId.type.c_str())) < MIN_ID_LEN)
-    {
-      snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
-      return std::string(errorMsg);
-    }
+    snprintf(errorMsg, sizeof errorMsg, "entity type length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
   }
 
   // Check for forbidden chars for "type", but not for "typePattern"
-  if (forbiddenIdCharsV2(entityId.type.c_str()))
+  if (forbiddenIdChars(entityId.type.c_str()))
   {
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, entityId.type);
     return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
@@ -546,14 +542,11 @@ std::string Entity::checkTypePattern(RequestType requestType)
     return std::string(errorMsg);
   }
 
-  if (!((requestType == BatchQueryRequest) || (requestType == BatchUpdateRequest && !typeGiven)))
+  if ((len = strlen(entityId.typePattern.c_str())) < MIN_ID_LEN)
   {
-    if ((len = strlen(entityId.typePattern.c_str())) < MIN_ID_LEN)
-    {
-      snprintf(errorMsg, sizeof errorMsg, "entity typePattern length: %zd, min length supported: %d", len, MIN_ID_LEN);
-      alarmMgr.badInput(clientIp, errorMsg);
-      return std::string(errorMsg);
-    }
+    snprintf(errorMsg, sizeof errorMsg, "entity typePattern length: %zd, min length supported: %d", len, MIN_ID_LEN);
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
   }
 
   return "OK";
@@ -595,32 +588,28 @@ std::string Entity::check(RequestType requestType)
     return err;
   }
 
-  // typeGiven enables some additional checkings for type and typePattern
-  if (typeGiven)
+  if ((entityId.type.empty()) && (entityId.typePattern.empty()))
   {
-    if ((entityId.type.empty()) && (entityId.typePattern.empty()))
-    {
-      snprintf(errorMsg, sizeof errorMsg, "type and typePattern cannot be both empty at the same time");
-      alarmMgr.badInput(clientIp, errorMsg);
-      return std::string(errorMsg);
-    }
+    snprintf(errorMsg, sizeof errorMsg, "type and typePattern cannot be both empty at the same time");
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
 
-    if ((!entityId.type.empty()) && (!entityId.typePattern.empty()))
-    {
-      snprintf(errorMsg, sizeof errorMsg, "type and typePattern cannot be both filled at the same time");
-      alarmMgr.badInput(clientIp, errorMsg);
-      return std::string(errorMsg);
-    }
+  if ((!entityId.type.empty()) && (!entityId.typePattern.empty()))
+  {
+    snprintf(errorMsg, sizeof errorMsg, "type and typePattern cannot be both filled at the same time");
+    alarmMgr.badInput(clientIp, errorMsg);
+    return std::string(errorMsg);
+  }
 
-    if ((!entityId.type.empty()) && ((err = checkType(requestType)) != "OK"))
-    {
-      return err;
-    }
+  if ((!entityId.type.empty()) && ((err = checkType(requestType)) != "OK"))
+  {
+    return err;
+  }
 
-    if ((!entityId.typePattern.empty()) && ((err = checkTypePattern(requestType)) != "OK"))
-    {
-      return err;
-    }
+  if ((!entityId.typePattern.empty()) && ((err = checkTypePattern(requestType)) != "OK"))
+  {
+    return err;
   }
 
   return attributeVector.check(requestType);

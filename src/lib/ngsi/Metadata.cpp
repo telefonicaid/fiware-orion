@@ -262,7 +262,7 @@ std::string Metadata::check(void)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdCharsV2(name.c_str()))
+  if (forbiddenIdChars(name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of a Metadata", name);
     return "Invalid characters in metadata name";
@@ -283,7 +283,7 @@ std::string Metadata::check(void)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdCharsV2(type.c_str()))
+  if (forbiddenIdChars(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of a Metadata", type);
     return "Invalid characters in metadata type";
@@ -436,13 +436,13 @@ bool Metadata::compoundItemExists(const std::string& compoundPath, orion::Compou
 
 /* ****************************************************************************
 *
-* Metadata::appendToBsoN -
+* Metadata::appendToBson -
 */
-void Metadata::appendToBsoN(orion::BSONObjBuilder* mdBuilder, orion::BSONArrayBuilder* mdNamesBuilder, bool useDefaultType)
+void Metadata::appendToBson(orion::BSONObjBuilder* mdBuilder, orion::BSONArrayBuilder* mdNamesBuilder)
 {
   std::string type = this->type;
 
-  if (!this->typeGiven && useDefaultType)
+  if (!this->typeGiven)
   {
     if ((this->compoundValueP == NULL) || (this->compoundValueP->valueType != orion::ValueTypeVector))
     {

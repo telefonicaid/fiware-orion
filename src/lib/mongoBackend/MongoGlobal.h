@@ -197,10 +197,10 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 
 /* *****************************************************************************
 *
-* processAreaScopeV2 -
+* processAreaScope -
 *
 */
-extern bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
+extern bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
 
 
 
