@@ -2590,6 +2590,7 @@ In order to overcome this problem, the `evalPriority` metadata can be used to de
 * Expressions are evaluated in incresing order of priority
 * In case of ties, Orion does not guarantee a particular evaluation order. Thus, expressions in the same priority level must be considered independent, and expressions using other attributes with the same or lower priority would result in unexpected values.
 * If no `evalPriority` is set, default 100000 is used
+* Note `evalPriority` cannot be associated to `id` or `type`. They are always calculated at the end (as they have 100001 priority order)
 * `evalPriority` only has a meaning in `notification.httpCustom.ngsi` in subscriptions. As metadata in regular entities (e.g. an entity created with `POST /v2/entities`) Orion doesn't implements any semantic for it
 
 Using `evalPriority` the above example could be reformuled this way:

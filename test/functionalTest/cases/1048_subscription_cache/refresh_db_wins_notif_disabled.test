@@ -39,7 +39,7 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "entities" : [
                 {
                         "id" : "E",
-                        "isPattern" : "false",
+                        "isPattern" : false,
                         "type" : "T",
                         "isTypePattern" : false
                 }
@@ -269,7 +269,7 @@ Content-Length: 482
     "entities": [
         {
             "id": "E",
-            "isPattern": "false",
+            "isPattern": false,
             "isTypePattern": false,
             "type": "T"
         }
@@ -348,7 +348,7 @@ Content-Length: 482
     "entities": [
         {
             "id": "E",
-            "isPattern": "false",
+            "isPattern": false,
             "isTypePattern": false,
             "type": "T"
         }

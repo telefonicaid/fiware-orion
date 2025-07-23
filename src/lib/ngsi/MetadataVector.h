@@ -58,7 +58,7 @@ public:
 
   Metadata* operator[](unsigned int ix) const;
 
-  void            toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);
+  void            toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames);
   
 } MetadataVector;
 

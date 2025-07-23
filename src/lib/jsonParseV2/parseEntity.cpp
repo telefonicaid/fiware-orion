@@ -140,6 +140,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   }
 
   int membersFound = 0;
+  bool typeGiven   = false;
   for (rapidjson::Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -173,7 +174,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
           return oe.toJson();
         }
 
-        if (forbiddenIdCharsV2(eP->entityId.id.c_str(), ""))
+        if (forbiddenIdChars(eP->entityId.id.c_str(), ""))
         {
           OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, ERROR_BAD_REQUEST);
 
@@ -206,7 +207,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
       }
 
       eP->entityId.type      = iter->value.GetString();
-      eP->typeGiven          = true;
+      typeGiven          = true;
 
       if (eP->entityId.type.empty())
       {
@@ -219,7 +220,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         return oe.toJson();
       }
 
-      if (forbiddenIdCharsV2(eP->entityId.type.c_str(), ""))
+      if (forbiddenIdChars(eP->entityId.type.c_str(), ""))
       {
         OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, ERROR_BAD_REQUEST);
 
@@ -266,7 +267,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
     return oe.toJson();
   }
 
-  if (!eP->typeGiven)
+  if (!typeGiven)
   {
     eP->entityId.type = DEFAULT_ENTITY_TYPE;
   }

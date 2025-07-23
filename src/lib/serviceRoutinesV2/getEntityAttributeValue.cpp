@@ -67,8 +67,8 @@ std::string getEntityAttributeValue
   std::string  answer;
   std::string  type       = ciP->uriParam["type"];
 
-  if (forbiddenIdCharsV2( compV[2].c_str(), NULL) ||
-      (forbiddenIdCharsV2(compV[4].c_str(), NULL)))
+  if (forbiddenIdChars( compV[2].c_str(), NULL) ||
+      (forbiddenIdChars(compV[4].c_str(), NULL)))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
@@ -104,7 +104,7 @@ std::string getEntityAttributeValue
     {
       // Do not use attribute name, change to 'value'
       caP->name = "value";
-      TIMED_RENDER(answer = caP->toJsonAsValue(ciP->httpHeaders.accepted("text/plain"),
+      TIMED_RENDER(answer = caP->getValueResponse(ciP->httpHeaders.accepted("text/plain"),
                                                ciP->httpHeaders.accepted("application/json"),
                                                ciP->httpHeaders.outformatSelect(),
                                                &(ciP->outMimeType),

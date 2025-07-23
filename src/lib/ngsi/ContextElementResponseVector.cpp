@@ -45,15 +45,14 @@ std::string ContextElementResponseVector::toJson
   RenderFormat                         renderFormat,
   const std::vector<std::string>&      attrsFilter,
   bool                                 blacklist,
-  const std::vector<std::string>&      metadataFilter,
-  ExprContextObject*                   exprContextObjectP
+  const std::vector<std::string>&      metadataFilter
 )
 {
   JsonVectorHelper jvh;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    jvh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP));
+    jvh.addRaw(vec[ix]->toJson(renderFormat, attrsFilter, blacklist, metadataFilter));
   }
 
   return jvh.str();

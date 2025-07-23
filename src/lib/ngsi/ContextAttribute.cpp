@@ -335,6 +335,7 @@ ContextAttribute::ContextAttribute()
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -388,6 +389,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP, bool useDefaultType, b
   previousValue         = NULL;
   actionType            = caP->actionType;
   shadowed              = caP->shadowed;
+  rawValueCalculated    = caP->rawValueCalculated;
 
 #if 0
   // This block seems to be a better alternative to implement cloneCompound. If enabled
@@ -494,6 +496,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -537,6 +540,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -579,6 +583,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -607,7 +612,7 @@ ContextAttribute::ContextAttribute
   LM_T(LmtClone, ("Creating a boolean ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
                   _name.c_str(),
                   _type.c_str(),
-                  _value ? "true" : "false"));
+                  FT(_value)));
 
   name                  = _name;
   type                  = _type;
@@ -622,6 +627,7 @@ ContextAttribute::ContextAttribute
   previousValue         = NULL;
   actionType            = "";
   shadowed              = false;
+  rawValueCalculated    = false;
 
   creDate = 0;
   modDate = 0;
@@ -817,52 +823,7 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
   //
   // value
   //
-  if (compoundValueP != NULL)
-  {
-    orion::CompoundValueNode* childToRenderP = compoundValueP;
-    if ((type == GEO_JSON) && (!hasIgnoreType()))
-    {
-      childToRenderP = getGeometry(compoundValueP);
-    }
-
-    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
-    // of DB entities) may lead to NULL, so the check is needed
-    if (childToRenderP != NULL)
-    {
-      jh.addRaw("value", childToRenderP->toJson(exprContextObjectP));
-    }
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    if ((type == DATE_TYPE) || (type == DATE_TYPE_ALT))
-    {
-      jh.addString("value", isodate2str(numberValue));
-    }
-    else // regular number
-    {
-      jh.addNumber("value", numberValue);
-    }
-  }
-  else if (valueType == orion::ValueTypeString)
-  {
-    jh.addRaw("value", smartStringValue(stringValue, exprContextObjectP, "null"));
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    jh.addBool("value", boolValue);
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    jh.addRaw("value", "null");
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_E(("Runtime Error (value not given for attribute %s)", name.c_str()));
-  }
-  else
-  {
-    LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
-  }
+  jh.addRaw("value", toJsonValue());
 
   std::vector<Metadata*> orderedMetadata;
   filterAndOrderMetadata(metadataFilter, &orderedMetadata);
@@ -887,11 +848,40 @@ std::string ContextAttribute::toJson(const std::vector<std::string>&  metadataFi
 * Also used by the ngsi expression logic
 *
 */
-std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
+std::string ContextAttribute::toJsonValue(void)
 {
+  if (!rawValueCalculated)
+  {
+    // For regular attribute rendering (not previously calculated base on ExprContextObject)
+    setRaw(NULL);
+  }
+  return rawValue;
+}
+
+
+/* ****************************************************************************
+*
+* setRaw -
+*
+*/
+void ContextAttribute::setRaw(ExprContextObject* exprContextObjectP)
+{
+  rawValueCalculated = true;
+
   if (compoundValueP != NULL)
   {
-    return compoundValueP->toJson();
+    orion::CompoundValueNode* childToRenderP = compoundValueP;
+    if ((type == GEO_JSON) && (!hasIgnoreType()))
+    {
+      childToRenderP = getGeometry(compoundValueP);
+    }
+
+    // Some internal error conditions in getGeometryToRender() (e.g. out of band manipulation
+    // of DB entities) may lead to NULL, so the check is needed
+    if (childToRenderP != NULL)
+    {
+      rawValue = childToRenderP->toJson(exprContextObjectP);
+    }
   }
   else if (valueType == orion::ValueTypeNumber)
   {
@@ -900,24 +890,24 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
       std::string out = "\"";
       out += toJsonString(isodate2str(numberValue));
       out += '"';
-      return out;
+      rawValue = out;
     }
     else // regular number
     {
-      return double2string(numberValue);
+      rawValue = double2string(numberValue);
     }
   }
   else if (valueType == orion::ValueTypeString)
   {
-    return smartStringValue(stringValue, exprContextObjectP, "null");
+    rawValue = smartStringValue(stringValue, exprContextObjectP, "null");
   }
   else if (valueType == orion::ValueTypeBoolean)
   {
-    return boolValue ? "true" : "false";
+    rawValue = FT(boolValue);
   }
   else if (valueType == orion::ValueTypeNull)
   {
-    return "null";
+    rawValue = "null";
   }
   else if (valueType == orion::ValueTypeNotGiven)
   {
@@ -927,19 +917,15 @@ std::string ContextAttribute::toJsonValue(ExprContextObject* exprContextObjectP)
   {
     LM_E(("Runtime Error (invalid value type %s for attribute %s)", valueTypeName(valueType), name.c_str()));
   }
-
-  return "";
 }
 
 
 /* ****************************************************************************
 *
-* toJsonAsValue -
+* getValueResponse -
 *
-* FIXME P7: toJsonValue() and toJsonAsValue() are very similar and may be confusing.
-* Try to find a couple of names different and meaningful enough
 */
-std::string ContextAttribute::toJsonAsValue
+std::string ContextAttribute::getValueResponse
 (
   bool             acceptedTextPlain,   // in parameter
   bool             acceptedJson,        // in parameter
@@ -976,7 +962,7 @@ std::string ContextAttribute::toJsonAsValue
         break;
 
       case orion::ValueTypeBoolean:
-        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
+        snprintf(buf, sizeof(buf), "%s", FT(boolValue));
         out = buf;
         break;
 
@@ -1121,7 +1107,7 @@ std::string ContextAttribute::check(bool asValue, bool relaxForbiddenCheck)
     return std::string(errorMsg);
   }
 
-  if (forbiddenIdCharsV2(name.c_str()))
+  if (forbiddenIdChars(name.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the name of an attribute", name);
     return "Invalid characters in attribute name";
@@ -1142,7 +1128,7 @@ std::string ContextAttribute::check(bool asValue, bool relaxForbiddenCheck)
     return std::string(errorMsg);
   }
 
-  if ((!asValue) && forbiddenIdCharsV2(type.c_str()))
+  if ((!asValue) && forbiddenIdChars(type.c_str()))
   {
     alarmMgr.badInput(clientIp, "found a forbidden character in the type of an attribute", type);
     return "Invalid characters in attribute type";
@@ -1219,7 +1205,7 @@ std::string ContextAttribute::getValue(void) const
     break;
 
   case orion::ValueTypeBoolean:
-    return boolValue ? "true" : "false";
+    return FT(boolValue);
     break;
 
   case orion::ValueTypeNull:

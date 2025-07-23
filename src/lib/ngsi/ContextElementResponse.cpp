@@ -158,13 +158,12 @@ std::string ContextElementResponse::toJson
   RenderFormat                         renderFormat,
   const std::vector<std::string>&      attrsFilter,
   bool                                 blacklist,
-  const std::vector<std::string>&      metadataFilter,
-  ExprContextObject*                   exprContextObjectP
+  const std::vector<std::string>&      metadataFilter
 )
 {
   std::string out;
 
-  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false, exprContextObjectP);
+  out = entity.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, false);
 
   return out;
 }

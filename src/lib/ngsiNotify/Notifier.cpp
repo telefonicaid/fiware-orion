@@ -263,6 +263,35 @@ static bool setNgsiPayload
   NotifyContextRequest   ncr;
   ContextElementResponse cer;
 
+  // First we add attributes in the ngsi field, adding calculated expressions to context in order of priority
+  std::vector<ContextAttribute*>  orderedNgsiAttrs;
+  orderByPriority(ngsi, &orderedNgsiAttrs);
+
+  for (unsigned int ix = 0; ix < orderedNgsiAttrs.size(); ix++)
+  {
+    // Pre-calculation of attribute values in the right order according evalPriority,
+    // adding them to context in sequence
+    ContextAttribute* caP = new ContextAttribute(orderedNgsiAttrs[ix], false, true);
+    caP->setRaw(exprContextObjectP);
+
+    TIME_EXPR_CTXBLD_START();
+    exprContextObjectP->add(caP->name, caP->rawValue, true);
+    TIME_EXPR_CTXBLD_STOP();
+
+    cer.entity.attributeVector.push_back(caP);
+    LM_W(("FGM: attr <%s>: %s", caP->name.c_str(), caP->rawValue.c_str()));
+  }
+  // Next, other attributes in the original entity not already added
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    if (cer.entity.attributeVector.get(en.attributeVector[ix]->name) < 0)
+    {
+      cer.entity.attributeVector.push_back(new ContextAttribute(en.attributeVector[ix], false, true));
+    }
+  }
+
+  LM_W(("FGM: context at this point is %s", exprContextObjectP->getJexlContext().c_str()));
+
   std::string effectiveId;
   if (ngsi.entityId.id.empty())
   {
@@ -288,31 +317,6 @@ static bool setNgsiPayload
   EntityId entId(effectiveId, "", effectiveType, "");
   cer.entity.fill(entId, en.servicePath);
 
-  // First we add attributes in the ngsi field, adding calculated expressions to context in order of priority
-  std::vector<ContextAttribute*>  orderedNgsiAttrs;
-  orderByPriority(ngsi, &orderedNgsiAttrs);
-
-  for (unsigned int ix = 0; ix < orderedNgsiAttrs.size(); ix++)
-  {
-    // Avoid to add context if an attribute with the same name exists in the entity
-    if (en.attributeVector.get(orderedNgsiAttrs[ix]->name) < 0)
-    {
-      TIME_EXPR_CTXBLD_START();
-      exprContextObjectP->add(orderedNgsiAttrs[ix]->name, orderedNgsiAttrs[ix]->toJsonValue(exprContextObjectP), true);
-      TIME_EXPR_CTXBLD_STOP();
-    }
-
-    cer.entity.attributeVector.push_back(new ContextAttribute(orderedNgsiAttrs[ix], false, true));
-  }
-  // Next, other attributes in the original entity not already added
-  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    if (cer.entity.attributeVector.get(en.attributeVector[ix]->name) < 0)
-    {
-      cer.entity.attributeVector.push_back(new ContextAttribute(en.attributeVector[ix], false, true));
-    }
-  }
-
   cer.error.code = SccOk;
 
   ncr.subscriptionId  = subscriptionId;
@@ -321,11 +325,11 @@ static bool setNgsiPayload
   if ((renderFormat == NGSI_V2_SIMPLIFIEDNORMALIZED) || (renderFormat == NGSI_V2_SIMPLIFIEDKEYVALUES) ||
       (renderFormat == NGSI_V2_KEYVALUES) || (renderFormat == NGSI_V2_VALUES) )
   {
-    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+    *payloadP = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
   }
   else
   {
-    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter, exprContextObjectP);
+    *payloadP = ncr.toJson(NGSI_V2_NORMALIZED, attrsFilter, blacklist, metadataFilter);
   }
 
   return true;

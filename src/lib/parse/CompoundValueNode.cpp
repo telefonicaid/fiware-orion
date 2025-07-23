@@ -482,7 +482,7 @@ std::string CompoundValueNode::toJson(ExprContextObject* exprContextObjectP)
     return double2string(numberValue);
 
   case orion::ValueTypeBoolean:
-    return (boolValue? "true" : "false");
+    return FT(boolValue);
 
   case orion::ValueTypeNull:
     return "null";

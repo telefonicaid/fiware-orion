@@ -93,7 +93,7 @@ typedef struct Metadata
   void         release(void);
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
-  void         appendToBsoN(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);
+  void         appendToBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames);
 
   void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 

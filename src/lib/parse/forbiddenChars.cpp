@@ -91,7 +91,7 @@ bool forbiddenChars(const char* s, const char* exceptions)
 *
 * forbiddenIdCharsV2 -
 */
-bool forbiddenIdCharsV2(const char* s, const char* exceptions)
+bool forbiddenIdChars(const char* s, const char* exceptions)
 {
   if (s == (void*) 0)
   {

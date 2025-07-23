@@ -45,8 +45,7 @@ typedef struct NotifyContextRequest
   std::string   toJson(RenderFormat                         renderFormat,
                        const std::vector<std::string>&      attrsFilter,
                        bool                                 blacklist,
-                       const std::vector<std::string>&      metadataFilter,
-                       ExprContextObject*                   exprContextObjectP = NULL);
+                       const std::vector<std::string>&      metadataFilter);
   void          release(void);
 } NotifyContextRequest;
 

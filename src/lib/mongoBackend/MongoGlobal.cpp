@@ -694,7 +694,7 @@ static std::string sortCriteria(const std::string& sortToken)
 
 /* *****************************************************************************
 *
-* processAreaScopeV2 -
+* processAreaScope -
 *
 * Returns true if queryP/countQueryP were filled, false otherwise
 *
@@ -708,7 +708,7 @@ static std::string sortCriteria(const std::string& sortToken)
 *   (see the aforementioned link).
 *
 */
-bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
+bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -1387,7 +1387,7 @@ bool entitiesQuery
       }
       else
       {
-        processAreaScopeV2(scopeP, &finalQuery, &finalCountQuery);
+        processAreaScope(scopeP, &finalQuery, &finalCountQuery);
       }
     }
     else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
@@ -1718,8 +1718,8 @@ bool registrationsQuery
   //
   //          (next two ones are for "universal pattern" registrations)
   //
-  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$in: [T1, T3, ...} },
-  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$exists: false } },
+  //          { cr.entities.id: ".*", cr.entities.isPattern: true (*), crs.entities.type: {$in: [T1, T3, ...} },
+  //          { cr.entities.id: ".*", cr.entities.isPattern: true (*), crs.entities.type: {$exists: false } },
   //   ],
   //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
   //   servicePath: ... ,
@@ -1729,6 +1729,8 @@ bool registrationsQuery
   //
   // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
   // universal pattern) so we cannot avoid to use this operator.
+  //
+  // (*) Not actually this way. See comment in the code.
   //
 
   /* Build query based on arguments */
@@ -1774,12 +1776,21 @@ bool registrationsQuery
   orion::BSONObjBuilder bobExistsFalse;
   bobExistsFalse.append("$exists", false);
 
+  // Note that previous to Orion 3.4.0 csub were using strings for this, so need to use
+  // {$in: [true, "true"]} instead of just true
+  orion::BSONArrayBuilder bInArr;
+  orion::BSONObjBuilder bin;
+  bInArr.append(true);
+  bInArr.append("true");
+  bin.append("$in", bInArr.arr());
+  orion::BSONObj binObj = bin.obj();
+
   bobArrayItem1.append(crEntitiesId, ".*");
-  bobArrayItem1.append(crEntitiesPattern, "true");
+  bobArrayItem1.append(crEntitiesPattern, binObj);
   bobArrayItem1.append(crEntitiesType, bobIn.obj());
 
   bobArrayItem2.append(crEntitiesId, ".*");
-  bobArrayItem2.append(crEntitiesPattern, "true");
+  bobArrayItem2.append(crEntitiesPattern, binObj);
   bobArrayItem2.append(crEntitiesType, bobExistsFalse.obj());
 
   entityOr.append(bobArrayItem1.obj());

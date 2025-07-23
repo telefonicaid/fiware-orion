@@ -442,7 +442,7 @@ void ContextAttributeVector::toBson
     orion::BSONObjBuilder    md;
     orion::BSONArrayBuilder  mdNames;
 
-    this->vec[ix]->metadataVector.toBson(&md, &mdNames, true);
+    this->vec[ix]->metadataVector.toBson(&md, &mdNames);
     if (mdNames.arrSize())
     {
       bsonAttr.append(ENT_ATTRS_MD, md.obj());

@@ -1,4 +1,4 @@
-# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-Evaluation priority in expressions
+evalPriority not honored (with evalPriority to do the right calculation)
 
 --SHELL-INIT--
 dbInit CB
@@ -32,15 +32,18 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub with expressions Z1=A+1, Y2=Z1+1, X3=Y2+1, S=X3+1 (X3 not notified)
-# 02. Create entity E1 with A=1
-# 03. Update entity E1 with A=2.1
-# 04. Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)
+# Same as eval_priority_not_honored_with_value.test but with evalPriority 1 for NO2Status and SO2Status, so
+# the calculation is done as expected: airQualityIndex is set to 3 and airQualityLevel is set to 'Regular'
+#
+# 01. Create custom sub
+# 02. Create entity to trigger expressions
+# 03. Dump accumulator and check notif is ok
 #
 
 
-echo "01. Create custom sub with expressions Z1=A+1, Y2=Z1+1, X3=Y2+1, S=X3+1 (X3 not notified)"
-echo "========================================================================================="
+echo "01. Create custom sub"
+echo "====================="
+# NOTE: '\'' is the way of scaping a ' in the payload variable below (see https://stackoverflow.com/a/1250279/1485926)
 payload='{
   "subject": {
     "entities": [
@@ -54,43 +57,48 @@ payload='{
     "httpCustom": {
       "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
       "ngsi": {
-        "Y2": {
-          "value": "${Z1+1}",
-          "type": "Calculated",
+        "NO2Status": {
+          "type": "Number",
+          "value": "${NO2StatusRaw}",
           "metadata": {
             "evalPriority": {
-              "value": 2,
-              "type": "Number"
+              "type": "Number",
+              "value": 1
             }
           }
         },
-        "Z1": {
-          "value": "${A+1}",
-          "type": "Calculated",
+        "SO2Status": {
+          "type": "Number",
+          "value": "${SO2StatusRaw}",
           "metadata": {
             "evalPriority": {
-              "value": 1,
-              "type": "Number"
+              "type": "Number",
+              "value": 1
             }
           }
         },
-        "X3": {
-          "value": "${Y2+1}",
-          "type": "Calculated",
+        "airQualityIndex": {
+          "type": "Number",
+          "value": "${(SO2Status >= NO2Status) ? SO2Status : NO2Status}",
           "metadata": {
             "evalPriority": {
-              "value": 3,
-              "type": "Number"
+              "type": "Number",
+              "value": 2
             }
           }
         },
-        "S": {
-          "value": "${X3+1}",
-          "type": "Calculated"
+        "airQualityLevel": {
+          "type": "Text",
+          "value": "${((airQualityIndex == 1) ? '\''Buena'\'' : ((airQualityIndex == 2)  ? '\''Razonablemente Buena'\'' : ((airQualityIndex == 3) ? '\''Regular'\'' :((airQualityIndex == 4) ? '\''Desfavorable'\'' : ((airQualityIndex == 5) ? '\''Muy Desfavorable'\'' : ((airQualityIndex == 6) ? '\''Extremadamente desfavorable'\'' : '\''Sin datos'\''))))))}",
+          "metadata": {
+          "evalPriority": {
+            "type": "Number",
+            "value": 3
+            }
+          }
         }
       }
-    },
-    "attrs": [ "Z1", "Y2", "S" ]
+    }
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -98,44 +106,35 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A=1"
-echo "============================="
+echo "02. Create entity E1 with a=[{b:1},{b:34},{b:4}]"
+echo "================================================"
 payload='{
   "id": "E1",
   "type": "T",
-  "A": {
-    "value": 1,
+  "NO2StatusRaw": {
+    "value": 2,
     "type": "Number"
-  }
+  },
+  "SO2StatusRaw": {
+    "value": 3,
+    "type": "Number"
+  }  
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "03. Update entity E1 with A=2.1"
-echo "==============================="
-payload='{
-  "A": {
-    "value": 2.1,
-    "type": "Number"
-  }
-}'
-orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
-echo
-echo
-
-
-echo "04. Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)"
-echo "========================================================================================"
+echo "06. Dump accumulator and see notifications (cal=[{b:1},{b:4}], cal=[{b:-1},{b:2}], cal=[{b:-1}], cal=[{b:-1, c:1}])"
+echo "==================================================================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub with expressions Z1=A+1, Y2=Z1+1, X3=Y2+1, S=X3+1 (X3 not notified)
-=========================================================================================
+01. Create custom sub
+=====================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -144,8 +143,8 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A=1
-=============================
+02. Create entity E1 with a=[{b:1},{b:34},{b:4}]
+================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -154,19 +153,11 @@ Content-Length: 0
 
 
 
-03. Update entity E1 with A=2.1
-===============================
-HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-
-
-04. Dump accumulator and see two notifications (Z1:2, Y2:3, S:5) (Z1:3.1, Y2:4.1, S:6.1)
-========================================================================================
+06. Dump accumulator and see notifications (cal=[{b:1},{b:4}], cal=[{b:-1},{b:2}], cal=[{b:-1}], cal=[{b:-1, c:1}])
+===================================================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 313
+Content-Length: 593
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -177,75 +168,55 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 {
     "data": [
         {
-            "S": {
-                "metadata": {},
-                "type": "Calculated",
-                "value": 5
-            },
-            "Y2": {
-                "metadata": {
-                    "evalPriority": {
-                        "type": "Number",
-                        "value": 2
-                    }
-                },
-                "type": "Calculated",
-                "value": 3
-            },
-            "Z1": {
+            "NO2Status": {
                 "metadata": {
                     "evalPriority": {
                         "type": "Number",
                         "value": 1
                     }
                 },
-                "type": "Calculated",
+                "type": "Number",
                 "value": 2
             },
-            "id": "E1",
-            "type": "T"
-        }
-    ],
-    "subscriptionId": "REGEX([0-9a-f]{24})"
-}
-=======================================
-POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /
-Content-Length: 319
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Ngsiv2-Attrsformat: normalized
-Host: 127.0.0.1:REGEX(\d+)
-Accept: application/json
-Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
-
-{
-    "data": [
-        {
-            "S": {
+            "NO2StatusRaw": {
                 "metadata": {},
-                "type": "Calculated",
-                "value": 6.1
+                "type": "Number",
+                "value": 2
             },
-            "Y2": {
-                "metadata": {
-                    "evalPriority": {
-                        "type": "Number",
-                        "value": 2
-                    }
-                },
-                "type": "Calculated",
-                "value": 4.1
-            },
-            "Z1": {
+            "SO2Status": {
                 "metadata": {
                     "evalPriority": {
                         "type": "Number",
                         "value": 1
                     }
                 },
-                "type": "Calculated",
-                "value": 3.1
+                "type": "Number",
+                "value": 3
+            },
+            "SO2StatusRaw": {
+                "metadata": {},
+                "type": "Number",
+                "value": 3
+            },
+            "airQualityIndex": {
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 2
+                    }
+                },
+                "type": "Number",
+                "value": 3
+            },
+            "airQualityLevel": {
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 3
+                    }
+                },
+                "type": "Text",
+                "value": "Regular"
             },
             "id": "E1",
             "type": "T"

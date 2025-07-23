@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/string.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -172,7 +173,7 @@ std::string getLogConfig
   std::string  level = lmLevelMaskStringGet();
   std::string  payloadMaxSize = std::to_string(logInfoPayloadMaxSize);
   std::string  lineMaxSize    = std::to_string(logLineMaxSize);
-  std::string  deprecate     = logDeprecate ? "true" : "false";
+  std::string  deprecate      = FT(logDeprecate);
 
   return "{\"level\":\"" + level + "\", \
            \"infoPayloadMaxSize\":" + payloadMaxSize + ", \

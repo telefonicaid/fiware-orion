@@ -66,7 +66,7 @@ std::string deleteEntity
 {
   Entity* eP;
 
-  if (forbiddenIdCharsV2(compV[2].c_str() , NULL))
+  if (forbiddenIdChars(compV[2].c_str() , NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;

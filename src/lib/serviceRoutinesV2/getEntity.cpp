@@ -75,7 +75,7 @@ std::string getEntity
     return oe.toJson();
   }
 
-  if (forbiddenIdCharsV2(entityId.c_str(), NULL))
+  if (forbiddenIdChars(entityId.c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
