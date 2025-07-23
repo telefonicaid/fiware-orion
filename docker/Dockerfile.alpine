@@ -58,7 +58,9 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       util-linux-dev \
       gnutls-dev \
       libgcrypt-dev \
-      cyrus-sasl-dev && \
+      cyrus-sasl-dev \
+      librdkafka-dev \
+      zlib1g-dev && \
     # Install libmicrohttpd from source
     echo =====================MARK1 && \
     cd /opt && \
@@ -163,7 +165,9 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       gnutls \
       libsasl \ 
       icu-libs \
-      libstdc++ && \
+      libstdc++ \
+      librdkafka-dev \
+      zlib1g-dev && \
     # Don't need old log files inside docker images
     rm -f /var/log/*log
 

@@ -57,6 +57,33 @@ jobs:
         # has changed and it doesn't work if we don't provide the configuration files in the volume. Again, feedback is welcome! :)
         run: docker run -d --name mosquitto-extra -p 1884:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 
+      - name: Run Kafka container (KRaft mode)
+        run: |
+          docker run -d \
+            --name kafka \
+            -p 9092:9092 \
+            -e CLUSTER_ID=kafka-docker-cluster-1 \
+            -e KAFKA_NODE_ID=1 \
+            -e KAFKA_BROKER_ID=1 \
+            -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP='CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT' \
+            -e KAFKA_ADVERTISED_LISTENERS='PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092' \
+            -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+            -e KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0 \
+            -e KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1 \
+            -e KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 \
+            -e KAFKA_PROCESS_ROLES='broker,controller' \
+            -e KAFKA_CONTROLLER_QUORUM_VOTERS='1@kafka:29093' \
+            -e KAFKA_LISTENERS='PLAINTEXT://:29092,CONTROLLER://:29093,PLAINTEXT_HOST://:9092' \
+            -e KAFKA_INTER_BROKER_LISTENER_NAME='PLAINTEXT' \
+            -e KAFKA_CONTROLLER_LISTENER_NAMES='CONTROLLER' \
+            -e KAFKA_LOG_DIRS='/tmp/kraft-combined-logs' \
+            -e KAFKA_AUTO_CREATE_TOPICS_ENABLE='true' \
+            -e KAFKA_DELETE_TOPIC_ENABLE='true' \
+            confluentinc/cp-kafka:7.4.0
+
+          # Esperar a que Kafka esté listo
+          docker exec kafka bash -c 'for i in {1..20}; do if kafka-broker-api-versions --bootstrap-server localhost:9092; then exit 0; fi; sleep 5; done; exit 1'
+
       - name: Run functional test
         run: |
           docker run  --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional
