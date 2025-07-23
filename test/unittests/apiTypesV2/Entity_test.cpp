@@ -65,7 +65,6 @@ TEST(Entity, check)
   enP->entityId.idPattern = "";
 
   enP->entityId.type = "T<1>";
-  enP->typeGiven = true;
   EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(EntitiesRequest));
 
   enP->entityId.typePattern = "T<1>";
@@ -94,7 +93,6 @@ TEST(Entity, checkV1)
   EXPECT_EQ(enP->check(BatchUpdateRequest), "id and idPattern cannot be both empty at the same time");
 
   enP->entityId.id = "id";
-  enP->typeGiven = true;
   EXPECT_EQ(enP->check(BatchUpdateRequest), "type and typePattern cannot be both empty at the same time");
 
   ContextAttribute* aP = new ContextAttribute();
