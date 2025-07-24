@@ -47,6 +47,8 @@ apt-get -y install \
   uuid-dev \
   libgnutls28-dev \
   libsasl2-dev \
+  librdkafka-dev \
+  zlib1g-dev \
   libgcrypt-dev
 
 echo "INSTALL: MongoDB shell" \
@@ -63,6 +65,7 @@ echo "INSTALL: python special dependencies" \
 && pip install Werkzeug==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
 && pip install amqtt==0.11.0b1 \
+&& pip install confluent-kafka==2.11.0 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
