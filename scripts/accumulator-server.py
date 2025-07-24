@@ -22,9 +22,14 @@
 
 # MQTT functionality based in old accumulator-mqtt.py script, by Burak
 
-# Requires paho-mqtt module:
+# Requires following dependencies:
 #
+# Flask==2.0.2
+# Werkzeug==2.0.2
 # paho-mqtt==1.6.1
+# amqtt==0.11.0b1
+# confluent-kafka==2.11.0
+#
 
 __author__ = 'fermin'
 
