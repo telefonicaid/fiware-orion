@@ -809,9 +809,6 @@ function accumulatorStart()
   then
     # Start with KAFKA
         echo "accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic"
-        echo "hola"
-        echo "$kafkaPort"
-        echo "hola"
         accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
         echo accumulator running as PID $$
   elif [ ! -z "$mqttHost" ]
