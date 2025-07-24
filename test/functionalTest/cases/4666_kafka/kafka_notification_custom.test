@@ -29,7 +29,6 @@ dbInit CB
 # tracelevel 163 is the one for MQTT notification logs
 brokerStart CB 163 IPV4
 accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "regex:^sub_.*"
-
 --SHELL--
 
 #

@@ -69,10 +69,10 @@ export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 
 # -----------------------------------------------------------------------------
 #
-# MQTT Broker configuration for harness tests
+# KAFKA Broker configuration for harness tests
 #
 export KAFKA_HOST=${KAFKA_HOST:-localhost}
-export KAFKA_PORT=${KAFKA_PORT:-1883}
+export KAFKA_PORT=${KAFKA_PORT:-9092}
 export KAFKA_DEBUG_PORT=${KAFKA_DEBUG_PORT:-18883}
 
 

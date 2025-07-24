@@ -763,7 +763,7 @@ function accumulatorStart()
 
   if [ "$1" = "--mqttTopic" ]
   then
-    mqttPort="$1 $2"
+    mqttTopic="$1 $2"
     shift
     shift
   fi
@@ -775,19 +775,19 @@ function accumulatorStart()
       shift
     fi
 
-    if [ "$1" = "--kafkaPort" ]
-    then
-      kafkaPort="$1 $2"
-      shift
-      shift
-    fi
+  if [ "$1" = "--kafkaPort" ]
+  then
+    kafkaPort="$1 $2"
+    shift
+    shift
+  fi
 
-    if [ "$1" = "--kafkaTopic" ]
-    then
-      kafkaPort="$1 $2"
-      shift
-      shift
-    fi
+  if [ "$1" = "--kafkaTopic" ]
+  then
+    kafkaTopic="$1 $2"
+    shift
+    shift
+  fi
 
   bindIp=$1
   port=$2
@@ -809,8 +809,7 @@ function accumulatorStart()
   then
     # Start with KAFKA
         echo "accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic"
-
-        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic # > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
         echo accumulator running as PID $$
   elif [ ! -z "$mqttHost" ]
   then
