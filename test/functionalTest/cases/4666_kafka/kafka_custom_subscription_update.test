@@ -30,10 +30,10 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create kafkaCustom sub url=kafka:///localhost:1883, topic=orion_${d}, payload=t:${t}
-# 02. Get sub, see kafkaCustom url=kafka:///localhost:1883, topic=orion_${d}, payload=t:${t}
+# 01. Create kafkaCustom sub url=kafka://localhost:1883, topic=orion_${d}, payload=t:${t}
+# 02. Get sub, see kafkaCustom url=kafka://localhost:1883, topic=orion_${d}, payload=t:${t}
 # 03. Update sub element different to notification
-# 04. Get sub, see kafkaCustom url=kafka:///localhost:1883, topic=orion_${d}, payload=t:${t}
+# 04. Get sub, see kafkaCustom url=kafka://localhost:1883, topic=orion_${d}, payload=t:${t}
 # 05. Update sub with kafkaCustom url=kafka://localhost:1884, topic=cb_${d}, payload=null
 # 06. Get sub, see kafkaCustom kafka://localhost:1884, topic=cb_${d}, payload=null
 # 07. Update sub to http sub
@@ -73,7 +73,7 @@ SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr 
 
 
 echo '02. Get sub, see kafkaCustom url=kafka:///localhost:1883, topic=orion_${d}, payload=t:${t}'
-echo "========================================================================================="
+echo "=========================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
@@ -89,8 +89,8 @@ echo
 echo
 
 
-echo '04. Get sub, see kafkaCustom url=kafka:///localhost:1883, topic=orion_${d}, payload=t:${t}'
-echo "=========================================================================================="
+echo '04. Get sub, see kafkaCustom url=kafka://localhost:1883, topic=orion_${d}, payload=t:${t}'
+echo "========================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
@@ -185,10 +185,9 @@ orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
-
 --REGEXPECT--
-01. Create kafkaCustom sub url=kafka:///localhost:1883, topic=/orion/${d}, payload=t:${t}
-=========================================================================================
+01. Create kafkaCustom sub url=kafka:///localhost:1883, topic=orion_${d}, payload=t:${t}
+========================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -197,46 +196,44 @@ Content-Length: 0
 
 
 
-02. Get sub, see kafkaCustom url=kafka:///localhost:1883, topic=/orion/${d}, payload=t:${t}
-===========================================================================================
+02. Get sub, see kafkaCustom url=kafka:///localhost:1883, topic=orion_${d}, payload=t:${t}
+==========================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 392
+Content-Length: 389
 
-[
-    {
-        "description": "Original sub",
-        "id": "REGEX([0-9a-f\-]{24})",
-        "notification": {
-            "attrs": [],
-            "attrsFormat": "normalized",
-            "covered": false,
-            "kafkaCustom": {
-                "payload": "t:${t}",
-                "qos": 0,
-                "retain": false,
-                "topic": "orion_${d}",
-                "url": "kafka://localhost:1883"
-            },
-            "onlyChangedAttrs": false
+{
+    "description": "Original sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "payload": "t:${t}",
+            "qos": 0,
+            "retain": true,
+            "topic": "orion_${d}",
+            "url": "kafka://localhost:1883"
         },
-        "status": "active",
-        "subject": {
-            "condition": {
-                "attrs": [],
-                "notifyOnMetadataChange": true
-            },
-            "entities": [
-                {
-                    "id": "E1",
-                    "type": "T1"
-                }
-            ]
-        }
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
     }
-]
+}
 
 
 03. Update sub element different to notification
@@ -247,7 +244,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}
+04. Get sub, see kafkaCustom url=kafka://localhost:1883, topic=orion_${d}, payload=t:${t}
 =========================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -285,7 +282,6 @@ Content-Length: 389
         ]
     }
 }
-
 
 
 05. Update sub with kafkaCustom url=kafka://localhost:1884, topic=cb_${d}, payload=null
@@ -380,17 +376,16 @@ Content-Length: 319
 }
 
 
-
-09. Update sub to kafkaCustom url=mqtt://localhost:1885, topic=orionbk_${d}, no payload
-=======================================================================================
+09. Update sub to kafkaCustom url=kafka://localhost:1885, topic=orionbk_${d}, no payload
+========================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-10. Get sub, see kafkaCustom url=mqtt://localhost:1885, topic=orionbk_${d}, no payload
-======================================================================================
+10. Get sub, see kafkaCustom url=kafka://localhost:1885, topic=orionbk_${d}, no payload
+=======================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -428,7 +423,6 @@ Content-Length: 372
 }
 
 
-
 11. Update sub to kafka url=kafka://localhost:1887, topic=orion
 ===============================================================
 HTTP/1.1 204 No Content
@@ -438,7 +432,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 12. Get sub, see kafka url=kafka://localhost:1887, topic=orion
-=============================================================
+==============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

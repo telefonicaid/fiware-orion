@@ -85,7 +85,7 @@ payload='{
     },
     "kafkaCustom": {
       "url": "localhost:1883",
-      "topic": "/orion/notif"
+      "topic": "orion_notif"
     },
     "attrs": [
       "A1"
@@ -120,6 +120,7 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+
 echo "04. Create kafkaCustom sub without url, see error"
 echo "================================================"
 payload='{
@@ -134,7 +135,7 @@ payload='{
   },
   "notification": {
     "kafkaCustom": {
-      "topic": "/orion/notif",
+      "topic": "orion_notif",
       "qos": 1
     },
     "attrs": [
@@ -189,7 +190,7 @@ payload='{
   "notification": {
     "kafkaCustom": {
       "url": "http://localhost:9999",
-      "topic": "/orion/notif"
+      "topic": "orion_notif"
     },
     "attrs": [
       "A1"
@@ -216,7 +217,7 @@ payload='{
   "notification": {
     "kafkaCustom": {
       "url": "kafka://localhost:1883/path/not/valid",
-      "topic": "/orion/notif"
+      "topic": "orion_notif"
     },
     "attrs": [
       "A1"
@@ -308,32 +309,6 @@ echo
 echo
 
 
-echo "11. Create httpCustom sub with kafka url, see error"
-echo "=================================================="
-payload='{
-  "description": "Test subscription",
-  "subject": {
-    "entities": [
-      {
-        "id": "E1",
-        "type": "T1"
-      }
-    ]
-  },
-  "notification": {
-    "httpCustom": {
-      "url": "kafka://localhost:1883"
-    },
-    "attrs": [
-      "A1"
-    ]
-  }
-}'
-orionCurl --url /v2/subscriptions --payload "$payload"
-echo
-echo
-
-
 --REGEXPECT--
 01. Create subs with missing notification type, see error
 =========================================================
@@ -363,7 +338,7 @@ Content-Length: 118
 }
 
 
-03. Create sub with mqttCustom not being an object, see error
+03. Create sub with kafkaCustom not being an object, see error
 =============================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -377,7 +352,7 @@ Content-Length: 80
 }
 
 
-04. Create mqttCustom sub without url, see error
+04. Create kafkaCustom sub without url, see error
 ================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -391,7 +366,7 @@ Content-Length: 72
 }
 
 
-05. Create mqttCustom sub with url not being a string, see error
+05. Create kafkaCustom sub with url not being a string, see error
 ================================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -405,7 +380,7 @@ Content-Length: 77
 }
 
 
-06. Create mqttCustom sub with http url, see error
+06. Create kafkaCustom sub with http url, see error
 ==================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -419,7 +394,7 @@ Content-Length: 94
 }
 
 
-07. Create mqttCustom sub with mqtt url with path, see error
+07. Create kafkaCustom sub with mqtt url with path, see error
 ============================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -433,7 +408,7 @@ Content-Length: 90
 }
 
 
-08. Create mqttCustom sub without topic, see error
+08. Create kafkaCustom sub without topic, see error
 ==================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -447,7 +422,7 @@ Content-Length: 74
 }
 
 
-09. Create mqttCustom sub with topic not being a string, see error
+09. Create kafkaCustom sub with topic not being a string, see error
 ==================================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -461,7 +436,7 @@ Content-Length: 79
 }
 
 
-10. Create mqttCustom sub with empty topic, see error
+10. Create kafkaCustom sub with empty topic, see error
 =====================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
@@ -471,20 +446,6 @@ Content-Length: 64
 
 {
     "description": "empty kafka field /topic/",
-    "error": "BadRequest"
-}
-
-
-11. Create httpCustom sub with mqtt url, see error
-==================================================
-HTTP/1.1 400 Bad Request
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Content-Type: application/json
-Content-Length: 85
-
-{
-    "description": "kafka URL cannot be used in http notifications",
     "error": "BadRequest"
 }
 
