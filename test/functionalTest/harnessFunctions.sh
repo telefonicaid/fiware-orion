@@ -763,7 +763,28 @@ function accumulatorStart()
 
   if [ "$1" = "--mqttTopic" ]
   then
-    mqttPort="$1 $2"
+    mqttTopic="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--kafkaHost" ]
+    then
+      kafkaHost="$1 $2"
+      shift
+      shift
+    fi
+
+  if [ "$1" = "--kafkaPort" ]
+  then
+    kafkaPort="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--kafkaTopic" ]
+  then
+    kafkaTopic="$1 $2"
     shift
     shift
   fi
@@ -784,15 +805,21 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  if [ -z "$mqttHost" ]
+  if [ ! -z "$kafkaHost" ]
   then
-    # Start without MQTT
-    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-    echo accumulator running as PID $$
-  else
+    # Start with KAFKA
+        echo "accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic"
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
+  elif [ ! -z "$mqttHost" ]
+  then
     # Start with MQTT
-    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-    echo accumulator running as PID $$
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
+  else
+    # Start without MQTT and without kafka
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
   fi
 
   # Wait until accumulator has started or we have waited a given maximum time
