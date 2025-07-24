@@ -198,7 +198,7 @@ Content-Length: 0
 04. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1, 1 KAFKA sub_E2 A:2
 ===========================================================================
 Kafka message at topic sub_E1
-Key: "REGEX([0-9a-f\-]{24})"
+Key: REGEX([0-9a-f\-]{24})
 Headers:
   FIWARE_SERVICEPATH: /
 Payload:
@@ -207,7 +207,7 @@ Payload:
 }
 =======================================
 Kafka message at topic sub_E2
-Key: "REGEX([0-9a-f\-]{24})"
+Key: REGEX([0-9a-f\-]{24})
 Headers:
   FIWARE_SERVICEPATH: /
 Payload:
@@ -215,7 +215,6 @@ Payload:
     "A": "2"
 }
 =======================================
-
 
 
 05. Update entity E1 with A=10
@@ -237,7 +236,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. Dump and reset accumulator, see: 1 KAFKA sub/E1 E A:10, 1 KAFKA sub/E2 A:20
 =============================================================================
 Kafka message at topic sub_E1
-Key: "REGEX([0-9a-f\-]{24})"
+Key: REGEX([0-9a-f\-]{24})
 Headers:
   FIWARE_SERVICEPATH: /
 Payload:
@@ -246,7 +245,7 @@ Payload:
 }
 =======================================
 Kafka message at topic sub_E2
-Key: "REGEX([0-9a-f\-]{24})"
+Key: REGEX([0-9a-f\-]{24})
 Headers:
   FIWARE_SERVICEPATH: /
 Payload:
@@ -254,7 +253,6 @@ Payload:
     "A": "20"
 }
 =======================================
-
 
 
 08. GET subscriptions: 1 sub with timesSent 4 and lastSuccess
