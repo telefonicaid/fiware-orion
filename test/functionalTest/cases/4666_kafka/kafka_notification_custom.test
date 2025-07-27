@@ -105,7 +105,7 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 2s
+sleep 7s
 
 
 echo "04. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1, 1 KAFKA sub_E2 A:2"
@@ -146,7 +146,7 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 0.5s
+sleep 7s
 
 
 echo "07. Dump and reset accumulator, see: 1 KAFKA sub/E1 E A:10, 1 KAFKA sub/E2 A:20"

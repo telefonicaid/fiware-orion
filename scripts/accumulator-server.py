@@ -835,7 +835,7 @@ class KafkaConsumerThread(threading.Thread):
             'auto.offset.reset': 'earliest',
             'enable.auto.commit': True,
             'allow.auto.create.topics': True,
-            'topic.metadata.refresh.interval.ms': 5000
+            'topic.metadata.refresh.interval.ms': 100
         }
         self.consumer = Consumer(conf)
 
