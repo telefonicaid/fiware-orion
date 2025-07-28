@@ -832,7 +832,7 @@ class KafkaConsumerThread(threading.Thread):
         conf = {
             'bootstrap.servers': f"{kafka_host}:{kafka_port}",
             'group.id': kafka_group_id,
-            'auto.offset.reset': 'earliest',
+            'auto.offset.reset': 'latest',
             'enable.auto.commit': True,
             'allow.auto.create.topics': True,
             'topic.metadata.refresh.interval.ms': 100
