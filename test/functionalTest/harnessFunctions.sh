@@ -1166,6 +1166,8 @@ kafkaCreateTopics() {
   topics=$@
   for topic in $topics; do
     echo "Creando tópico: $topic"
+
+    # Create the topic (if it does not exist)
     docker exec kafka kafka-topics \
       --create \
       --topic "$topic" \
@@ -1173,6 +1175,22 @@ kafkaCreateTopics() {
       --partitions 1 \
       --replication-factor 1 \
       --if-not-exists
+
+    # Actively wait until Kafka confirms that it exists
+    echo "Waiting for Kafka to register the topic '$topic'..."
+    for i in {1..10}; do
+      exists=$(docker exec kafka kafka-topics \
+        --list \
+        --bootstrap-server localhost:9092 | grep -w "$topic")
+
+      if [ -n "$exists" ]; then
+        echo "Topic '$topic' created and available."
+        break
+      else
+        echo "It still doesn't appear, trying again ($i/10)..."
+        sleep 2
+      fi
+    done
   done
 }
 
