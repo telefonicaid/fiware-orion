@@ -1156,6 +1156,45 @@ function dbInsertEntity()
 }
 
 
+
+# ------------------------------------------------------------------------------
+#
+# kafkaCreateTopics -
+#
+# Create one or more topics in Kafka
+kafkaCreateTopics() {
+  topics=$@
+  for topic in $topics; do
+    echo "Creando tópico: $topic"
+    docker exec kafka kafka-topics \
+      --create \
+      --topic "$topic" \
+      --bootstrap-server localhost:9092 \
+      --partitions 1 \
+      --replication-factor 1 \
+      --if-not-exists
+  done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# kafkaDestroyTopics -
+#
+# Delete one or more topics in Kafka
+kafkaDestroyTopics() {
+  topics=$@
+  for topic in $topics; do
+    echo "Eliminando tópico: $topic"
+    docker exec kafka kafka-topics \
+      --delete \
+      --topic "$topic" \
+      --bootstrap-server localhost:9092 \
+      --if-exists
+  done
+}
+
 # ------------------------------------------------------------------------------
 #
 # orionCurl
@@ -1425,3 +1464,5 @@ export -f dMsg
 export -f valgrindSleep
 export -f brokerStartAwait
 export -f brokerStopAwait
+export -f kafkaCreateTopics
+export -f kafkaDestroyTopics

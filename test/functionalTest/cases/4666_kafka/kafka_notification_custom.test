@@ -27,19 +27,19 @@ KAFKA custoom notification tests
 dbInit CB
 
 # tracelevel 163 is the one for MQTT notification logs
+kafkaCreateTopics sub_E1 sub_E2
 brokerStart CB 163 IPV4
-sleep 15
+sleep 5
 accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "regex:^sub_.*"
 echo "Verifying Kafka connection..."
 docker exec kafka kafka-topics --list --bootstrap-server localhost:9092
-sleep 15
+sleep 10s
 
 --SHELL--
 
 #
 # Hint: use this to run the KAFKA broker needed for this .test:
 #
-#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11 #TODO : Reference kafka container
 #
 # 01. Create KAFKA custom sub for entity E with topic sub_${id} payload A:{$A}
 # 02. Create entity E1 with A=1
@@ -109,7 +109,7 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 15s
+sleep 7s
 
 
 echo "04. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1, 1 KAFKA sub_E2 A:2"
@@ -306,5 +306,6 @@ Content-Length: 512
 
 --TEARDOWN--
 accumulatorStop
+kafkaDestroyTopics sub_E1 sub_E2
 brokerStop CB
 dbDrop CB
