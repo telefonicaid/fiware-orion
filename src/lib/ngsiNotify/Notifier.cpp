@@ -279,7 +279,6 @@ static bool setNgsiPayload
     TIME_EXPR_CTXBLD_STOP();
 
     cer.entity.attributeVector.push_back(caP);
-    LM_W(("FGM: attr <%s>: %s", caP->name.c_str(), caP->rawValue.c_str()));
   }
   // Next, other attributes in the original entity not already added
   for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
@@ -289,8 +288,6 @@ static bool setNgsiPayload
       cer.entity.attributeVector.push_back(new ContextAttribute(en.attributeVector[ix], false, true));
     }
   }
-
-  LM_W(("FGM: context at this point is %s", exprContextObjectP->getJexlContext().c_str()));
 
   std::string effectiveId;
   if (ngsi.entityId.id.empty())
