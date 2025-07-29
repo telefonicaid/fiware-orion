@@ -31,7 +31,6 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutinesV2/postUpdateContext.h"

@@ -250,114 +250,6 @@ std::string tenantCheck(const std::string& tenant)
 
 /* ****************************************************************************
 *
-* commonFilters -
-*/
-static void commonFilters
-(
-  ConnectionInfo*   ciP,
-  ParseData*        parseDataP,
-  RestService*      serviceP
-)
-{
-#if 0
-FIXME PR: no longer needed?
-  //
-  // 1. ?!exist=entity::type
-  //
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
-  {
-    ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
-
-    if (scopeVectorP == NULL)
-    {
-      // The scopeVectorP-lookup is MISSING (not implemented
-      // We just silently return.
-      //
-      return;
-    }
-
-    Scope* scopeP  = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
-    scopeP->oper   = SCOPE_OPERATOR_NOT;
-    scopeVectorP->push_back(scopeP);
-  }
-
-
-
-  //
-  // 2. ?exist=entity::type
-  //
-  if (ciP->uriParam[URI_PARAM_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
-  {
-    ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
-
-    if (scopeVectorP == NULL)
-    {
-      // The scopeVectorP-lookup is MISSING (not implemented)
-      // We just silently return.
-      //
-      return;
-    }
-
-    Scope*  scopeP  = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
-    scopeP->oper    = "";
-    scopeVectorP->push_back(scopeP);
-  }
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeFilter -
-*/
-static void scopeFilter
-(
-  ConnectionInfo*   ciP,
-  ParseData*        parseDataP,
-  RestService*      serviceP
-)
-{
-#if 0
-// FIXME PR: no longer needed?
-  ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
-
-  for (unsigned int ix = 0; ix < scopeVectorP->size(); ++ix)
-  {
-    Scope* scopeP = (*scopeVectorP)[ix];
-
-    if (scopeP->type == SCOPE_FILTER_NOT_EXISTENCE)
-    {
-      scopeP->type = SCOPE_FILTER_EXISTENCE;
-      scopeP->oper = SCOPE_OPERATOR_NOT;
-    }
-  }
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
-* filterRelease -
-*/
-static void filterRelease(ParseData* parseDataP, RequestType request)
-{
-#if 0
-// FIXME PR: no longer needed?
-  ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
-
-  if (scopeVectorP != NULL)
-  {
-    scopeVectorP->release();
-  }
-#endif
-}
-
-
-
-/* ****************************************************************************
-*
 * compCheck -
 */
 static bool compCheck(int components, const std::vector<std::string>& compV)
@@ -579,8 +471,6 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
-    commonFilters(ciP, &parseData, &serviceV[ix]);
-    scopeFilter(ciP, &parseData, &serviceV[ix]);
 
     //
     // If we have gotten this far the Input is OK.
@@ -594,8 +484,6 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
-
-    filterRelease(&parseData, serviceV[ix].request);
 
     delayedRelease(&jsonRelease);
 

@@ -33,7 +33,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
@@ -258,11 +257,11 @@ std::string getEntities
   }
   else if (ciP->uriParamTypes.size() == 0)
   {
-    parseDataP->qcr.res.fill("", pattern, "", EntityTypeEmptyOrNotEmpty);
+    parseDataP->qcr.res.fill("", pattern, "");
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill("", pattern, type, EntityTypeNotEmpty);
+    parseDataP->qcr.res.fill("", pattern, type);
   }
   else
   {

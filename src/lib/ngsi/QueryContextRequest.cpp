@@ -34,7 +34,6 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/QueryContextResponse.h"
 #include "ngsi/QueryContextRequest.h"
-#include "rest/EntityTypeInfo.h"
 #include "apiTypesV2/BatchQuery.h"
 
 
@@ -181,22 +180,12 @@ void QueryContextRequest::fill
 (
   const std::string& entityId,
   const std::string& entityIdPattern,
-  const std::string& entityType,
-  EntityTypeInfo     typeInfo
+  const std::string& entityType
 )
 {
   EntityId* eidP = new EntityId(entityId, entityIdPattern, entityType, "");
 
   entityIdVector.push_back(eidP);
-
-  /*if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty)) FIXME PR: no longer needed?
-  {
-    Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
-
-    scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
-
-    scopeVector.push_back(scopeP);
-  }*/
 }
 
 

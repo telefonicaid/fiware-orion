@@ -30,7 +30,6 @@
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
-#include "rest/EntityTypeInfo.h"
 
 #include "apiTypesV2/SubscriptionExpression.h"
 
@@ -68,8 +67,7 @@ typedef struct QueryContextRequest
   void          release(void);
   void          fill(const std::string&  entityId,
                      const std::string&  entityIdPattern,
-                     const std::string&  entityType,
-                     EntityTypeInfo      typeInfo);
+                     const std::string&  entityType);
   void          fill(BatchQuery* bqP);
 
 } QueryContextRequest;
