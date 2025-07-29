@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSI_GEOFILTER_H_
-#define SRC_LIB_NGSI_GEOFILTER_H_
+#ifndef SRC_LIB_APITYPESV2_GEOFILTER_H_
+#define SRC_LIB_APITYPESV2_GEOFILTER_H_
 
 /*
 *
@@ -57,4 +57,4 @@ typedef struct GeoFilter
 
 } GeoFilter;
 
-#endif  // SRC_LIB_NGSI_GEOFILTER_H_
+#endif  // SRC_LIB_APITYPESV2_GEOFILTER_H_

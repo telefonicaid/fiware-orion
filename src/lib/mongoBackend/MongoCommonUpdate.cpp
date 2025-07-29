@@ -47,7 +47,7 @@
 #include "orionTypes/UpdateActionType.h"
 #include "cache/subCache.h"
 #include "rest/StringFilter.h"
-#include "ngsi/GeoFilter.h"
+#include "apiTypesV2/GeoFilter.h"
 #include "rest/uriParamNames.h"
 
 #include "mongoBackend/dbConstants.h"

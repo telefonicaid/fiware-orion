@@ -28,7 +28,7 @@
 #include <string>
 
 #include "rest/StringFilter.h"
-#include "ngsi/GeoFilter.h"
+#include "apiTypesV2/GeoFilter.h"
 
 
 

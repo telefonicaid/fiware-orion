@@ -29,6 +29,7 @@ SET (SOURCES
     BatchUpdate.cpp
     HttpInfo.cpp
     MqttInfo.cpp
+    GeoFilter.cpp
 )
 
 SET (HEADERS
@@ -41,6 +42,7 @@ SET (HEADERS
     CustomPayloadType.h
     HttpInfo.h
     MqttInfo.h
+    GeoFilter.h
 )
 
 

@@ -32,7 +32,7 @@
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "rest/OrionError.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/GeoFilter.h"
+#include "apiTypesV2/GeoFilter.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 

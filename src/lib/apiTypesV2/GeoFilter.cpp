@@ -32,7 +32,7 @@
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "ngsi/GeoFilter.h"
+#include "apiTypesV2/GeoFilter.h"
 #include "parse/forbiddenChars.h"
 
 using namespace orion;
