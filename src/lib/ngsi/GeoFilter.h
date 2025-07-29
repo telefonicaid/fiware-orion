@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSI_SCOPE_H_
-#define SRC_LIB_NGSI_SCOPE_H_
+#ifndef SRC_LIB_NGSI_GEOFILTER_H_
+#define SRC_LIB_NGSI_GEOFILTER_H_
 
 /*
 *
@@ -35,9 +35,9 @@
 
 /* ****************************************************************************
 *
-* Scope -
+* GeoFilter -
 */
-typedef struct Scope
+typedef struct GeoFilter
 {
   orion::AreaType     areaType;
   orion::Polygon      polygon;
@@ -46,7 +46,7 @@ typedef struct Scope
   orion::Box          box;
   orion::Georel       georel;
 
-  Scope();
+  GeoFilter();
 
   int          fill(const std::string&  geometry,
                     const std::string&  coords,
@@ -55,6 +55,6 @@ typedef struct Scope
 
   void         release(void);
 
-} Scope;
+} GeoFilter;
 
-#endif  // SRC_LIB_NGSI_SCOPE_H_
+#endif  // SRC_LIB_NGSI_GEOFILTER_H_

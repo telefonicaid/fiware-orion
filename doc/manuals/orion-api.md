@@ -564,23 +564,23 @@ notifications.
 
 ### Entity service path
 
-Orion supports hierarchical scopes, so entities can be
-assigned to a scope [at creation time](user/walkthrough_apiv2.md#entity-creation).
+Orion supports hierarchical service paths, so entities can be
+assigned to a service path [at creation time](user/walkthrough_apiv2.md#entity-creation).
 Then, [query](user/walkthrough_apiv2.md#query-entity) and [subscription](user/walkthrough_apiv2.md#subscriptions)
-can be also scoped to locate entities in the corresponding scopes.
+can be also scoped to locate entities in the corresponding service path.
 
 For example, consider an Orion-based application using the following
-scopes (shown in the figure):
+service paths (shown in the figure):
 
--   `Madrid`, as first level scope
--   `Gardens` and `Districts`, as second-level scope (children of Madrid)
+-   `Madrid`, as first level
+-   `Gardens` and `Districts`, as second-level (children of Madrid)
 -   `ParqueNorte`, `ParqueOeste` and `ParqueSur` (children of Gardens) and
     `Fuencarral` and `Latina` (children of Districts)
 -   `Parterre1` and `Parterre2` (children of ParqueNorte)
 
 ![](ServicePathExample.png "ServicePathExample.png")
 
-The scope to use is specified using the `Fiware-ServicePath` HTTP header
+The service path to use is specified using the `Fiware-ServicePath` HTTP header
 in update/query request. For example, to create the entity `Tree1` of type
 `Tree` in `Parterre1` the following Fiware-ServicePath will be used:
 
@@ -588,15 +588,15 @@ in update/query request. For example, to create the entity `Tree1` of type
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
 ```
 
-In order to search for `Tree1` in that scope, the same
+In order to search for `Tree1` in that service path, the same
 Fiware-ServicePath will be used.
 
-Scopes are hierarchical and hierarchical search can be done. In order to
+Service paths are hierarchical and hierarchical search can be done. In order to
 do that the `#` special keyword is used. Thus, a query with
 pattern entity id `.*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
 
-Finally, you can query for disjoint scopes, using a comma-separated list
+Finally, you can query for disjoint service paths, using a comma-separated list
 in the `Fiware-ServicePath` header. For example, to get all trees in both
 `ParqueNorte` and `ParqueOeste` (but not `ParqueSur`) the following
 `Fiware-ServicePath` would be used in query request:
@@ -608,47 +608,47 @@ in the `Fiware-ServicePath` header. For example, to get all trees in both
 Some additional remarks:
 
 -   Limitations:
-    -   Scope must start with `/` (only "absolute" scopes are allowed)
-    -   10 maximum scope levels in a path
+    -   Service paths must start with `/` (only "absolute" service paths are allowed)
+    -   10 maximum levels in a path
     -   50 maximum characters in each level (1 char is minimum),
         only alphanumeric and underscore allowed
-    -   10 maximum disjoint scope paths in a comma-separated list in
-        query `Fiware-ServicePath` header (no more than 1 scope path in
+    -   10 maximum disjoint service paths in a comma-separated list in
+        query `Fiware-ServicePath` header (no more than 1 service path in
         update `Fiware-ServicePath` header)
     -   Trailing slashes are discarded
 
 -   `Fiware-ServicePath` is an optional header. It is assumed that all the
     entities created without `Fiware-ServicePath` (or that don't include
-    service path information in the database) belongs to a root scope
+    service path information in the database) belongs to a root service path
     `/` implicitly. All the queries without using `Fiware-ServicePath`
     (including subscriptions) are on `/#` implicitly. This behavior
     ensures backward compatibility to pre-0.14.0 versions.
 
 -   It is possible to have an entity with the same ID and type in
-    different Scopes. E.g. we can create entity ID `Tree1` of type
+    different service paths. E.g. we can create entity ID `Tree1` of type
     `Tree` in `/Madrid/Gardens/ParqueNorte/Parterre1` and another entity
     with ID `Tree1` of type `Tree` in `Madrid/Gardens/ParqueOeste` without
     getting any error. However, query can be weird in this
     scenario (e.g. a query in `Fiware-ServicePath /Madrid/Gardens`
     will returns two entities with the same ID and type in the
-    query response, making hard to distinguish to which scope
+    query response, making hard to distinguish to which service path
     belongs each one)
 
--   Entities belongs to one (and only one) scope.
+-   Entities belongs to one (and only one) service path.
 
 -   `Fiware-ServicePath` header is included in notification requests sent by Orion.
 
 -   You can use the [`servicePath` builtin attribute](#builtin-attributes) to get the entity service path.
 
--   The scopes entities can be combined orthogonally with the
+-   The service paths can be combined orthogonally with the
     [multi-tenancy functionality](#multi-tenancy). In that case,
-    each `scope tree` lives in a different service/tenant and they can
+    each "service paths tree" lives in a different service/tenant and they can
     use even the same names with complete database-based isolation. See
     figure below.
 
 ![](ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
 
--   Current version doesn’t allow to change the scope to which an entity
+-   Current version doesn’t allow to change the service path to which an entity
     belongs through the API (a workaround is to modify the
     `_id.servicePath` field in the [entities collection](admin/database_model.md#entities-collection) directly).
 

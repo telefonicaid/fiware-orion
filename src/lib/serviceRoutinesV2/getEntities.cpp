@@ -172,8 +172,8 @@ std::string getEntities
 
 
   //
-  // If URI param 'geometry' is present, create a new scope.
-  // The fill() method of the scope checks the validity of the info in:
+  // If URI param 'geometry' is present, create a new geo filter.
+  // The fill() method of the geo filter checks the validity of the info in:
   // - geometry
   // - georel
   // - coords
@@ -196,9 +196,8 @@ std::string getEntities
 
   //
   // String filter in URI param 'q' ?
-  // If so, put it in a new Scope and parse the q-string.
-  // The plain q-string is saved in Scope::value, just in case.
-  // Might be useful for debugging, if nothing else.
+  // If so, parse the q-string.
+
   //
   if (!q.empty())
   {
@@ -219,9 +218,7 @@ std::string getEntities
 
   //
   // Metadata string filter in URI param 'mq' ?
-  // If so, put it in a new Scope and parse the mq-string.
-  // The plain mq-string is saved in Scope::value, just in case.
-  // Might be useful for debugging, if nothing else.
+  // If so, parse the mq-string.
   //
   if (!mq.empty())
   {

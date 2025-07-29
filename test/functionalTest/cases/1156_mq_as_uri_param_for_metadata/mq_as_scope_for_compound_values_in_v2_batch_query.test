@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-mq as scope for v2 batch queries
+mq as filters for v2 batch queries
 
 --SHELL-INIT--
 dbInit CB

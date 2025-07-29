@@ -182,7 +182,7 @@ std::string parseExpression
   }
 
   //
-  // If geometry, coords and georel are filled, then attempt to create a filter scope
+  // If geometry, coords and georel are filled, then attempt to create a geo filter
   // with them
   //
   if (allThem)

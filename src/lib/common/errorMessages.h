@@ -61,7 +61,6 @@
 #define ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE   "Invalid characters in entity type"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID    "Invalid JSON type for entity id"
 #define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE  "Invalid JSON type for entity type"
-#define ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_SCOPE    "invalid JSON type for scope value: must be string"
 #define ERROR_DESC_BAD_REQUEST_INVALID_ATTRSFORMAT    "invalid attrsFormat, accepted values: normalized, simplifiedNormalized, keyValues, simplifiedkeyValues, values"
 #define ERROR_DESC_BAD_REQUEST_INVALID_STATUS         "status is not valid: it has to be either active, inactive or oneshot"
 #define ERROR_DESC_BAD_REQUEST_INVALID_RANGE          "ranges only valid for equal and not equal ops"

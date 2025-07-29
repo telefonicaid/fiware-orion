@@ -35,7 +35,7 @@
 #include "mongoBackend/mongoUpdateContext.h"
 #include "rest/OrionError.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/Scope.h"
+#include "ngsi/GeoFilter.h"
 #include "ngsi/UpdateContextRequest.h"
 #include "ngsi/UpdateContextResponse.h"
 

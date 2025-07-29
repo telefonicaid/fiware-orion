@@ -648,7 +648,7 @@ static std::string sortCriteria(const std::string& sortToken)
 
 /* *****************************************************************************
 *
-* processAreaScope -
+* processGeoFilter -
 *
 * Returns true if queryP/countQueryP were filled, false otherwise
 *
@@ -662,7 +662,7 @@ static std::string sortCriteria(const std::string& sortToken)
 *   (see the aforementioned link).
 *
 */
-bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
+bool processGeoFilter(const GeoFilter* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -670,7 +670,7 @@ bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::B
 
   if (!mongoLocationCapable())
   {
-    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+    std::string details = std::string("location filter was found but your MongoDB version doesn't support it. ") +
       "Please upgrade MongoDB server to 2.4 or newer)";
 
     alarmMgr.badInput(clientIp, details);
@@ -773,7 +773,7 @@ bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::B
 
     // This works as far as we don't have any other $and field in the query, in which
     // case the array for $and here needs to be combined with other items. Currently,
-    // users of processAreaScopesV2() doesn't do add any new $and clause.
+    // users of processGeoFiltersV2() doesn't do add any new $and clause.
     //
     // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
     // at least minDistance or maxDistance are there. Check functional tests
@@ -1321,7 +1321,7 @@ bool entitiesQuery
   }
 
   /* Part 5: filters */
-  processAreaScope(&expr.geoFilter, &finalQuery, &finalCountQuery);
+  processGeoFilter(&expr.geoFilter, &finalQuery, &finalCountQuery);
 
   for (unsigned int ix = 0; ix < expr.stringFilter.mongoFilters.size(); ++ix)
   {

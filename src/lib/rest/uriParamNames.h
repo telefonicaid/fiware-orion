@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "ngsi/Scope.h"    // SCOPE_VALUE_ENTITY_TYPE: "entity::type"
 
 
 

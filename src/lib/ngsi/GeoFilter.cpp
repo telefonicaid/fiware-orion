@@ -32,7 +32,7 @@
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "ngsi/Scope.h"
+#include "ngsi/GeoFilter.h"
 #include "parse/forbiddenChars.h"
 
 using namespace orion;
@@ -41,9 +41,9 @@ using namespace orion;
 
 /* ****************************************************************************
 *
-* Scope::Scope -
+* GeoFilter::GeoFilter -
 */
-Scope::Scope()
+GeoFilter::GeoFilter()
 {
   areaType = orion::NoArea;
 
@@ -69,9 +69,9 @@ static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
 
 /* ****************************************************************************
 *
-* Scope::fill - 
+* GeoFilter::fill -
 */
-int Scope::fill
+int GeoFilter::fill
 (
   const std::string&  geometryString,
   const std::string&  coordsString,
@@ -317,7 +317,7 @@ int Scope::fill
 *
 * release -
 */
-void Scope::release(void)
+void GeoFilter::release(void)
 {  
   // NOTE: georel, box, and point don't use dynamic memory, so they don't need release methods
   polygon.release();

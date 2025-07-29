@@ -81,8 +81,8 @@ echo
 echo
 
 
-echo "04. POST /v2/op/query, with E.* and in a scope q:A1==11, see E/T"
-echo "================================================================"
+echo "04. POST /v2/op/query, with E.* and in a filter q:A1==11, see E/T"
+echo "================================================================="
 payload='{
   "expression": {
     "q": "A1==11"
@@ -117,8 +117,8 @@ echo
 echo
 
 
-echo "07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4"
-echo "============================================================================"
+echo "07. POST /v2/op/query, with E.*, and with filters q:B and q=A5==45, see E5/T4"
+echo "============================================================================="
 payload='{
   "entities": [
     {
@@ -134,8 +134,8 @@ echo
 echo
 
 
-echo "08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see E5/Thing"
-echo "==========================================================================="
+echo "08. POST /v2/op/query, with E.* with filters q:!B and q=A5==45, see E5/Thing"
+echo "============================================================================"
 payload='{
   "entities": [
     {
@@ -182,8 +182,8 @@ Content-Length: 0
 
 
 
-04. POST /v2/op/query, with E.* and in a scope q:A1==11, see E/T
-================================================================
+04. POST /v2/op/query, with E.* and in a filter q:A1==11, see E/T
+=================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -233,8 +233,8 @@ Content-Length: 0
 
 
 
-07. POST /v2/op/query, with E.*, and with scopes q:B and q=A5==45, see E5/T4
-============================================================================
+07. POST /v2/op/query, with E.*, and with filters q:B and q=A5==45, see E5/T4
+=============================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -259,8 +259,8 @@ Content-Length: 129
 ]
 
 
-08. POST /v2/op/query, with E.* with scopes q:!B and q=A5==45, see E5/Thing
-===========================================================================
+08. POST /v2/op/query, with E.* with filters q:!B and q=A5==45, see E5/Thing
+============================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

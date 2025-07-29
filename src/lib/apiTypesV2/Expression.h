@@ -28,7 +28,7 @@
 #include <string>
 
 #include "rest/StringFilter.h"
-#include "ngsi/Scope.h"
+#include "ngsi/GeoFilter.h"
 
 
 
@@ -56,7 +56,7 @@ struct Expression
 
   StringFilter              stringFilter;
   StringFilter              mdStringFilter;
-  Scope                     geoFilter;
+  GeoFilter                 geoFilter;
 };
 
 #endif  // SRC_LIB_APITYPESV2_EXPRESSION_H_

@@ -30,7 +30,7 @@ SET (SOURCES
     Metadata.cpp
     MetadataVector.cpp
     Request.cpp
-    Scope.cpp
+    GeoFilter.cpp
     StringList.cpp
     NotifyContextRequest.cpp
     QueryContextRequest.cpp
@@ -48,7 +48,7 @@ SET (HEADERS
     EntityIdVector.h
     Metadata.h
     MetadataVector.h
-    Scope.h
+    GeoFilter.h
     StringList.h
     NotifyContextRequest.h
     QueryContextRequest.h
