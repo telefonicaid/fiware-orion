@@ -29,11 +29,9 @@ dbInit CB
 # tracelevel 163 is the one for MQTT notification logs
 kafkaCreateTopics sub_E1 sub_E2
 brokerStart CB 163 IPV4
-sleep 10s
-accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "regex:^sub_.*"
+accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "^sub_.*"
 echo "Verifying Kafka connection..."
 docker exec kafka kafka-topics --list --bootstrap-server localhost:9092
-sleep 10s
 
 --SHELL--
 
@@ -76,6 +74,7 @@ echo
 echo
 
 
+accumulatorReset
 echo "02. Create entity E1 with A=1"
 echo "============================="
 payload='{
@@ -91,7 +90,21 @@ echo
 echo
 
 
-echo "03. Create entity E2 with A=2"
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
+# due to the lock in accumulator-server.py?
+sleep 7s
+
+
+echo "03. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1"
+echo "========================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. Create entity E2 with A=2"
 echo "============================="
 payload='{
   "id": "E2",
@@ -109,18 +122,18 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 7s
+sleep 1s
 
 
-echo "04. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1, 1 KAFKA sub_E2 A:2"
-echo "==========================================================================="
+echo "05. Dump and reset accumulator, see: 1 KAFKA sub_E2 A:2"
+echo "======================================================="
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo "05. Update entity E1 with A=10"
+echo "06. Update entity E1 with A=10"
 echo "=============================="
 payload='{
   "A": {
@@ -133,7 +146,21 @@ echo
 echo
 
 
-echo "06. Update entity E2 with A=20"
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
+# due to the lock in accumulator-server.py?
+sleep 1s
+
+
+echo "07. Dump and reset accumulator, see: 1 KAFKA sub/E1 E A:10"
+echo "=========================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Update entity E2 with A=20"
 echo "=============================="
 payload='{
   "A": {
@@ -150,18 +177,18 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 7s
+sleep 1s
 
 
-echo "07. Dump and reset accumulator, see: 1 KAFKA sub/E1 E A:10, 1 KAFKA sub/E2 A:20"
-echo "============================================================================="
+echo "09. Dump and reset accumulator, see: 1 KAFKA sub/E2 A:20"
+echo "========================================================"
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo "08. GET subscriptions: 1 sub with timesSent 4 and lastSuccess"
+echo "10. GET subscriptions: 1 sub with timesSent 4 and lastSuccess"
 echo "============================================================="
 orionCurl --url /v2/subscriptions
 echo
@@ -189,18 +216,8 @@ Content-Length: 0
 
 
 
-03. Create entity E2 with A=2
-=============================
-HTTP/1.1 201 Created
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/E2?type=T
-Content-Length: 0
-
-
-
-04. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1, 1 KAFKA sub_E2 A:2
-===========================================================================
+03. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1
+=========================================================
 Kafka message at topic sub_E1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
@@ -210,6 +227,20 @@ Payload:
     "A": "1"
 }
 =======================================
+
+
+04. Create entity E2 with A=2
+=============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
+
+
+
+05. Dump and reset accumulator, see: 1 KAFKA sub_E2 A:2
+=======================================================
 Kafka message at topic sub_E2
 Key: REGEX([0-9a-f\-]{24})
 Headers:
@@ -221,7 +252,7 @@ Payload:
 =======================================
 
 
-05. Update entity E1 with A=10
+06. Update entity E1 with A=10
 ==============================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -229,16 +260,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-06. Update entity E2 with A=20
-==============================
-HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-
-
-07. Dump and reset accumulator, see: 1 KAFKA sub/E1 E A:10, 1 KAFKA sub/E2 A:20
-=============================================================================
+07. Dump and reset accumulator, see: 1 KAFKA sub/E1 E A:10
+==========================================================
 Kafka message at topic sub_E1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
@@ -248,6 +271,18 @@ Payload:
     "A": "10"
 }
 =======================================
+
+
+08. Update entity E2 with A=20
+==============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09. Dump and reset accumulator, see: 1 KAFKA sub/E2 A:20
+========================================================
 Kafka message at topic sub_E2
 Key: REGEX([0-9a-f\-]{24})
 Headers:
@@ -259,7 +294,7 @@ Payload:
 =======================================
 
 
-08. GET subscriptions: 1 sub with timesSent 4 and lastSuccess
+10. GET subscriptions: 1 sub with timesSent 4 and lastSuccess
 =============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)

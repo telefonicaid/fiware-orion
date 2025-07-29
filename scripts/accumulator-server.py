@@ -835,29 +835,30 @@ class KafkaConsumerThread(threading.Thread):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': True,
             'allow.auto.create.topics': True,
-            'topic.metadata.refresh.interval.ms': 100
+            'topic.metadata.refresh.interval.ms': 200,  # refresco muy rápido
+            'session.timeout.ms': 6000,
+            'max.poll.interval.ms': 10000
         }
         self.consumer = Consumer(conf)
-
-        # Determinar si es regex y procesar el nombre
-        self.regex_mode = kafka_topic.startswith("regex:")
-        self.actual_topic = kafka_topic.replace("regex:", "", 1) if self.regex_mode else kafka_topic
+        self.kafka_topic = kafka_topic
+        self.is_regex = self.kafka_topic.startswith("^") or self.kafka_topic.startswith("regex:")
+        if self.is_regex:
+            self.pattern_str = self.kafka_topic.replace("regex:", "") if self.kafka_topic.startswith("regex:") else self.kafka_topic
+        else:
+            self.pattern_str = None
 
     def run(self):
         # Suscripción usando regex o tópico directo
 
         try:
-            if self.regex_mode:
-                print(f"Subscribing to Kafka topics with regex: {self.actual_topic}")
-                try:
-                    # Intento 1: Método preferido
-                    self.consumer.subscribe(pattern=self.actual_topic, on_assign=self.on_assign)
-                except TypeError:
-                    # Intento 2: Método alternativo para nuevas versiones
-                    self.consumer.subscribe([self.actual_topic], on_assign=self.on_assign)
+            topics_metadata = self.consumer.list_topics(timeout=1).topics.keys()
+            if self.is_regex:
+                print(f"Subscribing to Kafka topics with regex: {self.kafka_topic}")
+                topics_match = [t for t in topics_metadata if re.match(self.pattern_str, t)]
+                self.consumer.subscribe(topics_match, on_assign=self.on_assign)
             else:
-                print(f"Subscribing to Kafka topic: {self.actual_topic}")
-                self.consumer.subscribe([self.actual_topic])
+                print(f"Subscribing to Kafka topic: {self.kafka_topic}")
+                self.consumer.subscribe([self.kafka_topic], on_assign=self.on_assign)
         except KafkaException as e:
             print(f"Subscription error: {e}")
             self.running = False
@@ -874,7 +875,6 @@ class KafkaConsumerThread(threading.Thread):
                 print(f"Error de Kafka: {e}")
             except Exception as e:
                 print(f"Error inesperado: {e}")
-                sleep(1)
 
     def on_assign(self, consumer, partitions):
         print(f"Particiones asignadas: {partitions}")
