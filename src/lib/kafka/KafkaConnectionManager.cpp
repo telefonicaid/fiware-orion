@@ -115,16 +115,16 @@ void KafkaConnectionManager::teardown(void)
   }
   connections.clear();
 
-  // 5. Limpieza global de librdkafka (esperar hasta 3 segundos)
+  // 5. Global cleanup of librdkafka (wait up to 3 seconds)
   int wait_time_ms = 3000;
   while (rd_kafka_wait_destroyed(wait_time_ms) == -1)
   {
-    LM_I(("Esperando finalización de threads internos de librdkafka..."));
+    LM_I(("Waiting for internal threads of librdkafka to finish..."));
     wait_time_ms -= 100;
     if (wait_time_ms <= 0) break;
   }
 
-  LM_T(LmtKafkaNotif, ("Destrucción de conexiones Kafka completada"));
+  LM_T(LmtKafkaNotif, ("Destruction of Kafka connections completed"));
 
 }
 
@@ -138,7 +138,7 @@ void KafkaConnectionManager::semInit(void)
 {
   if (sem_init(&sem, 0, 1) == -1)
   {
-    LM_X(1, ("Fatal Error (error initializing 'mqtt connection mgr' semaphore: %s)", strerror(errno)));
+    LM_X(1, ("Fatal Error (error initializing 'kafka connection mgr' semaphore: %s)", strerror(errno)));
   }
 }
 
@@ -279,7 +279,7 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
 
 /* ****************************************************************************
 *
-* KafkaConnectionManager::sendMqttNotification -
+* KafkaConnectionManager::sendKafkaNotification -
 */
 bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& brokers,

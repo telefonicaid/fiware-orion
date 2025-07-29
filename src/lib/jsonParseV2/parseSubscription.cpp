@@ -661,7 +661,7 @@ static std::string parseKafkaUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
   }
   if (protocol != "kafka:")
   {
-    return badInput(ciP, "http or https URL cannot be used in kafka notifications");
+    return badInput(ciP, "kafka schema is not used in URL");
   }
   if (path != "/")
   {

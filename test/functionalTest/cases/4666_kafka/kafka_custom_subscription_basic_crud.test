@@ -165,7 +165,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1229
+Content-Length: 1230
 
 [
     {
@@ -180,7 +180,7 @@ Content-Length: 1229
             "kafkaCustom": {
                 "payload": "temperature:${temperature}",
                 "qos": 0,
-                "retain": true,
+                "retain": false,
                 "topic": "orion_${dest}",
                 "url": "kafka://localhost:9092"
             },

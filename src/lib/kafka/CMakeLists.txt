@@ -27,7 +27,7 @@ SET (SOURCES
 
 SET (HEADERS
     KafkaConnectionManager.h
-        kafkaMgr.h
+    kafkaMgr.h
 )
 
 
@@ -51,7 +51,6 @@ target_link_directories(kafka PUBLIC /usr/lib/x86_64-linux-gnu)
 # Linked libraries
 target_link_libraries(kafka PUBLIC
         rdkafka
-        rdkafka++
         pthread
         ssl
         crypto

@@ -828,14 +828,14 @@ class KafkaConsumerThread(threading.Thread):
         self.daemon = True
         self.running = True
 
-        # Configuración esencial para Kafka
+        # Essential configuration for Kafka
         conf = {
             'bootstrap.servers': f"{kafka_host}:{kafka_port}",
             'group.id': kafka_group_id,
             'auto.offset.reset': 'latest',
             'enable.auto.commit': True,
             'allow.auto.create.topics': True,
-            'topic.metadata.refresh.interval.ms': 200,  # refresco muy rápido
+            'topic.metadata.refresh.interval.ms': 200,
             'session.timeout.ms': 6000,
             'max.poll.interval.ms': 10000
         }
@@ -848,7 +848,7 @@ class KafkaConsumerThread(threading.Thread):
             self.pattern_str = None
 
     def run(self):
-        # Suscripción usando regex o tópico directo
+        # Subscription using regular expressions or direct topic
 
         try:
             topics_metadata = self.consumer.list_topics(timeout=1).topics.keys()
@@ -857,14 +857,14 @@ class KafkaConsumerThread(threading.Thread):
                 topics_match = [t for t in topics_metadata if re.match(self.pattern_str, t)]
                 self.consumer.subscribe(topics_match, on_assign=self.on_assign)
             else:
-                print(f"Subscribing to Kafka topic: {self.kafka_topic}")
+                print(f"Subscribing to a Kafka topic: {self.kafka_topic}")
                 self.consumer.subscribe([self.kafka_topic], on_assign=self.on_assign)
         except KafkaException as e:
             print(f"Subscription error: {e}")
             self.running = False
             return
 
-        # Bucle principal de consumo
+        # Main consumption loop
         while self.running:
             try:
                 msg = self.consumer.poll(1.0)
@@ -872,17 +872,17 @@ class KafkaConsumerThread(threading.Thread):
                     continue
                 self.process_message(msg)
             except KafkaException as e:
-                print(f"Error de Kafka: {e}")
+                print(f"Kafka's error: {e}")
             except Exception as e:
-                print(f"Error inesperado: {e}")
+                print(f"Unexpected error: {e}")
 
     def on_assign(self, consumer, partitions):
-        print(f"Particiones asignadas: {partitions}")
+        print(f"Assigned partitions: {partitions}")
 
     def process_message(self, msg):
         global ac, t0, times
         with lock:
-            # Registrar tiempo
+            # Record time
             if not t0:
                 t0 = datetime.now()
                 times.append(0)
@@ -890,10 +890,10 @@ class KafkaConsumerThread(threading.Thread):
                 delta = datetime.now() - t0
                 times.append(trunc(delta.total_seconds()))
 
-            # Construir registro con key y headers
+            # Build record with key and headers
             s = f"Kafka message at topic {msg.topic()}\n"
 
-            # 1. Imprimir la KEY del mensaje
+            # 1. Print the message KEY
             if msg.key() is not None:
                 try:
                     key_str = msg.key().decode('utf-8')
@@ -903,7 +903,7 @@ class KafkaConsumerThread(threading.Thread):
             else:
                 s += "Key: (null)\n"
 
-            # 2. Imprimir los HEADERS del mensaje
+            # 2. Print the HEADERS of the message
             if msg.headers():
                 s += "Headers:\n"
                 for header_key, header_value in msg.headers():
@@ -913,7 +913,7 @@ class KafkaConsumerThread(threading.Thread):
                         value_str = header_value.hex()
                     s += f"  {header_key}: {value_str}\n"
 
-            # 3. Imprimir el payload
+            # 3. Print the payload
             s += "Payload:\n"
             try:
                 payload = json.loads(msg.value().decode('utf-8'))
