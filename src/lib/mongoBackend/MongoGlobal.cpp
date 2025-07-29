@@ -610,7 +610,9 @@ orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<
 
 
 
+#if 0
 /* *****************************************************************************
+* FIXME PR
 *
 * addFilterScope -
 */
@@ -653,6 +655,7 @@ static void addFilterScope( const Scope* scoP, std::vector<orion::BSONObj>* filt
     alarmMgr.badInput(clientIp, details);
   }
 }
+#endif
 
 
 
@@ -1271,6 +1274,7 @@ bool entitiesQuery
   const EntityIdVector&            enV,
   const StringList&                attrL,
   const ScopeVector&               spV,
+  const SubscriptionExpression&    expr,
   ContextElementResponseVector*    cerV,
   OrionError*                      oeP,
   const std::string&               tenant,
@@ -1366,8 +1370,22 @@ bool entitiesQuery
     finalCountQuery.append(ENT_ATTRNAMES, bob.obj());
   }
 
-  /* Part 5: scopes */
-  std::vector<orion::BSONObj>  filters;
+  /* Part 5: filters */
+  processAreaScope(&expr.geoFilter, &finalQuery, &finalCountQuery);
+
+  for (unsigned int ix = 0; ix < expr.stringFilter.mongoFilters.size(); ++ix)
+  {
+    finalQuery.appendElements(expr.stringFilter.mongoFilters[ix]);
+    finalCountQuery.appendElements(expr.stringFilter.mongoFilters[ix]);
+  }
+
+  for (unsigned int ix = 0; ix < expr.mdStringFilter.mongoFilters.size(); ++ix)
+  {
+    finalQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
+    finalCountQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
+  }
+
+  /*std::vector<orion::BSONObj>  filters;  FIXME PR
   unsigned int                 geoScopes = 0;
 
   for (unsigned int ix = 0; ix < spV.size(); ++ix)
@@ -1423,7 +1441,7 @@ bool entitiesQuery
   {
     finalQuery.appendElements(filters[ix]);
     finalCountQuery.appendElements(filters[ix]);
-  }
+  }*/
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
 

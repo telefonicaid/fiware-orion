@@ -68,6 +68,22 @@ std::string postBatchQuery
   EntityVector          entities;
   std::string           answer;
 
+  // FIXME PR: do a function in Expression to fill the expression
+  //qcrP->expr.fill(bqP->expr);
+  std::string err;
+  qcrP->expr.q = bqP->expr.q;
+  qcrP->expr.mq = bqP->expr.mq;
+  qcrP->expr.geometry = bqP->expr.geometry;
+  qcrP->expr.coords = bqP->expr.coords;
+  qcrP->expr.georel = bqP->expr.georel;
+  qcrP->expr.stringFilter.fill(&bqP->expr.stringFilter, &err);
+  qcrP->expr.mdStringFilter.fill(&bqP->expr.mdStringFilter, &err);
+  qcrP->expr.geoFilter.fill(bqP->expr.geometry,
+                            bqP->expr.coords,
+                            bqP->expr.georel,
+                            &err);
+  // FIXME pr: check for error in fill()
+
   // To be used later in the render stage
   StringList filterAttrs = bqP->attrsV;
 

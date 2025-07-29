@@ -33,7 +33,7 @@
 #include "ngsi/ScopeVector.h"
 #include "rest/EntityTypeInfo.h"
 
-
+#include "apiTypesV2/SubscriptionExpression.h"
 
 
 
@@ -54,6 +54,7 @@ typedef struct QueryContextRequest
   EntityIdVector    entityIdVector;  // Mandatory
   StringList        attributeList;   // Optional
   StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
+  SubscriptionExpression expr;       // Optional
   ScopeVector       scopeVector;     // Optional
 
   StringList        metadataList;          // From URI param 'metadata'

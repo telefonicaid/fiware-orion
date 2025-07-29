@@ -135,7 +135,7 @@ std::string parseBatchQuery(ConnectionInfo* ciP, BatchQuery* bqrP)
     }
     else if (name == "expression")
     {
-      std::string r = parseExpression(iter->value, &bqrP->scopeV, NULL);
+      std::string r = parseExpression(iter->value, bqrP->expr);
 
       if (r != "OK")
       {

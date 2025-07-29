@@ -65,16 +65,22 @@ static void insertInCache
   double               now
 )
 {
-  //
-  // StringFilter in Scope?
-  //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.scopeVector?
-  // If so, set it as string filter to the sub-cache item
-  //
-  StringFilter*  stringFilterP   = NULL;
-  StringFilter*  mdStringFilterP = NULL;
+  std::string err;
 
-  for (unsigned int ix = 0; ix < sub.scopeVector.size(); ++ix)
+  StringFilter*  stringFilterP   = sub.subject.condition.expression.stringFilter.clone(&err);
+  if (stringFilterP == NULL)
+  {
+    LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
+    return;
+  }
+  StringFilter*  mdStringFilterP = sub.subject.condition.expression.mdStringFilter.clone(&err);
+  if (stringFilterP == NULL)
+  {
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
+    return;
+  }
+
+  /*for (unsigned int ix = 0; ix < sub.scopeVector.size(); ++ix) // FIXME PR
   {
     if (sub.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
     {
@@ -85,7 +91,7 @@ static void insertInCache
     {
       mdStringFilterP = sub.scopeVector[ix]->mdStringFilterP;
     }
-  }
+  }*/
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
 

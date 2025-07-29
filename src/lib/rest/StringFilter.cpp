@@ -2413,7 +2413,7 @@ bool StringFilter::qMatch(ContextElementResponse* cerP)
 *
 * StringFilter::clone -
 */
-StringFilter* StringFilter::clone(std::string* errorStringP)
+StringFilter* StringFilter::clone(std::string* errorStringP) const
 {
   StringFilter* sfP = new StringFilter(type);
 

@@ -376,6 +376,7 @@ HttpStatusCode mongoQueryContext
   ok = entitiesQuery(requestP->entityIdVector,
                      requestP->attributeList,
                      requestP->scopeVector,
+                     requestP->expr,
                      &rawCerV,
                      &responseP->error,
                      tenant,

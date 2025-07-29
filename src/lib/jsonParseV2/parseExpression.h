@@ -31,6 +31,7 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ScopeVector.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
+#include "apiTypesV2/SubscriptionExpression.h"
 
 
 
@@ -41,8 +42,7 @@
 extern std::string parseExpression
 (
   const rapidjson::Value&      expression,
-  ScopeVector*                 svP,
-  ngsiv2::SubscriptionUpdate*  subsP
+  SubscriptionExpression&      expr
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEEXPRESSION_H_

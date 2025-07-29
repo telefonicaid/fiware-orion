@@ -28,6 +28,7 @@
 #include <string>
 
 #include "rest/StringFilter.h"
+#include "ngsi/Scope.h"
 
 
 
@@ -42,7 +43,7 @@
 */
 struct SubscriptionExpression
 {
-  SubscriptionExpression(): stringFilter(SftQ), mdStringFilter(SftMq), isSet(false) {}
+  SubscriptionExpression(): stringFilter(SftQ), mdStringFilter(SftMq) {}
   ~SubscriptionExpression() {}
 
   std::string               q;
@@ -53,7 +54,7 @@ struct SubscriptionExpression
 
   StringFilter              stringFilter;
   StringFilter              mdStringFilter;
-  bool                      isSet;
+  Scope                     geoFilter;
 };
 
 #endif  // SRC_LIB_APITYPESV2_SUBSCRIPTIONEXPRESSION_H_
