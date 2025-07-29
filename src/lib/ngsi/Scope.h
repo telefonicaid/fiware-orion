@@ -35,45 +35,18 @@
 
 /* ****************************************************************************
 *
-* Defined scopes so far
-*/
-#define SCOPE_OPERATOR_NOT           "Not"
-
-#define SCOPE_FILTER                 "FIWARE" "::" "Filter"
-#define SCOPE_FILTER_EXISTENCE       SCOPE_FILTER "::" "Existence"
-#define SCOPE_FILTER_NOT_EXISTENCE   SCOPE_FILTER "::" SCOPE_OPERATOR_NOT "::" "Existence"
-
-#define SCOPE_TYPE_SIMPLE_QUERY      "FIWARE::StringQuery"
-#define SCOPE_TYPE_SIMPLE_QUERY_MD   "FIWARE::StringQuery::Metadata"
-
-#define SCOPE_TYPE_LOCATION          FIWARE_LOCATION_V2
-
-#define SCOPE_VALUE_ENTITY_TYPE      "entity::type"
-
-
-
-/* ****************************************************************************
-*
 * Scope -
 */
 typedef struct Scope
 {
-  std::string  type;     // Mandatory
-  std::string  value;    // Mandatory
-
-  std::string  oper;     // Optional - used for filters
-
   orion::AreaType     areaType;
   orion::Polygon      polygon;
   orion::Point        point;
   orion::Line         line;
   orion::Box          box;
   orion::Georel       georel;
-  StringFilter*       stringFilterP;
-  StringFilter*       mdStringFilterP;
 
   Scope();
-  Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
 
   int          fill(const std::string&  geometry,
                     const std::string&  coords,

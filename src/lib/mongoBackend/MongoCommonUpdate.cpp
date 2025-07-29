@@ -4081,24 +4081,6 @@ unsigned int processContextElement
     bob.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePathV));
   }
 
-  // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
-  // Restriction is not a valid field in updateContext according to the NGSI specification. In the
-  // future we may consider to modify the spec to add such Restriction and avoid this ugly "direct injection"
-  // of URI filter into mongoBackend
-  //
-  if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
-  {
-    std::string  entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-
-    orion::BSONObjBuilder bobExist;
-    bobExist.append("$exists", false);
-
-    orion::BSONObjBuilder b;
-    b.append(entityTypeString, bobExist.obj());
-
-    bob.appendElements(b.obj());
-  }
-
   orion::BSONObj   query = bob.obj();
   orion::DBCursor  cursor;
 

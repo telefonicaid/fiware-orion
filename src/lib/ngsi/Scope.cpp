@@ -45,36 +45,10 @@ using namespace orion;
 */
 Scope::Scope()
 {
-  type     = "";
-  value    = "";
-  oper     = "";
   areaType = orion::NoArea;
 
   georel.maxDistance = -1;
   georel.minDistance = -1;
-
-  stringFilterP      = NULL;
-  mdStringFilterP    = NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* Scope::Scope -
-*/
-Scope::Scope(const std::string& _type, const std::string& _value, const std::string& _oper)
-{
-  type     = _type;
-  value    = _value;
-  oper     = _oper;
-  areaType = orion::NoArea;
-
-  georel.maxDistance = -1;
-  georel.minDistance = -1;
-
-  stringFilterP      = NULL;
-  mdStringFilterP    = NULL;
 }
 
 
@@ -109,8 +83,6 @@ int Scope::fill
   std::vector<std::string>    pointStringV;
   int                         points;
   std::vector<orion::Point*>  pointV;
-
-  type = FIWARE_LOCATION_V2;
 
   //
   // parse geometry
@@ -350,17 +322,5 @@ void Scope::release(void)
   // NOTE: georel, box, and point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
-
-  if (stringFilterP != NULL)
-  {
-    delete stringFilterP;
-    stringFilterP = NULL;
-  }
-
-  if (mdStringFilterP != NULL)
-  {
-    delete mdStringFilterP;
-    mdStringFilterP = NULL;
-  }
 }
 
