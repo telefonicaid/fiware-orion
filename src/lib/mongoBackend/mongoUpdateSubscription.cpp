@@ -145,26 +145,19 @@ static void updateInCache
   const std::string&         tenant
 )
 {
-  //
-  // StringFilter in Scope?
-  //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.scopeVector?
-  // If so, set it as string filter to the sub-cache item
-  //
-  StringFilter*  stringFilterP   = NULL;
-  StringFilter*  mdStringFilterP = NULL;
+  std::string err;
 
-  for (unsigned int ix = 0; ix < subUp.scopeVector.size(); ++ix)
+  StringFilter*  stringFilterP   = subUp.subject.condition.expression.stringFilter.clone(&err);
+  if (stringFilterP == NULL)
   {
-    if (subUp.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      stringFilterP = subUp.scopeVector[ix]->stringFilterP;
-    }
-
-    if (subUp.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      mdStringFilterP = subUp.scopeVector[ix]->mdStringFilterP;
-    }
+    LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
+    return;
+  }
+  StringFilter*  mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
+  if (stringFilterP == NULL)
+  {
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
+    return;
   }
 
   //
