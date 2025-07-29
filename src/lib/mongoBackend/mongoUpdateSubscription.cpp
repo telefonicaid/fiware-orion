@@ -145,15 +145,17 @@ static void updateInCache
   const std::string&         tenant
 )
 {
+  // set strinFilterP and mdStringFilterP (they will be used later in subCacheItemInsert)
   std::string err;
 
-  StringFilter*  stringFilterP   = subUp.subject.condition.expression.stringFilter.clone(&err);
+  StringFilter* stringFilterP = subUp.subject.condition.expression.stringFilter.clone(&err);
   if (stringFilterP == NULL)
   {
     LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
     return;
   }
-  StringFilter*  mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
+
+  StringFilter* mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
   if (stringFilterP == NULL)
   {
     LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));

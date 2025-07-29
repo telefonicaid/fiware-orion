@@ -169,7 +169,6 @@ std::string QueryContextRequest::toJsonV1(void)
 void QueryContextRequest::release(void)
 {
   entityIdVector.release();
-  scopeVector.release();
 }
 
 
@@ -190,14 +189,14 @@ void QueryContextRequest::fill
 
   entityIdVector.push_back(eidP);
 
-  if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty))
+  /*if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty)) FIXME PR: no longer needed?
   {
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
 
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
 
     scopeVector.push_back(scopeP);
-  }
+  }*/
 }
 
 
@@ -227,6 +226,4 @@ void QueryContextRequest::fill(BatchQuery* bqP)
   attributeList.fill(bqP->attributeV.stringV);  // attributeV is deprecated
   attrsList.fill(bqP->attrsV.stringV);
   metadataList.fill(bqP->metadataV.stringV);
-  scopeVector.fill(bqP->scopeV, false);  // false: DO NOT ALLOCATE NEW scopes - reference the 'old' ones
-  bqP->scopeV.vec.clear();  // QueryContextRequest::scopeVector has taken over the Scopes from bqP
 }

@@ -93,7 +93,6 @@ SET (SOURCES
     ngsi/Metadata_test.cpp
     ngsi/MetadataVector_test.cpp
     ngsi/Request_test.cpp
-    ngsi/ScopeVector_test.cpp
 
     apiTypesV2/Entity_test.cpp  
     apiTypesV2/EntityVector_test.cpp

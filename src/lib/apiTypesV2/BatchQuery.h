@@ -30,7 +30,6 @@
 
 #include "ngsi/StringList.h"
 #include "ngsi/Request.h"
-#include "ngsi/ScopeVector.h"
 
 #include "apiTypesV2/EntityVector.h"
 #include "apiTypesV2/SubscriptionExpression.h"
@@ -48,7 +47,6 @@ class BatchQuery
   StringList     attributeV;  // Deprecated
   StringList     attrsV;
   SubscriptionExpression expr;  // FIXME PR
-  ScopeVector    scopeV;
   StringList     metadataV;
 
   BatchQuery();

@@ -610,55 +610,6 @@ orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<
 
 
 
-#if 0
-/* *****************************************************************************
-* FIXME PR
-*
-* addFilterScope -
-*/
-static void addFilterScope( const Scope* scoP, std::vector<orion::BSONObj>* filtersP)
-{
-  if ((scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
-  {
-    // Early return to avoid _id.type: {$exits: true}
-    return;
-  }
-
-  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-
-  if (scoP->type == SCOPE_FILTER_EXISTENCE)
-  {
-    // Entity type existence filter only makes sense in NGSIv1
-    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
-    {
-      bool existValue = scoP->oper == SCOPE_OPERATOR_NOT ? false : true;
-
-      orion::BSONObjBuilder bobInner;
-      bobInner.append("$exists", existValue);
-
-      orion::BSONObjBuilder bobOuter;
-      bobOuter.append(entityTypeString, bobInner.obj());
-
-      filtersP->push_back(bobOuter.obj());
-    }
-    else
-    {
-      std::string details = std::string("unknown value for '") +
-        SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
-
-      alarmMgr.badInput(clientIp, details);
-    }
-  }
-  else
-  {
-    std::string details = std::string("unknown filter type '") + scoP->type + "'";
-    alarmMgr.badInput(clientIp, details);
-  }
-}
-#endif
-
-
-
 /* ****************************************************************************
 *
 * sortCriteria -
@@ -1273,7 +1224,6 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const ScopeVector&               spV,
   const SubscriptionExpression&    expr,
   ContextElementResponseVector*    cerV,
   OrionError*                      oeP,
@@ -1384,64 +1334,6 @@ bool entitiesQuery
     finalQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
     finalCountQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
   }
-
-  /*std::vector<orion::BSONObj>  filters;  FIXME PR
-  unsigned int                 geoScopes = 0;
-
-  for (unsigned int ix = 0; ix < spV.size(); ++ix)
-  {
-    const Scope* scopeP = spV[ix];
-
-    if (scopeP->type.find(SCOPE_FILTER) == 0)
-    {
-      addFilterScope(scopeP, &filters);
-    }
-    else if (scopeP->type == FIWARE_LOCATION_V2)
-    {
-      geoScopes++;
-      if (geoScopes > 1)
-      {
-        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
-      }
-      else
-      {
-        processAreaScope(scopeP, &finalQuery, &finalCountQuery);
-      }
-    }
-    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      if (scopeP->stringFilterP)
-      {
-        for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
-        {
-          finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
-          finalCountQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
-        }
-      }
-    }
-    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      if (scopeP->mdStringFilterP)
-      {
-        for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
-        {
-          finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
-          finalCountQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
-        }
-      }
-    }
-    else
-    {
-      std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
-      alarmMgr.badInput(clientIp, details);
-    }
-  }
-
-  for (unsigned int ix = 0; ix < filters.size(); ++ix)
-  {
-    finalQuery.appendElements(filters[ix]);
-    finalCountQuery.appendElements(filters[ix]);
-  }*/
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
 

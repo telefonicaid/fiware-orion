@@ -259,6 +259,8 @@ static void commonFilters
   RestService*      serviceP
 )
 {
+#if 0
+FIXME PR: no longer needed?
   //
   // 1. ?!exist=entity::type
   //
@@ -300,6 +302,7 @@ static void commonFilters
     scopeP->oper    = "";
     scopeVectorP->push_back(scopeP);
   }
+#endif
 }
 
 
@@ -315,6 +318,8 @@ static void scopeFilter
   RestService*      serviceP
 )
 {
+#if 0
+// FIXME PR: no longer needed?
   ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
   for (unsigned int ix = 0; ix < scopeVectorP->size(); ++ix)
@@ -327,6 +332,7 @@ static void scopeFilter
       scopeP->oper = SCOPE_OPERATOR_NOT;
     }
   }
+#endif
 }
 
 
@@ -337,12 +343,15 @@ static void scopeFilter
 */
 static void filterRelease(ParseData* parseDataP, RequestType request)
 {
+#if 0
+// FIXME PR: no longer needed?
   ScopeVector* scopeVectorP = &parseDataP->qcr.res.scopeVector;
 
   if (scopeVectorP != NULL)
   {
     scopeVectorP->release();
   }
+#endif
 }
 
 

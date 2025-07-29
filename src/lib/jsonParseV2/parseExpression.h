@@ -29,7 +29,6 @@
 
 #include "rapidjson/document.h"
 #include "rest/ConnectionInfo.h"
-#include "ngsi/ScopeVector.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "apiTypesV2/SubscriptionExpression.h"
 

@@ -82,7 +82,7 @@ std::string postBatchQuery
                             bqP->expr.coords,
                             bqP->expr.georel,
                             &err);
-  // FIXME pr: check for error in fill()
+  // FIXME PR: check for error in fill()
 
   // To be used later in the render stage
   StringList filterAttrs = bqP->attrsV;

@@ -31,7 +31,6 @@ SET (SOURCES
     MetadataVector.cpp
     Request.cpp
     Scope.cpp
-    ScopeVector.cpp
     StringList.cpp
     NotifyContextRequest.cpp
     QueryContextRequest.cpp

@@ -65,33 +65,21 @@ static void insertInCache
   double               now
 )
 {
+  // set strinFilterP and mdStringFilterP (they will be used later in subCacheItemInsert)
   std::string err;
 
-  StringFilter*  stringFilterP   = sub.subject.condition.expression.stringFilter.clone(&err);
+  StringFilter* stringFilterP = sub.subject.condition.expression.stringFilter.clone(&err);
   if (stringFilterP == NULL)
   {
     LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
     return;
   }
-  StringFilter*  mdStringFilterP = sub.subject.condition.expression.mdStringFilter.clone(&err);
+  StringFilter* mdStringFilterP = sub.subject.condition.expression.mdStringFilter.clone(&err);
   if (stringFilterP == NULL)
   {
     LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
     return;
   }
-
-  /*for (unsigned int ix = 0; ix < sub.scopeVector.size(); ++ix) // FIXME PR
-  {
-    if (sub.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      stringFilterP = sub.scopeVector[ix]->stringFilterP;
-    }
-
-    if (sub.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      mdStringFilterP = sub.scopeVector[ix]->mdStringFilterP;
-    }
-  }*/
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
 
