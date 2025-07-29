@@ -212,7 +212,7 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const SubscriptionExpression&    expr,
+  const Expression&    expr,
   ContextElementResponseVector*    cerV,
   OrionError*                      oeP,
   const std::string&               tenant,

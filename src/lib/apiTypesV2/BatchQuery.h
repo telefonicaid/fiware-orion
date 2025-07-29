@@ -32,7 +32,7 @@
 #include "ngsi/Request.h"
 
 #include "apiTypesV2/EntityVector.h"
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Expression.h"
 
 
 
@@ -46,7 +46,7 @@ class BatchQuery
   EntityVector   entities;
   StringList     attributeV;  // Deprecated
   StringList     attrsV;
-  SubscriptionExpression expr;  // FIXME PR
+  Expression     expr;
   StringList     metadataV;
 
   BatchQuery();

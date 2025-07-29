@@ -43,7 +43,7 @@
 std::string parseExpression
 (
   const rapidjson::Value&      expression,
-  SubscriptionExpression&      expr
+  Expression&                  expr
 )
 {
   std::string  errorString;

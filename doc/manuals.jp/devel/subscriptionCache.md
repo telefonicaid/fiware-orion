@@ -69,7 +69,7 @@ Broker が起動すると、サブスクリプション・キャッシュには�
   double                           statusLastChange;
   int64_t                          count;
   RenderFormat                     renderFormat;
-  SubscriptionExpression           expression;
+  Expression                       expression;
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;

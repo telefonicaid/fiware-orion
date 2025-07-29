@@ -31,7 +31,7 @@
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
 
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Expression.h"
 
 
 
@@ -52,7 +52,7 @@ typedef struct QueryContextRequest
   EntityIdVector    entityIdVector;  // Mandatory
   StringList        attributeList;   // Optional
   StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
-  SubscriptionExpression expr;       // Optional
+  Expression        expr;            // Optional
 
   StringList        metadataList;          // From URI param 'metadata'
   std::string       contextProvider;       // Not part of the payload - used internally only

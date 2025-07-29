@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_SUBSCRIPTIONEXPRESSION_H_
-#define SRC_LIB_APITYPESV2_SUBSCRIPTIONEXPRESSION_H_
+#ifndef SRC_LIB_APITYPESV2_EXPRESSION_H_
+#define SRC_LIB_APITYPESV2_EXPRESSION_H_
 
 /*
 *
@@ -34,17 +34,19 @@
 
 /* ***********************************************
 *
-* SubscriptionExpression -
+* Expression -
 *
 * NOTE
-*   This struct contains both 'q' and stringFilter.
-*   q is the 'plain string' of the stringFilter and it is used in parsing of V2 Subscriptions
-*   and when the q-string is read from the database.
+*   This struct contains both 'q/mq' and stringFilter/mdStringFilter.
+*   q/mq is the 'plain string' of the stringFilter/mdStringFilter and it is used in parsing of Subscriptions
+*   and when the q/mq-string is read from the database.
+*   This struct also contains the geometry, coords and georel strings (along with the parsed geoFilter)
+*   This struct is used in both subbscriptions and batch query expressions
 */
-struct SubscriptionExpression
+struct Expression
 {
-  SubscriptionExpression(): stringFilter(SftQ), mdStringFilter(SftMq) {}
-  ~SubscriptionExpression() {}
+  Expression(): stringFilter(SftQ), mdStringFilter(SftMq) {}
+  ~Expression() {}
 
   std::string               q;
   std::string               mq;
@@ -57,4 +59,4 @@ struct SubscriptionExpression
   Scope                     geoFilter;
 };
 
-#endif  // SRC_LIB_APITYPESV2_SUBSCRIPTIONEXPRESSION_H_
+#endif  // SRC_LIB_APITYPESV2_EXPRESSION_H_

@@ -34,7 +34,7 @@
 #include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Expression.h"
 #include "apiTypesV2/Subscription.h"
 
 
@@ -110,7 +110,7 @@ struct CachedSubscription
   double                           statusLastChange;
   int64_t                          count;
   RenderFormat                     renderFormat;
-  SubscriptionExpression           expression;
+  Expression                       expression;
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;

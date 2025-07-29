@@ -30,7 +30,7 @@
 
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Expression.h"
 #include "ngsi/EntityId.h"
 #include "common/RenderFormat.h"
 
@@ -121,7 +121,7 @@ struct Notification
 struct Condition
 {
   std::vector<std::string>  attributes;
-  SubscriptionExpression    expression;
+  Expression                expression;
   std::vector<SubAltType>   altTypes;
   bool                      notifyOnMetadataChange;
   std::string               toJson();

@@ -30,7 +30,7 @@
 #include "rapidjson/document.h"
 #include "rest/ConnectionInfo.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Expression.h"
 
 
 
@@ -41,7 +41,7 @@
 extern std::string parseExpression
 (
   const rapidjson::Value&      expression,
-  SubscriptionExpression&      expr
+  Expression&                  expr
 );
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEEXPRESSION_H_
