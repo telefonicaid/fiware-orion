@@ -68,6 +68,20 @@ std::string postBatchQuery
   EntityVector          entities;
   std::string           answer;
 
+  std::string err;
+  if (!qcrP->expr.fill(&bqP->expr, &err))
+  {
+    // This is Runtime Error and 500 Internal Server Error as it should not happen:
+    // any potential error with the expression should have been caught in the parsing stage
+    LM_E(("Runtime Error (filling expression: %s)", err.c_str()));
+
+    ciP->httpStatusCode = SccReceiverInternalError;
+    OrionError oe(SccReceiverInternalError, "error filling expression" + err);
+    TIMED_RENDER(answer = oe.toJson());
+
+    return answer;
+  }
+
   // To be used later in the render stage
   StringList filterAttrs = bqP->attrsV;
 

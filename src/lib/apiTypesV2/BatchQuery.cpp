@@ -60,6 +60,5 @@ void BatchQuery::release(void)
   entities.release();
   attributeV.release();
   attrsV.release();
-  scopeV.release();
   metadataV.release();
 }

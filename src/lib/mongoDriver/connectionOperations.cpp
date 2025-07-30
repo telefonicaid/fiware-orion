@@ -120,7 +120,7 @@ bool orion::collectionQuery
 *
 * Note we have _q (query for search) and _countQuery (query for count) given that
 * in some rare occasions they may be different (in particular, when geo-queries are
-* used, see processAreaScope function for more detail). However, most of the times
+* used, see processGeoFilter function for more detail). However, most of the times
 * this function is called with same value for _q and _countQuery
 */
 bool orion::collectionRangedQuery

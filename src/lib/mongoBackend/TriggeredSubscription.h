@@ -72,7 +72,7 @@ class TriggeredSubscription
     std::string               geometry;
     std::string               coords;
     std::string               georel;
-  }                        expression;      // Only used by NGSIv2 subscription
+  } expression;
 
   TriggeredSubscription(long long                _throttling,
                         long long                _maxFailsLimit,

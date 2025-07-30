@@ -116,17 +116,6 @@ namespace ngsiv2
 */
 Subscription::~Subscription()
 {
-  unsigned int sz = scopeVector.size();
-
-  if (sz > 0)
-  {
-    for (unsigned i = 0; i != sz; i++ )
-    {
-      scopeVector[i]->release();
-      delete scopeVector[i];
-    }
-    scopeVector.vec.clear();
-  }
 }
 
 

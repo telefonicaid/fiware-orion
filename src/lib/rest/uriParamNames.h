@@ -25,7 +25,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "ngsi/Scope.h"    // SCOPE_VALUE_ENTITY_TYPE: "entity::type"
 
 
 
@@ -35,12 +34,6 @@
 */
 #define URI_PARAM_PAGINATION_OFFSET       "offset"
 #define URI_PARAM_PAGINATION_LIMIT        "limit"
-#define URI_PARAM_COLLAPSE                "collapse"
-#define URI_PARAM_ENTITY_TYPE             SCOPE_VALUE_ENTITY_TYPE
-#define URI_PARAM_NOT_EXIST               "!exist"
-#define URI_PARAM_EXIST                   "exist"
-#define URI_PARAM_ATTRIBUTES_FORMAT       "attributesFormat"
-#define URI_PARAM_ATTRIBUTE_FORMAT        "attributeFormat"
 #define URI_PARAM_OPTIONS                 "options"
 #define URI_PARAM_TYPE                    "type"
 #define URI_PARAM_SORTED                  "orderBy"

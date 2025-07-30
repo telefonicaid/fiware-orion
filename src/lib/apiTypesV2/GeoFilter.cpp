@@ -32,7 +32,7 @@
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
 
-#include "ngsi/Scope.h"
+#include "apiTypesV2/GeoFilter.h"
 #include "parse/forbiddenChars.h"
 
 using namespace orion;
@@ -41,40 +41,14 @@ using namespace orion;
 
 /* ****************************************************************************
 *
-* Scope::Scope -
+* GeoFilter::GeoFilter -
 */
-Scope::Scope()
+GeoFilter::GeoFilter()
 {
-  type     = "";
-  value    = "";
-  oper     = "";
   areaType = orion::NoArea;
 
   georel.maxDistance = -1;
   georel.minDistance = -1;
-
-  stringFilterP      = NULL;
-  mdStringFilterP    = NULL;
-}
-
-
-
-/* ****************************************************************************
-*
-* Scope::Scope -
-*/
-Scope::Scope(const std::string& _type, const std::string& _value, const std::string& _oper)
-{
-  type     = _type;
-  value    = _value;
-  oper     = _oper;
-  areaType = orion::NoArea;
-
-  georel.maxDistance = -1;
-  georel.minDistance = -1;
-
-  stringFilterP      = NULL;
-  mdStringFilterP    = NULL;
 }
 
 
@@ -95,9 +69,9 @@ static void pointVectorRelease(const std::vector<orion::Point*>& pointV)
 
 /* ****************************************************************************
 *
-* Scope::fill - 
+* GeoFilter::fill -
 */
-int Scope::fill
+int GeoFilter::fill
 (
   const std::string&  geometryString,
   const std::string&  coordsString,
@@ -109,8 +83,6 @@ int Scope::fill
   std::vector<std::string>    pointStringV;
   int                         points;
   std::vector<orion::Point*>  pointV;
-
-  type = FIWARE_LOCATION_V2;
 
   //
   // parse geometry
@@ -345,22 +317,10 @@ int Scope::fill
 *
 * release -
 */
-void Scope::release(void)
+void GeoFilter::release(void)
 {  
   // NOTE: georel, box, and point don't use dynamic memory, so they don't need release methods
   polygon.release();
   line.release();
-
-  if (stringFilterP != NULL)
-  {
-    delete stringFilterP;
-    stringFilterP = NULL;
-  }
-
-  if (mdStringFilterP != NULL)
-  {
-    delete mdStringFilterP;
-    mdStringFilterP = NULL;
-  }
 }
 

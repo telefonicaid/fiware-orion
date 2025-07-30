@@ -33,7 +33,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
@@ -173,90 +172,68 @@ std::string getEntities
 
 
   //
-  // If URI param 'geometry' is present, create a new scope.
-  // The fill() method of the scope checks the validity of the info in:
+  // If URI param 'geometry' is present, create a new geo filter.
+  // The fill() method of the geo filter checks the validity of the info in:
   // - geometry
   // - georel
   // - coords
   //
   if (!geometry.empty())
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    if (scopeP->fill(geometry, coords, georel, &errorString) != 0)
+    if (parseDataP->qcr.res.expr.geoFilter.fill(geometry, coords, georel, &errorString) != 0)
     {
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, ERROR_BAD_REQUEST);
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;
-
-      scopeP->release();
-      delete scopeP;
-
       return out;
     }
-
-    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
 
   //
   // String filter in URI param 'q' ?
-  // If so, put it in a new Scope and parse the q-string.
-  // The plain q-string is saved in Scope::value, just in case.
-  // Might be useful for debugging, if nothing else.
+  // If so, parse the q-string.
+
   //
   if (!q.empty())
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
-    scopeP->stringFilterP = new StringFilter(SftQ);
-    if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
+    if (parseDataP->qcr.res.expr.stringFilter.parse(q.c_str(), &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
       alarmMgr.badInput(clientIp, errorString, q);
-      scopeP->release();
-      delete scopeP;
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;
       return out;
     }
-
-    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
   //
   // Metadata string filter in URI param 'mq' ?
-  // If so, put it in a new Scope and parse the mq-string.
-  // The plain mq-string is saved in Scope::value, just in case.
-  // Might be useful for debugging, if nothing else.
+  // If so, parse the mq-string.
   //
   if (!mq.empty())
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mq);
     std::string  errorString;
 
-    scopeP->mdStringFilterP = new StringFilter(SftMq);
-    if (scopeP->mdStringFilterP->parse(mq.c_str(), &errorString) == false)
+    if (parseDataP->qcr.res.expr.mdStringFilter.parse(mq.c_str(), &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
       alarmMgr.badInput(clientIp, errorString, mq);
-      scopeP->release();
-      delete scopeP;
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;
       return out;
     }
-
-    parseDataP->qcr.res.scopeVector.push_back(scopeP);
   }
 
 
@@ -277,11 +254,11 @@ std::string getEntities
   }
   else if (ciP->uriParamTypes.size() == 0)
   {
-    parseDataP->qcr.res.fill("", pattern, "", EntityTypeEmptyOrNotEmpty);
+    parseDataP->qcr.res.fill("", pattern, "");
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill("", pattern, type, EntityTypeNotEmpty);
+    parseDataP->qcr.res.fill("", pattern, type);
   }
   else
   {

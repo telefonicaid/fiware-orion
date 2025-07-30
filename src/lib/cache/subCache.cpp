@@ -514,7 +514,7 @@ static bool subMatch
   }
 
   //
-  // If one of the attribute names in the scope vector
+  // If one of the attribute names in the expression
   // of the subscription has the same name as the incoming attribute. there is a match.
   // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
   // case of ONANYCHANGE subscriptions).

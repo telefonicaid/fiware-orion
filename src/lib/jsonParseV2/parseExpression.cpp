@@ -43,10 +43,11 @@
 std::string parseExpression
 (
   const rapidjson::Value&      expression,
-  ScopeVector*                 svP,
-  ngsiv2::SubscriptionUpdate*  subsP
+  Expression&                  expr
 )
 {
+  std::string  errorString;
+
   if (!expression.IsObject())
   {
     return "expression is not an object";
@@ -55,11 +56,6 @@ std::string parseExpression
   if (expression.ObjectEmpty())
   {
     return "expression is empty";
-  }
-
-  if (subsP != NULL)
-  {
-    subsP->subject.condition.expression.isSet = true;
   }
 
   if (expression.HasMember("q"))
@@ -78,23 +74,12 @@ std::string parseExpression
       return "q is empty";
     }
 
-    if (subsP != NULL) {
-      subsP->subject.condition.expression.q = qString;
-    }
+    expr.q = qString;
 
-    std::string  errorString;
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, qString);
-
-    scopeP->stringFilterP = new StringFilter(SftQ);
-    if (scopeP->stringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
+    if (expr.stringFilter.parse(qString.c_str(), &errorString) == false)
     {
-      delete scopeP->stringFilterP;
-      delete scopeP;
-
       return errorString;
     }
-
-    svP->push_back(scopeP);
   }
 
   if (expression.HasMember("mq"))
@@ -113,24 +98,12 @@ std::string parseExpression
       return "mq is empty";
     }
 
-    if (subsP != NULL)
+    expr.mq = mqString;
+
+    if (expr.mdStringFilter.parse(mqString.c_str(), &errorString) == false)
     {
-      subsP->subject.condition.expression.mq = mqString;
-    }
-
-    std::string  errorString;
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mqString);
-
-    scopeP->mdStringFilterP = new StringFilter(SftMq);
-    if (scopeP->mdStringFilterP->parse(scopeP->value.c_str(), &errorString) == false)
-    {
-      delete scopeP->mdStringFilterP;
-      delete scopeP;
-
       return errorString;
     }
-
-    svP->push_back(scopeP);
   }
 
   // geometry
@@ -153,10 +126,7 @@ std::string parseExpression
 
       geometry = geometryOpt.value;
 
-      if (subsP != NULL)
-      {
-        subsP->subject.condition.expression.geometry = geometry;
-      }
+      expr.geometry = geometry;
     }
   }
 
@@ -177,10 +147,7 @@ std::string parseExpression
 
       coords = coordsOpt.value;
 
-      if (subsP != NULL)
-      {
-        subsP->subject.condition.expression.coords = coords;
-      }
+      expr.coords = coords;
     }
   }
 
@@ -202,10 +169,7 @@ std::string parseExpression
 
       georel = georelOpt.value;
 
-      if (subsP != NULL)
-      {
-        subsP->subject.condition.expression.georel = georel;
-      }
+      expr.georel = georel;
     }
   }
 
@@ -218,20 +182,17 @@ std::string parseExpression
   }
 
   //
-  // If geometry, coords and georel are filled, then attempt to create a filter scope
+  // If geometry, coords and georel are filled, then attempt to create a geo filter
   // with them
   //
   if (allThem)
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  err;
 
-    if (scopeP->fill(geometry, coords, georel, &err) != 0)
+    if (expr.geoFilter.fill(geometry, coords, georel, &err) != 0)
     {
-      delete scopeP;
       return "error parsing geo-query fields: " + err;
     }
-    svP->push_back(scopeP);
   }
 
   return "OK";

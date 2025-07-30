@@ -65,7 +65,7 @@ std::string patchSubscription
   //
   // If a string-filter is present, it is parsed in
   // jsonParseV2/parseSubscription.cpp, function parseNotifyConditionVector() and
-  // the resulting StringFilter object resides in a Scope in parseDataP->subsV2.restriction.scopeVector
+  // the resulting StringFilter object resides in parseDataP->subs.subject.condition.expression
   //
   TIMED_MONGO(mongoUpdateSubscription(parseDataP->sub,
                                       &beError,

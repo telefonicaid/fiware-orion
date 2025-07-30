@@ -33,7 +33,6 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "ngsi/ParseData.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
 #include "serviceRoutinesV2/postQueryContext.h"
@@ -83,7 +82,7 @@ std::string getEntity
   }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(entityId, "", type, EntityTypeEmptyOrNotEmpty);
+  parseDataP->qcr.res.fill(entityId, "", type);
 
   // Get attrs and metadata filters from URL params
   setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);

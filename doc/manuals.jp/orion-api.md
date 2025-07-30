@@ -617,7 +617,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   [`servicePath` 組み込み属性](#builtin-attributes)を使用してエンティティ・サービス・パスを取得できます
 
 -   スコープ・エンティティは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
-    その場合、各 `scope tree` (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
+    その場合、各 "service paths tree" (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
     同じ名前を使用することもできます。下の図を参照してください。
 
 ![](../manuals/ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
