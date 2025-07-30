@@ -41,7 +41,14 @@ bool Expression::fill(Expression *exprP, std::string *errP)
   coords = exprP->coords;
   georel = exprP->georel;
 
-  return stringFilter.fill(&exprP->stringFilter, errP) &&
-         mdStringFilter.fill(&exprP->mdStringFilter, errP) &&
-         (geoFilter.fill(exprP->geometry, exprP->coords, exprP->georel, errP) == 0);
+  // geoFilter is filled only if all needed parameters are present
+  bool geoFillResult = true;
+  if (!geometry.empty() && !coords.empty() && !georel.empty())
+  {
+    geoFillResult = (geoFilter.fill(exprP->geometry, exprP->coords, exprP->georel, errP) == 0);
+  }
+
+  return geoFillResult &&
+         stringFilter.fill(&exprP->stringFilter, errP) &&
+         mdStringFilter.fill(&exprP->mdStringFilter, errP);
 }
