@@ -43,5 +43,5 @@ bool Expression::fill(Expression *exprP, std::string *errP)
 
   return stringFilter.fill(&exprP->stringFilter, errP) &&
          mdStringFilter.fill(&exprP->mdStringFilter, errP) &&
-         geoFilter.fill(exprP->geometry, exprP->coords, exprP->georel, errP);
+         (geoFilter.fill(exprP->geometry, exprP->coords, exprP->georel, errP) == 0);
 }
