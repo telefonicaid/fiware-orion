@@ -21,23 +21,24 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-KAFKA custoom notification tests
+KAFKA custom notification tests
 
 --SHELL-INIT--
 dbInit CB
 
-# tracelevel 163 is the one for MQTT notification logs
+# tracelevel 163 is the one for KAFKA notification logs
 kafkaCreateTopics sub_E1 sub_E2
 brokerStart CB 163 IPV4
 accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "^sub_.*"
 echo "Verifying Kafka connection..."
-docker exec kafka kafka-topics --list --bootstrap-server localhost:9092
+docker exec kafka kafka-topics --list --bootstrap-server ${KAFKA_HOST}:${KAFKA_PORT}
 
 --SHELL--
 
 #
 # Hint: use this to run the KAFKA broker needed for this .test:
 #
+# docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11 #TODO: document  Kafka service
 #
 # 01. Create KAFKA custom sub for entity E with topic sub_${id} payload A:{$A}
 # 02. Create entity E1 with A=1
