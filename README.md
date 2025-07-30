@@ -255,6 +255,13 @@ tag `fiware-orion`
 
 [Top](#top)
 
+## Useful stuff
+
+If you use [VSCode](https://code.visualstudio.com/) you may find useful this [launch configuration](launch.json). Have a look to the
+comments in the file itself.
+
+[Top](#top)
+
 ---
 
 ## License
