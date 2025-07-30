@@ -554,34 +554,34 @@ Content-Type: application/json
 
 ### エンティティのサービス・パス (Entity service path)
 
-Orion は階層スコープをサポートしているため、エンティティの[作成時に](user/walkthrough_apiv2.md#entity-creation)、
-スコープに割り当てることができます。次に、[クエリ](user/walkthrough_apiv2.md#query-entity)と
-[サブスクリプション](user/walkthrough_apiv2.md#subscriptions)のスコープを設定して、対応するスコープ内のエンティティを
+Orion は階層サービス・パスをサポートしているため、エンティティの[作成時に](user/walkthrough_apiv2.md#entity-creation)、
+サービス・パスに割り当てることができます。次に、[クエリ](user/walkthrough_apiv2.md#query-entity)と
+[サブスクリプション](user/walkthrough_apiv2.md#subscriptions)のスコープを設定して、対応するサービス・パス内のエンティティを
 見つけることもできます。
 
-たとえば、次のスコープを使用する Orion ベースのアプリケーションを考えてみます (図を参照):
+たとえば、次のサービス・パスを使用する Orion ベースのアプリケーションを考えてみます (図を参照):
 
--   第1レベルのスコープとして、`Madrid`
--   第2レベルのスコープ (Madrid の子供たち) としての `Gardens` と `Districts`
+-   第1レベルとして、`Madrid`
+-   第2レベル (Madrid の子供たち) としての `Gardens` と `Districts`
 -   `ParqueNorte`, `ParqueOeste`, `ParqueSur` (Gardens の子) および `Fuencarral` と `Latina` (Districts の子)
 -   `Parterre1` と `Parterre2` (ParqueNorte の子)
 
 ![](../manuals/ServicePathExample.png "ServicePathExample.png")
 
-使用するスコープは、更新/クエリのリクエストで `Fiware-ServicePath` HTTP ヘッダを使用して指定されます。たとえば、
+使用するサービス・パスは、更新/クエリのリクエストで `Fiware-ServicePath` HTTP ヘッダを使用して指定されます。たとえば、
 `Parterre1` に `Tree` 型のエンティティ `Tree1` を作成するには、次の Fiware-ServicePath が使用されます:
 
 ```
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
 ```
 
-そのスコープで `Tree1` を検索するために、同じ Fiware-ServicePath が使用されます。
+そのサービス・パスで `Tree1` を検索するために、同じ Fiware-ServicePath が使用されます。
 
-スコープは階層的で、階層的な検索が可能です。これを行うために、`#` 特別なキーワードが使用されます。 したがって、
+サービス・パスは階層的で、階層的な検索が可能です。これを行うために、`#` 特別なキーワードが使用されます。 したがって、
 `/Madrid/Gardens/ParqueNorte/#` の `Tree` 型のエンティティ ID `.*` のパターンを持つ query は、`ParqueNorte`,
 `Parterre1`, `Parterre2` のすべてのツリー (trees) を返します。
 
-最後に、`Fiware-ServicePath` ヘッダでカンマ区切りのリストを使用して、ばらばらなスコープをクエリできます。たとえば、
+最後に、`Fiware-ServicePath` ヘッダでカンマ区切りのリストを使用して、ばらばらなサービス・パスをクエリできます。たとえば、
 `ParqueNorte` と `ParqueOeste` の両方ですべてのツリーを取得するには (`ParqueSur` ではなく)、次の `Fiware-ServicePath`
 を query リクエストで使用します:
 
@@ -592,37 +592,37 @@ Orion は階層スコープをサポートしているため、エンティテ�
 いくつかの追加のコメント:
 
 -   制限:
-    -   スコープは `/` で始まる必要があります ("絶対" (absolute) スコープのみが許可されます)
-    -   1つのパスで最大10のスコープ・レベル
+    -   サービス・パスは `/` で始まる必要があります ("絶対" (absolute) サービス・パスのみが許可されます)
+    -   1つのパスで最大10のレベル
     -   各レベルで最大50文字 (最低1文字)、英数字とアンダー・スコアのみ使用可能
-    -   クエリ `Fiware-ServicePath` ヘッダのコンマ区切りリスト内の最大10個のばらばらなスコープ・パス (アップデート
-        `Fiware-ServicePath` ヘッダのスコープ・パスは1つ以下)
+    -   クエリ `Fiware-ServicePath` ヘッダのコンマ区切りリスト内の最大10個のばらばらなサービス・パス (アップデート
+        `Fiware-ServicePath` ヘッダのサービス・パスは1つ以下)
     -   末尾のスラッシュは破棄されます
 
 -   `Fiware-ServicePath` はオプションのヘッダです。`Fiware-ServicePath` なしで作成された (またはデータベースにサービス
-   ・パス情報を含まない) すべてのエンティティは、暗黙的にルート・スコープ `/` に属していると想定されます。
+   ・パス情報を含まない) すべてのエンティティは、暗黙的にルート・サービス・パス `/` に属していると想定されます。
     `Fiware-ServicePath` を使用しないすべてのクエリ (サブスクリプションを含む) は、暗黙的に `/#` にあります。
     この動作により、0.14.0より前のバージョンとの下位互換性が保証されます
 
--   異なるスコープで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
+-   異なるサービス・パスで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
     に `Tree` 型のエンティティ ID `Tree1` を作成し、`Madrid/Gardens/ParqueOeste` に `Tree` 型の ID `Tree1`
     の別のエンティティをエラーなしで作成できます。ただし、このシナリオでは query が奇妙になる可能性があります
     (たとえば、`Fiware-ServicePath /Madrid/Gardens` のクエリは、クエリ・レスポンスで同じ ID と型を持つ2つの
-    エンティティを返すため、それぞれがどのスコープに属しているかを区別するのが難しくなります)
+    エンティティを返すため、それぞれがどのサービス・パスに属しているかを区別するのが難しくなります)
 
--   エンティティは1つの (そして、1つだけの) スコープに属します
+-   エンティティは1つの (そして、1つだけの) サービス・パスに属します
 
 -   `Fiware-ServicePath` ヘッダは、Orion から送信される通知リクエストに含まれています
 
 -   [`servicePath` 組み込み属性](#builtin-attributes)を使用してエンティティ・サービス・パスを取得できます
 
--   スコープ・エンティティは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
+-   サービス・パスは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
     その場合、各 "service paths tree" (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
     同じ名前を使用することもできます。下の図を参照してください。
 
 ![](../manuals/ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
 
--   現在のバージョンでは、API を介してエンティティが属するスコープを変更することはできません (回避策は、
+-   現在のバージョンでは、API を介してエンティティが属するサービス・パスを変更することはできません (回避策は、
     [エンティティ・コレクション](admin/database_model.md#entities-collection) の `_id.servicePath`
     フィールドを直接変更することです)
 
