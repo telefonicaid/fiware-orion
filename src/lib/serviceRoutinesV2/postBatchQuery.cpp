@@ -68,21 +68,19 @@ std::string postBatchQuery
   EntityVector          entities;
   std::string           answer;
 
-  // FIXME PR: do a function in Expression to fill the expression
-  //qcrP->expr.fill(bqP->expr);
   std::string err;
-  qcrP->expr.q = bqP->expr.q;
-  qcrP->expr.mq = bqP->expr.mq;
-  qcrP->expr.geometry = bqP->expr.geometry;
-  qcrP->expr.coords = bqP->expr.coords;
-  qcrP->expr.georel = bqP->expr.georel;
-  qcrP->expr.stringFilter.fill(&bqP->expr.stringFilter, &err);
-  qcrP->expr.mdStringFilter.fill(&bqP->expr.mdStringFilter, &err);
-  qcrP->expr.geoFilter.fill(bqP->expr.geometry,
-                            bqP->expr.coords,
-                            bqP->expr.georel,
-                            &err);
-  // FIXME PR: check for error in fill()
+  if (!bqP->expr.fill(&bqP->expr, &err))
+  {
+    // This is Runtime Error and 500 Internal Server Error as it should not happen:
+    // any potential error with the expression should have been caught in the parsing stage
+    LM_E(("Runtime Error (filling expression: %s)", err.c_str()));
+
+    ciP->httpStatusCode = SccReceiverInternalError;
+    OrionError oe(SccReceiverInternalError, "error filling expression" + err);
+    TIMED_RENDER(answer = oe.toJson());
+
+    return answer;
+  }
 
   // To be used later in the render stage
   StringList filterAttrs = bqP->attrsV;

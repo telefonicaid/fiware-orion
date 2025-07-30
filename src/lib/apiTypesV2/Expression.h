@@ -57,6 +57,8 @@ struct Expression
   StringFilter              stringFilter;
   StringFilter              mdStringFilter;
   GeoFilter                 geoFilter;
+
+  bool fill(Expression* exprP, std::string* errP);
 };
 
 #endif  // SRC_LIB_APITYPESV2_EXPRESSION_H_

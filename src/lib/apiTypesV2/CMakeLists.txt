@@ -30,6 +30,7 @@ SET (SOURCES
     HttpInfo.cpp
     MqttInfo.cpp
     GeoFilter.cpp
+    Expression.cpp
 )
 
 SET (HEADERS
@@ -43,6 +44,7 @@ SET (HEADERS
     HttpInfo.h
     MqttInfo.h
     GeoFilter.h
+    Expression.h
 )
 
 

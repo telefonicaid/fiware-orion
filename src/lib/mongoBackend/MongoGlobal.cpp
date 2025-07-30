@@ -773,7 +773,7 @@ bool processGeoFilter(const GeoFilter* scoP, orion::BSONObjBuilder* queryP, orio
 
     // This works as far as we don't have any other $and field in the query, in which
     // case the array for $and here needs to be combined with other items. Currently,
-    // users of processGeoFiltersV2() doesn't do add any new $and clause.
+    // users of processGeoFilter() doesn't do add any new $and clause.
     //
     // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
     // at least minDistance or maxDistance are there. Check functional tests
