@@ -1224,7 +1224,7 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const Expression&    expr,
+  const Expression&                expr,
   ContextElementResponseVector*    cerV,
   OrionError*                      oeP,
   const std::string&               tenant,
