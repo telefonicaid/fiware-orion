@@ -380,14 +380,10 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
   {
     b->append(CSUB_REFERENCE, sub.notification.kafkaInfo.url);
     b->append(CSUB_KAFKATOPIC, sub.notification.kafkaInfo.topic);
-    // b->append(CSUB_MQTTQOS,   (int) sub.notification.kafkaInfo.qos);
-    // b->append(CSUB_MQTTRETAIN, sub.notification.kafkaInfo.retain);
     b->append(CSUB_CUSTOM,    sub.notification.kafkaInfo.custom);
 
     LM_T(LmtMongo, ("Subscription reference:  %s", sub.notification.kafkaInfo.url.c_str()));
-    LM_T(LmtMongo, ("Subscription mqttTopic:  %s", sub.notification.kafkaInfo.topic.c_str()));
-    LM_T(LmtMongo, ("Subscription mqttQos:    %d", sub.notification.kafkaInfo.qos));
-    LM_T(LmtMongo, ("Subscription mqttRetain: %s", sub.notification.kafkaInfo.retain? "true": "false"));
+    LM_T(LmtMongo, ("Subscription kafkaTopic:  %s", sub.notification.kafkaInfo.topic.c_str()));
     LM_T(LmtMongo, ("Subscription custom:     %s", sub.notification.kafkaInfo.custom? "true" : "false"));
 
     if (sub.notification.mqttInfo.providedAuth)

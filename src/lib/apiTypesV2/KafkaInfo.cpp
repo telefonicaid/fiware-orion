@@ -41,7 +41,7 @@ namespace ngsiv2
 *
 * KafkaInfo::KafkaInfo - 
 */
-KafkaInfo::KafkaInfo() : qos(0), custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
+KafkaInfo::KafkaInfo() : custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
 {
 }
 
@@ -57,8 +57,6 @@ std::string KafkaInfo::toJson()
 
   jh.addString("url", this->url);
   jh.addString("topic", this->topic);
-  jh.addNumber("qos", (long long) this->qos);
-  jh.addBool("retain", this->retain);
 
   if (providedAuth)
   {
@@ -219,8 +217,6 @@ void KafkaInfo::fill(const KafkaInfo& _KafkaInfo)
 {
   this->url            = _KafkaInfo.url;
   this->topic          = _KafkaInfo.topic;
-  this->qos            = _KafkaInfo.qos;
-  this->retain         = _KafkaInfo.retain;
   this->custom         = _KafkaInfo.custom;
   this->payload        = _KafkaInfo.payload;
   this->payloadType    = _KafkaInfo.payloadType;

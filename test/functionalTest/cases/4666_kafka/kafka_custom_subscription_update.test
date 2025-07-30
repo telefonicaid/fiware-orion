@@ -146,8 +146,7 @@ payload='{
   "notification": {
     "kafkaCustom": {
       "url": "kafka://localhost:1885",
-      "topic": "orionbk_${d}",
-      "qos": 1
+      "topic": "orionbk_${d}"
     }
   }
 }'
@@ -169,8 +168,7 @@ payload='{
   "notification": {
     "kafka": {
       "url": "kafka://localhost:1887",
-      "topic": "orion",
-      "qos": 2
+      "topic": "orion"
     }
   }
 }'
@@ -202,7 +200,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 389
+Content-Length: 367
 
 {
     "description": "Original sub",
@@ -213,8 +211,6 @@ Content-Length: 389
         "covered": false,
         "kafkaCustom": {
             "payload": "t:${t}",
-            "qos": 0,
-            "retain": true,
             "topic": "orion_${d}",
             "url": "kafka://localhost:1883"
         },
@@ -250,7 +246,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 389
+Content-Length: 367
 
 {
     "description": "Modified sub",
@@ -261,8 +257,6 @@ Content-Length: 389
         "covered": false,
         "kafkaCustom": {
             "payload": "t:${t}",
-            "qos": 0,
-            "retain": true,
             "topic": "orion_${d}",
             "url": "kafka://localhost:1883"
         },
@@ -298,7 +292,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 382
+Content-Length: 360
 
 {
     "description": "Modified sub",
@@ -309,8 +303,6 @@ Content-Length: 382
         "covered": false,
         "kafkaCustom": {
             "payload": null,
-            "qos": 0,
-            "retain": true,
             "topic": "cb_${d}",
             "url": "kafka://localhost:1884"
         },
@@ -390,7 +382,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 372
+Content-Length: 350
 
 {
     "description": "Modified sub",
@@ -400,8 +392,6 @@ Content-Length: 372
         "attrsFormat": "normalized",
         "covered": false,
         "kafkaCustom": {
-            "qos": 0,
-            "retain": true,
             "topic": "orionbk_${d}",
             "url": "kafka://localhost:1885"
         },
@@ -437,7 +427,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 359
+Content-Length: 337
 
 {
     "description": "Modified sub",
@@ -447,8 +437,6 @@ Content-Length: 359
         "attrsFormat": "normalized",
         "covered": false,
         "kafka": {
-            "qos": 0,
-            "retain": true,
             "topic": "orion",
             "url": "kafka://localhost:1887"
         },

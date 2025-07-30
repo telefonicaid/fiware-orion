@@ -165,7 +165,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1230
+Content-Length: 1161
 
 [
     {
@@ -179,8 +179,6 @@ Content-Length: 1230
             "covered": false,
             "kafkaCustom": {
                 "payload": "temperature:${temperature}",
-                "qos": 0,
-                "retain": false,
                 "topic": "orion_${dest}",
                 "url": "kafka://localhost:9092"
             },
@@ -210,8 +208,6 @@ Content-Length: 1230
             "attrsFormat": "normalized",
             "covered": false,
             "kafkaCustom": {
-                "qos": 0,
-                "retain": false,
                 "topic": "orion_${dest}",
                 "url": "kafka://localhost:9092"
             },
@@ -242,8 +238,6 @@ Content-Length: 1230
             "covered": false,
             "kafkaCustom": {
                 "payload": null,
-                "qos": 0,
-                "retain": false,
                 "topic": "orion_${dest}",
                 "url": "kafka://localhost:9092"
             },
