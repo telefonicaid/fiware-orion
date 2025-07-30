@@ -69,7 +69,7 @@ std::string postBatchQuery
   std::string           answer;
 
   std::string err;
-  if (!bqP->expr.fill(&bqP->expr, &err))
+  if (!qcrP->expr.fill(&bqP->expr, &err))
   {
     // This is Runtime Error and 500 Internal Server Error as it should not happen:
     // any potential error with the expression should have been caught in the parsing stage
