@@ -47,7 +47,7 @@
 #include "orionTypes/UpdateActionType.h"
 #include "cache/subCache.h"
 #include "rest/StringFilter.h"
-#include "ngsi/Scope.h"
+#include "apiTypesV2/GeoFilter.h"
 #include "rest/uriParamNames.h"
 
 #include "mongoBackend/dbConstants.h"
@@ -2052,10 +2052,10 @@ static unsigned int processSubscriptions
      * (Issue #2396 should solve that) */
     if ((!tSubP->expression.georel.empty()) && (!tSubP->expression.coords.empty()) && (!tSubP->expression.geometry.empty()))
     {
-      Scope        geoScope;
+      GeoFilter    geoFilter;
       std::string  filterErr;
 
-      if (geoScope.fill(tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
+      if (geoFilter.fill(tSubP->expression.geometry, tSubP->expression.coords, tSubP->expression.georel, &filterErr) != 0)
       {
         // This has been already checked at subscription creation/update parsing time. Thus, the code cannot reach
         // this part.
@@ -2067,11 +2067,11 @@ static unsigned int processSubscriptions
         continue;
       }
 
-      orion::BSONObjBuilder bobQuery;  // used only to keep processAreaScope() signature
+      orion::BSONObjBuilder bobQuery;  // used only to keep processGeoFilter() signature
       orion::BSONObjBuilder bobCountQuery;
-      if (!processAreaScope(&geoScope, &bobQuery, &bobCountQuery))
+      if (!processGeoFilter(&geoFilter, &bobQuery, &bobCountQuery))
       {
-        // Error in processAreaScope is interpreted as no-match (conservative approach)
+        // Error in processGeoFilter is interpreted as no-match (conservative approach)
         continue;
       }
 
@@ -4079,24 +4079,6 @@ unsigned int processContextElement
   if (servicePathFilterNeeded(servicePathV))
   {
     bob.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePathV));
-  }
-
-  // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
-  // Restriction is not a valid field in updateContext according to the NGSI specification. In the
-  // future we may consider to modify the spec to add such Restriction and avoid this ugly "direct injection"
-  // of URI filter into mongoBackend
-  //
-  if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
-  {
-    std::string  entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-
-    orion::BSONObjBuilder bobExist;
-    bobExist.append("$exists", false);
-
-    orion::BSONObjBuilder b;
-    b.append(entityTypeString, bobExist.obj());
-
-    bob.appendElements(b.obj());
   }
 
   orion::BSONObj   query = bob.obj();

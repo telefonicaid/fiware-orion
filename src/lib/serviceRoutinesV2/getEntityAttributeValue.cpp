@@ -33,7 +33,6 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextAttribute.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/postQueryContext.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
@@ -76,7 +75,7 @@ std::string getEntityAttributeValue
   }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill("", compV[2], type, EntityTypeEmptyOrNotEmpty);
+  parseDataP->qcr.res.fill("", compV[2], type);
 
   // Call standard op postQueryContext
   OrionError oe;

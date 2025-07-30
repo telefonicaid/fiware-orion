@@ -251,7 +251,7 @@ public:
   bool  qMatch(ContextElementResponse* cerP);
   bool  mqMatch(ContextElementResponse* cerP);
 
-  StringFilter*  clone(std::string* errorStringP);
+  StringFilter*  clone(std::string* errorStringP) const;
   bool           fill(StringFilter* sfP, std::string* errorStringP);
 };
 

@@ -94,7 +94,6 @@ typedef enum TraceLevels
   /* Types (140-159) */
   LmtEntityId = 140,
   LmtRestriction,
-  LmtScope,
 
   /* Notifications (160-179) */
   LmtNotifier = 160,

@@ -197,10 +197,10 @@ extern bool includedAttribute(const std::string& attrName, const StringList& att
 
 /* *****************************************************************************
 *
-* processAreaScope -
+* processGeoFilter -
 *
 */
-extern bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
+extern bool processGeoFilter(const GeoFilter* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP);
 
 
 
@@ -212,7 +212,7 @@ extern bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const ScopeVector&               spV,
+  const Expression&                expr,
   ContextElementResponseVector*    cerV,
   OrionError*                      oeP,
   const std::string&               tenant,

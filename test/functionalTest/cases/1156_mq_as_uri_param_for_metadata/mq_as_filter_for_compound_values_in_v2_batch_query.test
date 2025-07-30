@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-mq as scope in compound values for v1 queries
+mq as filter for v2 batch queries
 
 --SHELL-INIT--
 dbInit CB
@@ -34,7 +34,7 @@ brokerStart CB
 # 02. Create entity E2, with attr A1=1, having metadata M1 { a:1, b:2 }
 # 03. Create entity E3, with attr A1=1, having metadata M2 { a:1, b:2 }
 # 04. Create entity E4, with attr A1=2, having metadata M1 { a:1, b:2 } and M2 { a:2, b:3 } (never to be found)
-# 05. GET entities matching q=A1==1 AND mq=A1.M1.b==2, see E2, using /v1/queryContext
+# 05. GET entities matching q=A1==1 AND mq=A1.M1.b==2, using /v2/op/query, see E2
 #
 
 echo "01. Create entity E1, with attr A1=1, having metadata M1 { a:1, b:1 }"
@@ -112,29 +112,23 @@ echo
 echo
 
 
-echo "05. GET entities matching q=A1==1 AND mq=A1.M1.b==2, see E2, using /v1/queryContext"
-echo "==================================================================================="
+echo "05. GET entities matching q=A1==1 AND mq=A1.M1.b==2, using /v2/op/query, see E2"
+echo "==============================================================================="
 payload='{
   "entities": [
     {
-      "isPattern": "true",
-      "id": ".*"
+      "idPattern": ".*"
     }
   ],
-  "restriction": {
-      "scopes": [
-          {
-              "type": "FIWARE::StringQuery::Metadata",
-              "value": "A1.M1.b==2"
-          },
-          {
-              "type": "FIWARE::StringQuery",
-              "value": "A1==1"
-          }
-      ]
-    }
+  "attributes": [
+    "A1"
+  ],
+  "expression": {
+    "mq": "A1.M1.b==2",
+    "q": "A1==1"
+  }
 }'
-orionCurl --url /v1/queryContext --payload "$payload"
+orionCurl --url /v2/op/query --payload "$payload"
 echo
 echo
 
@@ -180,46 +174,33 @@ Content-Length: 0
 
 
 
-05. GET entities matching q=A1==1 AND mq=A1.M1.b==2, see E2, using /v1/queryContext
-===================================================================================
+05. GET entities matching q=A1==1 AND mq=A1.M1.b==2, using /v2/op/query, see E2
+===============================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 266
+Content-Length: 128
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "M1",
-                                "type": "StructuredValue",
-                                "value": {
-                                    "a": 1,
-                                    "b": 2
-                                }
-                            }
-                        ],
-                        "name": "A1",
-                        "type": "Number",
-                        "value": 1
+[
+    {
+        "A1": {
+            "metadata": {
+                "M1": {
+                    "type": "StructuredValue",
+                    "value": {
+                        "a": 1,
+                        "b": 2
                     }
-                ],
-                "id": "E2",
-                "isPattern": "false",
-                "type": "Thing"
+                }
             },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
+            "type": "Number",
+            "value": 1
+        },
+        "id": "E2",
+        "type": "Thing"
+    }
+]
 
 
 --TEARDOWN--

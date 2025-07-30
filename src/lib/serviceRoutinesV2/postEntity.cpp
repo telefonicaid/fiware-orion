@@ -34,7 +34,6 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutinesV2/postUpdateContext.h"

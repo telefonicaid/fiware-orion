@@ -144,7 +144,6 @@ void utInit(bool notifierMocked, bool timerMocked)
   //
   uriParams[URI_PARAM_PAGINATION_OFFSET]   = DEFAULT_PAGINATION_OFFSET;
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = DEFAULT_PAGINATION_LIMIT;
-  uriParams[URI_PARAM_NOT_EXIST]           = "";  // FIXME P7: we need this to implement "restriction-based" filters
 
   //
   // Resetting servicePathVector

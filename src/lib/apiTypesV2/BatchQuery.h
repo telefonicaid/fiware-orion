@@ -30,9 +30,9 @@
 
 #include "ngsi/StringList.h"
 #include "ngsi/Request.h"
-#include "ngsi/ScopeVector.h"
 
 #include "apiTypesV2/EntityVector.h"
+#include "apiTypesV2/Expression.h"
 
 
 
@@ -46,7 +46,7 @@ class BatchQuery
   EntityVector   entities;
   StringList     attributeV;  // Deprecated
   StringList     attrsV;
-  ScopeVector    scopeV;
+  Expression     expr;
   StringList     metadataV;
 
   BatchQuery();

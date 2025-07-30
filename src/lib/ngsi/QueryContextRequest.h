@@ -30,10 +30,8 @@
 #include "ngsi/Request.h"
 #include "ngsi/StringList.h"
 #include "ngsi/EntityIdVector.h"
-#include "ngsi/ScopeVector.h"
-#include "rest/EntityTypeInfo.h"
 
-
+#include "apiTypesV2/Expression.h"
 
 
 
@@ -54,7 +52,7 @@ typedef struct QueryContextRequest
   EntityIdVector    entityIdVector;  // Mandatory
   StringList        attributeList;   // Optional
   StringList        attrsList;       // Used by the NGSIv2 forwarding logic, to avoid over-querying attributes (see pruneContextElements)
-  ScopeVector       scopeVector;     // Optional
+  Expression        expr;            // Optional
 
   StringList        metadataList;          // From URI param 'metadata'
   std::string       contextProvider;       // Not part of the payload - used internally only
@@ -69,8 +67,7 @@ typedef struct QueryContextRequest
   void          release(void);
   void          fill(const std::string&  entityId,
                      const std::string&  entityIdPattern,
-                     const std::string&  entityType,
-                     EntityTypeInfo      typeInfo);
+                     const std::string&  entityType);
   void          fill(BatchQuery* bqP);
 
 } QueryContextRequest;

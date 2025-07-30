@@ -30,9 +30,8 @@
 
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Expression.h"
 #include "ngsi/EntityId.h"
-#include "ngsi/ScopeVector.h"
 #include "common/RenderFormat.h"
 
 namespace ngsiv2
@@ -122,7 +121,7 @@ struct Notification
 struct Condition
 {
   std::vector<std::string>  attributes;
-  SubscriptionExpression    expression;
+  Expression                expression;
   std::vector<SubAltType>   altTypes;
   bool                      notifyOnMetadataChange;
   std::string               toJson();
@@ -163,7 +162,6 @@ public:
   Notification  notification;
   long long     throttling;
   RenderFormat  attrsFormat;
-  ScopeVector   scopeVector;
   std::string   toJson();
   void          release();
 

@@ -610,52 +610,6 @@ orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<
 
 
 
-/* *****************************************************************************
-*
-* addFilterScope -
-*/
-static void addFilterScope( const Scope* scoP, std::vector<orion::BSONObj>* filtersP)
-{
-  if ((scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
-  {
-    // Early return to avoid _id.type: {$exits: true}
-    return;
-  }
-
-  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-
-  if (scoP->type == SCOPE_FILTER_EXISTENCE)
-  {
-    // Entity type existence filter only makes sense in NGSIv1
-    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
-    {
-      bool existValue = scoP->oper == SCOPE_OPERATOR_NOT ? false : true;
-
-      orion::BSONObjBuilder bobInner;
-      bobInner.append("$exists", existValue);
-
-      orion::BSONObjBuilder bobOuter;
-      bobOuter.append(entityTypeString, bobInner.obj());
-
-      filtersP->push_back(bobOuter.obj());
-    }
-    else
-    {
-      std::string details = std::string("unknown value for '") +
-        SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
-
-      alarmMgr.badInput(clientIp, details);
-    }
-  }
-  else
-  {
-    std::string details = std::string("unknown filter type '") + scoP->type + "'";
-    alarmMgr.badInput(clientIp, details);
-  }
-}
-
-
-
 /* ****************************************************************************
 *
 * sortCriteria -
@@ -694,7 +648,7 @@ static std::string sortCriteria(const std::string& sortToken)
 
 /* *****************************************************************************
 *
-* processAreaScope -
+* processGeoFilter -
 *
 * Returns true if queryP/countQueryP were filled, false otherwise
 *
@@ -708,7 +662,7 @@ static std::string sortCriteria(const std::string& sortToken)
 *   (see the aforementioned link).
 *
 */
-bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
+bool processGeoFilter(const GeoFilter* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -716,7 +670,7 @@ bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::B
 
   if (!mongoLocationCapable())
   {
-    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+    std::string details = std::string("location filter was found but your MongoDB version doesn't support it. ") +
       "Please upgrade MongoDB server to 2.4 or newer)";
 
     alarmMgr.badInput(clientIp, details);
@@ -819,7 +773,7 @@ bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP, orion::B
 
     // This works as far as we don't have any other $and field in the query, in which
     // case the array for $and here needs to be combined with other items. Currently,
-    // users of processAreaScopesV2() doesn't do add any new $and clause.
+    // users of processGeoFilter() doesn't do add any new $and clause.
     //
     // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
     // at least minDistance or maxDistance are there. Check functional tests
@@ -1270,7 +1224,7 @@ bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const ScopeVector&               spV,
+  const Expression&                expr,
   ContextElementResponseVector*    cerV,
   OrionError*                      oeP,
   const std::string&               tenant,
@@ -1366,63 +1320,19 @@ bool entitiesQuery
     finalCountQuery.append(ENT_ATTRNAMES, bob.obj());
   }
 
-  /* Part 5: scopes */
-  std::vector<orion::BSONObj>  filters;
-  unsigned int                 geoScopes = 0;
+  /* Part 5: filters */
+  processGeoFilter(&expr.geoFilter, &finalQuery, &finalCountQuery);
 
-  for (unsigned int ix = 0; ix < spV.size(); ++ix)
+  for (unsigned int ix = 0; ix < expr.stringFilter.mongoFilters.size(); ++ix)
   {
-    const Scope* scopeP = spV[ix];
-
-    if (scopeP->type.find(SCOPE_FILTER) == 0)
-    {
-      addFilterScope(scopeP, &filters);
-    }
-    else if (scopeP->type == FIWARE_LOCATION_V2)
-    {
-      geoScopes++;
-      if (geoScopes > 1)
-      {
-        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
-      }
-      else
-      {
-        processAreaScope(scopeP, &finalQuery, &finalCountQuery);
-      }
-    }
-    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      if (scopeP->stringFilterP)
-      {
-        for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
-        {
-          finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
-          finalCountQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
-        }
-      }
-    }
-    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      if (scopeP->mdStringFilterP)
-      {
-        for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
-        {
-          finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
-          finalCountQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
-        }
-      }
-    }
-    else
-    {
-      std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
-      alarmMgr.badInput(clientIp, details);
-    }
+    finalQuery.appendElements(expr.stringFilter.mongoFilters[ix]);
+    finalCountQuery.appendElements(expr.stringFilter.mongoFilters[ix]);
   }
 
-  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  for (unsigned int ix = 0; ix < expr.mdStringFilter.mongoFilters.size(); ++ix)
   {
-    finalQuery.appendElements(filters[ix]);
-    finalCountQuery.appendElements(filters[ix]);
+    finalQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
+    finalCountQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
   }
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
