@@ -27,6 +27,25 @@ jobs:
         ports:
           - 27017:27017
 
+      kafka:
+        image: apache/kafka:3.7.0
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_ENABLE_KRAFT: "yes"
+          KAFKA_CFG_PROCESS_ROLES: broker,controller
+          KAFKA_CFG_NODE_ID: 1
+          KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+          KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+          KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+          KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+        options: >-
+          --health-cmd "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
     name: functional - ${{ matrix.payload.name }}
 
     strategy:
@@ -56,21 +75,6 @@ jobs:
         # to implement this (using eclipse-mosquitto:1.6.15) but in eclipse-mosquitto:2.0.11 it seems something in the internal configuration
         # has changed and it doesn't work if we don't provide the configuration files in the volume. Again, feedback is welcome! :)
         run: docker run -d --name mosquitto-extra -p 1884:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
-
-      - name: Start Kafka (KRaft mode)
-        run: |
-          docker run -d \
-            --name kafka \
-            -p 9092:9092 \
-            -e KAFKA_ENABLE_KRAFT=yes \
-            -e KAFKA_CFG_PROCESS_ROLES=broker,controller \
-            -e KAFKA_CFG_NODE_ID=1 \
-            -e KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093 \
-            -e KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093 \
-            -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
-            -e KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER \
-            -e KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT \
-            apache/kafka:3.7.0
 
       - name: Wait for Kafka to be ready
         run: |
