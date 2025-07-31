@@ -1168,20 +1168,22 @@ kafkaCreateTopics() {
     echo "Creando tópico: $topic"
 
     # Create the topic (if it does not exist)
-    docker exec kafka kafka-topics \
+    /opt/kafka/bin/kafka-topics.sh \
       --create \
       --topic "$topic" \
-      --bootstrap-server localhost:9092 \
+      --bootstrap-server kafka1:9092 \
       --partitions 1 \
       --replication-factor 1 \
+      --command-config /opt/kafka/ci.conf \
       --if-not-exists
 
-    # Actively wait until Kafka confirms that it exists
+    # Actively wait until Kafka confirmks that it exists
     echo "Waiting for Kafka to register the topic '$topic'..."
     for i in {1..10}; do
-      exists=$(docker exec kafka kafka-topics \
+      exists=$(/opt/kafka/bin/kafka-topics.sh \
         --list \
-        --bootstrap-server localhost:9092 | grep -w "$topic")
+        --command-config /opt/kafka/ci.conf \
+        --bootstrap-server kafka1:9092 | grep -w "$topic")
 
       if [ -n "$exists" ]; then
         echo "Topic '$topic' created and available."
@@ -1205,10 +1207,11 @@ kafkaDestroyTopics() {
   topics=$@
   for topic in $topics; do
     echo "Eliminando tópico: $topic"
-    docker exec kafka kafka-topics \
+     /opt/kafka/bin/kafka-topics.sh \
       --delete \
       --topic "$topic" \
-      --bootstrap-server localhost:9092 \
+      --bootstrap-server kafka1:9092 \
+      --command-config /opt/kafka/ci.conf \
       --if-exists
   done
 }

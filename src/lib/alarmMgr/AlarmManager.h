@@ -48,8 +48,6 @@ class AlarmManager
   int64_t                     forwardingErrorResets;
   int64_t                     mqttConnectionErrors;
   int64_t                     mqttConnectionResets;
-  int64_t                     kafkaConnectionErrors;
-  int64_t                     kafkaConnectionResets;
   int64_t                     dbErrors;
   int64_t                     dbErrorResets;
   bool                        dbOk;
@@ -58,12 +56,10 @@ class AlarmManager
   std::map<std::string, int>  forwardingErrorV;
   std::map<std::string, int>  badInputV;
   std::map<std::string, int>  mqttConnectionErrorV;
-  std::map<std::string, int>  kafkaConnectionErrorV;
 
   bool                        notificationErrorLogAlways;
   bool                        forwardingErrorLogAlways;
   bool                        mqttConnectionErrorLogAlways;
-  bool                        kafkaConnectionErrorLogAlways;
   bool                        badInputLogAlways;
   bool                        dbErrorLogAlways;
 
@@ -93,16 +89,12 @@ class AlarmManager
   bool mqttConnectionError(const std::string& endpoint, const std::string& details);
   bool mqttConnectionReset(const std::string& endpoint);
 
- bool kafkaConnectionError(const std::string& endpoint, const std::string& details);
- bool kafkaConnectionReset(const std::string& endpoint);
-
   // Methods for Log Summary
   void dbErrorsGet(bool* active, int64_t* raised, int64_t* released);
   void badInputGet(int64_t* active, int64_t* raised, int64_t* released);
   void notificationErrorGet(int64_t* active, int64_t* raised, int64_t* released);
   void forwardingErrorGet(int64_t* active, int64_t* raised, int64_t* released);
   void mqttConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released);
-  void kafkaConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released);
 
  private:
   void  semInit(void);

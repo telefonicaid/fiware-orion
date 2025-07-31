@@ -66,7 +66,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "user": "user_noexist",
       "passwd": "xxxx",
       "topic": "sub1"
@@ -117,7 +117,7 @@ echo "========================================"
 payload='{
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "user": "user1",
       "passwd": "xxxx",
       "topic": "sub1"

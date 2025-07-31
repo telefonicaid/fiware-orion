@@ -60,7 +60,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "topic": "sub0",
       "qos": 0
     }
@@ -85,7 +85,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "topic": "sub1",
       "qos": 1
     }
@@ -110,7 +110,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "topic": "sub2",
       "qos": 2
     }
@@ -259,9 +259,9 @@ MQTT message at topic sub2:
 
 06. Check log and see a trace for each qos possibility
 ======================================================
-MQTT notification sent to localhost:1883 on topic sub0 with qos 0 with id 1
-MQTT notification sent to localhost:1883 on topic sub1 with qos 1 with id 2
-MQTT notification sent to localhost:1883 on topic sub2 with qos 2 with id 3
+MQTT notification sent to mosquitto:1883 on topic sub0 with qos 0 with id 1
+MQTT notification sent to mosquitto:1883 on topic sub1 with qos 1 with id 2
+MQTT notification sent to mosquitto:1883 on topic sub2 with qos 2 with id 3
 
 
 07. GET subscriptions: 3 subs with timesSent 1 and lastSuccess
@@ -286,7 +286,7 @@ Content-Length: 1402
                 "qos": 0,
                 "retain": false,
                 "topic": "sub0",
-                "url": "mqtt://localhost:1883"
+                "url": "mqtt://mosquitto:1883"
             },
             "onlyChangedAttrs": false,
             "timesSent": 1
@@ -318,7 +318,7 @@ Content-Length: 1402
                 "qos": 1,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://localhost:1883"
+                "url": "mqtt://mosquitto:1883"
             },
             "onlyChangedAttrs": false,
             "timesSent": 1
@@ -350,7 +350,7 @@ Content-Length: 1402
                 "qos": 2,
                 "retain": false,
                 "topic": "sub2",
-                "url": "mqtt://localhost:1883"
+                "url": "mqtt://mosquitto:1883"
             },
             "onlyChangedAttrs": false,
             "timesSent": 1

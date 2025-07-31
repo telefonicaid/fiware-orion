@@ -26,9 +26,9 @@ KAFKA notification tests
 --SHELL-INIT--
 dbInit CB
 
-# tracelevel 163 is the one for KAFKA notification logs
+# tracelevel 164 is the one for KAFKA notification logs
 kafkaCreateTopics sub1 sub2
-brokerStart CB 163 IPV4
+brokerStart CB 164 IPV4
 accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "^sub.*"
 
 --SHELL--
@@ -62,7 +62,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092",
+      "url": "kafka://kafka1:9092",
       "topic": "sub1"
     }
   }
@@ -86,7 +86,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092",
+      "url": "kafka://kafka1:9092",
       "topic": "sub2"
     }
   }
@@ -308,7 +308,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1339
+Content-Length: 1333
 
 [
     {
@@ -320,7 +320,7 @@ Content-Length: 1339
             "covered": false,
             "kafka": {
                 "topic": "sub1",
-                "url": "kafka://localhost:9092"
+                "url": "kafka://kafka1:9092"
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
@@ -350,7 +350,7 @@ Content-Length: 1339
             "covered": false,
             "kafka": {
                 "topic": "sub2",
-                "url": "kafka://localhost:9092"
+                "url": "kafka://kafka1:9092"
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",

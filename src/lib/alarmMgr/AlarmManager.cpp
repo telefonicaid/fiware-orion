@@ -62,8 +62,6 @@ AlarmManager::AlarmManager()
   forwardingErrorResets(0),
   mqttConnectionErrors(0),
   mqttConnectionResets(0),
-  kafkaConnectionErrors(0),
-  kafkaConnectionResets(0),
   dbErrors(0),
   dbErrorResets(0),
   dbOk(true),
@@ -293,21 +291,6 @@ void AlarmManager::mqttConnectionErrorGet(int64_t* active, int64_t* raised, int6
 }
 
 
-/* ****************************************************************************
-*
-* AlarmManager::kafkaConnectionErrorGet -
-*
-* NOTE
-*   To read values, no semaphore is used.
-*/
-void AlarmManager::kafkaConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released)
-{
-  *active    = kafkaConnectionErrorV.size();
-  *raised    = kafkaConnectionErrors;
-  *released  = kafkaConnectionResets;
-}
-
-
 
 /* ****************************************************************************
 *
@@ -434,54 +417,6 @@ bool AlarmManager::mqttConnectionError(const std::string& endpoint, const std::s
 
 /* ****************************************************************************
 *
-* AlarmManager::kafkaConnectionError -
-*
-* Returns false if no effective alarm transition occurs, otherwise, true is returned.
-*
-* NOTE
-* The number of kafkaConnectionErrors per endpoint is maintained in the map.
-* Right now that info is not used, but might be in the future.
-* To do so, we'd need another counter as well, to not forget the accumulated
-* number each time the notificationErrors are reset.
-*/
-bool AlarmManager::kafkaConnectionError(const std::string& endpoint, const std::string& details)
-{
-  semTake();
-
-  std::map<std::string, int>::iterator iter = kafkaConnectionErrorV.find(endpoint);
-
-  if (iter != kafkaConnectionErrorV.end())  // Already exists - add to the 'url-specific' counter
-  {
-    iter->second += 1;
-
-    if (kafkaConnectionErrorLogAlways)
-    {
-      LM_W(("Repeated KafkaConnectionError %s: %s", endpoint.c_str(), details.c_str()));
-    }
-    else
-    {
-      // even if repeat alarms is off, this is a relevant event in debug level
-      LM_T(LmtKafkaNotif, ("Repeated KafkaConnectionError %s: %s", endpoint.c_str(), details.c_str()));
-    }
-
-    semGive();
-    return false;
-  }
-
-  ++kafkaConnectionErrors;
-
-  kafkaConnectionErrorV[endpoint] = 1;
-  semGive();
-
-  LM_W(("Raising alarm KafkaConnectionError %s: %s", endpoint.c_str(), details.c_str()));
-
-  return true;
-}
-
-
-
-/* ****************************************************************************
-*
 * AlarmManager::mqttConnectionReset -
 *
 * Returns false if no effective alarm transition occurs, otherwise, true is returned.
@@ -505,32 +440,6 @@ bool AlarmManager::mqttConnectionReset(const std::string& endpoint)
   return true;
 }
 
-
-
-/* ****************************************************************************
-*
-* AlarmManager::kafkaConnectionReset -
-*
-* Returns false if no effective alarm transition occurs, otherwise, true is returned.
-*/
-bool AlarmManager::kafkaConnectionReset(const std::string& endpoint)
-{
-  semTake();
-
-  if (kafkaConnectionErrorV.find(endpoint) == kafkaConnectionErrorV.end())  // Doesn't exist
-  {
-    semGive();
-    return false;
-  }
-
-  kafkaConnectionErrorV.erase(endpoint);
-  ++kafkaConnectionResets;
-  semGive();
-
-  LM_W(("Releasing alarm KafkaConnectionError %s", endpoint.c_str()));
-
-  return true;
-}
 
 
 

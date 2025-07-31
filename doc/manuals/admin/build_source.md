@@ -15,6 +15,8 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.88.1
 * openssl: 3.0.15
 * libuuid: 2.38.1
+* zlib1g-dev: 1:1.2.13.dfsg-1
+* librdkafka-dev: 2.0.2-1
 * libmosquitto: 2.0.20 (from source)
 * Mongo C driver: 1.29.0 (from source)
 * rapidjson: 1.1.0 (from source)
@@ -127,7 +129,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         . scripts/testEnv.sh
         python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
+        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0 
 
 * Run test harness in this environment (it takes some time, please be patient).
 

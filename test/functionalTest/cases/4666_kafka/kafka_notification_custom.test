@@ -26,12 +26,11 @@ KAFKA custom notification tests
 --SHELL-INIT--
 dbInit CB
 
-# tracelevel 163 is the one for KAFKA notification logs
+# tracelevel 164 is the one for KAFKA notification logs
 kafkaCreateTopics sub_E1 sub_E2
-brokerStart CB 163 IPV4
+brokerStart CB 164 IPV4
 accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "^sub_.*"
 echo "Verifying Kafka connection..."
-docker exec kafka kafka-topics --list --bootstrap-server ${KAFKA_HOST}:${KAFKA_PORT}
 
 --SHELL--
 
@@ -43,7 +42,7 @@ docker exec kafka kafka-topics --list --bootstrap-server ${KAFKA_HOST}:${KAFKA_P
 # 01. Create KAFKA custom sub for entity E with topic sub_${id} payload A:{$A}
 # 02. Create entity E1 with A=1
 # 03. Create entity E2 with A=2
-# 04. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1, 1 KAFKA sub__E2 A:2
+# 04. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1, 1 KAFKA sub_E2 A:2
 # 05. Update E1 with A=10
 # 06. Update E2 with A=20
 # 07. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:10, 1 KAFKA sub_E2 A:20
@@ -64,7 +63,7 @@ payload='{
   },
   "notification": {
     "kafkaCustom": {
-      "url": "kafka://localhost:9092",
+      "url": "kafka://kafka1:9092",
       "topic": "sub_${id}",
       "payload": "{ %22A%22: %22${A}%22 }"
     }
@@ -301,7 +300,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 489
+Content-Length: 486
 
 [
     {
@@ -314,7 +313,7 @@ Content-Length: 489
             "kafkaCustom": {
                 "payload": "{ %22A%22: %22${A}%22 }",
                 "topic": "sub_${id}",
-                "url": "kafka://localhost:9092"
+                "url": "kafka://kafka1:9092"
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",

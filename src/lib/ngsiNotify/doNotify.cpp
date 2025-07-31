@@ -186,7 +186,7 @@ static void doNotifyKafka(SenderThreadParams* params)
   std::string         endpoint;
 
   snprintf(portV, sizeof(portV), "%d", params->port);
-  endpoint = params->ip + ":" + portV;
+  endpoint = params->cluster;
 
   // Note in the case of HTTP this lmTransactionStart is done internally in httpRequestSend
   std::string protocol = params->protocol + "//";

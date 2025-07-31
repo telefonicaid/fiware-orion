@@ -115,3 +115,20 @@ apt-get -y clean \
 && rm -Rf /opt/libmicrohttpd-1.0.1 \
 && rm -Rf /opt/mosquitto-2.0.20 \
 && rm -Rf /opt/gmock-1.5.0
+
+set -e
+echo "Install kafka"
+
+KAFKA_VERSION=3.9.1
+INSTALL_DIR=/opt/kafka
+
+curl -fsSL "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz" -o /tmp/kafka.tgz
+mkdir -p "$INSTALL_DIR"
+tar -xzf /tmp/kafka.tgz --strip-components=1 -C "$INSTALL_DIR"
+rm /tmp/kafka.tgz
+echo "Done. Open a new shell and run:  kafka-topics --help"
+
+echo 'default.api.timeout.ms=12000' >> /opt/kafka/ci.conf
+echo 'request.timeout.ms=12000' >> /opt/kafka/ci.conf
+echo "Created /opt/kafka/ci.conf"
+

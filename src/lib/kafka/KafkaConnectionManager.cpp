@@ -78,8 +78,7 @@ KafkaConnectionManager::KafkaConnectionManager(void)
 */
 void KafkaConnectionManager::init(long _timeout)
 {
-  LM_T(LmtMqttNotif, ("Initializing KAFKA library"));
-  mosquitto_lib_init();
+  LM_T(LmtKafkaNotif, ("Initializing KAFKA library"));
 
   if (_timeout != -1)
   {
@@ -218,6 +217,8 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
 
   if (connections.find(endpoint) == connections.end())
   {
+    LM_T(LmtKafkaNotif, ("Starting a new KAFKA broker connection for %s", endpoint.c_str()));
+
     KafkaConnection* kConn = new KafkaConnection();
     kConn->endpoint = endpoint;
 
@@ -239,14 +240,29 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
     rd_kafka_conf_set(conf, "message.max.bytes", "10000000", nullptr, 0);
 
     // Connection callback (similar to MQTT)
-    rd_kafka_conf_set_dr_msg_cb(conf, [](rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque) {
+    rd_kafka_conf_set_dr_msg_cb(conf, [](rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque)
+    {
       KafkaConnection* kConn = static_cast<KafkaConnection*>(opaque);
-      kConn->connectionResult = msg->err;
+
+      if (msg->err == RD_KAFKA_RESP_ERR_NO_ERROR)
+      {
+        LM_T(LmtKafkaNotif, ("Kafka notification successfully published at %s on topic %s",
+               kConn->endpoint.c_str(),
+               rd_kafka_topic_name(msg->rkt)));
+      }
+      else
+      {
+        LM_E(("Kafka delivery failed at %s: %s",
+          kConn->endpoint.c_str(),
+          rd_kafka_err2str(msg->err)));
+      }
+
       kConn->connectionCallbackCalled = true;
       sem_post(&kConn->connectionSem);
     });
 
-    // Create producer (like mosquitto_new in MQTT)
+
+    // Create producer
     kConn->producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, nullptr, 0);
     if (!kConn->producer)
     {
@@ -259,18 +275,19 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
     sem_init(&kConn->connectionSem, 0, 0);
     kConn->connectionCallbackCalled = false;
 
-    // In Kafka, the connection is lazy, but we can force a test
     rd_kafka_poll(kConn->producer, 0);
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_sec += timeout / 1000;
     sem_timedwait(&kConn->connectionSem, &ts);
 
+    LM_T(LmtKafkaNotif, ("KAFKA successful connection for %s", endpoint.c_str()));
+
     connections[endpoint] = kConn;
     return kConn;
   }
 
-  // Existing connection (update timestamp)
+  LM_T(LmtKafkaNotif, ("Existing KAFKA broker connection for %s", endpoint.c_str()));
   connections[endpoint]->lastTime = getCurrentTime();
   return connections[endpoint];
 }
@@ -290,7 +307,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& servicePath)
 
 {
-  std::string endpoint = brokers; // Kafka uses "broker1:9092,broker2:9092"
+  std::string endpoint = brokers;
 
   semTake(); // Synchronization
 
@@ -299,7 +316,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (producer == nullptr)
   {
-    if (kConn) delete kConn; // Cleanup if getConnection() failed
+    if (kConn) delete kConn;
     semGive();
     LM_E(("Kafka producer not available for %s", endpoint.c_str()));
     return false;
@@ -324,7 +341,6 @@ bool KafkaConnectionManager::sendKafkaNotification(
     rd_kafka_header_add(headers, "FIWARE_SERVICEPATH", -1, servicePath.c_str(), servicePath.size());
   }
 
-
   bool retval = false;
   int resultCode = rd_kafka_producev(
             producer,
@@ -337,7 +353,8 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
-    alarmMgr.kafkaConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
+    // alarmMgr.kafkaConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
+    LM_E(("Kafka notification failed to %s on topic %s", brokers.c_str(), topic.c_str()));
     disconnect(kConn->producer, endpoint);
     connections.erase(endpoint);
     delete kConn;
@@ -346,9 +363,9 @@ bool KafkaConnectionManager::sendKafkaNotification(
   else
   {
     kConn->lastTime = getCurrentTime();
-    rd_kafka_poll(producer, 0); // Process events
+    rd_kafka_poll(producer, 0);
     LM_T(LmtKafkaNotif, ("Kafka notification sent to %s on topic %s", brokers.c_str(), topic.c_str()));
-    alarmMgr.kafkaConnectionReset(endpoint);
+    // alarmMgr.kafkaConnectionReset(endpoint);
     retval = true;
   }
 
@@ -358,41 +375,41 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
 
 
-/* ****************************************************************************
-*
-* KafkaConnectionManager::cleanup -
-*
-* maxAge parameter is in seconds
-*/
-void KafkaConnectionManager::cleanup(double maxAge)
-{
-  LM_T(LmtKafkaNotif, ("Checking Kafka connections age"));
-
-  semTake();
-
-  std::vector<std::string> toErase;
-
-  for (auto iter = connections.begin(); iter != connections.end(); ++iter)
-  {
-    std::string endpoint = iter->first;
-    KafkaConnection* kConn = iter->second;
-    double age = getCurrentTime() - kConn->lastTime;
-
-    if (age > maxAge)
-    {
-      LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removing it",
-          endpoint.c_str(), age, maxAge));
-
-      toErase.push_back(endpoint);
-      disconnect(kConn->producer, endpoint);
-      delete kConn;
-    }
-  }
-
-  for (const auto& endpoint : toErase)
-  {
-    connections.erase(endpoint);
-  }
-
-  semGive();
-}
+// /* ****************************************************************************
+// *
+// * KafkaConnectionManager::cleanup -
+// *
+// * maxAge parameter is in seconds
+// */
+// void KafkaConnectionManager::cleanup(double maxAge)
+// {
+//   LM_T(LmtKafkaNotif, ("Checking Kafka connections age"));
+//
+//   semTake();
+//
+//   std::vector<std::string> toErase;
+//
+//   for (auto iter = connections.begin(); iter != connections.end(); ++iter)
+//   {
+//     std::string endpoint = iter->first;
+//     KafkaConnection* kConn = iter->second;
+//     double age = getCurrentTime() - kConn->lastTime;
+//
+//     if (age > maxAge)
+//     {
+//       LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removing it",
+//           endpoint.c_str(), age, maxAge));
+//
+//       toErase.push_back(endpoint);
+//       disconnect(kConn->producer, endpoint);
+//       delete kConn;
+//     }
+//   }
+//
+//   for (const auto& endpoint : toErase)
+//   {
+//     connections.erase(endpoint);
+//   }
+//
+//   semGive();
+// }

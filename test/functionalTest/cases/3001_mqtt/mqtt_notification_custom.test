@@ -61,7 +61,7 @@ payload='{
   },
   "notification": {
     "mqttCustom": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "topic": "sub/${id}",
       "payload": "{ %22A%22: %22${A}%22 }"
     }
@@ -262,7 +262,7 @@ Content-Length: 509
                 "qos": 0,
                 "retain": false,
                 "topic": "sub/${id}",
-                "url": "mqtt://localhost:1883"
+                "url": "mqtt://mosquitto:1883"
             },
             "onlyChangedAttrs": false,
             "timesSent": 4

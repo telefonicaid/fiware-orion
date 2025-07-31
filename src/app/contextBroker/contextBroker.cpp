@@ -1336,10 +1336,10 @@ int main(int argC, char* argV[])
       times = 0;
       mqttMgr.cleanup(mqttMaxAge*60);
     }
-    if (times == kafkaMaxAge)
-    {
-      times = 0;
-      mqttMgr.cleanup(kafkaMaxAge*60);
-    }
+    // if (times == kafkaMaxAge)
+    // {
+    //   times = 0;
+    //   kafkaMgr.cleanup(kafkaMaxAge*60);
+    // }
   }
 }

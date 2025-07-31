@@ -52,6 +52,7 @@ typedef struct SenderThreadParams
   std::string                        ip;
   unsigned short                     port;
   std::string                        protocol;  // used to disinguish between mqtt and http/https notifications
+  std::string                        cluster;
   std::string                        verb;
   std::string                        tenant;
   long long                          maxFailsLimit;
