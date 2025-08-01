@@ -36,7 +36,7 @@ accumulatorStart
 # 03. Create E1 with attribute A1=1
 # 04. Dump & reset, see notifications A1=1 and A2=null in custom payload
 # 05. Create E2 with attribute A1=1
-# 06. Dump & reset, see notifications A1=1 and A2=<empty> in custom payload (invalid JSON)
+# 06. Dump & reset, see notifications A1=1 and A2=null in custom payload
 #
 
 echo "01. Create covered custom subscriptions for E1 covering attributes A1 and A2"
@@ -131,8 +131,8 @@ echo
 echo
 
 
-echo "06. Dump & reset, see notifications A1=1 and A2=<empty> in custom payload (invalid JSON)"
-echo "========================================================================================"
+echo "06. Dump & reset, see notifications A1=1 and A2=null in custom payload"
+echo "======================================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -143,30 +143,30 @@ echo
 01. Create covered custom subscriptions for E1 covering attributes A1 and A2
 ============================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create not covered custom subscriptions for E2
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Create E1 with attribute A1=1
 =================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 
@@ -188,18 +188,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 05. Create E2 with attribute A1=1
 =================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T
+Content-Length: 0
 
 
 
-06. Dump & reset, see notifications A1=1 and A2=<empty> in custom payload (invalid JSON)
-========================================================================================
+06. Dump & reset, see notifications A1=1 and A2=null in custom payload
+======================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 31
+Content-Length: 35
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: custom
 Host: 127.0.0.1:REGEX(\d+)
@@ -207,7 +207,7 @@ Accept: application/json
 Content-Type: application/json; charset=utf-8
 Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 
-{ "A1-value": 1, "A2-value":  }=======================================
+{ "A1-value": 1, "A2-value": null }=======================================
 
 
 --TEARDOWN--

@@ -24,6 +24,7 @@
 20) [Fiware-Correlator](#20-fiware-correlator)                                     
 
 21) [X-Auth-Token](#21-x-auth-token)
+22) [Authorization](#22-authorization)
 
 
 
@@ -134,7 +135,7 @@ Orion によって送信される発信 HTTP レスポンスで使用されま�
 この動作は CORS に関連しています。[ユーザ・マニュアルの CORS について](../user/cors.md#access-control-allow-headers)
 を参照してください。
 
-    Access-Control-Allow-Headers: Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token	
+    Access-Control-Allow-Headers: Authorization, Content-Type, Fiware-Service, Fiware-Servicepath, Ngsiv2-AttrsFormat, Fiware-Correlator, X-Forwarded-For, X-Real-IP, X-Auth-Token
 									               								   
 [トップ](#top)		
 		
@@ -215,7 +216,7 @@ Orion によって送信される発信 HTTP 通知で使用されます。通�
 Fiware-Service は、Orion で管理されるあらゆる種類の HTTP トランザクション (着信/発信リクエストおよび発信レスポンス) で使用
 されます。`-multiservice` が使用された場合、Orion は、特定のテナント/サービスのサブスクリプションに関連付けられた通知
 リクエストに `Fiware-Service` ヘッダを含めます (デフォルトのサービス/テナントを除き、ヘッダは存在しません)。
-[ユーザ・マニュアルのマルチテナンシーについて](../user/multitenancy.md)を参照してください。
+[Orion API のマルチ・テナンシーについて](../orion-api.md#multi-tenancy)を参照してください。
 
     POST http://127.0.0.1:9977/notify    
     Content-Length: 725    
@@ -234,7 +235,7 @@ Fiware-Service は、Orion で管理されるあらゆる種類の HTTP トラ�
 ## 18. Fiware-Servicepath
 
 Fiware-ServicePath は、Orion で管理されるあらゆる種類の HTTP トランザクション (着信/発信リクエストおよび発信レスポンス)
-で使用されるオプションのヘッダです。[ユーザ・マニュアルの service_path について](../user/service_path.md)を参照してください。
+で使用されるオプションのヘッダです。[Orion API の service_path について](../orion-api.md#service-path)を参照してください。
 
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1		
 
@@ -244,7 +245,7 @@ Fiware-ServicePath は、Orion で管理されるあらゆる種類の HTTP ト�
 ## 19. Fiware-Total-Count
 
 これは、Orion によって送信される発信 HTTP レスポンスで使用されるオプションのヘッダです。この操作はページネーションに関連
-しています。[ユーザ・マニュアルのページネーションについて](../user/pagination.md#pagination) を参照してください。
+しています。[Orion API のページネーションについて](../orion-api.md#pagination) を参照してください。
 	    
 [トップ](#top)
 
@@ -269,5 +270,15 @@ X-Auth-Token はオプションの HTTP ヘッダで、Orion はリクエスト�
 プロキシによって使用されます。
 	
     "X-Auth-Token": "fff0f4af447f4b589c835f805fe4be29"
+
+[トップ](#top)
+
+## 22. Authorization
+
+Authorization は、Orion がリクエストで受信したオプションの HTTP ヘッダであり、元のリクエストに関連付けられた他のリクエスト
+(通知およびフォワードされたクエリ/更新) に透過的に伝播します。[PEP Steelskin など](https://github.com/telefonicaid/fiware-pep-steelskin)
+の Orion と統合されたセキュリティ実施プロキシ (Security Enforcement Proxies) によって使用されます。
+
+    "Authorization": "Bearer fff0f4af447f4b589c835f805fe4be29"
 
 [トップ](#top)

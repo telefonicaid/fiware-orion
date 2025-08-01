@@ -12,21 +12,16 @@ _現在の Orion の内部アーキテクチャ_
 
 * 起動時に、Orion Context Broker は着信リクエストをリッスンする HTTP サーバを開始します。**残り**のライブラリはこれらのリクエストを処理し、そのライブラリは microhttpd 外部ライブラリに基づいており、リクエストごとに新しいスレッドが生成されます。
 
-* `connectionTreat()`関数は、新しいリクエストのエントリポイントです。詳細は、図 [RQ-01](sourceCode.md#flow-rq-01) を参照してくだい。リクエストが属する NGSI の API のバージョンに応じて、実行フローは実行ロジックの一つの "分岐" または別のものになります。基本的には、リクエスト URL プレフィックスが `/v1` か `/v2` かどうかによって異なります。
-
-* NGSIv1 (非推奨) リクエストの場合、ロジックは次のようになります :
-	* まず、[**jsonParse** library](sourceCode.md#srclibjsonparse)はリクエストのペイロードを入力として受け取り、一連のオブジェクトを生成します。NGSIv1 パーシング・ロジックは、[Boost library property_tree](https://theboostcpplibraries.com/boost.propertytree) に基づいています
-	* 次に、リクエストを処理するリクエストのサービス機能が呼び出されます。HTTP および URL パターンに関して、各リクエスト・タイプには、別々の機能があります。これらの関数を "サービス・ルーチン" と呼び、それらはライブラリの [**serviceRoutines**](sourceCode.md#srclibserviceroutines) に存在します。いくつかの "ハイ・レベル" サービス・ルーチンは、他の "ロー・レベル" サービス・ルーチンを呼び出すかもしれないことに注意してください。
-	* 最後に (1つまたは2つのホップのいずれかで)、サービス・ルーチンは **mongoBackend** ライブラリを呼び出します。詳細については[マッピングのドキュメント](ServiceRoutines.txt)を参照してください
-* NGSIv2 リクエストの場合、ロジックは次のようになります :
+* `connectionTreat()`関数は、新しいリクエストのエントリポイントです。詳細は、図 [RQ-01](sourceCode.md#flow-rq-01) を参照してくだい。
+* ロジックは次のようになります :
 	* まず、[**jsonParseV2** library](sourceCode.md#srclibjsonparsev2) はリクエスト・ペイロードを入力として受け取り、一連のオブジェクトを生成します。NGSIv2 パーシング・ロジックは [rapidjson](http://rapidjson.org) に基づいています。
-	* 次に、NGSIv1 と同様に、サービス・ルーチンが呼び出されてリクエストを処理します。HTTP および URL パターンに関して、各リクエスト・タイプには、サービス・ルーチンがあります。これらの "NGSIv2 サービス・ルーチン" は、ライブラリの [**serviceRoutinesV2**](sourceCode.md#srclibserviceroutinesv2) にあります。一部の V2 サービス・ルーチンは、NGSIv1 サービス・ルーチンを呼び出すかもしれないことに注意してください。詳細は、[マッピングのドキュメント](ServiceRoutines.txt)を参照してください。
-	* 最後に、**mongoBackend** ライブラリが呼び出されます。場合によっては、V2 サービス・ルーチンから直接行うことも、上の図に示すように V1 サービス・ルーチンを介して間接的に行うこともできます
-* **mongoBackend** のライブラリは、いくつかの点で、Orion の"頭脳"です。Orion が実行する、エンティティ情報の取得、エンティティの更新、サブスクリプションの作成などのさまざまな操作を目的とした一連の関数が含まれています。このライブラリは、対応する **mongoDriver** ライブラリ (対応する [MongoDB C driver](http://mongoc.org) をラップします) を使用して MongoDB とインタフェースします。歴史的な理由から、MongoDB バックエンドのほとんどは NGSIv1 ベースです。したがって、V1 サービス・ルーチンからアクセスされます。例外は、V2 サービス・ルーチンから直接呼び出される サブスクリプション一覧などの NGSIv2 専用の操作です
+        * 次に、リクエストを処理するためにサービスルーチンが呼び出されます。各リクエストタイプ（HTTP および URL パターン）には、ライブラリ [**serviceRoutinesV2**](sourceCode.md#srclibserviceroutinesv2) に格納されているサービスルーチンがあります。一部のサービスルーチンは他のサービスルーチンを呼び出す場合があることに注意してください（詳細は[マッピングドキュメント](ServiceRoutines.txt)を参照してください）
+        * 最後に、**mongoBackend** ライブラリが呼び出されます
+* [**mongoBackend** ライブラリ](sourceCode.md#srclibmongobackend)は、ある意味で Orion の「頭脳」です。Orion が実行する様々な操作（エンティティ情報の取得、エンティティの更新、サブスクリプションの作成など）を目的とした一連の関数が含まれています。このライブラリは、対応する [MongoDB C ドライバ](http://mongoc.org)ドライバを "ラップ" する **mongoDriver** ライブラリを使用して MongoDB とインターフェースします
 * 通知がトリガーされるたびに (たとえば、既存のサブスクリプションでカバーされるエンティティを更新した結果として)、通知モジュール([**ngsiNotify** ライブラリ](sourceCode.md#srclibngsinotify) にある) が **mongoBackend から呼び出されます**。このような通知を送信するため、Orion は2つの通知タイプをサポートしています
         * HTTP 通知。この場合、`httpRequestSend()` 関数 (**rest** ライブラリの一部) が HTTP リクエストの送信を担当します。これは、[libcurl](https://curl.haxx.se/libcurl/) 外部ライブラリに基づいています
         * MQTT 通知。この場合、`sendMqttNotification()` 関数 (**mqtt** ライブラリの一部) は、対応する MQTT broker での MQTT 通知の公開を担当します。これは、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) 外部ライブラリに基づいています
-* `httpRequestSend()` 関数は、特定の条件下でクエリ/更新を[コンテキスト・プロバイダ](../user/context_providers.md) に転送できる**serviceRoutines** 関数によっても呼び出されます
+* `httpRequestSend()` 関数は、特定の条件下でクエリ/更新を[コンテキスト・プロバイダ](../user/context_providers.md) に転送できる**serviceRoutinesV2** 関数によっても呼び出されます
 
 [トップ](#top)
 
@@ -44,22 +39,19 @@ NGSIv2 はまた、新しい V2 サービス・ルーチンを保持するため
 
 もう一つのアーキテクチャの進化 (今回は通信に関連する) は、発信 HTTP リクエストを直接処理 (つまり、リクエストを直接 TCP ソケットに書き込む) から、本格的な HTTP 指向のライブラリとしての libcurl の使用に移行していました。これは Orion 0.14.1 (2014年8月1日) で行われました。このようにして、HTTP プロトコルの微妙な細部がすべて考慮されています。実際、Orion 0.14.1 ではいくつかのバックエンドに通知を送信する問題を解決しました。
 
-## ターゲット・アーキテクチャ
+## NGSIv1 の削除
 
 アーキテクチャの進化の重要な成果の1つは、NGSIv1 API との完全な下位互換性を維持しながら、API の新しいバージョン (NGSIv2) 全体を開発できることでした (Orion1.0.0 で廃止された XML のレンダリングを除いて...それの後ろにひどい遺産として property_tree を残して:)。
 
-しかし、これは、いくつかの非効率的な側面 (特に、mongoBackend へのより直接的なフローではなく、サービス・ルーチン呼び出しの"チェーン") を伴う "並列" アーキテクチャにつながります。したがって、NGSIv1 が廃止予定であると宣言され、Orion のターゲットが NGSIv2 のみをサポートすることになると、ある時点で統合する必要があります (同様に、XML レンダリングは廃止され、最終的に削除されます)。
+しかし、これは "並列" アーキテクチャにつながり、いくつかの非効率な側面（特に、**mongoBackend** へのより直接的なフローではなく、サービスルーチン呼び出しの "チェーン"）がありました。そのため、NGSIv1 が非推奨と宣言され、Orion の目標が NGSIv2 のみをサポートすることになったら、いずれ統合する必要がありました（XML レンダリングが非推奨となり、最終的に削除されたのと同様に）。
 
-その時が来ると、ハイ・レベルの視点からのステップは次のようになります :
+Orion 4.0.0 では API の観点からNGSIv1 が削除されましたが、Orion 4.3.0 では統合が行われ、内部アーキテクチャの一部が統一されました (例: `serviceRoutines` は `serviceRoutinesV2` に、`ngsi10` は `ngsi` に統合されました)。NGSIv1 関連の多くのデッドコードが完全に削除されました。
 
-1. NGSIv1 JSON 機能を削除し、機能テストを調整します。これには、すべての property_tree の依存関係が削除されます
-2. NGSIv2 と NGSIv1 の内部タイプを単一の NGSI タイプ・ファミリーに統合します
-3. **serviceRoutines** と **mongoBackend** を単一NGSIタイプ・ファミリーに適応します
+## まだ保留中
 
-次の図は、上記の変更を考慮に入れて、ターゲット・アーキテクチャを示しています。
+いくつかの高レベルタスクが保留中です:
 
-![Orion target internal architecture](../../manuals/devel/images/target_architecture.png)
-
-_Orion のターゲット内部アーキテクチャ_
+1. NGSI 型を統合します (**orionType**, **ngsi**, **apiTypesV2** を再設計して統合する必要があります)。NGSIv1 から移行した古い型のほとんどは ngsi に含まれています
+2. **serviceRoutinesV2** と **mongoBackend** を新しい型に適合させます
 
 [トップ](#top)

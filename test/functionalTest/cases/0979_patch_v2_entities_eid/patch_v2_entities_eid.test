@@ -88,10 +88,10 @@ echo
 01. Intent to patch a non-existing entity - error, of course
 ============================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -102,20 +102,20 @@ Date: REGEX(.*)
 02. Create E1/attr1+attr2
 =========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 123
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 123
 
 {
     "attr1": {
@@ -136,18 +136,18 @@ Date: REGEX(.*)
 04. PATCH /v2/entities/E1 attr1=4
 =================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 123
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 123
 
 {
     "attr1": {
@@ -167,14 +167,14 @@ Date: REGEX(.*)
 
 06. PATCH /v2/entities/E1 attr3=6, to see the error (attr3 doesn't exist)
 =========================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 110
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
-    "description": "one or more of the attributes in the request do not exist: [ attr3 ]",
+    "description": "do not exist: E1 - [ attr3 ]",
     "error": "Unprocessable"
 }
 

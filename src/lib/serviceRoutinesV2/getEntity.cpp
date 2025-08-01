@@ -33,11 +33,9 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "rest/OrionError.h"
 #include "parse/forbiddenChars.h"
 
@@ -76,7 +74,7 @@ std::string getEntity
     return oe.toJson();
   }
 
-  if (forbiddenIdChars(ciP->apiVersion, entityId.c_str(), NULL))
+  if (forbiddenIdChars(entityId.c_str(), NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
@@ -84,7 +82,7 @@ std::string getEntity
   }
 
   // Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(entityId, type, "false", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill(entityId, "", type);
 
   // Get attrs and metadata filters from URL params
   setAttrsFilter(ciP->uriParam, ciP->uriParamOptions, &parseDataP->qcr.res.attrsList);
@@ -117,7 +115,7 @@ std::string getEntity
                                         parseDataP->qcr.res.metadataList.stringV));
 
     // response code the same of the wrapped operation
-    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    ciP->httpStatusCode = parseDataP->qcrs.res.error.code;
   }
   else
   {

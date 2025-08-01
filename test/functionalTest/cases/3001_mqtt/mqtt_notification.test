@@ -35,7 +35,7 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 #
 # Hint: use this to run the MQTT broker needed for this .test:
 #
-#   docker run -d -p 1883:1883 eclipse-mosquitto:1.6.7
+#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 #
 # 01. Create MQTT sub for entity E with topic sub1
 # 02. Create MQTT sub for entity E with topic sub2
@@ -187,40 +187,40 @@ echo
 01. Create MQTT sub for entity E with topic sub1
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Create MQTT sub for entity E with topic sub2
 ================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Create HTTP sub for entity E
 ================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 04. Create entity E with A=1
 ============================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
@@ -290,18 +290,18 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
 06. Update entity E with A=2
 ============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 07. GET subscriptions: 3 subs with timesSent 1 and lastSuccess
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 1259
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1379
 
 [
     {
@@ -315,6 +315,7 @@ Date: REGEX(.*)
             "lastSuccess": "REGEX(.*)",
             "mqtt": {
                 "qos": 0,
+                "retain": false,
                 "topic": "sub1",
                 "url": "mqtt://localhost:1883"
             },
@@ -324,7 +325,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -345,6 +347,7 @@ Date: REGEX(.*)
             "lastSuccess": "REGEX(.*)",
             "mqtt": {
                 "qos": 0,
+                "retain": false,
                 "topic": "sub2",
                 "url": "mqtt://localhost:1883"
             },
@@ -354,7 +357,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -383,7 +387,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {

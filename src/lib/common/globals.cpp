@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include <string>
 
@@ -35,7 +36,7 @@
 #include "common/globals.h"
 #include "common/sem.h"
 #include "alarmMgr/alarmMgr.h"
-#include "serviceRoutines/versionTreat.h"     // For orionInit()
+#include "serviceRoutinesV2/versionTreat.h"     // For orionInit()
 #include "mongoBackend/MongoGlobal.h"         // For orionInit()
 #include "mongoBackend/dbConstants.h"         // For mongoInit()
 
@@ -54,7 +55,6 @@ bool                   countersStatistics   = false;
 bool                   semWaitStatistics    = false;
 bool                   timingStatistics     = false;
 bool                   notifQueueStatistics = false;
-bool                   checkIdv1            = false;
 unsigned long long     inReqPayloadMaxSize  = DEFAULT_IN_REQ_PAYLOAD_MAX_SIZE;
 unsigned long long     outReqMsgMaxSize     = DEFAULT_OUT_REQ_MSG_MAX_SIZE;
 
@@ -193,8 +193,7 @@ void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics,
-  bool               _checkIdv1
+  bool               _notifQueueStatistics
 )
 {
   // Give the rest library the correct version string of this executable
@@ -226,40 +225,6 @@ void orionInit
   notifQueueStatistics = _notifQueueStatistics;
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
-
-  checkIdv1 = _checkIdv1;
-}
-
-
-
-/* ****************************************************************************
-*
-* isTrue - 
-*/
-bool isTrue(const std::string& s)
-{
-  if ((s == "true") || (s == "1"))
-  {
-    return true;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* isFalse - 
-*/
-bool isFalse(const std::string& s)
-{
-  if ((s == "false") || (s == "0"))
-  {
-    return true;
-  }
-
-  return false;
 }
 
 
@@ -302,175 +267,6 @@ double getCurrentTime(void)
   double t = getTimer()->getCurrentTime();
 
   return t;
-}
-
-
-
-/* ****************************************************************************
-*
-* toSeconds -
-*/
-int64_t toSeconds(int value, char what, bool dayPart)
-{
-  int64_t result = -1;
-
-  if (dayPart == true)
-  {
-    if (what == 'Y')
-    {
-      result = 365L * 24 * 3600 * value;
-    }
-    else if (what == 'M')
-    {
-      result = 30L * 24 * 3600 * value;
-    }
-    else if (what == 'W')
-    {
-      result = 7L * 24 * 3600 * value;
-    }
-    else if (what == 'D')
-    {
-      result = 24L * 3600 * value;
-    }
-  }
-  else
-  {
-    if (what == 'H')
-    {
-      result = 3600L * value;
-    }
-    else if (what == 'M')
-    {
-      result = 60L * value;
-    }
-    else if (what == 'S')
-    {
-      result = value;
-    }
-  }
-
-  if (result == -1)
-  {
-    alarmMgr.badInput(clientIp, "ERROR in duration string", std::string(1, what));
-  }
-
-  return result;
-}
-
-
-
-/*****************************************************************************
-*
-* parse8601 -
-*
-* This is common code for Duration and Throttling (at least)
-*
-*/
-int64_t parse8601(const std::string& s)
-{
-  if (s.empty())
-  {
-    return -1;
-  }
-
-  char*      duration    = strdup(s.c_str());
-  char*      toFree      = duration;
-  bool       dayPart     = true;
-  int64_t    accumulated = 0;
-  char*      start;
-
-  if (*duration != 'P')
-  {
-    free(toFree);
-    return -1;
-  }
-
-  ++duration;
-  start = duration;
-
-  if (*duration == 0)
-  {
-    free(toFree);
-    return -1;
-  }
-
-  bool digitsPending = false;
-
-  while (*duration != 0)
-  {
-    if (isdigit(*duration) || (*duration == '.') || (*duration == ','))
-    {
-      ++duration;
-      digitsPending = true;
-    }
-    else if ((dayPart == true) &&
-             ((*duration == 'Y') || (*duration == 'M') || (*duration == 'D') || (*duration == 'W')))
-    {
-      char what = *duration;
-
-      *duration = 0;
-      int value = atoi(start);
-
-      if ((value == 0) && (*start != '0'))
-      {
-        std::string details = std::string("parse error for duration '") + start + "'";
-        alarmMgr.badInput(clientIp, details, s);
-
-        free(toFree);
-        return -1;
-      }
-
-      accumulated += toSeconds(value, what, dayPart);
-      digitsPending = false;
-      ++duration;
-      start = duration;
-    }
-    else if ((dayPart == true) && (*duration == 'T'))
-    {
-      dayPart = false;
-      ++duration;
-      start = duration;
-      digitsPending = false;
-    }
-    else if ((dayPart == false) &&
-             ((*duration == 'H') || (*duration == 'M') || (*duration == 'S')))
-    {
-      char what = *duration;
-      int  value;
-
-      *duration = 0;
-
-      if (what == 'S')  // We support floats for the seconds, but only to round to an integer
-      {
-        // NOTE: here we use atof and not str2double on purpose
-        float secs  = atof(start);
-        value       = (int) round(secs);
-      }
-      else
-      {
-        value = atoi(start);
-      }
-
-      accumulated += toSeconds(value, what, dayPart);
-      digitsPending = false;
-      ++duration;
-      start = duration;
-    }
-    else
-    {
-      free(toFree);
-      return -1;  // ParseError
-    }
-  }
-
-  free(toFree);
-
-  if (digitsPending == true)
-  {
-    return -1;
-  }
-
-  return accumulated;
 }
 
 
@@ -536,10 +332,55 @@ static int timezoneOffset(const char* tz)
 
 /*****************************************************************************
 *
+* isLeapYear -
+*
+* This code will check, if the given year is a leap year or not.
+*
+*/
+bool isLeapYear(int year)
+{
+  // ref: https://www.geeksforgeeks.org/program-check-given-year-leap-year/
+  if (year % 400 == 0)
+  {
+    return true;
+  }
+  if ((year % 4 == 0) && (year % 100 != 0))
+  {
+    return true;
+  }
+  return false;
+}
+
+
+
+/*****************************************************************************
+*
+* daysInMonth -
+*
+* This code will check correct number of days in given month.
+*
+*/
+int daysInMonth(int year, int month)
+{
+  if (month == 1) //february
+  {
+    return isLeapYear(year) ? 29 : 28;
+  }
+  // for April, June, September, November
+  if (month == 3 || month == 5 || month == 8 || month == 10)
+  {
+    return 30;
+  }
+  // For all other months (Jan, March, May, July, Aug, October, December)
+  return 31;
+}
+
+
+
+/*****************************************************************************
+*
 * parse8601Time -
-*
-* This is common code for Duration and Throttling (at least).
-*
+**
 * Based in http://stackoverflow.com/questions/26895428/how-do-i-parse-an-iso-8601-date-with-optional-milliseconds-to-a-struct-tm-in-c
 *
 */
@@ -560,6 +401,18 @@ double parse8601Time(const std::string& ss)
   if (ss.length() > 29)
   {
     return -1;
+  }
+
+  // The following 'for' loop is implemented to handle a specific datetime case where the datetime string
+  // is '2016-04-05T14:10:0x.00Z'. This particular case is being incorrectly PASS through the
+  // sscanf() function i.e. used next to this 'for' loop.
+  for (int i = 0; ss[i] != '\0'; i++)
+  {
+    char c = ss[i];
+    if (isalpha(c) && c != 'T' && c != 'Z')
+    {
+      return -1;
+    }
   }
 
   // According to https://en.wikipedia.org/wiki/ISO_8601#Times, the following formats have to be supported
@@ -605,6 +458,25 @@ double parse8601Time(const std::string& ss)
   time.tm_hour = h;        // 0-23
   time.tm_min  = m;        // 0-59
   time.tm_sec  = (int) s;  // 0-61 (0-60 in C++11)
+
+  const int minYear = 0;
+  const int minMonth = 0;
+  const int maxMonth = 11;
+  const int minDay = 1;
+  const int maxDay = daysInMonth(y, time.tm_mon);
+  const int minHour = 0;
+  const int maxHour = 23;
+  const int minMinute = 0;
+  const int maxMinute = 59;
+  const int minSecond = 0;
+  const int maxSecond = 59;
+
+  if (time.tm_year < minYear || time.tm_mon < minMonth || time.tm_mon > maxMonth || time.tm_mday < minDay ||
+      time.tm_mday > maxDay || time.tm_hour < minHour || time.tm_hour > maxHour || time.tm_min < minMinute ||
+      time.tm_min > maxMinute || time.tm_sec < minSecond || time.tm_sec > maxSecond)
+  {
+    return -1;
+  }
 
   int64_t  totalSecs  = timegm(&time) - offset;
   float    millis     = s - (int) s;

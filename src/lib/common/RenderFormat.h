@@ -44,12 +44,13 @@
 typedef enum RenderFormat
 {
   NO_FORMAT              = 0,
-  NGSI_V1_LEGACY         = 1,
-  NGSI_V2_NORMALIZED     = 2,
-  NGSI_V2_KEYVALUES      = 3,
-  NGSI_V2_VALUES         = 4,
-  NGSI_V2_UNIQUE_VALUES  = 5,
-  NGSI_V2_CUSTOM         = 6
+  NGSI_V2_NORMALIZED     = 1,
+  NGSI_V2_KEYVALUES      = 2,
+  NGSI_V2_VALUES         = 3,
+  NGSI_V2_UNIQUE_VALUES  = 4,
+  NGSI_V2_CUSTOM         = 5,
+  NGSI_V2_SIMPLIFIEDNORMALIZED = 6,
+  NGSI_V2_SIMPLIFIEDKEYVALUES  = 7
 } RenderFormat;
 
 
@@ -58,7 +59,7 @@ typedef enum RenderFormat
 *
 * renderFormatToString - 
 */
-extern const char* renderFormatToString(RenderFormat format, bool noDefault = true, bool userLegacyWord = false);
+extern const char* renderFormatToString(RenderFormat format);
 
 
 

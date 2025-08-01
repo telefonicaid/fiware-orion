@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -471,34 +472,6 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
 /* ****************************************************************************
 *
-* validUrl - check validity of a URL
-*/
-bool validUrl(const std::string& url)
-{
-  std::string  host;
-  int          port;
-  std::string  path;
-  std::string  protocol;
-
-  return parseUrl(url, host, port, path, protocol);
-}
-
-
-
-/* ****************************************************************************
-*
-* i2s - integer to string
-*/
-char* i2s(int i, char* placeholder, int placeholderSize)
-{
-  snprintf(placeholder, placeholderSize, "%d", i);
-  return placeholder;
-}
-
-
-
-/* ****************************************************************************
-*
 * parsedUptime
 */
 std::string parsedUptime(int uptime)
@@ -520,32 +493,6 @@ std::string parsedUptime(int uptime)
 
   snprintf(s, sizeof(s), "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
-}
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - 
-*/
-bool onlyWs(const char* s)
-{
-  if (*s == 0)
-  {
-    return true;
-  }
-
-  while (*s != 0)
-  {
-    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
-    {
-      return false;
-    }
-
-    ++s;
-  }
-
-  return true;
 }
 
 
@@ -813,38 +760,6 @@ char* strToLower(char* to, const char* from, int toSize)
 
 /* ****************************************************************************
 *
-* strReplace - 
-*/
-void strReplace(char* to, int toLen, const char* from, const char* oldString, const char* newString)
-{
-  int toIx   = 0;
-  int fromIx = 0;
-  int oldLen = strlen(oldString);
-  int newLen = strlen(newString);
-
-  while (from[fromIx] != 0)
-  {
-    if (strncmp(&from[fromIx], oldString, oldLen) == 0)
-    {
-      strncat(to, newString, toLen - strlen(to));
-      toIx   += newLen;
-      fromIx += oldLen;
-    }
-    else
-    {
-      to[toIx] = from[fromIx];
-      toIx   += 1;
-      fromIx += 1;
-    }
-  }
-
-  to[toIx] = 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * servicePathCheck - check one single component of the service-path
 *
 * NOTE
@@ -964,11 +879,17 @@ std::string double2string(double f)
   long long  intPart   = (long long) f;
   double     diff      = f - intPart;
   bool       isInteger = false;
+  bool       large     = false;
 
   // abs value for 'diff'
   diff = (diff < 0)? -diff : diff;
 
-  if (diff > 0.9999999998)
+  if (diff > 1)
+  {
+    // this is an overflow situation, pe. f = 1.79e308
+    large = true;
+  }
+  else if (diff > 0.9999999998)
   {
     intPart += 1;
     isInteger = true;
@@ -984,7 +905,14 @@ std::string double2string(double f)
   }
   else
   {
-    snprintf(buf, bufSize, "%.9f", f);
+    if (large)
+    {
+      snprintf(buf, bufSize, "%.17g", f);
+    }
+    else
+    {
+      snprintf(buf, bufSize, "%.9f", f);
+    }
 
     // Clear out any unwanted trailing zeroes
     char* last = &buf[strlen(buf) - 1];
@@ -994,6 +922,14 @@ std::string double2string(double f)
       *last = 0;
       --last;
     }
+  }
+
+  /* At this point a value like 7.999999999536117 ends as "8." in buf
+   * which is not a legal JSON (see issue #4346). This check will remove
+   * the trailing dot in this case */
+  if (buf[strlen(buf) - 1] == '.')
+  {
+    buf[strlen(buf) - 1] = 0;
   }
 
   return std::string(buf);
@@ -1130,4 +1066,114 @@ bool regComp(regex_t* re, const char* pattern, int flags)
   LM_T(LmtRegexError, ("regcomp() failed for pattern '%s': %s", pattern, buffer));
 
   return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* htmlEscape - 
+*
+* Allocate a new buffer to hold an escaped version of the input buffer 's'.
+* Escaping characters demands more space in the buffer, for some characters up to six
+* characters - double-quote (") needs SIX chars: &quot;
+* So, when allocating room for the output (escaped) buffer, we need to consider the worst case
+* and six times the length of the input buffer is allocated (plus one byte for the zero-termination.
+*
+* See http://www.anglesanddangles.com/asciichart.php for more info on the 'html-escpaing' of ASCII chars.
+*/
+char* htmlEscape(const char* s)
+{
+  int   newLen  = strlen(s) * 6 + 1;  // See function header comment
+  char* out     = (char*) calloc(1, newLen);
+  int   sIx     = 0;
+  int   outIx   = 0;
+  
+  if (out == NULL)
+  {
+    LM_E(("Runtime Error (allocating %d bytes: %s)", newLen, strerror(errno)));
+    return NULL;
+  }
+
+  while (s[sIx] != 0)
+  {
+    switch (s[sIx])
+    {
+    case '<':
+      out[outIx++] = '&';
+      out[outIx++] = 'l';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '>':
+      out[outIx++] = '&';
+      out[outIx++] = 'g';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '(':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '0';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ')':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '=':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '6';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '\'':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '3';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '"':
+      out[outIx++] = '&';
+      out[outIx++] = 'q';
+      out[outIx++] = 'u';
+      out[outIx++] = 'o';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ';':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '5';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    default:
+      out[outIx++] = s[sIx++];
+    }
+  }
+
+  return out;
 }

@@ -29,19 +29,12 @@
 
 #include "common/RenderFormat.h"
 #include "common/globals.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextAttribute.h"
 #include "apiTypesV2/Entity.h"
 
 #include "mongoDriver/BSONObj.h"
-
-
-/* ****************************************************************************
-*
-* Forward declarations
-*/
-struct QueryContextResponse;
 
 
 
@@ -52,7 +45,7 @@ struct QueryContextResponse;
 typedef struct ContextElementResponse
 {
   Entity           entity;                     // Mandatory (represents a Context Element)
-  StatusCode       statusCode;                 // Mandatory
+  OrionError       error;                 // Mandatory
 
   bool             prune;                      // operational attribute used internally by the queryContext logic for not deleting entities that were
                                                // without attributes in the Orion DB
@@ -61,36 +54,18 @@ typedef struct ContextElementResponse
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP, bool cloneCompound = false);
   ContextElementResponse(const orion::BSONObj&  entityDoc,
-                         const StringList&      attrL,
-                         bool                   includeEmpty = true,
-                         ApiVersion             apiVersion   = V1);
+                         const StringList&      attrL);
   ContextElementResponse(Entity* eP, bool useDefaultType = false);
 
-  std::string  toJsonV1(bool                             asJsonObject,
-                        RequestType                      requestType,
-                        const std::vector<std::string>&  attrsFilter,
-                        bool                             blacklist,
-                        const std::vector<std::string>&  metadataFilter,
-                        bool                             comma               = false,
-                        bool                             omitAttributeValues = false);
+  std::string  toJson(RenderFormat                         renderFormat,
+                      const std::vector<std::string>&      attrsFilter,
+                      bool                                 blacklist,
+                      const std::vector<std::string>&      metadataFilter);
 
-  std::string  toJson(RenderFormat                     renderFormat,
-                      const std::vector<std::string>&  attrsFilter,
-                      bool                             blacklist,
-                      const std::vector<std::string>&  metadataFilter);
+  void         applyUpdateOperators(void);
 
   void         release(void);
 
-  std::string  check(ApiVersion          apiVersion,
-                     RequestType         requestType,
-                     const std::string&  predetectedError,
-                     int                 counter);
-
-  void                     fill(struct QueryContextResponse*  qcrP,
-                                const std::string&            entityId = "",
-                                const std::string&            entityType = "");
-  void                     fill(ContextElementResponse* cerP);
-  ContextElementResponse*  clone(void);
 } ContextElementResponse;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSE_H_

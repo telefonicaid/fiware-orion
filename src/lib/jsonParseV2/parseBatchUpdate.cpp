@@ -107,27 +107,29 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
       std::string r = parseEntityVector(ciP, iter, &burP->entities, false, true);
 
       if (r == "NotImplemented")
-      {
+      {        
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccNotImplemented, r, "NotImplemented");
         ciP->httpStatusCode = SccNotImplemented;
-        r = oe.toJson();
-        return r;
+        
+        burP->entities.release();
+        return oe.toJson();
       }
       else if (r != "OK")
-      {
+      {        
         alarmMgr.badInput(clientIp, r);
         oe.fill(SccBadRequest, r, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
-        r = oe.toJson();
-        return r;
+        
+        burP->entities.release();
+        return oe.toJson();
       }
     }
     else if (name == "actionType")
     {
       ActionType   actionType;
       std::string  actionTypeStr = iter->value.GetString();
-      if ((actionType = parseActionTypeV2(actionTypeStr)) == ActionTypeUnknown)
+      if ((actionType = parseActionType(actionTypeStr)) == ActionTypeUnknown)
       {
         std::string details = "invalid update action type: right ones are: "
           "append, appendStric, delete, replace, update";
@@ -136,6 +138,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
         oe.fill(SccBadRequest, details, ERROR_BAD_REQUEST);
         ciP->httpStatusCode = SccBadRequest;
 
+        burP->entities.release();
         return oe.toJson();
       }
       burP->updateActionType = actionType;
@@ -148,6 +151,7 @@ std::string parseBatchUpdate(ConnectionInfo* ciP, BatchUpdate* burP)
       oe.fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 
+      burP->entities.release();
       return oe.toJson();
     }
   }

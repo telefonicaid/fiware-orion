@@ -86,8 +86,7 @@ payload='{
   "provider": {
     "http": {
       "url": "http://localhost:'${LISTENER_PORT}'/badresponse"
-    },
-    "legacyForwarding": true
+    }
   }
 }'
 orionCurl --url /v2/registrations --payload "$payload"
@@ -106,30 +105,30 @@ echo
 01. Create entity E (local)
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/sensor001?type=TestType
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/sensor001?type=TestType
+Content-Length: 0
 
 
 
 02. Register CPr which does not response correctly
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Query for entity, get example_attr correctly
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 375
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 375
 
 {
     "example_attr": {

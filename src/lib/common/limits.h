@@ -151,8 +151,10 @@
 /* ****************************************************************************
 *
 * MAX_HTTP_TIMEOUT - 1800000 milliseconds, 30 minutes
+* MAX_MQTT_TIMEOUT - 1800000 milliseconds, 30 minutes
 */
 #define MAX_HTTP_TIMEOUT     1800000
+#define MAX_MQTT_TIMEOUT     1800000
 
 
 /* ****************************************************************************
@@ -224,6 +226,16 @@
 * see https://docs.mongodb.com/manual/reference/limits/#Nested-Depth-for-BSON-Documents
 */
 #define MAX_JSON_NESTING  50
+
+
+
+/* ****************************************************************************
+*
+* MIX_PRIORITY and MAX_PRIORITY
+*
+*/
+#define MIN_PRIORITY  1
+#define MAX_PRIORITY  100000
 
 
 

@@ -1,0 +1,205 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+DateTime with min and max operators errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E1 with DateTime T=2024-04-15T10:59:59.000Z
+# 02. Update entity with {$min: 2025x-04-15T10:59:59.000Z}, see error
+# 03. Update entity with {$max: 2023x-04-15T10:59:59.000Z, see error
+# 04. Update entity with {$mxn: 2025-04-15T10:59:59.000Z}, see error
+# 05. Update entity with {$max: 2025-04-15T10:59:59.000Z, foo: 1}, see error
+# 06. Get entity see T=2024-04-15T10:59:59.000Z (entity not modified)
+#
+
+
+echo '01. Create entity E1 with DateTime T=2024-04-15T10:59:59.000Z'
+echo '============================================================='
+payload='{
+  "id": "E1",
+  "type": "T",
+  "T": {
+    "value": "2024-04-15T10:59:59.000Z",
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Update entity with {$min: 2025x-04-15T10:59:59.000Z}, see error'
+echo "==================================================================="
+payload='{
+  "T": {
+    "value": {"$min": "2025x-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '03. Update entity with {$max: 2023x-04-15T10:59:59.000Z, see error'
+echo "=================================================================="
+payload='{
+  "T": {
+    "value": {"$max": "2023x-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '04. Update entity with {$mxn: 2025-04-15T10:59:59.000Z}, see error'
+echo "=================================================================="
+payload='{
+  "T": {
+    "value": {"$mxn": "2025-04-15T10:59:59.000Z"},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo '05. Update entity with {$max: 2025-04-15T10:59:59.000Z, foo: 1}, see error'
+echo "=========================================================================="
+payload='{
+  "T": {
+    "value": {"$max": "2025-04-15T10:59:59.000Z", "foo": 1},
+    "type": "DateTime"
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "06. Get entity see T=2024-04-15T10:59:59.000Z (entity not modified)"
+echo "==================================================================="
+orionCurl --url /v2/entities/E1
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create entity E1 with DateTime T=2024-04-15T10:59:59.000Z
+=============================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+02. Update entity with {$min: 2025x-04-15T10:59:59.000Z}, see error
+===================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 81
+
+{
+    "description": "date has invalid format in attribute value",
+    "error": "BadRequest"
+}
+
+
+03. Update entity with {$max: 2023x-04-15T10:59:59.000Z, see error
+==================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 81
+
+{
+    "description": "date has invalid format in attribute value",
+    "error": "BadRequest"
+}
+
+
+04. Update entity with {$mxn: 2025-04-15T10:59:59.000Z}, see error
+==================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 81
+
+{
+    "description": "date has invalid format in attribute value",
+    "error": "BadRequest"
+}
+
+
+05. Update entity with {$max: 2025-04-15T10:59:59.000Z, foo: 1}, see error
+==========================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 81
+
+{
+    "description": "date has invalid format in attribute value",
+    "error": "BadRequest"
+}
+
+
+06. Get entity see T=2024-04-15T10:59:59.000Z (entity not modified)
+===================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
+
+{
+    "T": {
+        "metadata": {},
+        "type": "DateTime",
+        "value": "2024-04-15T10:59:59.000Z"
+    },
+    "id": "E1",
+    "type": "T"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -31,6 +31,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
 #include "apiTypesV2/SubscriptionUpdate.h"
 #include "rest/OrionError.h"
 #include "alarmMgr/alarmMgr.h"
@@ -53,7 +54,6 @@
 using ngsiv2::HttpInfo;
 using ngsiv2::Subscription;
 using ngsiv2::SubscriptionUpdate;
-using ngsiv2::EntID;
 
 
 /* ****************************************************************************
@@ -61,7 +61,7 @@ using ngsiv2::EntID;
 * setNotificationInfo -
 *
 * This function does the cleanup ($unset) corresponding to a potential change
-* of notificaiton type. Then, it calls the setNotificationInfo() in MongoCommonSubscription.h/cpp
+* of notification type. Then, it calls the setNotificationInfo() in MongoCommonSubscription.h/cpp
 */
 void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, orion::BSONObjBuilder* unsetB)
 {
@@ -69,16 +69,28 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
   {
     unsetB->append(CSUB_MQTTTOPIC, 1);
     unsetB->append(CSUB_MQTTQOS,   1);
+    unsetB->append(CSUB_MQTTRETAIN, 1);
     unsetB->append(CSUB_USER,      1);
     unsetB->append(CSUB_PASSWD,    1);
 
-    if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
+    if  (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.httpInfo.includePayload) && (sub.notification.httpInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
+    }
+    else if (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Json)
     {
       unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
     }
-
-    if (sub.notification.httpInfo.json == NULL)
+    else  // (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
     {
+      unsetB->append(CSUB_PAYLOAD, 1);
       unsetB->append(CSUB_JSON, 1);
     }
   }
@@ -95,14 +107,25 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PASSWD, 1);
     }
 
-    if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
-    {
-      unsetB->append(CSUB_PAYLOAD, 1);
-    }
-
-    if (sub.notification.mqttInfo.json == NULL)
+    if  (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
     {
       unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.mqttInfo.includePayload) && (sub.notification.mqttInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
+    }
+    else if (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+    {
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else  // (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_PAYLOAD, 1);
     }
   }
 
@@ -122,26 +145,21 @@ static void updateInCache
   const std::string&         tenant
 )
 {
-  //
-  // StringFilter in Scope?
-  //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
-  // If so, set it as string filter to the sub-cache item
-  //
-  StringFilter*  stringFilterP   = NULL;
-  StringFilter*  mdStringFilterP = NULL;
+  // set strinFilterP and mdStringFilterP (they will be used later in subCacheItemInsert)
+  std::string err;
 
-  for (unsigned int ix = 0; ix < subUp.restriction.scopeVector.size(); ++ix)
+  StringFilter* stringFilterP = subUp.subject.condition.expression.stringFilter.clone(&err);
+  if (stringFilterP == NULL)
   {
-    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      stringFilterP = subUp.restriction.scopeVector[ix]->stringFilterP;
-    }
+    LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
+    return;
+  }
 
-    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      mdStringFilterP = subUp.restriction.scopeVector[ix]->mdStringFilterP;
-    }
+  StringFilter* mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
+  if (stringFilterP == NULL)
+  {
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
+    return;
   }
 
   //
@@ -209,6 +227,8 @@ static void updateInCache
   long long    lastSuccessCode;
   long long    count;
   long long    failsCounter;
+  long long    failsCounterFromDb;
+  bool         failsCounterFromDbValid;
   std::string  status;
   double       statusLastChange;
 
@@ -221,6 +241,8 @@ static void updateInCache
     lastSuccessCode      = subCacheP->lastSuccessCode;
     count                = subCacheP->count;
     failsCounter         = subCacheP->failsCounter;
+    failsCounterFromDb   = subCacheP->failsCounterFromDb;
+    failsCounterFromDbValid = subCacheP->failsCounterFromDbValid;
     status               = subCacheP->status;
     statusLastChange     = subCacheP->statusLastChange;
   }
@@ -233,6 +255,8 @@ static void updateInCache
     lastSuccessCode      = -1;
     count                = 0;
     failsCounter         = 0;
+    failsCounterFromDb   = 0;
+    failsCounterFromDbValid = false;
     status               = "";
     statusLastChange     = -1;
   }
@@ -256,6 +280,8 @@ static void updateInCache
                                           lastSuccessCode,
                                           count,
                                           failsCounter,
+                                          failsCounterFromDb,
+                                          failsCounterFromDbValid,
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           effectiveStatus,
                                           effectiveStatusLastChante,
@@ -321,7 +347,7 @@ std::string mongoUpdateSubscription
 
   setServicePath(servicePath, &setB);
 
-  if (subUp.subjectProvided)       setEntities(subUp, &setB, subUp.fromNgsiv1);
+  if (subUp.subjectProvided)       setEntities(subUp, &setB);
   if (subUp.subjectProvided)       setConds(subUp, &setB);
   if (subUp.subjectProvided)       setOperations(subUp, &setB);
   if (subUp.subjectProvided)       setExpression(subUp, &setB);
@@ -335,8 +361,8 @@ std::string mongoUpdateSubscription
   if (subUp.blacklistProvided)     setBlacklist(subUp, &setB);
   if (subUp.onlyChangedProvided)   setOnlyChanged(subUp, &setB);
   if (subUp.coveredProvided)       setCovered(subUp, &setB);
+  if (subUp.notifyOnMetadataChangeProvided) setNotifyOnMetadataChange(subUp, &setB);
   if (subUp.attrsFormatProvided)   setFormat(subUp, &setB);
-
 
   // Description is special, as "" value removes the field
   if (subUp.descriptionProvided)

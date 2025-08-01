@@ -43,10 +43,10 @@ echo
 01. Getting version via REST
 ============================
 HTTP/1.1 200 OK
-Content-Length: REGEX(\d+)
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
 
 {
 "orion" : {
@@ -58,17 +58,7 @@ Date: REGEX(.*)
   "compiled_in" : "REGEX(.*)",
   "release_date" : "REGEX(.*)",
   "machine" : "REGEX(.*)",
-  "doc" : "REGEX(.*)",
-  "libversions": {
-     "boost": "REGEX(.*)",
-     "libcurl": "REGEX(.*)",
-     "libmosquitto": "REGEX(.*)",
-     "libmicrohttpd": "REGEX(.*)",
-     "openssl": "REGEX(.*)",
-     "rapidjson": "REGEX(.*)",
-     "mongoc": "REGEX(.*)",
-     "bson": "REGEX(.*)"
-  }
+  "doc" : "REGEX(.*)"
 }
 }
 

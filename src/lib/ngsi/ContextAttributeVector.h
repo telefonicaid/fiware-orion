@@ -30,7 +30,10 @@
 
 #include "common/RenderFormat.h"
 #include "ngsi/ContextAttribute.h"
+#include "ngsi/StringList.h"
 
+#include "mongoDriver/BSONObj.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 /* ****************************************************************************
@@ -49,22 +52,22 @@ typedef struct ContextAttributeVector
   unsigned int             size(void) const;
   void                     release(void);
   void                     fill(const ContextAttributeVector& caV, bool useDefaultType = false, bool cloneCompounds = false);
+  void                     fill(const orion::BSONObj& attrs, const StringList& attrL);
+  void                     fill(const orion::BSONObj& attrs);
   int                      get(const std::string& attributeName) const;
 
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(ApiVersion apiVersion, RequestType requestType);
-
-  std::string        toJsonV1(bool                                   asJsonObject,
-                              RequestType                            requestType,
-                              const std::vector<ContextAttribute*>&  orderedAttrs,
-                              const std::vector<std::string>&        metadataFilter,
-                              bool                                   comma       = false,
-                              bool                                   omitValue   = false,
-                              bool                                   attrsAsName = false);
+  std::string        check(bool asValue);
 
   std::string        toJsonTypes(void);
+
+  void               toBson(double                    now,
+                            orion::BSONObjBuilder*    attrsToAdd,
+                            orion::BSONArrayBuilder*  attrNamesToAdd) const;
+
+  void               applyUpdateOperators(void);
 
 } ContextAttributeVector;
 

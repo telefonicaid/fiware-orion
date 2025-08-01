@@ -31,7 +31,7 @@
 */
 void* startSenderThread(void* p)
 {
-  std::vector<SenderThreadParams*>* paramsV = (std::vector<SenderThreadParams*>*) p;
+  SenderThreadParams* paramsV = (SenderThreadParams*) p;
 
   // process paramV to send notification (freeing memory after use)
   // note NULL in queue statistics (it doesn't make sense in this case) and curl object (will be generated internally in doNotify)

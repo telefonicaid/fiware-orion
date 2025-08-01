@@ -18,81 +18,42 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
-    AttributeExpression.cpp
-    ConditionValueList.cpp
     ContextAttribute.cpp
     ContextAttributeVector.cpp
     ContextElementResponse.cpp
     ContextElementResponseVector.cpp
-    ContextRegistration.cpp
-    ContextRegistrationVector.cpp
-    ContextRegistrationAttribute.cpp
-    ContextRegistrationAttributeVector.cpp
-    ContextRegistrationResponse.cpp
-    ContextRegistrationResponseVector.cpp
-    Duration.cpp
     EntityId.cpp
     EntityIdVector.cpp
     Metadata.cpp
     MetadataVector.cpp
-    NotifyCondition.cpp
-    NotifyConditionVector.cpp
-    Originator.cpp
-    ProvidingApplication.cpp
-    Reference.cpp
-    RegistrationId.cpp
     Request.cpp
-    Restriction.cpp
-    RestrictionString.cpp
-    Scope.cpp
-    ScopeVector.cpp
-    StatusCode.cpp
     StringList.cpp
-    SubscribeResponse.cpp
-    SubscribeError.cpp
-    SubscriptionId.cpp
-    Throttling.cpp
+    NotifyContextRequest.cpp
+    QueryContextRequest.cpp
+    QueryContextResponse.cpp
+    UpdateContextRequest.cpp
+    UpdateContextResponse.cpp
 )
 
 SET (HEADERS
-    AttributeExpression.h
-    ConditionValueList.h
     ContextAttribute.h
     ContextAttributeVector.h
     ContextElementResponse.h
     ContextElementResponseVector.h
-    ContextRegistrationAttribute.h
-    ContextRegistrationAttributeVector.h
-    ContextRegistration.h
-    ContextRegistrationVector.h
-    ContextRegistrationResponse.h
-    ContextRegistrationResponseVector.h
-    Duration.h
     EntityId.h
     EntityIdVector.h
     Metadata.h
     MetadataVector.h
-    NotifyCondition.h
-    NotifyConditionVector.h
-    Originator.h
-    ProvidingApplication.h
-    Reference.h
-    RegistrationId.h
-    Restriction.h
-    RestrictionString.h
-    Scope.h
-    StatusCode.h
     StringList.h
-    SubscribeError.h
-    SubscribeResponse.h
-    SubscriptionId.h
-    Throttling.h
+    NotifyContextRequest.h
+    QueryContextRequest.h
+    QueryContextResponse.h
+    UpdateContextRequest.h
+    UpdateContextResponse.h
 )
-
-
 
 # Include directories
 # -----------------------------------------------------------------

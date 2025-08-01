@@ -117,20 +117,20 @@ echo
 01. Create E1 with an attribute of each type (S: string, I: number, B: bool, N: null, O: json object, A: json array)
 ====================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. GET S with Accept header text/plain - see plain text
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 "S"
 
@@ -138,10 +138,10 @@ Date: REGEX(.*)
 03. GET S with Accept header */* - see plain text
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 "S"
 
@@ -149,10 +149,10 @@ Date: REGEX(.*)
 04. GET S with Accept header text/* - see plain text
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 "S"
 
@@ -160,10 +160,10 @@ Date: REGEX(.*)
 05. GET S with Accept header text/plain, application/json - see plain text
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 "S"
 
@@ -171,10 +171,10 @@ Date: REGEX(.*)
 06. GET S with Accept header application/json, text/plain - see plain text
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 "S"
 
@@ -182,10 +182,10 @@ Date: REGEX(.*)
 07. GET S with Accept header text/*, application/json - see plain text
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 "S"
 
@@ -193,10 +193,10 @@ Date: REGEX(.*)
 08. GET S with Accept header text/*;q=0.3,application/json;q=0.8 - see plain text (q is overridden)
 ===================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 "S"
 
@@ -204,10 +204,10 @@ Date: REGEX(.*)
 09. GET S with Accept header application/json - see error
 =========================================================
 HTTP/1.1 406 Not Acceptable
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "accepted MIME types: text/plain",

@@ -7,15 +7,10 @@
 * [src/lib/orionTypes/](#srcliboriontypes) (Common types)
 * [src/lib/rest/](#srclibrest) (REST interface, using external library microhttpd)
 * [src/lib/ngsi/](#srclibngsi) (Common NGSI types)
-* [src/lib/ngsi10/](#srclibngsi10) (Common NGSI10 types, NGSI10 = context management)
-* [src/lib/ngsi9/](#srclibngsi9) (Common NGSI9 types, NGSI9 = context management availability)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 types)
 * [src/lib/parse/](#srclibparse) (Common functions and types for payload parsing)
-* [src/lib/jsonParse/](#srclibjsonparse) (Parsing of JSON payload for NGSIv1 requests, using external library Boost property_tree)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (Parsing of JSON payload for NGSIv2 requests, using external library rapidjson)
-* [src/lib/serviceRoutines/](#srclibserviceroutines) (Service routines for NGSIv1)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (Service routines for NGSIv2)
-* [src/lib/convenience/](#srclibconvenience) (Convenience operations in NGSIv1)
 * [src/lib/mongoBackend/](#srclibmongobackend) (Database operations implementation)
 * [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI notifications)
@@ -24,6 +19,7 @@
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
 * [src/lib/logSummary/](#srcliblogsummary) (Log Summary implementation)
 * [src/lib/metricsMgr/](#srclibmetricsmgr) (Metrics Manager implementation)
+* [src/lib/expressions/](#srclibexpressions) (Custom notification expressions support)
 
 ## src/app/contextBroker/
 The main program is found in `contextBroker.cpp` and its purpose it to:
@@ -106,6 +102,8 @@ The library also contains a few other modules, namely:
 * OrionValueType, that is a type used to keep track of the 'JSON type' that an attribute/metadata-value is of.
 * areas, containing geometrical shapes, such as Point, Line, Box, Circle and Polygon.
 
+There is a [pending task](architecture.md#still-pending) to merge **ngsi**, **orionTypes** and **apiTypesV2** into a single set of types.
+
 [Top](#top)
 
 
@@ -171,7 +169,7 @@ _RQ-02: Treatment of a request_
 
 * `orion::requestServe()` calls `restService()` (step 1).
 * Also, if payload is present, `restService()` calls `payloadParse()` to parse the payload (step 2). Details are provided in the diagram [PP-01](#flow-pp-01).
-* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceFunctions and lib/serviceFunctionV2, please see the `RestService` vectors in [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker)).
+* The service function of the request takes over (step 3). The service function is chosen based on the **URL path** and **HTTP Method** used in the request. To determine which of all the service functions (found in lib/serviceRoutinesV2, please see the `RestService` vectors in [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker)).
 * The service function may invoke a lower level service function. See [the service routines mapping document](ServiceRoutines.txt) for details (step 4).
 * Finally, a function in [the **mongoBackend** library](#srclibmongobackend) is invoked (step 5). The MB diagrams provide detailed descriptions for the different cases.
 * A response string is created by the Service Routine and returned to `restService()` (step 6).
@@ -181,9 +179,8 @@ _RQ-02: Treatment of a request_
 
 ### `payloadParse()`
 
-The payload to Orion can be of three different types:
+The payload to Orion can be of two different types:
 
-* V1 JSON,
 * V2 JSON,
 * Plain Text
 
@@ -197,7 +194,23 @@ The JSON parse implementations reside in dedicated libraries while the text pars
 
 
 ## src/lib/ngsi/
-The **ngsi** library contains a collection of classes for the different payloads that constitutes the common part of the ngsi9 and ngsi10 protocols. Here you find basic classes like:
+The **ngsi** library contains a collection of classes for the different payloads that comes from the old version of the NGSI API (named NGSIv1).
+
+There is a [pending task](architecture.md#still-pending) to merge **ngsi**, **orionTypes** and **apiTypesV2** into a single set of types.
+
+It contains the top hierarchy classes for requests (and responses):
+
+* `UpdateContextRequest`
+* `UpdateContextResponse`
+* `QueryContextRequest`
+* `QueryContextResponse`
+* `SubscribeContextRequest`
+* `SubscribeContextResponse`
+* `UnsubscribeContextRequest`
+* `UnsubscribeContextResponse`
+* `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
+
+And basic classes:
 
 * `EntityId`
 * `EntityIdVector`
@@ -205,25 +218,23 @@ The **ngsi** library contains a collection of classes for the different payloads
 * `ContextAttributeVector`
 * `Metadata`
 * `MetadataVector`
+* etc.
 
 ### Methods and hierarchy
 
-These classes (as well as the classes in the libraries `ngsi9`, `ngsi10`, `convenience`) all have a standard set of methods:
+These classes all have a standard set of methods:
 
-* `toJson()`, to render the object to a JSON string (for NGSIv2). This method levarages `JsonObjectHelper` and `JsonVectorHelper`
+* `toJson()`, to render the object to a JSON string. This method levarages `JsonObjectHelper` and `JsonVectorHelper`
   in order to simplify the rendering process. This way you just add the elements you needs to print using `add*()` methods and don't
   need to bother with starting/ending brackets, quotes and comma control.
-* `toJsonV1()`, to render the object to a JSON string (for NGSIv1)
 * `present()`, for debugging (the object is dumped as text to the log file)
 * `release()`, to release all allocated resources of the object
 * `check()`, to make sure the object follows the rules, i.e. about no forbidden characters, or mandatory fields missing, etc.
 
-The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi10 library) contains a
+The classes follow a hierarchy, e.g. `UpdateContextRequest` (top hierarchy class found in the ngsi library) contains a
 `EntityVector`. `EntityVector` is of course a vector of `Entity`.
 
 Note that both `EntityVector` and `Entity` classes doesn't belong to this library, but to [`src/lib/apiTypesV2`](#srclibapitypesv2).
-In general, given that NGSIv1 is now deprecated, we try to use NGSIv2 classes as much as possible, reducing the number
-of equivalente classes within `src/lib/ngsi`.
 
 The methods `toJson()`, `check()`, `release()`, etc. are called in a tree-like fashion, starting from the top hierarchy class, e.g. `UpdateContextRequest`:
 
@@ -240,47 +251,14 @@ Each class invokes the method for its underlying classes. The example above was 
 [Top](#top)
 
 
-## src/lib/ngsi10/
-The **ngsi10** library contains the top hierarchy classes for NGSI10 (NGSIv1) requests (and responses):
-
-* `UpdateContextRequest`
-* `UpdateContextResponse`
-* `QueryContextRequest`
-* `QueryContextResponse`
-* `SubscribeContextRequest`
-* `SubscribeContextResponse`
-* `UpdateContextSubscriptionRequest`
-* `UpdateContextSubscriptionResponse`
-* `UnsubscribeContextRequest`
-* `UnsubscribeContextResponse`
-* `NotifyContextRequest` (outgoing request, sent by Orion, to notify subscribers)
-* `NotifyContextResponse` (incoming response from subscriber)
-
-See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
-
-[Top](#top)
-
-
-## src/lib/ngsi9/
-Just like the ngsi10 library, the **ngsi9** library contains the top hierarchy classes for NGSI9 (NGSIv1) requests:
-
-* `RegisterContextRequest`
-* `RegisterContextResponse`
-* `DiscoverContextAvailabilityRequest`
-* `DiscoverContextAvailabilityResponse`
-
-See the explanation of methods and hierarchy of the [**ngsi** library](#methods-and-hierarchy).
-
-[Top](#top)
-
-
 ## src/lib/apiTypesV2/
-The **apiTypesV2** library, just like the ngsi* libraries, contains classes; both basic classes (like the library **ngsi**) and top hierarchy classes (like the libraries **ngsi9** and **ngsi10**), for NGSIv2, the improved NGSI protocol.
+The **apiTypesV2** library, just like the ngsi library contains classes; both basic classes and top hierarchy classes.
 
 The hierarchical methods `release()`, `toJson()`, `check()`, etc. are found in these classes as well.
 
-[Top](#top)
+There is a [pending task](architecture.md#still-pending) to merge **ngsi**, **orionTypes** and **apiTypesV2** into a single set of types.
 
+[Top](#top)
 
 ## src/lib/parse/
 The **parse** library contains types and functions that are common to all types of payload parsing.
@@ -299,16 +277,6 @@ _PP-02: Parsing a text payload_
 [Top](#top)
 
 
-## src/lib/jsonParse/
-This library takes care of the JSON parsing of payload for NGSIv1 requests. It depends on the [Boost library property_tree](https://theboostcpplibraries.com/boost.propertytree) and uses SAX to translate the incoming JSON text into the ngsi classes.
-
-This library contains a vector of the type `JsonRequest`, that defines how to parse the different requests. The function `jsonTreat()` picks the parsing method and `jsonParse()` takes care of the parsing, with help from the Boost property_tree library.
-
-See detailed explanation of the V1 JSON parse implementation in its [dedicated document](jsonParse.md).
-
-[Top](#top)
-
-
 ## src/lib/jsonParseV2/
 This is where the newer NGSIv2 request payloads are parsed, using DOM. The [rapidjson](http://rapidjson.org/) library is used to parse the JSON payload, while the purpose of **jsonParseV2** (apart from invoking rapidjson) is to build a tree of objects representing the JSON payload.
 
@@ -319,8 +287,8 @@ See detailed explanation of the V2 JSON parse implementation in its [dedicated d
 [Top](#top)
 
 
-## src/lib/serviceRoutines/
-The **serviceRoutines** library is where the incoming requests are treated and sent to [**mongoBackend** library](#srclibmongobackend) for final processing.
+## src/lib/serviceRoutinesV2/
+The **serviceRoutinesV2** library is where the incoming requests are treated and sent to [**mongoBackend** library](#srclibmongobackend) for final processing.
 
 Two service routines are especially important as many other service routines end up calling them (see [the service routines mapping document](ServiceRoutines.txt) for details]):
 
@@ -362,25 +330,9 @@ typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vecto
 
 So, for the rest library to find the service routine of an incoming request, it uses the vectors of `RestService` as passed as the first seven parameters to `restInit()`, which are searched until an item matching the verb/method and the URL PATH and when the `RestService` item is found, the service routine is also found, as it is a part of a `RestService` item.
 
+Note some service routines invoke other service routines. See [the service routines mapping document](ServiceRoutines.txt) for details.
 
 [Top](#top)
-
-
-## src/lib/serviceRoutinesV2/
-Similar to the **serviceRoutines** library described above, the **serviceRoutinesV2** library contains the service routines for NGSIv2 requests.
-
-Some NGSIv2 service routines invoke [**mongoBackend**](#srclibmongobackend) directly. Others rely on a lower level service routine. See [the service routines mapping document](ServiceRoutines.txt) for details.
-
-[Top](#top)
-
-
-## src/lib/convenience/
-The **convenience** library contains top hierarchy classes for the NGSIv1 convenience operations. For a complete list of these requests (and the service routines in which they are based), kindly see [the service routines mapping document](ServiceRoutines.txt).
-
-This library is similar to the [**ngsi9**](#srclibngsi9) and [**ngsi10**](#srclibngsi10) libraries.
-
-[Top](#top)
-
 
 ## src/lib/mongoBackend/
 
@@ -457,7 +409,7 @@ Another important aspect of this library is that the notifications are sent by s
 
 Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be started with a thread pool for sending of notifications (`-notificationMode threadpool`). If so, during Orion startup, a pool of threads is created and these threads await new items in the notification queue and when an item becomes present, it is taken from the queue and processed, sending the notification in question. If the thread pool is not used, then a thread will be created for each notification to be sent (default value of `-notificationMode` is "transient", which gives this behaviour). More information on notification modes can be found in [this section of the Orion administration manual](../admin/perf_tuning.md#notification-modes-and-performance).
 
-This module is always invoked from `processOnChangeConditionForUpdateContext()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
+This module is always invoked from `processNotification()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
 
 The following four images demonstrate the program flow for context entity notifications without and with thread pool, both in the case
 of HTTP and MQTT notifications.
@@ -467,10 +419,10 @@ of HTTP and MQTT notifications.
 
 _NF-01: HTTP Notification on entity-attribute Update/Creation without thread pool_
 
-* A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
 * `pthread_create()` is called to create a new thread for sending of the notifications and without awaiting any result, the control is returned to mongoBackend (step 2).
 * `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 3).
-* `startSenderThread()` calls to `doNotify()` function, which loops over the `SenderThreadParams` vector and sends a notification per item (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
+* `startSenderThread()` calls to `doNotify()` function, which sends the notification corresponding to the `SenderThreadParams` object (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout).
 
 <a name="flow-nf-01b"></a>
 ![MQTT Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
@@ -486,13 +438,13 @@ _NF-01b: MQTT Notification on entity-attribute Update/Creation without thread po
 
 _NF-03: HTTP Notification on entity-attribute Update/Creation with thread pool_
 
-* A vector of `SenderThreadParams` is built, each item of this vector corresponding to one notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
 * A `ServiceQueue` is selected depending the service associated to the notification. If no queue exists for the service
   associated to the notification, then the default `ServiceQueue` is used. The `try_push()` method in the selected
   `ServiceQueue` is used to put the notification in the right queue (step 2).
-* The vector is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
+* The object is pushed onto the Notification Message Queue (step 3). This is done using `SyncQOverflow::try_push()`, which uses the notification queue semaphore to synchronize access to the queue (see [this document for more detail](semaphores.md#notification-queue-semaphore)). The threads that receive from the queue take care of sending the notification asap.
 * One of the worker threads in the thread pool pops an item from the message queue (step 4). This is done using `SyncQOverflow::pop()`, which uses the notification queue semaphore to synchronize access to the queue.
-* The worker thread calls to `doNotify()` function, which loops over the `SenderThreadParam` vector of the popped queue item and sends one notification per `SenderThreadParams` item in the vector (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout), and all notifications are done in a serialized manner.
+* The worker thread calls to `doNotify()` function, which takes the `SenderThreadParam` object of the popped queue item and sends the corresponding notification (steps 5, 6 and 7). The response from the receiver of the notification is waited on (with a timeout).
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
 
 <a name="flow-nf-03b"></a>
@@ -524,9 +476,6 @@ the [**ngsiNotify** library](#srclibngsinotify).
 ## src/lib/cache/
 To gain efficiency, Orion keeps its subscriptions in RAM, and a Subscription Cache Manager has been implemented for this purpose (more detail on the subscription cache in [this section of the Orion administration manual](../admin/perf_tuning.md#subscription-cache)).
 
-One of the main reasons for this cache is that when performing subscription matching at DB level, the operator `$where` must be used in MongoDB, and this
-is not at all recommended (it involves JavaScript execution at DB level, which has both performance and security problems).
-
 When the broker starts, the contents of the [csubs collection](../admin/database_model.md#csubs-collection) is extracted from the database and the subscription cache is populated.
 When a subscription is updated/created, the subscription cache is modified, but also the database. In this sense, the subscription cache is "write-through".
 
@@ -552,5 +501,10 @@ What it does is basically to compile a summary of the current state of the Alara
 To have similar metrics throughout the platform, a common set of metrics were invented and in the case of Orion, a manager was implemented for this purpose.
 This Metrics Manager resides in the library **metricsMgr**.
 For information about the metrics, please refer to [this document](../admin/metrics_api.md).
+
+[Top](#top)
+
+## src/lib/expressions/
+Provides support to the [macro substition logic used by custom notifications](../orion-api.md#macro-substitution). This library provides an abstraction for expression evaluation, providing two implementations: JEXL based and basic replacement based (the implementation to use is choosen at building time, based on the availability of the cjex library).
 
 [Top](#top)

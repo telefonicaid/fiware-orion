@@ -36,16 +36,11 @@
 
 /* ****************************************************************************
 *
-* FIWARE_LOCATION - 
+* FIWARE_LOCATION_V2 - 
 */
-#define FIWARE_LOCATION             "FIWARE::Location"
-#define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 #define FIWARE_LOCATION_V2          "FIWARE::Location::NGSIv2"
 
 #define EARTH_RADIUS_METERS         6371000
-
-#define LOCATION_WGS84              "WGS84"
-#define LOCATION_WGS84_LEGACY       "WSG84"    // We fixed the right string at 0.17.0, but the old one needs to be mantained
 
 
 
@@ -95,6 +90,7 @@
 #define DATE_MODIFIED   "dateModified"
 #define DATE_EXPIRES    "dateExpires"
 #define ALTERATION_TYPE "alterationType"
+#define SERVICE_PATH    "servicePath"
 #define ALL_ATTRS       "*"
 
 
@@ -129,7 +125,8 @@
 #define OPT_FORCEDUPDATE                "forcedUpdate"
 #define OPT_OVERRIDEMETADATA            "overrideMetadata"
 #define OPT_SKIPFORWARDING              "skipForwarding"
-
+#define OPT_FULL_COUNTERS               "fullCounters"
+#define OPT_LIB_VERSIONS                "libVersions"  // used in GET /version operation
 
 
 /* ****************************************************************************
@@ -148,23 +145,8 @@ typedef enum Ngsiv2Flavour
 {
   NGSIV2_NO_FLAVOUR               = 0,
   NGSIV2_FLAVOUR_ONCREATE         = 1,
-  NGSIV2_FLAVOUR_ONAPPEND         = 2,
-  NGSIV2_FLAVOUR_ONUPDATE         = 3
+  NGSIV2_FLAVOUR_ONAPPEND         = 2
 } Ngsiv2Flavour;
-
-
-
-/* ****************************************************************************
-*
-*  NGSI API version -
-*/
-typedef enum ApiVersion
-{
-  NO_VERSION  = -1,
-  ADMIN_API   = 0,
-  V1          = 1,
-  V2          = 2
-} ApiVersion;
 
 
 
@@ -204,7 +186,6 @@ typedef void (*OrionExitFunction)(int exitCode, const std::string& reason);
 */
 extern char               fwdHost[];
 extern int                fwdPort;
-extern bool               ngsi9Only;
 extern bool               harakiri;
 extern int                startTime;
 extern int                statisticsTime;
@@ -220,11 +201,9 @@ extern bool               timingStatistics;
 extern bool               countersStatistics;
 extern bool               notifQueueStatistics;
 
-extern bool               checkIdv1;
 extern bool               disableCusNotif;
 
 extern bool               insecureNotif;
-extern bool               ngsiv1Autocast;
 extern unsigned long long inReqPayloadMaxSize;
 extern unsigned long long outReqMsgMaxSize;
 
@@ -234,6 +213,7 @@ extern unsigned long      fcStepDelay;
 extern unsigned long      fcMaxInterval;
 
 extern unsigned long      logInfoPayloadMaxSize;
+extern bool               logDeprecate;
 
 
 /* ****************************************************************************
@@ -248,18 +228,8 @@ extern void orionInit
   bool               _countersStatistics,
   bool               _semWaitStatistics,
   bool               _timingStatistics,
-  bool               _notifQueueStatistics,
-  bool               _checkIdv1
+  bool               _notifQueueStatistics
 );
-
-
-
-/* ****************************************************************************
-*
-* isTrue - 
-*/
-extern bool isTrue(const std::string& s);
-extern bool isFalse(const std::string& s);
 
 
 
@@ -287,31 +257,9 @@ extern double getCurrentTime(void);
 
 
 
-/* ****************************************************************************
-*
-* toSeconds -
-*/
-extern int64_t toSeconds(int value, char what, bool dayPart);
-
-
-
-/*****************************************************************************
-*
-* parse8601 -
-*
-* This is common code for Duration and Throttling (at least)
-*
-*/
-extern int64_t parse8601(const std::string& s);
-
-
-
 /*****************************************************************************
 *
 * parse8601Time -
-*
-* This is common code for Duration and Throttling (at least)
-*
 */
 extern double parse8601Time(const std::string& s);
 

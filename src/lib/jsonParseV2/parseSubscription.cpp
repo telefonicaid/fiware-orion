@@ -50,6 +50,7 @@
 #include "jsonParseV2/parseSubscription.h"
 #include "jsonParseV2/parseExpression.h"
 #include "jsonParseV2/parseCompoundCommon.h"
+#include "jsonParseV2/parseContextAttribute.h"
 
 
 
@@ -58,7 +59,6 @@
 * USING
 */
 using ngsiv2::SubscriptionUpdate;
-using ngsiv2::EntID;
 using rapidjson::Value;
 
 
@@ -277,6 +277,11 @@ static std::string parseSubject(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
     return badInput(ciP, errorString);
   }
 
+  if (subsP->subject.entities.size() == 0)
+  {
+    return badInput(ciP, "subject entities is empty");
+  }
+
   // Condition
   if (subject.HasMember("condition"))
   {
@@ -316,6 +321,7 @@ std::string parseCustomJson
 )
 {
   // this new memory is freed in in HttpInfo::release()/MqttInfo::release()()
+  // or before returning in this function in the case of error
   *json = new orion::CompoundValueNode();
 
   if (holder.IsArray())
@@ -363,6 +369,8 @@ std::string parseCustomJson
         std::string r = parseCompoundValue(iter, cvnP, 0);
         if (r != "OK")
         {
+          // Early return
+          delete *json;
           return r;
         }
       }
@@ -415,6 +423,7 @@ std::string parseCustomJson
         if (r != "OK")
         {
           // Early return
+          delete *json;
           return r;
         }
       }
@@ -422,6 +431,7 @@ std::string parseCustomJson
   }
   else
   {
+    delete *json;
     return "json fields in httpCustom or mqttCustom must be object or array";
   }
 
@@ -439,15 +449,25 @@ std::string parseCustomJson
 static std::string parseCustomPayload
 (
   ConnectionInfo*             ciP,
+  ngsiv2::CustomPayloadType*  payloadType,
   std::string*                payload,
-  orion::CompoundValueNode**  json,
   bool*                       includePayload,
+  orion::CompoundValueNode**  json,
+  Entity*                     ngsi,
   const Value&                holder
 )
 {
-  if ((holder.HasMember("payload")) && (holder.HasMember("json")))
+  // Text is the one by default
+  *payloadType = ngsiv2::CustomPayloadType::Text;
+
+  unsigned int n = 0;
+  if (holder.HasMember("payload")) n++;
+  if (holder.HasMember("json"))    n++;
+  if (holder.HasMember("ngsi"))    n++;
+
+  if (n > 1)
   {
-    return badInput(ciP, "payload and json fields cannot be used at the same time in httpCustom or mqttCustom");
+    return badInput(ciP, "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom");
   }
 
   if (holder.HasMember("payload"))
@@ -479,10 +499,84 @@ static std::string parseCustomPayload
   }
   else  if (holder.HasMember("json"))
   {
+    *payloadType = ngsiv2::CustomPayloadType::Json;
+
     std::string r = parseCustomJson(holder["json"], json);
     if (!r.empty())
     {
       return badInput(ciP, r);
+    }
+  }
+  else if (holder.HasMember("ngsi"))
+  {
+    *payloadType = ngsiv2::CustomPayloadType::Ngsi;
+
+    for (rapidjson::Value::ConstMemberIterator iter = holder["ngsi"].MemberBegin(); iter != holder["ngsi"].MemberEnd(); ++iter)
+    {
+      std::string name   = iter->name.GetString();
+      std::string type   = jsonParseTypeNames[iter->value.GetType()];
+
+      if (name == "id")
+      {
+        if (type != "String")
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
+        }
+
+        ngsi->entityId.id = iter->value.GetString();
+      }
+      else if (name == "type")
+      {
+        if (type != "String")
+        {
+          return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
+        }
+
+        ngsi->entityId.type = iter->value.GetString();
+      }
+      else  // attribute
+      {
+        ContextAttribute* caP = new ContextAttribute();
+
+        ngsi->attributeVector.push_back(caP);
+
+        // Note we are using relaxForbiddenCheck true in this case, as JEXL expressions typically use forbidden
+        // chars and we don't want to fail in that case
+        std::string r = parseContextAttribute(ciP, iter, caP, false, true);
+
+        if (r == "max deep reached")
+        {
+          return badInput(ciP, ERROR_DESC_PARSE_MAX_JSON_NESTING);
+        }
+        else if (r != "OK")  // other error cases get a general treatment
+        {
+          return badInput(ciP, r);
+        }
+
+        // only evalPriority metadadata is allowed in this case
+        for (unsigned ix = 0; ix < caP->metadataVector.size(); ix++)
+        {
+          if (caP->metadataVector[ix]->name != NGSI_MD_EVAL_PRIORITY)
+          {
+            return badInput(ciP, ERROR_DESC_BAD_REQUEST_METADATA_NOT_ALLOWED_CUSTOM_NOTIF);
+          }
+          else
+          {
+            if (caP->metadataVector[ix]->valueType != orion::ValueTypeNumber)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MUST_BE_A_NUMBER);
+            }
+            if (caP->metadataVector[ix]->numberValue < MIN_PRIORITY)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MIN_ERROR);
+            }
+            if (caP->metadataVector[ix]->numberValue > MAX_PRIORITY)
+            {
+              return badInput(ciP, ERROR_DESC_BAD_REQUEST_EVALPRIORITY_MAX_ERROR);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -562,6 +656,31 @@ static std::string parseMqttQoS(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   else
   {
     subsP->notification.mqttInfo.qos = 0;
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseMqttRetain -
+*/
+static std::string parseMqttRetain(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& mqtt)
+{
+  Opt<bool> retainOpt = getBoolOpt(mqtt, "retain");
+  if (!retainOpt.ok())
+  {
+    return badInput(ciP, retainOpt.error);
+  }
+  if (retainOpt.given)
+  {
+    subsP->notification.mqttInfo.retain = retainOpt.value;
+  }
+  else
+  {
+    subsP->notification.mqttInfo.retain = 0;
   }
 
   return "";
@@ -854,9 +973,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     r = parseCustomPayload(ciP,
+                           &subsP->notification.httpInfo.payloadType,
                            &subsP->notification.httpInfo.payload,
-                           &subsP->notification.httpInfo.json,
                            &subsP->notification.httpInfo.includePayload,
+                           &subsP->notification.httpInfo.json,
+                           &subsP->notification.httpInfo.ngsi,
                            httpCustom);
     if (!r.empty())
     {
@@ -953,6 +1074,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // retain
+    r = parseMqttRetain(ciP, subsP, mqtt);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     // topic
     r = parseMqttTopic(ciP, subsP, mqtt);
     if (!r.empty())
@@ -994,6 +1122,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // retain
+    r = parseMqttRetain(ciP, subsP, mqttCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     // topic (same as in not custom mqtt)
     r = parseMqttTopic(ciP, subsP, mqttCustom);
     if (!r.empty())
@@ -1003,9 +1138,11 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // payload
     r = parseCustomPayload(ciP,
+                           &subsP->notification.mqttInfo.payloadType,
                            &subsP->notification.mqttInfo.payload,
-                           &subsP->notification.mqttInfo.json,
                            &subsP->notification.mqttInfo.includePayload,
+                           &subsP->notification.mqttInfo.json,
+                           &subsP->notification.mqttInfo.ngsi,
                            mqttCustom);
 
     if (!r.empty())
@@ -1192,7 +1329,7 @@ static std::string parseNotifyConditionVector
   // Expression
   if (condition.HasMember("expression"))
   {
-    std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
+    std::string r = parseExpression(condition["expression"], subsP->subject.condition.expression);
 
     if (r != "OK")
     {
@@ -1227,6 +1364,22 @@ static std::string parseNotifyConditionVector
       {
         subsP->subject.condition.altTypes.push_back(altType);
       }
+    }
+  }
+
+  // notifyOnMetadataChange
+  if (condition.HasMember("notifyOnMetadataChange"))
+  {
+    Opt<bool> notifyOnMetadataChangeOpt = getBoolOpt(condition, "notifyOnMetadataChange");
+    if (!notifyOnMetadataChangeOpt.ok())
+    {
+      return badInput(ciP, notifyOnMetadataChangeOpt.error);
+    }
+    else if (notifyOnMetadataChangeOpt.given)
+    {
+      bool notifyOnMetadataChangeBool = notifyOnMetadataChangeOpt.value;
+      subsP->notifyOnMetadataChangeProvided = true;
+      subsP->subject.condition.notifyOnMetadataChange = notifyOnMetadataChangeBool;
     }
   }
 

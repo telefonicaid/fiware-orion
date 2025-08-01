@@ -71,28 +71,28 @@ echo
 01. Create entity
 =================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/apartment_3?type=house
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/apartment_3?type=house
+Content-Length: 0
 
 
 
 02. Update entitiy attribute value with dots in keys
 ====================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Get entity
 ==============
 HTTP/1.1 200 OK
-Content-Length: 117
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 117
 
 {
     "id": "apartment_3",

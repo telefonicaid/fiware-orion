@@ -32,7 +32,7 @@ brokerStart CB 0 IPV4
 #
 # Hint: use this to run the MQTT broker needed for this .test:
 #
-#   docker run -d -p 1883:1883 eclipse-mosquitto:1.6.7
+#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 #
 # 01. Create MQTT sub with right enpdoint (localhost:1883)
 # 02. Upsert three times to trigger three MQTT notifications
@@ -61,6 +61,7 @@ orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 echo "02. Upsert three times to trigger three MQTT notifications"
 echo "=========================================================="
@@ -85,7 +86,7 @@ echo
 
 echo "03. Check logs and see three MQTT notifications and no alarms"
 echo "============================================================="
-cat /tmp/contextBroker.log | grep -v 'corr=N/A' | awk -F 'msg=' '{print $2}'
+cat /tmp/contextBroker.log | grep -v 'corr=N/A' | awk -F 'msg=' '{print $2}' | sed -e "s/$SUB_ID/SUB_ID/g"
 echo
 echo
 
@@ -94,33 +95,33 @@ echo
 01. Create MQTT sub with right enpdoint (localhost:1883)
 ========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Upsert three times to trigger three MQTT notifications
 ==========================================================
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
 HTTP/1.1 204 No Content
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
 
 
 
@@ -129,11 +130,11 @@ Date: REGEX(.*)
 #SORT_START
 Request received: POST /v2/subscriptions, request payload (142 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://localhost:1883", "topic": "sub1" } } }, response code: 201
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered REGEX(.*): broker: localhost:1883, topic: sub1
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered REGEX(.*): broker: localhost:1883, topic: sub1
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered REGEX(.*): broker: localhost:1883, topic: sub1
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 #SORT_END
 
 

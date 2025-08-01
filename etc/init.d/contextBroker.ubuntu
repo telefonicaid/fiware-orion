@@ -58,7 +58,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 DAEMON_ARGS="-port ${BROKER_PORT} \
    -logDir ${BROKER_LOG_DIR} \
    -pidpath ${BROKER_PID_FILE} \
-   -dbhost ${BROKER_DATABASE_HOST} \
+   -dbURI mongodb://${BROKER_DATABASE_HOST} \
    -db ${BROKER_DATABASE_NAME} \
    ${BROKER_EXTRA_OPS}"
 

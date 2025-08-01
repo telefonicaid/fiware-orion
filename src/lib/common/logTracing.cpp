@@ -28,74 +28,8 @@
 #include <string.h>
 
 #include "logMsg/logMsg.h"
+#include "common/statistics.h"
 
-/* ****************************************************************************
-*
-* logInfoNotification - rc as int
-*/
-void logInfoHttpNotification
-(
-  const char*  subId,
-  const char*  endpoint,
-  const char*  verb,
-  const char*  resource,
-  int          rc
-)
-{
-  char buffer[STRING_SIZE_FOR_INT];
-  snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoHttpNotification(subId, endpoint, verb, resource, buffer);
-}
-
-
-
-/* ****************************************************************************
-*
-* logInfoHttpNotification - rc as string
-*/
-void logInfoHttpNotification
-(
-  const char*  subId,
-  const char*  endpoint,
-  const char*  verb,
-  const char*  resource,
-  const char*  rc
-)
-{
-  LM_I(("Notif delivered (subId: %s): %s %s%s, response code: %s", subId, verb, endpoint, resource, rc));
-}
-
-
-
-/* ****************************************************************************
-*
-* logInfoMqttNotification
-*/
-void logInfoMqttNotification
-(
-  const char*  subId,
-  const char*  endpoint,
-  const char*  resource
-)
-{
-  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s", subId, endpoint, resource));
-}
-
-
-
-/* ****************************************************************************
-*
-* logInfoRequestWithoutPayload -
-*/
-void logInfoRequestWithoutPayload
-(
-  const char*  verb,
-  const char*  url,
-  int          rc
-)
-{
-  LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
-}
 
 
 /* ****************************************************************************
@@ -116,6 +50,115 @@ static char* truncatePayload(const char* payload)
   truncatedPayload[truncatedPayloadLengh - 1] = '\0';
 
   return truncatedPayload;
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoNotification - rc as int
+*/
+void logInfoHttpNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  verb,
+  const char*  resource,
+  const char*  payload,
+  int          rc
+)
+{
+  char buffer[STRING_SIZE_FOR_INT];
+  snprintf(buffer, sizeof(buffer), "%d", rc);
+  logInfoHttpNotification(subId, endpoint, verb, resource, payload, buffer);
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoHttpNotification - rc as string
+*/
+void logInfoHttpNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  verb,
+  const char*  resource,
+  const char*  payload,
+  const char*  rc
+)
+{
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc));
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoMqttNotification
+*/
+void logInfoMqttNotification
+(
+  const char*  subId,
+  const char*  endpoint,
+  const char*  resource,
+  const char*  payload
+)
+{
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s, payload (%d bytes): %s", subId, endpoint, resource, strlen(payload), effectivePayload));
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* logInfoRequestWithoutPayload -
+*/
+void logInfoRequestWithoutPayload
+(
+  const char*  verb,
+  const char*  url,
+  int          rc
+)
+{
+  LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
 }
 
 
@@ -186,7 +229,15 @@ void logInfoFwdRequest
 {
   char buffer[STRING_SIZE_FOR_INT];
   snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoFwdRequest(regId, verb, url, requestPayload, responsePayload, buffer);
+
+  if (responsePayload == NULL)
+  {
+    logInfoFwdRequest(regId, verb, url, requestPayload, "", buffer);
+  }
+  else
+  {
+    logInfoFwdRequest(regId, verb, url, requestPayload, responsePayload, buffer);
+  }
 }
 
 

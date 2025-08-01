@@ -40,14 +40,10 @@
 *
 * TriggeredSubscription -
 *
-* This class is thought to store the information about an ONCHANGE subscription
+* This class is thought to store the information about a subscription
 * triggered by an updateContext in order to notify, avoding a double-query on
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-
-*
-* We use the same class for both NGSI10 and NGSI9 subscription. The only difference
-* is that throttling and lastNotification are not needed in the second case (note
-* that there are different constructor depending the case)
 *
 */
 class TriggeredSubscription
@@ -74,7 +70,7 @@ class TriggeredSubscription
     std::string               geometry;
     std::string               coords;
     std::string               georel;
-  }                        expression;      // Only used by NGSIv2 subscription
+  } expression;
 
   TriggeredSubscription(long long                _throttling,
                         long long                _maxFailsLimit,
@@ -88,18 +84,12 @@ class TriggeredSubscription
                         const char*              _tenant,
                         bool                     _covered);
 
-  TriggeredSubscription(RenderFormat             _renderFormat,
-                        const ngsiv2::HttpInfo&  _httpInfo,
-                        const ngsiv2::MqttInfo&  _mqttInfo,
-                        const StringList&        _attrL);
-
   ~TriggeredSubscription();
 
   // FIXME P5: This method will cease to exist once geo-stuff is implemented the same way StringFilter was implemented (for Issue #1705)
   void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
   bool         stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
   bool         mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
-  std::string  toString(const std::string& delimiter);
 };
 
 #endif  // SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_

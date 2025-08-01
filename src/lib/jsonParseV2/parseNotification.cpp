@@ -29,7 +29,7 @@
 #include "common/errorMessages.h"
 #include "apiTypesV2/Entity.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
@@ -79,7 +79,8 @@ static bool parseContextElementResponse
     return false;
   }
 
-  cerP->entity.fill(entity.id, entity.type, entity.isPattern);
+  EntityId enId(entity.entityId.id, entity.entityId.idPattern, entity.entityId.type, entity.entityId.typePattern);
+  cerP->entity.fill(enId);
   cerP->entity.attributeVector.push_back(entity.attributeVector);
   entity.release();
 
@@ -193,10 +194,11 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_SUBSCRIPTIONID_NOT_STRING);
         ciP->httpStatusCode = SccBadRequest;
 
+        ncrP->release();
         return false;
       }
 
-      ncrP->subscriptionId.set(iter->value.GetString());
+      ncrP->subscriptionId = iter->value.GetString();
     }
     else if (name == "data")
     {
@@ -207,14 +209,16 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
         alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DATA_NOT_ARRAY);
         ciP->httpStatusCode = SccBadRequest;
 
+        ncrP->release();
         return false;
       }
 
       if (parseNotificationData(ciP, iter, ncrP, oeP) == false)
       {
-        alarmMgr.badInput(clientIp, oeP->details);
+        alarmMgr.badInput(clientIp, oeP->description);
         ciP->httpStatusCode = SccBadRequest;
 
+        ncrP->release();
         return false;
       }
     }
@@ -226,6 +230,7 @@ static bool parseNotificationNormalized(ConnectionInfo* ciP, NotifyContextReques
       oeP->fill(SccBadRequest, description, ERROR_BAD_REQUEST);
       ciP->httpStatusCode = SccBadRequest;
 
+      ncrP->release();
       return false;
     }
   }

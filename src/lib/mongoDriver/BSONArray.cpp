@@ -89,6 +89,17 @@ std::string BSONArray::toString(void) const
 
 /* ****************************************************************************
 *
+* BSONArray::equal -
+*/
+bool BSONArray::equal(const BSONArray& ba)
+{
+  return (bson_compare(this->b, ba.b) == 0);
+}
+
+
+
+/* ****************************************************************************
+*
 * BSONArray::operator= -
 */
 BSONArray& BSONArray::operator= (const BSONArray& rhs)

@@ -29,14 +29,12 @@
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
 
-#include "apiTypesV2/Entities.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/EntityTypeInfo.h"
 #include "rest/HttpHeaders.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntities.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 
 static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
 
@@ -51,7 +49,7 @@ static const int STRUCTURAL_OVERHEAD_BSON_ID = 10;
 
 static bool legalEntityLength(Entity* eP, const std::string& servicePath)
 {
-  return (servicePath.size() + eP->id.size() + eP->type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
+  return (servicePath.size() + eP->entityId.id.size() + eP->entityId.type.size() + STRUCTURAL_OVERHEAD_BSON_ID) < 1024;
 }
 
 
@@ -121,28 +119,22 @@ std::string postEntities
   postUpdateContext(ciP, components, compV, parseDataP, ngsiv2flavour);
 
   //
-  // 03. Check error - 3 different ways to get an error from postUpdateContext ... :-(
-  //     FIXME P4: make postUpdateContext have ONE way to return errors. See github issue #2763
+  // 03. Check error
   //
   std::string  answer = "";
-  if (parseDataP->upcrs.res.oe.code != SccNone)
+  if (parseDataP->upcrs.res.error.code != SccOk)
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
-  }
-  else if (parseDataP->upcrs.res.errorCode.code != SccOk)
-  {
-    ciP->httpStatusCode = parseDataP->upcrs.res.errorCode.code;
-    TIMED_RENDER(answer = parseDataP->upcrs.res.errorCode.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.error.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.error.toJson());
     ciP->answer         = answer;
   }
   else
   {
     // Prepare HTTP headers
-    std::string location = "/v2/entities/" + eP->id;
-    if (!eP->type.empty())
+    std::string location = "/v2/entities/" + eP->entityId.id;
+    if (!eP->entityId.type.empty())
     {
-      location += "?type=" + eP->type;
+      location += "?type=" + eP->entityId.type;
     }
     else
     {

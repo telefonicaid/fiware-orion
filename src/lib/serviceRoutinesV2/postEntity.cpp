@@ -32,13 +32,11 @@
 #include "common/clockFunctions.h"
 #include "common/errorMessages.h"
 
-#include "apiTypesV2/Entities.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntity.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
 
 
@@ -64,42 +62,39 @@ std::string postEntity
 {
   Entity*        eP  = &parseDataP->ent.res;
   ActionType     op;
-  Ngsiv2Flavour  flavor;
 
-  eP->id   = compV[2];
-  eP->type = ciP->uriParam["type"];
+  eP->entityId.id   = compV[2];
+  eP->entityId.type = ciP->uriParam["type"];
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  if (forbiddenIdChars(compV[2].c_str() , NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
 
-  if (ciP->uriParamOptions["append"] == true)  // pure-append
+  if (ciP->uriParamOptions[OPT_APPEND] == true)  // pure-append
   {
     op     = ActionTypeAppendStrict;
-    flavor = NGSIV2_FLAVOUR_ONUPDATE;
   }
   else
   {
     op     = ActionTypeAppend;  // append or update
-    flavor = NGSIV2_FLAVOUR_ONAPPEND;
   }
 
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);
 
   // Call standard op postUpdateContext
-  postUpdateContext(ciP, components, compV, parseDataP, flavor);
+  postUpdateContext(ciP, components, compV, parseDataP, NGSIV2_FLAVOUR_ONAPPEND);
 
   // Any error in the response?
   std::string answer = "";
 
-  if (parseDataP->upcrs.res.oe.code != SccNone)
+  if ((parseDataP->upcrs.res.error.code != SccNone ) && (parseDataP->upcrs.res.error.code != SccOk))
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.error.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.error.code;
   }
   else
   {

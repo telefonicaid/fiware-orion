@@ -1,0 +1,191 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+update format for notification messages custom no payload
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized with httpCustom and no payload field
+# 02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedkeyValues with httpCustom and no payload field
+# 03. Create entity E1/T1
+# 04. Dump accumulator to see notifications
+# 
+
+
+echo "01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized with httpCustom and no payload field"
+echo "=========================================================================================================================="
+payload='
+{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": [ "A1" ]
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrsFormat": "simplifiedNormalized"
+  },
+  "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" 
+echo
+echo
+
+
+echo "02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedKeyValues with httpCustom and no payload field"
+echo "========================================================================================================================="
+payload='
+{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1"
+      }
+    ],
+    "condition": {
+      "attrs": [ "A1" ]
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify"
+    },
+    "attrsFormat": "simplifiedKeyValues"
+  },
+  "expires": "2050-04-05T14:00:00.00Z"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E1/T1"
+echo "======================="
+payload='{
+  "id": "E1",
+  "type": "T1",
+  "A1": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "${payload}"
+echo
+echo
+
+
+echo "04. Dump accumulator to see notifications"
+echo "========================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedNormalized with httpCustom and no payload field
+==========================================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create NGSIv2 subscription for E1/A1 with attrsFormat set to simplifiedKeyValues with httpCustom and no payload field
+=========================================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Create entity E1/T1
+=======================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
+
+
+
+04. Dump accumulator to see notifications
+#SORT_START
+=========================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 70
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: simplifiedNormalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
+
+{
+    "A1": {
+        "metadata": {},
+        "type": "Number",
+        "value": 1
+    },
+    "id": "E1",
+    "type": "T1"
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 30
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: simplifiedKeyValues
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[12345])
+
+{
+    "A1": 1,
+    "id": "E1",
+    "type": "T1"
+}
+=======================================
+#SORT_END
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

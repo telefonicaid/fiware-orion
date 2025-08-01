@@ -1,6 +1,6 @@
 # Upgrading to 1.5.0 and beyond from a pre-1.5.0 version
 
-This procedure has to be done *only* if your DB contains attributes with [ID metadata](../user/metadata.md#metadata-id-for-attributes).
+This procedure has to be done *only* if your DB contains attributes with [ID metadata](https://github.com/telefonicaid/fiware-orion/blob/1.5.0/doc/manuals/user/metadata.md#metadata-id-for-attributes).
 
 -   Stop contextBroker
 -   Remove previous contextBroker version

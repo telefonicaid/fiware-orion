@@ -39,50 +39,53 @@
 */
 TEST(OrionError, all)
 {
-  StatusCode    sc(SccBadRequest, "no details 2");
   OrionError    e0;
-  OrionError    e1(SccOk, "no details 3");
-  OrionError    e3(sc);
-  OrionError    e4(SccOk, "Good Request");
+  OrionError    e1;
+  OrionError    e3;
+  OrionError    e4;
   std::string   out;
   const char*   outfile1 = "orion.orionError.all1.valid.json";
   const char*   outfile2 = "orion.orionError.all3.valid.json";
   const char*   outfile3 = "orion.orionError.all4.valid.json";
   ConnectionInfo ci;
 
+  e1.fill(SccOk, "no details 3");
+  e3.fill(SccBadRequest, "no details 2");
+  e4.fill(SccOk, "Good Request");
+
   ci.outMimeType = JSON;
 
   EXPECT_EQ(SccNone, e0.code);
-  EXPECT_EQ("",      e0.reasonPhrase);
-  EXPECT_EQ("",      e0.details);
+  EXPECT_EQ("",      e0.error);
+  EXPECT_EQ("",      e0.description);
 
   EXPECT_EQ(SccOk,          e1.code);
-  EXPECT_EQ("OK",           e1.reasonPhrase);
-  EXPECT_EQ("no details 3", e1.details);
+  EXPECT_EQ("OK",           e1.error);
+  EXPECT_EQ("no details 3", e1.description);
 
-  EXPECT_EQ(sc.code,         e3.code);
-  EXPECT_EQ(sc.reasonPhrase, e3.reasonPhrase);
-  EXPECT_EQ(sc.details,      e3.details);
+  EXPECT_EQ(SccBadRequest,  e3.code);
+  EXPECT_EQ("BadRequest",   e3.error);
+  EXPECT_EQ("no details 2", e3.description);
 
   EXPECT_EQ(SccOk,          e4.code);
-  EXPECT_EQ("OK",           e4.reasonPhrase);
-  EXPECT_EQ("Good Request", e4.details);
+  EXPECT_EQ("OK",           e4.error);
+  EXPECT_EQ("Good Request", e4.description);
 
   ci.outMimeType = JSON;
 
-  out = e1.toJsonV1();
+  out = e1.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e3.toJsonV1();
+  out = e3.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e4.toJsonV1();
+  out = e4.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf,
                                    sizeof(expectedBuf),
                                    outfile3)) << "Error getting test data from '" << outfile3 << "'";

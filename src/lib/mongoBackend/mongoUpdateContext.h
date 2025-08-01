@@ -30,8 +30,8 @@
 #include <map>
 
 #include "rest/HttpStatusCode.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "ngsi/UpdateContextResponse.h"
 
 
 
@@ -50,8 +50,7 @@ extern HttpStatusCode mongoUpdateContext
   const std::string&                    fiwareCorrelator,
   const std::string&                    ngsiV2AttrsFormat,
   const bool&                           forcedUpdate     = false,
-  const bool&                           overrideMetadata    = false,
-  ApiVersion                            apiVersion       = V1,
+  const bool&                           overrideMetadata = false,
   Ngsiv2Flavour                         ngsiv2Flavour    = NGSIV2_NO_FLAVOUR,
   bool                                  flowControl      = false
 );

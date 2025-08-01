@@ -1,0 +1,333 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+alterationType entityUpdate in combination with notifyOnMetadataChange
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create sub with alterationType entityUpdate+entityCreate and notifyOnMetadataChange false
+# 02. Create entity dummy-device-01 with two attributes
+# 03. Update entity dummy-device-01 metadata in two attributes
+# 04. Update entity dummy-device-01 without actual update
+# 05. Dump accumulator and see three notifications
+#
+
+
+echo "01. Create sub with alterationType entityUpdate+entityCreate and notifyOnMetadataChange false"
+echo "============================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "DummyDevice"
+      }
+    ],
+    "condition": {
+      "attrs": [
+        "temperature",
+        "humidity"
+      ],
+      "notifyOnMetadataChange": false,
+      "alterationTypes": [
+        "entityUpdate",
+        "entityCreate"
+      ]
+    }
+  },
+  "notification": {
+    "attrs": [
+      "temperature",
+      "humidity"
+    ],
+    "onlyChangedAttrs": true,
+    "attrsFormat": "normalized",
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    },
+    "metadata": [
+      "TimeInstant"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity dummy-device-01 with two attributes"
+echo "====================================================="
+payload='
+{
+  "id": "dummy-device-01",
+  "type": "DummyDevice",
+  "temperature": {
+    "type": "Number",
+    "value": 20,
+    "metadata": {
+      "TimeInstant": {
+        "type": "DateTime",
+        "value": "2024-08-20T00:00:00.000Z"
+      }
+    }
+  },
+  "humidity": {
+    "type": "Number",
+    "value": 50,
+    "metadata": {
+      "TimeInstant": {
+        "type": "DateTime",
+        "value": "2024-08-20T00:00:00.000Z"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update entity dummy-device-01 metadata in two attributes"
+echo "============================================================"
+payload='{
+  "temperature": {
+    "type": "Number",
+    "value": 20,
+    "metadata": {
+      "TimeInstant": {
+        "type": "DateTime",
+        "value": "2024-08-20T00:10:00.000Z"
+      }
+    }
+  },
+  "humidity": {
+    "type": "Number",
+    "value": 50,
+    "metadata": {
+      "TimeInstant": {
+        "type": "DateTime",
+        "value": "2024-08-20T00:10:00.000Z"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/entities/dummy-device-01/attrs -X POST --payload "$payload"
+echo
+echo
+
+
+echo "04. Update entity dummy-device-01 without actual update"
+echo "======================================================="
+payload='{
+  "temperature": {
+    "type": "Number",
+    "value": 20
+  },
+  "humidity": {
+    "type": "Number",
+    "value": 50
+  }
+}'
+orionCurl --url /v2/entities/dummy-device-01/attrs -X POST --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator and see three notifications"
+echo "================================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub with alterationType entityUpdate+entityCreate and notifyOnMetadataChange false
+=============================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity dummy-device-01 with two attributes
+=====================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/dummy-device-01?type=DummyDevice
+Content-Length: 0
+
+
+
+03. Update entity dummy-device-01 metadata in two attributes
+============================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Update entity dummy-device-01 without actual update
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Dump accumulator and see three notifications
+================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 347
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "humidity": {
+                "metadata": {
+                    "TimeInstant": {
+                        "type": "DateTime",
+                        "value": "2024-08-20T00:00:00.000Z"
+                    }
+                },
+                "type": "Number",
+                "value": 50
+            },
+            "id": "dummy-device-01",
+            "temperature": {
+                "metadata": {
+                    "TimeInstant": {
+                        "type": "DateTime",
+                        "value": "2024-08-20T00:00:00.000Z"
+                    }
+                },
+                "type": "Number",
+                "value": 20
+            },
+            "type": "DummyDevice"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 347
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "humidity": {
+                "metadata": {
+                    "TimeInstant": {
+                        "type": "DateTime",
+                        "value": "2024-08-20T00:10:00.000Z"
+                    }
+                },
+                "type": "Number",
+                "value": 50
+            },
+            "id": "dummy-device-01",
+            "temperature": {
+                "metadata": {
+                    "TimeInstant": {
+                        "type": "DateTime",
+                        "value": "2024-08-20T00:10:00.000Z"
+                    }
+                },
+                "type": "Number",
+                "value": 20
+            },
+            "type": "DummyDevice"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 347
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "humidity": {
+                "metadata": {
+                    "TimeInstant": {
+                        "type": "DateTime",
+                        "value": "2024-08-20T00:10:00.000Z"
+                    }
+                },
+                "type": "Number",
+                "value": 50
+            },
+            "id": "dummy-device-01",
+            "temperature": {
+                "metadata": {
+                    "TimeInstant": {
+                        "type": "DateTime",
+                        "value": "2024-08-20T00:10:00.000Z"
+                    }
+                },
+                "type": "Number",
+                "value": 20
+            },
+            "type": "DummyDevice"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

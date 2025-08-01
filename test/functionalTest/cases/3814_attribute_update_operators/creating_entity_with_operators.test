@@ -30,16 +30,12 @@ brokerStart CB
 --SHELL--
 
 #
-# This test would be modified in the case the limitation described
-# at https://fiware-orion.readthedocs.io/en/master/user/update_operators/index.html#create-or-replace-entities
-# gets solved at the some time
-#
 # 01. Create entity E1 with A={$inc:1}, B=2
-# 02. Get entity E1, see A={$inc:1}, B=2
+# 02. Get entity E1, see A=1, B=2
 # 03. Create entity E2 with A={$max:10}, B=4 using batch operation
-# 04. Get entity E2, see A={$max:10}, B=4
+# 04. Get entity E2, see A=10, B=4
 # 05. Create entity E3 with A={$min:2}, B=3 using upsert operation
-# 06. Get entity E3, see A={$min:2}, B=3
+# 06. Get entity E3, see A=0, B=3
 #
 
 
@@ -62,8 +58,8 @@ echo
 echo
 
 
-echo '02. Get entity E1, see A={$inc:1}, B=2'
-echo '======================================'
+echo '02. Get entity E1, see A=1, B=2'
+echo '==============================='
 orionCurl --url /v2/entities/E1
 echo
 echo
@@ -93,8 +89,8 @@ echo
 echo
 
 
-echo '04. Get entity E2, see A={$max:10}, B=4'
-echo '======================================='
+echo '04. Get entity E2, see A=10, B=4'
+echo '================================'
 orionCurl --url /v2/entities/E2
 echo
 echo
@@ -119,8 +115,8 @@ echo
 echo
 
 
-echo '06. Get entity E3, see A={$min:2}, B=3'
-echo '======================================='
+echo '06. Get entity E3, see A=0, B=3'
+echo '==============================='
 orionCurl --url /v2/entities/E3
 echo
 echo
@@ -130,28 +126,26 @@ echo
 01. Create entity E1 with A={$inc:1}, B=2
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 0
 
 
 
-02. Get entity E1, see A={$inc:1}, B=2
-======================================
+02. Get entity E1, see A=1, B=2
+===============================
 HTTP/1.1 200 OK
-Content-Length: 123
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
 
 {
     "A": {
         "metadata": {},
         "type": "Number",
-        "value": {
-            "$inc": 1
-        }
+        "value": 1
     },
     "B": {
         "metadata": {},
@@ -166,26 +160,24 @@ Date: REGEX(.*)
 03. Create entity E2 with A={$max:10}, B=4 using batch operation
 ================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Get entity E2, see A={$max:10}, B=4
-=======================================
+04. Get entity E2, see A=10, B=4
+================================
 HTTP/1.1 200 OK
-Content-Length: 124
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 115
 
 {
     "A": {
         "metadata": {},
         "type": "Number",
-        "value": {
-            "$max": 10
-        }
+        "value": 10
     },
     "B": {
         "metadata": {},
@@ -200,27 +192,25 @@ Date: REGEX(.*)
 05. Create entity E3 with A={$min:2}, B=3 using upsert operation
 ================================================================
 HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E3?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
 
 
 
-06. Get entity E3, see A={$min:2}, B=3
-=======================================
+06. Get entity E3, see A=0, B=3
+===============================
 HTTP/1.1 200 OK
-Content-Length: 123
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
 
 {
     "A": {
         "metadata": {},
         "type": "Number",
-        "value": {
-            "$min": 2
-        }
+        "value": 0
     },
     "B": {
         "metadata": {},

@@ -29,9 +29,10 @@
 
 #include "common/globals.h"
 #include "common/string.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
+#include "common/macroSubstitute.h"
 #include "alarmMgr/alarmMgr.h"
+#include "mongoDriver/safeMongo.h"
 #include "parse/forbiddenChars.h"
 
 #include "orionTypes/OrionValueType.h"
@@ -201,12 +202,7 @@ CompoundValueNode::~CompoundValueNode()
 */
 std::string CompoundValueNode::finish(void)
 {
-  LM_T(LmtCompoundValue, ("Finishing a compound"));
-
-  if (lmTraceIsSet(LmtCompoundValueShow))
-  {
-    show("");
-  }
+  LM_T(LmtCompoundValue, ("Finishing a compound: s (%s)", name.c_str(), toJson().c_str()));
 
   return check("");
 }
@@ -310,145 +306,6 @@ CompoundValueNode* CompoundValueNode::add
 
 /* ****************************************************************************
 *
-* shortShow -
-*/
-void CompoundValueNode::shortShow(const std::string& indent)
-{
-  if (valueType == orion::ValueTypeVector)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (vector)",
-                                 indent.c_str(),
-                                 name.c_str()));
-  }
-  else if (valueType == orion::ValueTypeObject)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (object)",
-                                 indent.c_str(),
-                                 name.c_str()));
-  }
-  else if (valueType == orion::ValueTypeString)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (%s)",
-                                 indent.c_str(),
-                                 name.c_str(),
-                                 stringValue.c_str()));
-    return;
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (%s)",
-                                 indent.c_str(),
-                                 name.c_str(),
-                                 (boolValue == true)? "true" : "false"));
-    return;
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (null)",
-                                 indent.c_str(),
-                                 name.c_str()));
-    return;
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (not given)",
-                                 indent.c_str(),
-                                 name.c_str()));
-    return;
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    LM_T(LmtCompoundValue,      ("%s%s (%f)",
-                                 indent.c_str(),
-                                 name.c_str(),
-                                 numberValue));
-    return;
-  }
-
-  for (uint64_t ix = 0; ix < childV.size(); ++ix)
-  {
-    childV[ix]->shortShow(indent + "  ");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* show -
-*/
-void CompoundValueNode::show(const std::string& indent)
-{
-  if (!name.empty())
-  {
-    LM_T(LmtCompoundValueShow, ("%sname:      %s",
-                                indent.c_str(),
-                                name.c_str()));
-  }
-
-  LM_T(LmtCompoundValueShow, ("%stype:      %s",
-                              indent.c_str(),
-                              orion::valueTypeName(valueType)));
-
-  if (valueType == orion::ValueTypeString)
-  {
-    LM_T(LmtCompoundValueShow, ("%sString Value:     %s",
-                                indent.c_str(),
-                                stringValue.c_str()));
-  }
-  else if (valueType == orion::ValueTypeBoolean)
-  {
-    LM_T(LmtCompoundValueShow, ("%sBool Value:     %s",
-                                indent.c_str(),
-                                (boolValue == false)? "false" : "true"));
-  }
-  else if (valueType == orion::ValueTypeNumber)
-  {
-    LM_T(LmtCompoundValueShow, ("%sNumber Value:     %f",
-                                indent.c_str(),
-                                numberValue));
-  }
-  else if (valueType == orion::ValueTypeNull)
-  {
-    LM_T(LmtCompoundValueShow, ("%sNull",
-                                indent.c_str()));
-  }
-  else if (valueType == orion::ValueTypeNotGiven)
-  {
-    LM_T(LmtCompoundValueShow, ("%sNotGiven",
-                                indent.c_str()));
-  }
-  else if (childV.size() != 0)
-  {
-    std::string childrenString;
-
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      childrenString += childV[ix]->name;
-      if (ix != childV.size() - 1)
-      {
-        childrenString += ", ";
-      }
-    }
-
-    LM_T(LmtCompoundValueShow, ("%s%lu children (%s)",
-                                indent.c_str(),
-                                childV.size(),
-                                childrenString.c_str()));
-
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      childV[ix]->show(indent + "  ");
-    }
-  }
-
-  LM_T(LmtCompoundValueShow, (""));
-}
-
-
-
-/* ****************************************************************************
-*
 * check -
 *
 * A vector must have all its children with the same name.
@@ -523,10 +380,94 @@ std::string CompoundValueNode::check(const std::string& path)
 
 /* ****************************************************************************
 *
+* CompoundValueNode::equal
+*
+*/
+bool CompoundValueNode::equal(const orion::BSONElement& be)
+{
+  // Note objects cannot be declared inside switch block
+  std::vector<orion::BSONElement> ba;
+  orion::BSONObj bo;
+
+  switch (valueType)
+  {
+  case orion::ValueTypeString:
+    return (be.type() == orion::String) && (stringValue == be.String());
+
+  case orion::ValueTypeNumber:
+    // FIXME P2: according to regression tests, this seems to work with all number types (int32/int64/double)
+    // However, let's keep an eye on this in the case some day it fails...
+    return (be.type() == orion::NumberDouble && numberValue == be.Number());
+
+  case orion::ValueTypeBoolean:
+    return (be.type() == orion::Bool) && (boolValue == be.Bool());
+
+  case orion::ValueTypeNull:
+    return (be.type() == orion::jstNULL);
+
+  case orion::ValueTypeVector:
+    // nodeP must be a vector
+    if (be.type() != orion::Array)
+    {
+      return false;
+    }
+    ba = be.Array();
+    // nodeP must have the same number of elements
+    if (childV.size() != ba.size())
+    {
+      return false;
+    }
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
+    {
+      if (!(childV[ix]->equal(ba[ix])))
+      {
+        return false;
+      }
+    }
+    return true;
+
+  case orion::ValueTypeObject:
+    // nodeP must be a object
+    if (be.type() != orion::Object)
+    {
+      return false;
+    }
+    bo = be.embeddedObject();
+    if ((int) childV.size() != bo.nFields())
+    {
+      return false;
+    }
+    for (unsigned int ix = 0; ix < childV.size(); ix++)
+    {
+      if (!bo.hasField(childV[ix]->name))
+      {
+        return false;
+      }
+      if (!(childV[ix]->equal(getFieldF(bo, childV[ix]->name))))
+      {
+        return false;
+      }
+    }
+    return true;
+
+  case orion::ValueTypeNotGiven:
+    LM_E(("Runtime Error (value type not given (%s))", name.c_str()));
+    return false;
+
+  default:
+    LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
+    return false;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * CompoundValueNode:toJson
 *
 */
-std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replacementsP)
+std::string CompoundValueNode::toJson(ExprContextObject* exprContextObjectP)
 {
   std::string      out;
   JsonVectorHelper jvh;
@@ -535,35 +476,13 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   switch (valueType)
   {
   case orion::ValueTypeString:
-    if ((replacementsP != NULL) && (stringValue.rfind("${", 0) == 0) && (stringValue.rfind("}", stringValue.size()) == stringValue.size() - 1))
-    {
-      // len("${") + len("}") = 3
-      std::string macroName = stringValue.substr(2, stringValue.size() - 3);
-      std::map<std::string, std::string>::iterator iter = replacementsP->find(macroName);
-      if (iter == replacementsP->end())
-      {
-        // macro doesn't exist in the replacement map, so we use null al failsafe
-        out += "null";
-      }
-      else
-      {
-        out += iter->second;
-      }
-    }
-    else
-    {
-      out = '"';
-      out += toJsonString(stringValue);
-      out += '"';
-    }
-
-    return out;
+    return smartStringValue(stringValue, exprContextObjectP, "null");
 
   case orion::ValueTypeNumber:
     return double2string(numberValue);
 
   case orion::ValueTypeBoolean:
-    return (boolValue? "true" : "false");
+    return FT(boolValue);
 
   case orion::ValueTypeNull:
     return "null";
@@ -571,14 +490,14 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
   case orion::ValueTypeVector:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      jvh.addRaw(childV[ix]->toJson(replacementsP));
+      jvh.addRaw(childV[ix]->toJson(exprContextObjectP));
     }
     return jvh.str();
 
   case orion::ValueTypeObject:
     for (unsigned int ix = 0; ix < childV.size(); ix++)
     {
-      joh.addRaw(childV[ix]->name, childV[ix]->toJson(replacementsP));
+      joh.addRaw(childV[ix]->name, childV[ix]->toJson(exprContextObjectP));
     }
     return joh.str();
 
@@ -590,6 +509,106 @@ std::string CompoundValueNode::toJson(std::map<std::string, std::string>* replac
     LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
     return "";
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode:toExprContextObject
+*
+*/
+ExprContextObject CompoundValueNode::toExprContextObject(void)
+{
+  ExprContextObject co;
+  for (uint64_t ix = 0; ix < childV.size(); ++ix)
+  {
+    CompoundValueNode* child = childV[ix];
+    switch (child->valueType)
+    {
+    case orion::ValueTypeString:
+      co.add(child->name, child->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      co.add(child->name, child->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      co.add(child->name, child->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      co.add(child->name);
+      break;
+
+    case orion::ValueTypeVector:
+      co.add(child->name, child->toExprContextList());
+      break;
+
+    case orion::ValueTypeObject:
+      co.add(child->name, child->toExprContextObject());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value type not given (%s))", name.c_str()));
+      break;
+
+    default:
+      LM_E(("Runtime Error (value type unknown (%s))", name.c_str()));
+    }
+  }
+  return co;
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode:toExprContextList
+*
+*/
+ExprContextList CompoundValueNode::toExprContextList(void)
+{
+  ExprContextList cl;
+  for (uint64_t ix = 0; ix < childV.size(); ++ix)
+  {
+    CompoundValueNode* child = childV[ix];
+    switch (child->valueType)
+    {
+    case orion::ValueTypeString:
+      cl.add(child->stringValue);
+      break;
+
+    case orion::ValueTypeNumber:
+      cl.add(child->numberValue);
+      break;
+
+    case orion::ValueTypeBoolean:
+      cl.add(child->boolValue);
+      break;
+
+    case orion::ValueTypeNull:
+      cl.add();
+      break;
+
+    case orion::ValueTypeVector:
+      cl.add(child->toExprContextList());
+      break;
+
+    case orion::ValueTypeObject:
+      cl.add(child->toExprContextObject());
+      break;
+
+    case orion::ValueTypeNotGiven:
+      LM_E(("Runtime Error (value type not given)"));
+      break;
+
+    default:
+      LM_E(("Runtime Error (value type unknown)"));
+    }
+  }
+  return cl;
 }
 
 
@@ -675,16 +694,5 @@ bool CompoundValueNode::isObject(void)
 bool CompoundValueNode::isString(void)
 {
   return (valueType == orion::ValueTypeString);
-}
-
-
-
-/* ****************************************************************************
-*
-* cname -
-*/
-const char* CompoundValueNode::cname(void)
-{
-  return name.c_str();
 }
 }

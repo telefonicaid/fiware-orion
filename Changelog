@@ -1,3 +1,153 @@
+4.2.0 (May 9th, 2025)
+
+- Fix: rendering of large float numbers (according IEEE754 standard) (#4642)
+- Fix: notification was not triggered in subs using entityUpdate alterationType when some attribute not included in condition.attrs has an actual value change (#4647)
+- Fix: previousValue metadata was not taken into account in attributes not in the update that triggers the notification (#4643)
+- Fix: detects duplication in orderBy tokens responding with 400 Bad Request in that case (#4664)
+- Fix: improve attribute and metadata invalid format dates for DateTime types in logs (#4616)
+- Fix: attrsFormat keyValues and values were not working in custom notifications using ngsi payloads (#4644)
+- Fix: JEXL expressions were not working in attrsFormat simplifiedKeyValues, keyValues or values (#4645)
+- Fix: env vars values with unsigned int or long types where not correctly printed at startup time in INFO log level (#4668)
+- Hardening: upgrade microhttpd dependency from 0.9.76 to 1.0.1
+- Hardening: upgrade libmosquitto dependency from 2.0.15 to 2.0.20
+- Hardening: upgrade libmongoc dependency from 1.24.3 to 1.29.0
+- Upgrade cjexl version from 0.4.0 to 0.6.0 (new transformations: nMapper, arrMax, arrMin, arrMed, arrSort and arrReverse )
+- Upgrade Debian version from 12.6 to 12.10 in Dockerfile
+- Reference MongoDB version changed from 6.0 to 8.0
+
+4.1.0 (September 12th, 2024)
+
+- Add: custom notification ngsi patching evaluation priority based in evalPriority builtin metadata (#4556)
+- Add: attribute metadata to JEXL context (#4594, #4560)
+- Fix: $max and $min operators were not supported with DateTime attributes (#4585)
+- Fix: wrong date values should not allowed in subscription's expires field (#4541)
+- Fix: do not raise DB alarm in case of wrong GeoJSON in client request
+- Fix: metadata modifications are not considered as change (with regards to subscription alterationTypes) if notifyOnMetadataChange is false (#4605)
+- Fix: invalid date in expires field of subscription (#2303)
+- Upgrade cjexl version from 0.3.0 to 0.4.0 (new transformations: now, getTime and toIsoString)
+- Upgrade Debian version from 12.4 to 12.6 in Dockerfile
+
+4.0.0 (June 6th, 2024)
+
+- Add: JEXL expression support in custom notification macro replacement (using cjexl 0.3.0) (#4004)
+- Add: expression context build and evaluation counters in timing section in GET /statistics (#4004)
+- Fix: use null for non existing attributes in custom covered notifications macro substitution (instead of empty string) to make behaviour more consistent (#4004)
+- Fix: use null for non existing attributes in macro substitution applied to "paylaod" field (instead of empty string) to make behaviour more consistent (#4004)
+- Fix: simplified GET /version operation, without including "libversions" field (add ?options=libVersions to get it)
+- Fix: lighter operation to get databases list from MongoDB (#4517)
+- Hardening: compile code using C++14 standard
+- Remove: `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` CLI parameters along with associated env vars, already deprecated in Orion 3.12.0 (use `-dbURI` instead`)
+- Remove: legacy subscription format
+- Remove: all the remaining NGSIv1 operations
+  - PUT /v1/contextEntities/{id}
+  - DELETE /v1/contextEntities/{id}
+  - GET /v1/contextEntities/{id}/attributes/{name}
+  - POST /v1/updateContext
+  - POST /NGSI10/updateContext
+  - POST /v1/queryContext
+  - POST /NGSI10/queryContext
+
+3.12.0 (February 29th, 2024)
+
+- Fix: service path levels with 0 length should not be allowed (#4495)
+- Fix: changed the default value of `-dbTimeout` to 0 to resolve conflict with `-dbURI` (#4496) 
+- Fix: wrong INFO startup log showing ORION_MONGO_TIMEOUT, ORION_IN_REQ_PAYLOAD_MAX_SIZE and ORION_OUT_REQ_MSG_MAX_SIZE env var values (#4496)
+- Fix: return 400 Bad Request when subject.entities exists but it is an empty array (#4499)
+- Deprecate: `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`, `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` CLI parameters along with associated env vars (use `-dbURI` instead`)
+
+3.11.0 (January 29th, 2024)
+
+- Add: notification.mqtt.retain and notification.mqttCustom.retain flag for MQTT retain in notifications (#4388)
+- Add: CLI parameter -dbUri / env var ORION_MONGO_URI (#3794)
+- Add: servicePath field to builtin attributes (#2877)
+- Add: notification payload in INFO log traces (#4449)
+- Add: log deprecation traces for usage of legacyForwarding mode in registrations
+- Add: log deprecation traces for usage of attrsFormat legacy in subscriptions
+- Add: deprecatedFeatures counters block in GET /v2/statistics
+- Fix: correctly detect JSON attribute and metadata value changes in subscription triggering logic (#4211, #4434, #643)
+- Fix: do not show dateExpires built-in attribute in GET /v2/types and GET /v2/types/{type} operations (#4451)
+- Fix: builtin attributes alterationType, dateCreated and dateModified included in notifications even when onlyChangedAttrs is true
+- Fix: update forwarding was not working when entity type is not included in the request (#4460)
+- Fix: DateTime and geo:json types were not supported in custom notifications using ngsi patching (#4435)
+- Fix: in custom notification NGSI payload patching macro subscription covering completely the string where is used, always cast to string for id/type (#4462)
+- Fix: on delete attributes operation, the lack of attribute in entity doesn't preclude the deletion of attributes which do exist (this way behaving same way as update attributes operation)
+- Fix: POST /v2/entities/E/attrs?options=append was wrongly creating entities
+- Fix: provide more informative error description in some error responses in update/delete operations
+- Fix: proper use of "PartialUpdate" (instead of "Unprocessed") in responses in the case of partial updates/deletions (#3499)
+- Fix: response 404 Not Found "NotFound" errors instead of 422 Unprocessable Content "Unprocessed" in the case of missing attribute in existing entity in attribute update operations
+- Fix: "Internal Server Error" changed to "InternalServerError" in error responses
+- Fix: improve logs in MongoDB query logic
+- Fix: logDeprecate not working correctly (`geo:json` wrongly considered as deprecated)
+- Fix: false positive in log deprecation logic when entity name (or other literal) includes the token "v1" (#4454)
+- Fix: improve error traces (#4387)
+- Hardening: upgrade libmongoc dependency from 1.23.1 to 1.24.3
+- Reference MongoDB version changed from 4.4 to 6.0
+- Reference distribution changed from Debian 11 to Debian 12
+- Upgrade Debian version from 11.6 to 12.4 in Dockerfile
+- Remove: deprecated NGSIv1 location metadata to specify entity geo-location
+
+3.10.0 (June 12th, 2023)
+
+- Add: option to change deprecate log setting in the REST management API
+- Fix: decimal rounding in some cases was generating wrong JSON in query responses and notifications (#4346)
+- Fix: pagination support in request query forwarding to Context Providers (#4149, #847, #1647)
+- Fix: count option not working when georel=near was in use (500 error was returned)
+- Fix: maxFailsLimit didn't work in some cases when update subscription is done just after cache refresh (only when csubs cache is enabled)
+- Fix: conditions.notifyOnMetadataChange false not working if condition.attrs is empty
+- Deprecate: `geo:json`, `geo:line`, `geo:box` and `geo:polygon` attribute types (use `geo:json` instead)
+- Remove: all NGSIv1 operations (deprecated in Orion 2.0.0) except the following ones
+    - PUT /v1/contextEntities/{id}
+    - DELETE /v1/contextEntities/{id}
+    - GET /v1/contextEntities/{id}/attributes/{name}
+    - POST /v1/updateContext
+    - POST /NGSI10/updateContext
+    - POST /v1/queryContext
+    - POST /NGSI10/queryContext
+
+3.9.0 (June 2th, 2023)
+
+- Add: new simplifiedNormalized and simplifiedKeyvalues for attrsFormat (#4286)
+- Add: subject.condition.notifyOnMetadataChange field to subscriptions, so only-metadata changes doesn't trigger notifications (#3727)
+- Add: support for update operators ($set, $addToSet, etc.) in entity creation and replace (#3814, reopnened)
+- Add: -mqttTimeout (env var ORION_MQTT_TIMEOUT) for MQTT broker connection timeout
+- Add: -disableNgsiv1 (env var ORION_DISABLE_NGSIV1) to disable NGSIv1 API requests
+- Add: -logDeprecate (env var ORION_LOG_DEPRECATE) to log deprecate usages at WARN level
+- Fix: alterationType with entityDelete not working if condition.attrs is empty (#4326)
+- Fix: $set/$unset update operator not working properly when the key has dots (#4315)
+- Fix: queue workers deadlock when MQTT broker was not responding to connection attemp
+- Fix: Ngsiv2-AttrsFormat header set to "normalized" in NGSI patching custom notification
+- Fix: memory access potential problem in GET /log/trace request when tracelevel 255 is enabled
+- Fix: Orion should return error and refuse to start when port is negative (#3875)
+- Fix: subscription autodisable based on maxFailsLimit not working when fails does not happen within the same csubs cache refresh cycle
+- Fix: incorrectly sum stale failsCounter from database when subscription has started to work again (only when csubs cache is enabled)
+- Fix: MQTT disconnection when MQTT publish fail (so re-connection is forced at next MQTT notification)
+- Fix: lineMaxSize and infoPayloadMaxSize in the log admin REST API (#3707)
+- Fix: check for service database name too long at cache sync logic (#2848)
+- Hardening: upgrade microhttpd dependency from 0.9.73 to 0.9.76
+
+3.8.0 (January 12th, 2023)
+
+- Add: json field in httpCustom and mqttCustom subscriptions to implement JSON-based payloads in notifications (#2560)
+- Add: ngsi field in httpCustom and mqttCustom subscriptions to implement NGSI payload patching in notifications (#4085)
+- Add: ${service}, ${servicePath} and ${authToken} macros in custom notifications (#4159)
+- Add: "Authorization" in CORS allowed headers (#4249)
+- Add: requestLegacy counters in GET /statistics response
+- Fix: conditions.alterationTypes not working properly when conditions.attributes is used in entityUpdate case (#1494, reopened)
+- Fix: GET /v2/types and GET /v2/types/{type} wrong attribute types result (#4216)
+- Fix: reset measuring_interval_in_secs correctly reset upon DELETE /statistics (#4233)
+- Fix: version request correctly recorded in statistics API (in "/version".GET instead than in separated versionRequests counter) (#4233)
+- Fix: GET /v2/registrations/{regId} was wrongly returning 200 OK instaed of 404 Not Found in case of non existing registration (#4235)
+- Fix: GET /statistics counters requests now use URLs intead of symbolic names
+- Fix: replace $where operator by $expr in subscription query logic in the -noCache case (#4148)
+- Upgrade Debian version from 11.2 to 11.6 in Dockerfile
+- Hardening: upgrade microhttpd dependency from 0.9.70 to 0.9.73
+- Hardening: upgrade libmosquitto dependency from 2.0.12 to 2.0.15
+- Hardening: upgrade libmongoc dependency from 1.17.4 to 1.23.1
+- Deprecated: GET /v2 operation
+- Remove: rendundant routes in administrative REST API not aligned with documentation
+- Remove: /ngsi9 URL paths (deprecated since Orion 1.2.0)
+- Remove: RPM package stuff
+
 3.7.0 (May 26th, 2022)
 
 - Add: conditions.alterationTypes subscription fuctionality (#1494)

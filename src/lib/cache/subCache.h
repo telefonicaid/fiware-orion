@@ -30,12 +30,11 @@
 #include <vector>
 
 #include "common/RenderFormat.h"
-#include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/Expression.h"
 #include "apiTypesV2/Subscription.h"
 
 
@@ -76,7 +75,7 @@ struct EntityInfo
 
 
   EntityInfo() {}
-  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
+  EntityInfo(const std::string& _entityId, const std::string& _entityType, bool _isPattern,
              bool _isTypePattern);
   ~EntityInfo() { release(); }
 
@@ -101,6 +100,8 @@ struct CachedSubscription
   char*                            servicePath;
   char*                            subscriptionId;
   int64_t                          failsCounter;
+  int64_t                          failsCounterFromDb;
+  bool                             failsCounterFromDbValid;
   int64_t                          maxFailsLimit;
   int64_t                          throttling;
   int64_t                          expirationTime;
@@ -109,10 +110,11 @@ struct CachedSubscription
   double                           statusLastChange;
   int64_t                          count;
   RenderFormat                     renderFormat;
-  SubscriptionExpression           expression;
+  Expression                       expression;
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
+  bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
@@ -194,7 +196,7 @@ extern void subCacheItemInsert
   const char*                        servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
   const ngsiv2::MqttInfo&            mqttInfo,
-  const std::vector<ngsiv2::EntID>&  entities,
+  const std::vector<EntityId>&       entities,
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,
@@ -219,7 +221,8 @@ extern void subCacheItemInsert
   const std::string&                 georel,
   bool                               blacklist,
   bool                               onlyChanged,
-  bool                               covered
+  bool                               covered,
+  bool                               notifyOnMetadataChange
 );
 
 
@@ -292,7 +295,8 @@ extern void subCacheMatch
   const char*                        entityId,
   const char*                        entityType,
   const std::vector<std::string>&    attributes,
-  const std::vector<std::string>&    modifiedAttrs,
+  const std::vector<std::string>&    attrsWithModifiedValue,
+  const std::vector<std::string>&    attrsWithModifiedMd,
   ngsiv2::SubAltType                 targetAltType,
   std::vector<CachedSubscription*>*  subVecP
 );

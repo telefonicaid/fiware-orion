@@ -40,7 +40,7 @@
 */
 extern void mongoListSubscriptions
 (
-  std::vector<ngsiv2::Subscription>*   vec,
+  std::vector<ngsiv2::Subscription*>*  vec,
   OrionError*                          oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,

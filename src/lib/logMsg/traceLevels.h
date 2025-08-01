@@ -74,9 +74,8 @@ typedef enum TraceLevels
   LmtCompoundValueRaw,
   LmtCompoundValueContainer,
   LmtCompoundValueStep,
-  LmtCompoundValueShow,
-  LmtJsonAttributes = 55,
-  LmtRegexError,
+  LmtJsonAttributes,
+  LmtRegexError = 55,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,
@@ -95,7 +94,6 @@ typedef enum TraceLevels
   /* Types (140-159) */
   LmtEntityId = 140,
   LmtRestriction,
-  LmtScope,
 
   /* Notifications (160-179) */
   LmtNotifier = 160,
@@ -131,6 +129,7 @@ typedef enum TraceLevels
   LmtNotImplemented,
   LmtCurlContext,
   LmtThreadpool,
+  LmtExpr,
 
   LmtOldInfo = 240,   // old INFO traces moved to DEBUG in Orion 2.5.0
 

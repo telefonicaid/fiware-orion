@@ -23,9 +23,8 @@ This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
 in the process :).
 
-The walkthrough is based on the NGSIv2 Specification, that can be found
-in Apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
-You should also have a look at the [NGSIv2 implementation notes](ngsiv2_implementation_notes.md).
+The walkthrough is based on the Orion API specification (based, in sequence, in the
+NGSIv2 Specification), that can be found [here](../orion-api.md).
 
 The main section is [context management](#context-management). It describes the
 basic context broker functionality for context management (information about entities,
@@ -118,14 +117,14 @@ host and/or port can be specified) and echoes whatever it receives in the
 terminal window where it is executed. Run it using the following
 command:
 
-```
-# cd /dir/where/accumulator-server/is/downloaded
-# chmod a+x accumulator-server.py
-# ./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
+```shell
+cd /dir/where/accumulator-server/is/downloaded
+chmod a+x accumulator-server.py
+./accumulator-server.py --port 1028 --url /accumulate --host ::1 --pretty-print -v
 ```
 
-Note this script requires Flask version 2.0.2 and paho-mqtt version 1.6.1, which can be installed using
-`pip install Flask==2.0.2` and `pip install paho-mqtt==1.6.1`. In addition, it is recommended to use
+Note this script requires Flask version 2.0.2 (along with Werkzeug 2.0.2) and paho-mqtt version 1.6.1, which can be installed using
+`pip install Flask==2.0.2 Werkzeug==2.0.2` and `pip install paho-mqtt==1.6.1` respectively. In addition, it is recommended to use
 Python 3.10.x In case of conflict with your base operating system Python installation, we recommend to use [virtualenv](https://virtualenv.pypa.io/en/latest/).
 
 More information about installing the accumulator (including an alternative based in docker) can be checked
@@ -149,15 +148,15 @@ following:
 
 -   For POST:
 
-```
-curl localhost:1026/<operation_url> -s -S [headers]' -d @- <<EOF
+```shell
+curl localhost:1026/<operation_url> -s -S [headers] -d @- <<EOF
 [payload]
 EOF
 ```
 
 -   For PUT:
 
-```
+```shell
 curl localhost:1026/<operation_url> -s -S [headers] -X PUT -d @- <<EOF
 [payload]
 EOF
@@ -165,7 +164,7 @@ EOF
 
 -   For PATCH:
 
-```
+```shell
 curl localhost:1026/<operation_url> -s -S [headers] -X PATCH -d @- <<EOF
 [payload]
 EOF
@@ -173,13 +172,13 @@ EOF
 
 -   For GET:
 
-```
+```shell
 curl localhost:1026/<operation_url> -s -S [headers]
 ```
 
 -   For DELETE:
 
-```
+```shell
 curl localhost:1026/<operation_url> -s -S [headers] -X DELETE
 ```
 
@@ -188,14 +187,14 @@ Regarding \[headers\] you have to include the following ones:
 -   Accept header to specify the payload format in which
     you want to receive the response. You should explicitly specify JSON.
 
-```
+```shell
 curl ... -H 'Accept: application/json' ...
 ```
 
 -   If using payload in the request (i.e. POST, PUT or PATCH),
     you have to supply the `Context-Type` HTTP header to specify the format (JSON).
 
-```
+```shell
 curl ... -H 'Content-Type: application/json' ...
 ```
 
@@ -211,9 +210,11 @@ Some additional remarks:
     different port.
 
 -   In order to pretty-print JSON in responses, you can use Python with
-    msjon.tool (examples along with tutorial are using this style):
+    mjson.tool (examples along with tutorial are using this style). Replace
+    `python` by the particular Python executable in your case (e.g. in some
+    cases it could be `| python3 -mjson.tool`).
 
-```
+```shell
 (curl ... | python -mjson.tool) <<EOF
 ...
 EOF
@@ -221,7 +222,7 @@ EOF
 
 -   Check that curl is installed in your system using:
 
-```
+```shell
 which curl
 ```
 
@@ -249,7 +250,7 @@ First, we are going to create Room1. Let's assume that at entity
 creation time, temperature and pressure of Room1 are 23 ºC and 720 mmHg
 respectively.
 
-```
+```shell
 curl localhost:1026/v2/entities -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "id": "Room1",
@@ -282,7 +283,7 @@ with a 201 Created HTTP code.
 Next, let's create Room2 in a similar way (in this case, setting
 temperature and pressure to 21 ºC and 711 mmHg respectively).
 
-```
+```shell
 curl localhost:1026/v2/entities -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "id": "Room2",
@@ -301,8 +302,8 @@ EOF
 
 Apart from simple values corresponding to JSON datatypes (i.e. numbers, strings, booleans, etc.)
 for attribute values, complex structures or custom metadata can be used. This is an advanced
-topic, described in [this section](structured_attribute_valued.md#structured-attribute-values ) and
-[this other](metadata.md#custom-attribute-metadata), respectively.
+topic, described in [this section](../orion-api.md#json-attribute-representation) and
+[this other](../orion-api.md#context-metadata), respectively.
 
 [Top](#top)
 
@@ -314,14 +315,14 @@ interesting with it (e.g. show a graph with the room temperature in a
 graphical user interface). The `GET /v2/entities/{id}` request is used in
 this case, e.g. to get context information for Room1:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1?type=Room -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Actually, you don't need to specify the type, as in this case there is no
 ambiguity using just the ID, so you can also do:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1 -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
@@ -329,7 +330,7 @@ In both cases,the response includes all the attributes belonging to Room1 and we
 check that temperature and pressure have the values that we set at
 entity creation with updateContext (23ºC and 720 mmHg).
 
-```
+```json
 {
     "id": "Room1",
     "pressure": {
@@ -349,13 +350,13 @@ entity creation with updateContext (23ºC and 720 mmHg).
 
 The `keyValues` option can be used in order to get a more compact and brief representation, including just attribute values:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1?options=keyValues -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
 
-```
+```json
 {
     "id": "Room1",
     "pressure": 720,
@@ -367,14 +368,14 @@ Response:
 You can also use the `values` option in order to get an even more compact representation corresponding to a list of attribute
 values. In this case, the `attrs` URL parameter needs to be used to specify the order. Eg, to get temperature first, then pressure:
 
-```
+```shell
 curl 'localhost:1026/v2/entities/Room1?options=values&attrs=temperature,pressure' -s -S  \
     -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
 
-```
+```json
 [
     23,
     720
@@ -385,14 +386,14 @@ Compare with the same operation, but reversing the `attrs` list (pressure first,
 
 Request:
 
-```
+```shell
 curl 'localhost:1026/v2/entities/Room1?options=values&attrs=pressure,temperature' -s -S  \
     -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
 
-```
+```json
 [
     720,
     23
@@ -403,13 +404,13 @@ Response:
 You can also request a single attribute, using the `GET /v2/entities/{id}/attrs/{attrsName}` operation. For example, to
 get only the temperature:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs/temperature -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 whose response is as follows:
 
-```
+```json
 {
     "metadata": {},
     "type": "Float",
@@ -421,7 +422,7 @@ You can also get only the value using the operation `GET /v2/entities/{id}/attrs
 you need to use `Accept: text/plain` as the value of the attribute is of that kind.
 
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Accept: text/plain' | python -mjson.tool
 ```
 
@@ -436,13 +437,13 @@ non-existing entity or attribute, as shown in the following cases below.
 
 Request:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room5 -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
 
-```
+```json
 {
     "description": "The requested entity has not been found. Check type and id",
     "error": "NotFound"
@@ -451,13 +452,13 @@ Response:
 
 Request:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs/humidity -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
 
-```
+```json
 {
     "description": "The entity does not have such an attribute",
     "error": "NotFound"
@@ -472,13 +473,13 @@ In both cases, the HTTP response code (not visible in the example) is 404 Not Fo
 
 You can get all the entities using the `GET /v2/entities` operation
 
-```
+```shell
 curl localhost:1026/v2/entities -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 In our case, both Room1 and Room2 will be returned:
 
-```
+```json
 [
     {
         "id": "Room1",
@@ -521,7 +522,7 @@ particular:
   entities with type `Room` (in this case retrieving both Room1 and Room2)
   you can use:
 
-```
+```shell
 curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' | python -mjson.tool
 ```
 
@@ -530,27 +531,27 @@ curl localhost:1026/v2/entities?type=Room -s -S  -H 'Accept: application/json' |
   id starts with `Room` and is followed by a number in the 2 to 5 range
   (in this case retrieving Room2) you can use (note the `-g` in curl command line
   to avoid problems with brackets):
-```
+```shell
 curl localhost:1026/v2/entities?idPattern=^Room[2-5] -g -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 * You can filter using attribute filters, using the URL parameter `q`. For
-  a complete description, please have a look at the "Simple Query Language" section in
-  the [NGSv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable).
+  a complete description, please have a look at the [Simple Query Language section](../orion-api.md#simple-query-language) in
+  the Orion API specification.
   For example, to get all entities whose temperature is above 22 (in this case
   retriving Room1). you can use:
-```
+```shell
 curl 'localhost:1026/v2/entities?q=temperature>22' -s -S  -H 'Accept: application/json' | python -mjson.tool
 ```
 
 * You can filter by geographical location. This is an advanced topic, described in
-  [this section](geolocation.md#geolocation-capabilities).
+  [this section](../orion-api.md#geographical-queries).
 
 As a final comment, note that although our example is very simple (only 2 entities), Orion
 can manage millions of entities in a real deployment. However, by default, only 20 entities
 are returned (which is fine for this tutorial, but probably not for a real utilization
 scenario). In order to learn about how to retrieve large sets of entities page by page,
-please refer to [the section on pagination](pagination.md#pagination) in this manual.
+please refer to [the section on pagination](../orion-api.md#pagination) in the Orion API specification.
 
 [Top](#top)
 
@@ -564,7 +565,7 @@ source of context information. Let's assume that this application in a
 given moment wants to set the temperature and pressure of Room1 to 26.5 ºC and
 763 mmHg respectively, so it issues the following request:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs -s -S -H 'Content-Type: application/json' -X PATCH -d @- <<EOF
 {
   "temperature": {
@@ -594,7 +595,7 @@ the value of an attribute in a really compact way and leaving the attribute type
 For example, to update Room1 temperature to 28.4 (note that the Content-Type here is `text/plain`
 which corresponds to the value `28.4` - no JSON involved here ...):
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs/temperature/value -s -S -H 'Content-Type: text/plain' -X PUT -d 28.5
 ```
 
@@ -604,11 +605,10 @@ of a given entity, i.e. removing previously existing ones.
 As in the case of entity creation, apart from simple values corresponding to
 JSON datatypes (i.e. numbers, strings, booleans, etc.) for attribute values, you can also
 use complex structures or custom metadata. These are advanced topics, described in
-[this section](structured_attribute_valued.md#structured-attribute-values ) and
-[this other](metadata.md#custom-attribute-metadata ), respectively.
+[this section](../orion-api.md#json-attribute-representation) and
+[this other](../orion-api.md#context-metadata), respectively.
 
-More details on adding/removing attributes can be found in [this section](update_action_types.md)
-of the manual.
+More details on adding/removing attributes can be found in the [Orion API specification](../orion-api.md).
 
 In the examples of this walkthrough we update attributes with particular values,
 such as `26.5`. However, you can also do updates like *"increase tempeture by 2.5 degrees"*.
@@ -636,7 +636,7 @@ In order to create a subscription, the following `POST /v2/subscriptions` operat
 is used. Let's consider the following example (note we are using `-v` to get the Location
 header in the response, as explained later on):
 
-```
+```shell
 curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "A subscription to get info about Room1",
@@ -708,8 +708,8 @@ Let's examine in detail the different elements included in the payload:
     trigger on any entity attribute change (regardless of the name of the attribute).
 -   Notifications include the attribute values *after* processing the update operation
     triggering the notification. However, you can make Orion include also the
-    *previous* value. This is achieved using metadata. Have a look at
-    [the following piece of documentation](metadata.md#metadata-in-notifications).
+    *previous* value. This is achieved using `previousValue` built-in metadata. Have a look at
+    [the following piece of documentation](../orion-api.md#builtin-metadata).
 -   You can also set "notify all attributes except _some_" subscriptions (a kind of
     "blacklist" functionality). In this case, use `exceptAttrs` instead of `attrs`
     within `notifications`.
@@ -719,7 +719,7 @@ In addition, it contains a `Location header` which holds the subscription ID: a
 24 digit hexadecimal number used for updating and cancelling the subscription.
 Write it down because you will need it later in this tutorial.
 
-```
+```text
 < HTTP/1.1 201 Created
 < Connection: Keep-Alive
 < Content-Length: 0
@@ -731,7 +731,7 @@ Write it down because you will need it later in this tutorial.
 Now that subscription has been created you can trigger it with any change in Room1
 pressure. For instance, let's do the following update:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 802
 ```
 
@@ -739,7 +739,7 @@ curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Typ
 Let's have a look now at accumulator-server.py. We will see one notification (and 
 just one for the moment, no matter how long you wait), similar to this one:
 
-```
+```text
 POST http://localhost:1028/accumulate
 Content-Length: 141
 User-Agent: orion/1.1.0-next libcurl/7.38.0
@@ -785,12 +785,12 @@ entity](#update-entity): perform the following four updates in sequence:
     consequently no notification is sent.
 -   update Room1 pressure to 765 adding `?options=forcedUpdate` to the request URL: 
     In this case, the broker will send the notification, because of the `forcedUpdate`
-    URI option. Details about `forcedUpdate` URI option are described [here](ngsiv2_implementation_notes.md#forcedupdate-option).
+    URI option. Details about `forcedUpdate` URI option are in the [Orion API specification](../orion-api.md).
 -   update Room2 pressure to 740: nothing happens, as the subscription
     is for Room1, not Room2.
 
 Subscriptions can be retrieved using `GET /v2/subscriptions` (which
-provides the whole list and [pagination](pagination.md) may be needed if the
+provides the whole list and [pagination](../orion-api.md#pagination) may be needed if the
 list is too large) or `GET /v2/subscriptions/{subId}` (to get a single
 subscription). In addition, subscriptions can be updated using the `PATCH /v2/subscription/{subId}`
 operation. Finally, subscriptions can be deleted using the `DELETE /v2/subscriptions/{subId}` operation.
@@ -799,7 +799,7 @@ Some additional considerations:
 
 * Subscriptions can be paused. In order to do so, set the `status` attribute
   to "inactive" (and if you want to resume the subscription, set it back to "active"):
-```
+```shell
 curl localhost:1026/v2/subscriptions/57458eb60962ef754e7c0998 -s -S \
     -X PATCH -H 'Content-Type: application/json' -d @- <<EOF
 {
@@ -812,8 +812,9 @@ EOF
   representation format in notifications, using the `attrsFormat` field within
   `notification`. Secondly, you can use a custom notification HTTP verb (e.g. PUT),
   custom HTTP headers, custom URL query parameters and custom payloads (not necessarily in JSON).
-  Have a look at "Notification Messages" and "Custom Notifications" in the
-  [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+  Have a look at [Notification Messages](../orion-api.md#notification-messages) and
+  [Custom Notifications](../orion-api.md#custom-notifications) sections in the
+  Orion API specification.
 * In addition to the HTTP notifications described in this section, Orion also supports
   MQTT notifications. This topic is described in more detail in [this document](mqtt_notifications.md).
 
@@ -825,7 +826,7 @@ You can include filtering expressions in `condition`. For example, to get notifi
 not only if pressure changes, but if it changes within the range 700-800. This would be done
 with the following subscription:
 
-```
+```shell
 curl -v localhost:1026/v2/subscriptions -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "description": "A subscription to get info about Room1 with filtering expresion",
@@ -860,18 +861,19 @@ EOF
 
 So now the following update will trigger a notification:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 715
 ```
 
 but the following one won't:
 
-```
+```shell
 curl localhost:1026/v2/entities/Room1/attrs/pressure/value -s -S -H 'Content-Type: text/plain' -X PUT -d 801
 ```
 
 There are more possibilities apart from range filters (equality filters, geo-filters, etc.). This is
-an advanced topic, see the "Subscriptions" section in the [NGSIv2 specification](http://telefonicaid.github.io/fiware-orion/api/v2/stable/).
+an advanced topic, see the [Subscriptions conditions section](../orion-api.md#subscriptionsubjectcondition)
+section in the Orion API specification.
 
 [Top](#top)
 
@@ -881,13 +883,13 @@ The following operation can be used to get a list of all entity types
 that exist in the Orion Context Broker in a given moment. For example, let's assume
 we have three entities of type Room and two entities of type Car:
 
-```
+```shell
 curl localhost:1026/v2/types -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 Response:
 
-```
+```json
 [
     {
         "attrs": {
@@ -939,32 +941,32 @@ important remarks:
 If you only need a list of the entity types (without any extra attribute details),
 you can use:
 
-```
+```shell
 curl localhost:1026/v2/types?options=values -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 and get:
 
-```
+```json
 [
     "Car",
     "Room"
 ]
 
 ```
-Note that the [pagination mechanism](pagination.md#pagination) also works in
+Note that the [pagination mechanism](../orion-api.md#pagination) also works in
 the `GET /v2/types` operation described above.
 
 In addition, you can use the following operation to get detailed
 information of a single type:
 
-```
+```shell
 curl localhost:1026/v2/types/Room -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
 The response will be:
 
-```
+```json
 {
     "attrs": {
         "pressure": {
@@ -995,7 +997,7 @@ Batch update allows you to create or update several entities with a single reque
 For example, to create Room3 (temperature 21.2 and pressure 722) and Room4
 (temperature 31.8 and pressure 712) you can use:
 
-```
+```shell
 curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "actionType": "append",
@@ -1034,7 +1036,7 @@ In this case we are using `append` `actionType`, which is for adding entities an
 `update` to change an attribute in one entity (temperature in Room3) and another
 attribute in other (pressure in Room4), leaving the other attributes untouched.
 
-```
+```shell
 curl -v localhost:1026/v2/op/update -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "actionType": "update",
@@ -1061,11 +1063,11 @@ EOF
 ```
 
 Apart from `append` and `update`, there are other action types: `delete`, `appendStrict`, etc.
-See [this section](update_action_types.md) for details.
+See [this section in the Orion API specification](../orion-api.md#update-post-v2opupdate) for details.
 
 Finally, the `POST /v2/op/query` allows to retrieve entities matching a query condition
 specified in the payload. It is very similar to `GET /v2/entities` (in fact, the response
-payload is the same and it also supports [pagination](pagination.md) in the same way).
+payload is the same and it also supports [pagination](../orion-api.md#pagination) in the same way).
 However `POST /v2/op/query` can express queries that `GET /v2/entities` cannot (e.g.
 a list of entities of different type).
 
@@ -1073,7 +1075,7 @@ For example, to get the attributes temperature and pressure of all the entities 
 whose temperature is greater than 40 and that are located within 20 km from the coordinates 40.31, -3.75, the
 following operation could be used:
 
-```
+```shell
 curl -v localhost:1026/v2/op/query -s -S -H 'Content-Type: application/json' -d @- <<EOF
 {
   "entities": [
@@ -1112,7 +1114,7 @@ information (named a "context provider") and what entities and attributes are pr
 Let's illustrate with an example, creating a simple registration.
 We are stating that the attributes temperature and pressure of Room5 are provided by a context provider in the URL http://mysensors.com/Rooms:
 
-```
+```shell
 curl -v localhost:1026/v2/registrations -s -S -H 'Content-Type: application/json' -d @-  <<EOF
 {
   "description": "Registration for Room5",
@@ -1142,7 +1144,7 @@ In addition, it contains a `Location header` which holds the registration ID: a
 24 digit hexadecimal number used for updating and deleting the registration.
 Write it down because you will need it later in this tutorial.
 
-```
+```text
 < HTTP/1.1 201 Created
 < Connection: Keep-Alive
 < Content-Length: 0
@@ -1153,7 +1155,7 @@ Write it down because you will need it later in this tutorial.
 
 You may retrieve the list of existing registrations using the following request:
 
-```
+```shell
 curl localhost:1026/v2/registrations -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
@@ -1163,7 +1165,7 @@ response uses `[...]` so a full list could be present.
 In addition, you may retrieve a single registration using the following request (replace `5a82be3d093af1b94ac0f730`
 by the actual registration ID in your case):
 
-```
+```shell
 curl localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 
@@ -1175,7 +1177,7 @@ advanced topic out of the scope of this tutorial. Please have a look at the [con
 Finally, you can delete an existing registration with the following request (replace `5a82be3d093af1b94ac0f730` by the actual
 registration ID in your case):
 
-```
+```shell
 curl -X DELETE localhost:1026/v2/registrations/5a82be3d093af1b94ac0f730 -s -S -H 'Accept: application/json' | python -mjson.tool
 ```
 

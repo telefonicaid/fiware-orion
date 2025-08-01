@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi10/UpdateContextRequest.h"
+#include "ngsi/UpdateContextRequest.h"
 
 
 

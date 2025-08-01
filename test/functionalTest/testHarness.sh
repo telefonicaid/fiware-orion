@@ -96,6 +96,8 @@ declare -A skipV
 typeset -i skips
 declare -A disabledTestV
 typeset -i disabledTests
+declare -A notInFlavourTestV
+typeset -i notInFlavourTests
 
 export DIFF=$SCRIPT_HOME/testDiff.py
 testError=0
@@ -104,6 +106,7 @@ okOnThird=0
 okOnPlus3=0
 skips=0
 disabledTests=0
+notInFlavourTests=0
 
 
 # -----------------------------------------------------------------------------
@@ -632,7 +635,7 @@ function fileCreation()
   then
     TEST_REGEXPECT=${pathWithoutExt}.regexpect
     vMsg "Creating $TEST_REGEXPECT at $PWD"
-    sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" > $TEST_REGEXPECT
+    sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" | sed '/^##/d' > $TEST_REGEXPECT
   else
     exitFunction 5 "--REGEXPECT-- part is missing" $path "($path)" "" DIE
   fi
@@ -914,7 +917,8 @@ function testDisabled
   dIx=0
   while [ $dIx -lt  ${#DISABLED[@]} ]
   do
-    if [ test/functionalTest/cases/$testcase == ${DISABLED[$dIx]} ]
+    # Comparison is done based in filename, skipping the path (see https://stackdiary.com/tutorials/bash-get-filename-from-path/)
+    if [ "${testcase##*/}" == "${DISABLED[$dIx]##*/}" ]
     then
       echo "Disabled"
 
@@ -932,6 +936,30 @@ function testDisabled
     dIx=$dIx+1
   done
   echo NOT Disabled
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# testMatchExprFlavour
+#
+function testMatchExprFlavour
+{
+  testcase=$1
+
+  if grep -q JEXL_EXPR_FLAVOUR $testcase
+  then
+    if $(contextBroker --version | grep -q jexl-expr)
+    then
+      echo NOT Disabled
+    else
+      echo "Disabled"
+      echo "Disabled" > /tmp/valgrind.out
+    fi
+  else
+    echo NOT Disabled
+  fi
 }
 
 
@@ -969,6 +997,17 @@ do
   then
     disabledTestV[$disabledTests]=$testNo': '$testFile
     disabledTests=$disabledTests+1
+    continue
+  fi
+
+  #
+  # Should the test be skipped due to it doesn't mach in the contextBroker flavour?
+  #
+  notInFlavour=$(testMatchExprFlavour $testFile)
+  if [ "$notInFlavour" == "Disabled" ]
+  then
+    notInFlavourTestV[$notInFlavourTests]=$testNo': '$testFile
+    notInFlavourTests=$notInFlavourTests+1
     continue
   fi
 
@@ -1185,6 +1224,18 @@ then
   while [ $ix -lt $disabledTests ]
   do
     echo "  o " ${disabledTestV[$ix]}
+    ix=$ix+1
+  done
+fi
+
+if [ $notInFlavourTests != 0 ]
+then
+  echo
+  echo WARNING: $notInFlavourTests test cases were not executed due to contexBroker not matching flavour:
+  ix=0
+  while [ $ix -lt $notInFlavourTests ]
+  do
+    echo "  o " ${notInFlavourTestV[$ix]}
     ix=$ix+1
   done
 fi

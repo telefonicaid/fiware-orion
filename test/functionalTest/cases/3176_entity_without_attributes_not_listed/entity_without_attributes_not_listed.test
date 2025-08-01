@@ -55,8 +55,7 @@ payload='{
     "http": {
       "url": "http://contextsource.example.org"
     },
-    "supportedForwardingMode": "all",
-    "legacyForwarding": true
+    "supportedForwardingMode": "all"
   },
   "status": "active"
 }'
@@ -87,30 +86,30 @@ echo
 01. POST /v2/registrations
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. POST /v2/entities
 =====================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 25
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 25
 
 [
     {

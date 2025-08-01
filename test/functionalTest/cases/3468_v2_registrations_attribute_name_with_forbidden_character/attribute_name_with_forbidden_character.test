@@ -117,10 +117,10 @@ echo
 01. POST /v2/registrations Forbidden character in attribute name
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
 
 {
     "description": "forbidden characters in attribute name",
@@ -131,10 +131,10 @@ Date: REGEX(.*)
 02. POST /v2/registrations Forbidden character in entity id
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 90
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
 
 {
     "description": "forbidden characters in /entities/ vector item /id/",
@@ -145,10 +145,10 @@ Date: REGEX(.*)
 03. POST /v2/registrations Forbidden character in entity type
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "forbidden characters in /entities/ vector item /type/",

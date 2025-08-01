@@ -65,7 +65,6 @@
 // The following counters are still under discussion
 //
 #define METRIC_TRANSACTIONS                        "transactions"
-#define METRIC_NGSIV1_TRANSACTIONS                 "ngsiv1Transactions"
 #define METRIC_NGSIV2_TRANSACTIONS                 "ngsiv2Transactions"
 #define METRIC_AVERAGE_TRANSACTION_TIME            "averageTransactionTime"
 #define METRIC_OK_TRANSACTIONS                     "okTransactions"
@@ -138,7 +137,7 @@ class MetricsManager
  public:
   MetricsManager();
 
-  bool         init(bool _on, bool _semWaitStatistics);
+  void         init(bool _on, bool _semWaitStatistics);
   void         add(const std::string& srv, const std::string& subServ, const std::string& metric, uint64_t value);
   void         reset(void);
   std::string  toJson(bool doReset);

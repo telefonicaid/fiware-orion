@@ -30,6 +30,8 @@
 
 #include "mongoDriver/BSONObj.h"
 #include "parse/CompoundValueNode.h"
+#include "apiTypesV2/CustomPayloadType.h"
+#include "apiTypesV2/Entity.h"
 
 namespace ngsiv2
 {
@@ -42,10 +44,13 @@ struct MqttInfo
   std::string   url;
   std::string   topic;
   unsigned int  qos;  // 0, 1 or 2
+  bool          retain;
 
   bool                       custom;
-  std::string                payload;  // either payload or json is used
-  orion::CompoundValueNode*  json;  // either payload or json is used
+  std::string                payload;  // either payload, json or ngsi is used (depending on payloadType)
+  orion::CompoundValueNode*  json;     // either payload, json or ngsi is used (depending on payloadType)
+  Entity                     ngsi;     // either payload, json or ngsi is used (depending on payloadType)
+  CustomPayloadType          payloadType;
   bool                       includePayload;
 
   bool          providedAuth;
@@ -53,10 +58,10 @@ struct MqttInfo
   std::string   passwd;
 
   MqttInfo();
-  explicit MqttInfo(const std::string& _url);
 
   std::string  toJson();
   void         fill(const orion::BSONObj& bo);
+  void         fill(const MqttInfo& _mqttInfo);
   void         release();
 };
 }

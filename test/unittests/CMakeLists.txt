@@ -65,32 +65,17 @@ SET (SOURCES
     testInit.cpp
     unittest.cpp
 
-    serviceRoutines/badVerbGetOnly_test.cpp
-    serviceRoutines/badVerbPostOnly_test.cpp
-    serviceRoutines/badVerbAllFour_test.cpp
-    serviceRoutines/badVerbGetPostOnly_test.cpp
-    serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
-    serviceRoutines/badVerbGetDeleteOnly_test.cpp
-    serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
-    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/putSubscriptionConvOp_test.cpp
-    serviceRoutines/versionTreat_test.cpp
-    serviceRoutines/exitTreat_test.cpp
-    serviceRoutines/statisticsTreat_test.cpp
+    serviceRoutinesV2/badVerbGetOnly_test.cpp
+    serviceRoutinesV2/badVerbPostOnly_test.cpp
+    serviceRoutinesV2/badVerbGetPostOnly_test.cpp
+    serviceRoutinesV2/badVerbGetDeleteOnly_test.cpp
+    serviceRoutinesV2/badVerbGetPutDeleteOnly_test.cpp
+    serviceRoutinesV2/versionTreat_test.cpp
+    serviceRoutinesV2/exitTreat_test.cpp
+    serviceRoutinesV2/statisticsTreat_test.cpp
 
-    convenience/Convenience_test.cpp
-    convenience/AppendContextElementRequest_test.cpp
-    convenience/AppendContextElementResponse_test.cpp
-    convenience/ContextAttributeResponse_test.cpp
-    convenience/ContextAttributeResponseVector_test.cpp
-    convenience/UpdateContextAttributeRequest_test.cpp
-    convenience/UpdateContextElementRequest_test.cpp
-    convenience/UpdateContextElementResponse_test.cpp
-    convenience/RegisterProviderRequest_test.cpp
     common/commonFormat_test.cpp
-    common/commonGlobals_test.cpp
     common/commonString_test.cpp
-    common/commonTag_test.cpp
     common/commonSem_test.cpp
     # FIXME P3: this test is aligned with the old version of the statistics logic for NGSIv1
     # it should be moved to NGSIv2 or, alternatively, removed the file at the end
@@ -98,60 +83,17 @@ SET (SOURCES
     common/commonWsStrip_test.cpp
     common/commonMacroSubstitute_test.cpp
 
-    ngsi9/RegisterContextRequest_test.cpp
-    ngsi9/RegisterContextResponse_test.cpp
-    ngsi9/DiscoverContextAvailabilityRequest_test.cpp
-    ngsi9/DiscoverContextAvailabilityResponse_test.cpp
-
-    ngsi10/QueryContextRequest_test.cpp
-    ngsi10/QueryContextResponse_test.cpp
-    ngsi10/NotifyContextRequest_test.cpp
-    ngsi10/SubscribeContextRequest_test.cpp
-    ngsi10/SubscribeContextResponse_test.cpp
-    ngsi10/UnsubscribeContextRequest_test.cpp
-    ngsi10/UnsubscribeContextResponse_test.cpp
-    ngsi10/UpdateContextRequest_test.cpp
-    ngsi10/UpdateContextResponse_test.cpp
-    ngsi10/UpdateContextSubscriptionRequest_test.cpp
-    ngsi10/UpdateContextSubscriptionResponse_test.cpp
+    ngsi/NotifyContextRequest_test.cpp
 
     ngsi/ContextAttribute_test.cpp
-    ngsi/NotifyCondition_test.cpp
     ngsi/AttributeList_test.cpp
-    ngsi/ConditionValueList_test.cpp
-    ngsi/ContextAttributeVector_test.cpp
     ngsi/ContextElementResponse_test.cpp
     ngsi/ContextElementResponseVector_test.cpp
-    ngsi/ContextRegistrationAttribute_test.cpp
-    ngsi/ContextRegistrationAttributeVector_test.cpp
-    ngsi/ContextRegistrationVector_test.cpp
-    ngsi/ProvidingApplication_test.cpp
-    ngsi/Duration_test.cpp
-    ngsi/AttributeExpression_test.cpp
-    ngsi/ContextRegistrationResponse_test.cpp
-    ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
     ngsi/Metadata_test.cpp
     ngsi/MetadataVector_test.cpp
-    ngsi/NotifyConditionVector_test.cpp
-    ngsi/Originator_test.cpp
-    ngsi/Reference_test.cpp
-    ngsi/Restriction_test.cpp
     ngsi/Request_test.cpp
-    ngsi/RestrictionString_test.cpp
-    ngsi/Scope_test.cpp
-    ngsi/ScopeVector_test.cpp
-    ngsi/StatusCode_test.cpp
-    ngsi/SubscribeError_test.cpp
-    ngsi/SubscriptionId_test.cpp
-    ngsi/Throttling_test.cpp
 
-    orionTypes/EntityType_test.cpp
-    orionTypes/EntityTypeResponse_test.cpp
-    orionTypes/EntityTypeVector_test.cpp
-    orionTypes/EntityTypeVectorResponse_test.cpp
-
-    apiTypesV2/Entities_test.cpp
     apiTypesV2/Entity_test.cpp  
     apiTypesV2/EntityVector_test.cpp
 
@@ -182,13 +124,10 @@ SET (SOURCES
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp
-    parse/nullTreat_test.cpp
-    jsonParse/jsonRequest_test.cpp
 
     rest/OrionError_test.cpp
     rest/Verb_test.cpp
     rest/restReply_test.cpp
-    rest/RestService_test.cpp
     rest/rest_test.cpp
 )
 
@@ -245,11 +184,9 @@ MESSAGE("unitTest distro: '${DISTRO}'")
 
 IF(${DISTRO} MATCHES "CentOS_6.*")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
-ELSEIF((${DISTRO} MATCHES "Debian_8.*") OR (${DISTRO} MATCHES "Debian_9.*") OR (${DISTRO} MATCHES "Debian_10.*") OR (${DISTRO} MATCHES "Debian_11.*"))
-  # It seems that Debian 8.x/9.x doesn't like -mt libraries for unit tests... not sure about other Debian versions
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
+# From Debian 8.x to 12.x: they don't like -mt libraries for unit tests
 ELSEIF(${DISTRO} MATCHES "Debian_.*")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST_MT} ${DYNAMIC_LIBS})
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} ${BOOST} ${DYNAMIC_LIBS})
 
 # The following ones are distros that haven't been checked since the refactoring in
 # PR #2062. They should be "promoted" as soon as we have positive feedback about

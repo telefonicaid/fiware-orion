@@ -97,13 +97,13 @@ echo
 01. Update using empty entity id and see error
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
-    "description": "entity id length: 0, min length supported: 1",
+    "description": "id and idPattern cannot be both empty at the same time",
     "error": "BadRequest"
 }
 
@@ -111,10 +111,10 @@ Date: REGEX(.*)
 02. Update using entity id exceding length and see error
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 87
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 87
 
 {
     "description": "entity id length: 257, max length supported: 256",
@@ -125,10 +125,10 @@ Date: REGEX(.*)
 03. Check no entity has been created
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

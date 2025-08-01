@@ -19,8 +19,9 @@
 # iot_support at tid dot es
 #
 
-ARG  IMAGE_TAG=11.3-slim
-FROM debian:${IMAGE_TAG}
+ARG  IMAGE_NAME=debian
+ARG  IMAGE_TAG=12.10-slim
+FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
 ARG GITHUB_REPOSITORY=fiware-orion
@@ -38,7 +39,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR /opt
 
-RUN \
+RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # Install security updates
     apt-get -y update && \
     apt-get -y upgrade && \
@@ -60,18 +61,18 @@ RUN \
       libgcrypt-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
-    curl -kOL http://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.70.tar.gz && \
-    tar xvf libmicrohttpd-0.9.70.tar.gz && \
-    cd libmicrohttpd-0.9.70 && \
+    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz && \
+    tar xvf libmicrohttpd-1.0.1.tar.gz && \
+    cd libmicrohttpd-1.0.1 && \
     ./configure --disable-messages --disable-postprocessor --disable-dauth && \
     make && \
     make install && \
     ldconfig && \
     # Install mosquitto from source
     cd /opt && \
-    curl -kOL http://mosquitto.org/files/source/mosquitto-2.0.12.tar.gz && \
-    tar xvf mosquitto-2.0.12.tar.gz && \
-    cd mosquitto-2.0.12 && \
+    curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz && \
+    tar xvf mosquitto-2.0.20.tar.gz && \
+    cd mosquitto-2.0.20 && \
     sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
     sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
     sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
@@ -80,12 +81,14 @@ RUN \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
-    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz && \
-    tar xfvz mongo-c-driver-1.17.4.tar.gz && \
-    cd mongo-c-driver-1.17.4 && \
+    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz && \
+    tar xfvz mongo-c-driver-1.29.0.tar.gz && \
+    cd mongo-c-driver-1.29.0 && \
     mkdir cmake-build && \
     cd cmake-build && \
-    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..   && \
+    # Different from ci/deb/build-dep.sh and build from source documentation, we add here also
+    # the MONGOC_TEST_USE_CRYPT_SHARED=FALSE. It needs Python and in this tiny image we don't have it
+    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE ..   && \
     make && \
     make install && \
     # Install rapidjson from source
@@ -99,6 +102,7 @@ RUN \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
+    bash get_cjexl.sh 0.6.0 $(cat /run/secrets/repo_token) && \
     make && \
     make install && \
     # reduce size of installed binaries
@@ -112,16 +116,17 @@ RUN \
     # cleanup sources, dev tools and locales to reduce the final image size
     # FIXME: this could need more tunning. Have a look to old CentOS Docerkile and try to
     # reproduce the same steps
-    rm -rf /opt/libmicrohttpd-0.9.70.tar.gz \
+    rm -rf /opt/libmicrohttpd-1.0.1.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
-           /opt/libmicrohttpd-0.9.70 \
-           /opt/mosquitto-2.0.12.tar.gz \
-           /opt/mosquitto-2.0.12 \
-           /opt/mongo-c-driver-1.17.4.tar.gz \
-           /opt/mongo-c-driver-1.17.4 \
+           /opt/libmicrohttpd-1.0.1 \
+           /opt/mosquitto-2.0.20.tar.gz \
+           /opt/mosquitto-2.0.20 \
+           /opt/mongo-c-driver-1.29.0.tar.gz \
+           /opt/mongo-c-driver-1.29.0 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
+           /usr/local/lib/libcjexl.a \
            /opt/rapidjson-1.1.0 \
            /opt/v1.1.0.tar.gz \
            /usr/local/include/rapidjson \
@@ -144,8 +149,7 @@ RUN \
     apt-get -y autoremove --purge && \
     # The above apt removal erases some dependencies needed by contextBroker. So we reinstall it
     apt-get -y install \
-        libicu67 \
-        libcurl4 \
+        libicu72 \
         libboost-thread1.74.0 && \
     # Don't need old log files inside docker images
     rm -f /var/log/*log
@@ -153,7 +157,7 @@ RUN \
 WORKDIR /
 
 # Note we disable log file as docker container will output by stdout
-ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast", "-disableFileLog" ]
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-disableFileLog" ]
 EXPOSE 1026
 
 LABEL "maintainer"="Orion Team. Telefónica I+D"

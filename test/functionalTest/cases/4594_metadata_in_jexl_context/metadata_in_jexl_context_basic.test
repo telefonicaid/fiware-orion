@@ -1,0 +1,287 @@
+# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+Metadata in JEXL context (basic case)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub with custom expression sum: metadata.A.MD1+metadata.B.MD1
+# 02. Create entity E1 with A.MD1=1 and B.MD1=2
+# 03. Update entity E1 with A.MD1=foo and B.MD1=bar
+# 04. Update entity E1 with A.MD1=2.1 and B.MD1=-3.8
+# 05. Dump accumulator and see three notifications (sum: 3, sum: foobar, sum: -1.7)
+#
+
+
+echo "01. Create custom sub with custom expression sum: metadata.A.MD1+metadata.B.MD1"
+echo "==============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "sum": {
+          "value": "${metadata.A.MD1+metadata.B.MD2}",
+          "type": "Calculated"
+        }
+      }
+    },
+    "attrs": [ "sum" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with A.MD1=1 and B.MD1=2"
+echo "============================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": 10,
+    "type": "Number",
+    "metadata": {
+        "MD1": {
+            "value": 1,
+            "type": "Number"
+        }
+    }
+  },
+  "B": {
+    "value": 20,
+    "type": "Number",
+    "metadata": {
+        "MD2": {
+            "value": 2,
+            "type": "Number"
+        }
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update entity E1 with A.MD1=foo and B.MD1=bar"
+echo "================================================="
+payload='{
+  "A": {
+    "value": 10,
+    "type": "Number",
+    "metadata": {
+        "MD1": {
+            "value": "foo",
+            "type": "Text"
+        }
+    }
+  },
+  "B": {
+    "value": 20,
+    "type": "Number",
+    "metadata": {
+        "MD2": {
+            "value": "bar",
+            "type": "Text"
+        }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. Update entity E1 with A.MD1=2.1 and B.MD1=-3.8"
+echo "=================================================="
+payload='{
+  "A": {
+    "value": 10,
+    "type": "Number",
+    "metadata": {
+        "MD1": {
+            "value": 2.1,
+            "type": "Number"
+        }
+    }
+  },
+  "B": {
+    "value": 20,
+    "type": "Number",
+    "metadata": {
+        "MD2": {
+            "value": -3.8,
+            "type": "Number"
+        }
+    }
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "05. Dump accumulator and see three notifications (sum: 3, sum: foobar, sum: -1.7)"
+echo "================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub with custom expression sum: metadata.A.MD1+metadata.B.MD1
+===============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1 with A.MD1=1 and B.MD1=2
+=============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Update entity E1 with A.MD1=foo and B.MD1=bar
+=================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Update entity E1 with A.MD1=2.1 and B.MD1=-3.8
+==================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Dump accumulator and see three notifications (sum: 3, sum: foobar, sum: -1.7)
+=================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 129
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "E1",
+            "sum": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 3
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 136
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "E1",
+            "sum": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": "foobar"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 132
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "id": "E1",
+            "sum": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": -1.7
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

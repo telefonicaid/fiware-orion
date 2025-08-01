@@ -127,20 +127,20 @@ echo
 01. Create entity
 =================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/A?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/A?type=T
+Content-Length: 0
 
 
 
 02. Query B1 coveredBy -> ok
 ============================
 HTTP/1.1 200 OK
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 [
     {
@@ -161,10 +161,10 @@ Date: REGEX(.*)
 03. Query B1 intersects -> ok
 =============================
 HTTP/1.1 200 OK
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 [
     {
@@ -185,10 +185,10 @@ Date: REGEX(.*)
 04. Query B1 disjoint -> nok
 ============================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -196,10 +196,10 @@ Date: REGEX(.*)
 05. Query B2 coveredBy -> nok
 =============================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -207,10 +207,10 @@ Date: REGEX(.*)
 06. Query B2 intersects -> ok
 =============================
 HTTP/1.1 200 OK
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 [
     {
@@ -231,10 +231,10 @@ Date: REGEX(.*)
 07. Query B2 disjoint -> nok
 ============================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -242,10 +242,10 @@ Date: REGEX(.*)
 08. Query B3 coveredBy -> nok
 =============================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -253,10 +253,10 @@ Date: REGEX(.*)
 09. Query B3 intersects -> nok
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -264,10 +264,10 @@ Date: REGEX(.*)
 10. Query B3 disjoint -> ok
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 91
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 91
 
 [
     {

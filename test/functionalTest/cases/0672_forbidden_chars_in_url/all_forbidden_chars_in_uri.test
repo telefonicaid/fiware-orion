@@ -109,153 +109,126 @@ echo
 01. Test the forbidden character <
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 02. Test the forbidden character >
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 03. Test the forbidden character "
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 04. Test the forbidden character '
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 05. Test the forbidden character =
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 06. Test the forbidden character ;
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 07. Test the forbidden character (
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 08. Test the forbidden character )
 ==================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "invalid character in URI",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "invalid character in URI",
+    "error": "BadRequest"
 }
 
 
 09. Test without forbidden characters
 =====================================
 HTTP/1.1 400 Bad Request
-Content-Length: 129
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
-    "orionError": {
-        "code": "400",
-        "details": "Service not found. Check your URL as probably it is wrong.",
-        "reasonPhrase": "Bad Request"
-    }
+    "description": "Service not found. Check your URL as probably it is wrong.",
+    "error": "BadRequest"
 }
 
 

@@ -27,6 +27,10 @@
 #include "apiTypesV2/Registration.h"
 #include "common/JsonHelper.h"
 #include "common/globals.h"
+#include "common/statistics.h"
+#include "logMsg/logMsg.h"
+#include "mongoDriver/safeMongo.h"
+#include "mongoBackend/dbConstants.h"
 
 
 
@@ -58,6 +62,228 @@ Registration::Registration(): descriptionProvided(false), expires(-1)
 */
 Registration::~Registration()
 {
+}
+
+
+/* ****************************************************************************
+*
+* setRegistrationId -
+*/
+void Registration::setRegistrationId(const orion::BSONObj& r)
+{
+  id = getFieldF(r, "_id").OID();
+}
+
+
+
+/* ****************************************************************************
+*
+* setDescription -
+*/
+void Registration::setDescription(const orion::BSONObj& r)
+{
+  if (r.hasField(REG_DESCRIPTION))
+  {
+    description         = getStringFieldF(r, REG_DESCRIPTION);
+    descriptionProvided = true;
+  }
+  else
+  {
+    description         = "";
+    descriptionProvided = false;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setProvider -
+*/
+void Registration::setProvider(const ngsiv2::ForwardingMode forwardingMode, const std::string& format, const orion::BSONObj& r)
+{
+  provider.http.url = (r.hasField(REG_PROVIDING_APPLICATION))? getStringFieldF(r, REG_PROVIDING_APPLICATION): "";
+
+  provider.supportedForwardingMode = forwardingMode;
+
+  if (format == "JSON")
+  {
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode detected in existing registration (regId: %s)", id.c_str()));
+    }
+    provider.legacyForwardingMode = true;
+  }
+  else
+  {
+    provider.legacyForwardingMode = false;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setEntities -
+*/
+void Registration::setEntities(const orion::BSONObj& cr0)
+{
+  std::vector<orion::BSONElement>  dbEntityV = getFieldF(cr0, REG_ENTITIES).Array();
+
+  for (unsigned int ix = 0; ix < dbEntityV.size(); ++ix)
+  {
+    EntityId         entity;
+    orion::BSONObj   ce = dbEntityV[ix].embeddedObject();
+
+    // id/idPattern
+    bool isIdPattern = false;
+    if (ce.hasField(REG_ENTITY_ISPATTERN))
+    {
+      if (getFieldF(ce, REG_ENTITY_ISPATTERN).type() != orion::Bool)
+      {
+        // Old versions of the registrations model (previous to Orion 4.3.0) use isPattern as string
+        // Although from 4.3.0 on isPattern is always stored as boolean, we need this guard to avoid
+        // problems with old registrations. Maybe in the future we can clean our database and remove
+        // this guard
+        isIdPattern = (getStringFieldF(ce, REG_ENTITY_ISPATTERN) == "true");
+      }
+      else
+      {
+        isIdPattern = getBoolFieldF(ce, REG_ENTITY_ISPATTERN);
+      }
+    }
+
+    if (isIdPattern)
+    {
+      entity.idPattern = getStringFieldF(ce, REG_ENTITY_ID);
+    }
+    else
+    {
+      entity.id = getStringFieldF(ce, REG_ENTITY_ID);
+    }
+
+    // type/typePattern
+    bool isTypePattern = false;
+    if (ce.hasField(REG_ENTITY_ISTYPEPATTERN))
+    {
+      isTypePattern = getBoolFieldF(ce, REG_ENTITY_ISTYPEPATTERN);
+    }
+
+    if (isTypePattern)
+    {
+      entity.typePattern = getStringFieldF(ce, REG_ENTITY_TYPE);
+    }
+    else
+    {
+      entity.type = getStringFieldF(ce, REG_ENTITY_TYPE);
+    }
+
+    dataProvided.entities.push_back(entity);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setAttributes -
+*/
+void Registration::setAttributes(const orion::BSONObj& cr0)
+{
+  std::vector<orion::BSONElement> dbAttributeV = getFieldF(cr0, REG_ATTRS).Array();
+
+  for (unsigned int ix = 0; ix < dbAttributeV.size(); ++ix)
+  {
+    orion::BSONObj  aobj     = dbAttributeV[ix].embeddedObject();
+    std::string     attrName = getStringFieldF(aobj, REG_ATTRS_NAME);
+
+    if (!attrName.empty())
+    {
+      dataProvided.attributes.push_back(attrName);
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* setDataProvided -
+*/
+bool Registration::setDataProvided(const orion::BSONObj& r, bool arrayAllowed)
+{
+  std::vector<orion::BSONElement> crV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
+
+  // Only one element is allowed. This is a weird thing in the database model, see issue #4611
+  if (crV.size() > 1)
+  {
+    return false;
+  }
+
+  // Get the forwarding mode to be used later in setProvider()
+  ngsiv2::ForwardingMode forwardingMode =
+      ngsiv2::stringToForwardingMode(r.hasField(REG_FORWARDING_MODE)? getStringField(r, REG_FORWARDING_MODE) : "all");
+
+  // Get the format to be used later in setProvider()
+  std::string format = r.hasField(REG_FORMAT)? getStringFieldF(r, REG_FORMAT) : "JSON";
+
+  //
+  // Extract the first (and only) CR from the contextRegistration vector
+  //
+  orion::BSONObj cr0 = crV[0].embeddedObject();
+
+  setEntities(cr0);
+  setAttributes(cr0);
+  setProvider(forwardingMode, format, cr0);
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* setExpires -
+*/
+void Registration::setExpires(const orion::BSONObj& r)
+{
+  expires = (r.hasField(REG_EXPIRATION))? getIntOrLongFieldAsLongF(r, REG_EXPIRATION) : -1;
+}
+
+
+
+/* ****************************************************************************
+*
+* setStatus -
+*/
+void Registration::setStatus(const orion::BSONObj& r)
+{
+  status = (r.hasField(REG_STATUS))? getStringFieldF(r, REG_STATUS): "";
+}
+
+
+
+/* ****************************************************************************
+*
+* Registration::fromBson -
+*/
+bool Registration::fromBson(const orion::BSONObj& r)
+{
+  setRegistrationId(r);
+  setDescription(r);
+
+  if (setDataProvided(r, false) == false)
+  {
+    // FIXME #4611: this check will be no longer needed after fixing the issue. setDataProvided return type (and the return type of this method)
+    // could be changed to void
+    return false;
+  }
+
+  setExpires(r);
+  setStatus(r);
+
+  return true;
 }
 
 

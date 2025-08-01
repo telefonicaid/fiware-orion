@@ -45,8 +45,7 @@ TEST(commonSem, unique)
 {
    int s;
 
-   s = semInit();
-   EXPECT_EQ(0, s);
+   semInit();
 
    s = reqSemGive(__FUNCTION__, "test");
    EXPECT_EQ(0, s);

@@ -25,7 +25,7 @@ Not POSIX regex in idPattern result in error
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 56 IPv4
+brokerStart CB 55 IPv4
 
 --SHELL--
 
@@ -67,10 +67,10 @@ echo
 01. Create subscription with not POSIX regex in idPattern, see error
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "Invalid regex for entity idPattern",

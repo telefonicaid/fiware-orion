@@ -129,40 +129,40 @@ echo
 01. Create an entity E1 with attribute A1=true
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Create an entity E2 with attribute A1=false
 ===============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 03. Create an entity E3 with attribute A1=true
 ==============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 04. GET all entities (3 entities)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 236
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 236
 
 [
     {
@@ -198,10 +198,10 @@ Date: REGEX(.*)
 05. GET entities with q=A1==true (2 hits)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 157
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 157
 
 [
     {
@@ -228,10 +228,10 @@ Date: REGEX(.*)
 06. GET entities with q=A1==false (1 hit)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 [
     {
@@ -249,10 +249,10 @@ Date: REGEX(.*)
 07. GET entities with q=A2==true (0 hits)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -260,10 +260,10 @@ Date: REGEX(.*)
 08. GET entities with q=A1!=true (1 hit)
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 80
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 80
 
 [
     {
@@ -281,10 +281,10 @@ Date: REGEX(.*)
 09. GET entities with q=A1!=false (2 hits)
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 157
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 157
 
 [
     {
@@ -311,10 +311,10 @@ Date: REGEX(.*)
 10. GET entities with q=A2!=true (0 hits)
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 

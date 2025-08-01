@@ -1,0 +1,258 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+JEXL expression in custom notification (nMapper transformation cases)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create custom sub using mapper cases
+# 02. Create entity E1 with T=0
+# 03. Update entity E1 with T=4
+# 04. Update entity E1 with T=6
+# 05. Dump accumulator and see No data, Bad, Extremenly bad
+#
+
+
+echo "01. Create custom sub using all transformations"
+echo "==============================================="
+# NOTE: '\'' is the way of scaping a ' in the payload variable below (see https://stackoverflow.com/a/1250279/1485926)
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "attrs": [
+      "T",
+      "R"
+    ],
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "R": {
+          "type": "Text",
+          "value": "${T|nMapper([0, 1, 2, 3, 4, 5, 6],['\''No data'\'', '\''Good'\'', '\''Somehow good'\'', '\''So-so'\'', '\''Bad'\'', '\''Very bad'\'', '\''Extremenly bad'\''])}"
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E1 with T=0"
+echo "============================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "T": {
+    "type": "Number",
+    "value": 0
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Update entity E1 with T=4"
+echo "============================="
+payload='{
+  "T": {
+    "type": "Number",
+    "value": 4
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "04. Update entity E1 with T=6"
+echo "============================="
+payload='{
+  "T": {
+    "type": "Number",
+    "value": 6
+  }
+}'
+orionCurl --url /v2/entities/E1/attrs --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "05. Dump accumulator and see No data, Bad, Extremenly bad"
+echo "========================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom sub using all transformations
+===============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E1 with T=0
+=============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+03. Update entity E1 with T=4
+=============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Update entity E1 with T=6
+=============================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Dump accumulator and see No data, Bad, Extremenly bad
+=========================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 175
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "R": {
+                "metadata": {},
+                "type": "Text",
+                "value": "No data"
+            },
+            "T": {
+                "metadata": {},
+                "type": "Number",
+                "value": 0
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 171
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "R": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Bad"
+            },
+            "T": {
+                "metadata": {},
+                "type": "Number",
+                "value": 4
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 182
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "R": {
+                "metadata": {},
+                "type": "Text",
+                "value": "Extremenly bad"
+            },
+            "T": {
+                "metadata": {},
+                "type": "Number",
+                "value": 6
+            },
+            "id": "E1",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

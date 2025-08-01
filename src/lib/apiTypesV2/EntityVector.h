@@ -46,13 +46,15 @@ typedef struct EntityVector
                       bool                             blacklist,
                       const std::vector<std::string>&  metadataFilter);
 
-  std::string   toJsonV1(bool asJsonObject, RequestType requestType, bool comma);
+  std::string  toJson(RenderFormat                     renderFormat);
 
-  std::string   check(ApiVersion apiVersion, RequestType requestType);
   void          push_back(Entity* item);
   unsigned int  size(void);
   Entity*       lookup(const std::string& name, const std::string& type);
   void          release();
+
+  void          fill(const QueryContextResponse& qcrs, OrionError* oeP);
+
 
   Entity*  operator[](unsigned int ix) const;
 } EntityVector;

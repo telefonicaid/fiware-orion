@@ -93,8 +93,8 @@ function _execute()
 
     sleep 3
 
-    contextBroker -port 30001 -dbhost localhost:20001 -pidpath cb1.pid &
-    contextBroker -port 30002 -dbhost localhost:20002 -pidpath cb2.pid &
+    contextBroker -port 30001 -dbURI mongodb://localhost:20001 -pidpath cb1.pid &
+    contextBroker -port 30002 -dbURI mongodb://localhost:20002 -pidpath cb2.pid &
 }
 
 [ $# = 0 ] && _usage
@@ -171,6 +171,12 @@ echo "===================================== PREPARE ============================
 
 echo "Builder: create temp folders"
 rm -Rf /tmp/builder || true && mkdir -p /tmp/builder/{db1,db2,db,bu}
+
+if [ -z "${REPO_ACCESS_TOKEN}" ]; then
+    echo "Builder: no REPO_ACCESS_TOKEN, skipping cjexl lib download"
+else
+    bash /opt/fiware-orion/get_cjexl.sh 0.6.0 $REPO_ACCESS_TOKEN
+fi
 
 if [ -n "${branch}" ]; then
     echo "===================================== CLONE ============================================"

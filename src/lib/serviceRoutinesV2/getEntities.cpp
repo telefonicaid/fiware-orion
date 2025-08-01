@@ -33,12 +33,10 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
-#include "rest/EntityTypeInfo.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/serviceRoutinesCommon.h"
-#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutinesV2/postQueryContext.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -66,6 +64,7 @@
 *   - attrs
 *   - metadata
 *   - options=keyValues
+*   - orderBy
 *   - type=TYPE
 *   - type=TYPE1,TYPE2,...TYPEN
 *
@@ -82,7 +81,7 @@ std::string getEntities
   ParseData*                 parseDataP
 )
 {
-  Entities     entities;
+  EntityVector entities;
   std::string  answer;
   std::string  pattern     = ".*";  // all entities, default value
   std::string  id          = ciP->uriParam["id"];
@@ -173,90 +172,68 @@ std::string getEntities
 
 
   //
-  // If URI param 'geometry' is present, create a new scope.
-  // The fill() method of the scope checks the validity of the info in:
+  // If URI param 'geometry' is present, create a new geo filter.
+  // The fill() method of the geo filter checks the validity of the info in:
   // - geometry
   // - georel
   // - coords
   //
   if (!geometry.empty())
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
     std::string  errorString;
 
-    if (scopeP->fill(ciP->apiVersion, geometry, coords, georel, &errorString) != 0)
+    if (parseDataP->qcr.res.expr.geoFilter.fill(geometry, coords, georel, &errorString) != 0)
     {
       OrionError oe(SccBadRequest, std::string("Invalid query: ") + errorString, ERROR_BAD_REQUEST);
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;
-
-      scopeP->release();
-      delete scopeP;
-
       return out;
     }
-
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
 
 
   //
   // String filter in URI param 'q' ?
-  // If so, put it in a new Scope and parse the q-string.
-  // The plain q-string is saved in Scope::value, just in case.
-  // Might be useful for debugging, if nothing else.
+  // If so, parse the q-string.
+
   //
   if (!q.empty())
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
     std::string  errorString;
 
-    scopeP->stringFilterP = new StringFilter(SftQ);
-    if (scopeP->stringFilterP->parse(q.c_str(), &errorString) == false)
+    if (parseDataP->qcr.res.expr.stringFilter.parse(q.c_str(), &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
       alarmMgr.badInput(clientIp, errorString, q);
-      scopeP->release();
-      delete scopeP;
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;
       return out;
     }
-
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
 
   //
   // Metadata string filter in URI param 'mq' ?
-  // If so, put it in a new Scope and parse the mq-string.
-  // The plain mq-string is saved in Scope::value, just in case.
-  // Might be useful for debugging, if nothing else.
+  // If so, parse the mq-string.
   //
   if (!mq.empty())
   {
-    Scope*       scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY_MD, mq);
     std::string  errorString;
 
-    scopeP->mdStringFilterP = new StringFilter(SftMq);
-    if (scopeP->mdStringFilterP->parse(mq.c_str(), &errorString) == false)
+    if (parseDataP->qcr.res.expr.mdStringFilter.parse(mq.c_str(), &errorString) == false)
     {
       OrionError oe(SccBadRequest, errorString, ERROR_BAD_REQUEST);
 
       alarmMgr.badInput(clientIp, errorString, mq);
-      scopeP->release();
-      delete scopeP;
 
       TIMED_RENDER(out = oe.toJson());
       ciP->httpStatusCode = oe.code;
       return out;
     }
-
-    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }
 
 
@@ -272,22 +249,16 @@ std::string getEntities
 
   if (!typePattern.empty())
   {
-    bool      isIdPattern = (!idPattern.empty() || pattern == ".*");
-    EntityId* entityId    = new EntityId(pattern, typePattern, isIdPattern ? "true" : "false", true);
-
+    EntityId* entityId = new EntityId("", pattern, "", typePattern);
     parseDataP->qcr.res.entityIdVector.push_back(entityId);
   }
   else if (ciP->uriParamTypes.size() == 0)
   {
-    parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, "");
   }
   else if (ciP->uriParamTypes.size() == 1)
   {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
-  }
-  else if (ciP->uriParamTypes.size() == 1)
-  {
-    parseDataP->qcr.res.fill(pattern, type, "true", EntityTypeNotEmpty, "");
+    parseDataP->qcr.res.fill("", pattern, type);
   }
   else
   {
@@ -297,7 +268,7 @@ std::string getEntities
     //
     for (unsigned int ix = 0; ix < ciP->uriParamTypes.size(); ++ix)
     {
-      EntityId* entityId = new EntityId(pattern, ciP->uriParamTypes[ix], "true");
+      EntityId* entityId = new EntityId("", pattern, ciP->uriParamTypes[ix], "");
 
       parseDataP->qcr.res.entityIdVector.push_back(entityId);
     }
@@ -308,10 +279,13 @@ std::string getEntities
   setMetadataFilter(ciP->uriParam, &parseDataP->qcr.res.metadataList);
 
   // 02. Call standard op postQueryContext
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  postQueryContext(ciP, components, compV, parseDataP);
 
   // 03. Check Internal Errors
-  if (parseDataP->qcrs.res.errorCode.code == SccReceiverInternalError)
+  // (I don't like this code very much, as for the second case we are using de description of the error to decide, but
+  // I guess that until CPrs functionality gets dropped we cannot do it better...)
+  if ((parseDataP->qcrs.res.error.code == SccReceiverInternalError) || (parseDataP->qcrs.res.error.description == ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY))
+
   {
     OrionError oe;
     entities.fill(parseDataP->qcrs.res, &oe);

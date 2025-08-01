@@ -191,20 +191,20 @@ echo
 01. Create mqttCustom sub url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
 ==============================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 344
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 389
 
 {
     "description": "Original sub",
@@ -216,6 +216,7 @@ Date: REGEX(.*)
         "mqttCustom": {
             "payload": "t:${t}",
             "qos": 2,
+            "retain": false,
             "topic": "/orion/${d}",
             "url": "mqtt://localhost:1883"
         },
@@ -224,7 +225,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -239,18 +241,18 @@ Date: REGEX(.*)
 03. Update sub element different to notification
 ================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get sub, see mqttCustom url=mqtt:///localhost:1883, topic=/orion/${d}, payload=t:${t}, qos=2
 ================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 344
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 389
 
 {
     "description": "Modified sub",
@@ -262,6 +264,7 @@ Date: REGEX(.*)
         "mqttCustom": {
             "payload": "t:${t}",
             "qos": 2,
+            "retain": false,
             "topic": "/orion/${d}",
             "url": "mqtt://localhost:1883"
         },
@@ -270,7 +273,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -285,18 +289,18 @@ Date: REGEX(.*)
 05. Update sub with mqttCustom url=mqtt://localhost:1884, topic=/cb/${d}, payload=null no-qos
 =============================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Get sub, see mqttCustom mqtt://localhost:1884, topic=/cb/${d}, payload=null, qos=0
 ======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 337
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 382
 
 {
     "description": "Modified sub",
@@ -308,6 +312,7 @@ Date: REGEX(.*)
         "mqttCustom": {
             "payload": null,
             "qos": 0,
+            "retain": false,
             "topic": "/cb/${d}",
             "url": "mqtt://localhost:1884"
         },
@@ -316,7 +321,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -331,18 +337,18 @@ Date: REGEX(.*)
 07. Update sub to http sub
 ==========================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get sub, see http element
 =============================
 HTTP/1.1 200 OK
-Content-Length: 289
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 319
 
 {
     "description": "Modified sub",
@@ -359,7 +365,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -374,18 +381,18 @@ Date: REGEX(.*)
 09. Update sub to mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1
 ==============================================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Get sub, see mqttCustom url=mqtt://localhost:1885, topic=/orionbk/${d}, no payload, qos=1
 =============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 327
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 372
 
 {
     "description": "Modified sub",
@@ -396,6 +403,7 @@ Date: REGEX(.*)
         "covered": false,
         "mqttCustom": {
             "qos": 1,
+            "retain": false,
             "topic": "/orionbk/${d}",
             "url": "mqtt://localhost:1885"
         },
@@ -404,7 +412,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -419,18 +428,18 @@ Date: REGEX(.*)
 11. Update sub to mqtt url=mqtt://localhost:1887, topic=/orion, qos=2
 =====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 12. Get sub, see mqtt url=mqtt://localhost:1887, topic=/orion, qos=2
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 314
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 359
 
 {
     "description": "Modified sub",
@@ -441,6 +450,7 @@ Date: REGEX(.*)
         "covered": false,
         "mqtt": {
             "qos": 2,
+            "retain": false,
             "topic": "/orion",
             "url": "mqtt://localhost:1887"
         },
@@ -449,7 +459,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {

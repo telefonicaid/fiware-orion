@@ -260,7 +260,7 @@ void JsonObjectHelper::addDate(const std::string& key, double timestamp)
 */
 void JsonObjectHelper::addBool(const std::string& key, bool b)
 {
-  addRaw(key, b? "true" : "false");
+  addRaw(key, FT(b));
 }
 
 
@@ -280,10 +280,17 @@ void JsonObjectHelper::addNull(const std::string& key)
 *
 * JsonObjectHelper::str -
 */
-std::string JsonObjectHelper::str()
+std::string JsonObjectHelper::str(bool closed)
 {
-  ss += '}';
-  return ss;
+  // closed == false used in ExprContext logic
+  if (closed)
+  {
+    return ss + '}';
+  }
+  else
+  {
+    return ss;
+  }
 }
 
 
@@ -401,8 +408,20 @@ void JsonVectorHelper::addDate(double timestamp)
 */
 void JsonVectorHelper::addBool(bool b)
 {
-  addRaw(b? "true" : "false");
+  addRaw(FT(b));
 }
+
+
+
+/* ****************************************************************************
+*
+* JsonObjectHelper::addNull -
+*/
+void JsonVectorHelper::addNull(void)
+{
+  addRaw("null");
+}
+
 
 
 
@@ -410,7 +429,7 @@ void JsonVectorHelper::addBool(bool b)
 *
 * JsonVectorHelper::str -
 */
-std::string JsonVectorHelper::str()
+std::string JsonVectorHelper::str(void)
 {
   ss += ']';
   return ss;

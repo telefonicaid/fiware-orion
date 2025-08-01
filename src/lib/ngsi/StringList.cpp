@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "ngsi/StringList.h"
@@ -53,17 +52,6 @@ void StringList::fill(const std::vector<std::string>& sVec)
 
 /* ****************************************************************************
 *
-* StringList::fill -
-*/
-void StringList::fill(const std::string& commaSeparatedList)
-{
-  stringSplit(commaSeparatedList, ',', stringV);
-}
-
-
-
-/* ****************************************************************************
-*
 * StringList::toJson -
 */
 std::string StringList::toJson(void)
@@ -76,52 +64,6 @@ std::string StringList::toJson(void)
   }
 
   return jh.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* StringList::toJsonV1 -
-*/
-std::string StringList::toJsonV1(bool comma, const std::string& fieldName)
-{
-  std::string  out = "";
-
-  if (stringV.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag(fieldName, true);
-
-  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
-  {
-    out += valueTag(fieldName, stringV[ix], ix != stringV.size() - 1, true);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* StringList::check -
-*/
-std::string StringList::check(void)
-{
-  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
-  {
-    if (stringV[ix].empty())
-    {
-      return "empty string";
-    }
-  }
-
-  return "OK";
 }
 
 
@@ -207,23 +149,3 @@ void StringList::clone(const StringList& sList)
   }
 }
 
-
-/* ****************************************************************************
-*
-* StringList::toString -
-*/
-std::string StringList::toString(void)
-{
-  std::string out;
-
-  for (unsigned int ix = 0; ix < stringV.size(); ++ix)
-  {
-    out += stringV[ix];
-    if (ix < stringV.size() - 1)
-    {
-      out += ",";
-    }
-  }
-
-  return out;
-}

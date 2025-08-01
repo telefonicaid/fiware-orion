@@ -68,7 +68,7 @@ class AlarmManager
  public:
   AlarmManager();
 
-  int  init(bool logAlreadyRaisedAlarms);
+  void  init(bool logAlreadyRaisedAlarms);
 
   void         semTake(void);
   void         semGive(void);
@@ -97,7 +97,7 @@ class AlarmManager
   void mqttConnectionErrorGet(int64_t* active, int64_t* raised, int64_t* released);
 
  private:
-  int  semInit(void);
+  void  semInit(void);
 };
 
 #endif  // SRC_LIB_ALARMMGR_ALARMMANAGER_H_

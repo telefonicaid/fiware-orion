@@ -42,18 +42,10 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              toJsonV1(bool                             asJsonObject,
-                                    RequestType                      requestType,
-                                    const std::vector<std::string>&  attrsFilter,
-                                    bool                             blacklist,
-                                    const std::vector<std::string>&  metadataFilter,
-                                    bool                             comma               = false,
-                                    bool                             omitAttributeValues = false);
-
-  std::string              toJson(RenderFormat                     renderFormat,
-                                  const std::vector<std::string>&  attrsFilter,
-                                  bool                             blacklist,
-                                  const std::vector<std::string>&  metadataFilter);
+  std::string              toJson(RenderFormat                         renderFormat,
+                                  const std::vector<std::string>&      attrsFilter,
+                                  bool                                 blacklist,
+                                  const std::vector<std::string>&      metadataFilter);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void) const;
   ContextElementResponse*  lookup(Entity* eP, HttpStatusCode code = SccNone);
@@ -61,12 +53,7 @@ typedef struct ContextElementResponseVector
   void                     fill(ContextElementResponseVector& cerV);
   void                     fill(EntityVector& erV, HttpStatusCode sc);    // Needed by NGSIv2 forwarding logic
   ContextElementResponse*  operator[] (unsigned int ix) const;
-  
 
-  std::string              check(ApiVersion          apiVersion,
-                                 RequestType         requestType,
-                                 const std::string&  predetectedError,
-                                 int                 counter);
 } ContextElementResponseVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSEVECTOR_H_

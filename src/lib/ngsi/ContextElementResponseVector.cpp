@@ -30,46 +30,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/RenderFormat.h"
 #include "common/JsonHelper.h"
 #include "ngsi/ContextElementResponseVector.h"
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::toJsonV1 -
-*/
-std::string ContextElementResponseVector::toJsonV1
-(
-  bool                             asJsonObject,
-  RequestType                      requestType,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter,
-  bool                             comma,
-  bool                             omitAttributeValues
-)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("contextResponses", true);
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(asJsonObject, requestType, attrsFilter, blacklist, metadataFilter, ix < (vec.size() - 1), omitAttributeValues);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
-}
 
 
 
@@ -79,10 +42,10 @@ std::string ContextElementResponseVector::toJsonV1
 */
 std::string ContextElementResponseVector::toJson
 (
-  RenderFormat                     renderFormat,
-  const std::vector<std::string>&  attrsFilter,
-  bool                             blacklist,
-  const std::vector<std::string>&  metadataFilter
+  RenderFormat                         renderFormat,
+  const std::vector<std::string>&      attrsFilter,
+  bool                                 blacklist,
+  const std::vector<std::string>&      metadataFilter
 )
 {
   JsonVectorHelper jvh;
@@ -93,33 +56,6 @@ std::string ContextElementResponseVector::toJson
   }
 
   return jvh.str();
-}
-
-
-
-/* ****************************************************************************
-*
-* ContextElementResponseVector::check -
-*/
-std::string ContextElementResponseVector::check
-(
-  ApiVersion          apiVersion,
-  RequestType         requestType,
-  const std::string&  predetectedError,
-  int                 counter
-)
-{
-  for (uint64_t ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(apiVersion, requestType, predetectedError, counter)) != "OK")
-    {
-      return res;
-    }
-  }
-
-  return "OK";
 }
 
 
@@ -186,7 +122,7 @@ ContextElementResponse* ContextElementResponseVector::lookup(Entity* eP, HttpSta
   {
     if (vec[ix]->entity.equal(eP) == true)
     {
-      if ((code == SccNone) || (vec[ix]->statusCode.code == code))
+      if ((code == SccNone) || (vec[ix]->error.code == code))
       {
         return vec[ix];
       }
@@ -224,7 +160,7 @@ void ContextElementResponseVector::fill(EntityVector& erV, HttpStatusCode sc)
   {
     ContextElementResponse* cerP = new ContextElementResponse(erV[ix]);
 
-    cerP->statusCode.fill(sc, erV[ix]->id);
+    cerP->error.fill(sc, erV[ix]->entityId.id);
 
     push_back(cerP);
   }

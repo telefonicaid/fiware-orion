@@ -37,25 +37,18 @@
 *
 * renderFormatToString - 
 */
-const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLegacyWord)
+const char* renderFormatToString(RenderFormat format)
 {
   switch (format)
   {
-  case NGSI_V1_LEGACY:              return useLegacyWord ? "legacy" : "JSON";
   case NGSI_V2_NORMALIZED:          return "normalized";
   case NGSI_V2_KEYVALUES:           return "keyValues";
   case NGSI_V2_VALUES:              return "values";
   case NGSI_V2_UNIQUE_VALUES:       return "uniqueValues";
   case NGSI_V2_CUSTOM:              return "custom";
-  case NO_FORMAT:
-    if (noDefault == true)
-    {
-      return "no render format";
-    }
-    else
-    {
-      return useLegacyWord ? "legacy" : "JSON";
-    }
+  case NGSI_V2_SIMPLIFIEDNORMALIZED:return "simplifiedNormalized";
+  case NGSI_V2_SIMPLIFIEDKEYVALUES: return "simplifiedKeyValues";
+  case NO_FORMAT:                   return "no render format";
   }
 
   return "Unknown render format";
@@ -69,13 +62,13 @@ const char* renderFormatToString(RenderFormat format, bool noDefault, bool useLe
 */
 RenderFormat stringToRenderFormat(const std::string& s, bool noDefault)
 {
-  if (s == "JSON")         { return NGSI_V1_LEGACY;        }  // DB content for NGSIv1 rendering due to legacy reasons
-  if (s == "legacy")       { return NGSI_V1_LEGACY;        }
   if (s == "normalized")   { return NGSI_V2_NORMALIZED;    }
   if (s == "keyValues")    { return NGSI_V2_KEYVALUES;     }
   if (s == "values")       { return NGSI_V2_VALUES;        }
   if (s == "uniqueValues") { return NGSI_V2_UNIQUE_VALUES; }
   if (s == "custom")       { return NGSI_V2_CUSTOM;        }
+  if (s == "simplifiedNormalized") { return NGSI_V2_SIMPLIFIEDNORMALIZED;    }
+  if (s == "simplifiedKeyValues")  { return NGSI_V2_SIMPLIFIEDKEYVALUES;     }
   
   return (noDefault == false)? DEFAULT_RENDER_FORMAT : NO_FORMAT;
 }

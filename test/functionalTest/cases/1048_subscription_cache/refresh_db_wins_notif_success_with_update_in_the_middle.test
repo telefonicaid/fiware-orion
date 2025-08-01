@@ -26,7 +26,7 @@ Cache refresh takes newer information from DB in successfull notification scenar
 --SHELL-INIT--
 dbInit CB
 
-mongoCmd ${CB_DB_NAME} 'db.csubs.insert({
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "_id" : ObjectId("61960a51596aa2623032357d"),
         "expiration" : NumberLong("9223372036854775807"),
         "reference" : "http://localhost:9997/notify",
@@ -39,7 +39,7 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insert({
         "entities" : [
                 {
                         "id" : "E",
-                        "isPattern" : "false",
+                        "isPattern" : false,
                         "type" : "T",
                         "isTypePattern" : false
                 }
@@ -125,7 +125,7 @@ echo
 
 echo "04. Get doc in DB before cache refresh and see lastNotification/Success in a far future and status code 211 but no count"
 echo "========================================================================================================================"
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -142,7 +142,7 @@ echo
 
 echo "06. Get doc in DB before cache refresh and see lastNotification/Success in a far future and status code 211 but no count + description"
 echo "======================================================================================================================================"
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -157,7 +157,7 @@ echo
 
 echo "08. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1 + description"
 echo "===================================================================================================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.find({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | sed 's/NumberLong(\([[:digit:]]\+\))/\1/g' | sed 's/NumberLong("\([[:digit:]]\+\)")/\1/g' | python ${SCRIPT_HOME}/jsonBeautifier.py
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -170,10 +170,10 @@ echo
 01. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 and without timeSent
 ===================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 376
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 406
 
 [
     {
@@ -193,7 +193,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -209,20 +210,20 @@ Date: REGEX(.*)
 02. Create entity E to trigger notification
 ===========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions and see lastNotification/Success in a far future and status code 211 (as cache data is older), timesSent 1
 ====================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 390
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 420
 
 [
     {
@@ -243,7 +244,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -266,7 +268,7 @@ Date: REGEX(.*)
     "entities": [
         {
             "id": "E",
-            "isPattern": "false",
+            "isPattern": false,
             "isTypePattern": false,
             "type": "T"
         }
@@ -296,8 +298,8 @@ Date: REGEX(.*)
 05. PATCH /v2/subscription to add a description
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
@@ -312,7 +314,7 @@ Date: REGEX(.*)
     "entities": [
         {
             "id": "E",
-            "isPattern": "false",
+            "isPattern": false,
             "isTypePattern": false,
             "type": "T"
         }
@@ -329,6 +331,7 @@ Date: REGEX(.*)
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",
@@ -342,10 +345,10 @@ Date: REGEX(.*)
 07. Wait 5.5s for cache refresh and GET /v2/subscriptions again to check everything is the same + description
 =============================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 427
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 457
 
 [
     {
@@ -367,7 +370,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -392,7 +396,7 @@ Date: REGEX(.*)
     "entities": [
         {
             "id": "E",
-            "isPattern": "false",
+            "isPattern": false,
             "isTypePattern": false,
             "type": "T"
         }
@@ -410,6 +414,7 @@ Date: REGEX(.*)
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],
+    "notifyOnMetadataChange": true,
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
     "servicePath": "/#",

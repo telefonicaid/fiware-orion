@@ -44,6 +44,7 @@ brokerStart CB
 # 12. Get sub2 to see it
 # 13. Update custom sub2 to add json field
 # 14. Get sub2 to see changes
+# 15. Get all subs and see sub1 an sub2 in its final state
 #
 
 
@@ -236,24 +237,31 @@ echo
 echo
 
 
+echo "15. Get all subs and see sub1 an sub2 in its final state"
+echo "========================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
 --REGEXPECT--
 01. Create custom sub1 with json field
 ======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 313
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 358
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -267,6 +275,7 @@ Date: REGEX(.*)
                 "x2": 2
             },
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -275,7 +284,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -290,18 +300,18 @@ Date: REGEX(.*)
 03. Update sub1 to remove json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 306
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -312,6 +322,7 @@ Date: REGEX(.*)
         "mqttCustom": {
             "payload": "foo",
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -320,7 +331,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -335,18 +347,18 @@ Date: REGEX(.*)
 05. Update sub1 to add json field back again
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 309
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 354
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -360,6 +372,7 @@ Date: REGEX(.*)
                 "zz"
             ],
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -368,7 +381,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -383,18 +397,18 @@ Date: REGEX(.*)
 07. Update sub1 to modify json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 305
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 350
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -409,6 +423,7 @@ Date: REGEX(.*)
                 3
             ],
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -417,7 +432,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -432,18 +448,18 @@ Date: REGEX(.*)
 09. Update sub1 to remove json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 306
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -454,6 +470,7 @@ Date: REGEX(.*)
         "mqttCustom": {
             "payload": "bar",
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -462,7 +479,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -477,20 +495,20 @@ Date: REGEX(.*)
 11. Create custom sub2 without json field
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 12. Get sub2 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 306
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -501,6 +519,7 @@ Date: REGEX(.*)
         "mqttCustom": {
             "payload": "zzz",
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -509,7 +528,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -524,18 +544,18 @@ Date: REGEX(.*)
 13. Update custom sub2 to add json field
 ========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 322
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 367
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -552,6 +572,7 @@ Date: REGEX(.*)
                 ]
             },
             "qos": 0,
+            "retain": false,
             "topic": "topic1",
             "url": "mqtt://localhost:1883"
         },
@@ -560,7 +581,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -570,6 +592,82 @@ Date: REGEX(.*)
         ]
     }
 }
+
+
+15. Get all subs and see sub1 an sub2 in its final state
+========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 721
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "mqttCustom": {
+                "payload": "bar",
+                "qos": 0,
+                "retain": false,
+                "topic": "topic1",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "mqttCustom": {
+                "json": {
+                    "z4": true,
+                    "z5": [
+                        10,
+                        20
+                    ]
+                },
+                "qos": 0,
+                "retain": false,
+                "topic": "topic1",
+                "url": "mqtt://localhost:1883"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E2",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
 
 
 --TEARDOWN--

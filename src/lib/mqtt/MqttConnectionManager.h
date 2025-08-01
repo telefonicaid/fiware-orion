@@ -45,6 +45,7 @@ typedef struct MqttConnection
   double             lastTime;
   sem_t              connectionSem;
   int                conectionResult;
+  bool               connectionCallbackCalled;
 } MqttConnection;
 
 
@@ -57,21 +58,23 @@ class MqttConnectionManager
 {
  private:
   std::map<std::string, MqttConnection*>  connections;
+  long                                    timeout;
   sem_t                                   sem;
 
  public:
   MqttConnectionManager();
 
-  int  init(void);
+  void init(long _timeout);
   void teardown(void);
 
   const char*  semGet(void);
 
-  bool sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos);
+  bool sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, bool retain);
   void cleanup(double maxAge);
 
  private:
-  int  semInit(void);
+  void disconnect(struct mosquitto*  mosq, const std::string& endpoint);
+  void semInit(void);
   void semTake(void);
   void semGive(void);
 

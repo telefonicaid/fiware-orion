@@ -243,30 +243,30 @@ echo
 01. Create E1 with A1 with value NULL
 =====================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 02. Create E2 with A1 with value 1
 ==================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E2?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=Thing
+Content-Length: 0
 
 
 
 03. Query with q=A1==null, See E1/A1
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 [
     {
@@ -284,10 +284,10 @@ Date: REGEX(.*)
 04. Query with q=A1!=null, See E2/A1
 ====================================
 HTTP/1.1 200 OK
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 [
     {
@@ -305,30 +305,30 @@ Date: REGEX(.*)
 05. Create E3 with A1 with M1 with value NULL
 =============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E3?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=Thing
+Content-Length: 0
 
 
 
 06. Create E4 with A1 with M1 with value 1
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E4?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E4?type=Thing
+Content-Length: 0
 
 
 
 07. Query with mq=A1.M1==null, See E3/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 114
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
 
 [
     {
@@ -351,10 +351,10 @@ Date: REGEX(.*)
 08. Query with mq=A1.M1!=null, See E4/A1
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 113
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
 
 [
     {
@@ -377,30 +377,30 @@ Date: REGEX(.*)
 09. Create E5 with A1 compound containing M1 with value NULL
 ============================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E5?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=Thing
+Content-Length: 0
 
 
 
 10. Create E6 with A1 compound containing M1 with value 1
 =========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E6?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E6?type=Thing
+Content-Length: 0
 
 
 
 11. Query with q=A1.M1==null, See E5/A1
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 101
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 101
 
 [
     {
@@ -421,10 +421,10 @@ Date: REGEX(.*)
 12. Query with q=A1.M1!=null, See E6/A1
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 101
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 101
 
 [
     {
@@ -445,30 +445,30 @@ Date: REGEX(.*)
 13. Create E7 with A1 with M1 compound containing X1 with value NULL
 ====================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E7?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E7?type=Thing
+Content-Length: 0
 
 
 
 14. Create E8 with A1 with M1 compound containing X1 with value 1
 =================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E8?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E8?type=Thing
+Content-Length: 0
 
 
 
 15. Query with mq=A1.M1.X1==null, See E7/A1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 140
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 140
 
 [
     {
@@ -494,10 +494,10 @@ Date: REGEX(.*)
 16. Query with mq=A1.M1.X1!=null, See E8/A1
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 139
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 139
 
 [
     {

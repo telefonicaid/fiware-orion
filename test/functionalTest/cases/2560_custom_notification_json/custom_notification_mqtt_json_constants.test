@@ -148,6 +148,10 @@ echo
 echo
 
 
+# Sometimes the accumulator needs some time to get the MQTT notification
+sleep 0.5s
+
+
 echo "05. Dump accumulator, see 2 notifications"
 echo "========================================="
 accumulatorDump
@@ -159,30 +163,30 @@ echo
 01. Create subscription for E1 with custom notification with JSON object
 ========================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Create subscription for E1 with custom notification with JSON array
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. GET /v2/subscriptions and see both subscriptions
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 856
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 946
 
 [
     {
@@ -219,10 +223,11 @@ Date: REGEX(.*)
                             "y1",
                             "y2"
                         ]
-                    },                    
+                    },
                     "text": "foo"
                 },
                 "qos": 0,
+                "retain": false,
                 "topic": "topic1",
                 "url": "mqtt://localhost:1883"
             },
@@ -231,7 +236,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -279,6 +285,7 @@ Date: REGEX(.*)
                     }
                 ],
                 "qos": 0,
+                "retain": false,
                 "topic": "topic1",
                 "url": "mqtt://localhost:1883"
             },
@@ -287,7 +294,8 @@ Date: REGEX(.*)
         "status": "active",
         "subject": {
             "condition": {
-                "attrs": []
+                "attrs": [],
+                "notifyOnMetadataChange": true
             },
             "entities": [
                 {
@@ -303,10 +311,10 @@ Date: REGEX(.*)
 04. Create E1 entity to trigger both notifications
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
 
 
 

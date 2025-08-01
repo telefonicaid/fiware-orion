@@ -35,8 +35,8 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 #
 # Hint: use this to run the MQTT brokers needed for this .test:
 #
-#   docker run -d -p 1883:1883 eclipse-mosquitto:1.6.7
-#   docker run -d -p 1884:1883 eclipse-mosquitto:1.6.7
+#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
+#   docker run -d -p 1884:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 #
 # 01. Create MQTT sub1 at localhost:1883 (1)
 # 02. Create MQTT sub2 at localhost:1883 (2)
@@ -223,60 +223,60 @@ echo
 01. Create MQTT sub1 at localhost:1883 (1)
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Create MQTT sub1 at localhost:1883 (2)
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Create MQTT sub1 at localhost:1884 (1)
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 04. Create MQTT sub1 at localhost:1884 (2)
 ==========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)
 ============================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1883?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1883?type=T
+Content-Length: 0
 
 
 
 06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
 ===================================================================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1884?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1884?type=T
+Content-Length: 0
 
 
 
@@ -347,8 +347,8 @@ Successfully disconnected from MQTT Broker at localhost:1884
 09. Update entity E1883 to re-create connections to localhost:1883
 ==================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

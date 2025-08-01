@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2019 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -62,16 +62,16 @@ def response_is_ok(data):
     :return:
     """
 
-    if not 'contextResponses' in data:
+    if 'contextResponses' not in data:
         return False
 
     if len(data['contextResponses']) != 1:
         return False
 
-    if not 'statusCode' in data['contextResponses'][0]:
+    if 'statusCode' not in data['contextResponses'][0]:
         return False
 
-    if not 'code' in data['contextResponses'][0]['statusCode']:
+    if 'code' not in data['contextResponses'][0]['statusCode']:
         return False
 
     if data['contextResponses'][0]['statusCode']['code'] != '200':
@@ -97,12 +97,12 @@ def dump_entity(id):
     res = requests.post(cb_endpoint + '/v1/queryContext', json=body, headers=headers, verify=False)
 
     if res.status_code != 200 or not response_is_ok(res.json()):
-        print
-        print '*** Error getting entity %s (%d): %s' % (id, res.status_code, res.json())
+        print()
+        print('*** Error getting entity %s (%d): %s' % (id, res.status_code, res.json()))
         return False
 
     entity_body = res.json()['contextResponses'][0]['contextElement']
-    print json.dumps(entity_body).decode('unicode-escape')
+    print(json.dumps(entity_body))
 
     return True
 
@@ -123,7 +123,7 @@ def dump_entities(filename):
 ### Main program starts here ###
 
 if len(sys.argv) != 2:
-    print "invalid number of arguments, please provide the file name of entities"
+    print("invalid number of arguments, please provide the file name of entities")
     sys.exit()
 
 filename = sys.argv[1]

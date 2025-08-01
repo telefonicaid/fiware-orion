@@ -39,40 +39,19 @@ The list of available options is the following:
     runs in both IPv4 and IPv6). Cannot be used at the same time
     as -ipv4.
 -   **-multiservice**. Enables multiservice/multitenant mode (see [multi
-    service tenant section](../user/multitenancy.md)).
+    service tenant section](../orion-api.md#multi-tenancy)).
 -   **-db <db>**. The MongoDB database to use or
     (if `-multiservice` is
     in use) the prefix to per-service/tenant databases (see section on
     [service/tenant database
-    separation](../user/multitenancy.md). This field is restricted to 10 characters
+    separation](../orion-api.md#multi-tenancy). This field is restricted to 10 characters
     max length.
--   **-dbhost <host>**. The MongoDB host and port to use, e.g. `-dbhost
-    localhost:12345`.
--   **-rplSet <replicat_set>**. If used, Orion CB connnects to a
-    MongoDB replica set (instead of a stand-alone MongoDB instance).
-    The name of the replica set to use is the value of the parameter. In
-    this case, the -dbhost parameter can be a list of hosts (separated
-    by ",") which are used as seed for the replica set.
--   **-dbTimeout <interval>**. Only used in the case of using replica
-    set (-rplSet), ignored otherwise. It specifies the timeout in
-    milliseconds for connections to the replica set.
--   **-dbuser <user>**. The MongoDB user to use. If your MongoDB doesn't
-    use authorization then this option must be avoided. See [database
-    authorization section](database_admin.md#database-authorization).
+-   **-dbURI <uri>** : The URI to use the MongoDB.
+    If the URI contains the string `${PWD}`, it will be replaced with the password
+    specified in `-dbpwd` or the environment variable `ORION_MONGO_PASSWORD`.
 -   **-dbpwd <pass>**. The MongoDB password to use. If your MongoDB
     doesn't use authorization then this option must be avoided. See [database
-    authorization section]( database_admin.md#database-authorization).
--   **-dbAuthMech <mechanism>**. The MongoDB authentication mechanism to use in the case
-    of providing `-dbuser` and `-dbpwd`. Alternatives are SCRAM-SHA-1 or SCRAM-SHA-256.
--   **-dbAuthDb <database>**. Specifies the database to use for authentication in the case
-    of providing `-dbuser` and `-dbpwd`.
--   **-dbSSL**. Enable SSL in the connection to MongoDB. You have to use this option if your
-    MongoDB server or replica set is using SSL (or, the other way around, you have not to use
-    this option if your MongoDB server or replicat set is not using SSL). Note there is
-    currently a limitation: Orion uses `tlsAllowInvalidCertificates=true` in this case,
-    so the certificate used by MongoDB server is not being validated.
--   **-dbDisableRetryWrites**. Set retryWrite parameter to false in DB connections (not
-    recommended, only to keep compatibility with old MongoDB instances)
+    authorization section](database_admin.md#database-authorization).
 -   **-dbPoolSize <size>**. Database connection pool. Default size of
     the pool is 10 connections.
 -   **-writeConcern <0|1>**. Write concern for MongoDB write operations:
@@ -115,10 +94,13 @@ The list of available options is the following:
 -   **-pidpath <pid_file>**. Specifies the file to store the PID of the
     broker process.
 -   **-httpTimeout <interval>**. Specifies the timeout in milliseconds
-    for forwarding messages and for notifications. Default timeout (if this parameter is not specified)
+    for HTTP forwarding messages and for notifications. Default timeout (if this parameter is not specified)
     is 5000 (5 seconds). Max value is 1800000 (30 minutes). This parameter can be defined individually for subscriptions. If defined on the subscription's
     JSON, the default parameter would be ignored. See section in the 
-    [NGSIv2 Implementation Notes](../user/ngsiv2_implementation_notes.md#timeout-subscriptions-option)
+    [`subscription.notification.http`](../orion-api.md#subscriptionnotificationhttp).
+-   **-mqttTimeout <interval>**. Specifies the timeout in milliseconds
+    for connection to MQTT brokers in MQTT notifications. Default timeout (if this parameter is not specified)
+    is 5000 (5 seconds). Max value is 1800000 (30 minutes).
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
@@ -171,13 +153,14 @@ The list of available options is the following:
     * No `${...}` macro substitution is performed.
 -   **-disableFileLog**. To prevent Orion from logging into a file (default behaviour is use a log file). This option might be useful if you are running on kubernetes.
 -   **-logForHumans**. To make the traces to standard out formated for humans (note that the traces in the log file are not affected)
--   **-logLineMaxSize**. Log line maximum length (when exceeded Orion prints `LINE TOO LONG` as log trace). Minimum allowed value: 100 bytes. Default value: 32 KBytes.
--   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes.
+-   **-logLineMaxSize**. Log line maximum length (when exceeded Orion prints `LINE TOO LONG` as log trace). Minimum allowed value: 100 bytes. Default value: 32 KBytes. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `lineMaxSize` field.
+-   **-logInfoPayloadMaxSize**. For those log traces at INFO level that print request and/or response payloads, this is the maximum allowed size for those payloads. If the payload size is greater than this setting, then only the first `-logInfoPayloadMaxSize` bytes are included (and an ellipsis in the form of `(...)` is shown in trace). Default value: 5 KBytes. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `infoPayloadMaxSize` field.
 -   **-disableMetrics**. To turn off the 'metrics' feature. Gathering of metrics is a bit costly, as system calls and semaphores are involved.
     Use this parameter to start the broker without metrics overhead.
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
 -   **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
+-   **-logDeprecate**. Log deprecation usages as warnings. More information in [this section of the documentation](../deprecated.md#log-deprecation-warnings). Default is: false. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `deprecated` field
 
 ## Configuration using environment variables
 
@@ -204,15 +187,9 @@ Two facts have to be taken into account:
 |	ORION_LOCALIP	|	localIp	|
 |	ORION_PORT	|	port	|
 |	ORION_PID_PATH	|	pidpath	|
-|	ORION_MONGO_HOST	|	dbhost	|
-|	ORION_MONGO_REPLICA_SET	|	rplSet	|
-|	ORION_MONGO_USER	|	dbuser	|
+|	ORION_MONGO_URI	|	dbURI	|
 |	ORION_MONGO_PASSWORD	|	dbpwd	|
-|	ORION_MONGO_AUTH_MECH	|	dbAuthMech	|
-|	ORION_MONGO_AUTH_SOURCE	|	dbAuthDb	|
-|	ORION_MONGO_SSL	|	dbSSL	|
 |	ORION_MONGO_DB	|	db	|
-|	ORION_MONGO_TIMEOUT	|	dbTimeout	|
 |	ORION_MONGO_POOL_SIZE	|	dbPoolSize	|
 |	ORION_USEIPV4	|	ipv4	|
 |	ORION_USEIPV6	|	ipv6	|
@@ -221,6 +198,7 @@ Two facts have to be taken into account:
 |	ORION_HTTPS_CERTFILE	|	cert	|
 |	ORION_MULTI_SERVICE	|	multiservice	|
 |	ORION_HTTP_TIMEOUT	|	httpTimeout	|
+|	ORION_MQTT_TIMEOUT	|	mqttTimeout	|
 |	ORION_REQ_TIMEOUT	|	reqTimeout	|
 |	ORION_MUTEX_POLICY	|	reqMutexPolicy	|
 |	ORION_MONGO_WRITE_CONCERN	|	writeConcern	|
@@ -243,7 +221,6 @@ Two facts have to be taken into account:
 |	ORION_STAT_NOTIF_QUEUE	|	statNotifQueue	|
 |	ORION_LOG_SUMMARY_PERIOD	|	logSummary	|
 |	ORION_RELOG_ALARMS	|	relogAlarms	|
-|	ORION_CHECK_ID_V1	|	strictNgsiv1Ids	|
 |	ORION_DISABLE_CUSTOM_NOTIF	|	disableCustomNotifications	|
 |   ORION_DISABLE_FILE_LOG  |   disableFileLog  |
 |	ORION_LOG_FOR_HUMANS	|	logForHumans	|
@@ -251,5 +228,5 @@ Two facts have to be taken into account:
 |   ORION_LOG_INFO_PAYLOAD_MAX_SIZE | logInfoPayloadMaxSize |
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
-|	ORION_NGSIV1_AUTOCAST	|	ngsiv1Autocast	|
 |       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
+|       ORION_LOG_DEPRECATE |  logDeprecate |

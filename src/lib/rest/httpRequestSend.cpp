@@ -51,7 +51,7 @@
 #include "rest/HttpHeaders.h"
 #include "rest/rest.h"
 #include "rest/curlSem.h"
-#include "serviceRoutines/versionTreat.h"
+#include "serviceRoutinesV2/versionTreat.h"
 
 
 
@@ -65,9 +65,9 @@ static long defaultTimeout = DEFAULT_TIMEOUT;
 
 /* ****************************************************************************
 *
-* httpRequestInit -
+* setHttpTimeout -
 */
-void httpRequestInit(long defaultTimeoutInMilliseconds)
+void setHttpTimeout(long defaultTimeoutInMilliseconds)
 {
   if (defaultTimeoutInMilliseconds != -1)
   {
@@ -258,7 +258,9 @@ int httpRequestSend
    long long*                                 statusCodeP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
-   long                                       timeoutInMilliseconds
+   long                                       timeoutInMilliseconds,
+   int                                        providerLimit,
+   int                                        providerOffset
 )
 {
   CURL*                curl;
@@ -574,6 +576,13 @@ int httpRequestSend
     url = ip;
   }
   url = protocol + url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  if ((providerLimit >= 0) && (providerOffset >=0))
+  {
+    std::string pLimit = std::to_string(providerLimit);
+    std::string pOffset = std::to_string(providerOffset);
+    url += "?limit=" + pLimit + "&offset=" + pOffset + "&options=count";
+  }
 
   if (insecureNotif)
   {

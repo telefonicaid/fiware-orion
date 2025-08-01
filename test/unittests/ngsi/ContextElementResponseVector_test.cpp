@@ -33,56 +33,25 @@
 
 /* ****************************************************************************
 *
-* check - 
-*/
-TEST(ContextElementResponseVector, check)
-{
-  ContextElementResponseVector  cerv;
-  ContextElementResponse        cer;
-  std::string                   out;
-
-  utInit();
-
-  out = cerv.check(V1, UpdateContext, "", 0);
-  EXPECT_STREQ("OK", out.c_str());
-
-  cer.entity.id         = "ID";
-  cer.entity.type       = "Type";
-  cer.entity.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "details");
-
-  cerv.push_back(&cer);
-  out = cerv.check(V1, UpdateContext, "", 0);
-  EXPECT_STREQ("OK", out.c_str());
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render - 
 *
 */
 TEST(ContextElementResponseVector, render)
 {
+  utInit();
+  
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
 
-  utInit();
+  std::vector<std::string> emptyV;  
 
-  std::vector<std::string> emptyV;
+  out = cerv.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV);
+  EXPECT_STREQ("[]", out.c_str());
 
-  // FIXME P2: "" is string, function signature says bool..
-  out = cerv.toJsonV1(false, UpdateContextElement, emptyV, false, emptyV, "");
-  EXPECT_STREQ("", out.c_str());
-
-  cer.entity.id         = "ID";
-  cer.entity.type       = "Type";
-  cer.entity.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "details");
+  cer.entity.entityId.id   = "ID";
+  cer.entity.entityId.type = "Type";
+  cer.error.fill(SccOk, "details");
 
   utExit();
 }

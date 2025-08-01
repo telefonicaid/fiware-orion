@@ -95,20 +95,20 @@ echo
 01. POST /v2/entities to create entity
 ======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/8787GHY?type=Car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/8787GHY?type=Car
+Content-Length: 0
 
 
 
 02. GET /v2/entities/8787GHY
 ============================
 HTTP/1.1 200 OK
-Content-Length: 325
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 325
 
 {
     "brand": {
@@ -144,16 +144,16 @@ Date: REGEX(.*)
 03. PUT /v2/entities/8787GHY/attrs/speed
 ========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. DELETE /v2/entities/8787GHY
 ===============================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

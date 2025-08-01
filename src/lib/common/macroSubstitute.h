@@ -31,8 +31,18 @@
 
 /* ****************************************************************************
 *
-* macroSubstitute - 
+* smartStringValue -
+*
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, const Entity& en, const std::string& service, const std::string& authToken);
+extern std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault);
+
+
+
+/* ****************************************************************************
+*
+* macroSubstitute -
+*
+*/
+extern bool macroSubstitute(std::string* sP, const std::string& in, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw = false);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

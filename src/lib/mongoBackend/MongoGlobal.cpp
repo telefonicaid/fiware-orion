@@ -49,8 +49,6 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "ngsi/ContextElementResponseVector.h"
-#include "ngsi/Duration.h"
-#include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 #include "rest/StringFilter.h"
 #include "apiTypesV2/Subscription.h"
@@ -73,7 +71,6 @@
 * USING
 */
 using ngsiv2::HttpInfo;
-using ngsiv2::EntID;
 
 
 
@@ -104,17 +101,10 @@ bool mongoMultitenant(void)
 */
 void mongoInit
 (
-  const char*  dbHost,
-  const char*  rplSet,
+  const char*  dbURI,
   std::string  dbName,
-  const char*  user,
   const char*  pwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          dbPoolSize,
   bool         mutexTimeStat
@@ -123,17 +113,10 @@ void mongoInit
   // Set the global multitenant variable
   multitenant = mtenant;
 
-  if (orion::mongoConnectionPoolInit(dbHost,
+  if (orion::mongoConnectionPoolInit(dbURI,
                                      dbName.c_str(),
-                                     rplSet,
-                                     user,
                                      pwd,
-                                     mechanism,
-                                     authDb,
-                                     dbSSL,
-                                     dbDisableRetryWrites,
                                      mtenant,
-                                     timeout,
                                      writeConcern,
                                      dbPoolSize,
                                      mutexTimeStat) != 0)
@@ -230,6 +213,7 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
   orion::BSONObjBuilder bob;
   bob.append("listDatabases", 1);
+  bob.append("nameOnly", true);
 
   if (!orion::runDatabaseCommand("admin", bob.obj(), &result, &err))
   {
@@ -251,9 +235,17 @@ bool getOrionDatabases(std::vector<std::string>* dbsP)
 
     if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
     {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
-      dbsP->push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      // Check for size of database name
+      if (strlen(dbName.c_str()) <= DB_AND_SERVICE_NAME_MAX_LEN)
+      {
+        LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+        dbsP->push_back(dbName);
+        LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      }
+      else
+      {
+        LM_E(("Runtime Error (database name size should be smaller than %d characters: %s)", DB_AND_SERVICE_NAME_MAX_LEN, dbName.c_str()));
+      }
     }
   }
 
@@ -408,18 +400,18 @@ void ensureDateExpirationIndex(const std::string& tenant)
 * commutative: en1 is interpreted as the entity to match *in* en2 (i.e.
 * it is assumed that the pattern is in en2)
 */
-bool matchEntity(const EntityId* en1, const EntityId* en2)
+bool matchEntity(const EntityId* en1, const EntityId& en2)
 {
   bool idMatch;
 
-  if (isTrue(en2->isPattern))
+  if (!en2.idPattern.empty())
   {
     regex_t regex;
 
     idMatch = false;
-    if (!regComp(&regex, en2->id.c_str(), REG_EXTENDED))
+    if (!regComp(&regex, en2.idPattern.c_str(), REG_EXTENDED))
     {
-      std::string details = std::string("error compiling regex for id: '") + en2->id + "'";
+      std::string details = std::string("error compiling regex for id: '") + en2.id + "'";
       alarmMgr.badInput(clientIp, details);
     }
     else
@@ -429,40 +421,13 @@ bool matchEntity(const EntityId* en1, const EntityId* en2)
       regfree(&regex);  // If regcomp fails it frees up itself (see glibc sources for details)
     }
   }
-  else  /* isPattern == false */
+  else  /* is not a pattern */
   {
-    idMatch = (en2->id == en1->id);
+    idMatch = (en2.id == en1->id);
   }
 
   // Note that type.empty() is like a * wildcard for type
-  return idMatch && (en1->type.empty() || en2->type.empty() || en2->type == en1->type);
-}
-
-
-
-/* ****************************************************************************
-*
-* includedEntity -
-*/
-bool includedEntity(EntityId en, const EntityIdVector& entityIdV)
-{
-  for (unsigned int ix = 0; ix < entityIdV.size(); ++ix)
-  {
-    if (en.isPatternIsTrue() && en.id == ".*")
-    {
-      // By the moment the only supported pattern is .*. In this case matching is
-      // based exclusively in type
-      if (en.type == entityIdV[ix]->type)
-      {
-        return true;
-      }
-    }
-    else if (matchEntity(&en, entityIdV[ix]))
-    {
-      return true;
-    }
-  }
-  return false;
+  return idMatch && (en1->type.empty() || en2.type.empty() || en2.type == en1->type);
 }
 
 
@@ -504,12 +469,12 @@ static void fillQueryEntity(orion::BSONObjBuilder* bobP, const EntityId* enP)
   const std::string  idString    = "_id." ENT_ENTITY_ID;
   const std::string  typeString  = "_id." ENT_ENTITY_TYPE;
 
-  if (enP->isPattern == "true")
+  if (!enP->idPattern.empty())
   {
     // In the case of "universal pattern" we can avoid adding anything (simpler query)
-    if (enP->id != ".*")
+    if (enP->idPattern != ".*")
     {
-      bobP->appendRegex(idString, enP->id);
+      bobP->appendRegex(idString, enP->idPattern);
     }
   }
   else
@@ -517,17 +482,18 @@ static void fillQueryEntity(orion::BSONObjBuilder* bobP, const EntityId* enP)
     bobP->append(idString, enP->id);
   }
 
-  if (!enP->type.empty())
+
+  if (!enP->typePattern.empty())
   {
-    if (enP->isTypePattern)
+    // In the case of "universal pattern" we can avoid adding anything (simpler query)
+    if (enP->typePattern != ".*")
     {
-      // In the case of "universal pattern" we can avoid adding anything (simpler query)
-      if (enP->type != ".*")
-      {
-        bobP->appendRegex(typeString, enP->type);
-      }
+      bobP->appendRegex(typeString, enP->typePattern);
     }
-    else
+  }
+  else
+  {
+    if (!enP->type.empty())
     {
       bobP->append(typeString, enP->type);
     }
@@ -644,174 +610,6 @@ orion::BSONObj fillQueryServicePath(const std::string& spKey, const std::vector<
 
 
 
-/* *****************************************************************************
-*
-* processAreaScope -
-*
-* Returns true if 'areaQueryP' was filled, false otherwise
-*/
-static bool processAreaScope(const Scope* scoP, orion::BSONObjBuilder* queryP)
-{
-  // FIXME #3774: previously this part was based in streamming instead of append()
-
-  std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-
-  if (!mongoLocationCapable())
-  {
-    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
-      "Please upgrade MongoDB server to 2.4 or newer)";
-
-    alarmMgr.badInput(clientIp, details);
-    return false;
-  }
-
-  bool     inverted = false;
-  orion::BSONObj  geoWithin;
-
-  if (scoP->areaType == orion::CircleType)
-  {
-    double radians = scoP->circle.radius() / EARTH_RADIUS_METERS;
-
-    orion::BSONObjBuilder    bobGeoWithin;
-    orion::BSONArrayBuilder  baOuter;
-    orion::BSONArrayBuilder  baInner;
-
-    baInner.append(scoP->circle.center.longitude());
-    baInner.append(scoP->circle.center.latitude());
-
-    baOuter.append(baInner.arr());
-    baOuter.append(radians);
-
-    bobGeoWithin.append("$centerSphere", baOuter.arr());
-
-    geoWithin = bobGeoWithin.obj();
-
-    inverted  = scoP->circle.inverted();
-  }
-  else if (scoP->areaType == orion::PolygonType)
-  {
-    orion::BSONArrayBuilder  vertex;
-    double            lat0 = 0;
-    double            lon0 = 0;
-
-    for (unsigned int jx = 0; jx < scoP->polygon.vertexList.size() ; ++jx)
-    {
-      double  lat  = scoP->polygon.vertexList[jx]->latitude();
-      double  lon  = scoP->polygon.vertexList[jx]->longitude();
-
-      if (jx == 0)
-      {
-        lat0 = lat;
-        lon0 = lon;
-      }
-
-      orion::BSONArrayBuilder baCoords;
-      baCoords.append(lon);
-      baCoords.append(lat);
-
-      vertex.append(baCoords.arr());
-    }
-
-    /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
-    orion::BSONArrayBuilder baCoords0;
-    baCoords0.append(lon0);
-    baCoords0.append(lat0);
-    vertex.append(baCoords0.arr());
-
-    /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
-    orion::BSONObjBuilder bobGeoWithin;
-    orion::BSONObjBuilder bobGeometry;
-    orion::BSONArrayBuilder baVertex;
-
-    baVertex.append(vertex.arr());
-
-    bobGeometry.append("type", "Polygon");
-    bobGeometry.append("coordinates", baVertex.arr());
-
-    bobGeoWithin.append("$geometry", bobGeometry.obj());
-    geoWithin = bobGeoWithin.obj();
-
-    inverted  = scoP->polygon.inverted();
-  }
-  else
-  {
-    alarmMgr.badInput(clientIp, "unknown area type");
-    return false;
-  }
-
-  if (inverted)
-  {
-    /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
-     * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
-    orion::BSONObjBuilder bobAreaQuery;
-    orion::BSONObjBuilder bobGeoWithin;
-
-    bobGeoWithin.append("$geoWithin", geoWithin);
-
-    bobAreaQuery.append("$exists", true);
-    bobAreaQuery.append("$not", bobGeoWithin.obj());
-
-    queryP->append(locCoords, bobAreaQuery.obj());
-  }
-  else
-  {
-    orion::BSONObjBuilder bobAreaQuery;
-    bobAreaQuery.append("$geoWithin", geoWithin);
-    queryP->append(locCoords, bobAreaQuery.obj());
-  }
-
-  return true;
-}
-
-
-
-/* *****************************************************************************
-*
-* addFilterScope -
-*/
-static void addFilterScope(ApiVersion apiVersion, const Scope* scoP, std::vector<orion::BSONObj>* filtersP)
-{
-  if ((apiVersion == V2) && (scoP->type == SCOPE_FILTER_EXISTENCE) && (scoP->value == SCOPE_VALUE_ENTITY_TYPE))
-  {
-    // Early return to avoid _id.type: {$exits: true} in NGSIv2 case. Entity type existence filter only
-    // makes sense in NGSIv1 (and may be removed soon as NGSIv1 is deprecated functionality)
-    return;
-  }
-
-  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
-
-  if (scoP->type == SCOPE_FILTER_EXISTENCE)
-  {
-    // Entity type existence filter only makes sense in NGSIv1
-    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
-    {
-      bool existValue = scoP->oper == SCOPE_OPERATOR_NOT ? false : true;
-
-      orion::BSONObjBuilder bobInner;
-      bobInner.append("$exists", existValue);
-
-      orion::BSONObjBuilder bobOuter;
-      bobOuter.append(entityTypeString, bobInner.obj());
-
-      filtersP->push_back(bobOuter.obj());
-    }
-    else
-    {
-      std::string details = std::string("unknown value for '") +
-        SCOPE_FILTER_EXISTENCE + "' filter: '" + scoP->value + "'";
-
-      alarmMgr.badInput(clientIp, details);
-    }
-  }
-  else
-  {
-    std::string details = std::string("unknown filter type '") + scoP->type + "'";
-    alarmMgr.badInput(clientIp, details);
-  }
-}
-
-
-
 /* ****************************************************************************
 *
 * sortCriteria -
@@ -826,6 +624,11 @@ static std::string sortCriteria(const std::string& sortToken)
   if (sortToken == DATE_MODIFIED)
   {
     return ENT_MODIFICATION_DATE;
+  }
+
+  if (sortToken == SERVICE_PATH)
+  {
+    return std::string("_id.") + ENT_SERVICE_PATH;
   }
 
   if (sortToken == ENT_ENTITY_ID)
@@ -845,11 +648,21 @@ static std::string sortCriteria(const std::string& sortToken)
 
 /* *****************************************************************************
 *
-* processAreaScopeV2 -
+* processGeoFilter -
 *
-* Returns true if areaQueryP was filled, false otherwise
+* Returns true if queryP/countQueryP were filled, false otherwise
+*
+* Most of the cases queryP and countQueryP are filled the same way. However, in the case of near georel they
+* are different. This is due to:
+*
+* - we need to use $near in the query used to search (queryP), due to the alternative using $geoWithin
+*   (described in https://stackoverflow.com/a/76416103/1485926) doesn't sort result by center proximity, so
+*   ?orderBy=distance will break
+* - we cannot use $near in the query used to count (countQueryP) as it doesn't work with modern count functions
+*   (see the aforementioned link).
+*
 */
-bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool avoidNearUsage)
+bool processGeoFilter(const GeoFilter* scoP, orion::BSONObjBuilder* queryP, orion::BSONObjBuilder* countQueryP)
 {
   // FIXME #3774: previously this part was based in streamming instead of append()
 
@@ -857,7 +670,7 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
 
   if (!mongoLocationCapable())
   {
-    std::string details = std::string("location scope was found but your MongoDB version doesn't support it. ") +
+    std::string details = std::string("location filter was found but your MongoDB version doesn't support it. ") +
       "Please upgrade MongoDB server to 2.4 or newer)";
 
     alarmMgr.badInput(clientIp, details);
@@ -956,119 +769,115 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
   orion::BSONObjBuilder bobArea;
   if (scoP->georel.type == "near")
   {
-    if (avoidNearUsage)
+    // 1. query used for count (without $near)
+
+    // This works as far as we don't have any other $and field in the query, in which
+    // case the array for $and here needs to be combined with other items. Currently,
+    // users of processGeoFilter() doesn't do add any new $and clause.
+    //
+    // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
+    // at least minDistance or maxDistance are there. Check functional tests
+    //
+    // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
+    // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+
+    orion::BSONArrayBuilder andArray;
+
+    orion::BSONArrayBuilder coordsBuilder;
+    coordsBuilder.append(scoP->point.longitude());
+    coordsBuilder.append(scoP->point.latitude());
+    orion::BSONArray coords = coordsBuilder.arr();
+
+    if (scoP->georel.maxDistance >= 0)
     {
-      // $near operation is problematic in countDocument()
-      // operation (see https://stackoverflow.com/questions/66143435/countdocuments-with-geo-queries-using-mindistance-semantics)
-      // In abscence of a better alternative I have used a solution as the one
-      // described at https://jira.mongodb.org/browse/DOCS-12834
-      // This works as far as we don't have any other $and field in the query, in which
-      // case the array for $and here needs to be combined with other items
-      //
-      // Why don't use this query style without $near all the time? Because $near provides
-      // ordering of results based in distance to the center, so in regular find() is the one
-      // we want to use
-      //
-      // Note that and empty query $and: [ ] could not happen, as the parsing logic check that
-      // at least minDistance or maxDistance are there. Check functional tests
-      //
-      // * 1177_geometry_and_coords/geometry_and_coords_errors.test, step 7
-      // * 1677_geo_location_for_api_v2/geo_location_for_api_v2_error_cases.test, step 6
+      orion::BSONObjBuilder andToken;
 
-      orion::BSONArrayBuilder andArray;
+      orion::BSONObjBuilder geoWithinMax;
+      orion::BSONArrayBuilder centerMax;
+      centerMax.append(coords);
+      centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
+      geoWithinMax.append("$centerSphere", centerMax.arr());
 
-      orion::BSONArrayBuilder coordsBuilder;
-      coordsBuilder.append(scoP->point.longitude());
-      coordsBuilder.append(scoP->point.latitude());
-      orion::BSONArray coords = coordsBuilder.arr();
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMax.obj());
 
-      if (scoP->georel.maxDistance >= 0)
-      {
-        orion::BSONObjBuilder andToken;
+      andToken.append(keyLoc, loc.obj());
 
-        orion::BSONObjBuilder geoWithinMax;
-        orion::BSONArrayBuilder centerMax;
-        centerMax.append(coords);
-        centerMax.append(scoP->georel.maxDistance / EARTH_RADIUS_METERS);
-        geoWithinMax.append("$centerSphere", centerMax.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMax.obj());
-
-        andToken.append(keyLoc, loc.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      if (scoP->georel.minDistance == 0)
-      {
-        // This is somehow a degenerate case, as any point in the space is
-        // more than 0 distance than any other point :). In this case we only
-        // check for existance of the location
-        orion::BSONObjBuilder existTrue;
-        existTrue.append("$exists", true);
-
-        orion::BSONObjBuilder andToken;
-        andToken.append(keyLoc, existTrue.obj());
-
-        andArray.append(andToken.obj());
-      }
-      else if (scoP->georel.minDistance > 0)
-      {
-        orion::BSONObjBuilder andToken;
-
-        orion::BSONObjBuilder geoWithinMin;
-        orion::BSONArrayBuilder centerMin;
-        centerMin.append(coords);
-        centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
-        geoWithinMin.append("$centerSphere", centerMin.arr());
-
-        orion::BSONObjBuilder loc;
-        loc.append("$geoWithin", geoWithinMin.obj());
-
-        orion::BSONObjBuilder notx;
-        notx.append("$not", loc.obj());
-
-        andToken.append(keyLoc, notx.obj());
-
-        andArray.append(andToken.obj());
-      }
-
-      queryP->append("$and", andArray.arr());
+      andArray.append(andToken.obj());
     }
-    else
+
+    if (scoP->georel.minDistance == 0)
     {
-      orion::BSONObjBuilder near;
+      // This is somehow a degenerate case, as any point in the space is
+      // more than 0 distance than any other point :). In this case we only
+      // check for existance of the location
+      orion::BSONObjBuilder existTrue;
+      existTrue.append("$exists", true);
 
-      near.append("$geometry", geometry);
+      orion::BSONObjBuilder andToken;
+      andToken.append(keyLoc, existTrue.obj());
 
-      if (scoP->georel.maxDistance >= 0)
-      {
-        near.append("$maxDistance", scoP->georel.maxDistance);
-      }
-
-      if (scoP->georel.minDistance >= 0)
-      {
-        near.append("$minDistance", scoP->georel.minDistance);
-      }
-
-      bobArea.append("$near", near.obj());
-      queryP->append(keyLoc, bobArea.obj());
+      andArray.append(andToken.obj());
     }
+    else if (scoP->georel.minDistance > 0)
+    {
+      orion::BSONObjBuilder andToken;
+
+      orion::BSONObjBuilder geoWithinMin;
+      orion::BSONArrayBuilder centerMin;
+      centerMin.append(coords);
+      centerMin.append(scoP->georel.minDistance / EARTH_RADIUS_METERS);
+      geoWithinMin.append("$centerSphere", centerMin.arr());
+
+      orion::BSONObjBuilder loc;
+      loc.append("$geoWithin", geoWithinMin.obj());
+
+      orion::BSONObjBuilder notx;
+      notx.append("$not", loc.obj());
+
+      andToken.append(keyLoc, notx.obj());
+
+      andArray.append(andToken.obj());
+    }
+
+    countQueryP->append("$and", andArray.arr());
+
+    // 2. Query used for count (with $near)
+
+    orion::BSONObjBuilder near;
+
+    near.append("$geometry", geometry);
+
+    if (scoP->georel.maxDistance >= 0)
+    {
+      near.append("$maxDistance", scoP->georel.maxDistance);
+    }
+
+    if (scoP->georel.minDistance >= 0)
+    {
+      near.append("$minDistance", scoP->georel.minDistance);
+    }
+
+    bobArea.append("$near", near.obj());
+    queryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "coveredBy")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoWithin", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "intersects")
   {
     orion::BSONObjBuilder bobGeom;
     bobGeom.append("$geometry", geometry);
     bobArea.append("$geoIntersects", bobGeom.obj());
+
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "disjoint")
   {
@@ -1080,10 +889,12 @@ bool processAreaScopeV2(const Scope* scoP, orion::BSONObjBuilder* queryP, bool a
     bobArea.append("$not", bobNot.obj());
 
     queryP->append(keyLoc, bobArea.obj());
+    countQueryP->append(keyLoc, bobArea.obj());
   }
   else if (scoP->georel.type == "equals")
   {
     queryP->append(keyLoc, geometry);
+    countQueryP->append(keyLoc, geometry);
   }
   else
   {
@@ -1205,48 +1016,94 @@ static void addIfNotPresentPreviousValueMetadata(ContextAttribute* caP)
     return;
   }
 
-  // Created the metadata
   Metadata* mdP = NULL;
-  ContextAttribute* previousValueP = caP->previousValue;
 
-  if (previousValueP->compoundValueP == NULL)
+  if (caP->previousValue == NULL)
   {
-    switch (previousValueP->valueType)
+    // in this case previousValue is filled with caP value
+    if (caP->compoundValueP == NULL)
     {
-    case orion::ValueTypeString:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->stringValue);
-      break;
+      switch (caP->valueType)
+      {
+      case orion::ValueTypeString:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->stringValue);
+        break;
 
-    case orion::ValueTypeBoolean:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->boolValue);
-      break;
+      case orion::ValueTypeBoolean:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->boolValue);
+        break;
 
-    case orion::ValueTypeNumber:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
-      break;
+      case orion::ValueTypeNumber:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, caP->numberValue);
+        break;
 
-    case orion::ValueTypeNull:
-      mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-      mdP->valueType = orion::ValueTypeNull;
-      break;
+      case orion::ValueTypeNull:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, "");
+        mdP->valueType = orion::ValueTypeNull;
+        break;
 
-    case orion::ValueTypeNotGiven:
-      LM_E(("Runtime Error (value not given for metadata)"));
-      return;
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given for metadata)"));
+        return;
 
-    default:
-      LM_E(("Runtime Error (unknown value type: %d)", previousValueP->valueType));
-      return;
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", caP->valueType));
+        return;
+      }
+    }
+    else
+    {
+      mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, caP->type, "");
+      mdP->valueType = caP->valueType;
+
+      // Different with the case when previousValue is not NULL, we cannot
+      // steal the value here, as the caP->compoundValueP has its own memory
+      // independent memory lifecyel
+      mdP->compoundValueP = caP->compoundValueP->clone();
     }
   }
   else
   {
-    mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
-    mdP->valueType = previousValueP->valueType;
+    ContextAttribute* previousValueP = caP->previousValue;
+    if (previousValueP->compoundValueP == NULL)
+    {
+      switch (previousValueP->valueType)
+      {
+      case orion::ValueTypeString:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->stringValue);
+        break;
 
-    // Steal the compound
-    mdP->compoundValueP = previousValueP->compoundValueP;
-    previousValueP->compoundValueP = NULL;
+      case orion::ValueTypeBoolean:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->boolValue);
+        break;
+
+      case orion::ValueTypeNumber:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, previousValueP->numberValue);
+        break;
+
+      case orion::ValueTypeNull:
+        mdP = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+        mdP->valueType = orion::ValueTypeNull;
+        break;
+
+      case orion::ValueTypeNotGiven:
+        LM_E(("Runtime Error (value not given for metadata)"));
+        return;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", previousValueP->valueType));
+        return;
+      }
+    }
+    else
+    {
+      mdP            = new Metadata(NGSI_MD_PREVIOUSVALUE, previousValueP->type, "");
+      mdP->valueType = previousValueP->valueType;
+
+      // Steal the compound
+      mdP->compoundValueP = previousValueP->compoundValueP;
+      previousValueP->compoundValueP = NULL;
+    }
   }
 
   // Add it to the vector (shadowed)
@@ -1297,6 +1154,11 @@ void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType
     addIfNotPresentAttr(&cerP->entity, ALTERATION_TYPE, DEFAULT_ATTR_STRING_TYPE, alterationType);
   }
 
+  // servicePath
+  if (!cerP->entity.servicePath.empty())
+  {
+    addIfNotPresentAttr(&cerP->entity, SERVICE_PATH, DEFAULT_ATTR_STRING_TYPE, cerP->entity.servicePath);
+  }
 
   for (unsigned int ix = 0; ix < cerP->entity.attributeVector.size(); ix++)
   {
@@ -1320,8 +1182,8 @@ void addBuiltins(ContextElementResponse* cerP, const std::string& alterationType
       addIfNotPresentMetadata(caP, NGSI_MD_ACTIONTYPE, DEFAULT_ATTR_STRING_TYPE, caP->actionType);
     }
 
-    // previousValue
-    if (caP->previousValue != NULL)
+    // previousValue (except in entityCreate case)
+    if (alterationType != "entityCreate")
     {
       addIfNotPresentPreviousValueMetadata(caP);
     }
@@ -1354,32 +1216,24 @@ static bool isCustomAttr(std::string attrName)
 *
 * entitiesQuery -
 *
-* This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
-* a vector with entities and a vector with attributes as input and returns the corresponding
-* ContextElementResponseVector or error.
+* This method is used by queryContext. It takes a vector with entities and a vector
+* with attributes as input and returns the corresponding ContextElementResponseVector or error.
 *
-* Note the includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
-* subscribeContext case, as empty values can cause problems in the case of federating Context
-* Brokers (the notifyContext is processed as an updateContext and in the latter case, an
-* empty value causes an error)
 */
 bool entitiesQuery
 (
   const EntityIdVector&            enV,
   const StringList&                attrL,
-  const Restriction&               res,
+  const Expression&                expr,
   ContextElementResponseVector*    cerV,
-  std::string*                     err,
-  bool                             includeEmpty,
+  OrionError*                      oeP,
   const std::string&               tenant,
   const std::vector<std::string>&  servicePath,
+  const std::vector<std::string>&  sortOrderV,
   int                              offset,
   int                              limit,
   bool*                            limitReached,
-  long long*                       countP,
-  const std::string&               sortOrderList,
-  ApiVersion                       apiVersion
+  long long*                       countP
 )
 {
   /* Query structure is as follows
@@ -1393,7 +1247,10 @@ bool entitiesQuery
    *
    */
 
+  std::string err;
+
   orion::BSONObjBuilder    finalQuery;
+  orion::BSONObjBuilder    finalCountQuery;
   orion::BSONArrayBuilder  orEnt;
 
   /* Part 1: entities - avoid $or in the case of a single element */
@@ -1403,6 +1260,7 @@ bool entitiesQuery
     fillQueryEntity(&bob, enV[0]);
     orion::BSONObj entObj = bob.obj();
     finalQuery.appendElements(entObj);
+    finalCountQuery.appendElements(entObj);
 
     LM_T(LmtMongo, ("Entity single query token: '%s'", entObj.toString().c_str()));
   }
@@ -1418,12 +1276,14 @@ bool entitiesQuery
       LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
     }
     finalQuery.append("$or", orEnt.arr());
+    finalCountQuery.append("$or", orEnt.arr());
   }
 
   /* Part 2: service path */
   if (servicePathFilterNeeded(servicePath))
   {
     finalQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
+    finalCountQuery.appendElements(fillQueryServicePath("_id." ENT_SERVICE_PATH, servicePath));
   }
 
   /* Part 3: attributes */
@@ -1457,72 +1317,22 @@ bool entitiesQuery
     orion::BSONObjBuilder bob;
     bob.append("$in", attrs.arr());
     finalQuery.append(ENT_ATTRNAMES, bob.obj());
+    finalCountQuery.append(ENT_ATTRNAMES, bob.obj());
   }
 
-  /* Part 5: scopes */
-  std::vector<orion::BSONObj>  filters;
-  unsigned int                 geoScopes = 0;
+  /* Part 5: filters */
+  processGeoFilter(&expr.geoFilter, &finalQuery, &finalCountQuery);
 
-  for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < expr.stringFilter.mongoFilters.size(); ++ix)
   {
-    const Scope* scopeP = res.scopeVector[ix];
-
-    if (scopeP->type.find(SCOPE_FILTER) == 0)
-    {
-      // FIXME P5: NGSIv1 filter, probably to be removed in the future
-      addFilterScope(apiVersion, scopeP, &filters);
-    }
-    else if (scopeP->type == FIWARE_LOCATION ||
-             scopeP->type == FIWARE_LOCATION_DEPRECATED ||
-             scopeP->type == FIWARE_LOCATION_V2)
-    {
-      geoScopes++;
-      if (geoScopes > 1)
-      {
-        alarmMgr.badInput(clientIp, "current version supports only one area scope, extra geoScope is ignored");
-      }
-      else
-      {
-        if (scopeP->type == FIWARE_LOCATION_V2)
-        {
-           processAreaScopeV2(scopeP, &finalQuery);
-        }
-        else  // FIWARE Location NGSIv1 (legacy)
-        {
-          processAreaScope(scopeP, &finalQuery);
-        }
-      }
-    }
-    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      if (scopeP->stringFilterP)
-      {
-        for (unsigned int ix = 0; ix < scopeP->stringFilterP->mongoFilters.size(); ++ix)
-        {
-          finalQuery.appendElements(scopeP->stringFilterP->mongoFilters[ix]);
-        }
-      }
-    }
-    else if (scopeP->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      if (scopeP->mdStringFilterP)
-      {
-        for (unsigned int ix = 0; ix < scopeP->mdStringFilterP->mongoFilters.size(); ++ix)
-        {
-          finalQuery.appendElements(scopeP->mdStringFilterP->mongoFilters[ix]);
-        }
-      }
-    }
-    else
-    {
-      std::string details = std::string("unknown scope type '") + scopeP->type + "', ignoring";
-      alarmMgr.badInput(clientIp, details);
-    }
+    finalQuery.appendElements(expr.stringFilter.mongoFilters[ix]);
+    finalCountQuery.appendElements(expr.stringFilter.mongoFilters[ix]);
   }
 
-  for (unsigned int ix = 0; ix < filters.size(); ++ix)
+  for (unsigned int ix = 0; ix < expr.mdStringFilter.mongoFilters.size(); ++ix)
   {
-    finalQuery.appendElements(filters[ix]);
+    finalQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
+    finalCountQuery.appendElements(expr.mdStringFilter.mongoFilters[ix]);
   }
 
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
@@ -1531,15 +1341,16 @@ bool entitiesQuery
   orion::DBCursor  cursor;
 
   orion::BSONObj query = finalQuery.obj();
+  orion::BSONObj countQuery = finalCountQuery.obj();
   orion::BSONObj sort;
 
-  if (sortOrderList.empty())
+  if (sortOrderV.size() == 0)
   {
     orion::BSONObjBuilder bobSort;
     bobSort.append(ENT_CREATION_DATE, 1);
     sort = bobSort.obj();
   }
-  else if ((sortOrderList == ORDER_BY_PROXIMITY))
+  else if ((sortOrderV[0] == ORDER_BY_PROXIMITY))
   {
     // In this case the solution is not setting any query.sort(), as the $near operator will do the
     // sorting itself. Of course, using orderBy=geo:distance without using georel=near will return
@@ -1547,24 +1358,22 @@ bool entitiesQuery
   }
   else
   {
-    std::vector<std::string>  sortedV;
-    int                       components = stringSplit(sortOrderList, ',', sortedV);
     orion::BSONObjBuilder     sortOrder;
 
-    for (int ix = 0; ix < components; ix++)
+    for (unsigned int ix = 0; ix < sortOrderV.size(); ix++)
     {
       std::string  sortToken;
       int          sortDirection;
 
-      if (sortedV[ix][0] == '!')
+      if (sortOrderV[ix][0] == '!')
       {
         // reverse
-        sortToken     = sortedV[ix].substr(1);
+        sortToken     = sortOrderV[ix].substr(1);
         sortDirection = -1;
       }
       else
       {
-        sortToken     = sortedV[ix];
+        sortToken     = sortOrderV[ix];
         sortDirection = 1;
       }
 
@@ -1577,7 +1386,7 @@ bool entitiesQuery
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, sort, limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, countQuery, sort, limit, offset, &cursor, countP, &err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -1600,13 +1409,10 @@ bool entitiesQuery
     // Build CER from BSON retrieved from DB
     docs++;
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
-    ContextElementResponse*  cer = new ContextElementResponse(r, attrL, includeEmpty, apiVersion);
+    ContextElementResponse*  cer = new ContextElementResponse(r, attrL);
 
-    // Add builtin attributes and metadata (only in NGSIv2)
-    if (apiVersion == V2)
-    {
-      addBuiltins(cer, "");
-    }
+    // Add builtin attributes and metadata
+    addBuiltins(cer, "");
 
     /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
     for (unsigned int ix = 0; ix < attrL.size(); ++ix)
@@ -1636,7 +1442,6 @@ bool entitiesQuery
       }
     }
 
-    cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
   }
 
@@ -1648,34 +1453,15 @@ bool entitiesQuery
 
   if (errType == ON_NEXT_MANAGED_ERROR)
   {
-    ContextElementResponse*  cer   = new ContextElementResponse();
-
     alarmMgr.dbError(nextErr);
 
-    //
-    // It would be nice to fill in the entity but it is difficult to do this.
-    //
-    // Solution:
-    //   If the incoming entity-vector has only *one* entity, I simply fill it in with enV[0] and
-    //   if more than one entity is in the vector, an empty entity is returned.
-    //
-    if (enV.size() == 1)
-    {
-      cer->entity.fill(enV[0]->id, enV[0]->type, enV[0]->isPattern);
-    }
-    else
-    {
-      cer->entity.fill("", "", "");
-    }
-
-    cer->statusCode.fill(SccReceiverInternalError, nextErr);
-    cerV->push_back(cer);
-    return true;
+    oeP->fill(SccReceiverInternalError, nextErr);
+    return false;
   }
   else if (errType == ON_NEXT_UNMANAGED_ERROR)
   {
-    *err = nextErr;
     LM_E(("Runtime Error (exception in next(): %s - query: %s)", nextErr.c_str(), query.toString().c_str()));
+    oeP->fill(SccReceiverInternalError, nextErr);
     return false;
   }
 
@@ -1697,13 +1483,13 @@ bool entitiesQuery
    * used before pruning in the CPr calculation logic */
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
-    if (enV[ix]->isPattern != "true")
+    if (enV[ix]->idPattern.empty())
     {
       bool needToAdd = true;
 
       for (unsigned int jx = 0; jx < cerV->size(); ++jx)
       {
-        if (((*cerV)[jx]->entity.id == enV[ix]->id) && ((*cerV)[jx]->entity.type == enV[ix]->type))
+        if (((*cerV)[jx]->entity.entityId.id == enV[ix]->id) && ((*cerV)[jx]->entity.entityId.type == enV[ix]->type))
         {
           needToAdd = false;
           break;  /* jx */
@@ -1714,9 +1500,7 @@ bool entitiesQuery
       {
         ContextElementResponse* cerP = new ContextElementResponse();
 
-        cerP->entity.id = enV[ix]->id;
-        cerP->entity.type = enV[ix]->type;
-        cerP->entity.isPattern = "false";
+        cerP->entity.entityId = enV[ix];
 
         //
         // This entity has to be pruned if after CPr searching no attribute is "added" to it.
@@ -1732,7 +1516,7 @@ bool entitiesQuery
           cerP->entity.attributeVector.push_back(caP);
         }
 
-        cerP->statusCode.fill(SccOk);
+        cerP->error.fill(SccOk);
 
         cerV->push_back(cerP);
       }
@@ -1750,7 +1534,7 @@ bool entitiesQuery
 *
 * Remove attributes in the vector with 'found' value is 'false'
 *
-* In the case of NGSIv2 we filter attributes with CPr not included in a list of attributes
+* We filter attributes with CPr not included in a list of attributes
 * passed as reference (and that comes from the original NGSIv2 query). Otherwise,
 * over-querying for attributes may occur and this could break some CPr usage cases (in particular
 * the ones with IOTAs, which may report error in the case of being asked for an attribute
@@ -1762,7 +1546,6 @@ bool entitiesQuery
 */
 void pruneContextElements
 (
-  ApiVersion                           apiVersion,
   const StringList&                    attrsV,
   const ContextElementResponseVector&  oldCerV,
   ContextElementResponseVector*        newCerVP
@@ -1773,16 +1556,15 @@ void pruneContextElements
     ContextElementResponse* cerP    = oldCerV[ix];
     ContextElementResponse* newCerP = new ContextElementResponse();
 
-    newCerP->entity.fill(cerP->entity.id,
-                         cerP->entity.type,
-                         cerP->entity.isPattern,
+    newCerP->entity.fill(cerP->entity.entityId,
                          cerP->entity.servicePath,
                          cerP->entity.creDate,
                          cerP->entity.modDate);
 
     // FIXME P10: not sure if this is the right way to do it, maybe we need a fill() method for this
-    newCerP->entity.providingApplicationList = cerP->entity.providingApplicationList;
-    newCerP->statusCode.fill(&cerP->statusCode);
+    newCerP->entity.providerList = cerP->entity.providerList;
+    newCerP->entity.providerRegIdList = cerP->entity.providerRegIdList;
+    newCerP->error.fill(&cerP->error);
 
     bool pruneEntity = cerP->prune;
 
@@ -1791,10 +1573,9 @@ void pruneContextElements
       ContextAttribute* caP = cerP->entity.attributeVector[jx];
 
       // To be included, it need to be found and one of the following:
-      // - It is V1
-      // - (Not being V1) The attributes filter list is empty
-      // - (Not being V1 and not empty attributes filter) The attribute is included in the filter list (taking into account wildcard)
-      if ((caP->found) && ((apiVersion == V1) || (attrsV.size() == 0) || (attrsV.lookup(caP->name, ALL_ATTRS))))
+      // - The attributes filter list is empty
+      // - (Not empty attributes filter) The attribute is included in the filter list (taking into account wildcard)
+      if ((caP->found) && ((attrsV.size() == 0) || (attrsV.lookup(caP->name, ALL_ATTRS))))
       {
         ContextAttribute* newCaP = new ContextAttribute(caP);
         newCerP->entity.attributeVector.push_back(newCaP);
@@ -1804,8 +1585,8 @@ void pruneContextElements
     /* If after pruning the entity has no attribute and no CPr information, then it is not included
      * in the output vector, except if "prune" is set to false */
     if (pruneEntity &&
-        (newCerP->entity.attributeVector.size()          == 0) &&
-        (newCerP->entity.providingApplicationList.size() == 0))
+        (newCerP->entity.attributeVector.size() == 0) &&
+        (newCerP->entity.providerList.size()    == 0))
     {
       newCerP->release();
       delete newCerP;
@@ -1819,137 +1600,19 @@ void pruneContextElements
 
 
 
-/* ***************************************************************************
-*
-* processEntity -
-*/
-static void processEntity(ContextRegistrationResponse* crr, const EntityIdVector& enV, orion::BSONObj entity)
-{
-  EntityId en;
-
-  en.id        = getStringFieldF(entity, REG_ENTITY_ID);
-  en.type      = entity.hasField(REG_ENTITY_TYPE)?      getStringFieldF(entity, REG_ENTITY_TYPE)      : "";
-  en.isPattern = entity.hasField(REG_ENTITY_ISPATTERN)? getStringFieldF(entity, REG_ENTITY_ISPATTERN) : "false";
-
-  if (includedEntity(en, enV))
-  {
-    EntityId* enP = new EntityId(en.id, en.type, en.isPattern);
-
-    crr->contextRegistration.entityIdVector.push_back(enP);
-  }
-}
-
-
-
-/* ***************************************************************************
-*
-* processAttribute -
-*/
-static void processAttribute(ContextRegistrationResponse* crr, const StringList& attrL, const orion::BSONObj& attribute)
-{
-  ContextRegistrationAttribute attr(
-    getStringFieldF(attribute, REG_ATTRS_NAME),
-    getStringFieldF(attribute, REG_ATTRS_TYPE));
-
-  if (includedAttribute(attr.name, attrL))
-  {
-    ContextRegistrationAttribute* attrP = new ContextRegistrationAttribute(attr.name, attr.type);
-    crr->contextRegistration.contextRegistrationAttributeVector.push_back(attrP);
-  }
-}
-
-
-
-/* ***************************************************************************
-*
-* processContextRegistrationElement -
-*/
-static void processContextRegistrationElement
-(
-  orion::BSONObj                      cr,
-  const EntityIdVector&               enV,
-  const StringList&                   attrL,
-  ContextRegistrationResponseVector*  crrV,
-  MimeType                            mimeType,
-  ProviderFormat                      providerFormat,
-  const std::string&                  regId
-)
-{
-  ContextRegistrationResponse crr;
-
-  crr.contextRegistration.providingApplication.set(getStringFieldF(cr, REG_PROVIDING_APPLICATION));
-  crr.contextRegistration.providingApplication.setProviderFormat(providerFormat);
-
-  std::vector<orion::BSONElement> queryEntityV = getFieldF(cr, REG_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix)
-  {
-    processEntity(&crr, enV, queryEntityV[ix].embeddedObject());
-  }
-
-  /* Note that attributes can be included only if at least one entity has been found */
-  if (crr.contextRegistration.entityIdVector.size() > 0)
-  {
-    if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
-    {
-      std::vector<orion::BSONElement> queryAttrV = getFieldF(cr, REG_ATTRS).Array();
-
-      for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
-      {
-        processAttribute(&crr, attrL, queryAttrV[ix].embeddedObject());
-      }
-    }
-  }
-
-  // FIXME: we don't take metadata into account at the moment
-  // crr.contextRegistration.registrationMetadataV = ..
-
-  /* Note that the context registration element is only included in one of the following cases:
-   * - The number of entities and attributes included are both greater than 0
-   * - The number of entities is greater than 0, the number of attributes is 0 but the discover
-   *   doesn't use attributes in the request
-   */
-  if (crr.contextRegistration.entityIdVector.size() == 0)
-  {
-    return;
-  }
-
-  if (crr.contextRegistration.contextRegistrationAttributeVector.size() > 0  ||
-      (crr.contextRegistration.contextRegistrationAttributeVector.size() == 0 && attrL.size() == 0))
-  {
-    ContextRegistrationResponse* crrP = new ContextRegistrationResponse();
-
-    crrP->contextRegistration = crr.contextRegistration;
-    crrP->providerFormat      = providerFormat;
-    crrP->regId               = regId;
-
-    crrV->push_back(crrP);
-  }
-}
-
-
-
 /* ****************************************************************************
 *
 * registrationsQuery -
-*
-* This method is used by discoverContextAvailabililty and subscribeContextAvailability. It takes
-* a vector with entities and a vector with attributes as input and returns the corresponding
-* ContextRegistrationResponseVector or error.
 */
 bool registrationsQuery
 (
   const EntityIdVector&               enV,
   const StringList&                   attrL,
   const ngsiv2::ForwardingMode        forwardingMode,
-  ContextRegistrationResponseVector*  crrV,
+  std::vector<ngsiv2::Registration>*  regV,
   std::string*                        err,
   const std::string&                  tenant,
-  const std::vector<std::string>&     servicePathV,
-  int                                 offset,
-  int                                 limit,
-  bool                                details,
-  long long*                          countP
+  const std::vector<std::string>&     servicePathV
 )
 {
   // query structure:
@@ -1965,8 +1628,8 @@ bool registrationsQuery
   //
   //          (next two ones are for "universal pattern" registrations)
   //
-  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$in: [T1, T3, ...} },
-  //          { cr.entities.id: ".*", cr.entities.isPattern: "true", crs.entities.type: {$exists: false } },
+  //          { cr.entities.id: ".*", cr.entities.isPattern: true (*), crs.entities.type: {$in: [T1, T3, ...} },
+  //          { cr.entities.id: ".*", cr.entities.isPattern: true (*), crs.entities.type: {$exists: false } },
   //   ],
   //   cr.attrs.name : { $in: [ A1, ... ] },  (only if attrs > 0)
   //   servicePath: ... ,
@@ -1977,8 +1640,8 @@ bool registrationsQuery
   // Note that by construction the $or array always has at least two elements (the two ones corresponding to the
   // universal pattern) so we cannot avoid to use this operator.
   //
-  // FIXME P5: the 'contextRegistration' token (19 chars) repeats in the query BSON. It would be better use 'cr' (2 chars)
-  // but this would need a data model migration in DB
+  // (*) Not actually this way. See comment in the code.
+  //
 
   /* Build query based on arguments */
   std::string       crEntitiesId      = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
@@ -1993,11 +1656,11 @@ bool registrationsQuery
     const EntityId* en = enV[ix];
     orion::BSONObjBuilder b;
 
-    if (isTrue(en->isPattern))
+    if (!en->idPattern.empty())
     {
-      b.appendRegex(crEntitiesId, en->id);
+      b.appendRegex(crEntitiesId, en->idPattern);
     }
-    else  /* isPattern = false */
+    else  /* not a pattern */
     {
       b.append(crEntitiesId, en->id);
     }
@@ -2023,12 +1686,21 @@ bool registrationsQuery
   orion::BSONObjBuilder bobExistsFalse;
   bobExistsFalse.append("$exists", false);
 
+  // Note that previous to Orion 3.4.0 csub were using strings for this, so need to use
+  // {$in: [true, "true"]} instead of just true
+  orion::BSONArrayBuilder bInArr;
+  orion::BSONObjBuilder bin;
+  bInArr.append(true);
+  bInArr.append("true");
+  bin.append("$in", bInArr.arr());
+  orion::BSONObj binObj = bin.obj();
+
   bobArrayItem1.append(crEntitiesId, ".*");
-  bobArrayItem1.append(crEntitiesPattern, "true");
+  bobArrayItem1.append(crEntitiesPattern, binObj);
   bobArrayItem1.append(crEntitiesType, bobIn.obj());
 
   bobArrayItem2.append(crEntitiesId, ".*");
-  bobArrayItem2.append(crEntitiesPattern, "true");
+  bobArrayItem2.append(crEntitiesPattern, binObj);
   bobArrayItem2.append(crEntitiesType, bobExistsFalse.obj());
 
   entityOr.append(bobArrayItem1.obj());
@@ -2098,15 +1770,13 @@ bool registrationsQuery
 
   orion::BSONObj query = queryBuilder.obj();
 
-  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
-
   TIME_STAT_MONGO_READ_WAIT_START();
   orion::DBConnection connection = orion::getMongoConnection();
 
   orion::BSONObjBuilder bobSort;
   bobSort.append("_id", 1);
 
-  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, bobSort.obj(), limit, offset, &cursor, countP, err))
+  if (!orion::collectionRangedQuery(connection, composeDatabaseName(tenant), COL_REGISTRATIONS, query, query, bobSort.obj(), 0, 0, &cursor, NULL, err))
   {
     orion::releaseMongoConnection(connection);
     TIME_STAT_MONGO_READ_WAIT_STOP();
@@ -2124,15 +1794,15 @@ bool registrationsQuery
 
     LM_T(LmtMongo, ("retrieved document [%d]: '%s'", docs, r.toString().c_str()));
 
-    MimeType                  mimeType = JSON;
-    std::vector<orion::BSONElement>  queryContextRegistrationV = getFieldF(r, REG_CONTEXT_REGISTRATION).Array();
-    std::string               format                    = getStringFieldF(r, REG_FORMAT);
-    ProviderFormat            providerFormat            = (format.empty())? PfJson : (format == "JSON")? PfJson : PfV2;
-    std::string               regId                     = getFieldF(r, "_id").OID();
-
-    for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
+    ngsiv2::Registration reg;
+    if (reg.fromBson(r))
     {
-      processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, mimeType, providerFormat, regId);
+      regV->push_back(reg);
+    }
+    else
+    {
+      // FIXME #4611: this else branch will be no longer needed after fixing the issue
+      LM_E(("Runtime Error (registrations with more than one CR are considered runtime errors since Orion 4.1.0, please fix reg %s at DB)", reg.id.c_str()));
     }
 
     /* FIXME: note that given the response doesn't distinguish from which registration ID the
@@ -2151,44 +1821,17 @@ bool registrationsQuery
 
 /* ****************************************************************************
 *
-* isCondValueInContextElementResponse -
-*/
-bool isCondValueInContextElementResponse(ConditionValueList* condValues, ContextElementResponseVector* cerV)
-{
-  /* Empty conValue means that any attribute matches (aka ONANYCHANGE) */
-  if (condValues->size() == 0)
-  {
-    return true;
-  }
-
-  for (unsigned int cvlx = 0; cvlx < condValues->size(); ++cvlx)
-  {
-    for (unsigned int aclx = 0; aclx < cerV->size(); ++aclx)
-    {
-      ContextAttributeVector caV = (*cerV)[aclx]->entity.attributeVector;
-
-      for (unsigned int kx = 0; kx < caV.size(); ++kx)
-      {
-        if (caV[kx]->name == (*condValues)[cvlx])
-        {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
 * condValueAttrMatch -
 */
 bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string>& modifiedAttrs)
 {
   std::vector<orion::BSONElement>  conds = getFieldF(sub, CSUB_CONDITIONS).Array();
+
+  // If the list of attributes to check is empty, then no match
+  if (modifiedAttrs.size() == 0)
+  {
+    return false;
+  }
 
   if (conds.size() == 0)
   {
@@ -2215,64 +1858,30 @@ bool condValueAttrMatch(const orion::BSONObj& sub, const std::vector<std::string
 
 /* ****************************************************************************
 *
-* subToEntityIdVector -
-*
-* Extract the entity ID vector from a BSON document (in the format of the csubs
-* collection)
-*/
-EntityIdVector subToEntityIdVector(const orion::BSONObj& sub)
-{
-  EntityIdVector                   enV;
-  std::vector<orion::BSONElement>  subEnts = getFieldF(sub, CSUB_ENTITIES).Array();
-
-  for (unsigned int ix = 0; ix < subEnts.size() ; ++ix)
-  {
-    orion::BSONObj  subEnt = subEnts[ix].embeddedObject();
-    EntityId*       en     = new EntityId(getStringFieldF(subEnt, CSUB_ENTITY_ID),
-                                     subEnt.hasField(CSUB_ENTITY_TYPE) ? getStringFieldF(subEnt, CSUB_ENTITY_TYPE) : "",
-                                     getStringFieldF(subEnt, CSUB_ENTITY_ISPATTERN));
-    enV.push_back(en);
-  }
-
-  return enV;
-}
-
-
-
-/* ****************************************************************************
-*
 * getCommonAttributes -
 */
 static void getCommonAttributes
 (
-  const bool                        type,
   const std::vector<std::string>&   fVector,
   const std::vector<std::string>&   sVector,
   std::vector<std::string>&         resultVector
 )
 {
-  if (type)
+  for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
   {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+    // some builtin attributes are always include (even when onlyChangedAttrs is true)
+    if ((sVector[avOc] == ALTERATION_TYPE) || (sVector[avOc] == DATE_CREATED) || (sVector[avOc] == DATE_MODIFIED))
     {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
-      {
+      resultVector.push_back(sVector[avOc]);
+    }
+    else 
+    {
+      for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+      {      
         if (fVector[cavOc] == sVector[avOc])
         {
-          resultVector.push_back(fVector[cavOc]);
-        }
-      }
-    }
-  }
-  else
-  {
-    for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
-    {
-      for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
-      {
-        if (fVector[cavOc] != sVector[avOc])
-        {
-          resultVector.push_back(fVector[cavOc]);
+          resultVector.push_back(sVector[avOc]);
+          break;          
         }
       }
     }
@@ -2280,66 +1889,70 @@ static void getCommonAttributes
 }
 
 
+/* ****************************************************************************
+*
+* getDifferenceAttributes -
+*/
+static void getDifferenceAttributes
+(
+  const std::vector<std::string>&   fVector,
+  const std::vector<std::string>&   sVector,
+  std::vector<std::string>&         resultVector
+)
+{
+  for (unsigned int cavOc = 0; cavOc < fVector.size(); ++cavOc)
+  {
+    bool found = false;
+    for (unsigned int avOc = 0; avOc < sVector.size(); ++avOc)
+    {
+      if (fVector[cavOc] == sVector[avOc])
+      {
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      resultVector.push_back(fVector[cavOc]);
+    }
+  }
+}
+
 
 /* ****************************************************************************
 *
 * subToNotifyList -
+*
 */
 void subToNotifyList
 (
-  const std::vector<std::string>&  modifiedAttrs,
-  const std::vector<std::string>&  conditionVector,
   const std::vector<std::string>&  notificationVector,
   const std::vector<std::string>&  entityAttrsVector,
   StringList&                      attrL,
-  const bool&                      blacklist,
-  bool&                            op
+  const bool&                      blacklist
 )
 {
-    std::vector<std::string>  condAttrs;
     std::vector<std::string>  notifyAttrs;
 
-    if (!blacklist)
+    if (blacklist)
     {
-      if (conditionVector.size() == 0 && notificationVector.size() == 0)
-      {
-        attrL.fill(modifiedAttrs);
-      }
-      else if (conditionVector.size() == 0 && notificationVector.size() != 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
-      }
-      else if (conditionVector.size() != 0 && notificationVector.size() == 0)
-      {
-        getCommonAttributes(true, modifiedAttrs, entityAttrsVector, notifyAttrs);
-      }
-      else
-      {
-        getCommonAttributes(true, modifiedAttrs, notificationVector, notifyAttrs);
-      }
-      if (notifyAttrs.size() == 0 && (conditionVector.size() != 0 || notificationVector.size() != 0))
-      {
-        op = true;
-      }
+      // By definition, notificationVector cannot be empty in blacklist case
+      // (checked at parsing time)
+      getDifferenceAttributes(entityAttrsVector, notificationVector, notifyAttrs);
       attrL.fill(notifyAttrs);
     }
-    else if (blacklist)
+    else
     {
-      if (conditionVector.size() == 0 && notificationVector.size() != 0)
+      if (notificationVector.size() == 0)
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, notifyAttrs);
+        // This means "all attributes"
+        attrL.fill(entityAttrsVector);
       }
       else
       {
-        getCommonAttributes(false, modifiedAttrs, notificationVector, condAttrs);
-        getCommonAttributes(true, condAttrs, entityAttrsVector, notifyAttrs);
+        getCommonAttributes(entityAttrsVector, notificationVector, notifyAttrs);
+        attrL.fill(notifyAttrs);
       }
-
-      if (notifyAttrs.size() == 0)
-      {
-        op = true;
-      }
-      attrL.fill(notifyAttrs);
     }
 }
 
@@ -2355,33 +1968,19 @@ void subToNotifyList
 StringList subToAttributeList
 (
   const orion::BSONObj&           sub,
-  const bool&                     onlyChanged,
   const bool&                     blacklist,
-  const std::vector<std::string>  modifiedAttrs,
-  const std::vector<std::string>  attributes,
-  bool&                           op
+  const std::vector<std::string>  attributes
 )
 {
-  if (!onlyChanged)
-  {
-    return subToAttributeList(sub);
-  }
   StringList                       attrL;
   std::vector<orion::BSONElement>  subAttrs = getFieldF(sub, CSUB_ATTRS).Array();
-  std::vector<orion::BSONElement>  condAttrs = getFieldF(sub, CSUB_CONDITIONS).Array();
-  std::vector<std::string>         conditionAttrs;
   std::vector<std::string>         notificationAttrs;
   for (unsigned int ix = 0; ix < subAttrs.size() ; ++ix)
   {
     std::string subAttr = subAttrs[ix].String();
     notificationAttrs.push_back(subAttr);
   }
-  for (unsigned int ix = 0; ix < condAttrs.size() ; ++ix)
-  {
-    std::string subAttr = condAttrs[ix].String();
-    conditionAttrs.push_back(subAttr);
-  }
-  subToNotifyList(modifiedAttrs, conditionAttrs, notificationAttrs, attributes, attrL, blacklist, op);
+  subToNotifyList(notificationAttrs, attributes, attrL, blacklist);
   return attrL;
 }
 
@@ -2486,11 +2085,11 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 * This functions is very similar the one with the same name in mongoQueryContext.cpp
 * but acting on a single CER instead that on a complete vector of them.
 *
-* Looks in the CER passed as argument, searching for a suitable CPr in the CRR
+* Looks in the CER passed as argument, searching for a suitable CPr in the Registrations
 * vector passed as argument. If a suitable CPr is found, it is set in the CER (and the 'found' field
 * is changed to true)
 */
-void fillContextProviders(ContextElementResponse* cer, const ContextRegistrationResponseVector& crrV)
+void fillContextProviders(ContextElementResponse* cer, const std::vector<ngsiv2::Registration>& regV)
 {
   for (unsigned int ix = 0; ix < cer->entity.attributeVector.size(); ++ix)
   {
@@ -2501,29 +2100,26 @@ void fillContextProviders(ContextElementResponse* cer, const ContextRegistration
       continue;
     }
 
-    /* Search for some CPr in crrV */
-    std::string     perEntPa;
-    std::string     perAttrPa;
-    MimeType        perEntPaMimeType  = NOMIMETYPE;
-    MimeType        perAttrPaMimeType = NOMIMETYPE;
-    ProviderFormat  providerFormat;
+    /* Search for some CPr in Registrations vector */
+    std::string     perEntProvider;
+    std::string     perAttrProvider;
+    bool            legacyProviderFormat;
     std::string     regId;
 
     cprLookupByAttribute(cer->entity,
                          ca->name,
-                         crrV,
-                         &perEntPa,
-                         &perEntPaMimeType,
-                         &perAttrPa,
-                         &perAttrPaMimeType,
-                         &providerFormat,
+                         regV,
+                         &perEntProvider,
+                         &perAttrProvider,
+                         &legacyProviderFormat,
                          &regId);
 
-    /* Looking results after crrV processing */
-    ca->providingApplication.set(perAttrPa.empty() ? perEntPa : perAttrPa);
-    ca->providingApplication.setProviderFormat(providerFormat);
-    ca->providingApplication.setRegId(regId);
-    ca->found = (!ca->providingApplication.get().empty());
+    /* Looking results after Registrations vector processing */
+    ca->provider.http.url = perAttrProvider.empty() ? perEntProvider : perAttrProvider;
+    ca->provider.legacyForwardingMode = legacyProviderFormat;
+    ca->providerRegId = regId;
+
+    ca->found = (!ca->provider.http.url.empty());
   }
 }
 
@@ -2565,64 +2161,62 @@ void cprLookupByAttribute
 (
   const Entity&                             en,
   const std::string&                        attrName,
-  const ContextRegistrationResponseVector&  crrV,
-  std::string*                              perEntPa,
-  MimeType*                                 perEntPaMimeType,
-  std::string*                              perAttrPa,
-  MimeType*                                 perAttrPaMimeType,
-  ProviderFormat*                           providerFormatP,
+  const std::vector<ngsiv2::Registration>&  regV,
+  std::string*                              perEntProviderP,
+  std::string*                              perAttrProviderP,
+  bool*                                     legacyPproviderFormatP,
   std::string*                              regId
 )
 {
-  *perEntPa  = "";
-  *perAttrPa = "";
+  *perEntProviderP  = "";
+  *perAttrProviderP = "";
   *regId = "";
 
-  for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
+  for (unsigned int regIx = 0; regIx < regV.size(); ++regIx)
   {
-    ContextRegistrationResponse* crr = crrV[crrIx];
+    ngsiv2::Registration reg = regV[regIx];
 
-    /* Is there a matching entity in the CRR? */
-    for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
+    /* Is there a matching entity in the Registration? */
+    for (unsigned enIx = 0; enIx < reg.dataProvided.entities.size(); ++enIx)
     {
-      EntityId* regEn = crr->contextRegistration.entityIdVector[enIx];
+      EntityId regEn = reg.dataProvided.entities[enIx];
 
-      if (regEn->isPatternIsTrue() && regEn->id == ".*")
+      if (regEn.idPattern == ".*")
       {
         // By the moment the only supported pattern is .*. In this case matching is
         // based exclusively in type
-        if (regEn->type != en.type && !regEn->type.empty())
+        if (regEn.type != en.entityId.type && !regEn.type.empty())
         {
-          /* No match (keep searching the CRR) */
+          /* No match (keep searching the Registration) */
           continue;
         }
       }
-      else if (regEn->id != en.id || (regEn->type != en.type && !regEn->type.empty()))
+      else if (regEn.id != en.entityId.id || (regEn.type != en.entityId.type && !regEn.type.empty()))
       {
-        /* No match (keep searching the CRR) */
+        /* No match (keep searching the Registration) */
         continue;
       }
 
-      /* CRR without attributes (keep searching in other CRR) */
-      if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
+      /* Registration without attributes (keep searching in other Registration) */
+      if (reg.dataProvided.attributes.size() == 0)
       {
-        *perEntPa         = crr->contextRegistration.providingApplication.get();
-        *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
-        *regId            = crr->regId;
+        *perEntProviderP         = reg.provider.http.url;
+        *legacyPproviderFormatP  = reg.provider.legacyForwardingMode;
+        *regId                   = reg.id;
 
         break;  /* enIx */
       }
 
       /* Is there a matching entity or the absence of attributes? */
-      for (unsigned attrIx = 0; attrIx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++attrIx)
+      for (unsigned attrIx = 0; attrIx < reg.dataProvided.attributes.size(); ++attrIx)
       {
-        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector[attrIx]->name;
+        std::string regAttrName = reg.dataProvided.attributes[attrIx];
         if (regAttrName == attrName)
         {
-          /* We cannot "improve" this result by keep searching the CRR vector, so we return */
-          *perAttrPa        = crr->contextRegistration.providingApplication.get();
-          *providerFormatP  = crr->contextRegistration.providingApplication.getProviderFormat();
-          *regId            = crr->regId;
+          /* We cannot "improve" this result by keep searching the Registrations vector, so we return */
+          *perAttrProviderP        = reg.provider.http.url;
+          *legacyPproviderFormatP  = reg.provider.legacyForwardingMode;
+          *regId                   = reg.id;
 
           return;
         }

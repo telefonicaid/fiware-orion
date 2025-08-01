@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/string.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -42,9 +43,28 @@
 
 /* ****************************************************************************
 *
-* changeLogLevel -
+* checkInteger -
+* This function is written: to check whether 'logSize' or 'payloadSize' options only contain integers, if not, return error.
 */
-std::string changeLogLevel
+bool checkInteger(std::string logConfigSize)
+{
+  for (unsigned int i = 0; i < logConfigSize.length(); i++)
+  {
+    if (!isdigit(logConfigSize[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* changeLogConfig -
+*/
+std::string changeLogConfig
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -55,11 +75,51 @@ std::string changeLogLevel
   std::string  level   = ciP->uriParam[URI_PARAM_LEVEL];
   const char*  levelP  = level.c_str();
 
-  if (level.empty())
+  std::string logSize     = ciP->uriParam[URI_PARAM_LOG_SIZE];
+  int logSizeValue        = atoi(logSize.c_str());
+  std::string payloadSize = ciP->uriParam[URI_PARAM_PAYLOAD_SIZE];
+  int payloadSizeValue    = atoi(payloadSize.c_str());
+  std::string deprecate   = ciP->uriParam[URI_PARAM_DEPRECATE];
+
+  if (level.empty() && logSize.empty() && payloadSize.empty() && deprecate.empty())
   {
     ciP->httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "no log level in URI param");
-    return "{\"error\":\"log level missing\"}";
+    alarmMgr.badInput(clientIp, "no log configs in URI param");
+    return "{\"error\":\"BadRequest\",\"description\":\"log config missing\"}";
+  }
+
+  if (!logSize.empty())
+  {
+    if (logSizeValue > 0 && checkInteger(logSize.c_str()))
+    {
+      logLineMaxSize = logSizeValue;
+    }
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, "invalid logLineMaxSize in URI param", logSize);
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid lineMaxSize, lineMaxSize should be an integer number > 0\"}";
+    }
+  }
+
+  if (!payloadSize.empty())
+  {
+    if (payloadSizeValue > 0 && checkInteger(payloadSize.c_str()))
+    {
+      logInfoPayloadMaxSize = payloadSizeValue;
+    }
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0\"}";
+    }
+  }
+
+  if (!deprecate.empty())
+  {
+    std::transform(deprecate.begin(), deprecate.end(), deprecate.begin(), ::tolower);
+    logDeprecate = deprecate == "true" ? true : false;
   }
 
   //
@@ -68,26 +128,29 @@ std::string changeLogLevel
   //  - "fatal" is translated into the internal "None", meaning complete silence.
   //  - "warn" is translated into "Warning" which is accepted internally.
   //
-  if ((strcasecmp(levelP, "none")    == 0) ||
-      (strcasecmp(levelP, "fatal")   == 0) ||
-      (strcasecmp(levelP, "error")   == 0) ||
-      (strcasecmp(levelP, "warning") == 0) ||
-      (strcasecmp(levelP, "warn")    == 0) ||
-      (strcasecmp(levelP, "info")    == 0) ||
-      (strcasecmp(levelP, "debug")   == 0))
+  if (!level.empty())
   {
-    if (strcasecmp(levelP, "warning") == 0)
+    if ((strcasecmp(levelP, "none")    == 0) ||
+        (strcasecmp(levelP, "fatal")   == 0) ||
+        (strcasecmp(levelP, "error")   == 0) ||
+        (strcasecmp(levelP, "warning") == 0) ||
+        (strcasecmp(levelP, "warn")    == 0) ||
+        (strcasecmp(levelP, "info")    == 0) ||
+        (strcasecmp(levelP, "debug")   == 0))
     {
-      level = "WARN";
-    }
+      if (strcasecmp(levelP, "warning") == 0)
+      {
+        level = "WARN";
+      }
 
-    lmLevelMaskSetString((char*) level.c_str());
-  }
-  else
-  {
-    ciP->httpStatusCode = SccBadRequest;
-    alarmMgr.badInput(clientIp, "invalid log level in URI param", level);
-    return "{\"error\":\"invalid log level\"}";
+      lmLevelMaskSetString((char*) level.c_str());
+    }
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      alarmMgr.badInput(clientIp, "invalid log level in URI param", level);
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid log level\"}";
+    }
   }
 
   return "";
@@ -97,9 +160,9 @@ std::string changeLogLevel
 
 /* ****************************************************************************
 *
-* getLogLevel -
+* getLogConfig -
 */
-std::string getLogLevel
+std::string getLogConfig
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -108,6 +171,12 @@ std::string getLogLevel
 )
 {
   std::string  level = lmLevelMaskStringGet();
+  std::string  payloadMaxSize = std::to_string(logInfoPayloadMaxSize);
+  std::string  lineMaxSize    = std::to_string(logLineMaxSize);
+  std::string  deprecate      = FT(logDeprecate);
 
-  return "{\"level\":\"" + level + "\"}";
+  return "{\"level\":\"" + level + "\", \
+           \"infoPayloadMaxSize\":" + payloadMaxSize + ", \
+           \"lineMaxSize\":" + lineMaxSize + ", \
+           \"deprecate\":" + deprecate + "}";
 }

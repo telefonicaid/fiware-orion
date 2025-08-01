@@ -119,20 +119,23 @@ echo
 echo
 
 
-echo "09. GET /v2/entities with only whitespace in q-item (q=   )"
-echo "==========================================================="
-q='q=   '
-orionCurl --url "/v2/entities?$q"
-echo
-echo
-
-
-echo "10. GET /v2/entities with trailing whitespace in q (q=a==12;   )"
-echo "================================================================"
-q='q=a==12;   '
-orionCurl --url "/v2/entities?$q"
-echo
-echo
+# FIXME: curl has changed its behaviour from Debian 11 to Debian 12 (see https://stackoverflow.com/q/77045755/1485926)
+# and now it is not a valid tool to test malformed URLs. Thus, we are commenting this fields while we look for
+# another tool or avoid curl to work in the old way
+#echo "09. GET /v2/entities with only whitespace in q-item (q=   )"
+#echo "==========================================================="
+#q='q=   '
+#orionCurl --url "/v2/entities?$q"
+#echo
+#echo
+#
+#
+#echo "10. GET /v2/entities with trailing whitespace in q (q=a==12;   )"
+#echo "================================================================"
+#q='q=a==12;   '
+#orionCurl --url "/v2/entities?$q"
+#echo
+#echo
 
 
 echo "11. GET /v2/entities with > RANGE"
@@ -227,10 +230,10 @@ echo
 01. GET /v2/entities with empty item in q (q=)
 ==============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 78
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 78
 
 {
     "description": "Empty right-hand-side for URI param /q/",
@@ -241,10 +244,10 @@ Date: REGEX(.*)
 02. GET /v2/entities with empty item in q (q=;)
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 46
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 46
 
 {
     "description": "empty q",
@@ -255,10 +258,10 @@ Date: REGEX(.*)
 03. GET /v2/entities with empty item in q (q=;;)
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 51
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 51
 
 {
     "description": "empty q-item",
@@ -269,10 +272,10 @@ Date: REGEX(.*)
 04. GET /v2/entities with non-empty item in q (q=a==55;)
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -280,10 +283,10 @@ Date: REGEX(.*)
 05. GET /v2/entities with empty item in q (q=a==55;;)
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 51
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 51
 
 {
     "description": "empty q-item",
@@ -294,10 +297,10 @@ Date: REGEX(.*)
 06. GET /v2/entities with empty left-hand-side in q-item
 ========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 69
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 69
 
 {
     "description": "empty left-hand-side in q-item",
@@ -308,10 +311,10 @@ Date: REGEX(.*)
 07. GET /v2/entities with empty right-hand-side in q-item
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "empty right-hand-side in q-item",
@@ -322,10 +325,10 @@ Date: REGEX(.*)
 08. GET /v2/entities with invalid char in q-item
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 79
 
 {
     "description": "invalid character found in URI param /q/",
@@ -333,41 +336,41 @@ Date: REGEX(.*)
 }
 
 
-09. GET /v2/entities with only whitespace in q-item (q=   )
-===========================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 77
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "empty q-item &#40;only whitespace&#41;",
-    "error": "BadRequest"
-}
-
-
-10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
-================================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 51
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
-
-{
-    "description": "empty q-item",
-    "error": "BadRequest"
-}
-
-
+##09. GET /v2/entities with only whitespace in q-item (q=   )
+##===========================================================
+##HTTP/1.1 400 Bad Request
+##Date: REGEX(.*)
+##Fiware-Correlator: REGEX([0-9a-f\-]{36})
+##Content-Type: application/json
+##Content-Length: 77
+##
+##{
+##    "description": "empty q-item &#40;only whitespace&#41;",
+##    "error": "BadRequest"
+##}
+##
+##
+##10. GET /v2/entities with trailing whitespace in q (q=a==12;   )
+##================================================================
+##HTTP/1.1 400 Bad Request
+##Date: REGEX(.*)
+##Fiware-Correlator: REGEX([0-9a-f\-]{36})
+##Content-Type: application/json
+##Content-Length: 51
+##
+##{
+##    "description": "empty q-item",
+##    "error": "BadRequest"
+##}
+##
+##
 11. GET /v2/entities with > RANGE
 =================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "description": "ranges only valid for equal and not equal ops",
@@ -378,10 +381,10 @@ Date: REGEX(.*)
 12. GET /v2/entities with == RANGE, but missing 'from'
 ======================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 58
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 58
 
 {
     "description": "empty item in range",
@@ -392,10 +395,10 @@ Date: REGEX(.*)
 13. GET /v2/entities with == RANGE, but missing 'to'
 ====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 58
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 58
 
 {
     "description": "empty item in range",
@@ -406,10 +409,10 @@ Date: REGEX(.*)
 14. GET /v2/entities with == RANGE, but with 'from' as a boolean
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "invalid data type for /range-from/",
@@ -420,10 +423,10 @@ Date: REGEX(.*)
 15. GET /v2/entities with == RANGE, but with 'to' as null
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "description": "invalid data type for /range-to/",
@@ -434,10 +437,10 @@ Date: REGEX(.*)
 16. GET /v2/entities with == RANGE, but with 'to' and 'from' of different types
 ===============================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 65
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 65
 
 {
     "description": "invalid range: types mixed",
@@ -448,10 +451,10 @@ Date: REGEX(.*)
 17. GET /v2/entities with < LIST
 ================================
 HTTP/1.1 400 Bad Request
-Content-Length: 83
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 83
 
 {
     "description": "lists only valid for equal and not equal ops",
@@ -462,10 +465,10 @@ Date: REGEX(.*)
 18. GET /v2/entities with != LIST, but with boolean value as first item
 =======================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "invalid JSON value type in list",
@@ -476,10 +479,10 @@ Date: REGEX(.*)
 19. GET /v2/entities with != LIST, but with null value as second item
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "invalid JSON value type in list",
@@ -490,10 +493,10 @@ Date: REGEX(.*)
 20. GET /v2/entities with != LIST, but with mixed type in list
 ==============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 70
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
 
 {
     "description": "invalid JSON value type in list",
@@ -504,10 +507,10 @@ Date: REGEX(.*)
 21. GET /v2/entities with != LIST, but with empty item in list (1,)
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 57
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 57
 
 {
     "description": "empty item in list",

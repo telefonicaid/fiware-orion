@@ -50,7 +50,7 @@
 * doNotifyHttp -
 *
 */
-static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue)
+static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<SenderThreadParams*>*  queue)
 {
   long long    statusCode = -1;
   std::string  out;
@@ -127,11 +127,11 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<s
   // Add notificacion result summary in log INFO level
   if (statusCode != -1)
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), statusCode);
+    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode);
   }
   else
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), out.c_str());
+    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
   }
 }
 
@@ -158,13 +158,13 @@ static void doNotifyMqtt(SenderThreadParams* params)
 
   // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
   // lastFailureReason and lastSuccessCode in MQTT notifications (they don't have sense in this case)
-  if (mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos))
+  if (mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos, params->retain))
   {
     // MQTT transaction is logged only in the case it was actually published. Upon successful publishing
     // mqttOnPublishCallback is called (by the moment we are not doing nothing there, just printing in
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
-    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str());
+    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else
@@ -183,73 +183,65 @@ static void doNotifyMqtt(SenderThreadParams* params)
 */
 void doNotify
 (
-  std::vector<SenderThreadParams*>*                  paramsV,
-  CURL*                                              curl,
-  SyncQOverflow<std::vector<SenderThreadParams*>*>*  queue,
-  const char*                                        logPrefix
+  SenderThreadParams*                  paramsP,
+  CURL*                                curl,
+  SyncQOverflow<SenderThreadParams*>*  queue,
+  const char*                          logPrefix
 )
 {
-  for (unsigned ix = 0; ix < paramsV->size(); ix++)
+  if (queue != NULL)
   {
-    SenderThreadParams* params = (*paramsV)[ix];
+    struct timespec     now;
+    struct timespec     howlong;
+    size_t              estimatedQSize;
 
-    if (queue != NULL)
-    {
-      struct timespec     now;
-      struct timespec     howlong;
-      size_t              estimatedQSize;
-
-      QueueStatistics::incOut();
-      clock_gettime(CLOCK_REALTIME, &now);
-      clock_difftime(&now, &params->timeStamp, &howlong);
-      estimatedQSize = queue->size();
-      QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
-    }
-
-    strncpy(transactionId, params->transactionId, sizeof(transactionId));
-
-    LM_T(LmtNotifier, ("%s sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****, maxFailsLimit=%lu, failsCounter=%lu",
-                       logPrefix,
-                       params->ip.c_str(),
-                       params->port,
-                       params->verb.c_str(),
-                       params->tenant.c_str(),
-                       params->servicePath.c_str(),
-                       params->xauthToken.c_str(),
-                       params->resource.c_str(),
-                       params->content_type.c_str(),
-                       params->qos,
-                       params->timeout,
-                       params->user.c_str(),
-                       params->maxFailsLimit,
-                       params->failsCounter));
-
-    LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", params->content.c_str()));
-
-    if (simulatedNotification)
-    {
-      LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
-      __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
-    }
-    else // we'll send the notification
-    {
-      if (params->protocol == "mqtt:")
-      {
-        doNotifyMqtt(params);
-      }
-      else
-      {
-        doNotifyHttp(params, curl, queue);
-      }
-    }
-
-    // End transaction
-    lmTransactionEnd();
-
-    // Free params memory
-    delete params;
+    QueueStatistics::incOut();
+    clock_gettime(CLOCK_REALTIME, &now);
+    clock_difftime(&now, &paramsP->timeStamp, &howlong);
+    estimatedQSize = queue->size();
+    QueueStatistics::addTimeInQWithSize(&howlong, estimatedQSize);
   }
 
-  // Free params vector memory
-  delete paramsV;
+  strncpy(transactionId, paramsP->transactionId, sizeof(transactionId));
+
+  LM_T(LmtNotifier, ("%s sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', resource='%s', content-type: %s, qos=%d, timeout=%d, user=%s, passwd=*****, maxFailsLimit=%lu, failsCounter=%lu",
+                     logPrefix,
+                     paramsP->ip.c_str(),
+                     paramsP->port,
+                     paramsP->verb.c_str(),
+                     paramsP->tenant.c_str(),
+                     paramsP->servicePath.c_str(),
+                     paramsP->xauthToken.c_str(),
+                     paramsP->resource.c_str(),
+                     paramsP->content_type.c_str(),
+                     paramsP->qos,
+                     paramsP->timeout,
+                     paramsP->user.c_str(),
+                     paramsP->maxFailsLimit,
+                     paramsP->failsCounter));
+
+  LM_T(LmtNotificationRequestPayload , ("notification request payload: %s", paramsP->content.c_str()));
+
+  if (simulatedNotification)
+  {
+    LM_T(LmtNotifier, ("simulatedNotification is 'true', skipping outgoing request"));
+    __sync_fetch_and_add(&noOfSimulatedNotifications, 1);
+  }
+  else // we'll send the notification
+  {
+    if (paramsP->protocol == "mqtt:")
+    {
+      doNotifyMqtt(paramsP);
+    }
+    else
+    {
+      doNotifyHttp(paramsP, curl, queue);
+    }
+  }
+
+  // End transaction
+  lmTransactionEnd();
+
+  // Free params memory
+  delete paramsP;
 }

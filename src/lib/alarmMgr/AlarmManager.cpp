@@ -79,7 +79,7 @@ AlarmManager::AlarmManager()
 *
 * AlarmManager::init - 
 */
-int AlarmManager::init(bool logAlreadyRaisedAlarms)
+void AlarmManager::init(bool logAlreadyRaisedAlarms)
 {
   notificationErrorLogAlways   = logAlreadyRaisedAlarms;
   badInputLogAlways            = logAlreadyRaisedAlarms;
@@ -87,7 +87,7 @@ int AlarmManager::init(bool logAlreadyRaisedAlarms)
   mqttConnectionErrorLogAlways = logAlreadyRaisedAlarms;
   forwardingErrorLogAlways     = logAlreadyRaisedAlarms;
 
-  return semInit();
+  semInit();
 }
 
 
@@ -96,15 +96,12 @@ int AlarmManager::init(bool logAlreadyRaisedAlarms)
 *
 * AlarmManager::semInit - 
 */
-int AlarmManager::semInit(void)
+void AlarmManager::semInit(void)
 {
   if (sem_init(&sem, 0, 1) == -1)
   {
-    LM_E(("Runtime Error (error initializing 'alarm mgr' semaphore: %s)", strerror(errno)));
-    return -1;
+    LM_X(1, ("Fatal Error (error initializing 'alarm mgr' semaphore: %s)", strerror(errno)));
   }
-
-  return 0;
 }
 
 

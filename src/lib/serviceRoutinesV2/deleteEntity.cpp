@@ -31,11 +31,10 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "apiTypesV2/Entities.h"
 #include "rest/OrionError.h"
-#include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/deleteEntity.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "serviceRoutinesV2/serviceRoutinesCommon.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 #include "parse/forbiddenChars.h"
 
 
@@ -44,7 +43,7 @@
 *
 * deleteEntity -
 *
-* DELETE /v2/entities/{entityId}
+* DELETE /v2/entities/{entityId}[/attrs/{attrName}]
 *
 * Payload In:  None
 * Payload Out: None
@@ -66,16 +65,16 @@ std::string deleteEntity
 {
   Entity* eP;
 
-  if (forbiddenIdChars(ciP->apiVersion, compV[2].c_str() , NULL))
+  if (forbiddenIdChars(compV[2].c_str() , NULL))
   {
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_INVALID_CHAR_URI, ERROR_BAD_REQUEST);
     ciP->httpStatusCode = oe.code;
     return oe.toJson();
   }
 
-  eP       = new Entity();
-  eP->id   = compV[2];
-  eP->type = ciP->uriParam["type"];
+  eP                = new Entity();
+  eP->entityId.id   = compV[2];
+  eP->entityId.type = ciP->uriParam["type"];
 
   if (compV.size() == 5)  // Deleting an attribute
   {
@@ -90,14 +89,17 @@ std::string deleteEntity
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  // Adjust error code if needed
+  adaptErrorCodeForSingleEntityOperation(&(parseDataP->upcrs.res.error), true);
+
   ciP->outMimeType = JSON;
 
   // Check for potential error
   string  answer = "";
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+  if ((parseDataP->upcrs.res.error.code != SccNone ) && (parseDataP->upcrs.res.error.code != SccOk))
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.error.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.error.code;
   }
   else
   {

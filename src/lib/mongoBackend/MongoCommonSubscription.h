@@ -109,7 +109,7 @@ extern void setStatus(const std::string& _status, orion::BSONObjBuilder* b, doub
 *
 * setEntities -
 */
-extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b, bool fromNgsiv1 = false);
+extern void setEntities(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 
@@ -201,6 +201,13 @@ extern void setOnlyChanged(const ngsiv2::Subscription& sub, orion::BSONObjBuilde
 * setCovered -
 */
 extern void setCovered(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
+/* ****************************************************************************
+*
+* setNotifyOnMetadataChange -
+*/
+extern void setNotifyOnMetadataChange(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 
 /* ****************************************************************************

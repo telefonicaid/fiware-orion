@@ -28,7 +28,7 @@
 #include <string>
 
 #include "rest/ConnectionInfo.h"
-#include "ngsi10/NotifyContextRequest.h"
+#include "ngsi/NotifyContextRequest.h"
 
 
 

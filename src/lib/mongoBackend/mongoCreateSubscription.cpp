@@ -31,6 +31,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/defaultValues.h"
+#include "common/statistics.h"
 #include "apiTypesV2/Subscription.h"
 #include "cache/subCache.h"
 #include "rest/OrionError.h"
@@ -64,26 +65,20 @@ static void insertInCache
   double               now
 )
 {
-  //
-  // StringFilter in Scope?
-  //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY sub.restriction.scopeVector?
-  // If so, set it as string filter to the sub-cache item
-  //
-  StringFilter*  stringFilterP   = NULL;
-  StringFilter*  mdStringFilterP = NULL;
+  // set strinFilterP and mdStringFilterP (they will be used later in subCacheItemInsert)
+  std::string err;
 
-  for (unsigned int ix = 0; ix < sub.restriction.scopeVector.size(); ++ix)
+  StringFilter* stringFilterP = sub.subject.condition.expression.stringFilter.clone(&err);
+  if (stringFilterP == NULL)
   {
-    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      stringFilterP = sub.restriction.scopeVector[ix]->stringFilterP;
-    }
-
-    if (sub.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      mdStringFilterP = sub.restriction.scopeVector[ix]->mdStringFilterP;
-    }
+    LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
+    return;
+  }
+  StringFilter* mdStringFilterP = sub.subject.condition.expression.mdStringFilter.clone(&err);
+  if (stringFilterP == NULL)
+  {
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
+    return;
   }
 
   cacheSemTake(__FUNCTION__, "Inserting subscription in cache");
@@ -119,7 +114,8 @@ static void insertInCache
                      sub.subject.condition.expression.georel,
                      sub.notification.blacklist,
                      sub.notification.onlyChanged,
-                     sub.notification.covered);
+                     sub.notification.covered,
+                     sub.subject.condition.notifyOnMetadataChange);
 
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 }
@@ -165,6 +161,7 @@ std::string mongoCreateSubscription
   setBlacklist(sub, &b);
   setOnlyChanged(sub, &b);
   setCovered(sub, &b);
+  setNotifyOnMetadataChange(sub, &b);
 
   if (!sub.description.empty())
   {

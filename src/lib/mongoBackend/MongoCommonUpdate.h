@@ -30,10 +30,23 @@
 #include <vector>
 
 #include "orionTypes/UpdateActionType.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 
-#define MONGODB_ERROR_DUPLICATE_KEY  "duplicate key"
-#define MONGODB_ERROR_WRONGJSON      "Can't extract geo keys"
+
+
+/* ****************************************************************************
+*
+*  UpdateCoverage -
+*/
+typedef enum UpdateCoverage
+{
+  UC_NONE             = 0,
+  UC_SUCCESS          = 1,
+  UC_FULL_ATTRS_FAIL  = 2,
+  UC_ENTITY_NOT_FOUND = 3,
+  UC_PARTIAL          = 4
+} UpdateCoverage;
+
 
 
 /* ****************************************************************************
@@ -54,8 +67,8 @@ extern unsigned int processContextElement
   const bool&                          forcedUpdate,
   const bool&                          overrideMetadata,
   unsigned int                         notifStartCounter,
-  ApiVersion                           apiVersion       = V1,
-  Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR
+  Ngsiv2Flavour                        ngsiV2Flavour    = NGSIV2_NO_FLAVOUR,
+  UpdateCoverage*                      updateCoverageP  = NULL
 );
 
 #endif  // SRC_LIB_MONGOBACKEND_MONGOCOMMONUPDATE_H_

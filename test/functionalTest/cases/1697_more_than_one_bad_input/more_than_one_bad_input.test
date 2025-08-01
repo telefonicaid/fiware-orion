@@ -71,6 +71,14 @@ echo
 
 echo "04. grep BadInput in log-file (4 lines found)"
 echo "============================================="
+# FIXME: in Debian 11 IP is 0.0.0.0 while in Debian 12 is 127.0.0.1. This could be due to changes in how
+# curl (used internally by orionCurl) works, from 7.74 (Debian 11) to 7.88 (Debian 12) (it wouldn't be
+# the only change, see https://stackoverflow.com/q/77045755/1485926 ;). I have tried to fix
+# using explictely 'curl --interface 0.0.0.0' in orionCurl function, but it doesn't work. Thus, the
+# alternative is to use a REGEX() so both IP options get covered. This can be seen as a temporal fix, so
+# when we decide to remove compatibility with Debian 11 we can remove the REGEX() and leave only one way
+# (it seems we have already used this trick is other .test files, look for '0.0.0.0|127.0.0.1' text pattern,
+# maybe all them could be removed at the same time)
 grep BadInput /tmp/contextBroker.log | awk -F'|' '{ print $10 }' | awk -F= '{ print $2 }'
 echo
 echo
@@ -80,41 +88,41 @@ echo
 01. Provoke FOUR Bad Inputs
 ===========================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 97
 
 {
     "description": "Service not found. Check your URL as probably it is wrong.",
     "error": "BadRequest"
 }
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Errors found in incoming JSON buffer",
     "error": "ParseError"
 }
 HTTP/1.1 405 Method Not Allowed
-Content-Length: 63
-Content-Type: application/json
-Allow: POST, GET
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Allow: POST, GET
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "method not allowed",
     "error": "MethodNotAllowed"
 }
 HTTP/1.1 411 Length Required
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "Zero/No Content-Length in PUT/POST/PATCH request",
@@ -138,10 +146,10 @@ Bad input active alarms: 1, raised: _total: 1, new: 1_, released: _total: 0, new
 
 04. grep BadInput in log-file (4 lines found)
 =============================================
-Raising alarm BadInput 0.0.0.0: service '/v2/noService' not found
-Repeated BadInput 0.0.0.0: JSON Parse Error (Invalid value)
-Repeated BadInput 0.0.0.0: bad verb for url '/v2/entities', method 'GETT'
-Repeated BadInput 0.0.0.0: {"error":"ContentLengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
+Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): service '/v2/noService' not found
+Repeated BadInput REGEX((0.0.0.0|127.0.0.1): JSON Parse Error \(Invalid value\))
+Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): bad verb for url '/v2/entities', method 'GETT'
+Repeated BadInput REGEX((0.0.0.0|127.0.0.1)): {"error":"ContentLengthRequired","description":"Zero/No Content-Length in PUT/POST/PATCH request"}
 
 
 --TEARDOWN--

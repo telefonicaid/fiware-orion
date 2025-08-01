@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
 #include "apiTypesV2/EntityVector.h"
@@ -60,89 +59,13 @@ std::string EntityIdVector::toJson(void)
 
 /* ****************************************************************************
 *
-* EntityIdVector::toJsonV1 -
-*/
-std::string EntityIdVector::toJsonV1(bool comma)
-{
-  std::string out = "";
-
-  if (vec.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("entities", true);
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    out += vec[ix]->toJsonV1(ix != vec.size() - 1, true);
-  }
-
-  out += endTag(comma, true);
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityIdVector::check -
-*/
-std::string EntityIdVector::check(RequestType requestType)
-{
-  // Only OK to be empty if part of a ContextRegistration
-  if ((requestType == DiscoverContextAvailability)           ||
-      (requestType == QueryContext)                          ||
-      (requestType == SubscribeContext))
-  {
-    if (vec.size() == 0)
-    {
-      alarmMgr.badInput(clientIp, "mandatory entity list missing");
-      return "No entities";
-    }
-  }
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string res;
-
-    if ((res = vec[ix]->check(requestType)) != "OK")
-    {
-      alarmMgr.badInput(clientIp, "invalid vector of EntityIds", res);
-      return res;
-    }
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityIdVector::lookup - find a matching entity in the entity-vector
 */
-EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type, const std::string& isPattern)
+EntityId* EntityIdVector::lookup(const std::string& id, const std::string& idPattern, const std::string& type, const std::string& typePattern)
 {
-  //
-  // isPattern:  "false" or "" is the same
-  //
-  std::string isPatternFromParam = isPattern;
-  if (isPatternFromParam.empty())
-  {
-    isPatternFromParam = "false";
-  }
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    std::string isPatternFromVec = vec[ix]->isPattern;
-
-    if (isPatternFromVec.empty())
-    {
-      isPatternFromVec = "false";
-    }
-
-    if ((vec[ix]->id == id) && (vec[ix]->type == type) && (isPatternFromVec == isPatternFromParam))
+    if ((vec[ix]->id == id) && (vec[ix]->type == type) && (vec[ix]->idPattern == idPattern) && (vec[ix]->typePattern == typePattern))
     {
       return vec[ix];
     }
@@ -174,7 +97,7 @@ void EntityIdVector::push_back(EntityId* item)
 */
 bool EntityIdVector::push_back_if_absent(EntityId* item)
 {
-  if (lookup(item->id, item->type, item->isPattern) == NULL)
+  if (lookup(item->id, item->idPattern, item->type, item->typePattern) == NULL)
   {
     vec.push_back(item);
     return true;
@@ -218,7 +141,6 @@ void EntityIdVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->release();
     delete(vec[ix]);
   }
 
@@ -237,7 +159,7 @@ void EntityIdVector::fill(EntityVector& _vec)
   for (unsigned int ix = 0; ix < _vec.size(); ++ix)
   {
     Entity*   entityP   = _vec[ix];
-    EntityId* entityIdP = new EntityId(entityP->id, entityP->type, entityP->isPattern, entityP->isTypePattern);
+    EntityId* entityIdP = new EntityId(entityP->entityId.id, entityP->entityId.idPattern, entityP->entityId.type, entityP->entityId.typePattern);
 
     vec.push_back(entityIdP);
   }

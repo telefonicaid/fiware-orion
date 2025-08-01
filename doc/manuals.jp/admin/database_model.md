@@ -26,10 +26,10 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **\_id** は ID 自体と型を含む EntityID を格納します。このために \_id を使用すると、EntityID が一意であることが保証されます。このフィールドの JSON ドキュメントは次のとおりです :
     -   **id** : エンティティの NGSI ID
     -   **type** : エンティティの NGSI 型
-    -   **servicePath** : [サービスパス機能](../user/service_path.md)に関連します
+    -   **servicePath** : [サービスパス機能](../orion-api.md#service-path)に関連します
 -   **attrs** は、そのエンティティに対して作成されたさまざまな属性のキーマップです。キーは、属性名で生成されます ("." は MongoDB document keys では有効な文字ではないので、"=" に変更します)。マップの各要素には、次の情報があります :
     -   **type**: 属性型
-    -   **value** : 属性値 (少なくとも1つの更新を受け取った属性の場合) です。バージョン 0.10.1 までは、この値は常に文字列ですが、0.11.0 ではこの値は構造化値を表す JSON オブジェクトまたは JSON ベクトルでもあります ([ユーザ・マニュアルの属性の構造化された値](../user/structured_attribute_valued.md)のセクションを参照ください)
+    -   **value** : 属性値 (少なくとも1つの更新を受け取った属性の場合) です。バージョン 0.10.1 までは、この値は常に文字列ですが、0.11.0 ではこの値は構造化値を表す JSON オブジェクトまたは JSON ベクトルでもあります ([Orion API 仕様の属性表現](../orion-api.md#json-attribute-representation)のセクションを参照ください)
     -   **md** (オプション) : カスタム・メタデータです。これはメタデータオブジェクトのキーマップです。キーはメタデータ名で生成されます ("." は MongoDB document keys では有効な文字ではないので、"=" に変更します)。例えば、"m.x" というメタデータは "m = x" キーを使用します。各キーのオブジェクト値には、メタデータの **type** と **value** の2つのフィールドがあります
     -   **mdNames** : 文字列の配列です。その要素は、属性のメタデータの名前です。ここでは "." から "=" への置換は行われません
     -   **creDate**: (追加の結果として) 属性の作成に対応するタイムスタンプ (浮動小数点数、ミリ秒の秒を意味します)
@@ -45,11 +45,11 @@ Orion Context Broker は、データベース内で次のサブセクション�
     -   **attrName** : attrs 配列内の地理的位置を識別する属性名です
     -   **coords** : エンティティの位置を表す GeoJSON です。詳細は以下を参照してください
 -   **lastCorrelator** : エンティティ上の最後の更新要求における root correlator の値です。自己通知ループ保護ロジックによって使用されます。*root correlator* とは、サフィックスのない更新要求の `Fiware-Correlator` リクエスト・ヘッダの値を意味します。例えば、`Fiware-Correlator: f320136c-0192-11eb-a893-000c29df7908; cbnotif=32` の root correlator は `f320136c-0192-11eb-a893-000c29df7908` です
--   **expDate** (オプション): エンティティの有効期限のタイムスタンプ (Date オブジェクトとして)。詳細については、[一時的なエンティティの機能](../user/transient_entities.md)を参照してください
+-   **expDate** (オプション): エンティティの有効期限のタイムスタンプ (Date オブジェクトとして)。詳細については、[一時的なエンティティの機能](../orion-api.md#transient-entities)を参照してください
 
 `location.coordsin` については、いくつかの形式を使用することができます :
 
-* ポイントを表します (geo:point で使用されるもの) :
+* ポイントを表します:
 
 ```
 {
@@ -58,7 +58,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 }
 ```
 
-* ラインを表します (geo:line で使用されているもの) :
+* ラインを表します:
 
 ```
 {
@@ -67,7 +67,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 }
 ```
 
-* ポリゴンを表します (geo:box と geo:polygon で使用されるもの) :
+* ポリゴンを表します:
 
 ```
 {
@@ -78,7 +78,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 
 * 最後に、`location.coords` は、[GeoJSON](http://www.macwright.org/2015/03/23/geojson-second-bite.html) 形式で場所を表現する任意の JSON オブジェクトを保持できます。任意の GeoJSON は geo:json 属性型で使用でき、有効なオブジェクトを導入するのはユーザの責任です。上記3つのケースは、実際には "fixed" ケースの GeoJSON 表現です。
 
-座標ペアは、[geo-location API](../user/geolocation.md) で使用されている順序とは反対の経度－緯度順 (longitude-latitude order) を使用することに注意してください。これは内部の [MongoDB ジオロケーション実装](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/) (GeoJSON に基づいています) が経度－緯度順を使用するためです。しかし、ユーザに近い他のシステム (Google マップなど) では、緯度－経度形式 (latitude-longitude format) を使用しているため、後者を API に使用しています。
+座標ペアでは経度-緯度 (longitude-latitude) の順序が使用されますが、これは[地理的クエリ (Geographical Queries)](../orion-api.md#geographica-queries)で使用される順序とは逆であることに注意してください。これは、[MongoDB の地理位置情報の内部実装](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/) (GeoJSON に基づく) が経度-緯度 (longitude-latitude) の順序を使用するためです。 ただし、ユーザに近い他のシステム (GoogleMaps など) は緯度経度形式 (latitude-longitude format) を使用するため、Geographical Queries API には後者を使用しました。
 
 サンプルドキュメント :
 
@@ -146,7 +146,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **format**: 転送されたリクエストを送信するために使用するフォーマット
     NGSIv1 フォーマットの場合、`format` の値として **JSON**を使用してください
     NGSIv2 では、今日現在、**normalized** フォーマットのみがサポートされています
--   **servicePath** : [サービスパス機能](../user/service_path.md)に関連します
+-   **servicePath** : [サービスパス機能](../orion-api.md#service-path)に関連します
 -   **status** (オプション) : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)。デフォルト・ステータス (すなわち、ドキュメントがこのフィールドを省略した場合) は "active" です
 -   **statusLastChange**: ステータスが最後に更新された時刻 (10進数、秒と秒の端数を意味します)。
     これは主にサブスクリプション・キャッシュ更新ロジックによって使用されます (したがって、DB のステータスは、新しい場合にのみキャッシュから更新されます)
@@ -156,9 +156,12 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **fwdMode**: プロバイダがサポートするフォワーディング・モード : `all`, `query`, `update` または `none`.
     省略した場合 (2.6.0 より前の Orion バージョン)、`all` が想定されます。
 -   **contextRegistration** : 要素に以下の情報が含まれる配列です :
-    -   **entities** : エンティティのリストを含む配列です (必須)。各エンティティの JSON には、**id**, **type** および **isPattern** が含まれています
+    -   **entities**: エンティティのリストを含む配列 (必須)。各エンティティの JSON には、**id** (文字列)、**type** (文字列)、*isPattern** (ブール値)、および**isTypePattern** (ブール値）（*) が含まれます
     -   **attrs** : 属性のリストを含む配列です (オプション)。各属性の JSON には、**name** および **type** が含まれています
     -   **providingApplication** : このレジストレーションのための提供アプリケーションの URL です (必須)
+
+(*) Orion 4.3.0 より前のバージョンでは、`isPattern` を文字列 (`"true"` または `"false"`) として使用していました。
+Orion はこれを文字列 (レガシー) または bool 型 (現行) として読み取ることをサポートしていますが、常に bool 型 (`true` または `false`) として保存します。
 
 サンプルドキュメント :
 
@@ -174,12 +177,12 @@ Orion Context Broker は、データベース内で次のサブセクション�
                {
                    "id": "E1",
                    "type": "T1",
-                   "isPattern": "false"
+                   "isPattern": false
                },
                {
                    "id": "E2",
                    "type": "T2",
-                   "isPattern": "false"
+                   "isPattern": false
                }
            ],
            "attrs": [
@@ -208,14 +211,15 @@ Orion Context Broker は、データベース内で次のサブセクション�
 フィールド :
 
 -   **\_id** : サブスクリプション ID (サブスクリプションを更新およびキャンセルするためにユーザに提供される値) です。このために \_id を使用すると、サブスクリプション ID は一意であり、サブスクリプション ID によるクエリは非常に高速です (\_id に自動のデフォルト・インデックスがあるため)
--   **servicePath** : [サービスパス機能](../user/service_path.md)に関連します。これは、サブスクリプションによってカプセル化されたクエリに関連付けられたサービスパスです。デフォルトは `/#` です
+-   **servicePath** : [サービスパス機能](../orion-api.md#service-path)に関連します。これは、サブスクリプションによってカプセル化されたクエリに関連付けられたサービスパスです。デフォルトは `/#` です
 -   **expiration** : サブスクリプションの有効期限が切れるタイムスタンプです (整数、秒を意味します)。永続的なサブスクリプションの場合、不当に高い値が使用されます。ソースコードの PERMANENT_SUBS_DATETIME を参照してください
 -   **lastNotification** : 最後の通知が送信された時刻です (整数、秒を意味します)。これは、通知が送信されるたびに更新され、スロットリング違反を回避します
 -   **throttling** : 通知の最小間隔です。0または -1 は、スロットリングがないことを意味します
 -   **reference** : 通知の URL です。HTTPまたはMQTTのいずれかを指定します
--   **mqttTopic**: MQTTトピック (MQTT 通知のみ)
--   **mqttQoS**: MQTT QoS 値 (MQTT 通知のみ)
--   **entities** : エンティティの配列 (必須) です。各エンティティの JSON には、**id**, **type**, **isPattern** および **isTypePattern** が含まれています。従来の理由から、**isPattern** は `"true"` または `"false"` (テキスト) で、**isTypePattern** は `true` または `false` (ブール値) であることに注意してください
+-   **topic**: MQTTトピック (MQTT 通知のみ)
+-   **qos**: MQTT QoS 値 (MQTT 通知のみ)
+-   **retain**: MQTT retain 値 (MQTT 通知のみ)
+-   **entities**: エンティティの配列 (必須)。各エンティティの JSON には、**id** (文字列)、**type** (文字列)、**isPattern** (ブール値)、**isTypePattern** (ブール値) (*) が含まれます。
 -   **attrs** : 属性名の配列 (文字列) (オプション) です
 -   **blacklist** : `attrs` をホワイトリスト (もし `blacklist` が `false` また存在しない場合) またはブラックリスト (もし `blackslist` が `true` の場合) として解釈する必要があるかどうかを指定するブール値フィールドです
 -   **onlyChanged**: 変更された属性のみを通知に含める必要があるか (onlyChanged が true
@@ -224,19 +228,23 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **conditions** : 通知をトリガーする属性のリストです。
 -   **expression** : 更新が来たときに通知を送信するかどうかを評価するために使用される式です。 次のフィールドで構成されています : q, mq, georel, geometry and/or coords (オプション)
 -   **count** : サブスクリプションに関連付けられて送信された通知の数です
--   **format** : 通知を送信するために使用する形式。可能な値はは **JSON**  (NGSIv1 レガシー形式の JSON 通知を意味する)、**normalized**, **keyValues**, **values** (最後の3つは NGSIv2 形式で使用されます) です
+-   **format** : 通知を送信するために使用する形式。可能な値は、**normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues**, **values** です
 -   **status** : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)、
-    または `oneshot` ([oneshot サブスクリプション](../user/oneshot_subscription.md) の場合) のいずれか。 NGSIv2 API
+    または `oneshot` ([oneshot サブスクリプション](../orion-api.md#oneshot-subscriptions) の場合) のいずれか。Orion API
     は追加の状態 (`expired`など) を考慮しますが、DB にヒットすることはありません (Orion によって管理されます)
 -   **description** (オプションフィールド) : サブスクリプションを説明するフリーテキスト文字列。最大長は1024です
--   **custom** : このサブスクリプションがカスタマイズされた通知 (NGSIv2 API の機能) を使用するかどうかを指定するブール値フィールドです。このフィールドが存在し、その値が "true" であれば、カスタマイズされた通知が使用されていて、`headers`, `qs`, `method` および `payload` フィールドは考慮されています
--   **headers** : NGSIv2 の通知カスタマイズ機能の HTTP ヘッダーキーマップを格納するためのオプションのフィールドです
--   **qs** : NGSIv2 の通知カスタマイズ機能のためのクエリパラメータのキーマップを格納するオプションのフィールドです
--   **method** : NGSIv2 の通知カスタマイズ機能の HTTP メソッドを格納するためのオプションのフィールドです
--   **payload** : NGSIv2 の通知カスタマイズ機能のペイロードを格納するオプションのフィールドです
+-   **custom** : このサブスクリプションがカスタマイズされた通知 (Orion API の機能) を使用するかどうかを指定するブール値フィールドです。このフィールドが存在し、その値が "true" であれば、カスタマイズされた通知が使用されていて、`headers`, `qs`, `method` および `payload` フィールドは考慮されています
+-   **headers** : 通知カスタマイズ機能の HTTP ヘッダーキーマップを格納するためのオプションのフィールドです
+-   **qs** : 通知カスタマイズ機能のためのクエリパラメータのキーマップを格納するオプションのフィールドです
+-   **method** : 通知カスタマイズ機能の HTTP メソッドを格納するためのオプションのフィールドです
+-   **payload** : 通知カスタマイズ機能のペイロードを格納するオプションのフィールドです
     その値が `null` の場合、ペイロードを通知に含める必要がないことを意味します。その値が `""` の場合、
     またはフィールドが省略されている場合は、NGSIv2 正規化形式が使用されます
--   **json** : NGSIv2 の通知カスタマイズ機能用に生成された JSON ベースのペイロードに JSON オブジェクトまたは配列を格納するためのオプションのフィールド。この機能の詳細は、[こちら](../user/ngsiv2_implementation_notes.md#custom-notification-with-json-payload)です
+-   **json** : Orion API の通知カスタマイズ機能用に生成された JSON ベースのペイロードに JSON オブジェクトまたは配列を格納するためのオプションのフィールド。この機能の詳細は、[こちら](../orion-api.md#json-payloads)です
+-   **ngsi**: Orion API の通知カスタマイズ機能用の NGSI パッチ・オブジェクトを格納するためのオプション・フィールド。
+    この機能の詳細は[こちら](../orion-api.md#ngsi-payload-patching)です。このフィールドの値は、値が
+    [エンティティ・ コレクション](#entities-collection) の `attrs` の簡略化されたバージョンである `attrs`
+    キーを持つオブジェクトです
 -   **lastFailure** : 最後の通知の失敗が発生した時刻です (整数、秒を意味します)。サブスクリプションが失敗したことがない場合は存在しません
 -   **lastFailureReason**: 最後の失敗の原因を説明するテキストです。
     サブスクリプションが一度も失敗したことがない場合は存在しません。
@@ -246,12 +254,15 @@ Orion Context Broker は、データベース内で次のサブセクション�
     ことがない場合は存在しません
 -   **maxFailsLimit**: 接続試行の最大制限を指定するために使用されるオプションのフィールド。これにより、失敗した通知の数に達すると、サブスクリプションは自動的に非アクティブ状態に移行します
 -   **failsCounter**: サブスクリプションに関連付けられた連続して失敗した通知の数。これは、通知の試行が失敗するたびに1つずつ増加します。通知の試行が成功すると、0にリセットされます
--   **altTypes**: サブスクリプションに関連付けられた変更タイプ (alteration types) のリストを含む配列。フィールドが含まれていない場合は、デフォルトが想定されます ([このドキュメント](../user/subscriptions_alttype.md)を確認してください)
-
+-   **altTypes**: サブスクリプションに関連付けられた変更タイプ (alteration types) のリストを含む配列。フィールドが含まれていない場合は、デフォルトが想定されます ([このドキュメント](../orion-api.md#subscriptions-based-in-alteration-type)を確認してください)
 -   **covered**: すべての `attrs` を通知に含める必要があるか (値がtrueの場合)、トリガー・エンティティに存在するものだけを含める必要があるか
     (値がfalseの場合、またはフィールドが省略されている場合) を指定するブール・フィールド
-    詳細については、ユーザ・マニュアル・ドキュメントの[対象サブスクリプション・セクション](../user/ngsiv2_implementation_notes.md#covered-subscriptions)
+    詳細については、Orion API 仕様の[対象サブスクリプション・セクション](../orion-api.md#covered-subscriptions)
     を参照してください。
+-   **notifyOnMetadataChange**: `true` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされます。`false` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされません。 デフォルトの動作 (省略された場合) は `true` の動作です。
+
+(*) Orion 4.3.0 より前のバージョンでは、`isPattern` を文字列 (`"true"` または `"false"`) として使用していました。
+Orion はこれを文字列 (レガシー) または bool 型 (現行) として読み取ることをサポートしていますが、常に bool 型 (`true` または `false`) として保存します。
 
 サンプルドキュメント :
 
@@ -265,7 +276,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
                 {
                         "id" : ".*",
                         "type" : "Room",
-                        "isPattern" : "true",
+                        "isPattern" : true,
                         "isTypePattern": false
                 }
         ],

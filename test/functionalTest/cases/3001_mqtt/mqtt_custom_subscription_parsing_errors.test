@@ -432,10 +432,10 @@ echo
 01. Create subs with missing notification type, see error
 =========================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 86
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 86
 
 {
     "description": "http, httpCustom, mqtt or mqttCustom is missing",
@@ -446,10 +446,10 @@ Date: REGEX(.*)
 02. Create subs with more than one notification type, see error
 ===============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 98
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 98
 
 {
     "description": "only one of http, httpCustom, mqtt or mqttCustom is allowed",
@@ -460,10 +460,10 @@ Date: REGEX(.*)
 03. Create sub with mqttCustom not being an object, see error
 =============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 79
 
 {
     "description": "mqttCustom notification is not an object",
@@ -474,10 +474,10 @@ Date: REGEX(.*)
 04. Create mqttCustom sub without url, see error
 ================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "description": "url mqtt notification is missing",
@@ -488,10 +488,10 @@ Date: REGEX(.*)
 05. Create mqttCustom sub with url not being a string, see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
 
 {
     "description": "url mqtt notification is not a string",
@@ -502,10 +502,10 @@ Date: REGEX(.*)
 06. Create mqttCustom sub with http url, see error
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 {
     "description": "http or https URL cannot be used in mqtt notifications",
@@ -516,10 +516,10 @@ Date: REGEX(.*)
 07. Create mqttCustom sub with mqtt url with path, see error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 89
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 89
 
 {
     "description": "path cannot be used in mqtt url, use topic instead",
@@ -530,10 +530,10 @@ Date: REGEX(.*)
 08. Create mqttCustom sub without topic, see error
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 73
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 73
 
 {
     "description": "topic mqtt notification is missing",
@@ -544,10 +544,10 @@ Date: REGEX(.*)
 09. Create mqttCustom sub with topic not being a string, see error
 ==================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 78
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 78
 
 {
     "description": "topic mqtt notification is not a string",
@@ -558,10 +558,10 @@ Date: REGEX(.*)
 10. Create mqttCustom sub with empty topic, see error
 =====================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 63
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 63
 
 {
     "description": "empty mqtt field /topic/",
@@ -572,10 +572,10 @@ Date: REGEX(.*)
 11. Create mqttCustom sub with qos not being a number, see error
 ================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 56
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 56
 
 {
     "description": "qos is not an int",
@@ -586,10 +586,10 @@ Date: REGEX(.*)
 12. Create mqttCustom sub with qos being a negative number, see error
 =====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "mqtt qos field must be an integer in the 0 to 2 range",
@@ -600,10 +600,10 @@ Date: REGEX(.*)
 13. Create mqttCustom sub with qos greater than 2, see error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 92
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 92
 
 {
     "description": "mqtt qos field must be an integer in the 0 to 2 range",
@@ -614,10 +614,10 @@ Date: REGEX(.*)
 14. Create httpCustom sub with mqtt url, see error
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 84
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 84
 
 {
     "description": "mqtt URL cannot be used in http notifications",

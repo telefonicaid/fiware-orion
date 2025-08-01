@@ -82,7 +82,7 @@ bool parseStringVector
       }
     }
 
-    if (forbiddenIdCharsV2(value.c_str()))
+    if (forbiddenIdChars(value.c_str()))
     {
       *errorStringP = "forbidden characters in attribute name";
        return false;

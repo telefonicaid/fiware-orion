@@ -112,29 +112,30 @@ static int pingConnection(mongoc_client_t* conn, const char* db, bool mtenat)
   // ping will be listDatabases in the admin DB. But if we run in not mtenant
   // mode listCollections in the default database will suffice
 
-  std::string  cmd;
+  std::string  cmdString;
   std::string  effectiveDb;
 
+  bson_t* ping = bson_new();
   if (mtenat)
   {
-    cmd = "listDatabases";
+    cmdString = "listDatabases";
+    BSON_APPEND_INT32(ping, "listDatabases", 1);
+    BSON_APPEND_BOOL(ping, "nameOnly", true);
     effectiveDb = "admin";
   }
   else
   {
-    cmd = "listCollections";
+    cmdString = "listCollections";
+    BSON_APPEND_INT32(ping, "listCollections", 1);
     effectiveDb = db;
   }
-
-  bson_t* ping = bson_new();
-  BSON_APPEND_INT32(ping, cmd.c_str(), 1);
   mongoc_database_t* database = mongoc_client_get_database(conn, effectiveDb.c_str());
 
   bson_error_t error;
   int r = 0;
   if (!mongoc_database_command_with_opts(database, ping, NULL, NULL, NULL, &error))
   {
-    LM_T(LmtMongo, ("ping command (%s at db %s) falied: %s", cmd.c_str(), effectiveDb.c_str(), error.message));
+    LM_T(LmtMongo, ("ping command (%s at db %s) falied: %s", cmdString.c_str(), effectiveDb.c_str(), error.message));
     // Reference error message: Authentication failed
     // Reference error message: command listCollections requires authentication
     if ((strstr(error.message, "Authentication failed") != NULL) || (strstr(error.message, "requires authentication") != NULL)) {
@@ -312,73 +313,30 @@ static void mongoDriverLogger
 
 /* ****************************************************************************
 *
-* mongoConnectionPoolInit -
+* composeMongoUri -
 */
-static std::string composeMongoUri
-(
-  const char*  host,
-  const char*  rplSet,
-  const char*  username,
-  const char*  passwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
-  int64_t      timeout
-)
+static std::string composeMongoUri(const char*  dbURI, const char*  passwd)
 {
   // Compose the mongoUri, taking into account all information
 
-  std::string uri = "mongodb://";
+  std::string uri;
 
-  // Add auth parameter if included
-  if (strlen(username) != 0 && strlen(passwd) != 0)
+  const char* pwd = strstr(dbURI, "${PWD}");
+  if (pwd != NULL)
   {
-    uri += username + std::string(":") + passwd + "@";
+    if (strlen(passwd) == 0)
+    {
+      LM_X(1, ("Invalid Command Line Options: -dbURI is used with a password substitution, but no password (-dbpwd) is supplied"));
+    }
+
+    // +6 is the length of the "${PWD}"
+    uri = std::string(dbURI, pwd - dbURI) + passwd + (pwd + 6);
   }
-
-  uri += host + std::string("/");
-
-  if (strlen(authDb) != 0)
+  else
   {
-    uri += authDb;
+    uri = dbURI;
   }
-
-  // First option prefix is '?' symbol
-  std::string optionPrefix = "?";
-
-  if (strlen(rplSet) != 0)
-  {
-    uri += optionPrefix + "replicaSet=" + rplSet;
-    optionPrefix = "&";
-  }
-
-  if (strlen(mechanism) != 0)
-  {
-    uri += optionPrefix + "authMechanism=" + mechanism;
-    optionPrefix = "&";
-  }
-
-  if (dbSSL)
-  {
-    uri += optionPrefix + "tls=true&tlsAllowInvalidCertificates=true";
-    optionPrefix = "&";
-  }
-
-  if (dbDisableRetryWrites)
-  {
-    uri += optionPrefix + "retryWrites=false";
-    optionPrefix = "&";
-  }
-
-  if (timeout > 0)
-  {
-    char buf[STRING_SIZE_FOR_LONG];
-    i2s(timeout, buf, sizeof(buf));
-    uri += optionPrefix + "connectTimeoutMS=" + buf;
-    optionPrefix = "&";
-  }
-
+  
   LM_T(LmtMongo, ("MongoDB connection URI: '%s'", offuscatePassword(uri, passwd).c_str()));
 
   return uri;
@@ -392,17 +350,10 @@ static std::string composeMongoUri
 */
 int orion::mongoConnectionPoolInit
 (
-  const char*  host,
+  const char*  dbURI,
   const char*  db,
-  const char*  rplSet,
-  const char*  username,
   const char*  passwd,
-  const char*  mechanism,
-  const char*  authDb,
-  bool         dbSSL,
-  bool         dbDisableRetryWrites,
   bool         mtenant,
-  int64_t      timeout,
   int          writeConcern,
   int          poolSize,
   bool         semTimeStat
@@ -421,7 +372,7 @@ int orion::mongoConnectionPoolInit
   atexit(shutdownClient);
 
   // Set mongo Uri to connect
-  std::string uri = composeMongoUri(host, rplSet, username, passwd, mechanism, authDb, dbSSL, dbDisableRetryWrites, timeout);
+  std::string uri = composeMongoUri(dbURI, passwd);
 
 #ifdef UNIT_TEST
   /* Basically, we are mocking all the DB pool with a single connection. The getMongoConnection() and mongoReleaseConnection() methods

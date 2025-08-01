@@ -388,7 +388,7 @@ struct QueryContextData
 {
   QueryContextRequest  res;           // Output/Result of the parse
   EntityId*            entityIdP;     // Pointer to the current EntityId
-  Scope*               scopeP;        // Pointer to the	current Scope
+  GeoFilter*           geoFilter;     // Pointer to the	current GeoFilter
   orion::Point*        vertexP;       // Pointer to the current Point
   int                  pointNo;       // Index of the current Point
   int                  coords;        // Number of coordinates

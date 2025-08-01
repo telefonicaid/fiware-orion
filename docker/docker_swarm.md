@@ -86,7 +86,7 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
     services:
 
       mongo:
-        image: mongo:4.4
+        image: mongo:8.0
         entrypoint: [ "/usr/bin/mongod", "--replSet", "rs", "--journal", "--smallfiles", "--bind_ip", "0.0.0.0"]
         volumes:
           - mongodata:/data/db
@@ -185,7 +185,7 @@ Details on how to deploy a MongoDB ReplicaSet in Docker Swarm are available
         image: fiware/orion:latest
         ports:
           - "1026:1026"
-        command: -logLevel DEBUG -dbhost mongo_mongo -rplSet rs -dbTimeout 10000
+        command: -logLevel DEBUG -dbURI mongodb://mongo_mongo/?replicaSet=rs&connectTimeoutMS=10000
         deploy:
           replicas: 2
         networks:

@@ -1,0 +1,298 @@
+# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom notification HTTP with NGSI errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create custom subscription with payload and ngsi field, see error
+# 02. Create custom subscription with json and ngsi field, see error
+# 03. Create custom subscription with ngsi field with metadata, see error
+# 04. Create custom subscription with ngsi field with invalidad id, see error
+# 05. Create custom subscription with ngsi field with invalidad type, see error
+# 06. Create custom subscription with ngsi field with invalidad attribute, see error
+#
+
+echo "01. Create custom subscription with payload and ngsi field, see error"
+echo "====================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "payload": "foo",
+      "ngsi": {
+        "id": "E",
+        "type": "T"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create custom subscription with json and ngsi field, see error"
+echo "=================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "json": {
+        "text": "foo"
+      },
+      "ngsi": {
+        "id": "E",
+        "type": "T"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create custom subscription with ngsi field with metadata, see error"
+echo "======================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "id": "E",
+        "type": "T",
+        "A": {
+          "value": 1,
+          "type": "Number",
+          "metadata": {
+            "M1": {
+              "value": "foo",
+              "type": "Text"
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create custom subscription with ngsi field with invalidad id, see error"
+echo "==========================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "id": 42
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create custom subscription with ngsi field with invalidad type, see error"
+echo "============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "type": 42
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create custom subscription with ngsi field with invalidad attribute, see error"
+echo "=================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "ngsi": {
+        "A": {
+          "value": 10,
+          "type": 42
+        }
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create custom subscription with payload and ngsi field, see error
+=====================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
+
+{
+    "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
+    "error": "BadRequest"
+}
+
+
+02. Create custom subscription with json and ngsi field, see error
+==================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
+
+{
+    "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
+    "error": "BadRequest"
+}
+
+
+03. Create custom subscription with ngsi field with metadata, see error
+=======================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
+
+{
+    "description": "only evalPriority metadata is allowed in ngsi field in custom notifications",
+    "error": "BadRequest"
+}
+
+
+04. Create custom subscription with ngsi field with invalidad id, see error
+===========================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "description": "Invalid JSON type for entity id",
+    "error": "BadRequest"
+}
+
+
+05. Create custom subscription with ngsi field with invalidad type, see error
+=============================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
+
+{
+    "description": "Invalid JSON type for entity type",
+    "error": "BadRequest"
+}
+
+
+06. Create custom subscription with ngsi field with invalidad attribute, see error
+==================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
+
+{
+    "description": "invalid JSON type for attribute type",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

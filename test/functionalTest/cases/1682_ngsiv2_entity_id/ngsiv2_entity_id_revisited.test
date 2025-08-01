@@ -74,8 +74,8 @@ orionCurl --url /v2/entities/E1/attrs  --payload "$payload"
 echo
 echo
 
-echo "04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)"
-echo "==========================================================================="
+echo "04. POST /v2/entities/E1?options=append A and B (and check 422 Unprocessable Content)"
+echo "====================================================================================="
 payload='{
   "A": {
     "value": 30
@@ -113,10 +113,10 @@ echo
 01. POST /v2/entities/E1 A (and check 404 Not Found)
 ====================================================
 HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 95
 
 {
     "description": "The requested entity has not been found. Check type and id",
@@ -127,42 +127,42 @@ Date: REGEX(.*)
 02. POST /v2/entities E1 A (and check 201 Created)
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=Thing
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
 
 
 
 03. POST /v2/entities/E1 A (and check 204 No Content)
 =====================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. POST /v2/entities/E1?options=append A and B (and check 400 Bad Request)
-===========================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 107
+04. POST /v2/entities/E1?options=append A and B (and check 422 Unprocessable Content)
+=====================================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Date: REGEX(.*)
+Content-Length: 112
 
 {
-    "description": "one or more of the attributes in the request already exist: [ A ]",
-    "error": "Unprocessable"
+    "description": "one or more of the attributes in the request already exist: E1 - [ A ]",
+    "error": "PartialUpdate"
 }
 
 
 05. GET /v2/entities/E1 (A: 20 -untouched-, B: foo)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 121
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 121
 
 {
     "A": {
@@ -183,8 +183,8 @@ Date: REGEX(.*)
 06. POST /v2/entities/E1?options=append B (and check 204 No Content)
 ====================================================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 

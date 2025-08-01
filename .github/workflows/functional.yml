@@ -2,39 +2,30 @@ name: Functional Tests
 
 on:
   push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
+      - '!checkvalgrind**'
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-   TEST_IMAGE_NAME: fiware/orion-ci:deb
+   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
 
 jobs:
   functional:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     continue-on-error: true
 
     services:
       mongodb:
-        image: mongo:4.4
+        image: mongo:8.0
         ports:
           - 27017:27017
-
-      mosquitto:
-        # Needed by MQTT notification tests
-        image: eclipse-mosquitto:1.6.7
-        ports:
-        - 1883:1883
-
-      mosquitto-extra:
-        # Needed by MQTT notification tests (multi broker)
-        image: eclipse-mosquitto:1.6.7
-        ports:
-        - 1884:1883
 
     name: functional - ${{ matrix.payload.name }}
 
@@ -55,6 +46,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Run Mosquitto container with authenticated user
+        # Why don't to use a service for this (as moquitto-extra above)? It would be the desirable solution, but I haven't able to
+        # configure volumes properly for it (the mosquitto container as service has problems to get the configuration files). Feedback welcome! :)
+        run: docker run -d --name mosquitto -p 1883:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
+
+      - name: Run Extra Mosquitto container used in multibroker tests
+        # Note we are reusing the same volume (although the extra broker does not require authenticated user). We use a service in the past
+        # to implement this (using eclipse-mosquitto:1.6.15) but in eclipse-mosquitto:2.0.11 it seems something in the internal configuration
+        # has changed and it doesn't work if we don't provide the configuration files in the volume. Again, feedback is welcome! :)
+        run: docker run -d --name mosquitto-extra -p 1884:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
+
       - name: Run functional test
         run: |
-          docker run  --network host -t --rm ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional
+          docker run  --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts functional

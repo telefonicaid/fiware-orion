@@ -24,7 +24,11 @@
 PROJECT(contextBroker)
 
 # find_package() for mongo driver doesn't work with cmake 2
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
+
+# set C++14 standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #
 # DEBUG or RELEASE build ?
@@ -171,26 +175,28 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 #    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable")
 #endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+# Enables some some #ifdef in the code for compiling in old system
+# FIXME: cleanup OLD_SSL_VERSION_FORMAT stuff after consolidating the change to Debian 12+
+IF((${DISTRO} MATCHES "Debian_11.*") OR (${DISTRO} MATCHES "Alpine_3.16.*"))
+  ADD_DEFINITIONS(-DOLD_SSL_VERSION_FORMAT)
+ENDIF()
+
 #
 # Libraries
 #
 
 SET (ORION_LIBS
     common
-    serviceRoutines
+    rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
     serviceRoutinesV2
     ngsiNotify
-    rest          # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o; jsonRequestTreat from payloadParse@RestService.cpp.o;
-    jsonParse
     jsonParseV2
     rest          # this is repeated for linking str2Verb from parseSubscription@parseSubscription.cpp.o;
                   # verbName(Verb) from setExtendedHttpInfo@MongoCommonSubscription.cpp.o
-    convenience
-    ngsi9
-    ngsi10
+    mongoBackend
     ngsi
     cache
-    mongoBackend
+    mongoBackend  # repeated (probably due to some circular dependency between mongoBackend and ngsi)
     mongoDriver
     parse
     apiTypesV2
@@ -198,6 +204,7 @@ SET (ORION_LIBS
     common
     alarmMgr
     metricsMgr
+    expressions
     logSummary
     lm
     pa
@@ -220,15 +227,31 @@ SET (BOOST_MT
 
 # See http://mongoc.org/libmongoc/current/tutorial.html#cmake
 # This find_package() command provides the mongo::mongoc_static used in
-# SET for common static libs. We use 1.17.4 as reference version.
-find_package (mongoc-1.0 1.17.4 EXACT)
+# SET for common static libs. We use 1.29.0 as reference version.
+find_package (mongoc-1.0 1.29.0 EXACT)
+
+# Is cjexl lib available?
+find_library (HAVE_CJEXL cjexl PATHS /usr/lib /usr/lib64 /usr/local/lib64 /usr/local/lib)
+if (HAVE_CJEXL)
+    message("Using cjexl")
+    SET (COMMON_STATIC_LIBS
+        microhttpd.a
+        mosquitto.a
+        ${HAVE_CJEXL}
+        mongo::mongoc_static
+    )
+else (HAVE_CJEXL)
+    message("Not using cjexl")
+    add_definitions(-DEXPR_BASIC)
+    SET (COMMON_STATIC_LIBS
+        microhttpd.a
+        mosquitto.a
+        mongo::mongoc_static
+    )
+endif (HAVE_CJEXL)
 
 # Static libs common to contextBroker and unitTest binaries
-SET (COMMON_STATIC_LIBS
-    microhttpd.a
-    mosquitto.a
-    mongo::mongoc_static
-)
+
 
 SET (DYNAMIC_LIBS
     curl
@@ -258,7 +281,6 @@ endif (UNIT_TEST)
 #
 include_directories("/usr/include")
 
-
 # Needed for the new C driver
 include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("/usr/local/include/libbson-1.0")
@@ -279,13 +301,13 @@ link_directories("/usr/lib/x86_64-linux-gnu")
 #
 # Enabling test harness
 #
-if (UNIT_TEST)
+if (COVERAGE AND NOT UNIT_TEST)
    ENABLE_TESTING()
    INCLUDE(Dart)
    SET (CMAKE_TEST_TIMEOUT 60)
    SET (DART_TIMEOUT 60)
-   #ADD_SUBDIRECTORY(test/harness)
-endif (UNIT_TEST)
+   ADD_SUBDIRECTORY(test/functionalTest/cases)
+endif (COVERAGE AND NOT UNIT_TEST)
 
 #
 # Continuing if OK
@@ -297,15 +319,10 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/common)
   ADD_SUBDIRECTORY(src/lib/orionTypes)
   ADD_SUBDIRECTORY(src/lib/ngsi)
-  ADD_SUBDIRECTORY(src/lib/serviceRoutines)
   ADD_SUBDIRECTORY(src/lib/serviceRoutinesV2)
-  ADD_SUBDIRECTORY(src/lib/convenience)
-  ADD_SUBDIRECTORY(src/lib/ngsi9)
-  ADD_SUBDIRECTORY(src/lib/ngsi10)
   ADD_SUBDIRECTORY(src/lib/ngsiNotify)
   ADD_SUBDIRECTORY(src/lib/apiTypesV2)
   ADD_SUBDIRECTORY(src/lib/parse)
-  ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/jsonParseV2)
   ADD_SUBDIRECTORY(src/lib/rest)
   ADD_SUBDIRECTORY(src/lib/mongoBackend)
@@ -313,6 +330,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/cache)
   ADD_SUBDIRECTORY(src/lib/alarmMgr)
   ADD_SUBDIRECTORY(src/lib/metricsMgr)
+  ADD_SUBDIRECTORY(src/lib/expressions)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/lib/mqtt)
   ADD_SUBDIRECTORY(src/app/contextBroker)

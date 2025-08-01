@@ -36,6 +36,16 @@
 // the same macro in parseArg library
 #define FT(x) (x == true)? "true" : "false"
 
+
+
+/* ****************************************************************************
+*
+* Macros for JSON rendering
+*/
+#define JSON_STR(value)                std::string("\"" + std::string(value) + "\"")
+
+
+
 /* ****************************************************************************
 *
 * isIPv6 -
@@ -69,33 +79,9 @@ extern bool parseUrl
 
 /* ****************************************************************************
 *
-* validUrl - check validity of a URL
-*/
-extern bool validUrl(const std::string& url);
-
-
-
-/* ****************************************************************************
-*
-* i2s - integer to string
-*/
-extern char* i2s(int i, char* placeholder, int placeholderSize);
-
-
-
-/* ****************************************************************************
-*
 * parsedUptime
 */
 extern std::string parsedUptime(int uptime);
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - 
-*/
-extern bool onlyWs(const char* s);
 
 
 
@@ -143,21 +129,6 @@ extern unsigned long atoUL(const char* string, std::string* errorMsg);
 * strToLower - 
 */
 extern char* strToLower(char* to, const char* from, int toSize);
-
-
-
-/* ****************************************************************************
-*
-* strReplace - 
-*/
-extern void strReplace
-(
-  char*       to,
-  int         toLen,
-  const char* from,
-  const char* newString,
-  const char* oldString
-);
 
 
 
@@ -215,5 +186,34 @@ extern std::string offuscatePassword(const std::string& uri, const std::string& 
 * regComp -
 */
 extern bool regComp(regex_t* re, const char* pattern, int flags);
+
+
+
+/* ****************************************************************************
+*
+* removeQuotes -
+*
+*/
+inline std::string removeQuotes(std::string s)
+{
+  if (s[0] == '"')
+  {
+    return s.substr(1, s.size()-2);
+  }
+  else
+  {
+    return s;
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* htmlEscape - 
+*/
+extern char* htmlEscape(const char* s);
+
+
 
 #endif  // SRC_LIB_COMMON_STRING_H_

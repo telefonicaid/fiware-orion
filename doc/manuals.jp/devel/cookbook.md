@@ -20,7 +20,7 @@ Orion に新しい CLI パラメータを追加するのは簡単です。これ
 * 新しい CLI パラメーターの値を保持する**変数**、および
 * `PaArgument` ベクトルの**新しい項目** `paArgs`
 
-新しいCLIパラメーターが `-v` (verbose) のようなブール値の場合、`bool` 変数が必要です。`-dbHost <host name>` のようなテキスト・パラメータの場合は、char-vector が使用されるなどです。
+新しいCLIパラメーターが `-v` (verbose) のようなブール値の場合、`bool` 変数が必要です。`-dbURI <MongoDB URI>` のようなテキスト・パラメータの場合は、char-vector が使用されるなどです。
 
 最も簡単な方法は、同じタイプの古い CLI パラメータを単純にコピーすることです。
 
@@ -122,8 +122,7 @@ typedef struct RestService
 {  
   RequestType   request;          // The type of the request  
   int           components;       // Number of components in the URL path  
-  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }  
-  std::string   payloadWord;      // No longer used, should be removed ... ?  
+  std::string   compV[10];        // Vector of URL path components. E.g. { "v2", "entities" }
   RestTreat     treat;            // service function pointer  
 } RestService;
 ```
@@ -138,7 +137,7 @@ typedef struct RestService
 
 * 項目1 : `Metadata` は、`src/lib/ngsi/Request.h` の `enum RequestType` の enum 定数として追加されなければなりません
 * 項目3 : `"*"`。コンポーネント・ベクトル  `RestService::compV` のアスタリスクは ANY 文字列と一致し、エンティティ ID、属性名などを含むパスが定義されている場合は必ず、`"*"` を必ず使用する必要があります
-* 項目5 : `putMetadata()` は、`PUT /v2/entities/*/attrs/*/metadata/*`のサービス・ルーチンであり、関数を実装しなければなりません。NGSIv2 サービス・ルーチン用のライブラリのディレクトリは、`src/lib/serviceRoutinesV2` です。[ライブラリの説明](sourceCode.md#srclibserviceroutinesv2)を参照してください
+* 項目5 : `putMetadata()` は、`PUT /v2/entities/*/attrs/*/metadata/*`のサービス・ルーチンであり、関数を実装しなければなりません。サービス・ルーチン用のライブラリのディレクトリは、`src/lib/serviceRoutinesV2` です。[ライブラリの説明](sourceCode.md#srclibserviceroutinesv2)を参照してください
 
 また、`orionRestServices.cpp`では、これらの` RestService` ベクトル行は実際には長く、スタイル・ガイドは長すぎる行に反していることに注意してください。 しかし、定義を使用して行を短くするだけでは、コードを理解しにくくなるので、必要ではありません。
 
@@ -164,7 +163,7 @@ std::string putMetadata
   std::string metadataName  = compV[6];  
 ```
 
-エンティティ/属性/メタデータを変更/作成するすべてのサービス・ルーチンは、NGSIv1 サービス・ルーチン `postUpdateContext()` に依存しており、`putMetadata()` も例外ではありません。したがって、`putMetadata()` では、`putMetadata()` のパラメータを使って、 `UpdateContextRequest` オブジェクトを構築し、`postUpdateContext()` を呼び出す必要があります。このようなもの : 
+エンティティ/属性/メタデータを変更/作成するすべてのサービス・ルーチンは、サービス・ルーチン `postUpdateContext()` に依存しており、`putMetadata()` も例外ではありません。したがって、`putMetadata()` では、`putMetadata()` のパラメータを使って、 `UpdateContextRequest` オブジェクトを構築し、`postUpdateContext()` を呼び出す必要があります。このようなもの :
 
 ```
   parseDataP->upcr.res.fill(entityId, attributeName, metadataName, ActionTypeAppend);
@@ -193,7 +192,7 @@ Orion の機能テストは、`.test` のサフィックスを持つ、テキス
 2. NAME セクション
 3. SHELL-INIT セクション
 4. SHELL セクション
-5. EXPECT/REGEXPECT セクション
+5. REGEXPECT セクション
 6. TEARDOWN セクション
 
 各セクション (ファイルの先頭から始まる著作権プリアンブルを除く) には、すべてのセクションが開始/終了する機能テスト・ハーネスを示すヘッダが必要です :
@@ -201,10 +200,8 @@ Orion の機能テストは、`.test` のサフィックスを持つ、テキス
 * `--NAME--`
 * `--SHELL-INIT--`
 * `--SHELL--`
-* `--REGEXPECT--` / `--EXPECT--`
+* `--REGEXPECT--`
 * `--TEARDOWN--`
-
-`--REGEXPECT--` が使用されていて、 `--EXPECT--` でなければ、期待されるセクションは正規表現を許可します。これは、これら2つの間で唯一異なるものです。
 
 ### 著作権のセクション
 このセクションは単に著作権のヘッダです。古いものをコピーしてください。必要に応じて、年を変更することを忘れないでください。
@@ -278,7 +275,7 @@ echo "0x. description of test step 0x"
 echo "==============================="  
 ```
   
-これらのステップは、現在のステップを出力の次のものから分離するために、`echo` を2回呼び出すことで終了します。 これは非常に重要なことです。出力を読むのがずっと**簡単**です。それは、**EXPECT/REGEXPECT** セクションに続くセクションに一致する必要があります。
+これらのステップは、現在のステップを出力の次のものから分離するために、`echo` を2回呼び出すことで終了します。 これは非常に重要なことです。出力を読むのがずっと**簡単**です。それは、**REGEXPECT** セクションに続くセクションに一致する必要があります。
 
 エンティティの作成などの典型的なステップは次のようになります :
 
@@ -303,22 +300,16 @@ echo
 echo
 ```
 
-### EXPECT/REGEXPECT セクション
+### REGEXPECT セクション
 まず、テストハーネス (`test/functionalTest/testHarness.sh`) は、2つのタイプの 'expect sections' を認めます。いずれか :
 
 ```
---EXPECT--
+--REGEXPECT--
 ```
 
-または
+正規表現を `REGEX()` 構文を使用して追加できることです。これは日付の比較や Orion によって作成され、レジストレーション id や 相関器 (correlator)、単純なタイムスタンプのような、レスポンスで返された IDs の比較にとって非常に重要です。重要な制限は、REGEXPECT セクションには、1行に **REGEX** が1つしかないということです。
 
-```
---REG-EXPECT--
-```
-
-**1つを選ぶ**必要があります。ほとんど**すべて**の現在の functests が、この `--REG-EXPECT--` タイプを使用します。 --REG-EXPECT-- の利点は、正規表現を `REGEX()` 構文を使用して追加できることです。これは日付の比較や Orion によって作成され、レジストレーション id や 相関器 (correlator)、単純なタイムスタンプのような、レスポンスで返された IDs の比較にとって非常に重要です。重要な制限は、REG-EXPECT セクションには、1行に **REGEX** が1つしかないということです。
-
-つまり、REG-EXPECT セクションでは、問題のテスト・ステップからの予想される出力を追加します。たとえば、SHELL セクションについての上記のサブ・チャプターの例 "01. Create entity E1 with attribute A1" は、
+つまり、問題のテスト・ステップからの予想される出力を追加します。たとえば、SHELL セクションについての上記のサブ・チャプターの例 "01. Create entity E1 with attribute A1" は、
 この対応する部分を --REGEXPECT-- セクションに置いてください :
 
 ```
@@ -340,6 +331,8 @@ Date: REGEX(.*)
 
 * 相関器 (correlator) は36文字の文字列で、ハイフンを含む16進数です。この正規表現は、各ハイフンがどこに来なければならないかを正確に知るようになりましたが、実際には必要ではありません
 * `Date` HTTP ヘッダの2番目の REGEX もより詳細に記述できます。また必要ありません
+
+REGEXPECT セクションにはコメントを含めることができます。`--REGEXPECT--` セクション内の `##` で始まる行は無視されます。
 
 ### TEARDOWN セクション
 ここでプロセスが強制終了され、データベースが削除されるため、次のテスト・ケースがクリーン・スレートで開始されます。最も一般的なコマンドは次のとおりです :
@@ -511,7 +504,7 @@ valgrind の出力は、テスト・ケースと同じ名前のファイルに�
 
 通常、Broker にはメモリ・リークはありませんので、**メモリ・リークを伴う**動作を行うには、一時的にメモリ・リークを追加する必要があります :
 
-* お気に入りのエディタで `src/lib/ngsi10/UpdateContextRequest.cpp` ファイルを開きます
+* お気に入りのエディタで `src/lib/ngsi/UpdateContextRequest.cpp` ファイルを開きます
 * メソッド `UpdateContextRequest::release()` を見つけ、`contextElementVector.release()` の呼び出しをコメントにします :
 
   ```

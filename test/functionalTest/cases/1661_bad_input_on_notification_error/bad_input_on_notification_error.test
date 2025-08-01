@@ -168,7 +168,7 @@ echo
 
 echo "07. Corrupt reference in subscription (using mongo)"
 echo "==================================================="
-mongoCmd ${CB_DB_NAME} 'db.csubs.update({_id: ObjectId("'$SUB_ID'")}, { $set: { "reference": "badReferenceForSubscription" }})'
+mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("'$SUB_ID'")}, { $set: { "reference": "badReferenceForSubscription" }})'
 echo
 echo
 
@@ -203,10 +203,10 @@ echo
 01. Try to create subscription for E1/A1, but with 'reference' x.y.com:abc - see error
 ======================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid URL parsing notification url",
@@ -217,10 +217,10 @@ Date: REGEX(.*)
 02. Try to create subscription for E1/A1, but with 'reference' without IP, just a port - see error
 ==================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid URL parsing notification url",
@@ -231,10 +231,10 @@ Date: REGEX(.*)
 03. Try to create subscription for E1/A1, but with 'reference' http://http://abc.a.com:1234 - see error
 =======================================================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 75
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 75
 
 {
     "description": "Invalid URL parsing notification url",
@@ -250,10 +250,10 @@ Raising alarm BadInput REGEX((0.0.0.0|127.0.0.1)): Invalid URL parsing notificat
 05. Create a valid subscription for E1/A1
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
@@ -265,7 +265,7 @@ Releasing alarm BadInput REGEX((0.0.0.0|127.0.0.1))
 
 07. Corrupt reference in subscription (using mongo)
 ===================================================
-WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+{"acknowledged":true,"insertedId":null,"matchedCount":1,"modifiedCount":1,"upsertedCount":0}
 
 
 08. Wait six seconds to assure the subscription cache has been modified
@@ -275,16 +275,16 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 09. Update E1/A1 to provoke a notification for the invalid subscription
 =======================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 10. Check log-file to make sure a Runtime Error was provoked due to the invalid subscription
 ============================================================================================
-Runtime Error (not sending NotifyContextRequest: malformed URL: 'badReferenceForSubscription')
+Runtime Error (not sending notification: malformed URL: 'badReferenceForSubscription')
 
 
 --TEARDOWN--

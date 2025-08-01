@@ -142,58 +142,58 @@ echo
 01. Create and update entity corresponding to Madrid
 ====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Madrid?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Madrid?type=City
+Content-Length: 0
 
 
 
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 02. Create and update  entity corresponding to Alcobendas
 =========================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Alcobendas?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Alcobendas?type=City
+Content-Length: 0
 
 
 
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 03. Create and update entity corresponding to Leganes
 =====================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/Leganes?type=City
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/Leganes?type=City
+Content-Length: 0
 
 
 
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Query inside 13.5 kms radius from Madrid center -> Madrid, Leganes
 ======================================================================
 HTTP/1.1 200 OK
-Content-Length: 212
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 212
 
 [
     {
@@ -220,10 +220,10 @@ Date: REGEX(.*)
 05. Query inside 15 kms radius from Madrid center -> Madrid, Alcobendas, Leganes
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 323
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 323
 
 [
     {
@@ -259,10 +259,10 @@ Date: REGEX(.*)
 06. Query in 13.5 kms radius outside Madrid center -> Alcobendas
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 112
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 112
 
 [
     {
@@ -280,10 +280,10 @@ Date: REGEX(.*)
 07. Query minDistance 0 kms to Madrid center -> Madrid, Alcobendas, Leganes
 ===========================================================================
 HTTP/1.1 200 OK
-Content-Length: 323
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 323
 
 [
     {

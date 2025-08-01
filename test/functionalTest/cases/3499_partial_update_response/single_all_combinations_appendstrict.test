@@ -1,0 +1,200 @@
+# Copyright 2023 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+All fail/success/partial combinations for append strict in single update operation
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E-A/B
+# 02. POST /v2/entities/E/attrs?options=append A/B (full fail)
+# 03. POST /v2/entities/E/attrs?options=append B/C (partial fail)
+# 04. POST /v2/entities/E/attrs?type=T&options=append A/B (full fail)
+# 05. POST /v2/entities/E/attrs?type=T&options=append B/D (partial fail)
+#
+
+echo "01. Create E-A/B"
+echo "================"
+payload='{
+  "actionType": "appendStrict",
+  "entities":
+  [
+    {
+      "type": "T",
+      "id":   "E",
+      "A": {
+         "value": 1,
+         "type": "Number"
+      },
+      "B": {
+         "value": 2,
+         "type": "Number"
+      }
+    }   
+  ]
+}'
+orionCurl --url /v2/op/update --payload "$payload"
+echo
+echo
+
+
+echo "02. POST /v2/entities/E/attrs?options=append A/B (full fail)"
+echo "============================================================"
+payload='{
+  "A": {
+    "value": 1,
+    "type": "Number"
+  },
+  "B": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities/E/attrs?options=append' --payload "$payload"
+echo
+echo
+
+
+echo "03. POST /v2/entities/E/attrs?options=append B/C (partial fail)"
+echo "==============================================================="
+payload='{
+  "B": {
+    "value": 1,
+    "type": "Number"
+  },
+  "C": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities/E/attrs?options=append' --payload "$payload"
+echo
+echo
+
+
+echo "04. POST /v2/entities/E/attrs?type=T&options=append A/B (full fail)"
+echo "==================================================================="
+payload='{
+  "A": {
+    "value": 1,
+    "type": "Number"
+  },
+  "B": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities/E/attrs?type=T&options=append' --payload "$payload"
+echo
+echo
+
+
+echo "05. POST /v2/entities/E/attrs?type=T&options=append B/D (partial fail)"
+echo "======================================================================"
+payload='{
+  "B": {
+    "value": 1,
+    "type": "Number"
+  },
+  "D": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities/E/attrs?type=T&options=append' --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E-A/B
+================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+02. POST /v2/entities/E/attrs?options=append A/B (full fail)
+============================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 114
+
+{
+    "description": "one or more of the attributes in the request already exist: E - [ A, B ]",
+    "error": "Unprocessable"
+}
+
+
+03. POST /v2/entities/E/attrs?options=append B/C (partial fail)
+===============================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 111
+
+{
+    "description": "one or more of the attributes in the request already exist: E - [ B ]",
+    "error": "PartialUpdate"
+}
+
+
+04. POST /v2/entities/E/attrs?type=T&options=append A/B (full fail)
+===================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 116
+
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ A, B ]",
+    "error": "Unprocessable"
+}
+
+
+05. POST /v2/entities/E/attrs?type=T&options=append B/D (partial fail)
+======================================================================
+HTTP/1.1 422 Unprocessable Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 113
+
+{
+    "description": "one or more of the attributes in the request already exist: E/T - [ B ]",
+    "error": "PartialUpdate"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

@@ -57,8 +57,6 @@ TriggeredSubscription::TriggeredSubscription
   failsCounter(_failsCounter),
   lastNotification(_lastNotification),
   renderFormat(_renderFormat),
-  httpInfo(_httpInfo),
-  mqttInfo(_mqttInfo),
   attrL(_attrL),
   cacheSubId(_cacheSubId),
   tenant((_tenant == NULL)? "" : _tenant),
@@ -67,48 +65,8 @@ TriggeredSubscription::TriggeredSubscription
   blacklist(false),
   covered(_covered)
 {
-  // Dynamic memory must be cloned
-  if (_httpInfo.json != NULL)
-  {
-    httpInfo.json = _httpInfo.json->clone();
-  }
-  if (_mqttInfo.json != NULL)
-  {
-    mqttInfo.json = _mqttInfo.json->clone();
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* TriggeredSubscription::TriggeredSubscription -
-*
-* Constructor without throttling (for NGSI9 subscriptions)
-*/
-TriggeredSubscription::TriggeredSubscription
-(
-  RenderFormat             _renderFormat,
-  const ngsiv2::HttpInfo&  _httpInfo,
-  const ngsiv2::MqttInfo&  _mqttInfo,
-  const StringList&        _attrL
-)
-:
-  throttling(-1),
-  maxFailsLimit(-1),
-  failsCounter(-1),
-  lastNotification(-1),
-  renderFormat(_renderFormat),
-  httpInfo(_httpInfo),
-  mqttInfo(_mqttInfo),
-  attrL(_attrL),
-  cacheSubId(""),
-  tenant(""),
-  stringFilterP(NULL),
-  mdStringFilterP(NULL),
-  blacklist(false),
-  covered(false)
-{
+  httpInfo.fill(_httpInfo);
+  mqttInfo.fill(_mqttInfo);
 }
 
 
@@ -141,10 +99,6 @@ TriggeredSubscription::~TriggeredSubscription()
 /* ****************************************************************************
 *
 * TriggeredSubscription::fillExpression -
-*
-* TriggeredSubscription class is shared for NGSI9 and NGSI10 subscriptions, so it is better
-* to keep expressions (an artifact for NGSI10) out of the constructor, in its independent fill
-* method
 */
 void TriggeredSubscription::fillExpression
 (
@@ -156,21 +110,6 @@ void TriggeredSubscription::fillExpression
   expression.georel   = georel;
   expression.geometry = geometry;
   expression.coords   = coords;
-}
-
-
-/* ****************************************************************************
-*
-* TriggeredSubscription::toString -
-*/
-std::string TriggeredSubscription::toString(const std::string& delimiter)
-{
-  std::stringstream ss;
-
-  ss << throttling << delimiter << lastNotification << delimiter << renderFormatToString(renderFormat) << delimiter << httpInfo.url;
-  ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
-
-  return ss.str();
 }
 
 

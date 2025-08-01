@@ -80,7 +80,6 @@ std::string getEntityAllTypes
                                  ciP->tenant,
                                  ciP->servicePathV,
                                  ciP->uriParam,
-                                 ciP->apiVersion,
                                  totalTypesP,
                                  noAttrDetail));
   }

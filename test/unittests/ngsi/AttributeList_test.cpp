@@ -37,25 +37,21 @@
 */
 TEST(AttributeList, ok)
 {
-  StringList     al;
-  std::string    out;
-  const char*    outfile1 = "ngsi.attributeList.ok.middle.json";
-
   utInit();
 
-  out = al.toJsonV1(false, "attributes");
-  EXPECT_STREQ("", out.c_str());
+  StringList     al;
+  std::string    out;
+  const char*    outfile1 = "ngsi.attributeList.ok.middle.json";  
+
+  out = al.toJson();
+  EXPECT_STREQ("[]", out.c_str());
 
   al.push_back("a1");
   al.push_back("a2");
   
-  out = al.toJsonV1(false, "attributes");
+  out = al.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
-
-  al.push_back("");
-  out = al.check();
-  EXPECT_STREQ("empty string", out.c_str());
 
   utExit();
 }

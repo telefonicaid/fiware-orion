@@ -158,20 +158,20 @@ echo
 01. Create entity with geo:json using Feature type
 ==================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Get entity and see Feature geometry
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 133
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 133
 
 {
     "id": "E",
@@ -193,10 +193,10 @@ Date: REGEX(.*)
 03. Geoquery covering the location returns the entity
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 135
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 135
 
 [
     {
@@ -220,18 +220,18 @@ Date: REGEX(.*)
 04. Update entity with a regular geo:json Point
 ===============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 05. Get entity and see Point
 ============================
 HTTP/1.1 200 OK
-Content-Length: 132
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 132
 
 {
     "id": "E",
@@ -253,10 +253,10 @@ Date: REGEX(.*)
 06. Geoquery covering the location returns the entity
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 134
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 134
 
 [
     {
@@ -280,18 +280,18 @@ Date: REGEX(.*)
 07. Update entity with a Feature again
 ======================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get entity and see Feature geometry
 =======================================
 HTTP/1.1 200 OK
-Content-Length: 134
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 134
 
 {
     "id": "E",
@@ -313,10 +313,10 @@ Date: REGEX(.*)
 09. Geoquery covering the location returns the entity
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 136
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 136
 
 [
     {

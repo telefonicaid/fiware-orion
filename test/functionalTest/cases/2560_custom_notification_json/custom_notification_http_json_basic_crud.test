@@ -44,6 +44,7 @@ brokerStart CB
 # 12. Get sub2 to see it
 # 13. Update custom sub2 to add json field
 # 14. Get sub2 to see changes
+# 15. Get all subs and see sub1 an sub2 in its final state
 #
 
 
@@ -229,24 +230,31 @@ echo
 echo
 
 
+echo "15. Get all subs and see sub1 an sub2 in its final state"
+echo "========================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
 --REGEXPECT--
 01. Create custom sub1 with json field
 ======================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 02. Get sub1 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 295
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 325
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -266,7 +274,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -281,18 +290,18 @@ Date: REGEX(.*)
 03. Update sub1 to remove json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 04. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 288
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 318
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -309,7 +318,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -324,18 +334,18 @@ Date: REGEX(.*)
 05. Update sub1 to add json field back again
 ============================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 06. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 291
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 321
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -355,7 +365,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -370,18 +381,18 @@ Date: REGEX(.*)
 07. Update sub1 to modify json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 08. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 287
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 317
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -402,7 +413,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -417,18 +429,18 @@ Date: REGEX(.*)
 09. Update sub1 to remove json field
 ====================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 10. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 288
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 318
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -445,7 +457,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -460,20 +473,20 @@ Date: REGEX(.*)
 11. Create custom sub2 without json field
 =========================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 12. Get sub2 to see it
 ======================
 HTTP/1.1 200 OK
-Content-Length: 288
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 318
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -490,7 +503,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -505,18 +519,18 @@ Date: REGEX(.*)
 13. Update custom sub2 to add json field
 ========================================
 HTTP/1.1 204 No Content
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
 14. Get sub1 to see changes
 ===========================
 HTTP/1.1 200 OK
-Content-Length: 304
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 334
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -539,7 +553,8 @@ Date: REGEX(.*)
     "status": "active",
     "subject": {
         "condition": {
-            "attrs": []
+            "attrs": [],
+            "notifyOnMetadataChange": true
         },
         "entities": [
             {
@@ -549,6 +564,76 @@ Date: REGEX(.*)
         ]
     }
 }
+
+
+15. Get all subs and see sub1 an sub2 in its final state
+========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 655
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "httpCustom": {
+                "payload": "bar",
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "httpCustom": {
+                "json": {
+                    "z4": true,
+                    "z5": [
+                        10,
+                        20
+                    ]
+                },
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E2",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
 
 
 --TEARDOWN--

@@ -35,6 +35,8 @@
 #include "parse/CompoundValueNode.h"
 
 #include "mongoDriver/BSONObj.h"
+#include "mongoDriver/BSONObjBuilder.h"
+#include "mongoDriver/BSONArrayBuilder.h"
 
 
 
@@ -44,7 +46,7 @@
 *
 * Metadata interpreted by Orion Context Broker, i.e. not custom metadata
 */
-#define NGSI_MD_LOCATION           "location"        // Deprecated (NGSIv1)
+#define NGSI_MD_EVAL_PRIORITY      "evalPriority"
 #define NGSI_MD_IGNORE_TYPE        "ignoreType"
 #define NGSI_MD_PREVIOUSVALUE      "previousValue"   // Special metadata
 #define NGSI_MD_ACTIONTYPE         "actionType"      // Special metadata
@@ -87,14 +89,15 @@ typedef struct Metadata
   Metadata(const std::string& _name, const orion::BSONObj& mdB);
   ~Metadata();
 
-  std::string  toJsonV1(bool comma);
   std::string  toJson(void);
   void         release(void);
-  void         fill(const struct Metadata& md);
-  std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
-  std::string  check(ApiVersion apiVersion);
+  void         appendToBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames);
+
+  void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
+
+  std::string  check(void);
 } Metadata;
 
 #endif  // SRC_LIB_NGSI_METADATA_H_

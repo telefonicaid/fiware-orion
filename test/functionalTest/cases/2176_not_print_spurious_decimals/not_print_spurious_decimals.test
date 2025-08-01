@@ -82,20 +82,20 @@ echo
 01. Create entity with attributes A: 442.123456785551 and B: 200
 ================================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E?type=T
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
 
 
 
 02. Get A value: 442.123456786 (9 decimals)
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 13
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 13
 
 442.123456786
 
@@ -103,10 +103,10 @@ Date: REGEX(.*)
 03. Get B value: 200 (0 decimals)
 =================================
 HTTP/1.1 200 OK
-Content-Length: 3
-Content-Type: text/plain
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: text/plain
+Content-Length: 3
 
 200
 
@@ -114,10 +114,10 @@ Date: REGEX(.*)
 04. Get whole entity, same results for A and B
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 107
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 107
 
 {
     "A": {

@@ -42,7 +42,7 @@ ngsiv2::SubAltType parseAlterationType(const std::string& altType)
 {
   if (altType == "entityChange")
   {
-    return ngsiv2::SubAltType::EntityChange;
+    return ngsiv2::SubAltType::EntityChangeBothValueAndMetadata;
   }
   else if (altType == "entityUpdate")
   {
@@ -66,11 +66,24 @@ ngsiv2::SubAltType parseAlterationType(const std::string& altType)
 
 /* ****************************************************************************
 *
+* isChangeAltType -
+*/
+bool isChangeAltType(ngsiv2::SubAltType altType)
+{
+  return (altType == ngsiv2::SubAltType::EntityChangeBothValueAndMetadata) ||
+         (altType == ngsiv2::SubAltType::EntityChangeOnlyMetadata)         ||
+         (altType == ngsiv2::SubAltType::EntityChangeOnlyValue);
+}
+
+
+
+/* ****************************************************************************
+*
 * subAltType2string -
 */
 std::string subAltType2string(ngsiv2::SubAltType altType)
 {
-  if (altType == ngsiv2::SubAltType::EntityChange)
+  if (isChangeAltType(altType))
   {
     return "entityChange";
   }
@@ -103,17 +116,6 @@ namespace ngsiv2
 */
 Subscription::~Subscription()
 {
-  unsigned int sz = restriction.scopeVector.size();
-
-  if (sz > 0)
-  {
-    for (unsigned i = 0; i != sz; i++ )
-    {
-      restriction.scopeVector[i]->release();
-      delete restriction.scopeVector[i];
-    }
-    restriction.scopeVector.vec.clear();
-  }
 }
 
 
@@ -144,7 +146,7 @@ std::string Subscription::toJson(void)
   jh.addString("status", this->status);
 
   jh.addRaw("subject", this->subject.toJson());
-  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat, true, true)));
+  jh.addRaw("notification", this->notification.toJson(renderFormatToString(this->attrsFormat)));
 
   if (this->throttling > 0)
   {
@@ -329,6 +331,8 @@ std::string Condition::toJson()
   std::string operationsString = jhv.str();
 
   if (operationsString != "[]")         jh.addRaw("alterationTypes", operationsString);
+
+  jh.addBool("notifyOnMetadataChange", this->notifyOnMetadataChange);
 
   return jh.str();
 }

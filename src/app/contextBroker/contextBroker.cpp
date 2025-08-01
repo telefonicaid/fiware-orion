@@ -80,7 +80,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "jsonParse/jsonRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
@@ -105,6 +104,7 @@
 #include "alarmMgr/alarmMgr.h"
 #include "mqtt/mqttMgr.h"
 #include "metricsMgr/metricsMgr.h"
+#include "expressions/exprMgr.h"
 #include "logSummary/logSummary.h"
 
 #include "contextBroker/orionRestServices.h"
@@ -139,15 +139,9 @@ static bool isFatherProcess = false;
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
-char            dbHost[256];
-char            rplSet[64];
 char            dbName[64];
-char            user[256];
 char            pwd[256];
-char            authMech[64];
-char            authDb[64];
-bool            dbSSL;
-bool            dbDisableRetryWrites;
+char            dbURI[1024];
 char            pidPath[256];
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -158,8 +152,8 @@ bool            https;
 bool            mtenant;
 char            allowedOrigin[64];
 int             maxAge;
-long            dbTimeout;
 long            httpTimeout;
+long            mqttTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
 int             writeConcern;
@@ -185,16 +179,14 @@ bool            statTiming;
 bool            statNotifQueue;
 int             lsPeriod;
 bool            relogAlarms;
-bool            strictIdv1;
 bool            disableCusNotif;
 bool            logForHumans;
 unsigned long   logLineMaxSize;
 unsigned long   logInfoPayloadMaxSize;
 bool            disableMetrics;
 bool            disableFileLog;
-int             reqTimeout;
+long            reqTimeout;
 bool            insecureNotif;
-bool            ngsiv1Autocast;
 
 bool            fcEnabled;
 double          fcGauge;
@@ -202,6 +194,8 @@ unsigned long   fcStepDelay;
 unsigned long   fcMaxInterval;
 
 int             mqttMaxAge;
+
+bool            logDeprecate;
 
 
 
@@ -211,7 +205,6 @@ int             mqttMaxAge;
 */
 #define PIDPATH                _i "/tmp/contextBroker.pid"
 #define IP_ALL                 _i "0.0.0.0"
-#define LOCALHOST              _i "localhost"
 #define ONE_MONTH_PERIOD       (3600 * 24 * 31)
 
 #define FG_DESC                "don't start as daemon"
@@ -237,7 +230,8 @@ int             mqttMaxAge;
 #define MULTISERVICE_DESC      "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC    "enable Cross-Origin Resource Sharing with allowed origin. Use '__ALL' for any"
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
-#define HTTP_TMO_DESC          "timeout in milliseconds for forwards and notifications"
+#define HTTP_TMO_DESC          "timeout in milliseconds for HTTP forwards and notifications"
+#define MQTT_TMO_DESC          "timeout in milliseconds for MQTT broker connection in notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
@@ -258,17 +252,17 @@ int             mqttMaxAge;
 #define STAT_NOTIF_QUEUE       "enable thread pool notifications queue statistics"
 #define LOG_SUMMARY_DESC       "log summary period in seconds (defaults to 0, meaning 'off')"
 #define RELOGALARMS_DESC       "log messages for existing alarms beyond the raising alarm log message itself"
-#define CHECK_v1_ID_DESC       "additional checks for id fields in the NGSIv1 API"
 #define DISABLE_CUSTOM_NOTIF   "disable NGSIv2 custom notifications"
 #define DISABLE_FILE_LOG       "disable logging into file"
 #define LOG_FOR_HUMANS_DESC    "human readible log to screen"
 #define LOG_LINE_MAX_SIZE_DESC "log line maximum size (in bytes)"
 #define LOG_INFO_PAYLOAD_MAX_SIZE_DESC  "maximum length for request or response payload in INFO log level (in bytes)"
-#define METRICS_DESC           "turn off the 'metrics' feature"
+#define DISABLE_METRICS_DESC   "turn off the 'metrics' feature"
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
-#define INSECURE_NOTIF         "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
-#define NGSIV1_AUTOCAST        "automatic cast for number, booleans and dates in NGSIv1 update/create attribute operations"
+#define INSECURE_NOTIF_DESC    "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
+#define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
+#define DBURI_DESC             "complete URI for database connection"
 
 
 
@@ -285,21 +279,13 @@ PaArgument paArgs[] =
 {
   { "-fg",                          &fg,                    "FOREGROUND",               PaBool,   PaOpt, false,                           false, true,                  FG_DESC                      },
   { "-localIp",                     bindAddress,            "LOCALIP",                  PaString, PaOpt, IP_ALL,                          PaNL,  PaNL,                  LOCALIP_DESC                 },
-  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            PaNL,  PaNL,                  PORT_DESC                    },
+  { "-port",                        &port,                  "PORT",                     PaInt,    PaOpt, 1026,                            1,    65535,                  PORT_DESC                    },
   { "-pidpath",                     pidPath,                "PID_PATH",                 PaString, PaOpt, PIDPATH,                         PaNL,  PaNL,                  PIDPATH_DESC                 },
 
-  { "-dbhost",                      dbHost,                 "MONGO_HOST",               PaString, PaOpt, LOCALHOST,                       PaNL,  PaNL,                  DBHOST_DESC                  },
-  { "-rplSet",                      rplSet,                 "MONGO_REPLICA_SET",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  RPLSET_DESC                  },
-  { "-dbuser",                      user,                   "MONGO_USER",               PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBUSER_DESC                  },
+  { "-dbURI",                       dbURI,                  "MONGO_URI",                PaString, PaOpt, _i "mongodb://localhost:27017",                           PaNL,  PaNL,                  DBURI_DESC                   },
   { "-dbpwd",                       pwd,                    "MONGO_PASSWORD",           PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBPASSWORD_DESC              },
 
-  { "-dbAuthMech",                  authMech,               "MONGO_AUTH_MECH",          PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHMECH_DESC              },
-  { "-dbAuthDb",                    authDb,                 "MONGO_AUTH_SOURCE",        PaString, PaOpt, _i "",                           PaNL,  PaNL,                  DBAUTHDB_DESC                },
-  { "-dbSSL",                       &dbSSL,                 "MONGO_SSL",                PaBool,   PaOpt, false,                           false, true,                  DBSSL_DESC                   },
-  { "-dbDisableRetryWrites",        &dbDisableRetryWrites,  "MONGO_DISABLE_RETRY_WRITES", PaBool, PaOpt, false,                           false, true,                  DBDISABLERETRYWRITES_DESC    },
-
   { "-db",                          dbName,                 "MONGO_DB",                 PaString, PaOpt, _i "orion",                      PaNL,  PaNL,                  DB_DESC                      },
-  { "-dbTimeout",                   &dbTimeout,             "MONGO_TIMEOUT",            PaULong,  PaOpt, 10000,                           0,     UINT_MAX,              DB_TMO_DESC                  },
   { "-dbPoolSize",                  &dbPoolSize,            "MONGO_POOL_SIZE",          PaInt,    PaOpt, 10,                              1,     10000,                 DBPS_DESC                    },
 
   { "-ipv4",                        &useOnlyIPv4,           "USEIPV4",                  PaBool,   PaOpt, false,                           false, true,                  USEIPV4_DESC                 },
@@ -313,6 +299,7 @@ PaArgument paArgs[] =
   { "-multiservice",                &mtenant,               "MULTI_SERVICE",            PaBool,   PaOpt, false,                           false, true,                  MULTISERVICE_DESC            },
 
   { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_HTTP_TIMEOUT,      HTTP_TMO_DESC                },
+  { "-mqttTimeout",                 &mqttTimeout,           "MQTT_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_MQTT_TIMEOUT,      MQTT_TMO_DESC                },
   { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,                  REQ_TMO_DESC                 },
   { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,                  MUTEX_POLICY_DESC            },
   { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                     WRITE_CONCERN_DESC           },
@@ -341,21 +328,20 @@ PaArgument paArgs[] =
   { "-logSummary",                  &lsPeriod,              "LOG_SUMMARY_PERIOD",       PaInt,    PaOpt, 0,                               0,     ONE_MONTH_PERIOD,      LOG_SUMMARY_DESC             },
   { "-relogAlarms",                 &relogAlarms,           "RELOG_ALARMS",             PaBool,   PaOpt, false,                           false, true,                  RELOGALARMS_DESC             },
 
-  { "-strictNgsiv1Ids",             &strictIdv1,            "CHECK_ID_V1",              PaBool,   PaOpt, false,                           false, true,                  CHECK_v1_ID_DESC             },
   { "-disableCustomNotifications",  &disableCusNotif,       "DISABLE_CUSTOM_NOTIF",     PaBool,   PaOpt, false,                           false, true,                  DISABLE_CUSTOM_NOTIF         },
 
   { "-disableFileLog",              &disableFileLog,        "DISABLE_FILE_LOG",         PaBool,   PaOpt, false,                           false, true,                  DISABLE_FILE_LOG             },
   { "-logForHumans",                &logForHumans,          "LOG_FOR_HUMANS",           PaBool,   PaOpt, false,                           false, true,                  LOG_FOR_HUMANS_DESC          },
-  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaLong,   PaOpt, (32 * 1024),                     100,   PaNL,                  LOG_LINE_MAX_SIZE_DESC       },
-  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaLong,   PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
+  { "-logLineMaxSize",              &logLineMaxSize,        "LOG_LINE_MAX_SIZE",        PaULong,  PaOpt, (32 * 1024),                     100,   PaNL,                  LOG_LINE_MAX_SIZE_DESC       },
+  { "-logInfoPayloadMaxSize",       &logInfoPayloadMaxSize, "LOG_INFO_PAYLOAD_MAX_SIZE",PaULong,  PaOpt, (5 * 1024),                      0,     PaNL,                  LOG_INFO_PAYLOAD_MAX_SIZE_DESC  },
 
-  { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  METRICS_DESC                 },
+  { "-disableMetrics",              &disableMetrics,        "DISABLE_METRICS",          PaBool,   PaOpt, false,                           false, true,                  DISABLE_METRICS_DESC         },
 
-  { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF               },
-
-  { "-ngsiv1Autocast",              &ngsiv1Autocast,        "NGSIV1_AUTOCAST",          PaBool,   PaOpt, false,                           false, true,                  NGSIV1_AUTOCAST              },
+  { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF_DESC          },
 
   { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
+
+  { "-logDeprecate",                &logDeprecate,          "LOG_DEPRECATE",            PaBool,   PaOpt, false,                           false, true,                  LOG_DEPRECATE_DESC           },
 
   PA_END_OF_ARGS
 };
@@ -387,8 +373,8 @@ static const char* validLogLevels[] =
 * to treat the incoming request.
 *
 * The URL path is divided into components (Using '/' as field separator) so that the URL
-* "/ngsi9/registerContext" becomes a component vector of the two components
-* "ngsi9" and "registerContext".
+* "/v2/entities" becomes a component vector of the two components
+* "v2" and "entities".
 *
 * Each line contains the necessary information for ONE service:
 *   RequestType   request     - The type of the request
@@ -583,6 +569,8 @@ void exitFunc(void)
   curl_context_cleanup();
   curl_global_cleanup();
 
+  exprMgr.release();
+
 #ifdef DEBUG
   // valgrind pass is done using DEBUG compilation, so we have to take care with
   // the cache releasing to avoid false positives. In production this is not really
@@ -663,7 +651,7 @@ static void contextBrokerInit(void)
   setNotifier(pNotifier);
 
   /* Set HTTP timeout */
-  httpRequestInit(httpTimeout);
+  setHttpTimeout(httpTimeout);
 
   //WARN about insecureNotifications mode
   if (insecureNotif == true)
@@ -965,13 +953,25 @@ static void logEnvVars(void)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((int*) aP->varP)));
       }
+      else if (aP->type == PaUInt)
+      {
+        LM_I(("env var ORION_%s (%s): %u", aP->envName, aP->option, *((unsigned int*) aP->varP)));
+      }      
+      else if (aP->type == PaLong)
+      {
+        LM_I(("env var ORION_%s (%s): %ld", aP->envName, aP->option, *((long*) aP->varP)));
+      }
+      else if (aP->type == PaULong)
+      {
+        LM_I(("env var ORION_%s (%s): %lu", aP->envName, aP->option, *((unsigned long*) aP->varP)));
+      }
       else if (aP->type == PaDouble)
       {
         LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option, *((double*) aP->varP)));
       }
       else
       {
-        LM_I(("env var ORION_%s (%s): %d", aP->envName, aP->option));
+        LM_E(("cannot show env var ORION_%s (%s) due to unrecognized type: %d", aP->envName, aP->option, aP->type));
       }
     }
   }
@@ -1023,6 +1023,12 @@ int main(int argC, char* argV[])
   paConfig("man exitstatus", (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
 
   std::string versionString = std::string(ORION_VERSION) + " (git version: " + GIT_HASH + ")";
+
+  #ifdef EXPR_BASIC
+  versionString += " flavours: basic-expr";
+  #else
+  versionString += " flavours: jexl-expr";
+  #endif
 
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
@@ -1115,11 +1121,6 @@ int main(int argC, char* argV[])
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
-  if ((strlen(authMech) > 0) && (strncmp(authMech, "SCRAM-SHA-1", strlen("SCRAM-SHA-1")) != 0) && (strncmp(authMech, "SCRAM-SHA-256", strlen("SCRAM-SHA-256")) != 0))
-  {
-    LM_X(1, ("Fatal Error (-dbAuthMech must be either SCRAM-SHA-1 or SCRAM-SHA-256"));
-  }
-
   if (useOnlyIPv6 && useOnlyIPv4)
   {
     LM_X(1, ("Fatal Error (-ipv4 and -ipv6 can not be activated at the same time. They are incompatible)"));
@@ -1200,9 +1201,10 @@ int main(int argC, char* argV[])
 
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
-  mqttMgr.init();
-  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue, strictIdv1);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, authMech, authDb, dbSSL, dbDisableRetryWrites, mtenant, dbTimeout, writeConcern, dbPoolSize, statSemWait);
+  mqttMgr.init(mqttTimeout);
+  exprMgr.init();
+  orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
+  mongoInit(dbURI, dbName, pwd, mtenant, writeConcern, dbPoolSize, statSemWait);
   metricsMgr.init(!disableMetrics, statSemWait);
   logSummaryInit(&lsPeriod);
 

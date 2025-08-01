@@ -76,34 +76,34 @@ echo
 01. Create E1/A1
 ================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1?type=T1
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T1
+Content-Length: 0
 
 
 
 02. PATCH E1/A1+A2, see error (error due to A2 not existing, but A1 is modified)
 ================================================================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 107
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
+HTTP/1.1 422 Unprocessable Content
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 67
 
 {
-    "description": "one or more of the attributes in the request do not exist: [ A2 ]",
-    "error": "Unprocessable"
+    "description": "do not exist: E1 - [ A2 ]",
+    "error": "PartialUpdate"
 }
 
 
 03. Make sure E1/A1 was modified in step 02
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 71
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 71
 
 {
     "A1": {

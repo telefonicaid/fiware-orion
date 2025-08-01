@@ -247,10 +247,10 @@ echo
 01. Create subscription with errors in geo-fields, get error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 137
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 137
 
 {
     "description": "error parsing geo-query fields: error parsing geometry: Invalid selector in geometry specification",
@@ -261,20 +261,20 @@ Date: REGEX(.*)
 02. Create subscription, ok
 ===========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/subscriptions/REGEX([0-9a-f]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
 
 
 
 03. Update subscription with errors in geo-fields, get error
 ============================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 106
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 106
 
 {
     "description": "error parsing geo-query fields: invalid point in URI param /coords/",
@@ -285,10 +285,10 @@ Date: REGEX(.*)
 04. Update subscription with partial geo-parameters (one parameter)
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 119
 
 {
     "description": "partial geo expression: geometry, georel and coords have to be provided together",
@@ -299,10 +299,10 @@ Date: REGEX(.*)
 05. Update subscription with partial geo-parameters (two parameters)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 119
 
 {
     "description": "partial geo expression: geometry, georel and coords have to be provided together",
@@ -313,10 +313,10 @@ Date: REGEX(.*)
 06. Create subscription with partial geo-parameters (one parameter)
 ===================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 119
 
 {
     "description": "partial geo expression: geometry, georel and coords have to be provided together",
@@ -327,10 +327,10 @@ Date: REGEX(.*)
 07. Create subscription with partial geo-parameters (two parameters)
 ====================================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 119
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 119
 
 {
     "description": "partial geo expression: geometry, georel and coords have to be provided together",

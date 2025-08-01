@@ -60,8 +60,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -86,8 +85,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -112,8 +110,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -138,8 +135,7 @@ payload='{
    "provider": {
      "http": {
        "url": "http://localhost:'${CP1_PORT}'/v2"
-     },
-     "legacyForwarding": true
+     }
    },
    "status": "active"
 }'
@@ -180,50 +176,50 @@ echo
 01. Register entity E1/A1, with service path /a1/e1
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 02. Register entity E2/A1, with service path /a1/e2
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 03. Register entity E3/A1, with service path /a1/e3
 ===================================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 04. Register entity E4/A1, with service path /#
 ===============================================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/registrations/REGEX([0-9a-f\-]{24})
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/registrations/REGEX([0-9a-f\-]{24})
+Content-Length: 0
 
 
 
 05. GET all four registration, without service path
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 1053
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1057
 
 [
     {
@@ -244,7 +240,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -267,7 +263,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -290,7 +286,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -313,7 +309,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -324,10 +320,10 @@ Date: REGEX(.*)
 06. GET no registration, with service path /a1/# ...
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -335,10 +331,10 @@ Date: REGEX(.*)
 07. GET one registration using service path /a1/e2
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 264
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 265
 
 [
     {
@@ -359,7 +355,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -370,10 +366,10 @@ Date: REGEX(.*)
 08. GET all four registrations (step 04) for service path /#
 ============================================================
 HTTP/1.1 200 OK
-Content-Length: 1053
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1057
 
 [
     {
@@ -394,7 +390,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -417,7 +413,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -440,7 +436,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"
@@ -463,7 +459,7 @@ Date: REGEX(.*)
             "http": {
                 "url": "http://localhost:REGEX(\d+)/v2"
             },
-            "legacyForwarding": true,
+            "legacyForwarding": false,
             "supportedForwardingMode": "all"
         },
         "status": "active"

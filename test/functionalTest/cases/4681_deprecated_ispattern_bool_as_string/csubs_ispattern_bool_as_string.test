@@ -1,0 +1,462 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Check that deprecated isPattern as string in DB is still working in subscriptions
+
+--SHELL-INIT--
+dbInit CB
+
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertMany([
+  {
+    expiration: Long("9223372036854775807"),
+    reference: "http://127.0.0.1:9997/notify",
+    custom: false,
+    timeout: Long("0"),
+    throttling: Long("0"),
+    maxFailsLimit: Long("-1"),
+    servicePath: "/#",
+    status: "active",
+    statusLastChange: 1752740084.1475978,
+    entities: [ { id: "E", isPattern: false, type: "T1", isTypePattern: false } ],
+    attrs: [],
+    metadata: [],
+    blacklist: false,
+    onlyChanged: false,
+    covered: false,
+    notifyOnMetadataChange: true,
+    conditions: [],
+    expression: { q: "", mq: "", geometry: "", coords: "", georel: "" },
+    altTypes: [],
+    format: "normalized"
+  },
+  {
+    expiration: Long("9223372036854775807"),
+    reference: "http://127.0.0.1:9997/notify",
+    custom: false,
+    timeout: Long("0"),
+    throttling: Long("0"),
+    maxFailsLimit: Long("-1"),
+    servicePath: "/#",
+    status: "active",
+    statusLastChange: 1752740084.1769524,
+    entities: [ { id: ".*", isPattern: true, type: "T2", isTypePattern: false } ],
+    attrs: [],
+    metadata: [],
+    blacklist: false,
+    onlyChanged: false,
+    covered: false,
+    notifyOnMetadataChange: true,
+    conditions: [],
+    expression: { q: "", mq: "", geometry: "", coords: "", georel: "" },
+    altTypes: [],
+    format: "normalized"
+  },
+  {
+    expiration: Long("9223372036854775807"),
+    reference: "http://127.0.0.1:9997/notify",
+    custom: false,
+    timeout: Long("0"),
+    throttling: Long("0"),
+    maxFailsLimit: Long("-1"),
+    servicePath: "/#",
+    status: "active",
+    statusLastChange: 1752739706.7936537,
+    entities: [
+      { id: "E", isPattern: "false", type: "T3", isTypePattern: false }
+    ],
+    attrs: [],
+    metadata: [],
+    blacklist: false,
+    onlyChanged: false,
+    covered: false,
+    notifyOnMetadataChange: true,
+    conditions: [],
+    expression: { q: "", mq: "", geometry: "", coords: "", georel: "" },
+    altTypes: [],
+    format: "normalized"
+  },
+  {
+    expiration: Long("9223372036854775807"),
+    reference: "http://127.0.0.1:9997/notify",
+    custom: false,
+    timeout: Long("0"),
+    throttling: Long("0"),
+    maxFailsLimit: Long("-1"),
+    servicePath: "/#",
+    status: "active",
+    statusLastChange: 1752739706.8070972,
+    entities: [
+      { id: ".*", isPattern: "true", type: "T4", isTypePattern: false }
+    ],
+    attrs: [],
+    metadata: [],
+    blacklist: false,
+    onlyChanged: false,
+    covered: false,
+    notifyOnMetadataChange: true,
+    conditions: [],
+    expression: { q: "", mq: "", geometry: "", coords: "", georel: "" },
+    altTypes: [],
+    format: "normalized"
+  }  
+])'
+
+brokerStart CB
+accumulatorStart --pretty-print
+
+
+--SHELL--
+
+#
+# We have pre-inserted in DB 4 subscriptions:
+#
+# 1. isPattern: false, type: T1
+# 2. isPattern: true, type: T2
+# 3. isPattern: "false", type: T3
+# 4. isPattern: "true", type: T4
+#
+# 01. GET /v2/subscriptions and see the four subscriptions
+# 02. Update entity four times to trigger the subscriptions
+# 03. Dump accumulator and see four notifications
+#
+
+echo "01. GET /v2/subscriptions and see the four subscriptions"
+echo "========================================================"
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "02. Update entity four times to trigger the subscriptions"
+echo "========================================================="
+payload='{
+  "id": "E",
+  "type": "T1",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+payload='{
+  "id": "E",
+  "type": "T2",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+payload='{
+  "id": "E",
+  "type": "T3",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+payload='{
+  "id": "E",
+  "type": "T4",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url '/v2/entities' --payload "$payload"
+echo
+echo
+
+
+echo "03. Dump accumulator and see four notifications"
+echo "==============================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/subscriptions and see the four subscriptions
+========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1205
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T2"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T3"
+                }
+            ]
+        }
+    },
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://127.0.0.1:9997/notify"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "T4"
+                }
+            ]
+        }
+    }
+]
+
+
+02. Update entity four times to trigger the subscriptions
+=========================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T1
+Content-Length: 0
+
+
+
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T2
+Content-Length: 0
+
+
+
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T3
+Content-Length: 0
+
+
+
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T4
+Content-Length: 0
+
+
+
+03. Dump accumulator and see four notifications
+===============================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 123
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "id": "E",
+            "type": "T1"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 123
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "id": "E",
+            "type": "T2"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 123
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "id": "E",
+            "type": "T3"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 123
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "id": "E",
+            "type": "T4"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

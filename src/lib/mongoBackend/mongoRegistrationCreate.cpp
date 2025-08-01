@@ -115,7 +115,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
 
   for (unsigned int eIx = 0; eIx < regP->dataProvided.entities.size(); ++eIx)
   {
-    ngsiv2::EntID* eP = &regP->dataProvided.entities[eIx];
+    EntityId* eP = &regP->dataProvided.entities[eIx];
 
     orion::BSONObjBuilder bob;
     if (eP->idPattern.empty())
@@ -129,7 +129,7 @@ static void setContextRegistrationVector(ngsiv2::Registration* regP, orion::BSON
     else
     {
       bob.append(REG_ENTITY_ID, eP->idPattern);
-      bob.append(REG_ENTITY_ISPATTERN, "true");
+      bob.append(REG_ENTITY_ISPATTERN, true);
       if (!eP->type.empty())
       {
         bob.append(REG_ENTITY_TYPE, eP->type);
@@ -229,6 +229,16 @@ void mongoRegistrationCreate
   setForwardingMode(regP->provider.supportedForwardingMode, &bob);
 
   std::string format = (regP->provider.legacyForwardingMode == true)? "JSON" : "normalized";
+
+  if (format == "JSON")
+  {
+    __sync_fetch_and_add(&noOfDprLegacyForwarding, 1);
+    if (logDeprecate)
+    {
+      LM_W(("Deprecated usage of legacyForwarding mode in registration creation (regId: %s)", regIdP->c_str()));
+    }
+  }
+
   setFormat(format, &bob);
 
   //

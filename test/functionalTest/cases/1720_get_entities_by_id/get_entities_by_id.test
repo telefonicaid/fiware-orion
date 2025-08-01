@@ -90,40 +90,40 @@ echo
 01. Create entity vehicle1
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/vehicle1?type=car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/vehicle1?type=car
+Content-Length: 0
 
 
 
 02. Create entity vehicle2
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/vehicle2?type=car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/vehicle2?type=car
+Content-Length: 0
 
 
 
 02. Create entity vehicle3
 ==========================
 HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/vehicle3?type=car
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/vehicle3?type=car
+Content-Length: 0
 
 
 
 04. Query for id=vehicle -> no result
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 2
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
 
 []
 
@@ -131,10 +131,10 @@ Date: REGEX(.*)
 05. Query for id=vehicle1 -> vehicle
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 47
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 47
 
 [
     {
@@ -148,10 +148,10 @@ Date: REGEX(.*)
 06. Query for id=vehicle1,vehicle3 -> vehicle1, vehicle3
 ========================================================
 HTTP/1.1 200 OK
-Content-Length: 93
-Content-Type: application/json
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 93
 
 [
     {

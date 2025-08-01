@@ -89,25 +89,9 @@ bool forbiddenChars(const char* s, const char* exceptions)
 
 /* ****************************************************************************
 *
-* forbiddenIdChars -
-*/
-bool forbiddenIdChars(int api, const char* s, const char* exceptions)
-{
-  if (api == 1 && !checkIdv1)
-  {
-    return forbiddenChars(s, exceptions);  // old behavior
-  }
-
-  return forbiddenIdCharsV2(s, exceptions);
-}
-
-
-
-/* ****************************************************************************
-*
 * forbiddenIdCharsV2 -
 */
-bool forbiddenIdCharsV2(const char* s, const char* exceptions)
+bool forbiddenIdChars(const char* s, const char* exceptions)
 {
   if (s == (void*) 0)
   {

@@ -25,10 +25,9 @@
 #include <stdio.h>
 #include <string>
 
-#include "common/tag.h"
+#include "common/string.h"
 #include "common/JsonHelper.h"
 #include "rest/ConnectionInfo.h"
-#include "ngsi/StatusCode.h"
 #include "rest/OrionError.h"
 
 
@@ -39,9 +38,10 @@
 */
 OrionError::OrionError()
 {
-  code         = SccNone;
-  reasonPhrase = "";
-  details      = "";
+  code        = SccNone;
+  error       = "";
+  description = "";
+  filled      = false;
 }
 
 
@@ -50,24 +50,27 @@ OrionError::OrionError()
 *
 * OrionError::OrionError -
 */
-OrionError::OrionError(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
+OrionError::OrionError(HttpStatusCode _code, const std::string& _description, const std::string& _error)
 {
-  code          = _code;
-  reasonPhrase  = _reasonPhrase.empty() ? httpStatusCodeString(code) : _reasonPhrase;
-  details       = _details;
+  code        = _code;
+  error       = _error.empty() ? httpStatusCodeString(code) : _error;
+  description = _description;
+  filled      = true;
 }
+
 
 
 
 /* ****************************************************************************
 *
-* OrionError::OrionError -
+* OrionError::fill -
 */
-OrionError::OrionError(StatusCode& sc)
+void OrionError::fill(HttpStatusCode _code, const std::string& _description, const std::string& _error)
 {
-  code          = sc.code;
-  reasonPhrase  = httpStatusCodeString(code);
-  details       = sc.details;
+  code        = _code;
+  error       = _error.empty()? httpStatusCodeString(code) : _error;
+  description = _description;
+  filled      = true;
 }
 
 
@@ -76,11 +79,9 @@ OrionError::OrionError(StatusCode& sc)
 *
 * OrionError::fill -
 */
-void OrionError::fill(HttpStatusCode _code, const std::string& _details, const std::string& _reasonPhrase)
+void OrionError::fill(const OrionError& oe)
 {
-  code          = _code;
-  reasonPhrase  = _reasonPhrase.empty()? httpStatusCodeString(code) : _reasonPhrase;
-  details       = _details;
+  fill(oe.code, oe.description, oe.error);
 }
 
 
@@ -89,29 +90,30 @@ void OrionError::fill(HttpStatusCode _code, const std::string& _details, const s
 *
 * OrionError::fill -
 */
-void OrionError::fill(const StatusCode& sc)
+void OrionError::fill(OrionError* oeP)
 {
-  code          = sc.code;
-  reasonPhrase  = (sc.reasonPhrase.empty())? httpStatusCodeString(code) : sc.reasonPhrase;
-  details       = sc.details;
+  fill(oeP->code, oeP->description, oeP->error);
 }
 
 
 
 /* ****************************************************************************
 *
-* OrionError::smartRender -
+* OrionError::fillOrAppend -
 */
-std::string OrionError::smartRender(ApiVersion apiVersion)
+void OrionError::fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _error)
 {
-  if (apiVersion == V1 || apiVersion == NO_VERSION)
+  if (filled)
   {
-    return toJsonV1();
+    // Already filled by a previous operation. This can happen in batch update processing
+    description += appendDetail;
   }
-  else // admin or v2
+  else
   {
-    shrinkReasonPhrase();
-    return toJson();
+    code        = _code;
+    error       = _error.empty()? httpStatusCodeString(code) : _error;
+    description = fullDetails;
+    filled      = true;
   }
 }
 
@@ -119,16 +121,12 @@ std::string OrionError::smartRender(ApiVersion apiVersion)
 
 /* ****************************************************************************
 *
-* OrionError::setStatusCodeAndSmartRender -
+* OrionError::setSCAndRender -
 */
-std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP)
+std::string OrionError::setSCAndRender(HttpStatusCode* scP)
 {
-  if ((apiVersion == V2) || (apiVersion == ADMIN_API))
-  {
-    *scP = code;
-  }
-
-  return smartRender(apiVersion);
+  *scP = code;
+  return toJson();
 }
 
 
@@ -139,8 +137,8 @@ std::string OrionError::setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpS
 */
 std::string OrionError::toJson(void)
 {
-  char*  reasonPhraseEscaped = htmlEscape(reasonPhrase.c_str());
-  char*  detailsEscaped      = htmlEscape(details.c_str());
+  char*  reasonPhraseEscaped = htmlEscape(error.c_str());
+  char*  detailsEscaped      = htmlEscape(description.c_str());
 
   JsonObjectHelper jh;
 
@@ -153,106 +151,3 @@ std::string OrionError::toJson(void)
   return jh.str();
 }
 
-
-
-/* ****************************************************************************
-*
-* OrionError::toJsonV1 -
-*
-*/
-std::string OrionError::toJsonV1(void)
-{
-  std::string  out           = "{";
-
-  //
-  // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
-  //
-  out += startTag("orionError", false);
-  out += valueTag("code",          code,         true);
-  out += valueTag("reasonPhrase",  reasonPhrase, !details.empty());
-
-  if (!details.empty())
-  {
-    out += valueTag("details",       details);
-  }
-
-  out += endTag();
-
-  out += "}";
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* OrionError::shrinkReasonPhrase -
-*
-* This method removes any whitespace in the reasonPhrase field, i.e.
-* transforms "Not Found" to "NotFound".
-*
-* It is used by smartRender method, in order to prepare to render in API v2 case
-*
-* FIXME P4: The following alternative (more compact) way has been proposed:
-*
-*  #include <algorithm>  // std::remove_if
-*  #include <cctype>     // std::isspace
-*
-*  ...
-*
-*  reasonPhrase.erase(std::remove_if(reasonPhrase.begin(), reasonPhrase.end(), std::isspace), reasonPhrase.end());
-*
-* However, 'std::isspace' doesn't directly work. We have been able to make it work with
-* 'static_cast<int(*)(int)>(isspace)'. However, that is obscure so until we can find
-* a way of using just 'std::isspace', the current implementation stills.
-*
-*/
-void OrionError::shrinkReasonPhrase(void)
-{
-  char buf[80];  // 80 should be enough to hold any reason phrase
-
-#if 0
-  strncpy(buf, reasonPhrase.c_str(), sizeof(buf));
-
-  // See: http://stackoverflow.com/questions/1726302/removing-spaces-from-a-string-in-c
-  if (*j != ' ')
-  {
-    *i = *j;
-    ++i;
-  }
-  ++j;
-
-  char* i = buf;
-  char* j = buf;
-  while (*j != 0)
-  {
-    *i = *j++;
-    if (*i != ' ')
-    {
-      i++;
-    }
-  }
-  *i = 0;
-#endif
-
-  char*         fromP = (char*) reasonPhrase.c_str();
-  char*         toP   = buf;
-  unsigned int  toLen = 0;
-
-  while ((*fromP != 0) && (toLen < sizeof(buf)))
-  {
-    // If next char is not whitespace: copy to outgoing
-    if (*fromP != ' ')
-    {
-      *toP = *fromP;
-      ++toP;
-      ++toLen;
-    }
-
-    ++fromP;
-  }
-  *toP = 0;  // End-of string
-
-  reasonPhrase = std::string(buf);
-}
