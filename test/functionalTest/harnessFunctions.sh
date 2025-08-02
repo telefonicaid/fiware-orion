@@ -763,7 +763,28 @@ function accumulatorStart()
 
   if [ "$1" = "--mqttTopic" ]
   then
-    mqttPort="$1 $2"
+    mqttTopic="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--kafkaHost" ]
+    then
+      kafkaHost="$1 $2"
+      shift
+      shift
+    fi
+
+  if [ "$1" = "--kafkaPort" ]
+  then
+    kafkaPort="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--kafkaTopic" ]
+  then
+    kafkaTopic="$1 $2"
     shift
     shift
   fi
@@ -784,15 +805,21 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  if [ -z "$mqttHost" ]
+  if [ ! -z "$kafkaHost" ]
   then
-    # Start without MQTT
-    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-    echo accumulator running as PID $$
-  else
+    # Start with KAFKA
+        echo "accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic"
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
+  elif [ ! -z "$mqttHost" ]
+  then
     # Start with MQTT
-    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-    echo accumulator running as PID $$
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
+  else
+    # Start without MQTT and without kafka
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
   fi
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -1129,6 +1156,63 @@ function dbInsertEntity()
 }
 
 
+
+# ------------------------------------------------------------------------------
+#
+# kafkaCreateTopics -
+#
+# Create one or more topics in Kafka
+kafkaCreateTopics() {
+  topics=$@
+  for topic in $topics; do
+    echo "Creando tópico: $topic"
+
+    # Create the topic (if it does not exist)
+    docker exec kafka kafka-topics \
+      --create \
+      --topic "$topic" \
+      --bootstrap-server localhost:9092 \
+      --partitions 1 \
+      --replication-factor 1 \
+      --if-not-exists
+
+    # Actively wait until Kafka confirms that it exists
+    echo "Waiting for Kafka to register the topic '$topic'..."
+    for i in {1..10}; do
+      exists=$(docker exec kafka kafka-topics \
+        --list \
+        --bootstrap-server localhost:9092 | grep -w "$topic")
+
+      if [ -n "$exists" ]; then
+        echo "Topic '$topic' created and available."
+        break
+      else
+        echo "It still doesn't appear, trying again ($i/10)..."
+        sleep 2
+      fi
+    done
+  done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# kafkaDestroyTopics -
+#
+# Delete one or more topics in Kafka
+kafkaDestroyTopics() {
+  topics=$@
+  for topic in $topics; do
+    echo "Eliminando tópico: $topic"
+    docker exec kafka kafka-topics \
+      --delete \
+      --topic "$topic" \
+      --bootstrap-server localhost:9092 \
+      --if-exists
+  done
+}
+
 # ------------------------------------------------------------------------------
 #
 # orionCurl
@@ -1398,3 +1482,5 @@ export -f dMsg
 export -f valgrindSleep
 export -f brokerStartAwait
 export -f brokerStopAwait
+export -f kafkaCreateTopics
+export -f kafkaDestroyTopics

@@ -1,4 +1,4 @@
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,32 +21,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
-    Entity.cpp
-    EntityVector.cpp
-    Subscription.cpp
-    Registration.cpp
-    BatchQuery.cpp
-    BatchUpdate.cpp
-    HttpInfo.cpp
-    MqttInfo.cpp
-    GeoFilter.cpp
-    Expression.cpp
-    KafkaInfo.cpp
+    KafkaConnectionManager.cpp
+    kafkaMgr.cpp
 )
 
 SET (HEADERS
-    Entity.h
-    EntityVector.h
-    Subscription.h
-    Registration.h
-    BatchQuery.h
-    BatchUpdate.h
-    CustomPayloadType.h
-    HttpInfo.h
-    MqttInfo.h
-    GeoFilter.h
-    Expression.h
-    KafkaInfo.h
+    KafkaConnectionManager.h
+    kafkaMgr.h
 )
 
 
@@ -58,4 +39,21 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(apiTypesV2 STATIC ${SOURCES} ${HEADERS})
+ADD_LIBRARY(kafka STATIC ${SOURCES} ${HEADERS})
+
+
+# Include directories
+#target_include_directories(kafka PUBLIC /usr/include/librdkafka)
+
+# Linker directories
+target_link_directories(kafka PUBLIC /usr/lib/x86_64-linux-gnu)
+
+# Linked libraries
+target_link_libraries(kafka PUBLIC
+        rdkafka
+        pthread
+        ssl
+        crypto
+        z
+        sasl2
+)

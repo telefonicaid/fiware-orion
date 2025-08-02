@@ -58,7 +58,9 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       uuid-dev \
       libgnutls28-dev \
       libsasl2-dev \
-      libgcrypt-dev && \
+      libgcrypt-dev \
+      librdkafka-dev \
+      zlib1g-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
     curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz && \
@@ -145,7 +147,9 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       uuid-dev \
       libgnutls28-dev \
       libsasl2-dev \
-      libgcrypt-dev && \
+      libgcrypt-dev  \
+      librdkafka-dev \
+      zlib1g-dev && \
     apt-get -y autoremove --purge && \
     # The above apt removal erases some dependencies needed by contextBroker. So we reinstall it
     apt-get -y install \
