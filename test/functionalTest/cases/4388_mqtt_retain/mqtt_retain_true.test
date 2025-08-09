@@ -54,7 +54,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "topic": "orion/retain",
       "retain": true
     }
@@ -178,6 +178,7 @@ MQTT message at topic orion/retain:
 
 
 --TEARDOWN--
+mosquitto_pub -h mosquitto -p 1883 -t 'orion/retain' -n -r
 brokerStop CB
 dbDrop CB
 accumulatorStop

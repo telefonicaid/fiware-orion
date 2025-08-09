@@ -73,7 +73,7 @@ export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 #
 export KAFKA_HOST=${KAFKA_HOST:-localhost}
 export KAFKA_PORT=${KAFKA_PORT:-9092}
-export KAFKA_DEBUG_PORT=${KAFKA_DEBUG_PORT:-18883}
+#export KAFKA_DEBUG_PORT=${KAFKA_DEBUG_PORT:-18883}
 
 
 
@@ -84,7 +84,7 @@ export KAFKA_DEBUG_PORT=${KAFKA_DEBUG_PORT:-18883}
 #
 export MQTT_HOST=${MQTT_HOST:-localhost}
 export MQTT_PORT=${MQTT_PORT:-1883}
-#export MQTT_DEBUG_PORT=${MQTT_DEBUG_PORT:-18883}
+export MQTT_DEBUG_PORT=${MQTT_DEBUG_PORT:-18883}
 
 # -----------------------------------------------------------------------------
 #

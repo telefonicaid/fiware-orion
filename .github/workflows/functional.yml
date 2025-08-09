@@ -50,5 +50,8 @@ jobs:
         run: |
           docker compose \
             --project-name functional-${{ github.run_id }}-${{ strategy.job-index }} \
-            -f functional_tests_compose.yml \
-            up --build --abort-on-container-exit --exit-code-from tests
+            -f ./.github/workflows/functional_tests_compose.yaml \
+            --project-directory . \
+            up  --build --abort-on-container-exit --exit-code-from tests \
+            --attach tests \
+            --no-log-prefix

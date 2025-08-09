@@ -27,6 +27,7 @@ Custom notification MQTT with NGSI payload more than one ocurrence of same macro
 dbInit CB
 brokerStart CB
 accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} --mqttTopic "#"
+accumulatorReset
 
 --SHELL--
 
@@ -52,7 +53,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "ngsi": {
         "id": "${id}:${id}:${id}",
         "type": "${type}-${id}-${type}",
@@ -191,4 +192,5 @@ MQTT message at topic topic1:
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+accumulatorReset
 accumulatorStop

@@ -83,7 +83,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092",
+      "url": "kafka://kafka1:9092",
       "topic": "orion"
     },
     "attrs": [

@@ -54,7 +54,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "topic": "orion/notretain",
       "retain": false
     }

@@ -5105,6 +5105,8 @@ A `kafka` object contains the following subfields:
 | `url`     |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port) |
 | `topic`   |          | string | Represent the KAFKA topic to use                                                                                                      |
 
+For further information about MQTT notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
+
 #### `subscription.notification.httpCustom`
 
 A `httpCustom` object contains the following subfields.
@@ -5159,8 +5161,7 @@ A `kafkaCustom` object contains the following subfields.
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
-If `kafkaCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications,
-see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
+If `kafkaCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
 
 ### Subscription List
 

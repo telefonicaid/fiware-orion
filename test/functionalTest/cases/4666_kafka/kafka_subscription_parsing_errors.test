@@ -81,10 +81,10 @@ payload='{
   },
   "notification": {
     "http": {
-      "url": "mqtt://localhost"
+      "url": "mqtt://kafka1"
     },
     "kafka": {
-      "url": "localhost:9092",
+      "url": "kafka1:9092",
       "topic": "orion_notif"
     },
     "attrs": [
@@ -187,7 +187,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "http://localhost:9999",
+      "url": "http://kafka1:9999",
       "topic": "orion_notif"
     },
     "attrs": [
@@ -214,7 +214,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092/path/not/valid",
+      "url": "kafka://kafka1:9092/path/not/valid",
       "topic": "orion_notif"
     },
     "attrs": [
@@ -241,7 +241,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092"
+      "url": "kafka://kafka1:9092"
     },
     "attrs": [
       "A1"
@@ -267,7 +267,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092",
+      "url": "kafka://kafka1:9092",
       "topic": 1234
     },
     "attrs": [
@@ -294,7 +294,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092",
+      "url": "kafka://kafka1:9092",
       "topic": ""
     },
     "attrs": [
@@ -321,7 +321,7 @@ payload='{
   },
   "notification": {
     "http": {
-      "url": "kafka://localhost:9092"
+      "url": "kafka://kafka1:9092"
     },
     "attrs": [
       "A1"

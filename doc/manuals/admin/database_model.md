@@ -283,8 +283,8 @@ Fields:
 -   **lastNotification**: the time (as integer number, meaning seconds) when last notification was sent. This
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
--   **reference**: the URL for notifications, either HTTP or MQTT
--   **topic**: MQTT topic (only in MQTT notifications)
+-   **reference**: the URL for notifications, either HTTP, MQTT or KAFKA
+-   **topic**: MQTT topic (MQTT or KAFKA notifications)
 -   **qos**: MQTT QoS value (only in MQTT notifications)
 -   **retain**: MQTT retain value (only in MQTT notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each

@@ -568,7 +568,7 @@ bool parseKafkaBrokerList(const std::string& url, std::string& cleanListOut, std
       return false;
 
     // normalize and save
-    // Para IPv6 mantenemos los corchetes
+    // For IPv6 we keep brackets
     if (host.find(':') != std::string::npos && host.front() != '[')
       host = "[" + host + "]";
 

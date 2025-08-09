@@ -30,19 +30,19 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create kafka sub url=kafka:///localhost:9092, topic=orion
-# 02. Get sub, see url=kafka://localhost:9092, topic=orion
+# 01. Create kafka sub url=kafka:///kafka1:9092, topic=orion
+# 02. Get sub, see url=kafka://kafka1:9092, topic=orion
 # 03. Update sub element different to notification
-# 04. Get sub, see url=kafka://localhost:9092, topic=orion
-# 05. Update sub with url=kafka://localhost:9093, topic=cb
-# 06. Get sub, see url=kafka://localhost:9093, topic=cb
+# 04. Get sub, see url=kafka://kafka1:9092, topic=orion
+# 05. Update sub with url=kafka://kafka1:9093, topic=cb
+# 06. Get sub, see url=kafka://kafka1:9093, topic=cb
 # 07. Update sub to http sub
 # 08. Get sub, see http element
-# 09. Update sub to kafka url=kafka://localhost:9094, topic=orionbk
-# 10. Get sub, see url=kafka://localhost:9094, topic=orionbk
+# 09. Update sub to kafka url=kafka://kafka1:9094, topic=orionbk
+# 10. Get sub, see url=kafka://kafka1:9094, topic=orionbk
 #
 
-echo "01. Create kafka sub url=kafka://localhost:9092, topic=orion"
+echo "01. Create kafka sub url=kafka://kafka1:9092, topic=orion"
 echo "============================================================"
 payload='{
   "description": "Original sub",
@@ -56,7 +56,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9092",
+      "url": "kafka://kafka1:9092",
       "topic": "orion"
     }
   }
@@ -69,7 +69,7 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "02. Get sub, see url=kafka://localhost:9092, topic=orion"
+echo "02. Get sub, see url=kafka://kafka1:9092, topic=orion"
 echo "========================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
@@ -86,19 +86,19 @@ echo
 echo
 
 
-echo "04. Get sub, see url=kafka://localhost:9092, topic=orion"
+echo "04. Get sub, see url=kafka://kafka1:9092, topic=orion"
 echo "========================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "05. Update sub with url=kafka://localhost:9093, topic=cb"
+echo "05. Update sub with url=kafka://kafka1:9093, topic=cb"
 echo "========================================================"
 payload='{
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9093",
+      "url": "kafka://kafka1:9093",
       "topic": "cb"
     }
   }
@@ -108,7 +108,7 @@ echo
 echo
 
 
-echo "06. Get sub, see url=kafka://localhost:9093, topic=cb"
+echo "06. Get sub, see url=kafka://kafka1:9093, topic=cb"
 echo "====================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
@@ -120,7 +120,7 @@ echo "=========================="
 payload='{
   "notification": {
     "http": {
-      "url": "http://localhost:9999"
+      "url": "http://kafka1:9999"
     }
   }
 }'
@@ -136,12 +136,12 @@ echo
 echo
 
 
-echo "09. Update sub to kafka url=kafka://localhost:9094, topic=orionbk"
+echo "09. Update sub to kafka url=kafka://kafka1:9094, topic=orionbk"
 echo "================================================================="
 payload='{
   "notification": {
     "kafka": {
-      "url": "kafka://localhost:9094",
+      "url": "kafka://kafka1:9094",
       "topic": "orionbk"
     }
   }
@@ -151,7 +151,7 @@ echo
 echo
 
 
-echo "10. Get sub, see url=kafka://localhost:9094, topic=orionbk"
+echo "10. Get sub, see url=kafka://kafka1:9094, topic=orionbk"
 echo "=========================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
@@ -159,7 +159,7 @@ echo
 
 
 --REGEXPECT--
-01. Create kafka sub url=kafka://localhost:9092, topic=orion
+01. Create kafka sub url=kafka://kafka1:9092, topic=orion
 ============================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -169,13 +169,13 @@ Content-Length: 0
 
 
 
-02. Get sub, see url=kafka://localhost:9092, topic=orion
+02. Get sub, see url=kafka://kafka1:9092, topic=orion
 =========================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 337
+Content-Length: 334
 
 {
     "description": "Original sub",
@@ -186,7 +186,7 @@ Content-Length: 337
         "covered": false,
         "kafka": {
             "topic": "orion",
-            "url": "kafka://localhost:9092"
+            "url": "kafka://kafka1:9092"
         },
         "onlyChangedAttrs": false
     },
@@ -214,13 +214,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Get sub, see url=kafka://localhost:9092, topic=orion
+04. Get sub, see url=kafka://kafka1:9092, topic=orion
 ========================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 337
+Content-Length: 334
 
 {
     "description": "Modified sub",
@@ -231,7 +231,7 @@ Content-Length: 337
         "covered": false,
         "kafka": {
             "topic": "orion",
-            "url": "kafka://localhost:9092"
+            "url": "kafka://kafka1:9092"
         },
         "onlyChangedAttrs": false
     },
@@ -251,7 +251,7 @@ Content-Length: 337
 }
 
 
-05. Update sub with url=kafka://localhost:9093, topic=cb
+05. Update sub with url=kafka://kafka1:9093, topic=cb
 ========================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -259,13 +259,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-06. Get sub, see url=kafka://localhost:9093, topic=cb
+06. Get sub, see url=kafka://kafka1:9093, topic=cb
 =====================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 334
+Content-Length: 331
 
 {
     "description": "Modified sub",
@@ -276,7 +276,7 @@ Content-Length: 334
         "covered": false,
         "kafka": {
             "topic": "cb",
-            "url": "kafka://localhost:9093"
+            "url": "kafka://kafka1:9093"
         },
         "onlyChangedAttrs": false
     },
@@ -310,7 +310,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 319
+Content-Length: 316
 
 {
     "description": "Modified sub",
@@ -320,7 +320,7 @@ Content-Length: 319
         "attrsFormat": "normalized",
         "covered": false,
         "http": {
-            "url": "http://localhost:9999"
+            "url": "http://kafka1:9999"
         },
         "onlyChangedAttrs": false
     },
@@ -340,7 +340,7 @@ Content-Length: 319
 }
 
 
-09. Update sub to kafka url=kafka://localhost:9094, topic=orionbk
+09. Update sub to kafka url=kafka://kafka1:9094, topic=orionbk
 =================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -348,13 +348,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-10. Get sub, see url=kafka://localhost:9094, topic=orionbk
+10. Get sub, see url=kafka://kafka1:9094, topic=orionbk
 ==========================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 339
+Content-Length: 336
 
 {
     "description": "Modified sub",
@@ -365,7 +365,7 @@ Content-Length: 339
         "covered": false,
         "kafka": {
             "topic": "orionbk",
-            "url": "kafka://localhost:9094"
+            "url": "kafka://kafka1:9094"
         },
         "onlyChangedAttrs": false
     },

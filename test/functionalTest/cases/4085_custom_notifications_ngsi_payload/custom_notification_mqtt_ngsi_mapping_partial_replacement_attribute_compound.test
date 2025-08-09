@@ -52,7 +52,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://localhost:1883",
+      "url": "mqtt://mosquitto:1883",
       "ngsi": {
         "A11": {
           "value": {
@@ -250,4 +250,5 @@ MQTT message at topic topic1:
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+accumulatorReset
 accumulatorStop

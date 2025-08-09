@@ -100,7 +100,7 @@ void KafkaConnectionManager::init(long _timeout)
 */
 void KafkaConnectionManager::teardown(void)
 {
-  LM_T(LmtMqttNotif, ("Teardown KAFKA connections"));
+  LM_T(LmtKafkaNotif, ("Teardown KAFKA connections"));
 
   for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
@@ -375,41 +375,41 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
 
 
-// /* ****************************************************************************
-// *
-// * KafkaConnectionManager::cleanup -
-// *
-// * maxAge parameter is in seconds
-// */
-// void KafkaConnectionManager::cleanup(double maxAge)
-// {
-//   LM_T(LmtKafkaNotif, ("Checking Kafka connections age"));
-//
-//   semTake();
-//
-//   std::vector<std::string> toErase;
-//
-//   for (auto iter = connections.begin(); iter != connections.end(); ++iter)
-//   {
-//     std::string endpoint = iter->first;
-//     KafkaConnection* kConn = iter->second;
-//     double age = getCurrentTime() - kConn->lastTime;
-//
-//     if (age > maxAge)
-//     {
-//       LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removing it",
-//           endpoint.c_str(), age, maxAge));
-//
-//       toErase.push_back(endpoint);
-//       disconnect(kConn->producer, endpoint);
-//       delete kConn;
-//     }
-//   }
-//
-//   for (const auto& endpoint : toErase)
-//   {
-//     connections.erase(endpoint);
-//   }
-//
-//   semGive();
-// }
+/* ****************************************************************************
+*
+* KafkaConnectionManager::cleanup -
+*
+* maxAge parameter is in seconds
+*/
+void KafkaConnectionManager::cleanup(double maxAge)
+{
+  LM_T(LmtKafkaNotif, ("Checking Kafka connections age"));
+
+  semTake();
+
+  std::vector<std::string> toErase;
+
+  for (auto iter = connections.begin(); iter != connections.end(); ++iter)
+  {
+    std::string endpoint = iter->first;
+    KafkaConnection* kConn = iter->second;
+    double age = getCurrentTime() - kConn->lastTime;
+
+    if (age > maxAge)
+    {
+      LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removing it",
+          endpoint.c_str(), age, maxAge));
+
+      toErase.push_back(endpoint);
+      disconnect(kConn->producer, endpoint);
+      delete kConn;
+    }
+  }
+
+  for (const auto& endpoint : toErase)
+  {
+    connections.erase(endpoint);
+  }
+
+  semGive();
+}
