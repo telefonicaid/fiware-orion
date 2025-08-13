@@ -1,0 +1,112 @@
+# ─────────── Common blocks (anchors)───────────
+x-kafka-env: &kafka_env
+  KAFKA_PROCESS_ROLES: broker,controller
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_LOG_DIRS: /var/lib/kafka/data
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_LOG4J_ROOT_LOGLEVEL: "OFF"
+  KAFKA_LOG4J_LOGGERS: ""
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+  KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+# Common for the 2-node cluster (kafka1/kafka2)
+x-kafka-env-2node: &kafka_env_2node
+  <<: *kafka_env
+  # Controladores en PUERTOS DISTINTOS (host networking ⇒ no se pueden repetir)
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:29093,2@kafka2:29093
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  # CLUSTER_ID válido derivado de "cluster_test" (22 chars Base64 URL-safe)
+  CLUSTER_ID: IUReO9E0W926J9OLjW5UXw
+
+# Common Kafka service configuration
+x-kafka-svc: &kafka_svc
+  image: confluentinc/cp-kafka:7.5.0
+  logging: { driver: "none" }
+
+services:
+  # ─────────────────── Infra ───────────────────
+  mongodb:
+    image: mongo:8.0
+    container_name: mongodb
+    ports:
+      - 27017:27017
+
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:2.0.11
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./test/functionalTest/mosquittoConf/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./test/functionalTest/mosquittoConf/mosquitto_passwd:/mosquitto/config/mosquitto_passwd:ro
+    # Asegúrate de que en mosquitto.conf haya `listener 1883`
+
+  mosquitto-extra:
+    container_name: mosquitto-extra
+    image: eclipse-mosquitto:2.0.11
+    ports:
+      - "1884:1884"
+    volumes:
+      - ./test/functionalTest/mosquittoConf/mosquitto-extra.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./test/functionalTest/mosquittoConf/mosquitto_passwd:/mosquitto/config/mosquitto_passwd:ro
+    # Asegúrate de que en mosquitto-extra.conf haya `listener 1884`
+
+  # ─────────────────── Kafka cluster A (2 brokers) ───────────────────
+  kafka1:
+    <<: *kafka_svc
+    container_name: kafka1
+    ports: [ "9092:9092" ]
+    environment:
+      <<: *kafka_env_2node
+      KAFKA_NODE_ID: 1
+      # Bind al host (0.0.0.0) y puertos únicos de host
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:19092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093
+      # Lo que anuncian los brokers para clientes y entre brokers
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+  kafka2:
+    <<: *kafka_svc
+    container_name: kafka2
+    ports: [ "9094:9094" ]
+    environment:
+      <<: *kafka_env_2node
+      KAFKA_NODE_ID: 2
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:19094,EXTERNAL://0.0.0.0:9094,CONTROLLER://0.0.0.0:29093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:19094,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+  # ─────────────────── Kafka cluster B (independiente) ───────────────────
+  kafkaB:
+    <<: *kafka_svc
+    container_name: kafkaB
+    ports: [ "9095:9095" ]
+    environment:
+      <<: *kafka_env
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:19095,EXTERNAL://0.0.0.0:9095,CONTROLLER://0.0.0.0:39093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafkaB:19095,EXTERNAL://localhost:9095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafkaB:39093
+      CLUSTER_ID: 4aHwR_RyUaG-30kA4XyKpQ
+
+  # ─────────────────── Tests ───────────────────
+  tests:
+    image: ${TEST_IMAGE_NAME:-telefonicaiot/fiware-orion:ci}
+    container_name: tests
+    network_mode: host
+    depends_on: [ mongodb, kafka1, kafka2, kafkaB, mosquitto, mosquitto-extra ]
+    environment:
+      REPO_ACCESS_TOKEN: ${REPO_ACCESS_TOKEN}
+      FT_FROM_IX: ${FT_FROM_IX}
+      FT_TO_IX: ${FT_TO_IX}
+      CB_NO_CACHE: ${CB_NO_CACHE}
+    volumes:
+      - .:/opt/fiware-orion
+    command: >
+      build -miqts functional

@@ -51,7 +51,7 @@ payload='{
   },
   "notification": {
     "mqttCustom": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "topic1",
       "json": {
         "x": {
@@ -81,7 +81,7 @@ payload='{
   },
   "notification": {
     "mqttCustom": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "topic1",
       "json": [
         "22",
@@ -186,7 +186,7 @@ Content-Length: 781
                 "qos": 0,
                 "retain": false,
                 "topic": "topic1",
-                "url": "mqtt://mosquitto:1883"
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false
         },
@@ -228,7 +228,7 @@ Content-Length: 781
                 "qos": 0,
                 "retain": false,
                 "topic": "topic1",
-                "url": "mqtt://mosquitto:1883"
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false
         },

@@ -288,7 +288,7 @@ static void setCustomKafkaInfo(const ngsiv2::KafkaInfo& kafkaInfo, orion::BSONOb
         logStr = jsonBuilderObj.toString();
         b->append(CSUB_JSON, jsonBuilderObj);
       }
-      else  // httpInfo.json->isVector();
+      else  // kafkaInfo.json->isVector();
       {
         orion::BSONArrayBuilder jsonBuilder;
         compoundValueBson(kafkaInfo.json->childV, jsonBuilder);
@@ -299,7 +299,7 @@ static void setCustomKafkaInfo(const ngsiv2::KafkaInfo& kafkaInfo, orion::BSONOb
       LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
     }
   }
-  else  // mqttInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi
+  else  // kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi
   {
     // id and type (both optional in this case)
     orion::BSONObjBuilder bob;
@@ -376,7 +376,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     }
   }
 
-  else if (sub.notification.type == ngsiv2::KafkaNotification) // KafkaNotification
+  else // KafkaNotification
   {
     b->append(CSUB_REFERENCE, sub.notification.kafkaInfo.url);
     b->append(CSUB_KAFKATOPIC, sub.notification.kafkaInfo.topic);

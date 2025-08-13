@@ -52,7 +52,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "ngsi": {
         "A1": {
           "value": "this is A1: ${A1}",

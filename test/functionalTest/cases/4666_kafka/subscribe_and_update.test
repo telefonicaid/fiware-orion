@@ -27,16 +27,15 @@ KAFKA Notifications
 dbInit CB
 
 # Using default KAFKA configuration in testEnv.sh
-kafkaCreateTopics orion
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" orion
 brokerStart CB 0-255 IPV4
-accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "orion"
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "orion"
 
 --SHELL--
 
 #
-# Hint: use this to run the KAFKA broker needed for this .test:
+# Hint:  A Kafka cluster accessible at localhost:9092,localhost:9094 is required for this .test:
 #
-#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11 #TODO: document Kafka service
 #
 # 01. POST /v2/entities, creating E1/T1
 # 02. Subscribe to E1 on condition A2
@@ -83,7 +82,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://kafka1:9092",
+      "url": "kafka://localhost:9092,localhost:9094",
       "topic": "orion"
     },
     "attrs": [
@@ -178,6 +177,6 @@ Payload:
 
 --TEARDOWN--
 accumulatorStop
-kafkaDestroyTopics orion
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" orion
 brokerStop CB
 dbDrop CB

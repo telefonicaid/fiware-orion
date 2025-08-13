@@ -30,19 +30,19 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create mqtt sub url=mqtt:///mosquitto:1883, topic=/orion, qos=2
-# 02. Get sub, see url=mqtt://mosquitto:1883, topic=/orion, qos=2
+# 01. Create mqtt sub url=mqtt:///localhost:1883, topic=/orion, qos=2
+# 02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 # 03. Update sub element different to notification
-# 04. Get sub, see url=mqtt://mosquitto:1883, topic=/orion, qos=2
-# 05. Update sub with url=mqtt://mosquitto-exta:1883, topic=/cb, no-qos
-# 06. Get sub, see url=mqtt://mosquitto-exta:1883, topic=/cb, qos=0
+# 04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
+# 05. Update sub with url=mqtt://localhost:1884, topic=/cb, no-qos
+# 06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0
 # 07. Update sub to http sub
 # 08. Get sub, see http element
 # 09. Update sub to mqtt url=mqtt://localhost:1885, topic=/orionbk, qos=1
 # 10. Get sub, see url=mqtt://localhost:1885, topic=/orionbk, qos=1
 #
 
-echo "01. Create mqtt sub url=mqtt://mosquitto:1883, topic=/orion, qos=2"
+echo "01. Create mqtt sub url=mqtt://localhost:1883, topic=/orion, qos=2"
 echo "=================================================================="
 payload='{
   "description": "Original sub",
@@ -56,7 +56,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "/orion",
       "qos": 2
     }
@@ -70,7 +70,7 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "02. Get sub, see url=mqtt://mosquitto:1883, topic=/orion, qos=2"
+echo "02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2"
 echo "==============================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
@@ -87,19 +87,19 @@ echo
 echo
 
 
-echo "04. Get sub, see url=mqtt://mosquitto:1883, topic=/orion, qos=2"
+echo "04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2"
 echo "==============================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
-echo "05. Update sub with url=mqtt://mosquitto-exta:1883, topic=/cb, no-qos"
+echo "05. Update sub with url=mqtt://localhost:1884, topic=/cb, no-qos"
 echo "================================================================"
 payload='{
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto-exta:1883",
+      "url": "mqtt://localhost:1884",
       "topic": "/cb"
     }
   }
@@ -109,7 +109,7 @@ echo
 echo
 
 
-echo "06. Get sub, see url=mqtt://mosquitto-exta:1883, topic=/cb, qos=0"
+echo "06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0"
 echo "============================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
@@ -161,7 +161,7 @@ echo
 
 
 --REGEXPECT--
-01. Create mqtt sub url=mqtt://mosquitto:1883, topic=/orion, qos=2
+01. Create mqtt sub url=mqtt://localhost:1883, topic=/orion, qos=2
 ==================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -171,7 +171,7 @@ Content-Length: 0
 
 
 
-02. Get sub, see url=mqtt://mosquitto:1883, topic=/orion, qos=2
+02. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -190,7 +190,7 @@ Content-Length: 359
             "qos": 2,
             "retain": false,
             "topic": "/orion",
-            "url": "mqtt://mosquitto:1883"
+            "url": "mqtt://localhost:1883"
         },
         "onlyChangedAttrs": false
     },
@@ -218,7 +218,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Get sub, see url=mqtt://mosquitto:1883, topic=/orion, qos=2
+04. Get sub, see url=mqtt://localhost:1883, topic=/orion, qos=2
 ===============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -237,7 +237,7 @@ Content-Length: 359
             "qos": 2,
             "retain": false,
             "topic": "/orion",
-            "url": "mqtt://mosquitto:1883"
+            "url": "mqtt://localhost:1883"
         },
         "onlyChangedAttrs": false
     },
@@ -257,7 +257,7 @@ Content-Length: 359
 }
 
 
-05. Update sub with url=mqtt://mosquitto-exta:1883, topic=/cb, no-qos
+05. Update sub with url=mqtt://localhost:1884, topic=/cb, no-qos
 ================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -265,13 +265,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-06. Get sub, see url=mqtt://mosquitto-exta:1883, topic=/cb, qos=0
+06. Get sub, see url=mqtt://localhost:1884, topic=/cb, qos=0
 ============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 361
+Content-Length: 356
 
 {
     "description": "Modified sub",
@@ -284,7 +284,7 @@ Content-Length: 361
             "qos": 0,
             "retain": false,
             "topic": "/cb",
-            "url": "mqtt://mosquitto-exta:1883"
+            "url": "mqtt://localhost:1884"
         },
         "onlyChangedAttrs": false
     },

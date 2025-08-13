@@ -27,45 +27,43 @@ KAFKA subscription multibroker
 dbInit CB
 
 # tracelevel 164 is the one for KAFKA notification logs
-brokerStart CB 164 IPV4
-kafkaCreateTopics sub1 sub2 sub3 sub4
-accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "^sub.*"
+brokerStart CB 164 IPV4 -kafkaMaxAge 1
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1 sub2
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
 
 --SHELL--
 
 #
-# Hint: use this to run the KAFKA brokers needed for this .test:
+# Hint: A Kafka cluster accessible at localhost:9092,localhost:9094, and another cluster accessible at localhost:9095 are required for this .test:
 #
-#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11 #TODO: document  Kafka service
-#   docker run -d -p 1884:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11 #TODO: document  Kafka service
 #
-# 01. Create KAFKA sub1 at kafka1:9092 (1)
-# 02. Create KAFKA sub2 at kafka1:9092 (2)
-# 03. Create KAFKA sub3 at kafkaB:9095 (1)
-# 04. Create KAFKA sub4 at kafkaB:9095 (2)
-# 05. Create entity E1883 to stimulate connections to kafka1:9092 (one created, one reused)
-# 06. Sleep 60 seconds, then create entity E1884 to stimulate connections to kafkaB:9095 (one created, one reused)
-# 07. Sleep 60 seconds, get logs and see kafka1:9092 connection went away
-# 08. Sleep 60 seconds, get logs and see kafkaB:9095 connection went away
-# 09. Update entity E1883 to re-create connections to kafka1:9092
-# 10. Dump accumulator for kafkaB:9095 and see 4 notifications
+# 01. Create KAFKA sub1 at localhost:9092,localhost:9094 (1)
+# 02. Create KAFKA sub2 at localhost:9092,localhost:9094 (2)
+# 03. Create KAFKA sub3 at localhost:9095 (1)
+# 04. Create KAFKA sub4 at localhost:9095 (2)
+# 05. Create entity E9092:9094 to stimulate connections to localhost:9092,localhost:9094 (one created, one reused)
+# 06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:9095 (one created, one reused)
+# 07. Sleep 70 seconds, get logs and see localhost:9092,localhost:9094 connection went away
+# 08. Update entity E9092:9094 to re-create connections to localhost:9092,localhost:9094
+# 09. Sleep 70 seconds, get logs and see localhost:9095 connection went away
+# 10. Dump accumulator for localhost:9092,localhost:9094 and see 4 notifications
 #
 
-echo "01. Create KAFKA sub1 at kafka1:9092 (1)"
+echo "01. Create KAFKA sub1 at localhost:9092,localhost:9094 (1)"
 echo "=========================================="
 payload='{
   "description": "sub1",
   "subject": {
     "entities": [
       {
-        "id": "E9092",
+        "id": "E9092:9094",
         "type": "T"
       }
     ]
   },
   "notification": {
     "kafka": {
-      "url": "kafka://kafka1:9092",
+      "url": "kafka://localhost:9092,localhost:9094",
       "topic": "sub1"
     }
   }
@@ -75,21 +73,21 @@ echo
 echo
 
 
-echo "02. Create KAFKA sub2 at kafka1:9092 (2)"
+echo "02. Create KAFKA sub2 at localhost:9092,localhost:9094 (2)"
 echo "=========================================="
 payload='{
   "description": "sub2",
   "subject": {
     "entities": [
       {
-        "id": "E9092",
+        "id": "E9092:9094",
         "type": "T"
       }
     ]
   },
   "notification": {
     "kafka": {
-      "url": "kafka://kafka1:9092",
+      "url": "kafka://localhost:9092,localhost:9094",
       "topic": "sub2"
     }
   }
@@ -99,7 +97,7 @@ echo
 echo
 
 
-echo "03. Create KAFKA sub3 at kafkaB:9095 (1)"
+echo "03. Create KAFKA sub3 at localhost:9095 (1)"
 echo "=========================================="
 payload='{
   "description": "sub3",
@@ -113,7 +111,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://kafkaB:9095",
+      "url": "kafka://localhost:9095",
       "topic": "sub3"
     }
   }
@@ -123,7 +121,7 @@ echo
 echo
 
 
-echo "04. Create KAFKA sub4 at kafkaB:9095 (2)"
+echo "04. Create KAFKA sub4 at localhost:9095 (2)"
 echo "=========================================="
 payload='{
   "description": "sub4",
@@ -137,7 +135,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://kafkaB:9095",
+      "url": "kafka://localhost:9095",
       "topic": "sub4"
     }
   }
@@ -147,10 +145,10 @@ echo
 echo
 
 
-echo "05. Create entity E9092 to stimulate connections to kafka1:9092 (one created, one reused)"
-echo "============================================================================================"
+echo "05. Create entity E9092:9094 to stimulate connections to localhost:9092,localhost:9094 (one created, one reused)"
+echo "================================================================================================================"
 payload='{
-  "id": "E9092",
+  "id": "E9092:9094",
   "type": "T",
   "A": {
     "value": 1,
@@ -162,7 +160,7 @@ echo
 echo
 
 
-echo "06. Sleep 10 seconds, then create entity E9095 to stimulate connections to kafkaB:9095 (one created, one reused)"
+echo "06. Sleep 60 seconds, then create entity E9095 to stimulate connections to localhost:9095 (one created, one reused)"
 echo "==================================================================================================================="
 payload='{
   "id": "E9095",
@@ -172,35 +170,35 @@ payload='{
     "type": "Number"
   }
 }'
-sleep 10s
+sleep 60s
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "07. Sleep 10 seconds, get logs and see kafka1:9092 connection and kafkaB:9095 connection are maintained."
-echo "=============================================================================================================="
-sleep 10s
+echo "07. Sleep 70 seconds, get logs and see localhost:9092,localhost:9094 connection went away"
+echo "========================================================================================="
+sleep 70s
 cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
 echo
 echo
 
 
-echo "08. Update entity E9092 to reuse connections to kafka1:9092"
-echo "=================================================================="
+echo "08. Update entity E9092:9094 to reuse connections to localhost:9092,localhost:9094"
+echo "=================================================================================="
 payload='{
   "A": {
     "value": 2,
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities/E9092/attrs --payload "$payload"
+orionCurl --url /v2/entities/E9092:9094/attrs --payload "$payload"
 echo
 echo
 
-echo "09. Sleep 10 seconds, get logs and see kafka1:9092 connection and kafkaB:9095 connection are maintained."
-echo "=============================================================================================================="
-sleep 10s
+echo "09. Sleep 70 seconds, get logs and see localhost:9095 connection went away"
+echo "=========================================================================="
+sleep 70s
 cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
 echo
 echo
@@ -212,15 +210,15 @@ echo
 sleep 2s
 
 
-echo "10. Dump accumulator for kafkaB:9095 and see 4 notifications"
-echo "==============================================================="
+echo "10. Dump accumulator for localhost:9092,localhost:9094 and see 4 notifications"
+echo "=============================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create KAFKA sub1 at kafka1:9092 (1)
+01. Create KAFKA sub1 at localhost:9092,localhost:9094 (1)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -230,7 +228,7 @@ Content-Length: 0
 
 
 
-02. Create KAFKA sub2 at kafka1:9092 (2)
+02. Create KAFKA sub2 at localhost:9092,localhost:9094 (2)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -240,7 +238,7 @@ Content-Length: 0
 
 
 
-03. Create KAFKA sub3 at kafkaB:9095 (1)
+03. Create KAFKA sub3 at localhost:9095 (1)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -250,7 +248,7 @@ Content-Length: 0
 
 
 
-04. Create KAFKA sub4 at kafkaB:9095 (2)
+04. Create KAFKA sub4 at localhost:9095 (2)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -260,17 +258,17 @@ Content-Length: 0
 
 
 
-05. Create entity E9092 to stimulate connections to kafka1:9092 (one created, one reused)
-============================================================================================
+05. Create entity E9092:9094 to stimulate connections to localhost:9092,localhost:9094 (one created, one reused)
+================================================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/E9092?type=T
+Location: /v2/entities/E9092:9094?type=T
 Content-Length: 0
 
 
 
-06. Sleep 10 seconds, then create entity E9095 to stimulate connections to kafkaB:9095 (one created, one reused)
+06. Sleep 60 seconds, then create entity E9095 to stimulate connections to localhost:9095 (one created, one reused)
 ===================================================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -280,56 +278,73 @@ Content-Length: 0
 
 
 
-07. Sleep 10 seconds, get logs and see kafka1:9092 connection and kafkaB:9095 connection are maintained.
-==============================================================================================================
+07. Sleep 70 seconds, get logs and see localhost:9092,localhost:9094 connection went away
+=========================================================================================
 #SORT_START
 Initializing KAFKA library
-Starting a new KAFKA broker connection for kafka1:9092
-KAFKA successful connection for kafka1:9092
-Kafka notification sent to kafka1:9092 on topic sub1
-Existing KAFKA broker connection for kafka1:9092
-Kafka notification sent to kafka1:9092 on topic sub2
-Starting a new KAFKA broker connection for kafkaB:9095
-KAFKA successful connection for kafkaB:9095
-Kafka notification sent to kafkaB:9095 on topic sub3
-Existing KAFKA broker connection for kafkaB:9095
-Kafka notification sent to kafkaB:9095 on topic sub4
+Starting a new KAFKA broker connection for localhost:9092,localhost:9094
+KAFKA successful connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Existing KAFKA broker connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
+Checking Kafka connections age
+Starting a new KAFKA broker connection for localhost:9095
+KAFKA successful connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub3
+Existing KAFKA broker connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub4
+Kafka notification successfully published at localhost:9095 on topic sub3
+Kafka notification successfully published at localhost:9095 on topic sub4
+Checking Kafka connections age
+Kafka connection localhost:9092,localhost:9094 too old REGEX(.*)
 #SORT_END
 
 
-08. Update entity E9092 to reuse connections to kafka1:9092
-==================================================================
+08. Update entity E9092:9094 to reuse connections to localhost:9092,localhost:9094
+==================================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-09. Sleep 10 seconds, get logs and see kafka1:9092 connection and kafkaB:9095 connection are maintained.
-==============================================================================================================
+09. Sleep 70 seconds, get logs and see localhost:9095 connection went away
+==========================================================================
 #SORT_START
 Initializing KAFKA library
-Starting a new KAFKA broker connection for kafka1:9092
-KAFKA successful connection for kafka1:9092
-Kafka notification sent to kafka1:9092 on topic sub1
-Existing KAFKA broker connection for kafka1:9092
-Kafka notification sent to kafka1:9092 on topic sub2
-Starting a new KAFKA broker connection for kafkaB:9095
-KAFKA successful connection for kafkaB:9095
-Kafka notification sent to kafkaB:9095 on topic sub3
-Existing KAFKA broker connection for kafkaB:9095
-Kafka notification sent to kafkaB:9095 on topic sub4
-Existing KAFKA broker connection for kafka1:9092
-Kafka notification successfully published at kafka1:9092 on topic sub1
-Kafka notification successfully published at kafka1:9092 on topic sub2
-Kafka notification sent to kafka1:9092 on topic sub1
-Existing KAFKA broker connection for kafka1:9092
-Kafka notification sent to kafka1:9092 on topic sub2
+Starting a new KAFKA broker connection for localhost:9092,localhost:9094
+KAFKA successful connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Existing KAFKA broker connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
+Checking Kafka connections age
+Starting a new KAFKA broker connection for localhost:9095
+KAFKA successful connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub3
+Existing KAFKA broker connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub4
+Kafka notification successfully published at localhost:9095 on topic sub3
+Kafka notification successfully published at localhost:9095 on topic sub4
+Checking Kafka connections age
+Kafka connection localhost:9092,localhost:9094 too old REGEX(.*)
+Starting a new KAFKA broker connection for localhost:9092,localhost:9094
+KAFKA successful connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Existing KAFKA broker connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
+Checking Kafka connections age
+Kafka connection localhost:9095 too old REGEX(.*)
 #SORT_END
 
 
-10. Dump accumulator for kafkaB:9095 and see 4 notifications
-===============================================================
+10. Dump accumulator for localhost:9092,localhost:9094 and see 4 notifications
+==============================================================================
 #SORT_START
 Kafka message at topic sub1
 Key: REGEX([0-9a-f\-]{24})
@@ -340,7 +355,7 @@ Payload:
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
     "data": [
         {
-            "id": "E9092",
+            "id": "E9092:9094",
             "type": "T",
             "A": {
                 "type": "Number",
@@ -360,7 +375,7 @@ Payload:
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
     "data": [
         {
-            "id": "E9092",
+            "id": "E9092:9094",
             "type": "T",
             "A": {
                 "type": "Number",
@@ -380,7 +395,7 @@ Payload:
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
     "data": [
         {
-            "id": "E9092",
+            "id": "E9092:9094",
             "type": "T",
             "A": {
                 "type": "Number",
@@ -400,7 +415,7 @@ Payload:
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
     "data": [
         {
-            "id": "E9092",
+            "id": "E9092:9094",
             "type": "T",
             "A": {
                 "type": "Number",
@@ -416,6 +431,6 @@ Payload:
 
 --TEARDOWN--
 accumulatorStop
-kafkaDestroyTopics sub1 sub2 sub3 sub4
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1 sub2
 brokerStop CB
 dbDrop CB

@@ -56,7 +56,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "user": "user_noexist",
       "passwd": "xxxx",
       "topic": "sub1"
@@ -120,7 +120,7 @@ echo "========================================"
 payload='{
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "user": "user1",
       "passwd": "xxxx",
       "topic": "sub1"
@@ -204,7 +204,7 @@ Content-Length: 485
                 "qos": 0,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://mosquitto:1883",
+                "url": "mqtt://localhost:1883",
                 "user": "user_noexist"
             },
             "onlyChangedAttrs": false,
@@ -259,7 +259,7 @@ Content-Length: 485
                 "qos": 0,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://mosquitto:1883",
+                "url": "mqtt://localhost:1883",
                 "user": "user_noexist"
             },
             "onlyChangedAttrs": false,
@@ -322,7 +322,7 @@ Content-Length: 502
                 "qos": 0,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://mosquitto:1883",
+                "url": "mqtt://localhost:1883",
                 "user": "user1"
             },
             "onlyChangedAttrs": false,
@@ -348,17 +348,17 @@ Content-Length: 502
 09. Check logs and see 1 raised alarm, 1 repeat alarm and 1 released alarm
 ==========================================================================
 #SORT_START
-Request received: POST /v2/subscriptions, request payload (184 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://mosquitto:1883", "user": "user_noexist", "passwd": "xxxx", "topic": "sub1" } } }, response code: 201
+Request received: POST /v2/subscriptions, request payload (184 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://localhost:1883", "user": "user_noexist", "passwd": "xxxx", "topic": "sub1" } } }, response code: 201
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-Raising alarm MqttConnectionError mosquitto:1883: Connection Refused: not authorised.
+Raising alarm MqttConnectionError localhost:1883: Connection Refused: not authorised.
 Request received: GET /v2/subscriptions, response code: 200
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
 Request received: GET /v2/subscriptions, response code: 200
-Repeated MqttConnectionError mosquitto:1883: Connection Refused: not authorised.
-Request received: PATCH /v2/subscriptions/SUB_ID, request payload (118 bytes): { "notification": { "mqtt": { "url": "mqtt://mosquitto:1883", "user": "user1", "passwd": "xxxx", "topic": "sub1" } } }, response code: 204
+Repeated MqttConnectionError localhost:1883: Connection Refused: not authorised.
+Request received: PATCH /v2/subscriptions/SUB_ID, request payload (118 bytes): { "notification": { "mqtt": { "url": "mqtt://localhost:1883", "user": "user1", "passwd": "xxxx", "topic": "sub1" } } }, response code: 204
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-Releasing alarm MqttConnectionError mosquitto:1883
-MQTT Notif delivered (subId: SUB_ID): broker: mosquitto:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
+Releasing alarm MqttConnectionError localhost:1883
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: GET /v2/subscriptions, response code: 200
 #SORT_END
 

@@ -15,8 +15,8 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.88.1
 * openssl: 3.0.15
 * libuuid: 2.38.1
-* zlib1g-dev: 1:1.2.13.dfsg-1
-* librdkafka-dev: 2.0.2-1
+* zlib1g 1:1.2.13.dfsg-1
+* librdkafka: 2.0.2-1
 * libmosquitto: 2.0.20 (from source)
 * Mongo C driver: 1.29.0 (from source)
 * rapidjson: 1.1.0 (from source)
@@ -119,7 +119,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
 
 * Install additional required tools for functional and valgrind tests:
 
-        sudo apt-get install curl netcat-traditional valgrind bc python3 python3-pip mosquitto
+        sudo apt-get install curl netcat-traditional valgrind bc python3 python3-pip mosquitto openjdk-17-jre-headlessk
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an other programs, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
 
@@ -129,7 +129,19 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         . scripts/testEnv.sh
         python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0 
+        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0
+
+* Install the Kafka client (CLI)
+
+          KAFKA_VERSION=3.9.1
+          INSTALL_DIR=/opt/kafka
+          curl -fsSL "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz" -o /tmp/kafka.tgz
+          sudo mkdir -p "$INSTALL_DIR"
+          sudo tar -xzf /tmp/kafka.tgz --strip-components=1 -C "$INSTALL_DIR"
+          rm /tmp/kafka.tgz
+          echo 'default.api.timeout.ms=12000' >> /opt/kafka/ci.conf
+          echo 'request.timeout.ms=12000' >> /opt/kafka/ci.conf
+
 
 * Run test harness in this environment (it takes some time, please be patient).
 

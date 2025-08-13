@@ -83,9 +83,9 @@ def usage():
     Print usage message
     """
 
-    print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> --mqttHost " +
+    print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> " +
           "--mqttHost <host> --mqttPort <port> --mqttTopic <topic> " +
-          "--kafkaHost <host> --kafkaPort <port> --kafkaTopic <topic> " +
+          "--bootstrapServers --kafkaTopic <topic> " +
           "--kafkaGroupId <group_id> --url <server url> --pretty-print "
           "--https --key <key_file> --cert <cert_file> -v -u")
     print("""\nParameters:
@@ -95,8 +95,7 @@ def usage():
           --mqttPort <port>: mqtt broker port to use (default is 1883)"
           --mqttTopic <topic>: mqtt topic to use (default is accumulate_mqtt)"
           --url <server url>: server URL to use (default is /accumulate)"
-          --kafkaHost <host>: Kafka broker host (optional)
-          --kafkaPort <port>: Kafka broker port (default 9092)
+          --bootstrapServers <endpoint>: Kafka url example: brokerA:9092,brokerB:9094
           --kafkaTopic <topic>: Kafka topic (default 'accumulate_kafka')
           --kafkaGroupId <group_id>: Kafka consumer group ID (default 'accumulator_group')
           --pretty-print: pretty print mode"
@@ -120,8 +119,7 @@ host = '0.0.0.0'
 mqtt_host = None
 mqtt_port = 1883
 mqtt_topic = 'accumulate_mqtt'
-kafka_host = None
-kafka_port = 9092
+bootstrap_servers = None
 kafka_topic = 'accumulate_kafka'
 kafka_group_id = 'accumulator_group'
 server_url = '/accumulate'
@@ -142,8 +140,7 @@ try:
             'mqttHost=',
             'mqttPort=',
             'mqttTopic=',
-            'kafkaHost=',
-            'kafkaPort=',
+            'bootstrapServers=',
             'kafkaTopic=',
             'kafkaGroupId=',
             'url=',
@@ -162,8 +159,8 @@ for opt, arg in opts:
         sys.exit(0)
     elif opt == '--mqttHost':
         mqtt_host = arg
-    elif opt == '--kafkaHost':
-        kafka_host = arg
+    elif opt == '--bootstrapServers':
+        bootstrap_servers = arg
     elif opt == '--host':
         host = arg
     elif opt == '--url':
@@ -184,11 +181,6 @@ for opt, arg in opts:
             mqtt_port = int(arg)
         except ValueError:
             usage_and_exit('mqttPort parameter must be an integer')
-    elif opt == '--kafkaPort':
-        try:
-            kafka_port = int(arg)
-        except ValueError:
-            usage_and_exit('kafkaPort parameter must be an integer')
     elif opt == '-v':
         verbose = 1
     elif opt == '--pretty-print':
@@ -215,9 +207,8 @@ if verbose:
         print("mqtt_port: " + str(mqtt_port))
         print("mqtt_host: " + str(mqtt_host))
         print("mqtt_topic: " + str(mqtt_topic))
-    if kafka_host:
-        print("kafka_host: " + str(kafka_host))
-        print("kafka_port: " + str(kafka_port))
+    if bootstrap_servers:
+        print("bootstrap_servers: " + str(bootstrap_servers))
         print("kafka_topic: " + str(kafka_topic))
         print(f"kafka_group_id: " + str(kafka_group_id))
     print("server_url: " + str(server_url))
@@ -830,7 +821,7 @@ class KafkaConsumerThread(threading.Thread):
 
         # Essential configuration for Kafka
         conf = {
-            'bootstrap.servers': f"{kafka_host}:{kafka_port}",
+            'bootstrap.servers': bootstrap_servers,
             'group.id': kafka_group_id,
             'auto.offset.reset': 'latest',
             'enable.auto.commit': True,
@@ -949,7 +940,7 @@ if __name__ == '__main__':
 
     # Start Kafka consumer if configured
     kafka_thread = None
-    if kafka_host:
+    if bootstrap_servers:
         kafka_thread = KafkaConsumerThread()
         kafka_thread.start()
 

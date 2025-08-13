@@ -227,7 +227,7 @@ std::string Notification::toJson(const std::string& attrsFormat)
     }
   }
 
-  else if (this->type == KafkaNotification)   // case for Kafka
+  else // case for Kafka
   {
     if (this->kafkaInfo.custom)
     {

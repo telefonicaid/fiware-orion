@@ -201,3 +201,30 @@ bool forbiddenMqttTopic(const char* s)
 
   return false;
 }
+
+/* ****************************************************************************
+*
+* forbiddenKafkaTopic -
+*/
+bool forbiddenKafkaTopic(const char* s)
+{
+  if (s == (void*) 0)
+  {
+    return false;
+  }
+
+  while (*s != 0)
+  {
+    switch (*s)
+    {
+    case '+':
+    case '#':
+    case '/':
+      return true;
+    }
+
+    ++s;
+  }
+
+  return false;
+}

@@ -1,4 +1,4 @@
-# Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -40,10 +40,6 @@ include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 # Library declaration
 # -----------------------------------------------------------------
 ADD_LIBRARY(kafka STATIC ${SOURCES} ${HEADERS})
-
-
-# Include directories
-#target_include_directories(kafka PUBLIC /usr/include/librdkafka)
 
 # Linker directories
 target_link_directories(kafka PUBLIC /usr/lib/x86_64-linux-gnu)

@@ -817,6 +817,7 @@ EOF
   Orion API specification.
 * In addition to the HTTP notifications described in this section, Orion also supports
   MQTT notifications. This topic is described in more detail in [this document](mqtt_notifications.md).
+  KAFKA notifications. This topic is described in more detail in [this document](kafka_notifications.md).
 
 [Top](#top)
 

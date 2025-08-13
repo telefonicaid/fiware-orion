@@ -2121,11 +2121,17 @@ static unsigned int processSubscriptions
     notification.httpInfo.fill(tSubP->httpInfo);
     notification.mqttInfo.fill(tSubP->mqttInfo);
     notification.kafkaInfo.fill(tSubP->kafkaInfo);
-    notification.type = (
-      notification.mqttInfo.topic.empty() ?
-      (notification.kafkaInfo.topic.empty() ?  ngsiv2::HttpNotification : ngsiv2::KafkaNotification)
-      : ngsiv2::MqttNotification
-      );
+
+    if (!notification.mqttInfo.topic.empty())
+    {
+      notification.type = ngsiv2::MqttNotification;
+    } else if (!notification.kafkaInfo.topic.empty())
+    {
+      notification.type = ngsiv2::KafkaNotification;
+    } else
+    {
+      notification.type = ngsiv2::HttpNotification;
+    }
 
     notificationSent = processNotification(notifyCerP,
                                            tSubP->attrL,

@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan
+* Author: Oriana Romero (based in MQTT implementation from Burak Karaboga)
 */
 
 #include <semaphore.h>
@@ -40,12 +40,12 @@
 */
 typedef struct KafkaConnection
 {
- rd_kafka_t*        producer;       // Similar a mosquitto*
+ rd_kafka_t*        producer;       // similar to mosquitto*
  std::string        endpoint;       // "broker1:9092,broker2:9092"
- double             lastTime;       // Timestamp de última actividad
- sem_t              connectionSem;  // Sincronización (como en MQTT)
- int                connectionResult; // Código de error (rd_kafka_resp_err_t)
- bool               connectionCallbackCalled; // Para callbacks
+ double             lastTime;       // Last activity timestamp
+ sem_t              connectionSem;  // Synchronization (as in MQTT)
+ int                connectionResult; //  Error code (rd_kafka_resp_err_t)
+ bool               connectionCallbackCalled; // For callbacks
 } KafkaConnection;
 
 
@@ -56,9 +56,9 @@ typedef struct KafkaConnection
 class KafkaConnectionManager
 {
 private:
- std::map<std::string, KafkaConnection*>  connections;  // Mapa por endpoint
- long                                    timeout;       // Timeout en ms
- sem_t                                   sem;           // Semaforo global
+ std::map<std::string, KafkaConnection*>  connections;  // Map by endpoint
+ long                                    timeout;       // Timeout in ms
+ sem_t                                   sem;           // Global traffic light
 
 public:
  KafkaConnectionManager();
@@ -68,7 +68,7 @@ public:
  const char*  semGet(void);
 
  bool sendKafkaNotification(
-  const std::string& brokers,
+  const std::string& endpoint,
   const std::string& topic,
   const std::string& content,
   const std::string& subscriptionId,
@@ -76,14 +76,15 @@ public:
   const std::string& servicePath
  );
 
- void cleanup(double maxAge);  // Limpieza de conexiones inactivas
+ void cleanup(double maxAge);  // Cleaning inactive connections
+ void dispatchKafkaCallbacks();
 
 private:
  void disconnect(rd_kafka_t* producer, const std::string& endpoint);
  void semInit(void);
  void semTake(void);
  void semGive(void);
- KafkaConnection* getConnection(const std::string& brokers);
+ KafkaConnection* getConnection(const std::string& endpoint);
 };
 
 #endif  // SRC_LIB_KAFKA_KAFKACONNECTIONMANAGER_H_

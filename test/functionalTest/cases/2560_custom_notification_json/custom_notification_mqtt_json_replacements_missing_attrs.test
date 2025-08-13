@@ -49,7 +49,7 @@ payload='{
   },
   "notification": {
     "mqttCustom": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "topic1",
       "json": {
         "A": "${A}",

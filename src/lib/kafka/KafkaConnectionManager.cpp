@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan (with contributions from Burak Karaboga in old mqtt.cpp file)
+* Author: Oriana Romero (based in MQTT implementation from Burak Karaboga)
 */
 
 #include "kafka/KafkaConnectionManager.h"
@@ -43,9 +43,14 @@
 
 /* ****************************************************************************
 *
-* KAFKA_DEFAULT_KEEPALIVE -
+* KAFKA CONTANTS-
 */
-#define KAFKA_DEFAULT_KEEPALIVE 60
+#define KAFKA_DESTROY_TIMEOUT_MS  3000
+#define KAFKA_WAIT_INCREMENT_MS 100
+#define KAFKA_FLUSH_TIMEOUT_MS 1000;
+
+#define KAFKA_MAX_BUFFERING_MS_STR  "10"
+#define KAFKA_MAX_MESSAGE_BYTES_STR "10000000"
 
 
 
@@ -115,11 +120,11 @@ void KafkaConnectionManager::teardown(void)
   connections.clear();
 
   // 5. Global cleanup of librdkafka (wait up to 3 seconds)
-  int wait_time_ms = 3000;
+  int wait_time_ms = KAFKA_DESTROY_TIMEOUT_MS;
   while (rd_kafka_wait_destroyed(wait_time_ms) == -1)
   {
     LM_I(("Waiting for internal threads of librdkafka to finish..."));
-    wait_time_ms -= 100;
+    wait_time_ms -= KAFKA_WAIT_INCREMENT_MS;
     if (wait_time_ms <= 0) break;
   }
 
@@ -190,30 +195,58 @@ void KafkaConnectionManager::semGive(void)
 
 /* ****************************************************************************
 *
+* KafkaConnectionManager::dispatchKafkaCallbacks -
+*/
+void KafkaConnectionManager::dispatchKafkaCallbacks()
+{
+  // We copy the producers under the semaphore to minimize critical section time.
+  std::vector<rd_kafka_t*> producers;
+  producers.reserve(connections.size());
+
+  semTake();
+  for (auto& kv : connections) {
+    KafkaConnection* k = kv.second;
+    if (k && k->producer)
+      producers.push_back(k->producer);
+  }
+  semGive();
+
+  // We fire callbacks outside the critical section
+  for (auto* p : producers) {
+    // 0 ms: does not block; if you call frequently, this is sufficient
+    rd_kafka_poll(p, 0);
+  }
+}
+
+
+/* ****************************************************************************
+*
 * KafkaConnectionManager::disconnect -
 */
 void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string& endpoint)
 {
   if (producer)
   {
-    rd_kafka_resp_err_t err = rd_kafka_flush(producer, 1000); // Espera 1s para enviar mensajes pendientes
+    int kafka_flush_timeout_ms = KAFKA_FLUSH_TIMEOUT_MS;
+    rd_kafka_resp_err_t err = rd_kafka_flush(producer, kafka_flush_timeout_ms); // Wait 1 second to send pending messages
     if (err != RD_KAFKA_RESP_ERR_NO_ERROR)
     {
       LM_E(("Error al hacer flush de mensajes para %s: %s",
            endpoint.c_str(), rd_kafka_err2str(err)));
     }
-    rd_kafka_destroy(producer);     // Libera recursos (equivalente a mosquitto_destroy)
+    rd_kafka_destroy(producer);     // Free resources (equivalent to mosquitto_destroy)
   }
-  // alarmMgr.kafkaConnectionError(endpoint, "disconnected");
+  //FIXME #4666: Implement alarm feature for Kafka notifications
+  //alarmMgr.kafkaConnectionError(endpoint, "disconnected");
 }
 
 /* ****************************************************************************
 *
 * KafkaConnectionManager::getConnection -
 */
-KafkaConnection* KafkaConnectionManager::getConnection(const std::string& brokers)
+KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoint)
 {
-  std::string endpoint = brokers; // Kafka uses "broker1:9092,broker2:9092"
+  // Kafka uses endpoint "broker1:9092,broker2:9092"
 
   if (connections.find(endpoint) == connections.end())
   {
@@ -224,7 +257,7 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
 
     // Basic configuration (as in MQTT)
     rd_kafka_conf_t* conf = rd_kafka_conf_new();
-    if (rd_kafka_conf_set(conf, "bootstrap.servers", brokers.c_str(), nullptr, 0) != RD_KAFKA_CONF_OK)
+    if (rd_kafka_conf_set(conf, "bootstrap.servers", endpoint.c_str(), nullptr, 0) != RD_KAFKA_CONF_OK)
     {
       LM_E(("Runtime Error (Kafka config failed for %s)", endpoint.c_str()));
       delete kConn;
@@ -236,8 +269,8 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
     rd_kafka_conf_set(conf, "message.encoding", "utf-8", nullptr, 0);
 
     // Buffer configuration
-    rd_kafka_conf_set(conf, "queue.buffering.max.ms", "10", nullptr, 0);
-    rd_kafka_conf_set(conf, "message.max.bytes", "10000000", nullptr, 0);
+    rd_kafka_conf_set(conf, "queue.buffering.max.ms", KAFKA_MAX_BUFFERING_MS_STR, nullptr, 0);
+    rd_kafka_conf_set(conf, "message.max.bytes", KAFKA_MAX_MESSAGE_BYTES_STR, nullptr, 0);
 
     // Connection callback (similar to MQTT)
     rd_kafka_conf_set_dr_msg_cb(conf, [](rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque)
@@ -299,7 +332,7 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& broker
 * KafkaConnectionManager::sendKafkaNotification -
 */
 bool KafkaConnectionManager::sendKafkaNotification(
-    const std::string& brokers,
+    const std::string& endpoint,
     const std::string& topic,
     const std::string& content,
     const std::string& subscriptionId,
@@ -307,11 +340,10 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& servicePath)
 
 {
-  std::string endpoint = brokers;
 
   semTake(); // Synchronization
 
-  KafkaConnection* kConn = getConnection(brokers);
+  KafkaConnection* kConn = getConnection(endpoint);
   rd_kafka_t* producer = kConn ? kConn->producer : nullptr;
 
   if (producer == nullptr)
@@ -333,11 +365,13 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   rd_kafka_headers_t* headers = rd_kafka_headers_new(0); // Initially without headers
 
-  if (!tenant.empty()) {
+  if (!tenant.empty())
+  {
     rd_kafka_header_add(headers, "FIWARE_SERVICE", -1, tenant.c_str(), tenant.size());
   }
 
-  if (!servicePath.empty()) {
+  if (!servicePath.empty())
+  {
     rd_kafka_header_add(headers, "FIWARE_SERVICEPATH", -1, servicePath.c_str(), servicePath.size());
   }
 
@@ -353,8 +387,9 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
-    // alarmMgr.kafkaConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
-    LM_E(("Kafka notification failed to %s on topic %s", brokers.c_str(), topic.c_str()));
+    //FIXME #4666: Implement alarm feature for Kafka notifications
+    //alarmMgr.kafkaConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
+    LM_E(("Kafka notification failed to %s on topic %s", endpoint.c_str(), topic.c_str()));
     disconnect(kConn->producer, endpoint);
     connections.erase(endpoint);
     delete kConn;
@@ -364,8 +399,9 @@ bool KafkaConnectionManager::sendKafkaNotification(
   {
     kConn->lastTime = getCurrentTime();
     rd_kafka_poll(producer, 0);
-    LM_T(LmtKafkaNotif, ("Kafka notification sent to %s on topic %s", brokers.c_str(), topic.c_str()));
-    // alarmMgr.kafkaConnectionReset(endpoint);
+    LM_T(LmtKafkaNotif, ("Kafka notification sent to %s on topic %s", endpoint.c_str(), topic.c_str()));
+    //FIXME #4666: Implement alarm feature for Kafka notifications
+    //alarmMgr.kafkaConnectionReset(endpoint);
     retval = true;
   }
 
@@ -397,11 +433,10 @@ void KafkaConnectionManager::cleanup(double maxAge)
 
     if (age > maxAge)
     {
-      LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removing it",
-          endpoint.c_str(), age, maxAge));
-
       toErase.push_back(endpoint);
       disconnect(kConn->producer, endpoint);
+      LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removed.",
+          endpoint.c_str(), age, maxAge));
       delete kConn;
     }
   }

@@ -460,7 +460,9 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   {
     // IPv4
     if (!getIPv4HostPort(urlTokens[2], host, port, protocol))
+    {
       return false;
+    }
   }
 
   //
@@ -487,10 +489,15 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 *
 * parseKafkaBrokerList
 */
-bool parseKafkaBrokerList(const std::string& url, std::string& cleanListOut, std::string& protocol, std::string& path)
+bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, std::string* protocol, std::string* path)
 {
   if (url.empty())
     return false;
+
+  // Validate output pointers
+  if (!cleanListOut || !protocol || !path) {
+    return false;
+  }
 
   std::stringstream        ss(url);
   std::string              rawBroker;
@@ -505,38 +512,37 @@ bool parseKafkaBrokerList(const std::string& url, std::string& cleanListOut, std
   //
   // // Accept only kafka://
   //
-  protocol = urlTokens[0];
-
+  *protocol = urlTokens[0];
 
   while (std::getline(ss, rawBroker, ','))
   {
     // Trim
     rawBroker.erase(0, rawBroker.find_first_not_of(" \t\n\r"));
     rawBroker.erase(rawBroker.find_last_not_of(" \t\n\r") + 1);
-    if (rawBroker.empty())
-      continue;
+    if (rawBroker.empty()) continue;
 
     // Prefix kafka://
-
-    const std::string prefix = protocol + "//";
+    const std::string prefix = *protocol + "//";
 
     if (rawBroker.rfind(prefix, 0) == 0)
+    {
       rawBroker.erase(0, prefix.size());
+    }
 
-    // reject if it contains ‘/’ (there should be no path)
-    if (path.empty())
+    // reject if it contains '/' (there should be no path)
+    if (path->empty())
     {
       /* Minimum path is always "/" */
-      path = "/";
+      *path = "/";
     }
+
     size_t slashPos = rawBroker.find('/');
     if (slashPos != std::string::npos)
     {
-      path = rawBroker.substr(slashPos);
+      *path = rawBroker.substr(slashPos);
     }
 
-    //Validations
-
+    // Validations
     std::string host, portStr;
     int         port = 0;
 
@@ -549,8 +555,8 @@ bool parseKafkaBrokerList(const std::string& url, std::string& cleanListOut, std
     }
     else
     {
-      // Pv4 addr:port
-      if (!getIPv4HostPort(rawBroker, host, port, protocol))
+      // IPv4 addr:port
+      if (!getIPv4HostPort(rawBroker, host, port, *protocol))
         return false;
     }
 
@@ -579,16 +585,15 @@ bool parseKafkaBrokerList(const std::string& url, std::string& cleanListOut, std
     return false;
 
   // Rebuild final list
-  cleanListOut.clear();
+  cleanListOut->clear();
   for (size_t i = 0; i < cleaned.size(); ++i)
   {
-    if (i) cleanListOut += ',';
-    cleanListOut += cleaned[i];
+    if (i) *cleanListOut += ',';
+    *cleanListOut += cleaned[i];
   }
 
   return true;
 }
-
 
 
 /* ****************************************************************************

@@ -129,7 +129,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PAYLOAD, 1);
     }
   }
-  else if (sub.notification.type == ngsiv2::KafkaNotification) // KafkaNotification
+  else // KafkaNotification
   {
     unsetB->append(CSUB_TIMEOUT, 1);
     unsetB->append(CSUB_METHOD,  1);

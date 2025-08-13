@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Burak Karaboga
+* Author: Oriana Romero (based in MQTT implementation from Burak Karaboga)
 */
 #include <string>
 

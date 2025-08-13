@@ -38,19 +38,19 @@ accumulatorStart --pretty-print --mqttHost ${MQTT_HOST} --mqttPort ${MQTT_PORT} 
 #   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 #   docker run -d -p 1884:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
 #
-# 01. Create MQTT sub1 at mosquitto:1883 (1)
-# 02. Create MQTT sub2 at mosquitto:1883 (2)
-# 03. Create MQTT sub3 at mosquitto-extra:1884 (1)
-# 04. Create MQTT sub4 at mosquitto-extra:1884 (2)
-# 05. Create entity E1883 to stimulate connections to mosquitto:1883 (one created, one reused)
-# 06. Sleep 60 seconds, then create entity E1884 to stimulate connections to mosquitto-extra:1884 (one created, one reused)
-# 07. Sleep 60 seconds, get logs and see mosquitto:1883 connection went away
-# 08. Sleep 60 seconds, get logs and see mosquitto-extra:1884 connection went away
-# 09. Update entity E1883 to re-create connections to mosquitto:1883
-# 10. Dump accumulator for mosquitto:1883 and see 4 notifications
+# 01. Create MQTT sub1 at localhost:1883 (1)
+# 02. Create MQTT sub2 at localhost:1883 (2)
+# 03. Create MQTT sub3 at localhost:1884 (1)
+# 04. Create MQTT sub4 at localhost:1884 (2)
+# 05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)
+# 06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
+# 07. Sleep 60 seconds, get logs and see localhost:1883 connection went away
+# 08. Sleep 60 seconds, get logs and see localhost:1884 connection went away
+# 09. Update entity E1883 to re-create connections to localhost:1883
+# 10. Dump accumulator for localhost:1883 and see 4 notifications
 #
 
-echo "01. Create MQTT sub1 at mosquitto:1883 (1)"
+echo "01. Create MQTT sub1 at localhost:1883 (1)"
 echo "=========================================="
 payload='{
   "description": "sub1",
@@ -64,7 +64,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "/sub1"
     }
   }
@@ -74,7 +74,7 @@ echo
 echo
 
 
-echo "02. Create MQTT sub1 at mosquitto:1883 (2)"
+echo "02. Create MQTT sub1 at localhost:1883 (2)"
 echo "=========================================="
 payload='{
   "description": "sub2",
@@ -88,7 +88,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "/sub2"
     }
   }
@@ -98,7 +98,7 @@ echo
 echo
 
 
-echo "03. Create MQTT sub1 at mosquitto-extra:1884 (1)"
+echo "03. Create MQTT sub1 at localhost:1884 (1)"
 echo "=========================================="
 payload='{
   "description": "sub3",
@@ -112,7 +112,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto-extra:1884",
+      "url": "mqtt://localhost:1884",
       "topic": "/sub3"
     }
   }
@@ -122,7 +122,7 @@ echo
 echo
 
 
-echo "04. Create MQTT sub1 at mosquitto-extra:1884 (2)"
+echo "04. Create MQTT sub1 at localhost:1884 (2)"
 echo "=========================================="
 payload='{
   "description": "sub4",
@@ -136,7 +136,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto-extra:1884",
+      "url": "mqtt://localhost:1884",
       "topic": "/sub4"
     }
   }
@@ -146,7 +146,7 @@ echo
 echo
 
 
-echo "05. Create entity E1883 to stimulate connections to mosquitto:1883 (one created, one reused)"
+echo "05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)"
 echo "============================================================================================"
 payload='{
   "id": "E1883",
@@ -161,7 +161,7 @@ echo
 echo
 
 
-echo "06. Sleep 60 seconds, then create entity E1884 to stimulate connections to mosquitto-extra:1884 (one created, one reused)"
+echo "06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)"
 echo "==================================================================================================================="
 payload='{
   "id": "E1884",
@@ -177,7 +177,7 @@ echo
 echo
 
 
-echo "07. Sleep 60 seconds, get logs and see mosquitto:1883 connection went away"
+echo "07. Sleep 60 seconds, get logs and see localhost:1883 connection went away"
 echo "=========================================================================="
 sleep 60s
 cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
@@ -185,7 +185,7 @@ echo
 echo
 
 
-echo "08. Sleep 60 seconds, get logs and see mosquitto-extra:1884 connection went away"
+echo "08. Sleep 60 seconds, get logs and see localhost:1884 connection went away"
 echo "=========================================================================="
 sleep 60s
 cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
@@ -193,7 +193,7 @@ echo
 echo
 
 
-echo "09. Update entity E1883 to re-create connections to mosquitto:1883"
+echo "09. Update entity E1883 to re-create connections to localhost:1883"
 echo "=================================================================="
 payload='{
   "A": {
@@ -212,7 +212,7 @@ echo
 sleep 0.5s
 
 
-echo "10. Dump accumulator for mosquitto:1883 and see 4 notifications"
+echo "10. Dump accumulator for localhost:1883 and see 4 notifications"
 echo "==============================================================="
 accumulatorDump
 accumulatorReset
@@ -221,7 +221,7 @@ echo
 
 
 --REGEXPECT--
-01. Create MQTT sub1 at mosquitto:1883 (1)
+01. Create MQTT sub1 at localhost:1883 (1)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -231,7 +231,7 @@ Content-Length: 0
 
 
 
-02. Create MQTT sub1 at mosquitto:1883 (2)
+02. Create MQTT sub1 at localhost:1883 (2)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -241,7 +241,7 @@ Content-Length: 0
 
 
 
-03. Create MQTT sub1 at mosquitto-extra:1884 (1)
+03. Create MQTT sub1 at localhost:1884 (1)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -251,7 +251,7 @@ Content-Length: 0
 
 
 
-04. Create MQTT sub1 at mosquitto-extra:1884 (2)
+04. Create MQTT sub1 at localhost:1884 (2)
 ==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -261,7 +261,7 @@ Content-Length: 0
 
 
 
-05. Create entity E1883 to stimulate connections to mosquitto:1883 (one created, one reused)
+05. Create entity E1883 to stimulate connections to localhost:1883 (one created, one reused)
 ============================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -271,7 +271,7 @@ Content-Length: 0
 
 
 
-06. Sleep 60 seconds, then create entity E1884 to stimulate connections to mosquitto-extra:1884 (one created, one reused)
+06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:1884 (one created, one reused)
 ===================================================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
@@ -281,71 +281,71 @@ Content-Length: 0
 
 
 
-07. Sleep 60 seconds, get logs and see mosquitto:1883 connection went away
+07. Sleep 60 seconds, get logs and see localhost:1883 connection went away
 ==========================================================================
 Initializing MQTT library
 #SORT_START
-New MQTT broker connection for mosquitto:1883
-Connecting to MQTT Broker at mosquitto:1883
-MQTT successfull connection for mosquitto:1883
-MQTT notification sent to mosquitto:1883 on topic /sub1 with qos 0 with id 1
-Existing MQTT broker connection for mosquitto:1883
-MQTT notification sent to mosquitto:1883 on topic /sub2 with qos 0 with id 2
-MQTT notification successfully published at mosquitto:1883 with id 1
-MQTT notification successfully published at mosquitto:1883 with id 2
+New MQTT broker connection for localhost:1883
+Connecting to MQTT Broker at localhost:1883
+MQTT successfull connection for localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub1 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
+MQTT notification successfully published at localhost:1883 with id 1
+MQTT notification successfully published at localhost:1883 with id 2
 #SORT_END
 Checking MQTT connections age
 #SORT_START
-New MQTT broker connection for mosquitto-extra:1884
-Connecting to MQTT Broker at mosquitto-extra:1884
-MQTT successfull connection for mosquitto-extra:1884
-MQTT notification sent to mosquitto-extra:1884 on topic /sub3 with qos 0 with id 1
-Existing MQTT broker connection for mosquitto-extra:1884
-MQTT notification sent to mosquitto-extra:1884 on topic /sub4 with qos 0 with id 2
-MQTT notification successfully published at mosquitto-extra:1884 with id 1
-MQTT notification successfully published at mosquitto-extra:1884 with id 2
+New MQTT broker connection for localhost:1884
+Connecting to MQTT Broker at localhost:1884
+MQTT successfull connection for localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub3 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
+MQTT notification successfully published at localhost:1884 with id 1
+MQTT notification successfully published at localhost:1884 with id 2
 #SORT_END
 Checking MQTT connections age
-MQTT connection mosquitto:1883 too old REGEX(.*)
-Disconnecting from MQTT Broker at mosquitto:1883
-Successfully disconnected from MQTT Broker at mosquitto:1883
+MQTT connection localhost:1883 too old REGEX(.*)
+Disconnecting from MQTT Broker at localhost:1883
+Successfully disconnected from MQTT Broker at localhost:1883
 
 
-08. Sleep 60 seconds, get logs and see mosquitto-extra:1884 connection went away
+08. Sleep 60 seconds, get logs and see localhost:1884 connection went away
 ==========================================================================
 Initializing MQTT library
 #SORT_START
-New MQTT broker connection for mosquitto:1883
-Connecting to MQTT Broker at mosquitto:1883
-MQTT successfull connection for mosquitto:1883
-MQTT notification sent to mosquitto:1883 on topic /sub1 with qos 0 with id 1
-Existing MQTT broker connection for mosquitto:1883
-MQTT notification sent to mosquitto:1883 on topic /sub2 with qos 0 with id 2
-MQTT notification successfully published at mosquitto:1883 with id 1
-MQTT notification successfully published at mosquitto:1883 with id 2
+New MQTT broker connection for localhost:1883
+Connecting to MQTT Broker at localhost:1883
+MQTT successfull connection for localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub1 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1883
+MQTT notification sent to localhost:1883 on topic /sub2 with qos 0 with id 2
+MQTT notification successfully published at localhost:1883 with id 1
+MQTT notification successfully published at localhost:1883 with id 2
 #SORT_END
 Checking MQTT connections age
 #SORT_START
-New MQTT broker connection for mosquitto-extra:1884
-Connecting to MQTT Broker at mosquitto-extra:1884
-MQTT successfull connection for mosquitto-extra:1884
-MQTT notification sent to mosquitto-extra:1884 on topic /sub3 with qos 0 with id 1
-Existing MQTT broker connection for mosquitto-extra:1884
-MQTT notification sent to mosquitto-extra:1884 on topic /sub4 with qos 0 with id 2
-MQTT notification successfully published at mosquitto-extra:1884 with id 1
-MQTT notification successfully published at mosquitto-extra:1884 with id 2
+New MQTT broker connection for localhost:1884
+Connecting to MQTT Broker at localhost:1884
+MQTT successfull connection for localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub3 with qos 0 with id 1
+Existing MQTT broker connection for localhost:1884
+MQTT notification sent to localhost:1884 on topic /sub4 with qos 0 with id 2
+MQTT notification successfully published at localhost:1884 with id 1
+MQTT notification successfully published at localhost:1884 with id 2
 #SORT_END
 Checking MQTT connections age
-MQTT connection mosquitto:1883 too old REGEX(.*)
-Disconnecting from MQTT Broker at mosquitto:1883
-Successfully disconnected from MQTT Broker at mosquitto:1883
+MQTT connection localhost:1883 too old REGEX(.*)
+Disconnecting from MQTT Broker at localhost:1883
+Successfully disconnected from MQTT Broker at localhost:1883
 Checking MQTT connections age
-MQTT connection mosquitto-extra:1884 too old REGEX(.*)
-Disconnecting from MQTT Broker at mosquitto-extra:1884
-Successfully disconnected from MQTT Broker at mosquitto-extra:1884
+MQTT connection localhost:1884 too old REGEX(.*)
+Disconnecting from MQTT Broker at localhost:1884
+Successfully disconnected from MQTT Broker at localhost:1884
 
 
-09. Update entity E1883 to re-create connections to mosquitto:1883
+09. Update entity E1883 to re-create connections to localhost:1883
 ==================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -354,7 +354,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 #SORT_START
-10. Dump accumulator for mosquitto:1883 and see 4 notifications
+10. Dump accumulator for localhost:1883 and see 4 notifications
 ===============================================================
 MQTT message at topic /sub1:
 {

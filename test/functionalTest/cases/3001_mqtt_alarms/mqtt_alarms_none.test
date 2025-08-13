@@ -52,7 +52,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "sub1"
     }
   }
@@ -128,13 +128,13 @@ Location: /v2/entities/E?type=T
 03. Check logs and see three MQTT notifications and no alarms
 =============================================================
 #SORT_START
-Request received: POST /v2/subscriptions, request payload (142 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://mosquitto:1883", "topic": "sub1" } } }, response code: 201
+Request received: POST /v2/subscriptions, request payload (142 bytes): { "subject": { "entities": [ { "id": "E", "type": "T" } ] }, "notification": { "mqtt": { "url": "mqtt://localhost:1883", "topic": "sub1" } } }, response code: 201
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered (subId: SUB_ID): broker: mosquitto:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered (subId: SUB_ID): broker: mosquitto:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 Request received: POST /v2/entities?options=forcedUpdate,upsert, request payload (64 bytes): { "id": "E", "type": "T", "A": { "value": 1, "type": "Float" } }, response code: 204
-MQTT Notif delivered (subId: SUB_ID): broker: mosquitto:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
+MQTT Notif delivered (subId: SUB_ID): broker: localhost:1883, topic: sub1, payload (121 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Float","value":1,"metadata":{}}}]}
 #SORT_END
 
 

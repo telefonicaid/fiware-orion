@@ -66,17 +66,5 @@ This releases network resources without destroying the producer. If the producer
 Kafka does not “reconnect” the same closed TCP connection; it creates a new one (to the same broker).
 However, the producer object (rd_kafka_t) remains the same, keeping its configuration and internal state. It does not free the producer’s memory.
 
-What should we do in Orion?
-Avoid destroying producers, or be very conservative about doing so—destroy them only when strictly necessary.
-
-When would we need to destroy the producer in Orion?
-
-If we need to apply credential changes, which is not implemented at the moment.
-
-Inactive clusters (long periods) — cleanup should be conservative (30+ days).
-
-This leads to two issues:
-
-1. Apply the `connections.max.idle.ms` configuration to the Kafka producer (improvement)
 
 

@@ -49,7 +49,7 @@ payload='{
   },
   "notification": {
     "mqttCustom": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "${service}${servicePath}/${authToken}",
       "payload": "id: ${id}, S: ${service}, SS: ${servicePath}, token: ${authToken}"
     }
@@ -78,7 +78,6 @@ echo
 echo "03. Dump accumulator, see 1 notification"
 echo "========================================"
 accumulatorDump
-accumulatorReset
 echo
 echo
 

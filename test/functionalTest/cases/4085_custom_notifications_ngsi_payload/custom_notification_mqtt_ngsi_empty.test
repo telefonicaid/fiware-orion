@@ -52,7 +52,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "ngsi": {}
     }
   }
@@ -102,7 +102,6 @@ sleep 0.75s
 echo "04. Dump accumulator and see two notifications with id E1"
 echo "========================================================="
 accumulatorDump
-accumulatorReset
 echo
 echo
 

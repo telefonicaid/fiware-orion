@@ -768,19 +768,12 @@ function accumulatorStart()
     shift
   fi
 
-  if [ "$1" = "--kafkaHost" ]
+  if [ "$1" = "--bootstrapServers" ]
     then
-      kafkaHost="$1 $2"
+      bootstrapServers="$1 $2"
       shift
       shift
     fi
-
-  if [ "$1" = "--kafkaPort" ]
-  then
-    kafkaPort="$1 $2"
-    shift
-    shift
-  fi
 
   if [ "$1" = "--kafkaTopic" ]
   then
@@ -805,11 +798,10 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  if [ ! -z "$kafkaHost" ]
+  if [ ! -z "$bootstrapServers" ]
   then
     # Start with KAFKA
-        echo "accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic"
-        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $kafkaHost $kafkaPort $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $bootstrapServers $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
         echo accumulator running as PID $$
   elif [ ! -z "$mqttHost" ]
   then
@@ -1163,15 +1155,21 @@ function dbInsertEntity()
 #
 # Create one or more topics in Kafka
 kafkaCreateTopics() {
-  topics=$@
-  for topic in $topics; do
-    echo "Creando tópico: $topic"
+  if [ "$#" -lt 2 ]; then
+    echo "Uso: kafkaCreateTopics <bootstrap> <topic1> [topic2 ...]"
+    echo "Ej.:  kafkaCreateTopics kafka1:9092 sub1 sub2"
+    return 2
+  fi
 
-    # Create the topic (if it does not exist)
+  local bootstrap="$1"; shift
+
+  for topic in "$@"; do
+    echo "Creating topic: $topic (bootstrap: $bootstrap)"
+
     /opt/kafka/bin/kafka-topics.sh \
       --create \
       --topic "$topic" \
-      --bootstrap-server kafka1:9092 \
+      --bootstrap-server "$bootstrap" \
       --partitions 1 \
       --replication-factor 1 \
       --command-config /opt/kafka/ci.conf \
@@ -1179,13 +1177,11 @@ kafkaCreateTopics() {
 
     # Actively wait until Kafka confirmks that it exists
     echo "Waiting for Kafka to register the topic '$topic'..."
-    for i in {1..10}; do
-      exists=$(/opt/kafka/bin/kafka-topics.sh \
-        --list \
-        --command-config /opt/kafka/ci.conf \
-        --bootstrap-server kafka1:9092 | grep -w "$topic")
-
-      if [ -n "$exists" ]; then
+    for i in $(seq 1 10); do
+      if /opt/kafka/bin/kafka-topics.sh \
+          --list \
+          --command-config /opt/kafka/ci.conf \
+          --bootstrap-server "$bootstrap" | grep -qw -- "$topic"; then
         echo "Topic '$topic' created and available."
         break
       else
@@ -1204,17 +1200,47 @@ kafkaCreateTopics() {
 #
 # Delete one or more topics in Kafka
 kafkaDestroyTopics() {
-  topics=$@
-  for topic in $topics; do
-    echo "Eliminando tópico: $topic"
-     /opt/kafka/bin/kafka-topics.sh \
+  if [ "$#" -lt 2 ]; then
+    echo "Use: kafkaDestroyTopics <bootstrap> <topic1> [topic2 ...]"
+    echo "Example:  kafkaDestroyTopics kafka1:9092 sub1 sub2"
+    return 2
+  fi
+
+  local bootstrap="$1"; shift
+  local topic
+
+  for topic in "$@"; do
+    echo "Eliminating topic: $topic (bootstrap: $bootstrap)"
+
+    /opt/kafka/bin/kafka-topics.sh \
       --delete \
       --topic "$topic" \
-      --bootstrap-server kafka1:9092 \
+      --bootstrap-server "$bootstrap" \
       --command-config /opt/kafka/ci.conf \
       --if-exists
   done
 }
+
+
+
+# ------------------------------------------------------------------------------
+#
+# cleanMqttRetain -
+#
+# Delete retained topics by posting an empty message in the topic.
+cleanMqttRetain() {
+  local host="$1"
+  local topic="$2"
+  local port="${3:-1883}"
+
+  if [[ -z "$host" || -z "$topic" ]]; then
+    echo "Uso: mqtt_retain_empty <host> <topic> [puerto]" >&2
+    return 1
+  fi
+
+  mosquitto_pub -h "$host" -p "$port" -t "$topic" -n -r
+}
+
 
 # ------------------------------------------------------------------------------
 #
@@ -1487,3 +1513,4 @@ export -f brokerStartAwait
 export -f brokerStopAwait
 export -f kafkaCreateTopics
 export -f kafkaDestroyTopics
+export -f cleanMqttRetain

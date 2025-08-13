@@ -49,7 +49,8 @@ apt-get -y install \
   libsasl2-dev \
   libgcrypt-dev \
   librdkafka-dev \
-  zlib1g-dev \
+  openjdk-17-jre-headless \
+  zlib1g-dev
 
 echo "INSTALL: MongoDB shell" \
 && curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor \
@@ -109,26 +110,23 @@ echo "INSTALL: mosquitto" \
 
 ldconfig
 
+echo "INSTALL: Kafka" && \
+KAFKA_VERSION=3.9.1 && \
+INSTALL_DIR=/opt/kafka && \
+curl -fsSL "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz" -o /tmp/kafka.tgz && \
+mkdir -p "$INSTALL_DIR" && \
+tar -xzf /tmp/kafka.tgz --strip-components=1 -C "$INSTALL_DIR" && \
+rm /tmp/kafka.tgz && \
+echo "Done. Open a new shell and run:  kafka-topics --help" && \
+echo 'default.api.timeout.ms=12000' >> /opt/kafka/ci.conf && \
+echo 'request.timeout.ms=12000' >> /opt/kafka/ci.conf && \
+echo "Created /opt/kafka/ci.conf"
+
+
+
 apt-get -y clean \
 && rm -Rf /opt/mongo-c-driver-1.29.0 \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-1.0.1 \
 && rm -Rf /opt/mosquitto-2.0.20 \
 && rm -Rf /opt/gmock-1.5.0
-
-set -e
-echo "Install kafka"
-
-KAFKA_VERSION=3.9.1
-INSTALL_DIR=/opt/kafka
-
-curl -fsSL "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz" -o /tmp/kafka.tgz
-mkdir -p "$INSTALL_DIR"
-tar -xzf /tmp/kafka.tgz --strip-components=1 -C "$INSTALL_DIR"
-rm /tmp/kafka.tgz
-echo "Done. Open a new shell and run:  kafka-topics --help"
-
-echo 'default.api.timeout.ms=12000' >> /opt/kafka/ci.conf
-echo 'request.timeout.ms=12000' >> /opt/kafka/ci.conf
-echo "Created /opt/kafka/ci.conf"
-

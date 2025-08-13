@@ -72,7 +72,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "ngsi": {
         "A": {
           "value": "${B",
@@ -117,7 +117,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "ngsi": {
         "A": {
           "value": "B}",
@@ -159,7 +159,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "ngsi": {
         "A": {
           "value": "${${B}}",

@@ -27,17 +27,15 @@ KAFKA custom notification tests
 dbInit CB
 
 # tracelevel 164 is the one for KAFKA notification logs
-kafkaCreateTopics sub_E1 sub_E2
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub_E1 sub_E2
 brokerStart CB 164 IPV4
-accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "^sub_.*"
-echo "Verifying Kafka connection..."
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub_.*"
 
 --SHELL--
 
 #
-# Hint: use this to run the KAFKA broker needed for this .test:
+# Hint:  A Kafka cluster accessible at localhost:9092,localhost:9094 is required for this .test:
 #
-# docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11 #TODO: document  Kafka service
 #
 # 01. Create KAFKA custom sub for entity E with topic sub_${id} payload A:{$A}
 # 02. Create entity E1 with A=1
@@ -63,7 +61,7 @@ payload='{
   },
   "notification": {
     "kafkaCustom": {
-      "url": "kafka://kafka1:9092",
+      "url": "kafka://localhost:9092,localhost:9094",
       "topic": "sub_${id}",
       "payload": "{ %22A%22: %22${A}%22 }"
     }
@@ -300,7 +298,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 486
+Content-Length: 504
 
 [
     {
@@ -313,7 +311,7 @@ Content-Length: 486
             "kafkaCustom": {
                 "payload": "{ %22A%22: %22${A}%22 }",
                 "topic": "sub_${id}",
-                "url": "kafka://kafka1:9092"
+                "url": "kafka://localhost:9092,localhost:9094"
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
@@ -339,6 +337,6 @@ Content-Length: 486
 
 --TEARDOWN--
 accumulatorStop
-kafkaDestroyTopics sub_E1 sub_E2
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub_E1 sub_E2
 brokerStop CB
 dbDrop CB

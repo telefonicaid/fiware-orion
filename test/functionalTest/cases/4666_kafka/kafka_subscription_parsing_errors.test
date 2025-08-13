@@ -40,7 +40,10 @@ brokerStart CB
 # 08. Create kafka sub without topic, see error
 # 09. Create kafka sub with topic not being a string, see error
 # 10. Create kafka sub with empty topic, see error
-# 11. Create http sub with kafka url, see error
+# 11. Create kafka sub with topic with #, see error
+# 12. Create kafka sub with topic with +, see error
+# 13. Create kafka sub with topic with /, see error
+# 14. Create http sub with kafka url, see error
 #
 
 
@@ -307,7 +310,91 @@ echo
 echo
 
 
-echo "11. Create http sub with kafka url, see error"
+echo "11. Create kafka sub with topic with #, see error"
+echo "================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": "sub#",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "12. Create kafka sub with topic with +, see error"
+echo "================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": "sub+",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "13. Create kafka sub with topic with /, see error"
+echo "================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": "/sub",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "14. Create http sub with kafka url, see error"
 echo "============================================="
 payload='{
   "description": "Test subscription",
@@ -474,7 +561,49 @@ Content-Length: 64
 }
 
 
-11. Create http sub with kafka url, see error
+11. Create kafka sub with topic with #, see error
+=================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "description": "+, # and / are not allowed in kafka field /topic/",
+    "error": "BadRequest"
+}
+
+
+12. Create kafka sub with topic with +, see error
+================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "description": "+, # and / are not allowed in kafka field /topic/",
+    "error": "BadRequest"
+}
+
+
+13. Create kafka sub with topic with /, see error
+================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "description": "+, # and / are not allowed in kafka field /topic/",
+    "error": "BadRequest"
+}
+
+
+14. Create http sub with kafka url, see error
 =============================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)

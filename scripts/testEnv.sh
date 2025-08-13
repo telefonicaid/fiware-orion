@@ -69,13 +69,10 @@ export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 
 # -----------------------------------------------------------------------------
 #
-# KAFKA Broker configuration for harness tests
+# KAFKA Bootstrap configuration for harness tests
 #
-export KAFKA_HOST=${KAFKA_HOST:-localhost}
-export KAFKA_PORT=${KAFKA_PORT:-9092}
-#export KAFKA_DEBUG_PORT=${KAFKA_DEBUG_PORT:-18883}
-
-
+export KAFKA_BOOTSTRAP_A="${KAFKA_BOOTSTRAP_A:-localhost:9092,localhost:9094}"
+export KAFKA_BOOTSTRAP_B="${KAFKA_BOOTSTRAP_B:-localhost:9095}"
 
 
 # -----------------------------------------------------------------------------

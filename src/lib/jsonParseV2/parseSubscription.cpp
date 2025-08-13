@@ -655,7 +655,7 @@ static std::string parseKafkaUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
   std::string protocol;
   std::string  path;
 
-  if (!parseKafkaBrokerList(urlOpt.value, cleanBrokers, protocol, path))
+  if (!parseKafkaBrokerList(urlOpt.value, &cleanBrokers, &protocol, &path))
     return badInput(ciP, "invalid kafka /url/");
 
   if (protocol != "kafka:")
@@ -789,10 +789,10 @@ static std::string parseKafkaTopic(ConnectionInfo* ciP, SubscriptionUpdate* subs
     return badInput(ciP, "empty kafka field /topic/");
   }
 
-  // if (forbiddenMqttTopic(topicOpt.value.c_str()))
-  // {
-  //   return badInput(ciP, "+ and # are not allowed in kafka field /topic/");
-  // }
+  if (forbiddenKafkaTopic(topicOpt.value.c_str()))
+  {
+    return badInput(ciP, "+, # and / are not allowed in kafka field /topic/");
+  }
 
 
   if (forbiddenChars(topicOpt.value.c_str()))
@@ -1259,27 +1259,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
-    // // user/pass
-    // r = parseMqttAuth(ciP, subsP, mqtt);
-    // if (!r.empty())
-    // {
-    //   return r;
-    // }
-
-    // // qos
-    // r = parseMqttQoS(ciP, subsP, mqtt);
-    // if (!r.empty())
-    // {
-    //   return r;
-    // }
-
-    // // retain
-    // r = parseMqttRetain(ciP, subsP, mqtt);
-    // if (!r.empty())
-    // {
-    //   return r;
-    // }
-
     // topic
     r = parseKafkaTopic(ciP, subsP, kafka);
     if (!r.empty())
@@ -1306,27 +1285,6 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
     {
       return r;
     }
-
-    // // user/pass same as in not custom mqtt)
-    // r = parseMqttAuth(ciP, subsP, mqttCustom);
-    // if (!r.empty())
-    // {
-    //   return r;
-    // }
-
-    // // qos (same as in not custom mqtt)
-    // r = parseMqttQoS(ciP, subsP, mqttCustom);
-    // if (!r.empty())
-    // {
-    //   return r;
-    // }
-
-    // // retain
-    // r = parseMqttRetain(ciP, subsP, mqttCustom);
-    // if (!r.empty())
-    // {
-    //   return r;
-    // }
 
     // topic (same as in not custom mqtt)
     r = parseKafkaTopic(ciP, subsP, kafkaCustom);

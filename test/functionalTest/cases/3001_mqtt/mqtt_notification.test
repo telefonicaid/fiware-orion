@@ -61,7 +61,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "sub1"
     }
   }
@@ -85,7 +85,7 @@ payload='{
   },
   "notification": {
     "mqtt": {
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "topic": "sub2"
     }
   }
@@ -317,7 +317,7 @@ Content-Length: 1379
                 "qos": 0,
                 "retain": false,
                 "topic": "sub1",
-                "url": "mqtt://mosquitto:1883"
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false,
             "timesSent": 2
@@ -349,7 +349,7 @@ Content-Length: 1379
                 "qos": 0,
                 "retain": false,
                 "topic": "sub2",
-                "url": "mqtt://mosquitto:1883"
+                "url": "mqtt://localhost:1883"
             },
             "onlyChangedAttrs": false,
             "timesSent": 2

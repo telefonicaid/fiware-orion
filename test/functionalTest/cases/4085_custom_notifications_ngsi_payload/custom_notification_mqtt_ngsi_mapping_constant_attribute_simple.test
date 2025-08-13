@@ -52,7 +52,7 @@ payload='{
   "notification": {
     "mqttCustom": {
       "topic": "topic1",
-      "url": "mqtt://mosquitto:1883",
+      "url": "mqtt://localhost:1883",
       "ngsi": {
         "A": {
           "value": "foo",
@@ -111,7 +111,6 @@ sleep 0.75s
 echo "04. Dump accumulator and see two notifications with A set to foo"
 echo "================================================================"
 accumulatorDump
-accumulatorReset
 echo
 echo
 
@@ -194,5 +193,4 @@ MQTT message at topic topic1:
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-accumulatorReset
 accumulatorStop

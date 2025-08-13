@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2018 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Burak Karaboga
+* Author: Oriana Romero (based in MQTT implementation from Burak Karaboga)
 */
 #include <string>
 
@@ -105,8 +105,6 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
 {
   this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
   this->topic  = bo.hasField(CSUB_KAFKATOPIC)? getStringFieldF(bo, CSUB_KAFKATOPIC) : "";
-  // this->qos    = bo.hasField(CSUB_KAFKAQOS)?   getIntFieldF(bo, CSUB_MQTTQOS)      : 0;
-  // this->retain = bo.hasField(CSUB_MQTTRETAIN)? getBoolFieldF(bo, CSUB_MQTTRETAIN) : false;
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
 
   // both user and passwd have to be used at the same time

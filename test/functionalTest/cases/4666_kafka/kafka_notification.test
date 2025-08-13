@@ -27,16 +27,15 @@ KAFKA notification tests
 dbInit CB
 
 # tracelevel 164 is the one for KAFKA notification logs
-kafkaCreateTopics sub1 sub2
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1 sub2
 brokerStart CB 164 IPV4
-accumulatorStart --pretty-print --kafkaHost ${KAFKA_HOST} --kafkaPort ${KAFKA_PORT} --kafkaTopic "^sub.*"
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
 
 --SHELL--
 
 #
-# Hint: use this to run the KAFKA broker needed for this .test:
+# Hint: A Kafka cluster accessible at localhost:9092,localhost:9094 is required for this .test:
 #
-#   docker run -d -p 1883:1883 -v /path/to/repo/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11 #TODO: document  Kafka service
 #
 # 01. Create KAFKA sub for entity E with topic sub1
 # 02. Create KAFKA sub for entity E with topic sub2
@@ -62,7 +61,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://kafka1:9092",
+      "url": "kafka://localhost:9092,localhost:9094",
       "topic": "sub1"
     }
   }
@@ -86,7 +85,7 @@ payload='{
   },
   "notification": {
     "kafka": {
-      "url": "kafka://kafka1:9092",
+      "url": "kafka://localhost:9092,localhost:9094",
       "topic": "sub2"
     }
   }
@@ -308,7 +307,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1333
+Content-Length: 1369
 
 [
     {
@@ -320,7 +319,7 @@ Content-Length: 1333
             "covered": false,
             "kafka": {
                 "topic": "sub1",
-                "url": "kafka://kafka1:9092"
+                "url": "kafka://localhost:9092,localhost:9094"
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
@@ -350,7 +349,7 @@ Content-Length: 1333
             "covered": false,
             "kafka": {
                 "topic": "sub2",
-                "url": "kafka://kafka1:9092"
+                "url": "kafka://localhost:9092,localhost:9094"
             },
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
@@ -475,6 +474,6 @@ Payload:
 
 --TEARDOWN--
 accumulatorStop
-kafkaDestroyTopics sub1 sub2
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1 sub2
 brokerStop CB
 dbDrop CB
