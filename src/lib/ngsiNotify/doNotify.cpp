@@ -42,6 +42,7 @@
 #include "common/limits.h"
 #include "common/statistics.h"
 #include "common/logTracing.h"
+#include "common/string.h"
 
 
 
@@ -55,19 +56,24 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
   long long    statusCode = -1;
   std::string  out;
 
-  char                portV[STRING_SIZE_FOR_INT];
-  std::string         endpoint;
-  std::string         url;
+  std::string host;
+  int         port;
+  std::string url;
 
-  snprintf(portV, sizeof(portV), "%d", params->port);
-  endpoint = params->ip + ":" + portV;
-  url = endpoint + params->resource;
+  // Parse endpoint to get host and port
+  if (!parseEndpoint(params->endpoint, host, port))
+  {
+    LM_E(("Runtime Error (invalid endpoint: '%s')", params->endpoint.c_str()));
+    return;
+  }
+
+  url = params->endpoint + params->resource;
 
   int r =  httpRequestSend(curl,
                        "subId: " + params->subscriptionId,
                        params->from,
-                       params->ip,
-                       params->port,
+                       host,
+                       port,
                        params->protocol,
                        params->verb,
                        params->tenant,
@@ -127,11 +133,11 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
   // Add notificacion result summary in log INFO level
   if (statusCode != -1)
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode);
+    logInfoHttpNotification(params->subscriptionId.c_str(), params->endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode);
   }
   else
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
+    logInfoHttpNotification(params->subscriptionId.c_str(), params->endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
   }
 }
 
@@ -144,27 +150,31 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
 */
 static void doNotifyMqtt(SenderThreadParams* params)
 {
-  char                portV[STRING_SIZE_FOR_INT];
-  std::string         endpoint;
+  std::string host;
+  int         port;
 
-  snprintf(portV, sizeof(portV), "%d", params->port);
-  endpoint = params->ip + ":" + portV;
+  // Parse endpoint to get host and port
+  if (!parseEndpoint(params->endpoint, host, port))
+  {
+    LM_E(("Runtime Error (invalid endpoint: '%s')", params->endpoint.c_str()));
+    return;
+  }
 
   // Note in the case of HTTP this lmTransactionStart is done internally in httpRequestSend
   std::string protocol = params->protocol + "//";
   correlatorIdSet(params->fiwareCorrelator.c_str());
-  lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
+  lmTransactionStart("to", protocol.c_str(), host.c_str(), port, params->resource.c_str(),
                      params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
   // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
   // lastFailureReason and lastSuccessCode in MQTT notifications (they don't have sense in this case)
-  if (mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos, params->retain))
+  if (mqttMgr.sendMqttNotification(host, port, params->user, params->passwd, params->content, params->resource, params->qos, params->retain))
   {
     // MQTT transaction is logged only in the case it was actually published. Upon successful publishing
     // mqttOnPublishCallback is called (by the moment we are not doing nothing there, just printing in
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
-    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
+    logInfoMqttNotification(params->subscriptionId.c_str(), params->endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else

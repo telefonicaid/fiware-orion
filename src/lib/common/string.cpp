@@ -472,6 +472,77 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
 /* ****************************************************************************
 *
+* buildEndpoint - construct endpoint string from host and port
+*/
+std::string buildEndpoint(const std::string& host, int port)
+{
+  char portV[STRING_SIZE_FOR_INT];
+  snprintf(portV, sizeof(portV), "%d", port);
+  return host + ":" + portV;
+}
+
+
+
+/* ****************************************************************************
+*
+* parseEndpoint - parse endpoint string into host and port
+*
+* This function parses an endpoint string (host:port) into separate host and port values.
+* Returns true on success, false on failure.
+*/
+bool parseEndpoint(const std::string& endpoint, std::string& host, int& port)
+{
+  // Handle IPv6 case first
+  std::string auxIp;
+  std::string auxPort;
+  
+  if (getIPv6Port(endpoint, auxIp, auxPort))
+  {
+    // IPv6
+    host = auxIp;
+    port = atoi(auxPort.c_str());
+  }
+  else
+  {
+    // IPv4 or hostname
+    std::vector<std::string> hostTokens;
+    int components = stringSplit(endpoint, ':', hostTokens);
+
+    if (components < 1 || components > 2)
+    {
+      return false;
+    }
+
+    host = hostTokens[0];
+
+    if (components == 2)
+    {
+      if (hostTokens[1].empty())
+      {
+        return false;
+      }
+      port = atoi(hostTokens[1].c_str());
+    }
+    else
+    {
+      // No port specified - this should not happen for endpoints, but handle gracefully
+      return false;
+    }
+  }
+
+  // Validate port range
+  if (port <= 0 || port > MAX_PORT)
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * parsedUptime
 */
 std::string parsedUptime(int uptime)

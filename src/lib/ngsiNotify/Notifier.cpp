@@ -592,8 +592,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   paramsP->type             = QUEUE_MSG_NOTIF;
   paramsP->from             = fromIp;  // note fromIp is a thread variable
-  paramsP->ip               = host;
-  paramsP->port             = port;
+  paramsP->endpoint         = buildEndpoint(host, port);
   paramsP->protocol         = protocol;
   paramsP->verb             = method;
   paramsP->tenant           = tenant;
@@ -764,8 +763,7 @@ SenderThreadParams* Notifier::buildSenderParams
 
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
-    paramsP->ip               = host;
-    paramsP->port             = port;
+    paramsP->endpoint         = buildEndpoint(host, port);
     paramsP->protocol         = protocol;
     paramsP->verb             = verbName(verb);
     paramsP->tenant           = tenant;
