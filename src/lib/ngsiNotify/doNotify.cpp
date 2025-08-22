@@ -153,7 +153,7 @@ static void doNotifyMqtt(SenderThreadParams* params)
   std::string host;
   int         port;
 
-  // Parse endpoint to get host and port
+  // Parse endpoint to get host and port for logging purposes only
   if (!parseEndpoint(params->endpoint, host, port))
   {
     LM_E(("Runtime Error (invalid endpoint: '%s')", params->endpoint.c_str()));
@@ -168,7 +168,7 @@ static void doNotifyMqtt(SenderThreadParams* params)
 
   // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
   // lastFailureReason and lastSuccessCode in MQTT notifications (they don't have sense in this case)
-  if (mqttMgr.sendMqttNotification(host, port, params->user, params->passwd, params->content, params->resource, params->qos, params->retain))
+  if (mqttMgr.sendMqttNotification(params->endpoint, params->user, params->passwd, params->content, params->resource, params->qos, params->retain))
   {
     // MQTT transaction is logged only in the case it was actually published. Upon successful publishing
     // mqttOnPublishCallback is called (by the moment we are not doing nothing there, just printing in
