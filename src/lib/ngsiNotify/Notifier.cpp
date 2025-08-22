@@ -546,8 +546,9 @@ static SenderThreadParams* buildSenderParamsCustom
   std::string  host;
   int          port;
   std::string  uriPath;
+  std::string  endpoint;
 
-  if (!parseUrl(url, host, port, uriPath, protocol))
+  if (!parseUrl(url, host, port, uriPath, protocol, endpoint))
   {
     LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
     return NULL;
@@ -592,7 +593,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   paramsP->type             = QUEUE_MSG_NOTIF;
   paramsP->from             = fromIp;  // note fromIp is a thread variable
-  paramsP->endpoint         = buildEndpoint(host, port);
+  paramsP->endpoint         = endpoint;
   paramsP->protocol         = protocol;
   paramsP->verb             = method;
   paramsP->tenant           = tenant;
@@ -748,9 +749,10 @@ SenderThreadParams* Notifier::buildSenderParams
     int          port;
     std::string  uriPath;
     std::string  protocol;
+    std::string  endpoint;
 
     std::string url = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-    if (!parseUrl(url, host, port, uriPath, protocol))
+    if (!parseUrl(url, host, port, uriPath, protocol, endpoint))
     {
       LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
       return NULL;
@@ -763,7 +765,7 @@ SenderThreadParams* Notifier::buildSenderParams
 
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
-    paramsP->endpoint         = buildEndpoint(host, port);
+    paramsP->endpoint         = endpoint;
     paramsP->protocol         = protocol;
     paramsP->verb             = verbName(verb);
     paramsP->tenant           = tenant;

@@ -605,3 +605,99 @@ TEST(string, buildParseEndpointRoundtrip)
   EXPECT_EQ(originalHost, parsedHost);
   EXPECT_EQ(originalPort, parsedPort);
 }
+
+/* ****************************************************************************
+*
+* parseUrlWithEndpoint -
+*/
+TEST(string, parseUrlWithEndpoint)
+{
+  std::string url = "http://host:8080/my/path";
+  
+  std::string host;
+  int         port;
+  std::string path;
+  std::string protocol;
+  std::string endpoint;
+  
+  bool result = parseUrl(url, host, port, path, protocol, endpoint);
+  
+  EXPECT_TRUE(result);
+  EXPECT_EQ("host", host);
+  EXPECT_EQ(8080, port);
+  EXPECT_EQ("/my/path", path);
+  EXPECT_EQ("http:", protocol);
+  EXPECT_EQ("host:8080", endpoint);
+}
+
+/* ****************************************************************************
+*
+* parseUrlWithEndpointNoPort -
+*/
+TEST(string, parseUrlWithEndpointNoPort)
+{
+  std::string url = "http://host/my/path";
+  
+  std::string host;
+  int         port;
+  std::string path;
+  std::string protocol;
+  std::string endpoint;
+  
+  bool result = parseUrl(url, host, port, path, protocol, endpoint);
+  
+  EXPECT_TRUE(result);
+  EXPECT_EQ("host", host);
+  EXPECT_EQ(80, port);
+  EXPECT_EQ("/my/path", path);
+  EXPECT_EQ("http:", protocol);
+  EXPECT_EQ("host:80", endpoint);
+}
+
+/* ****************************************************************************
+*
+* parseUrlWithEndpointHttps -
+*/
+TEST(string, parseUrlWithEndpointHttps)
+{
+  std::string url = "https://secure.host.com:9443/secure/path";
+  
+  std::string host;
+  int         port;
+  std::string path;
+  std::string protocol;
+  std::string endpoint;
+  
+  bool result = parseUrl(url, host, port, path, protocol, endpoint);
+  
+  EXPECT_TRUE(result);
+  EXPECT_EQ("secure.host.com", host);
+  EXPECT_EQ(9443, port);
+  EXPECT_EQ("/secure/path", path);
+  EXPECT_EQ("https:", protocol);
+  EXPECT_EQ("secure.host.com:9443", endpoint);
+}
+
+/* ****************************************************************************
+*
+* parseUrlWithEndpointMqtt -
+*/
+TEST(string, parseUrlWithEndpointMqtt)
+{
+  std::string url = "mqtt://mqtt.broker.com:1883/topic";
+  
+  std::string host;
+  int         port;
+  std::string path;
+  std::string protocol;
+  std::string endpoint;
+  
+  bool result = parseUrl(url, host, port, path, protocol, endpoint);
+  
+  EXPECT_TRUE(result);
+  EXPECT_EQ("mqtt.broker.com", host);
+  EXPECT_EQ(1883, port);
+  EXPECT_EQ("/topic", path);
+  EXPECT_EQ("mqtt:", protocol);
+  EXPECT_EQ("mqtt.broker.com:1883", endpoint);
+}

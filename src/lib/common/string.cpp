@@ -472,6 +472,22 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
 /* ****************************************************************************
 *
+* parseUrl - overloaded version that also extracts endpoint
+*/
+bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol, std::string& endpoint)
+{
+  bool result = parseUrl(url, host, port, path, protocol);
+  if (result)
+  {
+    endpoint = buildEndpoint(host, port);
+  }
+  return result;
+}
+
+
+
+/* ****************************************************************************
+*
 * buildEndpoint - construct endpoint string from host and port
 */
 std::string buildEndpoint(const std::string& host, int port)
