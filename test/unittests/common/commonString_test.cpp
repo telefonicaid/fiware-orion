@@ -503,3 +503,105 @@ TEST(string, str2double)
   EXPECT_TRUE(b);
   EXPECT_EQ(23, d);
 }
+
+/* ****************************************************************************
+*
+* buildEndpoint -
+*/
+TEST(string, buildEndpoint)
+{
+  std::string endpoint;
+  
+  endpoint = buildEndpoint("localhost", 1883);
+  EXPECT_EQ("localhost:1883", endpoint);
+  
+  endpoint = buildEndpoint("mqtt.example.com", 8883);
+  EXPECT_EQ("mqtt.example.com:8883", endpoint);
+  
+  endpoint = buildEndpoint("192.168.1.100", 80);
+  EXPECT_EQ("192.168.1.100:80", endpoint);
+  
+  // IPv6 addresses (note: IPv6 addresses should be enclosed in brackets for URLs, 
+  // but at the endpoint level we store them without brackets for consistency)
+  endpoint = buildEndpoint("2001:db8::1", 443);
+  EXPECT_EQ("2001:db8::1:443", endpoint);
+}
+
+/* ****************************************************************************
+*
+* parseEndpoint -
+*/
+TEST(string, parseEndpoint)
+{
+  bool        result;
+  std::string host;
+  int         port;
+  
+  // Valid endpoints
+  result = parseEndpoint("localhost:1883", host, port);
+  EXPECT_TRUE(result);
+  EXPECT_EQ("localhost", host);
+  EXPECT_EQ(1883, port);
+  
+  result = parseEndpoint("mqtt.example.com:8883", host, port);
+  EXPECT_TRUE(result);
+  EXPECT_EQ("mqtt.example.com", host);
+  EXPECT_EQ(8883, port);
+  
+  result = parseEndpoint("192.168.1.100:80", host, port);
+  EXPECT_TRUE(result);
+  EXPECT_EQ("192.168.1.100", host);
+  EXPECT_EQ(80, port);
+  
+  // IPv6 endpoint
+  result = parseEndpoint("2001:db8::1:443", host, port);
+  EXPECT_TRUE(result);
+  EXPECT_EQ("2001:db8::1", host);
+  EXPECT_EQ(443, port);
+  
+  // Invalid endpoints
+  result = parseEndpoint("invalid", host, port);
+  EXPECT_FALSE(result);
+  
+  result = parseEndpoint("host:", host, port);
+  EXPECT_FALSE(result);
+  
+  result = parseEndpoint(":1234", host, port);
+  EXPECT_FALSE(result);
+  
+  result = parseEndpoint("", host, port);
+  EXPECT_FALSE(result);
+  
+  result = parseEndpoint("host:0", host, port);
+  EXPECT_FALSE(result);
+  
+  result = parseEndpoint("host:65536", host, port);
+  EXPECT_FALSE(result);
+  
+  result = parseEndpoint("host:-1", host, port);
+  EXPECT_FALSE(result);
+  
+  result = parseEndpoint("host:abc", host, port);
+  EXPECT_FALSE(result);
+}
+
+/* ****************************************************************************
+*
+* buildParseEndpointRoundtrip -
+*/
+TEST(string, buildParseEndpointRoundtrip)
+{
+  // Test that building an endpoint and then parsing it gets back the original values
+  std::string originalHost = "test.example.com";
+  int         originalPort = 9999;
+  
+  std::string endpoint = buildEndpoint(originalHost, originalPort);
+  
+  std::string parsedHost;
+  int         parsedPort;
+  bool        result = parseEndpoint(endpoint, parsedHost, parsedPort);
+  
+  EXPECT_TRUE(result);
+  EXPECT_EQ(originalHost, parsedHost);
+  EXPECT_EQ(originalPort, parsedPort);
+}
