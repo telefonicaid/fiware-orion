@@ -32,6 +32,7 @@
 
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
+#include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 
 
@@ -41,19 +42,6 @@
 * MQTT_DEFAULT_KEEPALIVE -
 */
 #define MQTT_DEFAULT_KEEPALIVE 60
-
-
-
-/* ****************************************************************************
-*
-* getEndpoint -
-*/
-inline std::string getEndpoint(const std::string& host, int port)
-{
-  char  portV[STRING_SIZE_FOR_INT];
-  snprintf(portV, sizeof(portV), "%d", port);
-  return host + ":" + portV;
-}
 
 
 
@@ -236,10 +224,21 @@ void MqttConnectionManager::disconnect(struct mosquitto*  mosq, const std::strin
 *
 * MqttConnectionManager::getConnection -
 */
-MqttConnection* MqttConnectionManager::getConnection(const std::string& host, int port, const std::string& user, const std::string& passwd)
+MqttConnection* MqttConnectionManager::getConnection(const std::string& endpoint, const std::string& user, const std::string& passwd)
 {
   // Note we don't take the sem here, as the caller has already done that
-  std::string endpoint = getEndpoint(host, port);
+  
+  // Parse endpoint to get host and port for mosquitto_connect call
+  std::string host;
+  int         port;
+  
+  if (!parseEndpoint(endpoint, host, port))
+  {
+    LM_E(("Runtime Error (invalid endpoint: '%s')", endpoint.c_str()));
+    MqttConnection* cP = new MqttConnection();
+    cP->mosq = NULL;
+    return cP;
+  }
 
   if (connections.find(endpoint) == connections.end())
   {
@@ -363,17 +362,15 @@ MqttConnection* MqttConnectionManager::getConnection(const std::string& host, in
 *
 * MqttConnectionManager::sendMqttNotification -
 */
-bool MqttConnectionManager::sendMqttNotification(const std::string& host, int port, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, bool retain)
+bool MqttConnectionManager::sendMqttNotification(const std::string& endpoint, const std::string& user, const std::string& passwd, const std::string& content, const std::string& topic, unsigned int qos, bool retain)
 {
-  std::string endpoint = getEndpoint(host, port);
-
   // A previous version of the implementation took the sem in getConnection(), but we
   // need to do it in sendMqttNotification to avoid the connection get removed by
   // the cleanup() method while is being used here (the probability is small, but
   // it could happen in theory)
   semTake();
 
-  MqttConnection* cP = getConnection(host, port, user, passwd);
+  MqttConnection* cP = getConnection(endpoint, user, passwd);
   mosquitto* mosq = cP->mosq;
 
   if (mosq == NULL)
