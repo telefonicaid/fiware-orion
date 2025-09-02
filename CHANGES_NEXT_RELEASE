@@ -8,4 +8,5 @@
 - Fix: memory leaks in parse logic in case of parse error (possibly)
 - Fix: csubs and registrations now use isPattern as bool instead of string (legacy from NGSIv1 model), although strings are still supported (#4681)
 - Hardening: remove a huge amount of NGSIv1 related dead-code (#4681)
-- Add: support for NGSI subscriptions and forwarding Orion notifications to Kafka topics.
+- Add: support for Kafka based notifications (#4666)
+- Add: new CLI parameters kafkaTimeout and kafkaMaxAge (and associated env vars ORION_KAFKA_TIMEOUT and ORION_KAFKA_MAX_AGE) (#4666)

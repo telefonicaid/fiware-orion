@@ -204,15 +204,19 @@ void KafkaConnectionManager::dispatchKafkaCallbacks()
   producers.reserve(connections.size());
 
   semTake();
-  for (auto& kv : connections) {
+  for (auto& kv : connections)
+  {
     KafkaConnection* k = kv.second;
     if (k && k->producer)
+    {
       producers.push_back(k->producer);
+    }
   }
   semGive();
 
   // We fire callbacks outside the critical section
-  for (auto* p : producers) {
+  for (rd_kafka_t* p : producers)
+  {
     // 0 ms: does not block; if you call frequently, this is sufficient
     rd_kafka_poll(p, 0);
   }
@@ -257,20 +261,20 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
 
     // Basic configuration (as in MQTT)
     rd_kafka_conf_t* conf = rd_kafka_conf_new();
-    if (rd_kafka_conf_set(conf, "bootstrap.servers", endpoint.c_str(), nullptr, 0) != RD_KAFKA_CONF_OK)
+    if (rd_kafka_conf_set(conf, "bootstrap.servers", endpoint.c_str(), NULL, 0) != RD_KAFKA_CONF_OK)
     {
       LM_E(("Runtime Error (Kafka config failed for %s)", endpoint.c_str()));
       delete kConn;
-      return nullptr;
+      return NULL;
     }
     rd_kafka_conf_set_opaque(conf, kConn);
 
     // Force UTF-8 and disable conversions
-    rd_kafka_conf_set(conf, "message.encoding", "utf-8", nullptr, 0);
+    rd_kafka_conf_set(conf, "message.encoding", "utf-8", NULL, 0);
 
     // Buffer configuration
-    rd_kafka_conf_set(conf, "queue.buffering.max.ms", KAFKA_MAX_BUFFERING_MS_STR, nullptr, 0);
-    rd_kafka_conf_set(conf, "message.max.bytes", KAFKA_MAX_MESSAGE_BYTES_STR, nullptr, 0);
+    rd_kafka_conf_set(conf, "queue.buffering.max.ms", KAFKA_MAX_BUFFERING_MS_STR, NULL, 0);
+    rd_kafka_conf_set(conf, "message.max.bytes", KAFKA_MAX_MESSAGE_BYTES_STR, NULL, 0);
 
     // Connection callback (similar to MQTT)
     rd_kafka_conf_set_dr_msg_cb(conf, [](rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque)
@@ -296,12 +300,12 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
 
 
     // Create producer
-    kConn->producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, nullptr, 0);
+    kConn->producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, NULL, 0);
     if (!kConn->producer)
     {
       LM_E(("Runtime Error (Failed to create Kafka producer for %s)", endpoint.c_str()));
       delete kConn;
-      return nullptr;
+      return NULL;
     }
 
     // Wait for connection
@@ -344,9 +348,9 @@ bool KafkaConnectionManager::sendKafkaNotification(
   semTake(); // Synchronization
 
   KafkaConnection* kConn = getConnection(endpoint);
-  rd_kafka_t* producer = kConn ? kConn->producer : nullptr;
+  rd_kafka_t* producer = kConn ? kConn->producer : NULL;
 
-  if (producer == nullptr)
+  if (producer == NULL)
   {
     if (kConn) delete kConn;
     semGive();
@@ -367,12 +371,12 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (!tenant.empty())
   {
-    rd_kafka_header_add(headers, "FIWARE_SERVICE", -1, tenant.c_str(), tenant.size());
+    rd_kafka_header_add(headers, "Fiware-Service", -1, tenant.c_str(), tenant.size());
   }
 
   if (!servicePath.empty())
   {
-    rd_kafka_header_add(headers, "FIWARE_SERVICEPATH", -1, servicePath.c_str(), servicePath.size());
+    rd_kafka_header_add(headers, "Fiware-Servicepath", -1, servicePath.c_str(), servicePath.size());
   }
 
   bool retval = false;

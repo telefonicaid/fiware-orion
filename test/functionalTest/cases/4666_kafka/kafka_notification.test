@@ -254,7 +254,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
 REGEX(^Kafka message at topic sub\d+$)
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -274,7 +274,7 @@ Payload:
 REGEX(^Kafka message at topic sub\d+$)
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -433,7 +433,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
 REGEX(^Kafka message at topic sub\d+$)
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -453,7 +453,7 @@ Payload:
 REGEX(^Kafka message at topic sub\d+$)
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",

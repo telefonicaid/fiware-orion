@@ -519,7 +519,10 @@ bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, st
     // Trim
     rawBroker.erase(0, rawBroker.find_first_not_of(" \t\n\r"));
     rawBroker.erase(rawBroker.find_last_not_of(" \t\n\r") + 1);
-    if (rawBroker.empty()) continue;
+    if (rawBroker.empty())
+    {
+      continue;
+    }
 
     // Prefix kafka://
     const std::string prefix = *protocol + "//";
@@ -557,7 +560,9 @@ bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, st
     {
       // IPv4 addr:port
       if (!getIPv4HostPort(rawBroker, host, port, *protocol))
+      {
         return false;
+      }
     }
 
     //
@@ -576,7 +581,9 @@ bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, st
     // normalize and save
     // For IPv6 we keep brackets
     if (host.find(':') != std::string::npos && host.front() != '[')
+    {
       host = "[" + host + "]";
+    }
 
     cleaned.push_back(host + ":" + std::to_string(port));
   }

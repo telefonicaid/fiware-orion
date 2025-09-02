@@ -375,7 +375,6 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
       setCustomMqttInfo(sub.notification.mqttInfo, b);
     }
   }
-
   else // KafkaNotification
   {
     b->append(CSUB_REFERENCE, sub.notification.kafkaInfo.url);

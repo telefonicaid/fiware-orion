@@ -219,7 +219,7 @@ Content-Length: 0
 Kafka message at topic sub_E1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "A": "1"
@@ -242,7 +242,7 @@ Content-Length: 0
 Kafka message at topic sub_E2
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "A": "2"
@@ -263,7 +263,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Kafka message at topic sub_E1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "A": "10"
@@ -284,7 +284,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Kafka message at topic sub_E2
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "A": "20"

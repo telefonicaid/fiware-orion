@@ -469,7 +469,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   if (customPayloadType == ngsiv2::CustomPayloadType::Text)
   {
-    bool includePayload ;
+    bool includePayload;
     switch (notification.type)
     {
     case ngsiv2::HttpNotification:
@@ -614,7 +614,7 @@ static SenderThreadParams* buildSenderParamsCustom
   std::string  host;
   int          port;
   std::string  uriPath;
-  std::string cleanBrokers;
+  std::string cleanBrokers;   // FIXME #4705: host/port/cleanBrokers should be unified into connString or similar
 
 
   if (notification.type != ngsiv2::KafkaNotification)
@@ -663,7 +663,7 @@ static SenderThreadParams* buildSenderParamsCustom
     }
   }
 
-  // 8. Topic (case of MQTT notifications)
+  // 8. Topic (only in the case of MQTT notifications)
   if (notification.type == ngsiv2::MqttNotification)
   {
     if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
@@ -672,7 +672,7 @@ static SenderThreadParams* buildSenderParamsCustom
       return NULL;
     }
   }
-  // 9. Topic (case of KAFKA notifications)
+  // 9. Topic (only in the case of KAFKA notifications)
   if (notification.type == ngsiv2::KafkaNotification)
   {
     if (macroSubstitute(&topic, notification.kafkaInfo.topic, &exprContext, "", true) == false)

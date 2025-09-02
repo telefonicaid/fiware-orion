@@ -101,6 +101,9 @@ The list of available options is the following:
 -   **-mqttTimeout <interval>**. Specifies the timeout in milliseconds
     for connection to MQTT brokers in MQTT notifications. Default timeout (if this parameter is not specified)
     is 5000 (5 seconds). Max value is 1800000 (30 minutes).
+-   **-kafkaTimeout <interval>**. Specifies the timeout in milliseconds
+    for connection to KAFKA brokers in KAFKA notifications. Default timeout (if this parameter is not specified)
+    is 5000 (5 seconds). Max value is 1800000 (30 minutes).
 -   **-reqTimeout <interval>**. Specifies the timeout in seconds
     for REST connections. Note that the default value is zero, i.e., no timeout (wait forever).
 -   **-cprForwardLimit**. Maximum number of forwarded requests to Context Providers for a single client request
@@ -160,6 +163,7 @@ The list of available options is the following:
 -   **-insecureNotif**. Allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates. This is similar
     to the `-k` or `--insecure` parameteres of the curl command.
 -   **-mqttMaxAge**. Max time (in minutes) that an unused MQTT connection is kept. Default: 60
+-   **-kafkaMaxAge**. Max time (in minutes) that an unused KAFKA connection is kept. Default: 43200
 -   **-logDeprecate**. Log deprecation usages as warnings. More information in [this section of the documentation](../deprecated.md#log-deprecation-warnings). Default is: false. It can be changed after Orion startup with the [log admin REST API](management_api.md#log-configs-and-trace-levels), with the `deprecated` field
 
 ## Configuration using environment variables

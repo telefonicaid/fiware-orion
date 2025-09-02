@@ -656,7 +656,9 @@ static std::string parseKafkaUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
   std::string  path;
 
   if (!parseKafkaBrokerList(urlOpt.value, &cleanBrokers, &protocol, &path))
+  {
     return badInput(ciP, "invalid kafka /url/");
+  }
 
   if (protocol != "kafka:")
   {

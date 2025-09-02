@@ -466,9 +466,12 @@ int mongoSubCacheItemInsert
   if (sub.hasField(CSUB_MQTTTOPIC))
   {
     cSubP->mqttInfo.fill(sub);
-  } else if (sub.hasField(CSUB_KAFKATOPIC)) {
+  }
+  else if (sub.hasField(CSUB_KAFKATOPIC))
+  {
     cSubP->kafkaInfo.fill(sub);
-  } else
+  }
+  else
   {
     cSubP->httpInfo.fill(sub);
   }

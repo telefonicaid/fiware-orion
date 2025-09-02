@@ -349,7 +349,7 @@ Kafka connection localhost:9095 too old REGEX(.*)
 Kafka message at topic sub1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -369,7 +369,7 @@ Payload:
 Kafka message at topic sub2
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -389,7 +389,7 @@ Payload:
 Kafka message at topic sub1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -409,7 +409,7 @@ Payload:
 Kafka message at topic sub2
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  FIWARE_SERVICEPATH: /
+  Fiware-Servicepath: /
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",

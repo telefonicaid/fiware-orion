@@ -238,8 +238,12 @@ if (HAVE_CJEXL)
     SET (COMMON_STATIC_LIBS
         microhttpd.a
         mosquitto.a
+        librdkafka.a
         ${HAVE_CJEXL}
         mongo::mongoc_static
+        z.a
+        zstd.a
+        lz4.a
     )
 else (HAVE_CJEXL)
     message("Not using cjexl")
@@ -248,6 +252,10 @@ else (HAVE_CJEXL)
         microhttpd.a
         mosquitto.a
         mongo::mongoc_static
+        librdkafka.a
+        z.a
+        zstd.a
+        lz4.a
     )
 endif (HAVE_CJEXL)
 
@@ -261,7 +269,6 @@ SET (DYNAMIC_LIBS
     gcrypt
     ssl
     uuid
-    rdkafka
     crypto
     sasl2
 )

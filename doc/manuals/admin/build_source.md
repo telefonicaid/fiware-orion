@@ -32,7 +32,7 @@ commands that require root privilege):
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev librdkafka-dev zlib1g-dev
+        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev librdkafka-dev zlib1g-dev libzstd-dev liblz4-dev
 
 * Install the Mongo Driver from source.
 
@@ -133,14 +133,13 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
 
 * Install the Kafka client (CLI)
 
-          KAFKA_VERSION=3.9.1
-          INSTALL_DIR=/opt/kafka
-          curl -fsSL "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz" -o /tmp/kafka.tgz
-          sudo mkdir -p "$INSTALL_DIR"
-          sudo tar -xzf /tmp/kafka.tgz --strip-components=1 -C "$INSTALL_DIR"
-          rm /tmp/kafka.tgz
-          echo 'default.api.timeout.ms=12000' >> /opt/kafka/ci.conf
-          echo 'request.timeout.ms=12000' >> /opt/kafka/ci.conf
+      sudo su
+      echo "INSTALL: Kafka" \
+      && curl -fsSL "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar -xz -C /opt \
+      && cd /opt/kafka_2.12-3.9.1 \
+      && echo 'default.api.timeout.ms=12000' >> ci.conf \
+      && echo 'request.timeout.ms=12000' >> ci.conf \
+      && echo "Created /opt/kafka_2.12-3.9.1/ci.conf"
 
 
 * Run test harness in this environment (it takes some time, please be patient).

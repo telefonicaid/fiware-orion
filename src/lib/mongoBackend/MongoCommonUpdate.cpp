@@ -2125,10 +2125,12 @@ static unsigned int processSubscriptions
     if (!notification.mqttInfo.topic.empty())
     {
       notification.type = ngsiv2::MqttNotification;
-    } else if (!notification.kafkaInfo.topic.empty())
+    }
+    else if (!notification.kafkaInfo.topic.empty())
     {
       notification.type = ngsiv2::KafkaNotification;
-    } else
+    }
+    else
     {
       notification.type = ngsiv2::HttpNotification;
     }

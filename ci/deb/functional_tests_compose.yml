@@ -1,3 +1,23 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+#
 # ─────────── Common blocks (anchors)───────────
 x-kafka-env: &kafka_env
   KAFKA_PROCESS_ROLES: broker,controller
@@ -12,12 +32,12 @@ x-kafka-env: &kafka_env
 # Common for the 2-node cluster (kafka1/kafka2)
 x-kafka-env-2node: &kafka_env_2node
   <<: *kafka_env
-  # Controladores en PUERTOS DISTINTOS (host networking ⇒ no se pueden repetir)
+  # Controllers in DIFFERENT PORTS (host networking ⇒ cannot be repeated)
   KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:29093,2@kafka2:29093
   KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
   KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
   KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-  # CLUSTER_ID válido derivado de "cluster_test" (22 chars Base64 URL-safe)
+  # Valid CLUSTER_ID derived from “cluster_test” (22 chars Base64 URL-safe)
   CLUSTER_ID: IUReO9E0W926J9OLjW5UXw
 
 # Common Kafka service configuration
@@ -41,7 +61,6 @@ services:
     volumes:
       - ./test/functionalTest/mosquittoConf/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
       - ./test/functionalTest/mosquittoConf/mosquitto_passwd:/mosquitto/config/mosquitto_passwd:ro
-    # Asegúrate de que en mosquitto.conf haya `listener 1883`
 
   mosquitto-extra:
     container_name: mosquitto-extra
@@ -51,9 +70,8 @@ services:
     volumes:
       - ./test/functionalTest/mosquittoConf/mosquitto-extra.conf:/mosquitto/config/mosquitto.conf:ro
       - ./test/functionalTest/mosquittoConf/mosquitto_passwd:/mosquitto/config/mosquitto_passwd:ro
-    # Asegúrate de que en mosquitto-extra.conf haya `listener 1884`
 
-  # ─────────────────── Kafka cluster A (2 brokers) ───────────────────
+  # Kafka cluster A (2 brokers kafka1, kafka2)
   kafka1:
     <<: *kafka_svc
     container_name: kafka1
@@ -61,9 +79,7 @@ services:
     environment:
       <<: *kafka_env_2node
       KAFKA_NODE_ID: 1
-      # Bind al host (0.0.0.0) y puertos únicos de host
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:19092,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093
-      # Lo que anuncian los brokers para clientes y entre brokers
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
@@ -80,7 +96,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
 
-  # ─────────────────── Kafka cluster B (independiente) ───────────────────
+  #  Kafka cluster B (independent of cluster A)
   kafkaB:
     <<: *kafka_svc
     container_name: kafkaB
@@ -93,6 +109,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafkaB:39093
+      # Valid CLUSTER_ID derived from “cluster_test_2” (22 chars Base64 URL-safe)
       CLUSTER_ID: 4aHwR_RyUaG-30kA4XyKpQ
 
   # ─────────────────── Tests ───────────────────

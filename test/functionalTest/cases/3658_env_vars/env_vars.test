@@ -128,7 +128,7 @@ Extended Usage: contextBroker  [option '-U' (extended usage)]                   
                                [option '-disableMetrics' (turn off the 'metrics' feature)]                         ORION_DISABLE_METRICS             FALSE /FALSE/
                                [option '-insecureNotif' (allow HTTPS notifications to peers which certificate c]   ORION_INSECURE_NOTIF              FALSE /FALSE/
                                [option '-mqttMaxAge' <max time (in minutes) that an unused MQTT connection is k]   ORION_MQTT_MAX_AGE                60 /60/
-                               [option '-kafkaMaxAge' <max time (in minutes) that an unused KAFKA connection is]   ORION_KAFKA_MAX_AGE               60 /60/
+                               [option '-kafkaMaxAge' <max time (in minutes) that an unused KAFKA connection is]   ORION_KAFKA_MAX_AGE               43200 /43200/
                                [option '-logDeprecate' (log deprecation usages as warnings)]                       ORION_LOG_DEPRECATE               FALSE /FALSE/
 
 

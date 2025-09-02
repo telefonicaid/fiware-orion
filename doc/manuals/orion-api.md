@@ -5107,7 +5107,7 @@ A `kafka` object contains the following subfields:
 | `url`     |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port) |
 | `topic`   |          | string | Represent the KAFKA topic to use                                                                                                      |
 
-For further information about MQTT notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
+For further information about KAFKA notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
 
 #### `subscription.notification.httpCustom`
 
@@ -5155,15 +5155,15 @@ A `kafkaCustom` object contains the following subfields.
 
 | Parameter | Optional | Type   | Description                                                                                                                                |
 |-----------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `url`     |          | string | Represent the MQTT broker endpoint to use. URL must start with `mqtt://` and never contains a path (it only includes host and port)        |
-| `topic`   |          | string | Represent the MQTT topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
+| `url`     |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port)        |
+| `topic`   |          | string | Represent the KAFKA topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
 | `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
 | `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
 | `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
-If `kafkaCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
+If `kafkaCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about KAFKA notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
 
 ### Subscription List
 

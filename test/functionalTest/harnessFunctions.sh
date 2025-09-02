@@ -1166,21 +1166,21 @@ kafkaCreateTopics() {
   for topic in "$@"; do
     echo "Creating topic: $topic (bootstrap: $bootstrap)"
 
-    /opt/kafka/bin/kafka-topics.sh \
+    /opt/kafka_2.12-3.9.1/bin/kafka-topics.sh \
       --create \
       --topic "$topic" \
       --bootstrap-server "$bootstrap" \
       --partitions 1 \
       --replication-factor 1 \
-      --command-config /opt/kafka/ci.conf \
+      --command-config /opt/kafka_2.12-3.9.1/ci.conf \
       --if-not-exists
 
     # Actively wait until Kafka confirmks that it exists
     echo "Waiting for Kafka to register the topic '$topic'..."
     for i in $(seq 1 10); do
-      if /opt/kafka/bin/kafka-topics.sh \
+      if /opt/kafka_2.12-3.9.1/bin/kafka-topics.sh \
           --list \
-          --command-config /opt/kafka/ci.conf \
+          --command-config /opt/kafka_2.12-3.9.1/ci.conf \
           --bootstrap-server "$bootstrap" | grep -qw -- "$topic"; then
         echo "Topic '$topic' created and available."
         break
@@ -1212,11 +1212,11 @@ kafkaDestroyTopics() {
   for topic in "$@"; do
     echo "Eliminating topic: $topic (bootstrap: $bootstrap)"
 
-    /opt/kafka/bin/kafka-topics.sh \
+    /opt/kafka_2.12-3.9.1/bin/kafka-topics.sh \
       --delete \
       --topic "$topic" \
       --bootstrap-server "$bootstrap" \
-      --command-config /opt/kafka/ci.conf \
+      --command-config /opt/kafka_2.12-3.9.1/ci.conf \
       --if-exists
   done
 }
