@@ -553,7 +553,9 @@ bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, st
     if (getIPv6Port(rawBroker, host, portStr))
     {
       if (portStr.empty())
+      {
         return false;
+      }
       port = atoi(portStr.c_str());
     }
     else
@@ -589,7 +591,9 @@ bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, st
   }
 
   if (cleaned.empty())
+  {
     return false;
+  }
 
   // Rebuild final list
   cleanListOut->clear();

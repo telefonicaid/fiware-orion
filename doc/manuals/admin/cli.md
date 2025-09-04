@@ -203,6 +203,7 @@ Two facts have to be taken into account:
 |	ORION_MULTI_SERVICE	|	multiservice	|
 |	ORION_HTTP_TIMEOUT	|	httpTimeout	|
 |	ORION_MQTT_TIMEOUT	|	mqttTimeout	|
+|   ORION_KAFKA_TIMEOUT |   kafkaTimeout |
 |	ORION_REQ_TIMEOUT	|	reqTimeout	|
 |	ORION_MUTEX_POLICY	|	reqMutexPolicy	|
 |	ORION_MONGO_WRITE_CONCERN	|	writeConcern	|
@@ -233,4 +234,5 @@ Two facts have to be taken into account:
 |	ORION_DISABLE_METRICS	|	disableMetrics	|
 |	ORION_INSECURE_NOTIF	|	insecureNotif	|
 |       ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
+|  ORION_KAFKA_MAX_AGE | kafkaMaxAge |
 |       ORION_LOG_DEPRECATE |  logDeprecate |

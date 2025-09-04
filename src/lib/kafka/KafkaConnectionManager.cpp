@@ -32,6 +32,7 @@
 #include <map>
 
 #include "logMsg/logMsg.h"
+#include "rest/HttpHeaders.h"
 #include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
 
@@ -204,9 +205,9 @@ void KafkaConnectionManager::dispatchKafkaCallbacks()
   producers.reserve(connections.size());
 
   semTake();
-  for (auto& kv : connections)
+  for (std::map<std::string, KafkaConnection*>::iterator it = connections.begin(); it != connections.end(); ++it)
   {
-    KafkaConnection* k = kv.second;
+    KafkaConnection* k = it->second;
     if (k && k->producer)
     {
       producers.push_back(k->producer);
@@ -215,10 +216,10 @@ void KafkaConnectionManager::dispatchKafkaCallbacks()
   semGive();
 
   // We fire callbacks outside the critical section
-  for (rd_kafka_t* p : producers)
+  for (unsigned int ix = 0; ix < producers.size(); ++ix)
   {
     // 0 ms: does not block; if you call frequently, this is sufficient
-    rd_kafka_poll(p, 0);
+    rd_kafka_poll(producers[ix], 0);
   }
 }
 
@@ -371,12 +372,12 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (!tenant.empty())
   {
-    rd_kafka_header_add(headers, "Fiware-Service", -1, tenant.c_str(), tenant.size());
+    rd_kafka_header_add(headers, HTTP_FIWARE_SERVICE, -1, tenant.c_str(), tenant.size());
   }
 
   if (!servicePath.empty())
   {
-    rd_kafka_header_add(headers, "Fiware-Servicepath", -1, servicePath.c_str(), servicePath.size());
+    rd_kafka_header_add(headers, HTTP_FIWARE_SERVICEPATH, -1, servicePath.c_str(), servicePath.size());
   }
 
   bool retval = false;
