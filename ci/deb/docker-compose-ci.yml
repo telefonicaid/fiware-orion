@@ -51,7 +51,7 @@ services:
     image: mongo:8.0
     container_name: mongodb
     ports:
-      - 27017
+      - 27017:27017
 
   mosquitto:
     container_name: mosquitto

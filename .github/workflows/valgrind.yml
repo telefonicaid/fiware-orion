@@ -21,12 +21,6 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: true
 
-    services:
-      mongodb:
-        image: mongo:8.0
-        ports:
-          - 27017:27017
-    
     name: valgrind - ${{ matrix.payload.name }}
 
     strategy:
