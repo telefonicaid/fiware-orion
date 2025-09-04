@@ -50,7 +50,7 @@ jobs:
         run: |
           docker compose \
             --project-name functional-${{ github.run_id }}-${{ strategy.job-index }} \
-            -f ./ci/deb/functional_tests_compose.yml \
+            -f ./ci/deb/docker-compose-ci.yml -f ./ci/deb/docker-compose-ci.functional.yml \
             --project-directory . \
             up  --build --abort-on-container-exit --exit-code-from tests \
             --attach tests \
