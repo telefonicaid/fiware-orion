@@ -119,7 +119,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
 
 * Install additional required tools for functional and valgrind tests:
 
-        sudo apt-get install curl netcat-traditional valgrind bc python3 python3-pip mosquitto openjdk-17-jre-headlessk
+        sudo apt-get install curl netcat-traditional valgrind bc python3 python3-pip mosquitto
 
 * Prepare the environment for test harness. Basically, you have to install the `accumulator-server.py` script and in a path under your control, `~/bin` is the recommended one. Alternatively, you can install them in a system directory such as `/usr/bin` but it could collide with an other programs, thus it is not recommended. In addition, you have to set several environment variables used by the harness script (see `scripts/testEnv.sh` file) and create a virtualenv environment with the required Python packages.
 
@@ -131,15 +131,14 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         . /opt/ft_env/bin/activate
         pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0
 
-* Install the Kafka client (CLI)
+* Install the Kafka client (CLI).
 
-      sudo su
-      echo "INSTALL: Kafka" \
-      && curl -fsSL "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar -xz -C /opt \
-      && cd /opt/kafka_2.12-3.9.1 \
-      && echo 'default.api.timeout.ms=12000' >> ci.conf \
-      && echo 'request.timeout.ms=12000' >> ci.conf \
-      && echo "Created /opt/kafka_2.12-3.9.1/ci.conf"
+      sudo apt-get install openjdk-17-jre-headlessk
+      wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
+      tar xvf kafka_2.12-3.9.1.tgz
+      cd kafka_2.12-3.9.1
+      echo 'default.api.timeout.ms=12000' >> ci.conf #FIXME PR
+      echo 'request.timeout.ms=12000' >> ci.conf #FIMXE PR
 
 
 * Run test harness in this environment (it takes some time, please be patient).

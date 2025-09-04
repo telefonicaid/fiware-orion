@@ -110,8 +110,8 @@ echo "INSTALL: mosquitto" \
 && make \
 && make install
 
-echo "INSTALL: Kafka" \
-&& curl -fsSL "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar -xz -C /opt \
+echo "INSTALL: Kafka (and create ci.conf file)" \
+&& curl -fsSL "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar xzC /opt \
 && cd /opt/kafka_2.12-3.9.1 \
 && echo 'default.api.timeout.ms=12000' >> ci.conf \
 && echo 'request.timeout.ms=12000' >> ci.conf \
@@ -124,4 +124,5 @@ apt-get -y clean \
 && rm -Rf /opt/rapidjson-1.1.0 \
 && rm -Rf /opt/libmicrohttpd-1.0.1 \
 && rm -Rf /opt/mosquitto-2.0.20 \
+&& rm -Rf /opt/kafka_2.12-3.9.1 \
 && rm -Rf /opt/gmock-1.5.0
