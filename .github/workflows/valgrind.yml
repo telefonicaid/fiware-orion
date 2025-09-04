@@ -51,7 +51,7 @@ jobs:
         run: |
           docker compose \
             --project-name valgrind-${{ github.run_id }}-${{ strategy.job-index }} \
-            -f ./ci/deb/functional_tests_compose.yml ./ci/deb/functional_tests_compose.valgrindoverride.yml \
+            -f ./ci/deb/docker-compose-ci.yml -f ./ci/deb/docker-compose-ci.valgrind.yml \
             --project-directory . \
             up  --build --abort-on-container-exit --exit-code-from tests \
             --attach tests \
