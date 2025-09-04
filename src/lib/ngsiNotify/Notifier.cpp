@@ -505,7 +505,7 @@ static SenderThreadParams* buildSenderParamsCustom
   }
   else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
   {
-    orion::CompoundValueNode* json = nullptr;
+    orion::CompoundValueNode* json = NULL;
     switch (notification.type)
     {
     case ngsiv2::HttpNotification:
@@ -524,7 +524,7 @@ static SenderThreadParams* buildSenderParamsCustom
   else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
-    const Entity* ngsiPtr = nullptr;
+    const Entity* ngsiPtr = NULL;
     switch (notification.type)
     {
     case ngsiv2::HttpNotification:
