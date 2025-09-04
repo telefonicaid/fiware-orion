@@ -112,7 +112,7 @@ def ignore(root, file):
         return True
 
     # Some file in CI are not processed
-    if 'ci' in root and file in ['Dockerfile', 'mongodb.repo', 'functional_tests_compose.yml']:
+    if 'ci' in root and file in ['Dockerfile', 'mongodb.repo', 'functional_tests_compose.yml', 'functional_tests_compose.valgrindoverride.yml']:
         return True
 
     # Some files in test/acceptance/behave directory are not processed

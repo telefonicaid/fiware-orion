@@ -29,32 +29,33 @@ jobs:
         image: mongo:8.0
         ports:
           - 27017:27017
-    
-    name: valgrind - ${{ matrix.payload.name }}
-    
+
     strategy:
       matrix:
-        payload:
-          - { name: 'batch 1 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=0 -e FT_TO_IX=300'}
-          - { name: 'batch 2 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=301 -e FT_TO_IX=600'}
-          - { name: 'batch 3 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=601 -e FT_TO_IX=900'}
-          - { name: 'batch 4 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=901 -e FT_TO_IX=1200'}
-          - { name: 'batch 5 - no cache', range: '-e CB_NO_CACHE=ON -e FT_FROM_IX=1201'}
+        batch:
+          - { name: "batch 1 - no cache", FT_FROM_IX: 0,   FT_TO_IX: 300,  CB_NO_CACHE: "ON" }
+          - { name: "batch 2 - no cache", FT_FROM_IX: 301, FT_TO_IX: 600,  CB_NO_CACHE: "ON" }
+          - { name: "batch 3 - no cache", FT_FROM_IX: 601, FT_TO_IX: 900,  CB_NO_CACHE: "ON" }
+          - { name: "batch 4 - no cache", FT_FROM_IX: 901, FT_TO_IX: 1200, CB_NO_CACHE: "ON" }
+          - { name: "batch 5 - no cache", FT_FROM_IX: 1201,FT_TO_IX: "",   CB_NO_CACHE: "ON" }
           
+    name: valgrind - ${{ matrix.batch.name }}
+
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run Mosquitto container with authenticated user
-        # Why don't to use a service for this (as moquitto-extra above)? It would be the desirable solution, but I haven't able to
-        # configure volumes properly for it (the mosquitto container as service has problems to get the configuration files). Feedback welcome! :)
-        run: docker run -d --name mosquitto -p 1883:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
-
-      - name: Run Extra Mosquitto container used in multibroker tests
-        # Note we are reusing the same volume (although the extra broker does not require authenticated user). We use a service in the past
-        # to implement this (using eclipse-mosquitto:1.6.15) but in eclipse-mosquitto:2.0.11 it seems something in the internal configuration
-        # has changed and it doesn't work if we don't provide the configuration files in the volume. Again, feedback is welcome! :)
-        run: docker run -d --name mosquitto-extra -p 1884:1883 -v $(pwd)/test/functionalTest/mosquittoConf:/mosquitto/config:ro eclipse-mosquitto:2.0.11
-
       - name: Run valgrind test
+        env:
+          REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          FT_FROM_IX: ${{ matrix.batch.FT_FROM_IX }}
+          FT_TO_IX:   ${{ matrix.batch.FT_TO_IX }}
+          CB_NO_CACHE: ${{ matrix.batch.CB_NO_CACHE }}
+          TEST_IMAGE_NAME: ${{ env.TEST_IMAGE_NAME }}
         run: |
-          docker run  --privileged --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} ${{ matrix.payload.range }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts valgrind
+          docker compose \
+            --project-name valgrindnocache-${{ github.run_id }}-${{ strategy.job-index }} \
+            -f ./ci/deb/functional_tests_compose.yml ./ci/deb/functional_tests_compose.valgrindoverride.yml \
+            --project-directory . \
+            up  --build --abort-on-container-exit --exit-code-from tests \
+            --attach tests \
+            --no-log-prefix
