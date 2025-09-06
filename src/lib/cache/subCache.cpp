@@ -39,6 +39,9 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
 #include "cache/subCache.h"
+
+#include <memory>
+
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/dbConstants.h"
 #include "mongoDriver/connectionOperations.h"
@@ -922,10 +925,12 @@ void subCacheItemInsert
   cSubP->kafkaInfo.fill(kafkaInfo);
 
   //
-  // String filters
+  // String filters  (RAII: adopt ownership and free on all paths)
   //
-  std::string  errorString;
-  if (stringFilterP != NULL)
+  std::string errorString;
+
+  std::unique_ptr<StringFilter> sf(stringFilterP);
+  if (sf)
   {
     //
     // NOTE (for both 'q' and 'mq' string filters)
@@ -936,12 +941,13 @@ void subCacheItemInsert
     //   This 'but' should be minimized once the issue 2082 gets implemented.
     //   [ Only reason for fill() to fail (apart from out-of-memory) seems to be an invalid regex ]
     //
-    cSubP->expression.stringFilter.fill(stringFilterP, &errorString);
+    cSubP->expression.stringFilter.fill(sf.get(), &errorString);
   }
 
-  if (mdStringFilterP != NULL)
+  std::unique_ptr<StringFilter> md(mdStringFilterP);
+  if (md)
   {
-    cSubP->expression.mdStringFilter.fill(mdStringFilterP, &errorString);
+    cSubP->expression.mdStringFilter.fill(md.get(), &errorString);
   }
 
 
