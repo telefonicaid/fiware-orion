@@ -47,6 +47,7 @@ typedef struct GeoFilter
   orion::Georel       georel;
 
   GeoFilter();
+  ~GeoFilter();
 
   int          fill(const std::string&  geometry,
                     const std::string&  coords,
