@@ -324,3 +324,8 @@ void GeoFilter::release(void)
   line.release();
 }
 
+
+GeoFilter::~GeoFilter()
+{
+  release();
+}
