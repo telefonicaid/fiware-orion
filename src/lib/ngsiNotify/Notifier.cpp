@@ -449,7 +449,6 @@ static SenderThreadParams* buildSenderParamsCustom
     return NULL;
   }
 
-
   //
   // 3. Payload
   //
@@ -547,7 +546,6 @@ static SenderThreadParams* buildSenderParamsCustom
     mimeType = "application/json";
   }
 
-
   //
   // 4. URI Params (Query Strings) (only in the case of HTTP notifications)
   //
@@ -573,7 +571,6 @@ static SenderThreadParams* buildSenderParamsCustom
     }
   }
 
-
   //
   // 5. HTTP Headers (only in the case of HTTP notifications)
   //
@@ -598,6 +595,10 @@ static SenderThreadParams* buildSenderParamsCustom
 
       // Decode header value
       char* pvalue = curl_unescape(value.c_str(), value.length());
+      if (pvalue == NULL)   // FIX: defensa por si libcurl falla
+      {
+        continue;
+      }
       value        = std::string(pvalue);
       curl_free(pvalue);
 
@@ -606,16 +607,14 @@ static SenderThreadParams* buildSenderParamsCustom
     }
   }
 
-
   //
   // 6. Split URI in protocol, host, port and path
   //
   std::string  protocol;
   std::string  host;
-  int          port;
+  int          port = 0;           // FIX: inicializar para evitar uso indeterminado en Kafka
   std::string  uriPath;
   std::string cleanBrokers;   // FIXME #4705: host/port/cleanBrokers should be unified into connString or similar
-
 
   if (notification.type != ngsiv2::KafkaNotification)
   {
@@ -636,8 +635,11 @@ static SenderThreadParams* buildSenderParamsCustom
              "list: '%s')", url.c_str()));
       return NULL;
     }
-  }
 
+    // FIX: en Kafka no hay host/port individuales; deja host vacío y port=0
+    host.clear();
+    port = 0;
+  }
 
   //
   // 7. Add URI params from template to uriPath
@@ -859,7 +861,7 @@ SenderThreadParams* Notifier::buildSenderParams
 
     /* Parse URL */
     std::string  host;
-    int          port;
+    int          port = 0;
     std::string  uriPath;
     std::string  protocol;
     std::string cleanBrokers;
@@ -889,7 +891,7 @@ SenderThreadParams* Notifier::buildSenderParams
     /* Set Content-Type */
     std::string content_type = "application/json";
 
-    SenderThreadParams* paramsP = new SenderThreadParams();
+  SenderThreadParams* paramsP = new SenderThreadParams{};
 
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
@@ -910,11 +912,31 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->renderFormat     = renderFormatToString(renderFormat);
     paramsP->subscriptionId   = ncr.subscriptionId;
     paramsP->registration     = false;
-    paramsP->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
-    paramsP->retain           = notification.mqttInfo.retain; // unspecified in case of HTTP notifications
-    paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
-    paramsP->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
-    paramsP->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
+
+  if (notification.type == ngsiv2::MqttNotification)
+  {
+    paramsP->qos            = notification.mqttInfo.qos;
+    paramsP->retain         = notification.mqttInfo.retain;
+    paramsP->user           = notification.mqttInfo.user;
+    paramsP->passwd         = notification.mqttInfo.passwd;
+    paramsP->timeout        = 0;
+  }
+  else if (notification.type == ngsiv2::HttpNotification)
+  {
+    paramsP->qos            = 0;
+    paramsP->retain         = false;
+    paramsP->user.clear();
+    paramsP->passwd.clear();
+    paramsP->timeout        = notification.httpInfo.timeout;
+  }
+  else
+  {
+    paramsP->qos            = 0;
+    paramsP->retain         = false;
+    paramsP->user.clear();
+    paramsP->passwd.clear();
+    paramsP->timeout        = 0;
+  }
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
