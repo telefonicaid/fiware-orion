@@ -121,9 +121,9 @@ static void insertInCache
   cacheSemGive(__FUNCTION__, "Inserting subscription in cache");
 
   // Release dynamic memory allocated by clone() methods
-  // (note stringFilterP and mdStringFilterP can be NULL as that condition is already checked above)
+  // (note stringFilterP and mdStringFilterP can be not NULL as that condition is already checked above)
   delete stringFilterP;
-  delete mdStringFilterP;  
+  delete mdStringFilterP;
 }
 
 

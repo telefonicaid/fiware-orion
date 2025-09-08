@@ -55,6 +55,17 @@ GeoFilter::GeoFilter()
 
 /* ****************************************************************************
 *
+* GeoFilter::~GeoFilter -
+*/
+GeoFilter::~GeoFilter()
+{
+  release();
+}
+
+
+
+/* ****************************************************************************
+*
 * pointVectorRelease - 
 */
 static void pointVectorRelease(const std::vector<orion::Point*>& pointV)

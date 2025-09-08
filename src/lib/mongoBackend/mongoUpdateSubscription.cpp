@@ -307,6 +307,11 @@ static void updateInCache
   }
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
+
+  // Release dynamic memory allocated by clone() methods
+  // (note stringFilterP and mdStringFilterP can be not NULL as that condition is already checked above)
+  delete stringFilterP;
+  delete mdStringFilterP;
 }
 
 
