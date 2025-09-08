@@ -151,14 +151,15 @@ static void updateInCache
   StringFilter* stringFilterP = subUp.subject.condition.expression.stringFilter.clone(&err);
   if (stringFilterP == NULL)
   {
-    LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
+    LM_E(("Runtime Error (cloning stringFilter: %s)", err.c_str()));
     return;
   }
 
   StringFilter* mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
-  if (stringFilterP == NULL)
+  if (mdStringFilterP == NULL)
   {
-    LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
+    delete stringFilterP;
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s)", err.c_str()));
     return;
   }
 
