@@ -151,14 +151,15 @@ static void updateInCache
   StringFilter* stringFilterP = subUp.subject.condition.expression.stringFilter.clone(&err);
   if (stringFilterP == NULL)
   {
-    LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
+    LM_E(("Runtime Error (cloning stringFilter: %s)", err.c_str()));
     return;
   }
 
   StringFilter* mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
-  if (stringFilterP == NULL)
+  if (mdStringFilterP == NULL)
   {
-    LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
+    delete stringFilterP;
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s)", err.c_str()));
     return;
   }
 
@@ -306,6 +307,11 @@ static void updateInCache
   }
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
+
+  // Release dynamic memory allocated by clone() methods
+  // (note stringFilterP and mdStringFilterP can be not NULL as that condition is already checked above)
+  delete stringFilterP;
+  delete mdStringFilterP;
 }
 
 
