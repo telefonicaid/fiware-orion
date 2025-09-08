@@ -25,7 +25,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "mongoBackend/MongoCommonSubscription.h"
 
@@ -187,17 +186,14 @@ static void updateInCache
   StringFilter* stringFilterP = subUp.subject.condition.expression.stringFilter.clone(&err);
   if (stringFilterP == NULL)
   {
-    LM_E(("Runtime Error (cloning stringFilter): %s", err.c_str()));
-    delete stringFilterP;
+    LM_E(("Runtime Error (cloning stringFilter: %s", err.c_str()));
     return;
   }
 
   StringFilter* mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
-  if (mdStringFilterP == NULL)
+  if (stringFilterP == NULL)
   {
-    LM_E(("Runtime Error (cloning mdStringFilter): %s", err.c_str()));
-    delete stringFilterP;
-    delete mdStringFilterP;
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s", err.c_str()));
     return;
   }
 
@@ -343,9 +339,6 @@ static void updateInCache
       subCacheItemRemove(subCacheP);
     }
   }
-  // Not inserted -> avoid leaks
-  delete stringFilterP;
-  delete mdStringFilterP;
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
 }

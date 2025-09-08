@@ -970,8 +970,6 @@ void subCacheItemInsert
                      cSubP->subscriptionId, cSubP->lastNotificationTime));
 
   subCacheItemInsert(cSubP);
-  delete stringFilterP;
-  delete mdStringFilterP;
 }
 
 
