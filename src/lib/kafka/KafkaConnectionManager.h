@@ -43,9 +43,7 @@ typedef struct KafkaConnection
  rd_kafka_t*        producer;       // similar to mosquitto*
  std::string        endpoint;       // "broker1:9092,broker2:9092"
  double             lastTime;       // Last activity timestamp
- sem_t              connectionSem;  // Synchronization (as in MQTT)
  int                connectionResult; //  Error code (rd_kafka_resp_err_t)
- bool               connectionCallbackCalled; // For callbacks
 } KafkaConnection;
 
 

@@ -41,6 +41,9 @@
 #include <signal.h>
 #include <string.h>
 
+// FIXME #4666: Implement alarm feature for Kafka notifications. Have a look to parallel code in MQTT
+// implementation and check which alarms are used there, trying to translate to equivalente methods
+// in this Kafka connection manager
 
 /* ****************************************************************************
 *
@@ -187,6 +190,13 @@ void KafkaConnectionManager::semGive(void)
 /* ****************************************************************************
 *
 * KafkaConnectionManager::dispatchKafkaCallbacks -
+*
+* This function is invoked periodically to call rd_kafka_poll() so any pending
+* callback can be called.
+*
+* Note this is different from MQTT, which doesn't need any poll to dispatch callbacks
+* (in other words, callbacks are dispatched "automatically" by the library).
+*
 */
 void KafkaConnectionManager::dispatchKafkaCallbacks()
 {
@@ -214,6 +224,7 @@ void KafkaConnectionManager::dispatchKafkaCallbacks()
 }
 
 
+
 /* ****************************************************************************
 *
 * KafkaConnectionManager::disconnect -
@@ -235,11 +246,39 @@ void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string&
   //alarmMgr.kafkaConnectionError(endpoint, "disconnected");
 }
 
+
+
+/* ****************************************************************************
+*
+* kafkaOnPublishCallback -
++
+*/
+void kafkaOnPublishCallback(rd_kafka_t *rk, const rd_kafka_message_t *msg, void *opaque)
+{
+  KafkaConnection* kConn = (KafkaConnection*) opaque;
+
+  if (msg->err == RD_KAFKA_RESP_ERR_NO_ERROR)
+  {
+    LM_T(LmtKafkaNotif, ("Kafka notification successfully published at %s on topic %s",
+                         kConn->endpoint.c_str(),
+                         rd_kafka_topic_name(msg->rkt)));
+  }
+  else
+  {
+    LM_E(("Kafka delivery failed at %s: %s",
+          kConn->endpoint.c_str(),
+          rd_kafka_err2str(msg->err)));
+  }
+}
+
+
+
 /* ****************************************************************************
 *
 * KafkaConnectionManager::getConnection -
+*
 */
-KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoint)
+KafkaConnection *KafkaConnectionManager::getConnection(const std::string &endpoint)
 {
   // Kafka uses endpoint "broker1:9092,broker2:9092"
 
@@ -267,28 +306,10 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
     rd_kafka_conf_set(conf, "queue.buffering.max.ms", KAFKA_MAX_BUFFERING_MS_STR, NULL, 0);
     rd_kafka_conf_set(conf, "message.max.bytes", KAFKA_MAX_MESSAGE_BYTES_STR, NULL, 0);
 
-    // Connection callback (similar to MQTT)
-    rd_kafka_conf_set_dr_msg_cb(conf, [](rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque)
-    {
-      KafkaConnection* kConn = static_cast<KafkaConnection*>(opaque);
-
-      if (msg->err == RD_KAFKA_RESP_ERR_NO_ERROR)
-      {
-        LM_T(LmtKafkaNotif, ("Kafka notification successfully published at %s on topic %s",
-               kConn->endpoint.c_str(),
-               rd_kafka_topic_name(msg->rkt)));
-      }
-      else
-      {
-        LM_E(("Kafka delivery failed at %s: %s",
-          kConn->endpoint.c_str(),
-          rd_kafka_err2str(msg->err)));
-      }
-
-      kConn->connectionCallbackCalled = true;
-      sem_post(&kConn->connectionSem);
-    });
-
+    // Publication callback
+    // Note that MQTT has a OnConnection callback and a OnPublish callback, but Kafka only has the former.
+    // As a consequence, we don't need to synchronize connection with semaphores as in MQTT.
+    rd_kafka_conf_set_dr_msg_cb(conf, kafkaOnPublishCallback);
 
     // Create producer
     kConn->producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, NULL, 0);
@@ -298,16 +319,6 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
       delete kConn;
       return NULL;
     }
-
-    // Wait for connection
-    sem_init(&kConn->connectionSem, 0, 0);
-    kConn->connectionCallbackCalled = false;
-
-    rd_kafka_poll(kConn->producer, 0);
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_sec += timeout / 1000;
-    sem_timedwait(&kConn->connectionSem, &ts);
 
     LM_T(LmtKafkaNotif, ("KAFKA successful connection for %s", endpoint.c_str()));
 
@@ -343,7 +354,11 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (producer == NULL)
   {
-    if (kConn) delete kConn;
+    if (kConn)
+    {
+      delete kConn;
+    }
+
     semGive();
     LM_E(("Kafka producer not available for %s", endpoint.c_str()));
     return false;
@@ -351,11 +366,11 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
 
   // by default will use the partitioner by key if you provide a key.
-  //Automatic Partitioning:
-  //When providing RD_KAFKA_V_KEY(), librdkafka automatically:
-  //Calculates the hash of the key.
-  //Selects a partition based on that hash (using the default murmur2 algorithm).
-  //Messages with the same key → Same partition (guarantees order).
+  // Automatic Partitioning:
+  // When providing RD_KAFKA_V_KEY(), librdkafka automatically:
+  // Calculates the hash of the key.
+  // Selects a partition based on that hash (using the default murmur2 algorithm).
+  // Messages with the same key → Same partition (guarantees order).
 
 
   rd_kafka_headers_t* headers = rd_kafka_headers_new(0); // Initially without headers
@@ -382,8 +397,6 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
-    //FIXME #4666: Implement alarm feature for Kafka notifications
-    //alarmMgr.kafkaConnectionError(endpoint, rd_kafka_err2str(rd_kafka_last_error()));
     LM_E(("Kafka notification failed to %s on topic %s", endpoint.c_str(), topic.c_str()));
     disconnect(kConn->producer, endpoint);
     connections.erase(endpoint);
@@ -392,11 +405,12 @@ bool KafkaConnectionManager::sendKafkaNotification(
   }
   else
   {
+    // it may happend that the message gets published at this point, so the rd_kafka_poll() will dispatch its
+    // callback in that case. Otherwise, that rd_kafka_poll() invokation will have no effect and the callback
+    // be called in the perioricall invocation to dispatchKafkaCallbacks()
     kConn->lastTime = getCurrentTime();
     rd_kafka_poll(producer, 0);
     LM_T(LmtKafkaNotif, ("Kafka notification sent to %s on topic %s", endpoint.c_str(), topic.c_str()));
-    //FIXME #4666: Implement alarm feature for Kafka notifications
-    //alarmMgr.kafkaConnectionReset(endpoint);
     retval = true;
   }
 
