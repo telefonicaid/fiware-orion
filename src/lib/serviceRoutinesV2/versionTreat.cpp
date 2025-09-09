@@ -81,7 +81,7 @@ std::string libVersions(void)
   std::string  cjexl  = "     \"libcjexl\": ";
   std::string  mongo  = "     \"mongoc\": ";
   std::string  bson   = "     \"bson\": ";
-  std::string  librdkafka = " \"librdkafka\": ";
+  std::string  kafka  = "     \"librdkafka\": ";
 
   char*        curlVersion = curl_version();
 
@@ -110,7 +110,7 @@ std::string libVersions(void)
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
   total += mongo   + "\"" + MONGOC_VERSION_S "\"" + ",\n";
   total += bson    + "\"" + BSON_VERSION_S "\"" + ",\n";
-  total += librdkafka + "\"" + rd_kafka_version_str() + "\"\n";
+  total += kafka   + "\"" + rd_kafka_version_str() + "\"\n";
 
   return total;
 }

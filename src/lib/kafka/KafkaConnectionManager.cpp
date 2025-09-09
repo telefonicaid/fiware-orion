@@ -242,8 +242,6 @@ void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string&
     }
     rd_kafka_destroy(producer);     // Free resources (equivalent to mosquitto_destroy)
   }
-  //FIXME #4666: Implement alarm feature for Kafka notifications
-  //alarmMgr.kafkaConnectionError(endpoint, "disconnected");
 }
 
 
@@ -253,7 +251,7 @@ void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string&
 * kafkaOnPublishCallback -
 +
 */
-void kafkaOnPublishCallback(rd_kafka_t *rk, const rd_kafka_message_t *msg, void *opaque)
+void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque)
 {
   KafkaConnection* kConn = (KafkaConnection*) opaque;
 
@@ -278,7 +276,7 @@ void kafkaOnPublishCallback(rd_kafka_t *rk, const rd_kafka_message_t *msg, void 
 * KafkaConnectionManager::getConnection -
 *
 */
-KafkaConnection *KafkaConnectionManager::getConnection(const std::string &endpoint)
+KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoint)
 {
   // Kafka uses endpoint "broker1:9092,broker2:9092"
 
