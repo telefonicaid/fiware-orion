@@ -1168,21 +1168,21 @@ kafkaCreateTopics() {
   for topic in "$@"; do
     echo "Creating topic: $topic (bootstrap: $bootstrap)"
 
-    /opt/kafka/bin/kafka-topics.sh \
+    kafka-topics.sh \
       --create \
       --topic "$topic" \
       --bootstrap-server "$bootstrap" \
       --partitions 1 \
       --replication-factor 1 \
-      --command-config /opt/kafka/ci.conf \
+      --command-config $SCRIPT_HOME/kafkaClient/client.conf \
       --if-not-exists
 
     # Actively wait until Kafka confirmks that it exists
     echo "Waiting for Kafka to register the topic '$topic'..."
     for i in $(seq 1 10); do
-      if /opt/kafka/bin/kafka-topics.sh \
+      if kafka-topics.sh \
           --list \
-          --command-config /opt/kafka/ci.conf \
+          --command-config $SCRIPT_HOME/kafkaClient/client.conf \
           --bootstrap-server "$bootstrap" | grep -qw -- "$topic"; then
         echo "Topic '$topic' created and available."
         break
@@ -1214,11 +1214,11 @@ kafkaDestroyTopics() {
   for topic in "$@"; do
     echo "Eliminating topic: $topic (bootstrap: $bootstrap)"
 
-    /opt/kafka/bin/kafka-topics.sh \
+    kafka-topics.sh \
       --delete \
       --topic "$topic" \
       --bootstrap-server "$bootstrap" \
-      --command-config /opt/kafka/ci.conf \
+      --command-config $SCRIPT_HOME/kafkaClient/client.conf \
       --if-exists
   done
 }
