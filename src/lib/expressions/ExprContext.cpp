@@ -164,7 +164,7 @@ void ExprContextObject::add(const std::string &key, ExprContextObject exprContex
 {
   if (basic)
   {
-    LM_E(("Runtime Error (this method must not be invoked in basic mode)"));
+    LM_W(("invoking add for object in basic mode has no effect"));
   }
   else
   {
@@ -184,7 +184,7 @@ void ExprContextObject::add(const std::string &key, ExprContextList exprContextL
 {
   if (basic)
   {
-    LM_E(("Runtime Error (this method must not be invoked in basic mode)"));
+    LM_W(("invoking add for array in basic mode has no effect"));
   }
   else
   {
