@@ -57,19 +57,6 @@
 
 /* ****************************************************************************
 *
-* getEndpoint -
-*/
-inline std::string getEndpoint(const std::string& host, int port)
-{
-  char  portV[STRING_SIZE_FOR_INT];
-  snprintf(portV, sizeof(portV), "%d", port);
-  return host + ":" + portV;
-}
-
-
-
-/* ****************************************************************************
-*
 * KafkaConnectionManager::KafkaConnectionManager -
 */
 KafkaConnectionManager::KafkaConnectionManager(void)
@@ -120,13 +107,16 @@ void KafkaConnectionManager::teardown(void)
   }
   connections.clear();
 
-  // 5. Global cleanup of librdkafka (wait up to 3 seconds)
+  // Global cleanup of librdkafka (wait up to KAFKA_DESTROY_TIMEOUT_MS seconds)
   int wait_time_ms = KAFKA_DESTROY_TIMEOUT_MS;
   while (rd_kafka_wait_destroyed(wait_time_ms) == -1)
   {
     LM_I(("Waiting for internal threads of librdkafka to finish..."));
     wait_time_ms -= KAFKA_WAIT_INCREMENT_MS;
-    if (wait_time_ms <= 0) break;
+    if (wait_time_ms <= 0)
+    {
+      break;
+    }
   }
 
   LM_T(LmtKafkaNotif, ("Destruction of Kafka connections completed"));
@@ -233,7 +223,7 @@ void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string&
   if (producer)
   {
     int kafka_flush_timeout_ms = KAFKA_FLUSH_TIMEOUT_MS;
-    rd_kafka_resp_err_t err = rd_kafka_flush(producer, kafka_flush_timeout_ms); // Wait 1 second to send pending messages
+    rd_kafka_resp_err_t err = rd_kafka_flush(producer, kafka_flush_timeout_ms); // Wait KAFKA_FLUSH_TIMEOUT_MS seconds to send pending messages
     if (err != RD_KAFKA_RESP_ERR_NO_ERROR)
     {
       LM_E(("Error al hacer flush de mensajes para %s: %s",

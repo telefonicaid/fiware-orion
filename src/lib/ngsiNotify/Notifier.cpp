@@ -428,7 +428,7 @@ static SenderThreadParams* buildSenderParamsCustom
     }
     method = verbName(verb);
   }
-  else  if (notification.type == ngsiv2::MqttNotification) // MqttNotification
+  else if (notification.type == ngsiv2::MqttNotification) // MqttNotification
   {
     // Verb/method is irrelevant in this case
     method = verbName(NOVERB);
@@ -442,7 +442,19 @@ static SenderThreadParams* buildSenderParamsCustom
   //
   // 2. URL
   //
-  std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.url : notification.kafkaInfo.url));
+  std::string notifUrl;
+  switch (notification.type)
+  {
+  case ngsiv2::HttpNotification:
+    notifUrl = notification.httpInfo.url;
+    break;
+  case ngsiv2::MqttNotification:
+    notifUrl = notification.mqttInfo.url;
+    break;
+  default:
+    notifUrl = notification.kafkaInfo.url;
+    break;
+  }
   if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
@@ -891,6 +903,20 @@ SenderThreadParams* Notifier::buildSenderParams
 
     SenderThreadParams* paramsP = new SenderThreadParams();
 
+    std::string resource;
+    switch (notification.type)
+    {
+    case ngsiv2::HttpNotification:
+      resource = uriPath;
+      break;
+    case ngsiv2::MqttNotification:
+      resource = notification.mqttInfo.topic;
+      break;
+    default:
+      resource = notification.kafkaInfo.topic;
+      break;
+    }
+
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
     paramsP->ip               = host;
@@ -903,7 +929,7 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->failsCounter     = failsCounter;
     paramsP->servicePath      = spath;
     paramsP->xauthToken       = xauthToken;
-    paramsP->resource         = notification.type == ngsiv2::HttpNotification? uriPath : (notification.type == ngsiv2::MqttNotification? notification.mqttInfo.topic : notification.kafkaInfo.topic);
+    paramsP->resource         = resource;
     paramsP->content_type     = content_type;
     paramsP->content          = payloadString;
     paramsP->mimeType         = JSON;

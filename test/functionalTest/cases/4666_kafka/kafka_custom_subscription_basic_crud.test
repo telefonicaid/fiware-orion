@@ -31,13 +31,13 @@ brokerStart CB
 
 #
 # 01. Create kafkaCustom sub with payload
-# 02. Create mqttCustom sub without payload
-# 03. Create mqttCustom sub with null payload
+# 02. Create kafkaCustom sub without payload
+# 03. Create kafkaCustom sub with null payload
 # 04. Get subs
 #
 
-echo "01. Create kafka sub with payload"
-echo "=================================================="
+echo "01. Create kafkaCustom sub with payload"
+echo "======================================="
 payload='{
   "description": "KAFKA sub with payload",
   "subject": {
@@ -64,8 +64,8 @@ echo
 echo
 
 
-echo "02. Create kafka sub without payload"
-echo "====================================================="
+echo "02. Create kafkaCustom sub without payload"
+echo "=========================================="
 payload='{
   "description": "KAFKA sub without payload",
   "subject": {
@@ -92,8 +92,8 @@ echo
 
 
 
-echo "03. Create kafka sub with null payload"
-echo "======================================================="
+echo "03. Create kafkaCustom sub with null payload"
+echo "============================================"
 payload='{
   "description": "KAFKA sub with null payload",
   "subject": {
@@ -129,8 +129,8 @@ echo
 
 
 --REGEXPECT--
-01. Create kafka sub with payload
-==================================================
+01. Create kafkaCustom sub with payload
+=======================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -139,8 +139,8 @@ Content-Length: 0
 
 
 
-02. Create kafka sub without payload
-=====================================================
+02. Create kafkaCustom sub without payload
+==========================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -149,8 +149,8 @@ Content-Length: 0
 
 
 
-03. Create kafka sub with null payload
-=======================================================
+03. Create kafkaCustom sub with null payload
+============================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

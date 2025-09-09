@@ -211,21 +211,21 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
 *
 * KafkaInfo::fill -
 */
-void KafkaInfo::fill(const KafkaInfo& _KafkaInfo)
+void KafkaInfo::fill(const KafkaInfo& _kafkaInfo)
 {
-  this->url            = _KafkaInfo.url;
-  this->topic          = _KafkaInfo.topic;
-  this->custom         = _KafkaInfo.custom;
-  this->payload        = _KafkaInfo.payload;
-  this->payloadType    = _KafkaInfo.payloadType;
-  this->includePayload = _KafkaInfo.includePayload;
-  this->providedAuth   = _KafkaInfo.providedAuth;
-  this->user           = _KafkaInfo.user;
-  this->passwd         = _KafkaInfo.passwd;
+  this->url            = _kafkaInfo.url;
+  this->topic          = _kafkaInfo.topic;
+  this->custom         = _kafkaInfo.custom;
+  this->payload        = _kafkaInfo.payload;
+  this->payloadType    = _kafkaInfo.payloadType;
+  this->includePayload = _kafkaInfo.includePayload;
+  this->providedAuth   = _kafkaInfo.providedAuth;
+  this->user           = _kafkaInfo.user;
+  this->passwd         = _kafkaInfo.passwd;
 
-  this->json = _KafkaInfo.json == NULL ? NULL : _KafkaInfo.json->clone();
+  this->json = _kafkaInfo.json == NULL ? NULL : _kafkaInfo.json->clone();
 
-  this->ngsi.fill(_KafkaInfo.ngsi, false, true);  // clone compounds enabled
+  this->ngsi.fill(_kafkaInfo.ngsi, false, true);  // clone compounds enabled
 }
 
 

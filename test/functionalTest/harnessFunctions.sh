@@ -798,6 +798,8 @@ function accumulatorStart()
 
   accumulatorStop $port
 
+  # Note that although accumulator-server.py can run using at the same time HTTP, MQTT and KAFKA listeners, this
+  # function only allows to run in HTTP, HTTP+MQTT and HTTP+KAFKA modes. That suffices for current functional test cases
   if [ ! -z "$bootstrapServers" ]
   then
     # Start with KAFKA
@@ -1234,7 +1236,7 @@ cleanMqttRetain() {
   local port="${3:-1883}"
 
   if [[ -z "$host" || -z "$topic" ]]; then
-    echo "Uso: mqtt_retain_empty <host> <topic> [puerto]" >&2
+    echo "Usage: mqtt_retain_empty <host> <topic> [port]" >&2
     return 1
   fi
 

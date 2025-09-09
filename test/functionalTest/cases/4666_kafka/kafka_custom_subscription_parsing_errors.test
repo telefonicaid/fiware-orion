@@ -202,8 +202,8 @@ echo
 echo
 
 
-echo "07. Create kafkaCustom sub with mqtt url with path, see error"
-echo "============================================================"
+echo "07. Create kafkaCustom sub with kafka url with path, see error"
+echo "=============================================================="
 payload='{
   "description": "Test subscription",
   "subject": {
@@ -394,8 +394,8 @@ Content-Length: 70
 }
 
 
-07. Create kafkaCustom sub with mqtt url with path, see error
-============================================================
+07. Create kafkaCustom sub with kafka url with path, see error
+==============================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
