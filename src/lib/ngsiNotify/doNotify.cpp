@@ -182,10 +182,8 @@ static void doNotifyMqtt(SenderThreadParams* params)
 */
 static void doNotifyKafka(SenderThreadParams* params)
 {
-  char                portV[STRING_SIZE_FOR_INT];
   std::string         endpoint;
 
-  snprintf(portV, sizeof(portV), "%d", params->port);
   endpoint = params->endpoint;
 
   // Note in the case of HTTP this lmTransactionStart is done internally in httpRequestSend
