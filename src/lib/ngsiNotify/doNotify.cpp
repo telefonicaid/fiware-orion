@@ -165,7 +165,7 @@ static void doNotifyMqtt(SenderThreadParams* params)
     // mqttOnPublishCallback is called (by the moment we are not doing nothing there, just printing in
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
-    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
+    logInfoNonRequestNotification("MQTT", params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else
@@ -198,7 +198,7 @@ static void doNotifyKafka(SenderThreadParams* params)
   // lastFailureReason and lastSuccessCode in KAFKA notifications (they don't have sense in this case)
   if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, params->subscriptionId, params->tenant, params->servicePath))
   {
-    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
+    logInfoNonRequestNotification("KAFKA", params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else

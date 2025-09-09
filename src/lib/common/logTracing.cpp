@@ -114,10 +114,11 @@ void logInfoHttpNotification
 
 /* ****************************************************************************
 *
-* logInfoMqttNotification
+* logInfoNonRequestNotification
 */
-void logInfoMqttNotification
+void logInfoNonRequestNotification
 (
+  const char*  prefix,
   const char*  subId,
   const char*  endpoint,
   const char*  resource,
@@ -137,7 +138,7 @@ void logInfoMqttNotification
     effectivePayload = (char*) payload;
   }
 
-  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s, payload (%d bytes): %s", subId, endpoint, resource, strlen(payload), effectivePayload));
+  LM_I(("%s Notif delivered (subId: %s): broker: %s, topic: %s, payload (%d bytes): %s", prefix, subId, endpoint, resource, strlen(payload), effectivePayload));
 
   if (cleanAfterUse)
   {
