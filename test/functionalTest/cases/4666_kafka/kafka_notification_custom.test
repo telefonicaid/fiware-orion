@@ -72,7 +72,6 @@ echo
 echo
 
 
-accumulatorReset
 echo "02. Create entity E1 with A=1"
 echo "============================="
 payload='{
