@@ -41,7 +41,7 @@ namespace ngsiv2
 *
 * KafkaInfo::KafkaInfo - 
 */
-KafkaInfo::KafkaInfo() : custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
+KafkaInfo::KafkaInfo() : custom(false), json(NULL), payloadType(Text), includePayload(true)/*, providedAuth(false)*/ // FIXME #4714: not yet in use
 {
 }
 
@@ -58,11 +58,12 @@ std::string KafkaInfo::toJson()
   jh.addString("url", this->url);
   jh.addString("topic", this->topic);
 
-  if (providedAuth)
-  {
-    jh.addString("user", this->user);
-    jh.addString("passwd", "*****");
-  }
+  // FIXME #4714: not yet in use
+  //if (providedAuth)
+  //{
+  //  jh.addString("user", this->user);
+  //  jh.addString("passwd", "*****");
+  //}
 
   if (custom)
   {
@@ -107,8 +108,9 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
   this->topic  = bo.hasField(CSUB_KAFKATOPIC)? getStringFieldF(bo, CSUB_KAFKATOPIC) : "";
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
 
+  // FIXME #4714: not yet in use
   // both user and passwd have to be used at the same time
-  if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))
+  /*if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))
   {
     this->user   = getStringFieldF(bo, CSUB_USER);
     this->passwd = getStringFieldF(bo, CSUB_PASSWD);
@@ -119,7 +121,7 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
     this->user   = "";
     this->passwd = "";
     this->providedAuth = false;
-  }
+  }*/
 
   if (this->custom)
   {
@@ -219,9 +221,9 @@ void KafkaInfo::fill(const KafkaInfo& _kafkaInfo)
   this->payload        = _kafkaInfo.payload;
   this->payloadType    = _kafkaInfo.payloadType;
   this->includePayload = _kafkaInfo.includePayload;
-  this->providedAuth   = _kafkaInfo.providedAuth;
-  this->user           = _kafkaInfo.user;
-  this->passwd         = _kafkaInfo.passwd;
+  //this->providedAuth   = _kafkaInfo.providedAuth;  // FIXME #4714: not yet in use
+  //this->user           = _kafkaInfo.user;          // FIXME #4714: not yet in use
+  //this->passwd         = _kafkaInfo.passwd;        // FIXME #4714: not yet in use
 
   this->json = _kafkaInfo.json == NULL ? NULL : _kafkaInfo.json->clone();
 
