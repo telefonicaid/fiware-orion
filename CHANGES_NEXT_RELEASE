@@ -7,6 +7,7 @@
 - Fix: admin log operations error responses were not following NGSIv2 error response syntax
 - Fix: memory leaks in parse logic in case of parse error (possibly)
 - Fix: csubs and registrations now use isPattern as bool instead of string (legacy from NGSIv1 model), although strings are still supported (#4681)
+- Fix: use warning instead of Runtime Error when adding an object or array in basic expressions mode
 - Hardening: remove a huge amount of NGSIv1 related dead-code (#4681)
 - Add: support for Kafka based notifications (#4666)
 - Add: new CLI parameters kafkaTimeout and kafkaMaxAge (and associated env vars ORION_KAFKA_TIMEOUT and ORION_KAFKA_MAX_AGE) (#4666)

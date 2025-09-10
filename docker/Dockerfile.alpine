@@ -112,7 +112,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
-    bash get_cjexl.sh 0.6.0 $(cat /run/secrets/repo_token) && \
+    ash get_cjexl.sh 0.6.0 $(cat /run/secrets/repo_token) && \
     # patch bash and mktemp statement in build script, as in alpine is slightly different
     sed -i 's/mktemp \/tmp\/compileInfo.h.XXXX/mktemp/g' scripts/build/compileInfo.sh && \
     sed -i 's/bash/ash/g' scripts/build/compileInfo.sh && \
