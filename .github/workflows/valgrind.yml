@@ -21,8 +21,6 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: true
 
-    name: valgrind - ${{ matrix.payload.name }}
-
     strategy:
       matrix:
         batch:
@@ -31,7 +29,9 @@ jobs:
           - { name: "batch 3 - cache", FT_FROM_IX: 601, FT_TO_IX: 900,  CB_NO_CACHE: ""  }
           - { name: "batch 4 - cache", FT_FROM_IX: 901, FT_TO_IX: 1200, CB_NO_CACHE: ""  }
           - { name: "batch 5 - cache", FT_FROM_IX: 1201,FT_TO_IX: "",   CB_NO_CACHE: ""  }
-          
+
+    name: valgrind - ${{ matrix.batch.name }}
+
     steps:
       - uses: actions/checkout@v2
 
