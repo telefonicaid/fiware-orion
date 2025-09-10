@@ -47,7 +47,7 @@ in KAFKA subscriptions work the same as in HTTP subscriptions, taking into accou
 * `kafkaCustom` is used instead of `httpCustom`
 * The same fields used in `kafka` can be used in `kafkaCustom`.
 * `qs` and `method`cannot be used, as they doesn’t have equivalence in Kafka
-* Macro replacement is performed in `topic` and `payload` fields.
+* Macro replacement is performed in `topic`, `payload`, `json` and `ngsi` fields. `url` is a fixed value.
 
 ## Connection management
 
