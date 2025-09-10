@@ -138,6 +138,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
       tar xvf kafka_2.12-3.9.1.tgz
       # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)
 
+Next steps require to set up needed services for testing as described [in this documentation](../../../test/functionalTest/README.md#start-needed-services).
 
 * Run test harness in this environment (it takes some time, please be patient).
 
