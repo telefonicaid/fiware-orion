@@ -8,6 +8,8 @@ ADD fuse_gtest_files.py.patch /opt/archive/
 RUN ln -s /opt/bin/build.sh /usr/local/bin/build \
 && /opt/bin/build-dep.sh
 
+ENV PATH="/opt/kafka/bin:$PATH"
+
 WORKDIR /opt/
 
 CMD ["/usr/local/bin/build", "-h"]
