@@ -85,7 +85,7 @@ def usage():
 
     print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> " +
           "--mqttHost <host> --mqttPort <port> --mqttTopic <topic> " +
-          "--bootstrapServers --kafkaTopic <topic> " +
+          "--bootstrapServers <endpoint> --kafkaTopic <topic> " +
           "--kafkaGroupId <group_id> --url <server url> --pretty-print "
           "--https --key <key_file> --cert <cert_file> -v -u")
     print("""\nParameters:

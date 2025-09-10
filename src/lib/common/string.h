@@ -220,6 +220,19 @@ inline std::string removeQuotes(std::string s)
 
 /* ****************************************************************************
 *
+* getEndpoint -
+*/
+inline std::string getEndpoint(const std::string& host, int port)
+{
+  char  portV[STRING_SIZE_FOR_INT];
+  snprintf(portV, sizeof(portV), "%d", port);
+  return host + ":" + portV;
+}
+
+
+
+/* ****************************************************************************
+*
 * htmlEscape - 
 */
 extern char* htmlEscape(const char* s);

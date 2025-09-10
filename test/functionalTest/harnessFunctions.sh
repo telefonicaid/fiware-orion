@@ -798,6 +798,8 @@ function accumulatorStart()
 
   accumulatorStop $port
 
+  # Note that although accumulator-server.py can run using at the same time HTTP, MQTT and KAFKA listeners, this
+  # function only allows to run in HTTP, HTTP+MQTT and HTTP+KAFKA modes. That suffices for current functional test cases
   if [ ! -z "$bootstrapServers" ]
   then
     # Start with KAFKA
@@ -1166,21 +1168,21 @@ kafkaCreateTopics() {
   for topic in "$@"; do
     echo "Creating topic: $topic (bootstrap: $bootstrap)"
 
-    /opt/kafka/bin/kafka-topics.sh \
+    kafka-topics.sh \
       --create \
       --topic "$topic" \
       --bootstrap-server "$bootstrap" \
       --partitions 1 \
       --replication-factor 1 \
-      --command-config /opt/kafka/ci.conf \
+      --command-config $SCRIPT_HOME/kafkaClient/client.conf \
       --if-not-exists
 
     # Actively wait until Kafka confirmks that it exists
     echo "Waiting for Kafka to register the topic '$topic'..."
     for i in $(seq 1 10); do
-      if /opt/kafka/bin/kafka-topics.sh \
+      if kafka-topics.sh \
           --list \
-          --command-config /opt/kafka/ci.conf \
+          --command-config $SCRIPT_HOME/kafkaClient/client.conf \
           --bootstrap-server "$bootstrap" | grep -qw -- "$topic"; then
         echo "Topic '$topic' created and available."
         break
@@ -1212,11 +1214,11 @@ kafkaDestroyTopics() {
   for topic in "$@"; do
     echo "Eliminating topic: $topic (bootstrap: $bootstrap)"
 
-    /opt/kafka/bin/kafka-topics.sh \
+    kafka-topics.sh \
       --delete \
       --topic "$topic" \
       --bootstrap-server "$bootstrap" \
-      --command-config /opt/kafka/ci.conf \
+      --command-config $SCRIPT_HOME/kafkaClient/client.conf \
       --if-exists
   done
 }
@@ -1234,7 +1236,7 @@ cleanMqttRetain() {
   local port="${3:-1883}"
 
   if [[ -z "$host" || -z "$topic" ]]; then
-    echo "Uso: mqtt_retain_empty <host> <topic> [puerto]" >&2
+    echo "Usage: mqtt_retain_empty <host> <topic> [port]" >&2
     return 1
   fi
 

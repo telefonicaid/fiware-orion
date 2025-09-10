@@ -385,13 +385,14 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription kafkaTopic:  %s", sub.notification.kafkaInfo.topic.c_str()));
     LM_T(LmtMongo, ("Subscription custom:     %s", sub.notification.kafkaInfo.custom? "true" : "false"));
 
-    if (sub.notification.mqttInfo.providedAuth)
+    // FIXME #4714: not yet in use
+    /*if (sub.notification.mqttInfo.providedAuth)
     {
       b->append(CSUB_USER,   sub.notification.kafkaInfo.user);
       b->append(CSUB_PASSWD, sub.notification.kafkaInfo.passwd);
       LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.kafkaInfo.user.c_str()));
       LM_T(LmtMongo, ("Subscription passwd: *****"));
-    }
+    }*/
 
     if (sub.notification.kafkaInfo.custom)
     {

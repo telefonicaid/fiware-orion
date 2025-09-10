@@ -133,14 +133,12 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
 
 * Install the Kafka client (CLI).
 
-      sudo apt-get install openjdk-17-jre-headlessk
+      sudo apt-get install openjdk-17-jre-headless
       wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
       tar xvf kafka_2.12-3.9.1.tgz
-      mv kafka_2.12-3.9.1 kafka
-      cd kafka
-      echo 'default.api.timeout.ms=12000' >> ci.conf #FIXME PR
-      echo 'request.timeout.ms=12000' >> ci.conf #FIMXE PR
+      # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)
 
+Next steps require to set up needed services for testing as described [in this documentation](../../../test/functionalTest/README.md#start-needed-services).
 
 * Run test harness in this environment (it takes some time, please be patient).
 

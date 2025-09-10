@@ -57,7 +57,7 @@ class TriggeredSubscription
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
   ngsiv2::MqttInfo          mqttInfo;
-  ngsiv2::KafkaInfo        kafkaInfo;
+  ngsiv2::KafkaInfo         kafkaInfo;
   StringList                attrL;
   std::string               cacheSubId;
   std::string               tenant;

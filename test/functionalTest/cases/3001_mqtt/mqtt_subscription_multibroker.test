@@ -215,7 +215,6 @@ sleep 0.5s
 echo "10. Dump accumulator for localhost:1883 and see 4 notifications"
 echo "==============================================================="
 accumulatorDump
-accumulatorReset
 echo
 echo
 

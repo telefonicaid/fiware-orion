@@ -136,7 +136,7 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 7s
+sleep 2s
 
 
 echo "05. Dump and reset accumulator, see E A=1 in: 1 KAFKA sub1, 1 KAFKA sub2, 1 HTTP"
@@ -166,8 +166,6 @@ echo
 sleep 1s
 
 
-# FIXME: if we put this step after dump&reset one, it is not checked... don't know why,
-# maybe the usage of SORT_START/END?
 echo "07. GET subscriptions: 3 subs with timesSent 1 and lastSuccess"
 echo "=============================================================="
 orionCurl --url /v2/subscriptions
@@ -429,8 +427,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
     ],
     "subscriptionId": "REGEX([0-9a-f\-]{24})"
 }
+#SORT_START
 =======================================
-REGEX(^Kafka message at topic sub\d+$)
+Kafka message at topic sub1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
   Fiware-Servicepath: /
@@ -450,7 +449,7 @@ Payload:
     ]
 }
 =======================================
-REGEX(^Kafka message at topic sub\d+$)
+Kafka message at topic sub2
 Key: REGEX([0-9a-f\-]{24})
 Headers:
   Fiware-Servicepath: /
@@ -470,6 +469,7 @@ Payload:
     ]
 }
 =======================================
+#SORT_END
 
 
 --TEARDOWN--

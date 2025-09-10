@@ -492,10 +492,13 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, std::string* protocol, std::string* path)
 {
   if (url.empty())
+  {
     return false;
+  }
 
   // Validate output pointers
-  if (!cleanListOut || !protocol || !path) {
+  if (!cleanListOut || !protocol || !path)
+  {
     return false;
   }
 

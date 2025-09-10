@@ -50,9 +50,9 @@ struct KafkaInfo
   CustomPayloadType          payloadType;
   bool                       includePayload;
 
-  bool          providedAuth;
-  std::string   user;
-  std::string   passwd;
+  //bool          providedAuth;  // FIXME #4714: not yet in use
+  //std::string   user;          // FIXME #4714: not yet in use
+  //std::string   passwd;        // FIXME #4714: not yet in use
 
   KafkaInfo();
 

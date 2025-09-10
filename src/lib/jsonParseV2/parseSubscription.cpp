@@ -497,7 +497,7 @@ static std::string parseCustomPayload
       *payload = payloadOpt.value;
     }
   }
-  else  if (holder.HasMember("json"))
+  else if (holder.HasMember("json"))
   {
     *payloadType = ngsiv2::CustomPayloadType::Json;
 
