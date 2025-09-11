@@ -75,7 +75,17 @@ extern bool parseUrl
   std::string&        protocol
 );
 
-
+/* ****************************************************************************
+*
+* parseKafkaBrokerList -
+*/
+extern bool parseKafkaBrokerList
+(
+  const std::string&  url,
+  std::string*        cleanListOut,
+  std::string*        protocol,
+  std::string*        path
+);
 
 /* ****************************************************************************
 *
@@ -204,6 +214,19 @@ inline std::string removeQuotes(std::string s)
   {
     return s;
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* getEndpoint -
+*/
+inline std::string getEndpoint(const std::string& host, int port)
+{
+  char  portV[STRING_SIZE_FOR_INT];
+  snprintf(portV, sizeof(portV), "%d", port);
+  return host + ":" + portV;
 }
 
 

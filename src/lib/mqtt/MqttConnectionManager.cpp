@@ -30,6 +30,7 @@
 #include <vector>
 #include <map>
 
+#include "common/string.h"
 #include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "alarmMgr/alarmMgr.h"
@@ -41,19 +42,6 @@
 * MQTT_DEFAULT_KEEPALIVE -
 */
 #define MQTT_DEFAULT_KEEPALIVE 60
-
-
-
-/* ****************************************************************************
-*
-* getEndpoint -
-*/
-inline std::string getEndpoint(const std::string& host, int port)
-{
-  char  portV[STRING_SIZE_FOR_INT];
-  snprintf(portV, sizeof(portV), "%d", port);
-  return host + ":" + portV;
-}
 
 
 

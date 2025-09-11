@@ -375,10 +375,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 86
+Content-Length: 106
 
 {
-    "description": "http, httpCustom, mqtt or mqttCustom is missing",
+    "description": "http, httpCustom, mqtt, mqttCustom, kafka or kafkaCustom is missing",
     "error": "BadRequest"
 }
 
@@ -389,10 +389,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 98
+Content-Length: 118
 
 {
-    "description": "only one of http, httpCustom, mqtt or mqttCustom is allowed",
+    "description": "only one of http, httpCustom, mqtt, mqttCustom, kafka or kafkaCustom is allowed",
     "error": "BadRequest"
 }
 

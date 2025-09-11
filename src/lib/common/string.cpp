@@ -37,6 +37,7 @@
 #include "common/wsStrip.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
+#include "parse/forbiddenChars.h"
 
 
 
@@ -157,6 +158,49 @@ bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort
   return isIPv6(res);
 }
 
+
+/* ****************************************************************************
+*
+* getIPv4HostPort -
+*/
+bool getIPv4HostPort(const std::string& broker, std::string& host, int& port, const std::string& protocol)
+{
+  // IPv4
+  std::vector<std::string>  hostTokens;
+  int   components = stringSplit(broker, ':', hostTokens);
+
+  /* some.host.com:8080
+   *              ^
+   *              |
+   * ------------- ----
+   *   0             1  position in urlTokens vector
+   * 1            2     components
+   */
+
+  /* Sanity check */
+  if (components > 2)
+  {
+    return false;
+  }
+
+  host = hostTokens[0];
+
+  if (components == 2)
+  {
+    /* Sanity check (corresponding to http://xxxx:/path) */
+    if (hostTokens[1].empty())
+    {
+      return false;
+    }
+
+    port = atoi(hostTokens[1].c_str());
+  }
+  else  // port not given - using default ports
+  {
+    port = protocol == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
+  }
+  return true;
+}
 
 
 /* ****************************************************************************
@@ -359,13 +403,13 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   /* First: split by the first '/' to get host:ip and path */
   std::vector<std::string>  urlTokens;
-  int                       components = stringSplit(url, '/', urlTokens);  
+  int                       components = stringSplit(url, '/', urlTokens);
 
   //
   // Ensuring the scheme is present
   // Note that although mqtt:// is not officially supported it is used de facto (see for instance https://github.com/mqtt/mqtt.org/wiki/URI-Scheme)
   //
-  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:")))
+  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:") && (urlTokens[0] != "kafka:")))
   {
     return false;
   }
@@ -415,38 +459,9 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   else
   {
     // IPv4
-    std::vector<std::string>  hostTokens;
-    components = stringSplit(urlTokens[2], ':', hostTokens);
-
-    /* some.host.com:8080
-     *              ^
-     *              |
-     * ------------- ----
-     *   0             1  position in urlTokens vector
-     * 1            2     components
-     */
-
-    /* Sanity check */
-    if (components > 2)
+    if (!getIPv4HostPort(urlTokens[2], host, port, protocol))
     {
       return false;
-    }
-
-    host = hostTokens[0];
-
-    if (components == 2)
-    {
-      /* Sanity check (corresponding to http://xxxx:/path) */
-      if (hostTokens[1].empty())
-      {
-        return false;
-      }
-
-      port = atoi(hostTokens[1].c_str());
-    }
-    else  // port not given - using default ports
-    {
-      port = urlTokens[0] == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }
   }
 
@@ -468,6 +483,131 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   return true;
 }
 
+
+
+/* ****************************************************************************
+*
+* parseKafkaBrokerList
+*/
+bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, std::string* protocol, std::string* path)
+{
+  if (url.empty())
+  {
+    return false;
+  }
+
+  // Validate output pointers
+  if (!cleanListOut || !protocol || !path)
+  {
+    return false;
+  }
+
+  std::stringstream        ss(url);
+  std::string              rawBroker;
+  std::vector<std::string> cleaned;
+
+  /* First: split by the first '/' to get host:ip and path */
+  std::vector<std::string>  urlTokens;
+  int components = stringSplit(url, '/', urlTokens);
+  (void)components;
+
+  //
+  //
+  // // Accept only kafka://
+  //
+  *protocol = urlTokens[0];
+
+  while (std::getline(ss, rawBroker, ','))
+  {
+    // Trim
+    rawBroker.erase(0, rawBroker.find_first_not_of(" \t\n\r"));
+    rawBroker.erase(rawBroker.find_last_not_of(" \t\n\r") + 1);
+    if (rawBroker.empty())
+    {
+      continue;
+    }
+
+    // Prefix kafka://
+    const std::string prefix = *protocol + "//";
+
+    if (rawBroker.rfind(prefix, 0) == 0)
+    {
+      rawBroker.erase(0, prefix.size());
+    }
+
+    // reject if it contains '/' (there should be no path)
+    if (path->empty())
+    {
+      /* Minimum path is always "/" */
+      *path = "/";
+    }
+
+    size_t slashPos = rawBroker.find('/');
+    if (slashPos != std::string::npos)
+    {
+      *path = rawBroker.substr(slashPos);
+    }
+
+    // Validations
+    std::string host, portStr;
+    int         port = 0;
+
+    // IPv6  [addr]:port
+    if (getIPv6Port(rawBroker, host, portStr))
+    {
+      if (portStr.empty())
+      {
+        return false;
+      }
+      port = atoi(portStr.c_str());
+    }
+    else
+    {
+      // IPv4 addr:port
+      if (!getIPv4HostPort(rawBroker, host, port, *protocol))
+      {
+        return false;
+      }
+    }
+
+    //
+    // Is 'port' a valid number?
+    // MAX_PORT is the maximum number that a port can have.
+    // Negative port numbers cannot exist and 0 is reserved.
+    //
+    if ((port > MAX_PORT) || (port <= 0))
+    {
+      return false;
+    }
+
+    if (forbiddenChars(host.c_str()) || !hostnameIsValid(host.c_str()))
+      return false;
+
+    // normalize and save
+    // For IPv6 we keep brackets
+    if (host.find(':') != std::string::npos && host.front() != '[')
+    {
+      host = "[" + host + "]";
+    }
+
+    cleaned.push_back(host + ":" + std::to_string(port));
+  }
+
+  if (cleaned.empty())
+  {
+    return false;
+  }
+
+  // Rebuild final list
+  cleanListOut->clear();
+  for (size_t i = 0; i < cleaned.size(); ++i)
+  {
+    if (i) *cleanListOut += ',';
+    *cleanListOut += cleaned[i];
+  }
+
+  return true;
+}
 
 
 /* ****************************************************************************

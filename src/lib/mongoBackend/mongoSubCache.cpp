@@ -141,6 +141,10 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   {
     cSubP->mqttInfo.fill(sub);
   }
+  else if (sub.hasField(CSUB_KAFKATOPIC))
+  {
+    cSubP->kafkaInfo.fill(sub);
+  }
   else
   {
     cSubP->httpInfo.fill(sub);
@@ -462,6 +466,10 @@ int mongoSubCacheItemInsert
   if (sub.hasField(CSUB_MQTTTOPIC))
   {
     cSubP->mqttInfo.fill(sub);
+  }
+  else if (sub.hasField(CSUB_KAFKATOPIC))
+  {
+    cSubP->kafkaInfo.fill(sub);
   }
   else
   {

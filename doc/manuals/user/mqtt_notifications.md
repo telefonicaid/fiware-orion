@@ -54,7 +54,7 @@ in MQTT subscriptions work the same as in HTTP subscriptions, taking into accoun
 * `mqttCustom` is used instead of `httpCustom`
 * The same fields used in `mqtt` can be used in `mqttCustom`.
 * `headers`, `qs` and `method`cannot be used, as they doesn’t have equivalence in MQTT
-* Macro replacement is performed in `topic` and `payload` fields. `url`, `qos`, `retain`, `user` and `passwd` are fixed values
+* Macro replacement is performed in `topic`, `payload`, `json` and `ngsi` fields. `url`, `qos`, `retain`, `user` and `passwd` are fixed values.
 
 ## Connection management
 

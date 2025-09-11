@@ -100,6 +100,7 @@ typedef enum TraceLevels
   LmtNotificationRequestPayload,
   LmtNotificationResponsePayload,
   LmtMqttNotif,
+  LmtKafkaNotif,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,

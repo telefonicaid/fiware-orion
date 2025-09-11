@@ -1,0 +1,622 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+KAFKA subcription parsing errors
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subs with missing notification type, see error
+# 02. Create subs with more than one notification type, see error
+# 03. Create sub with kafka not being an object, see error
+# 04. Create kafka sub without url, see error
+# 05. Create kafka sub with url not being a string, see error
+# 06. Create kafka sub with http url, see error
+# 07. Create kafka sub with kafka url with path, see error
+# 08. Create kafka sub without topic, see error
+# 09. Create kafka sub with topic not being a string, see error
+# 10. Create kafka sub with empty topic, see error
+# 11. Create kafka sub with topic with #, see error
+# 12. Create kafka sub with topic with +, see error
+# 13. Create kafka sub with topic with /, see error
+# 14. Create http sub with kafka url, see error
+#
+
+
+echo "01. Create subs with missing notification type, see error"
+echo "========================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create subs with more than one notification type, see error"
+echo "==============================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "mqtt://kafka1"
+    },
+    "kafka": {
+      "url": "kafka1:9092",
+      "topic": "orion_notif"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create sub with kafka not being an object, see error"
+echo "========================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": "foo",
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+echo "04. Create kafka sub without url, see error"
+echo "==========================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "topic": "orion_notif"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create kafka sub with url not being a string, see error"
+echo "==========================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": 1234,
+      "topic": "orion_notif"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create kafka sub with http url, see error"
+echo "============================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "http://kafka1:9999",
+      "topic": "orion_notif"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create kafka sub with kafka url with path, see error"
+echo "========================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092/path/not/valid",
+      "topic": "orion_notif"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "08. Create kafka sub without topic, see error"
+echo "============================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "09. Create kafka sub with topic not being a string, see error"
+echo "============================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": 1234
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "10. Create kafka sub with empty topic, see error"
+echo "================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": ""
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "11. Create kafka sub with topic with #, see error"
+echo "================================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": "sub#",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "12. Create kafka sub with topic with +, see error"
+echo "================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": "sub+",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "13. Create kafka sub with topic with /, see error"
+echo "================================================"
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://kafka1:9092",
+      "topic": "/sub",
+      "qos": 1
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "14. Create http sub with kafka url, see error"
+echo "============================================="
+payload='{
+  "description": "Test subscription",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "kafka://kafka1:9092"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subs with missing notification type, see error
+=========================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 106
+
+{
+    "description": "http, httpCustom, mqtt, mqttCustom, kafka or kafkaCustom is missing",
+    "error": "BadRequest"
+}
+
+
+02. Create subs with more than one notification type, see error
+===============================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 118
+
+{
+    "description": "only one of http, httpCustom, mqtt, mqttCustom, kafka or kafkaCustom is allowed",
+    "error": "BadRequest"
+}
+
+
+03. Create sub with kafka not being an object, see error
+========================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
+
+{
+    "description": "kafka notification is not an object",
+    "error": "BadRequest"
+}
+
+
+04. Create kafka sub without url, see error
+===========================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 72
+
+{
+    "description": "url kafka notification is missing",
+    "error": "BadRequest"
+}
+
+
+05. Create kafka sub with url not being a string, see error
+===========================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 77
+
+{
+    "description": "url kafka notification is not a string",
+    "error": "BadRequest"
+}
+
+
+06. Create kafka sub with http url, see error
+=============================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "description": "kafka schema is not used in URL",
+    "error": "BadRequest"
+}
+
+
+07. Create kafka sub with kafka url with path, see error
+========================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 90
+
+{
+    "description": "path cannot be used in kafka url, use topic instead",
+    "error": "BadRequest"
+}
+
+
+08. Create kafka sub without topic, see error
+=============================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 74
+
+{
+    "description": "topic kafka notification is missing",
+    "error": "BadRequest"
+}
+
+
+09. Create kafka sub with topic not being a string, see error
+=============================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 79
+
+{
+    "description": "topic kafka notification is not a string",
+    "error": "BadRequest"
+}
+
+
+10. Create kafka sub with empty topic, see error
+================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 64
+
+{
+    "description": "empty kafka field /topic/",
+    "error": "BadRequest"
+}
+
+
+11. Create kafka sub with topic with #, see error
+=================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "description": "+, # and / are not allowed in kafka field /topic/",
+    "error": "BadRequest"
+}
+
+
+12. Create kafka sub with topic with +, see error
+================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "description": "+, # and / are not allowed in kafka field /topic/",
+    "error": "BadRequest"
+}
+
+
+13. Create kafka sub with topic with /, see error
+================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "description": "+, # and / are not allowed in kafka field /topic/",
+    "error": "BadRequest"
+}
+
+
+14. Create http sub with kafka url, see error
+=============================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 85
+
+{
+    "description": "kafka URL cannot be used in http notifications",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

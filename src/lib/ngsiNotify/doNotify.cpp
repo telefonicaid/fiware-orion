@@ -32,6 +32,7 @@
 
 #include "alarmMgr/alarmMgr.h"
 #include "mqtt/mqttMgr.h"
+#include "kafka/kafkaMgr.h"
 #include "rest/httpRequestSend.h"
 #include "cache/subCache.h"
 
@@ -164,7 +165,7 @@ static void doNotifyMqtt(SenderThreadParams* params)
     // mqttOnPublishCallback is called (by the moment we are not doing nothing there, just printing in
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
-    logInfoMqttNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
+    logInfoNonRequestNotification("MQTT", params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
   }
   else
@@ -172,6 +173,39 @@ static void doNotifyMqtt(SenderThreadParams* params)
     subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
   }
 }
+
+
+/* ****************************************************************************
+*
+* doNotifyKafka -
+*
+*/
+static void doNotifyKafka(SenderThreadParams* params)
+{
+  std::string         endpoint;
+
+  endpoint = params->endpoint;
+
+  // Note in the case of HTTP this lmTransactionStart is done internally in httpRequestSend
+  std::string protocol = params->protocol + "//";
+  correlatorIdSet(params->fiwareCorrelator.c_str());
+  lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
+                     params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
+
+  // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
+  // lastFailureReason and lastSuccessCode in KAFKA notifications (they don't have sense in this case)
+  if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, params->subscriptionId, params->tenant, params->servicePath))
+  {
+    logInfoNonRequestNotification("KAFKA", params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
+  }
+  else
+  {
+    subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
+  }
+}
+
+
 
 
 
@@ -232,6 +266,10 @@ void doNotify
     if (paramsP->protocol == "mqtt:")
     {
       doNotifyMqtt(paramsP);
+    }
+    else if (paramsP->protocol == "kafka:")
+    {
+      doNotifyKafka(paramsP);
     }
     else
     {

@@ -30,6 +30,7 @@
 
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
+#include "apiTypesV2/KafkaInfo.h"
 #include "common/RenderFormat.h"
 #include "ngsi/StringList.h"
 #include "rest/StringFilter.h"
@@ -56,6 +57,7 @@ class TriggeredSubscription
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
   ngsiv2::MqttInfo          mqttInfo;
+  ngsiv2::KafkaInfo         kafkaInfo;
   StringList                attrL;
   std::string               cacheSubId;
   std::string               tenant;
@@ -79,6 +81,7 @@ class TriggeredSubscription
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
                         const ngsiv2::MqttInfo&  _mqttInfo,
+                        const ngsiv2::KafkaInfo&  _kafkaInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
                         const char*              _tenant,

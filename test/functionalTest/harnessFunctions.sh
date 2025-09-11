@@ -763,7 +763,21 @@ function accumulatorStart()
 
   if [ "$1" = "--mqttTopic" ]
   then
-    mqttPort="$1 $2"
+    mqttTopic="$1 $2"
+    shift
+    shift
+  fi
+
+  if [ "$1" = "--bootstrapServers" ]
+    then
+      bootstrapServers="$1 $2"
+      shift
+      shift
+    fi
+
+  if [ "$1" = "--kafkaTopic" ]
+  then
+    kafkaTopic="$1 $2"
     shift
     shift
   fi
@@ -784,15 +798,22 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  if [ -z "$mqttHost" ]
+  # Note that although accumulator-server.py can run using at the same time HTTP, MQTT and KAFKA listeners, this
+  # function only allows to run in HTTP, HTTP+MQTT and HTTP+KAFKA modes. That suffices for current functional test cases
+  if [ ! -z "$bootstrapServers" ]
   then
-    # Start without MQTT
-    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-    echo accumulator running as PID $$
-  else
+    # Start with KAFKA
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $bootstrapServers $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
+  elif [ ! -z "$mqttHost" ]
+  then
     # Start with MQTT
-    accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
-    echo accumulator running as PID $$
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $mqttHost $mqttPort $mqttTopic > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
+  else
+    # Start without MQTT and without kafka
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        echo accumulator running as PID $$
   fi
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -1129,6 +1150,100 @@ function dbInsertEntity()
 }
 
 
+
+# ------------------------------------------------------------------------------
+#
+# kafkaCreateTopics -
+#
+# Create one or more topics in Kafka
+kafkaCreateTopics() {
+  if [ "$#" -lt 2 ]; then
+    echo "Uso: kafkaCreateTopics <bootstrap> <topic1> [topic2 ...]"
+    echo "Ej.:  kafkaCreateTopics kafka1:9092 sub1 sub2"
+    return 2
+  fi
+
+  local bootstrap="$1"; shift
+
+  for topic in "$@"; do
+    echo "Creating topic: $topic (bootstrap: $bootstrap)"
+
+    kafka-topics.sh \
+      --create \
+      --topic "$topic" \
+      --bootstrap-server "$bootstrap" \
+      --partitions 1 \
+      --replication-factor 1 \
+      --command-config $SCRIPT_HOME/kafkaClient/client.conf \
+      --if-not-exists
+
+    # Actively wait until Kafka confirmks that it exists
+    echo "Waiting for Kafka to register the topic '$topic'..."
+    for i in $(seq 1 10); do
+      if kafka-topics.sh \
+          --list \
+          --command-config $SCRIPT_HOME/kafkaClient/client.conf \
+          --bootstrap-server "$bootstrap" | grep -qw -- "$topic"; then
+        echo "Topic '$topic' created and available."
+        break
+      else
+        echo "It still doesn't appear, trying again ($i/10)..."
+        sleep 2
+      fi
+    done
+  done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# kafkaDestroyTopics -
+#
+# Delete one or more topics in Kafka
+kafkaDestroyTopics() {
+  if [ "$#" -lt 2 ]; then
+    echo "Use: kafkaDestroyTopics <bootstrap> <topic1> [topic2 ...]"
+    echo "Example:  kafkaDestroyTopics kafka1:9092 sub1 sub2"
+    return 2
+  fi
+
+  local bootstrap="$1"; shift
+  local topic
+
+  for topic in "$@"; do
+    echo "Eliminating topic: $topic (bootstrap: $bootstrap)"
+
+    kafka-topics.sh \
+      --delete \
+      --topic "$topic" \
+      --bootstrap-server "$bootstrap" \
+      --command-config $SCRIPT_HOME/kafkaClient/client.conf \
+      --if-exists
+  done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# cleanMqttRetain -
+#
+# Delete retained topics by posting an empty message in the topic.
+cleanMqttRetain() {
+  local host="$1"
+  local topic="$2"
+  local port="${3:-1883}"
+
+  if [[ -z "$host" || -z "$topic" ]]; then
+    echo "Usage: mqtt_retain_empty <host> <topic> [port]" >&2
+    return 1
+  fi
+
+  mosquitto_pub -h "$host" -p "$port" -t "$topic" -n -r
+}
+
+
 # ------------------------------------------------------------------------------
 #
 # orionCurl
@@ -1398,3 +1513,6 @@ export -f dMsg
 export -f valgrindSleep
 export -f brokerStartAwait
 export -f brokerStopAwait
+export -f kafkaCreateTopics
+export -f kafkaDestroyTopics
+export -f cleanMqttRetain

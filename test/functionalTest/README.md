@@ -3,8 +3,24 @@
 ### Prerequisites
 
 * The `contextBroker` binary is in execution path
-* MongoDB database is up and running
+* All the needed services (MongoDB, MQTT broker, Kafka broker, etc.) are up and running
 * accumulator-server.py is correctly installed and available in the execution path (see specific section below)
+
+## Start needed services
+
+Since Orion 4.3.0, a docker compose is provided to ease the set up of required services for functional testing. Note that:
+
+* Docker is requiered in the system where you are going to execute the tests (check [Docker installation documentation](https://docs.docker.com/engine/install))
+* If you run locally some of the services included in that docker compose (e.g. a local MongoDB service in your system), you must stop them before starting it up or conflicts will happen
+
+To set up required services run in a terminal:
+
+```
+cd /path/to/fiware-orion
+docker compose -f ci/deb/docker-compose-ci.yml --project-directory . up
+```
+
+When you end your testing you can stop the service in the terminal typically with Ctrl+C.
 
 ### How to install accumulator-server.py
 
@@ -28,6 +44,7 @@ pip install Flask==2.0.2
 pip install Werkzeug==2.0.2
 pip install paho-mqtt==1.6.1
 pip install amqtt==0.11.0b1  # Not actually an accumulator-server.py dependency, but needed by some tests
+pip install confluent-kafka==2.11.0
 ```
 
 Next, install the accumulator-server.py script itself:
@@ -58,7 +75,7 @@ RUN python3 -m venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 # Install required packages within the virtual environment
-RUN pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1
+RUN pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0
 
 COPY . /app
 WORKDIR /app

@@ -178,6 +178,7 @@ MQTT message at topic orion/retain:
 
 
 --TEARDOWN--
+cleanMqttRetain localhost 'orion/retain' 1883
 brokerStop CB
 dbDrop CB
 accumulatorStop

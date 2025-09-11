@@ -18,6 +18,7 @@ nav:
       - 'API Walkthrough': 'user/walkthrough_apiv2.md'
       - 'CORS': 'user/cors.md'
       - 'MQTT notifications': 'user/mqtt_notifications.md'
+      - 'KAFKA notifications': 'user/kafka_notifications.md'
       - 'Update operators for attribute values': 'user/update_operators.md'
       - 'Context Providers and request forwarding': 'user/context_providers.md'
       - 'Context Broker federation': 'user/federation.md'

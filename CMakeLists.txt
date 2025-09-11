@@ -209,6 +209,7 @@ SET (ORION_LIBS
     lm
     pa
     mqtt
+    kafka
 )
 
 SET (BOOST
@@ -237,8 +238,12 @@ if (HAVE_CJEXL)
     SET (COMMON_STATIC_LIBS
         microhttpd.a
         mosquitto.a
+        librdkafka.a
         ${HAVE_CJEXL}
         mongo::mongoc_static
+        z.a
+        zstd.a
+        lz4.a
     )
 else (HAVE_CJEXL)
     message("Not using cjexl")
@@ -247,6 +252,10 @@ else (HAVE_CJEXL)
         microhttpd.a
         mosquitto.a
         mongo::mongoc_static
+        librdkafka.a
+        z.a
+        zstd.a
+        lz4.a
     )
 endif (HAVE_CJEXL)
 
@@ -282,6 +291,7 @@ endif (UNIT_TEST)
 include_directories("/usr/include")
 
 # Needed for the new C driver
+include_directories("/usr/include/librdkafka")
 include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("/usr/local/include/libbson-1.0")
 
@@ -333,6 +343,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/expressions)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/lib/mqtt)
+  ADD_SUBDIRECTORY(src/lib/kafka)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")

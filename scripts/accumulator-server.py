@@ -22,9 +22,14 @@
 
 # MQTT functionality based in old accumulator-mqtt.py script, by Burak
 
-# Requires paho-mqtt module:
+# Requires following dependencies:
 #
+# Flask==2.0.2
+# Werkzeug==2.0.2
 # paho-mqtt==1.6.1
+# amqtt==0.11.0b1
+# confluent-kafka==2.11.0
+#
 
 __author__ = 'fermin'
 
@@ -52,8 +57,11 @@ import atexit
 import string
 import signal
 import json
+import re
 import paho.mqtt.client as mqtt
 import threading
+from confluent_kafka import Consumer, KafkaException, KafkaError
+from confluent_kafka.admin import AdminClient, NewTopic
 
 
 def usage_and_exit(msg):
@@ -75,8 +83,10 @@ def usage():
     Print usage message
     """
 
-    print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> --mqttHost " +
-          "<host> --mqttPort <port> --mqttTopic <topic> --url <server url> --pretty-print " +
+    print(f"Usage: {os.path.basename(__file__)} --host <host> --port <port> " +
+          "--mqttHost <host> --mqttPort <port> --mqttTopic <topic> " +
+          "--bootstrapServers <endpoint> --kafkaTopic <topic> " +
+          "--kafkaGroupId <group_id> --url <server url> --pretty-print "
           "--https --key <key_file> --cert <cert_file> -v -u")
     print("""\nParameters:
           --host <host>: host to use database to use (default is '0.0.0.0')"
@@ -85,6 +95,9 @@ def usage():
           --mqttPort <port>: mqtt broker port to use (default is 1883)"
           --mqttTopic <topic>: mqtt topic to use (default is accumulate_mqtt)"
           --url <server url>: server URL to use (default is /accumulate)"
+          --bootstrapServers <endpoint>: Kafka url example: brokerA:9092,brokerB:9094
+          --kafkaTopic <topic>: Kafka topic (default 'accumulate_kafka')
+          --kafkaGroupId <group_id>: Kafka consumer group ID (default 'accumulator_group')
           --pretty-print: pretty print mode"
           --https: start in https"
           --key <key file>: (only used if https is enabled)"
@@ -106,6 +119,9 @@ host = '0.0.0.0'
 mqtt_host = None
 mqtt_port = 1883
 mqtt_topic = 'accumulate_mqtt'
+bootstrap_servers = None
+kafka_topic = 'accumulate_kafka'
+kafka_group_id = 'accumulator_group'
 server_url = '/accumulate'
 verbose = 0
 pretty = False
@@ -124,6 +140,9 @@ try:
             'mqttHost=',
             'mqttPort=',
             'mqttTopic=',
+            'bootstrapServers=',
+            'kafkaTopic=',
+            'kafkaGroupId=',
             'url=',
             'pretty-print',
             'https',
@@ -140,12 +159,18 @@ for opt, arg in opts:
         sys.exit(0)
     elif opt == '--mqttHost':
         mqtt_host = arg
+    elif opt == '--bootstrapServers':
+        bootstrap_servers = arg
     elif opt == '--host':
         host = arg
     elif opt == '--url':
         server_url = arg
     elif opt == '--mqttTopic':
         mqtt_topic = arg
+    elif opt == '--kafkaTopic':
+        kafka_topic = arg
+    elif opt == '--kafkaGroupId':
+        kafka_group_id = arg
     elif opt == '--port':
         try:
             port = int(arg)
@@ -178,9 +203,14 @@ if verbose:
     print("verbose mode is on")
     print("port: " + str(port))
     print("host: " + str(host))
-    print("mqtt_port: " + str(mqtt_port))
-    print("mqtt_host: " + str(mqtt_host))
-    print("mqtt_topic: " + str(mqtt_topic))
+    if mqtt_host:
+        print("mqtt_port: " + str(mqtt_port))
+        print("mqtt_host: " + str(mqtt_host))
+        print("mqtt_topic: " + str(mqtt_topic))
+    if bootstrap_servers:
+        print("bootstrap_servers: " + str(bootstrap_servers))
+        print("kafka_topic: " + str(kafka_topic))
+        print(f"kafka_group_id: " + str(kafka_group_id))
     print("server_url: " + str(server_url))
     print("pretty: " + str(pretty))
     print("https: " + str(https))
@@ -782,6 +812,111 @@ def on_message(client, userdata, msg):
 
     lock.release()
 
+# Kafka Consumer
+class KafkaConsumerThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.running = True
+
+        # Essential configuration for Kafka
+        conf = {
+            'bootstrap.servers': bootstrap_servers,
+            'group.id': kafka_group_id,
+            'auto.offset.reset': 'latest',
+            'enable.auto.commit': True,
+            'allow.auto.create.topics': True,
+            'topic.metadata.refresh.interval.ms': 200,
+            'session.timeout.ms': 6000,
+            'max.poll.interval.ms': 10000
+        }
+        self.consumer = Consumer(conf)
+        self.kafka_topic = kafka_topic
+        self.is_regex = self.kafka_topic.startswith("^") or self.kafka_topic.startswith("regex:")
+        if self.is_regex:
+            self.pattern_str = self.kafka_topic.replace("regex:", "") if self.kafka_topic.startswith("regex:") else self.kafka_topic
+        else:
+            self.pattern_str = None
+
+    def run(self):
+        # Subscription using regular expressions or direct topic
+
+        try:
+            topics_metadata = self.consumer.list_topics(timeout=1).topics.keys()
+            if self.is_regex:
+                print(f"Subscribing to Kafka topics with regex: {self.kafka_topic}")
+                topics_match = [t for t in topics_metadata if re.match(self.pattern_str, t)]
+                self.consumer.subscribe(topics_match, on_assign=self.on_assign)
+            else:
+                print(f"Subscribing to a Kafka topic: {self.kafka_topic}")
+                self.consumer.subscribe([self.kafka_topic], on_assign=self.on_assign)
+        except KafkaException as e:
+            print(f"Subscription error: {e}")
+            self.running = False
+            return
+
+        # Main consumption loop
+        while self.running:
+            try:
+                msg = self.consumer.poll(1.0)
+                if msg is None:
+                    continue
+                self.process_message(msg)
+            except KafkaException as e:
+                print(f"Kafka's error: {e}")
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+
+    def on_assign(self, consumer, partitions):
+        print(f"Assigned partitions: {partitions}")
+
+    def process_message(self, msg):
+        global ac, t0, times
+        with lock:
+            # Record time
+            if not t0:
+                t0 = datetime.now()
+                times.append(0)
+            else:
+                delta = datetime.now() - t0
+                times.append(trunc(delta.total_seconds()))
+
+            # Build record with key and headers
+            s = f"Kafka message at topic {msg.topic()}\n"
+
+            # 1. Print the message KEY
+            if msg.key() is not None:
+                try:
+                    key_str = msg.key().decode('utf-8')
+                except UnicodeDecodeError:
+                    key_str = msg.key().hex()
+                s += f"Key: {key_str}\n"
+            else:
+                s += "Key: (null)\n"
+
+            # 2. Print the HEADERS of the message
+            if msg.headers():
+                s += "Headers:\n"
+                for header_key, header_value in msg.headers():
+                    try:
+                        value_str = header_value.decode('utf-8') if header_value else "(empty)"
+                    except UnicodeDecodeError:
+                        value_str = header_value.hex()
+                    s += f"  {header_key}: {value_str}\n"
+
+            # 3. Print the payload
+            s += "Payload:\n"
+            try:
+                payload = json.loads(msg.value().decode('utf-8'))
+                s += json.dumps(payload, indent=4) if pretty else json.dumps(payload)
+            except:
+                s += msg.value().decode('utf-8', errors='replace')
+
+            s += '\n=======================================\n'
+            ac += s
+
+            if verbose:
+                print(s)
 
 ac = ''
 t0 = ''
@@ -802,6 +937,12 @@ if __name__ == '__main__':
         # Other loop*() functions are available that give a threaded interface and a
         # manual interface.
         client.loop_start()
+
+    # Start Kafka consumer if configured
+    kafka_thread = None
+    if bootstrap_servers:
+        kafka_thread = KafkaConsumerThread()
+        kafka_thread.start()
 
     # Note that using debug=True breaks the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,

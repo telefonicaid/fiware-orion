@@ -58,4 +58,11 @@ extern bool forbiddenQuotes(char* s);
 */
 extern bool forbiddenMqttTopic(const char* s);
 
+
+/* ****************************************************************************
+*
+* forbiddenKafkaTopic -
+*/
+extern bool forbiddenKafkaTopic(const char* s);
+
 #endif  // SRC_LIB_PARSE_FORBIDDENCHARS_H_

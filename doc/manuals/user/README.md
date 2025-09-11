@@ -8,6 +8,7 @@
   * [API Walkthrough](walkthrough_apiv2.md)
   * [CORS](cors.md)
   * [MQTT notifications](mqtt_notifications.md)
+  * [KAFKA notifications](kafka_notifications.md)
   * [Update operators for attribute values](update_operators.md)
   * [Context Providers registration and request forwarding](context_providers.md)
   * [Context broker federation](federation.md)

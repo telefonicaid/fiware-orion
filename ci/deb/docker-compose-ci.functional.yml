@@ -1,0 +1,37 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+#
+
+services:
+  # ─────────────────── Functional Tests ───────────────────
+  tests:
+    image: ${TEST_IMAGE_NAME:-telefonicaiot/fiware-orion:ci}
+    container_name: tests
+    network_mode: host
+    depends_on: [ mongodb, kafka1, kafka2, kafkaB, mosquitto, mosquitto-extra ]
+    environment:
+      REPO_ACCESS_TOKEN: ${REPO_ACCESS_TOKEN}
+      FT_FROM_IX: ${FT_FROM_IX}
+      FT_TO_IX: ${FT_TO_IX}
+      CB_NO_CACHE: ${CB_NO_CACHE}
+    volumes:
+      - .:/opt/fiware-orion
+    command:
+      build -miqts functional

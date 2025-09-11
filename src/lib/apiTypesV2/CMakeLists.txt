@@ -31,6 +31,7 @@ SET (SOURCES
     MqttInfo.cpp
     GeoFilter.cpp
     Expression.cpp
+    KafkaInfo.cpp
 )
 
 SET (HEADERS
@@ -45,6 +46,7 @@ SET (HEADERS
     MqttInfo.h
     GeoFilter.h
     Expression.h
+    KafkaInfo.h
 )
 
 

@@ -46,6 +46,8 @@
 #include <bson/bson.h>
 #include <mosquitto.h>
 
+#include "kafka/kafkaMgr.h"
+
 #ifndef EXPR_BASIC
 // Interface to use libcjexl
 extern "C" {
@@ -79,6 +81,7 @@ std::string libVersions(void)
   std::string  cjexl  = "     \"libcjexl\": ";
   std::string  mongo  = "     \"mongoc\": ";
   std::string  bson   = "     \"bson\": ";
+  std::string  kafka  = "     \"librdkafka\": ";
 
   char*        curlVersion = curl_version();
 
@@ -106,7 +109,8 @@ std::string libVersions(void)
 #endif
   total += rjson   + "\"" + RAPIDJSON_VERSION_STRING "\"" + ",\n";
   total += mongo   + "\"" + MONGOC_VERSION_S "\"" + ",\n";
-  total += bson    + "\"" + BSON_VERSION_S "\"" + "\n";
+  total += bson    + "\"" + BSON_VERSION_S "\"" + ",\n";
+  total += kafka   + "\"" + rd_kafka_version_str() + "\"\n";
 
   return total;
 }
