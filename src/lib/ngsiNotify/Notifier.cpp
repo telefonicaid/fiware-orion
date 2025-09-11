@@ -870,8 +870,10 @@ SenderThreadParams* Notifier::buildSenderParams
     std::string payloadString = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
 
     /* Parse URL */
+    // FIXME #4705: setting port to 0 to avoid valgrind errors regarding uninitialized variable
+    // It wouldn't be needed anymore when that issue gets implemented, as port variable will disappear
     std::string  host;
-    int          port;
+    int          port = 0;
     std::string  uriPath;
     std::string  protocol;
     std::string cleanBrokers;
