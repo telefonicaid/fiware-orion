@@ -109,7 +109,10 @@ The response is a listing of information of all the broker's semaphores:
      },
     "mqttMgr": {
         "status": "free"
-     },
+    },
+    "kafkaMgr": {
+        "status": "free"
+    },
     "request": {
         "status": "free"
     },
@@ -134,6 +137,7 @@ Short explanation of the semaphores:
 * **logMsg**, makes sure that not two messages are written simultaneously to the log-file
 * **metrics**, protects internal data of the Metrics Manager
 * **mqttMgr**, protects the data of MTTQ connections manager
+* **kafkaMgr**, protects the data of KAFKA connections manager
 * **request**, makes sure there are not two simultaneous requests to mongodb 
 * **subCache**, protects the Subscription Cache
 * **timeStat**, protects the data for timing statistics
