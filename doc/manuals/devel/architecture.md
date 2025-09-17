@@ -21,6 +21,7 @@ _Current Orion internal architecture_
 * Whenever a notification is triggered (e.g. as a consequence of updating an entity covered by an existing subscription), the notifier module (residing in the [**ngsiNotify** library](sourceCode.md#srclibngsinotify) is invoked from **mongoBackend** in order to send such a notification. Orion supports two notification types:
 	* HTTP notifications. In this case, the `httpRequestSend()` function (part of the **rest** library) is in charge of sending HTTP requests. It is based on the [libcurl](https://curl.haxx.se/libcurl/) external library.
 	* MQTT notifications. In this case, the `sendMqttNotification()` function (part of the **mqtt** library) is in charge of publishing the MQTT notification in the corresponding MQTT broker. It is based on the [mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) external library.
+	* KAFKA notifications. In this case, the `sendKafkaNotification()` function (part of the **kafka** library) is in charge of publishing the KAFKA notification in the corresponding KAFKA broker. It is based on the [rdkafka](https://github.com/confluentinc/librdkafka) external library.
 * The `httpRequestSend()` function is also called by **serviceRoutinesV2** functions capable of forwarding queries/updates to [Context Providers](../user/context_providers.md) under some conditions.
 
 [Top](#top)

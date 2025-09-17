@@ -74,6 +74,7 @@ When the broker starts, the subscription cache is populated with the subscriptio
   bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
+  ngsiv2::KafkaInfo                kafkaInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
   int64_t                          lastSuccess;  // timestamp of last successful notification
   std::string                      lastFailureReason;

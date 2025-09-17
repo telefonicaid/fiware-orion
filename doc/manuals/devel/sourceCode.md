@@ -15,6 +15,7 @@
 * [src/lib/mongoDriver/](#srclibmongodriver) (Database interface to MongoDB)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI notifications)
 * [src/lib/mqtt/](#srclibmqtt) (MQTT notifications)
+* [src/lib/kafka/](#srclibkafka) (KAFKA notifications)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (Alarm Manager implementation)
 * [src/lib/cache/](#srclibcache) (Subscription cache implementation)
 * [src/lib/logSummary/](#srcliblogsummary) (Log Summary implementation)
@@ -404,6 +405,8 @@ When an entity is created or modified or when a subscription is created or modif
   the [**rest** library](#srclibrest) is used: `httpRequestSend()`.
 * For MQTT notifications, [mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) is used. Actually, a function from
   the [**mqtt** library](#srclibmqtt) is used: `sendMqttNotification()`
+* For KAFKA notifications, [rdkafka](https://github.com/confluentinc/librdkafka) is used. Actually, a function from
+  the [**kafka** library](#srclibmqtt) is used: `sendKafkaNotification()`
 
 Another important aspect of this library is that the notifications are sent by separate threads, using a thread pool if desired.
 
@@ -412,7 +415,7 @@ Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be sta
 This module is always invoked from `processNotification()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
 
 The following four images demonstrate the program flow for context entity notifications without and with thread pool, both in the case
-of HTTP and MQTT notifications.
+of HTTP and MQTT/KAFKA notifications.
 
 <a name="flow-nf-01"></a>
 ![HTTP Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01.png)
@@ -425,13 +428,13 @@ _NF-01: HTTP Notification on entity-attribute Update/Creation without thread poo
 * `startSenderThread()` calls to `doNotify()` function, which sends the notification corresponding to the `SenderThreadParams` object (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout).
 
 <a name="flow-nf-01b"></a>
-![MQTT Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
+![MQTT/KAFKA Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
 
-_NF-01b: MQTT Notification on entity-attribute Update/Creation without thread pool_
+_NF-01b: MQTT/KAFKA Notification on entity-attribute Update/Creation without thread pool_
 
-* Step 1 to 4 are the same a in the previous diagram. The difference is in steps 5 and 6, which use MQTT library to publish the notification in
-  the corresponding MQTT broker. If the connection to the MQTT broker don't exist previously, then it is created as part as the notification
-  process (there is a keepalive time configured with the `-mqttMaxAge` CLI so idle connectiona periodically cleaned up).
+* Step 1 to 4 are the same a in the previous diagram. The difference is in steps 5 and 6, which use MQTT or KAFKA library to publish the notification in
+  the corresponding MQTT or KAFKA broker. If the connection to the MQTT/KAFKA broker don't exist previously, then it is created as part as the notification
+  process (there is a keepalive time configured with the `-mqttMaxAge` or `-kafkaMaxAge` CLI so idle connectiona periodically cleaned up).
 
 <a name="flow-nf-03"></a>
 ![HTTP Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03.png)
@@ -448,13 +451,13 @@ _NF-03: HTTP Notification on entity-attribute Update/Creation with thread pool_
 * After that, the worker thread sleeps, waiting to wake up when a new item in the queue needs to be processed.
 
 <a name="flow-nf-03b"></a>
-![MQTT Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
+![MQTT/KAFKA Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
 
-_NF-03b: MQTT Notification on entity-attribute Update/Creation with thread pool_
+_NF-03b: MQTT/KAFKA Notification on entity-attribute Update/Creation with thread pool_
 
-* Step 1 to 5 are the same as in the previous diagram. The difference is in steps 6 and 7, which use MQTT library to publish the notification in
-  the corresponding MQTT broker. If the connection to the MQTT broker don't exist previously, then it is created as part as the notification
-  process (there is a keepalive time configured with the `-mqttMaxAge` CLI so idle connectiona periodically cleaned up).
+* Step 1 to 5 are the same as in the previous diagram. The difference is in steps 6 and 7, which use MQTT or KAFKA library to publish the notification in
+  the corresponding MQTT or KAFKA broker. If the connection to the MQTT/KAFKA broker don't exist previously, then it is created as part as the notification
+  process (there is a keepalive time configured with the `-mqttMaxAge` or `-kafkaMaxAge` CLI so idle connectiona periodically cleaned up).
 
 [Top](#top)
 
@@ -462,7 +465,16 @@ _NF-03b: MQTT Notification on entity-attribute Update/Creation with thread pool_
 
 This library deals with MQTT notifications, based on [mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) external library. There is
 a connection manager implemented as a singleton of the `MqttConnectionManager` class that keeps control of opened MQTT connections
-(cleaning up idle connections based in the `-maxMqttAge` keepalive) and provides the `sendMqttNotification` used by
+(cleaning up idle connections based in the `-mqttMaxAge` keepalive) and provides the `sendMqttNotification` used by
+the [**ngsiNotify** library](#srclibngsinotify).
+
+[Top](#top)
+
+## src/lib/kafka/
+
+This library deals with KAFKA notifications, based on [rdkafka](https://github.com/confluentinc/librdkafka) external library. There is
+a connection manager implemented as a singleton of the `KafkaConnectionManager` class that keeps control of opened KAFKA connections
+(cleaning up idle connections based in the `-kafkaMaxAge` keepalive) and provides the `sendKafkaNotification` used by
 the [**ngsiNotify** library](#srclibngsinotify).
 
 [Top](#top)
