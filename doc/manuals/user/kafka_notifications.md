@@ -51,20 +51,9 @@ in KAFKA subscriptions work the same as in HTTP subscriptions, taking into accou
 
 ## Connection management
 
-The connection is established the first time a notification is published to a Kafka cluster.
+The endpoint of the KAFKA cluster associated with a subscription is specified in the “url” field at the time of subscription,
+but the connection to it is made the first time a KAFKA notification is published. 
 
-Kafka is designed for efficiency with persistent connections (long-lived, reused).
-
-- Every time you destroy and recreate a producer (rd_kafka_t):
-- Resynchronizes cluster metadata (queries partitions, brokers, etc.).
-- Re-handshakes with brokers (authentication, new TCP connections).
-- Loss of internal buffers (the producer loses its optimized state).
-- Performance impact: additional latency on publications.
-
-Kafka producers have the configuration parameter `connections.max.idle.ms` to close inactive sockets (without destroying the producer).
-This releases network resources without destroying the producer. If the producer needs to send a message after the socket is closed, it automatically opens a new connection.
-Kafka does not “reconnect” the same closed TCP connection; it creates a new one (to the same broker).
-However, the producer object (rd_kafka_t) remains the same, keeping its configuration and internal state. It does not free the producer’s memory.
-
-
-
+Once established, the connection to KAFKA remains open while notifications are being published.
+If it is not used (no messages are sent), Orion will close it after a maintenance period defined by the `-kafkaMaxAge` parameter ([CLI parameter](../admin/cli.md), 30 days by default).
+If an error occurs with KAFKA, the connection will also be closed and automatically re-created the next time Orion publishes a notification.
