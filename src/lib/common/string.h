@@ -79,6 +79,38 @@ extern bool parseUrl
 
 /* ****************************************************************************
 *
+* parseUrl - overloaded version that also extracts endpoint
+*/
+extern bool parseUrl
+(
+  const std::string&  url,
+  std::string&        host,
+  int&                port,
+  std::string&        path,
+  std::string&        protocol,
+  std::string&        endpoint
+);
+
+
+
+/* ****************************************************************************
+*
+* buildEndpoint - construct endpoint string from host and port
+*/
+extern std::string buildEndpoint(const std::string& host, int port);
+
+
+
+/* ****************************************************************************
+*
+* parseEndpoint - parse endpoint string into host and port
+*/
+extern bool parseEndpoint(const std::string& endpoint, std::string& host, int& port);
+
+
+
+/* ****************************************************************************
+*
 * parsedUptime
 */
 extern std::string parsedUptime(int uptime);
