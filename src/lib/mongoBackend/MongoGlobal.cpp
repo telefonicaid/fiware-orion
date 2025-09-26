@@ -1321,7 +1321,10 @@ bool entitiesQuery
   }
 
   /* Part 5: filters */
-  processGeoFilter(&expr.geoFilter, &finalQuery, &finalCountQuery);
+  if (expr.geoFilter.areaType != orion::NoArea)
+  {
+    processGeoFilter(&expr.geoFilter, &finalQuery, &finalCountQuery);
+  }
 
   for (unsigned int ix = 0; ix < expr.stringFilter.mongoFilters.size(); ++ix)
   {
