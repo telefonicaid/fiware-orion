@@ -46,6 +46,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # Install dependencies
     apt-get -y install \
       curl \
+      librdkafka1 \
       cmake \
       libssl-dev \
       git \
