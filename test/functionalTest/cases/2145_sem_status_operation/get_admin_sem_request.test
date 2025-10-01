@@ -47,7 +47,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 382
+Content-Length: 411
 
 {
     "alarmMgr": {
@@ -63,6 +63,9 @@ Content-Length: 382
         "status": "free"
     },
     "dbConnectionPool": {
+        "status": "free"
+    },
+    "kafkaMgr": {
         "status": "free"
     },
     "logMsg": {

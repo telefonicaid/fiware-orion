@@ -930,6 +930,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            cSubP->renderFormat,
                                                            cSubP->httpInfo,
                                                            cSubP->mqttInfo,
+                                                           cSubP->kafkaInfo,
                                                            aList,
                                                            cSubP->subscriptionId,
                                                            cSubP->tenant,
@@ -1761,10 +1762,15 @@ static bool addTriggeredSubscriptions_noCache
       RenderFormat      renderFormat       = stringToRenderFormat(renderFormatString);
       ngsiv2::HttpInfo  httpInfo;
       ngsiv2::MqttInfo  mqttInfo;
+      ngsiv2::KafkaInfo kafkaInfo;
 
       if (sub.hasField(CSUB_MQTTTOPIC))
       {
         mqttInfo.fill(sub);
+      }
+      else if (sub.hasField(CSUB_KAFKATOPIC))
+      {
+        kafkaInfo.fill(sub);
       }
       else
       {
@@ -1794,11 +1800,13 @@ static bool addTriggeredSubscriptions_noCache
           renderFormat,
           httpInfo,
           mqttInfo,
+          kafkaInfo,
           aList, "", "", covered);
 
       // Release after using them to fill the TriggeredSubscription
       httpInfo.release();
       mqttInfo.release();
+      kafkaInfo.release();
 
       if (!onlyChanged)
       {
@@ -2112,7 +2120,20 @@ static unsigned int processSubscriptions
     ngsiv2::Notification notification;
     notification.httpInfo.fill(tSubP->httpInfo);
     notification.mqttInfo.fill(tSubP->mqttInfo);
-    notification.type = (notification.mqttInfo.topic.empty()? ngsiv2::HttpNotification : ngsiv2::MqttNotification);
+    notification.kafkaInfo.fill(tSubP->kafkaInfo);
+
+    if (!notification.mqttInfo.topic.empty())
+    {
+      notification.type = ngsiv2::MqttNotification;
+    }
+    else if (!notification.kafkaInfo.topic.empty())
+    {
+      notification.type = ngsiv2::KafkaNotification;
+    }
+    else
+    {
+      notification.type = ngsiv2::HttpNotification;
+    }
 
     notificationSent = processNotification(notifyCerP,
                                            tSubP->attrL,
@@ -2134,6 +2155,7 @@ static unsigned int processSubscriptions
     // than using notification type
     notification.httpInfo.release();
     notification.mqttInfo.release();
+    notification.kafkaInfo.release();
 
     if (notificationSent)
     {

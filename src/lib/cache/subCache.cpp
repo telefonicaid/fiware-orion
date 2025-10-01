@@ -656,6 +656,7 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 
   cSubP->httpInfo.release();
   cSubP->mqttInfo.release();
+  cSubP->kafkaInfo.release();
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
@@ -840,6 +841,7 @@ void subCacheItemInsert
   const char*                             servicePath,
   const ngsiv2::HttpInfo&                 httpInfo,
   const ngsiv2::MqttInfo&                 mqttInfo,
+  const ngsiv2::KafkaInfo&                kafkaInfo,
   const std::vector<EntityId>&            entIdVector,
   const std::vector<std::string>&         attributes,
   const std::vector<std::string>&         metadata,
@@ -917,6 +919,7 @@ void subCacheItemInsert
 
   cSubP->httpInfo.fill(httpInfo);
   cSubP->mqttInfo.fill(mqttInfo);
+  cSubP->kafkaInfo.fill(kafkaInfo);
 
   //
   // String filters

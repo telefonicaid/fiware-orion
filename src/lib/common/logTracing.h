@@ -64,10 +64,11 @@ extern void logInfoHttpNotification
 
 /* ****************************************************************************
 *
-* logInfoMqttNotification
+* logInfoNonRequestNotification
 */
-extern void logInfoMqttNotification
+extern void logInfoNonRequestNotification
 (
+  const char*  prefix,
   const char*  subId,
   const char*  endpoint,
   const char*  resource,

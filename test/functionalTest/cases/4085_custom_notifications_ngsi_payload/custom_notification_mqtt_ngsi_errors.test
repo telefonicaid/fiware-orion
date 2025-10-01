@@ -221,10 +221,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 133
+Content-Length: 146
 
 {
-    "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
+    "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom, mqttCustom or kafkaCustom",
     "error": "BadRequest"
 }
 
@@ -235,10 +235,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 133
+Content-Length: 146
 
 {
-    "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom",
+    "description": "only one of payload, json or ngsi fields accepted at the same time in httpCustom, mqttCustom or kafkaCustom",
     "error": "BadRequest"
 }
 

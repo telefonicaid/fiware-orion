@@ -34,6 +34,7 @@
 #include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
+#include "apiTypesV2/KafkaInfo.h"
 #include "apiTypesV2/Expression.h"
 #include "apiTypesV2/Subscription.h"
 
@@ -117,6 +118,7 @@ struct CachedSubscription
   bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
+  ngsiv2::KafkaInfo                kafkaInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
   int64_t                          lastSuccess;  // timestamp of last successful notification
   std::string                      lastFailureReason;
@@ -196,6 +198,7 @@ extern void subCacheItemInsert
   const char*                        servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
   const ngsiv2::MqttInfo&            mqttInfo,
+  const ngsiv2::KafkaInfo&           kafkaInfo,
   const std::vector<EntityId>&       entities,
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,

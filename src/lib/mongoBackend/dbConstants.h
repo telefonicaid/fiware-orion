@@ -130,6 +130,8 @@
 #define CSUB_MQTTQOS                 "qos"
 #define CSUB_MQTTRETAIN              "retain"
 
+#define CSUB_KAFKATOPIC              "kafkaTopic"
+
 #define CSUB_USER                    "user"
 #define CSUB_PASSWD                  "passwd"
 

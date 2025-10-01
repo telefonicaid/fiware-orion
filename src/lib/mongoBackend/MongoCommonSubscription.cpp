@@ -256,7 +256,75 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
   }
 }
 
+/* ****************************************************************************
+*
+* setCustomKafkaInfo -
+*/
+static void setCustomKafkaInfo(const ngsiv2::KafkaInfo& kafkaInfo, orion::BSONObjBuilder* b)
+{
+  if (kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Text)
+  {
+    if (!kafkaInfo.includePayload)
+    {
+      b->appendNull(CSUB_PAYLOAD);
+      LM_T(LmtMongo, ("Subscription payload: null"));
+    }
+    else if (!kafkaInfo.payload.empty())
+    {
+      b->append(CSUB_PAYLOAD, kafkaInfo.payload);
+      LM_T(LmtMongo, ("Subscription payload: %s", kafkaInfo.payload.c_str()));
+    }
+  }
+  else if (kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+  {
+    if (kafkaInfo.json != NULL)
+    {
+      std::string logStr;
+      if (kafkaInfo.json->isObject())
+      {
+        orion::BSONObjBuilder jsonBuilder;
+        compoundValueBson(kafkaInfo.json->childV, jsonBuilder);
+        orion::BSONObj jsonBuilderObj = jsonBuilder.obj();
+        logStr = jsonBuilderObj.toString();
+        b->append(CSUB_JSON, jsonBuilderObj);
+      }
+      else  // kafkaInfo.json->isVector();
+      {
+        orion::BSONArrayBuilder jsonBuilder;
+        compoundValueBson(kafkaInfo.json->childV, jsonBuilder);
+        orion::BSONArray jsonBuilderArr = jsonBuilder.arr();
+        logStr = jsonBuilderArr.toString();
+        b->append(CSUB_JSON, jsonBuilderArr);
+      }
+      LM_T(LmtMongo, ("Subscription json: %s", logStr.c_str()));
+    }
+  }
+  else  // kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi
+  {
+    // id and type (both optional in this case)
+    orion::BSONObjBuilder bob;
+    if (!kafkaInfo.ngsi.entityId.id.empty())
+    {
+      bob.append(ENT_ENTITY_ID, kafkaInfo.ngsi.entityId.id);
+    }
+    if (!kafkaInfo.ngsi.entityId.type.empty())
+    {
+      bob.append(ENT_ENTITY_TYPE, kafkaInfo.ngsi.entityId.type);
+    }
 
+    // attributes
+    // (-1 as date as creDate and modDate are not used in this case)
+    orion::BSONObjBuilder    attrsToAdd;  // not actually used
+    orion::BSONArrayBuilder  attrNamesToAdd;
+    kafkaInfo.ngsi.attributeVector.toBson(-1, &attrsToAdd, &attrNamesToAdd);
+
+    // note that although metadata is not needed in the ngsi field logic,
+    // mdNames: [ ] is added to each attribute as a consequence of the toBson() logic
+    bob.append(ENT_ATTRS, attrsToAdd.obj());
+
+    b->append(CSUB_NGSI, bob.obj());
+  }
+}
 
 /* ****************************************************************************
 *
@@ -280,7 +348,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
       setCustomHttpInfo(sub.notification.httpInfo, b);
     }
   }
-  else  // MqttNotification
+  else if (sub.notification.type == ngsiv2::MqttNotification) // MqttNotification
   {
     b->append(CSUB_REFERENCE, sub.notification.mqttInfo.url);
     b->append(CSUB_MQTTTOPIC, sub.notification.mqttInfo.topic);
@@ -305,6 +373,30 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     if (sub.notification.mqttInfo.custom)
     {
       setCustomMqttInfo(sub.notification.mqttInfo, b);
+    }
+  }
+  else // KafkaNotification
+  {
+    b->append(CSUB_REFERENCE, sub.notification.kafkaInfo.url);
+    b->append(CSUB_KAFKATOPIC, sub.notification.kafkaInfo.topic);
+    b->append(CSUB_CUSTOM,    sub.notification.kafkaInfo.custom);
+
+    LM_T(LmtMongo, ("Subscription reference:  %s", sub.notification.kafkaInfo.url.c_str()));
+    LM_T(LmtMongo, ("Subscription kafkaTopic:  %s", sub.notification.kafkaInfo.topic.c_str()));
+    LM_T(LmtMongo, ("Subscription custom:     %s", sub.notification.kafkaInfo.custom? "true" : "false"));
+
+    // FIXME #4714: not yet in use
+    /*if (sub.notification.mqttInfo.providedAuth)
+    {
+      b->append(CSUB_USER,   sub.notification.kafkaInfo.user);
+      b->append(CSUB_PASSWD, sub.notification.kafkaInfo.passwd);
+      LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.kafkaInfo.user.c_str()));
+      LM_T(LmtMongo, ("Subscription passwd: *****"));
+    }*/
+
+    if (sub.notification.kafkaInfo.custom)
+    {
+      setCustomKafkaInfo(sub.notification.kafkaInfo, b);
     }
   }
 }

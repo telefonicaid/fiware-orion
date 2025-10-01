@@ -209,6 +209,7 @@ SET (ORION_LIBS
     lm
     pa
     mqtt
+    kafka
 )
 
 SET (BOOST
@@ -255,6 +256,7 @@ endif (HAVE_CJEXL)
 
 SET (DYNAMIC_LIBS
     curl
+    rdkafka
     gnutls
     pthread
     gcrypt
@@ -282,6 +284,7 @@ endif (UNIT_TEST)
 include_directories("/usr/include")
 
 # Needed for the new C driver
+include_directories("/usr/include/librdkafka")
 include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("/usr/local/include/libbson-1.0")
 
@@ -333,6 +336,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/expressions)
   ADD_SUBDIRECTORY(src/lib/logSummary)
   ADD_SUBDIRECTORY(src/lib/mqtt)
+  ADD_SUBDIRECTORY(src/lib/kafka)
   ADD_SUBDIRECTORY(src/app/contextBroker)
 else ()
     MESSAGE("cmake: NOT OK")

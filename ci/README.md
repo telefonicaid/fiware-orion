@@ -22,12 +22,39 @@ Current version of CI supports:
 
 File compliance, payload and style checks are combined in one 'compliance' test.
 
+# How to run all test locally
+
+You can run the functional tests with:
+
+```
+docker compose -f ci/deb/docker-compose-ci.yml -f ci/deb/docker-compose-ci.functional.yml --project-directory . up
+```
+
+That would set up all the needed services (MongoDB, MQTT broker, Kafka broker, etc.) with the `docker-compose-ci.yml` and run the tests with `docker-compose-ci.functional.yml` (which uses the `telefonicaiot/fiware-orion:ci` for that).
+
+Alternativelly you can run the valgrind tests with:
+
+```
+docker compose -f ci/deb/docker-compose-ci.yml -f ci/deb/docker-compose-ci.valgrind.yml --project-directory . up
+```
+
+For alternative ways of using the image, read next section.
+
 # How to use the image locally
 
 Sometime you need to run the CI image locally (for instance, to debug problems found in GitHub Action jobs). In that case,
 the following cheatsheet can be useful:
 
-To download the image:
+First, you have to set up required services running in a terminal (stop local instances of the service before or you will get conflicts)
+
+```
+cd /path/to/fiware-orion
+docker compose -f ci/deb/docker-compose-ci.yml --project-directory . up
+```
+
+When you end your testing you can stop the services in the terminal typically with Ctrl+C.
+
+Next, to download the image (alternativelly you can [build it locally](#how-to-build-the-image-locally))
 
 ```
 docker pull telefonicaiot/fiware-orion:ci
@@ -36,15 +63,13 @@ docker pull telefonicaiot/fiware-orion:ci
 To run the image in the same way that GitHub Actions does, for instance:
 
 ```
-# Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
-docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci build -miqts functional
+docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1001 -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci build -miqts functional
 ```
 
 To run the image using an interactive bash on it
 
 ```
-# Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
 docker run --network host -ti -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci bash
 ```
@@ -52,7 +77,7 @@ docker run --network host -ti -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-o
 Once have a bash shell, you can do the same execution:
 
 ```
-root@debian11:/opt# CB_NO_CACHE=ON FT_FROM_IX=1201 build -miqts functional
+root@debian11:/opt# CB_NO_CACHE=ON FT_FROM_IX=1001 build -miqts functional
 ```
 
 Alternatively, you can run the `testHarness.sh` script directly (for instance, to execute a single test):
@@ -72,3 +97,20 @@ sudo chown -R fermin:fermin /path/to/fiware-orion
 
 **NOTE2:** the `build` script will make changes in your `makefile` file. Do a `git checkout makefile` after your debug session
 to recover it.
+
+# How to build the image locally
+
+In some case, we may want to build the image locally instead of pull the one at Dockerhub. The following commands could help.
+
+First, it's a good idea to remove any existing `telefonicaiot/fiware-orion:ci` image downloaed from Dockerhub:
+
+```
+docker rmi <id of the image>
+```
+
+Next, to build the container:
+
+```
+cd /path/to/fiware-orion/ci/deb
+docker build -t telefonicaiot/fiware-orion:ci .
+```

@@ -428,17 +428,33 @@ static SenderThreadParams* buildSenderParamsCustom
     }
     method = verbName(verb);
   }
-  else  // MqttNotification
+  else if (notification.type == ngsiv2::MqttNotification) // MqttNotification
+  {
+    // Verb/method is irrelevant in this case
+    method = verbName(NOVERB);
+  }
+  else // KafkaNotification
   {
     // Verb/method is irrelevant in this case
     method = verbName(NOVERB);
   }
 
-
   //
   // 2. URL
   //
-  std::string notifUrl = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
+  std::string notifUrl;
+  switch (notification.type)
+  {
+  case ngsiv2::HttpNotification:
+    notifUrl = notification.httpInfo.url;
+    break;
+  case ngsiv2::MqttNotification:
+    notifUrl = notification.mqttInfo.url;
+    break;
+  default:
+    notifUrl = notification.kafkaInfo.url;
+    break;
+  }
   if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
   {
     // Warning already logged in macroSubstitute()
@@ -449,12 +465,50 @@ static SenderThreadParams* buildSenderParamsCustom
   //
   // 3. Payload
   //
-  ngsiv2::CustomPayloadType customPayloadType = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payloadType : notification.mqttInfo.payloadType);
+  ngsiv2::CustomPayloadType customPayloadType;
+  switch (notification.type)
+  {
+  case ngsiv2::HttpNotification:
+    customPayloadType = notification.httpInfo.payloadType;
+    break;
+  case ngsiv2::MqttNotification:
+    customPayloadType = notification.mqttInfo.payloadType;
+    break;
+  default:
+    customPayloadType = notification.kafkaInfo.payloadType;
+    break;
+  }
 
   if (customPayloadType == ngsiv2::CustomPayloadType::Text)
   {
-    bool         includePayload = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.includePayload : notification.mqttInfo.includePayload);
-    std::string  notifPayload   = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.payload : notification.mqttInfo.payload);
+    bool includePayload;
+    switch (notification.type)
+    {
+    case ngsiv2::HttpNotification:
+      includePayload = notification.httpInfo.includePayload;
+      break;
+    case ngsiv2::MqttNotification:
+      includePayload = notification.mqttInfo.includePayload;
+      break;
+    default:
+      includePayload = notification.kafkaInfo.includePayload;
+      break;
+    }
+
+    std::string notifPayload;
+    switch (notification.type)
+    {
+    case ngsiv2::HttpNotification:
+      notifPayload = notification.httpInfo.payload;
+      break;
+    case ngsiv2::MqttNotification:
+      notifPayload = notification.mqttInfo.payload;
+      break;
+    case ngsiv2::KafkaNotification:
+      notifPayload = notification.kafkaInfo.payload;
+      break;
+    }
+
     if (!setPayload(includePayload, notifPayload, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, &mimeType, &renderFormat))
     {
       // Warning already logged in macroSubstitute()
@@ -463,14 +517,40 @@ static SenderThreadParams* buildSenderParamsCustom
   }
   else if (customPayloadType == ngsiv2::CustomPayloadType::Json)
   {
-    orion::CompoundValueNode*  json = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.json : notification.mqttInfo.json);
+    orion::CompoundValueNode* json = NULL;
+    switch (notification.type)
+    {
+    case ngsiv2::HttpNotification:
+      json = notification.httpInfo.json;
+      break;
+    case ngsiv2::MqttNotification:
+      json = notification.mqttInfo.json;
+      break;
+    case ngsiv2::KafkaNotification:
+      json = notification.kafkaInfo.json;
+      break;
+    }
     setJsonPayload(json, &exprContext, &payload, &mimeType);
     renderFormat = NGSI_V2_CUSTOM;
   }
   else  // customPayloadType == ngsiv2::CustomPayloadType::Ngsi
   {
     // Important to use const& for Entity here. Otherwise problems may occur in the object release logic
-    const Entity& ngsi = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.ngsi : notification.mqttInfo.ngsi);
+    const Entity* ngsiPtr = NULL;
+    switch (notification.type)
+    {
+    case ngsiv2::HttpNotification:
+      ngsiPtr = &notification.httpInfo.ngsi;
+      break;
+    case ngsiv2::MqttNotification:
+      ngsiPtr = &notification.mqttInfo.ngsi;
+      break;
+    case ngsiv2::KafkaNotification:
+      ngsiPtr = &notification.kafkaInfo.ngsi;
+      break;
+    }
+    const Entity& ngsi = *ngsiPtr;
+
     if (!setNgsiPayload(ngsi, subscriptionId, en, &exprContext, attrsFilter, blacklist, metadataFilter, &payload, renderFormat, basic))
     {
       // Warning already logged in macroSubstitute()
@@ -546,11 +626,28 @@ static SenderThreadParams* buildSenderParamsCustom
   std::string  host;
   int          port;
   std::string  uriPath;
+  std::string cleanBrokers;   // FIXME #4705: host/port/cleanBrokers should be unified into connString or similar
 
-  if (!parseUrl(url, host, port, uriPath, protocol))
+
+  if (notification.type != ngsiv2::KafkaNotification)
   {
-    LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
-    return NULL;
+    if (!parseUrl(url, host, port, uriPath, protocol))
+    {
+      LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
+      return NULL;
+    }
+  }
+  else
+  {
+    //
+    // Kafka notification => list of brokers validated with parseKafkaBrokerList()
+    //
+    if (!parseKafkaBrokerList(url, &cleanBrokers, &protocol, &uriPath))
+    {
+      LM_E(("Runtime Error (not sending notification: malformed Kafka broker "
+             "list: '%s')", url.c_str()));
+      return NULL;
+    }
   }
 
 
@@ -587,6 +684,15 @@ static SenderThreadParams* buildSenderParamsCustom
       return NULL;
     }
   }
+  // 9. Topic (only in the case of KAFKA notifications)
+  if (notification.type == ngsiv2::KafkaNotification)
+  {
+    if (macroSubstitute(&topic, notification.kafkaInfo.topic, &exprContext, "", true) == false)
+    {
+      // Warning already logged in macroSubstitute()
+      return NULL;
+    }
+  }
 
   SenderThreadParams*  paramsP = new SenderThreadParams();
 
@@ -595,6 +701,7 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->ip               = host;
   paramsP->port             = port;
   paramsP->protocol         = protocol;
+  paramsP->endpoint         = cleanBrokers;
   paramsP->verb             = method;
   paramsP->tenant           = tenant;
   paramsP->maxFailsLimit    = maxFailsLimit;
@@ -658,7 +765,12 @@ SenderThreadParams* Notifier::buildSenderParams
         verb = POST;
       }
     }
-    else  // MqttNotification
+    else if (notification.type == ngsiv2::MqttNotification) // MqttNotification
+    {
+      // Verb/methodd is irrelevant in this case
+      verb = NOVERB;
+    }
+    else
     {
       // Verb/methodd is irrelevant in this case
       verb = NOVERB;
@@ -694,7 +806,20 @@ SenderThreadParams* Notifier::buildSenderParams
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
-    bool custom = notification.type == ngsiv2::HttpNotification ? notification.httpInfo.custom : notification.mqttInfo.custom;
+    bool custom;
+    switch (notification.type)
+    {
+    case ngsiv2::HttpNotification:
+      custom = notification.httpInfo.custom;
+      break;
+    case ngsiv2::MqttNotification:
+      custom = notification.mqttInfo.custom;
+      break;
+    default:
+      custom = notification.kafkaInfo.custom;
+      break;
+    }
+
     if (custom && !disableCusNotif)
     {
       return buildSenderParamsCustom(subId,
@@ -745,16 +870,34 @@ SenderThreadParams* Notifier::buildSenderParams
     std::string payloadString = ncr.toJson(renderFormat, attrsFilter, blacklist, metadataFilter);
 
     /* Parse URL */
+    // FIXME #4705: setting port to 0 to avoid valgrind errors regarding uninitialized variable
+    // It wouldn't be needed anymore when that issue gets implemented, as port variable will disappear
     std::string  host;
-    int          port;
+    int          port = 0;
     std::string  uriPath;
     std::string  protocol;
+    std::string cleanBrokers;
 
-    std::string url = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : notification.mqttInfo.url);
-    if (!parseUrl(url, host, port, uriPath, protocol))
+    std::string url = (notification.type == ngsiv2::HttpNotification ? notification.httpInfo.url : (notification.type == ngsiv2::MqttNotification ? notification.mqttInfo.url : notification.kafkaInfo.url));
+    if (notification.type != ngsiv2::KafkaNotification)
     {
+      if (!parseUrl(url, host, port, uriPath, protocol))
+      {
       LM_E(("Runtime Error (not sending notification: malformed URL: '%s')", url.c_str()));
       return NULL;
+      }
+    }
+    else
+    {
+    //
+    // Kafka notification => list of brokers validated with parseKafkaBrokerList()
+    //
+    if (!parseKafkaBrokerList(url, &cleanBrokers, &protocol, &uriPath))
+    {
+      LM_E(("Runtime Error (not sending notification: malformed Kafka broker "
+             "list: '%s')", url.c_str()));
+      return NULL;
+    }
     }
 
     /* Set Content-Type */
@@ -762,18 +905,33 @@ SenderThreadParams* Notifier::buildSenderParams
 
     SenderThreadParams* paramsP = new SenderThreadParams();
 
+    std::string resource;
+    switch (notification.type)
+    {
+    case ngsiv2::HttpNotification:
+      resource = uriPath;
+      break;
+    case ngsiv2::MqttNotification:
+      resource = notification.mqttInfo.topic;
+      break;
+    default:
+      resource = notification.kafkaInfo.topic;
+      break;
+    }
+
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
     paramsP->ip               = host;
     paramsP->port             = port;
     paramsP->protocol         = protocol;
+    paramsP->endpoint         = cleanBrokers;
     paramsP->verb             = verbName(verb);
     paramsP->tenant           = tenant;
     paramsP->maxFailsLimit    = maxFailsLimit;
     paramsP->failsCounter     = failsCounter;
     paramsP->servicePath      = spath;
     paramsP->xauthToken       = xauthToken;
-    paramsP->resource         = notification.type == ngsiv2::HttpNotification? uriPath : notification.mqttInfo.topic;
+    paramsP->resource         = resource;
     paramsP->content_type     = content_type;
     paramsP->content          = payloadString;
     paramsP->mimeType         = JSON;

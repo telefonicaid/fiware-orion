@@ -1,0 +1,436 @@
+# Copyright 2021 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+KAFKA subscription multibroker
+
+--SHELL-INIT--
+dbInit CB
+
+# tracelevel 164 is the one for KAFKA notification logs
+brokerStart CB 164 IPV4 -kafkaMaxAge 1
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1 sub2
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
+
+--SHELL--
+
+#
+# Hint: A Kafka cluster accessible at localhost:9092,localhost:9094, and another cluster accessible at localhost:9095 are required for this .test:
+#
+#
+# 01. Create KAFKA sub1 at localhost:9092,localhost:9094 (1)
+# 02. Create KAFKA sub2 at localhost:9092,localhost:9094 (2)
+# 03. Create KAFKA sub3 at localhost:9095 (1)
+# 04. Create KAFKA sub4 at localhost:9095 (2)
+# 05. Create entity E9092:9094 to stimulate connections to localhost:9092,localhost:9094 (one created, one reused)
+# 06. Sleep 60 seconds, then create entity E1884 to stimulate connections to localhost:9095 (one created, one reused)
+# 07. Sleep 70 seconds, get logs and see localhost:9092,localhost:9094 connection went away
+# 08. Update entity E9092:9094 to re-create connections to localhost:9092,localhost:9094
+# 09. Sleep 70 seconds, get logs and see localhost:9095 connection went away
+# 10. Dump accumulator for localhost:9092,localhost:9094 and see 4 notifications
+#
+
+echo "01. Create KAFKA sub1 at localhost:9092,localhost:9094 (1)"
+echo "=========================================="
+payload='{
+  "description": "sub1",
+  "subject": {
+    "entities": [
+      {
+        "id": "E9092:9094",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "sub1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create KAFKA sub2 at localhost:9092,localhost:9094 (2)"
+echo "=========================================="
+payload='{
+  "description": "sub2",
+  "subject": {
+    "entities": [
+      {
+        "id": "E9092:9094",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "sub2"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create KAFKA sub3 at localhost:9095 (1)"
+echo "=========================================="
+payload='{
+  "description": "sub3",
+  "subject": {
+    "entities": [
+      {
+        "id": "E9095",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://localhost:9095",
+      "topic": "sub3"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create KAFKA sub4 at localhost:9095 (2)"
+echo "=========================================="
+payload='{
+  "description": "sub4",
+  "subject": {
+    "entities": [
+      {
+        "id": "E9095",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafka": {
+      "url": "kafka://localhost:9095",
+      "topic": "sub4"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity E9092:9094 to stimulate connections to localhost:9092,localhost:9094 (one created, one reused)"
+echo "================================================================================================================"
+payload='{
+  "id": "E9092:9094",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Sleep 60 seconds, then create entity E9095 to stimulate connections to localhost:9095 (one created, one reused)"
+echo "==================================================================================================================="
+payload='{
+  "id": "E9095",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+sleep 60s
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Sleep 70 seconds, get logs and see localhost:9092,localhost:9094 connection went away"
+echo "========================================================================================="
+sleep 70s
+cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+echo "08. Update entity E9092:9094 to reuse connections to localhost:9092,localhost:9094"
+echo "=================================================================================="
+payload='{
+  "A": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E9092:9094/attrs --payload "$payload"
+echo
+echo
+
+echo "09. Sleep 70 seconds, get logs and see localhost:9095 connection went away"
+echo "=========================================================================="
+sleep 70s
+cat /tmp/contextBroker.log | grep 'DEBUG\|ERROR\|WARN' | grep -v 'start command line' | awk -F 'msg=' '{print $2}'
+echo
+echo
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of MQTT notifications
+# due to the lock in accumulator-server.py?
+sleep 2s
+
+
+echo "10. Dump accumulator for localhost:9092,localhost:9094 and see 4 notifications"
+echo "=============================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create KAFKA sub1 at localhost:9092,localhost:9094 (1)
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+02. Create KAFKA sub2 at localhost:9092,localhost:9094 (2)
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+03. Create KAFKA sub3 at localhost:9095 (1)
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+04. Create KAFKA sub4 at localhost:9095 (2)
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+05. Create entity E9092:9094 to stimulate connections to localhost:9092,localhost:9094 (one created, one reused)
+================================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E9092:9094?type=T
+Content-Length: 0
+
+
+
+06. Sleep 60 seconds, then create entity E9095 to stimulate connections to localhost:9095 (one created, one reused)
+===================================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E9095?type=T
+Content-Length: 0
+
+
+
+07. Sleep 70 seconds, get logs and see localhost:9092,localhost:9094 connection went away
+=========================================================================================
+#SORT_START
+Initializing KAFKA library
+Starting a new KAFKA broker connection for localhost:9092,localhost:9094
+KAFKA successful connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Existing KAFKA broker connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
+Checking Kafka connections age
+Starting a new KAFKA broker connection for localhost:9095
+KAFKA successful connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub3
+Existing KAFKA broker connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub4
+Kafka notification successfully published at localhost:9095 on topic sub3
+Kafka notification successfully published at localhost:9095 on topic sub4
+Checking Kafka connections age
+Kafka connection localhost:9092,localhost:9094 too old REGEX(.*)
+#SORT_END
+
+
+08. Update entity E9092:9094 to reuse connections to localhost:9092,localhost:9094
+==================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09. Sleep 70 seconds, get logs and see localhost:9095 connection went away
+==========================================================================
+#SORT_START
+Initializing KAFKA library
+Starting a new KAFKA broker connection for localhost:9092,localhost:9094
+KAFKA successful connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Existing KAFKA broker connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
+Checking Kafka connections age
+Starting a new KAFKA broker connection for localhost:9095
+KAFKA successful connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub3
+Existing KAFKA broker connection for localhost:9095
+Kafka notification sent to localhost:9095 on topic sub4
+Kafka notification successfully published at localhost:9095 on topic sub3
+Kafka notification successfully published at localhost:9095 on topic sub4
+Checking Kafka connections age
+Kafka connection localhost:9092,localhost:9094 too old REGEX(.*)
+Starting a new KAFKA broker connection for localhost:9092,localhost:9094
+KAFKA successful connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Existing KAFKA broker connection for localhost:9092,localhost:9094
+Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
+Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
+Checking Kafka connections age
+Kafka connection localhost:9095 too old REGEX(.*)
+#SORT_END
+
+
+10. Dump accumulator for localhost:9092,localhost:9094 and see 4 notifications
+==============================================================================
+#SORT_START
+Kafka message at topic sub1
+Key: REGEX([0-9a-f\-]{24})
+Headers:
+  Fiware-Servicepath: /
+Payload:
+{
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E9092:9094",
+            "type": "T",
+            "A": {
+                "type": "Number",
+                "value": 1,
+                "metadata": {}
+            }
+        }
+    ]
+}
+=======================================
+Kafka message at topic sub2
+Key: REGEX([0-9a-f\-]{24})
+Headers:
+  Fiware-Servicepath: /
+Payload:
+{
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E9092:9094",
+            "type": "T",
+            "A": {
+                "type": "Number",
+                "value": 1,
+                "metadata": {}
+            }
+        }
+    ]
+}
+=======================================
+Kafka message at topic sub1
+Key: REGEX([0-9a-f\-]{24})
+Headers:
+  Fiware-Servicepath: /
+Payload:
+{
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E9092:9094",
+            "type": "T",
+            "A": {
+                "type": "Number",
+                "value": 2,
+                "metadata": {}
+            }
+        }
+    ]
+}
+=======================================
+Kafka message at topic sub2
+Key: REGEX([0-9a-f\-]{24})
+Headers:
+  Fiware-Servicepath: /
+Payload:
+{
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E9092:9094",
+            "type": "T",
+            "A": {
+                "type": "Number",
+                "value": 2,
+                "metadata": {}
+            }
+        }
+    ]
+}
+=======================================
+#SORT_END
+
+
+--TEARDOWN--
+accumulatorStop
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1 sub2
+brokerStop CB
+dbDrop CB

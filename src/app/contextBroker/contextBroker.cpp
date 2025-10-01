@@ -103,6 +103,7 @@
 #include "common/string.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mqtt/mqttMgr.h"
+#include "kafka/kafkaMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "expressions/exprMgr.h"
 #include "logSummary/logSummary.h"
@@ -154,6 +155,7 @@ char            allowedOrigin[64];
 int             maxAge;
 long            httpTimeout;
 long            mqttTimeout;
+long            kafkaTimeout;
 int             dbPoolSize;
 char            reqMutexPolicy[16];
 int             writeConcern;
@@ -194,6 +196,7 @@ unsigned long   fcStepDelay;
 unsigned long   fcMaxInterval;
 
 int             mqttMaxAge;
+int             kafkaMaxAge;
 
 bool            logDeprecate;
 
@@ -232,6 +235,7 @@ bool            logDeprecate;
 #define CORS_MAX_AGE_DESC      "maximum time in seconds preflight requests are allowed to be cached. Default: 86400"
 #define HTTP_TMO_DESC          "timeout in milliseconds for HTTP forwards and notifications"
 #define MQTT_TMO_DESC          "timeout in milliseconds for MQTT broker connection in notifications"
+#define KAFKA_TMO_DESC         "timeout in milliseconds for KAFKA broker connection in notifications"
 #define DBPS_DESC              "database connection pool size"
 #define MUTEX_POLICY_DESC      "mutex policy (none/read/write/all)"
 #define WRITE_CONCERN_DESC     "db write concern (0:unacknowledged, 1:acknowledged)"
@@ -261,6 +265,7 @@ bool            logDeprecate;
 #define REQ_TMO_DESC           "connection timeout for REST requests (in seconds)"
 #define INSECURE_NOTIF_DESC    "allow HTTPS notifications to peers which certificate cannot be authenticated with known CA certificates"
 #define MQTT_MAX_AGE_DESC      "max time (in minutes) that an unused MQTT connection is kept, default: 60"
+#define KAFKA_MAX_AGE_DESC     "max time (in minutes) that an unused KAFKA connection is kept, default: 43200"
 #define LOG_DEPRECATE_DESC     "log deprecation usages as warnings"
 #define DBURI_DESC             "complete URI for database connection"
 
@@ -300,6 +305,7 @@ PaArgument paArgs[] =
 
   { "-httpTimeout",                 &httpTimeout,           "HTTP_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_HTTP_TIMEOUT,      HTTP_TMO_DESC                },
   { "-mqttTimeout",                 &mqttTimeout,           "MQTT_TIMEOUT",             PaLong,   PaOpt, -1,                              -1,    MAX_MQTT_TIMEOUT,      MQTT_TMO_DESC                },
+  { "-kafkaTimeout",                &kafkaTimeout,          "KAFKA_TIMEOUT",            PaLong,   PaOpt, -1,                              -1,    MAX_KAFKA_TIMEOUT,     KAFKA_TMO_DESC               },
   { "-reqTimeout",                  &reqTimeout,            "REQ_TIMEOUT",              PaLong,   PaOpt,  0,                               0,    PaNL,                  REQ_TMO_DESC                 },
   { "-reqMutexPolicy",              reqMutexPolicy,         "MUTEX_POLICY",             PaString, PaOpt, _i "all",                        PaNL,  PaNL,                  MUTEX_POLICY_DESC            },
   { "-writeConcern",                &writeConcern,          "MONGO_WRITE_CONCERN",      PaInt,    PaOpt, 1,                               0,     1,                     WRITE_CONCERN_DESC           },
@@ -340,7 +346,7 @@ PaArgument paArgs[] =
   { "-insecureNotif",               &insecureNotif,         "INSECURE_NOTIF",           PaBool,   PaOpt, false,                           false, true,                  INSECURE_NOTIF_DESC          },
 
   { "-mqttMaxAge",                  &mqttMaxAge,            "MQTT_MAX_AGE",             PaInt,    PaOpt, 60,                              PaNL,  PaNL,                  MQTT_MAX_AGE_DESC            },
-
+  { "-kafkaMaxAge",                 &kafkaMaxAge,           "KAFKA_MAX_AGE",            PaInt,    PaOpt, 43200,                           PaNL,  PaNL,                  KAFKA_MAX_AGE_DESC           },
   { "-logDeprecate",                &logDeprecate,          "LOG_DEPRECATE",            PaBool,   PaOpt, false,                           false, true,                  LOG_DEPRECATE_DESC           },
 
   PA_END_OF_ARGS
@@ -565,6 +571,7 @@ void exitFunc(void)
   }
 
   mqttMgr.teardown();
+  kafkaMgr.teardown();
 
   curl_context_cleanup();
   curl_global_cleanup();
@@ -1202,6 +1209,7 @@ int main(int argC, char* argV[])
   SemOpType policy = policyGet(reqMutexPolicy);
   alarmMgr.init(relogAlarms);
   mqttMgr.init(mqttTimeout);
+  kafkaMgr.init(kafkaTimeout);
   exprMgr.init();
   orionInit(orionExit, ORION_VERSION, policy, statCounters, statSemWait, statTiming, statNotifQueue);
   mongoInit(dbURI, dbName, pwd, mtenant, writeConcern, dbPoolSize, statSemWait);
@@ -1312,8 +1320,9 @@ int main(int argC, char* argV[])
   int times = 0;
   while (1)
   {
-    // Sleep periodically during a minute
-    sleep(60);
+    // Sleep periodically during a second
+    sleep(1);
+    kafkaMgr.dispatchKafkaCallbacks();
 
     // At the present moment MQTT max age checking is the only one periodic process we need to do
     // If some other is introduced in the future, this part should be adapted.
@@ -1323,10 +1332,15 @@ int main(int argC, char* argV[])
     // checking should be moved to a separate thread or, the other way arround, the cache sync
     // process be included as part of this sleep loop
     times++;
-    if (times == mqttMaxAge)
+    if (times == mqttMaxAge * 60)
     {
       times = 0;
       mqttMgr.cleanup(mqttMaxAge*60);
+    }
+    if (times == kafkaMaxAge * 60)
+    {
+      times = 0;
+      kafkaMgr.cleanup(kafkaMaxAge*60);
     }
   }
 }

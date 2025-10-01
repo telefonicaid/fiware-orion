@@ -15,6 +15,8 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libcurl: 7.88.1
 * openssl: 3.0.15
 * libuuid: 2.38.1
+* zlib1g 1:1.2.13.dfsg-1
+* librdkafka: 2.0.2-1
 * libmosquitto: 2.0.20 (from source)
 * Mongo C driver: 1.29.0 (from source)
 * rapidjson: 1.1.0 (from source)
@@ -30,7 +32,7 @@ commands that require root privilege):
 
 * Install the required libraries (except what needs to be taken from source, described in following steps).
 
-        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev
+        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev librdkafka-dev zlib1g-dev libzstd-dev liblz4-dev
 
 * Install the Mongo Driver from source.
 
@@ -127,7 +129,16 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         . scripts/testEnv.sh
         python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
+        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0
+
+* Install the Kafka client (CLI).
+
+      sudo apt-get install openjdk-17-jre-headless
+      wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
+      tar xvf kafka_2.12-3.9.1.tgz
+      # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)
+
+Next steps require to set up needed services for testing as described [in this documentation](../../../test/functionalTest/README.md#start-needed-services).
 
 * Run test harness in this environment (it takes some time, please be patient).
 

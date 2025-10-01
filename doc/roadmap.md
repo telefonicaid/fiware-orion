@@ -48,7 +48,6 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next **9 months**
 after next planned release:
 
-- Orion Kafka based notifications ([#4666](https://github.com/telefonicaid/fiware-orion/issues/4666))
 - Permissions attribute on entities ([#4514](https://github.com/telefonicaid/fiware-orion/issues/4514))
 - Advanced query language ([#4395](https://github.com/telefonicaid/fiware-orion/issues/4395))
 - Signed entities ([#4398](https://github.com/telefonicaid/fiware-orion/issues/4398))
@@ -74,6 +73,7 @@ you wish to get involved in the implementation or influence the roadmap
 
 The following list contains all features that were in the roadmap and have already been implemented.
 
+- Orion Kafka based notifications ([#4666](https://github.com/telefonicaid/fiware-orion/issues/4666)) ([4.3.0](https://github.com/telefonicaid/fiware-orion/releases/tag/4.0.0))
 - Expression language support (JEXL) ([#4004](https://github.com/telefonicaid/fiware-orion/issues/4004)) ([4.0.0](https://github.com/telefonicaid/fiware-orion/releases/tag/4.0.0))
 - MQTT Retain flag ([#4388](https://github.com/telefonicaid/fiware-orion/issues/4388)) ([3.11.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.11.0))
 - Custom notifications: simplifying sending JSON requests ([#2560](https://github.com/telefonicaid/fiware-orion/issues/2560)) ([3.8.0](https://github.com/telefonicaid/fiware-orion/releases/tag/3.8.0))

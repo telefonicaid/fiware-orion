@@ -49,9 +49,10 @@ typedef struct SenderThreadParams
 {
   unsigned short                     type; // 0 -> regular notif, 1 -> kill thread
   std::string                        from;
-  std::string                        ip;
-  unsigned short                     port;
+  std::string                        ip;        // used in HTTP and MQTT notifications (not in KAFKA). Unify (FIXME #4705)
+  unsigned short                     port;      // used in HTTP and MQTT notifications (not in KAFKA). Unify (FIXME #4705)
   std::string                        protocol;  // used to disinguish between mqtt and http/https notifications
+  std::string                        endpoint;  // FIXME #4705: unify ip/port into endpoint (more general)
   std::string                        verb;
   std::string                        tenant;
   long long                          maxFailsLimit;

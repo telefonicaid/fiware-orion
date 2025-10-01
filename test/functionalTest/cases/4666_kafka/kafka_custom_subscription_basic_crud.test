@@ -1,0 +1,266 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+KAFKA custom subcription basic crud
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create kafkaCustom sub with payload
+# 02. Create kafkaCustom sub without payload
+# 03. Create kafkaCustom sub with null payload
+# 04. Get subs
+#
+
+echo "01. Create kafkaCustom sub with payload"
+echo "======================================="
+payload='{
+  "description": "KAFKA sub with payload",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "orion_${dest}",
+      "payload": "temperature:${temperature}"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create kafkaCustom sub without payload"
+echo "=========================================="
+payload='{
+  "description": "KAFKA sub without payload",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "orion_${dest}"
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+
+echo "03. Create kafkaCustom sub with null payload"
+echo "============================================"
+payload='{
+  "description": "KAFKA sub with null payload",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "orion_${dest}",
+      "payload": null
+    },
+    "attrs": [
+      "A1"
+    ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Get subs"
+echo "============"
+orionCurl --url /v2/subsorionCurl --url /v2/subscriptions
+echo
+echo
+
+
+
+--REGEXPECT--
+01. Create kafkaCustom sub with payload
+=======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+02. Create kafkaCustom sub without payload
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+03. Create kafkaCustom sub with null payload
+============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+04. Get subs
+============
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 1161
+
+[
+    {
+        "description": "KAFKA sub with payload",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "kafkaCustom": {
+                "payload": "temperature:${temperature}",
+                "topic": "orion_${dest}",
+                "url": "kafka://localhost:9092"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "KAFKA sub without payload",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "kafkaCustom": {
+                "topic": "orion_${dest}",
+                "url": "kafka://localhost:9092"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    },
+    {
+        "description": "KAFKA sub with null payload",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [
+                "A1"
+            ],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "kafkaCustom": {
+                "payload": null,
+                "topic": "orion_${dest}",
+                "url": "kafka://localhost:9092"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E1",
+                    "type": "T1"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+
