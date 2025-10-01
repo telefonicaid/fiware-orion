@@ -146,6 +146,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # remove the same packages we installed at the beginning to build Orion
     apk del \
       curl \
+      librdkafka \
       cmake \
       make \
       gcc \

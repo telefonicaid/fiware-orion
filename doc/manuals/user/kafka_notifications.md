@@ -51,7 +51,7 @@ in KAFKA subscriptions work the same as in HTTP subscriptions, taking into accou
 
 ## Connection management
 
-The endpoint of the KAFKA cluster associated with a subscription is specified in the “url” field at the time of subscription,
+The endpoint of the KAFKA cluster associated with a subscription is specified in the `url` field at the time of subscription,
 but the connection to it is made the first time a KAFKA notification is published. 
 
 Once established, the connection to KAFKA remains open while notifications are being published.

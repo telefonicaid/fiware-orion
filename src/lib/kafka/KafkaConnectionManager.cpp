@@ -41,7 +41,7 @@
 #include <signal.h>
 #include <string.h>
 
-// FIXME #4666: Implement alarm feature for Kafka notifications. Have a look to parallel code in MQTT
+// FIXME #4716: Implement alarm feature for Kafka notifications. Have a look to parallel code in MQTT
 // implementation and check which alarms are used there, trying to translate to equivalente methods
 // in this Kafka connection manager
 
@@ -432,7 +432,7 @@ void KafkaConnectionManager::cleanup(double maxAge)
 
   std::vector<std::string> toErase;
 
-  for (auto iter = connections.begin(); iter != connections.end(); ++iter)
+  for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
     std::string endpoint = iter->first;
     KafkaConnection* kConn = iter->second;
@@ -448,9 +448,9 @@ void KafkaConnectionManager::cleanup(double maxAge)
     }
   }
 
-  for (const auto& endpoint : toErase)
+  for (size_t i = 0; i < toErase.size(); ++i)
   {
-    connections.erase(endpoint);
+    connections.erase(toErase[i]);
   }
 
   semGive();
