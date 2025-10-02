@@ -29,7 +29,7 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
 
 * 必要なライブラリをインストールします (次の手順で説明する、ソースから取得する必要があるものを除きます)
 
-        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev
+        sudo apt-get install libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev librdkafka-dev zlib1g-dev libzstd-dev liblz4-dev
 
 * ソースから Mongo Driver をインストールします
 
@@ -128,7 +128,16 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
         . scripts/testEnv.sh
         python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1
+        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0
+
+* Kafkaクライアントをインストール (CLI).
+
+      sudo apt-get install openjdk-17-jre-headless
+      wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
+      tar xvf kafka_2.12-3.9.1.tgz
+      # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)
+
+次の手順では、[このドキュメント](../../../test/functionalTest/README.md#start-needed-services)で説明されているように、テストに必要なサービスをセットアップする必要があります。
 
 * この環境でテスト・ハーネスを実行してください (時間がかかりますので、気をつけてください)
 
@@ -150,4 +159,4 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
         make coverage INSTALL_DIR=~
 
-*注意*: デバッグ・トレースに依存する機能テストは、カバレッジ実行で失敗すると予想されます (例: notification_different_sizes または not_posix_regex_idpattern.test)。これは、デバッグ トレースで使用される LM_T マクロが条件カバレッジに "ノイズ" を追加するため、カバレッジ・コード・ビルドで無効になっているためです。この方法では、カバレッジ・レポートがより有用になります。
+*注意*: デバッグトレースに依存する機能テストは、カバレッジ実行時に失敗すると予想されます（例：notification_different_sizes や not_posix_regex_idpattern.test）。これは、デバッグトレースで使用される LM_T マクロが、条件カバレッジに「ノイズ」を追加するため、カバレッジコードビルドで無効化されているためです。これにより、カバレッジレポートの有用性が向上します。

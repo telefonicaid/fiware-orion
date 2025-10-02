@@ -285,7 +285,7 @@ Fields:
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications, either HTTP, MQTT or KAFKA
 -   **topic**: MQTT topic (only in MQTT notifications)
--   **kafkaTopic**: MQTT topic (only in KAFKA notifications)
+-   **kafkaTopic**: KAFKA topic (only in KAFKA notifications)
 -   **qos**: MQTT QoS value (only in MQTT notifications)
 -   **retain**: MQTT retain value (only in MQTT notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each

@@ -21,6 +21,7 @@ _現在の Orion の内部アーキテクチャ_
 * 通知がトリガーされるたびに (たとえば、既存のサブスクリプションでカバーされるエンティティを更新した結果として)、通知モジュール([**ngsiNotify** ライブラリ](sourceCode.md#srclibngsinotify) にある) が **mongoBackend から呼び出されます**。このような通知を送信するため、Orion は2つの通知タイプをサポートしています
         * HTTP 通知。この場合、`httpRequestSend()` 関数 (**rest** ライブラリの一部) が HTTP リクエストの送信を担当します。これは、[libcurl](https://curl.haxx.se/libcurl/) 外部ライブラリに基づいています
         * MQTT 通知。この場合、`sendMqttNotification()` 関数 (**mqtt** ライブラリの一部) は、対応する MQTT broker での MQTT 通知の公開を担当します。これは、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) 外部ライブラリに基づいています
+        * KAFKA 通知。この場合、`sendKafkaNotification()` 関数（**kafka** ライブラリの一部）が、対応する KAFKA ブローカーへの KAFKA 通知の発行を担当します。この関数は [rdkafka](https://github.com/confluentinc/librdkafka) 外部ライブラリに基づいています
 * `httpRequestSend()` 関数は、特定の条件下でクエリ/更新を[コンテキスト・プロバイダ](../user/context_providers.md) に転送できる**serviceRoutinesV2** 関数によっても呼び出されます
 
 [トップ](#top)

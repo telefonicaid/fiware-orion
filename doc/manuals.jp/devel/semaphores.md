@@ -10,6 +10,7 @@ Orion は、以下のような繊細なデータやリソースを保護する�
 * [メトリック・マネージャ](#metrics-manager-semaphore) (Metrics Manager)
 * [アラーム・マネージャ](#alarm-manager-semaphore) (Alarm Manager)
 * [MQTT 接続マネージャ](#mqtt-connection-manager-semaphore)
+* [KAFKA 接続マネージャ](#kafka-connection-manager-semaphore)
 * [ログ・ファイル](#log-file-semaphore) (Log file)
 * [通知キュー](#notification-queue-semaphore) (Notification queue)
 * [通知キュー統計情報](#notification-queue-statistics-semaphore) (Notification queue statistics)
@@ -160,8 +161,23 @@ MQTT 接続マネージャは MetricsManager と非常によく似ており、�
 
 セマフォは接続ハッシュ・マップへのアクセスを保護し、次の方法でアクセスします:
 
-* `sendMqttNotification()`
-* `cleanup()`
+* `MqttConnectionManager::sendMqttNotification()`
+* `MqttConnectionManager::cleanup()`
+
+[トップ](#top)
+
+<a name="kafka-connection-manager-semaphore"></a>
+## KAFKA 接続マネージャ・セマフォ
+KAFKAコネクション・マネージャーはメトリクス・マネージャーと非常に似ており、セマフォも同じパターンに従います。`KafkaConnectionManager`クラスには、`sem`というプライベート・フィールドと以下のメソッドがあります:
+
+* `KafkaConnectionManager::semTake()`
+* `KafkaConnectionManager::semGive()`
+
+セマフォは接続ハッシュマップへのアクセスを保護し、以下の方法でアクセスします:
+
+* `KafkaConnectionManager::sendKafkaNotification()`
+* `KafkaConnectionManager::dispatchKafkaCallbacks()`
+* `KafkaConnectionManager::cleanup()`
 
 [トップ](#top)
 
