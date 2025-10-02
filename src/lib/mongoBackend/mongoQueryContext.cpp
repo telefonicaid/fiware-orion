@@ -361,9 +361,12 @@ HttpStatusCode mongoQueryContext
 
   // Check for duplicate tokens (with or without "!" prefix)
   std::set<std::string> uniqueTokens;
-  for (const auto& token : sortedV) {
+  for (size_t i = 0; i < sortedV.size(); ++i)
+  {
+    std::string token = sortedV[i];
     std::string normalizedToken = (token[0] == '!') ? token.substr(1) : token;
-    if (!uniqueTokens.insert(normalizedToken).second) {
+    if (!uniqueTokens.insert(normalizedToken).second)
+    {
       alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
       responseP->error.fill(SccBadRequest, ERROR_DESC_BAD_REQUEST_DUPLICATED_ORDERBY);
 
