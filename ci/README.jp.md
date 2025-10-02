@@ -23,12 +23,39 @@ CI の現在のバージョンは以下をサポートします:
 
 ファイル・コンプライアンス、ペイロード、およびスタイル・チェックは、1つの 'compliance' テストにまとめられています。
 
+# すべてのテストをローカルで実行する方法
+
+機能テストは次のように実行できます:
+
+```
+docker compose -f ci/deb/docker-compose-ci.yml -f ci/deb/docker-compose-ci.functional.yml --project-directory . up
+```
+
+これにより、`docker-compose-ci.yml` を使用して必要なすべてのサービス (MongoDB、MQTT ブローカー、Kafka ブローカーなど) が設定され、`docker-compose-ci.functional.yml` (そのために `telefonicaiot/fiware-orion:ci` を使用) を使用してテストが実行されます。
+
+あるいは、次のコマンドで valgrind テストを実行することもできます:
+
+```
+docker compose -f ci/deb/docker-compose-ci.yml -f ci/deb/docker-compose-ci.valgrind.yml --project-directory . up
+```
+
+イメージを使った別の方法については、次のセクションをお読みください。
+
 # イメージをローカルで使用する方法
 
 場合によっては、CI イメージをローカルで実行する必要があります (たとえば、GitHub アクション・ジョブで見つかった問題を
 デバッグするためです)。その場合、次のチート・シートが役立ちます:
 
-イメージをダウンロードするには:
+まず、ターミナルで必要なサービスを実行する必要があります（事前にローカル・インスタンスを停止してください。そうしないと競合が発生します）。
+
+```
+cd /path/to/fiware-orion
+docker compose -f ci/deb/docker-compose-ci.yml --project-directory . up
+```
+
+テストを終了するときは、ターミナルで Ctrl+C を押すことでサービスを停止できます。
+
+次に、イメージをダウンロードします（または、[ローカルでビルド](#how-to-build-the-image-locally)）。
 
 ```
 docker pull telefonicaiot/fiware-orion:ci
@@ -37,15 +64,13 @@ docker pull telefonicaiot/fiware-orion:ci
 たとえば、GitHub Actions と同じ方法でイメージを実行するには、次のようにします:
 
 ```
-# Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
-docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1201 -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci build -miqts functional
+docker run --network host --rm -e CB_NO_CACHE=ON -e FT_FROM_IX=1001 -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci build -miqts functional
 ```
 
 インタラクティブな bash を使用してイメージを実行するには:
 
 ```
-# Check that MongoDB server is running in your localhost:27017
 cd /path/to/fiware-orion
 docker run --network host -ti -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-orion:ci bash
 ```
@@ -53,7 +78,7 @@ docker run --network host -ti -v $(pwd):/opt/fiware-orion telefonicaiot/fiware-o
 bash シェルを起動したら、同様の実行を行うことができます:
 
 ```
-root@debian11:/opt# CB_NO_CACHE=ON FT_FROM_IX=1201 build -miqts functional
+root@debian11:/opt# CB_NO_CACHE=ON FT_FROM_IX=1001 build -miqts functional
 ```
 
 または、`testHarness.sh` スクリプトを直接実行することもできます (たとえば、単一のテストを実行するため):
@@ -73,3 +98,20 @@ sudo chown -R fermin:fermin /path/to/fiware-orion
 
 **注2:** `build` スクリプトは `makefile` ファイルに変更を加えます。デバッグ・セッションの後に `git checkout makefile`
 を実行して変更を取り消します。
+
+# ローカルでイメージを構築する方法
+
+場合によっては、Dockerhub からプルするのではなく、ローカルでイメージをビルドしたいことがあります。以下のコマンドが役立ちます。
+
+まず、Dockerhub からダウンロードした既存の `telefonicaiot/fiware-orion:ci` イメージを削除することをお勧めします:
+
+```
+docker rmi <id of the image>
+```
+
+次に、コンテナをビルドします:
+
+```
+cd /path/to/fiware-orion/ci/deb
+docker build -t telefonicaiot/fiware-orion:ci .
+```

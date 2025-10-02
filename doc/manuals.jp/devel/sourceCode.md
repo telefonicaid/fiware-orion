@@ -15,6 +15,7 @@
 * [src/lib/mongoDriver/](#srclibmongodriver) (MongoDB へのデータベース・インターフェース)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI 通知)
 * [src/lib/mqtt/](#srclibmqtt) (MQTT 通知)
+* [src/lib/kafka/](#srclibkafka) (KAFKA 通知)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (アラーム管理の実装)
 * [src/lib/cache/](#srclibcache) (サブスクリプション・キャッシュの実装)
 * [src/lib/logSummary/](#srcliblogsummary) (ログ・サマリの実装)
@@ -394,6 +395,8 @@ typedef struct MongoConnection
   [**rest**ライブラリ](#srclibrest) の関数 `httpRequestSend()` が使用されます
 * MQTT 通知には、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) が使用されます。
   実際には、[**mqtt** ライブラリ](#srclibmqtt) の関数が使用されます: `sendMqttNotification()`
+* KAFKA 通知には、[rdkafka](https://github.com/confluentinc/librdkafka) が使用されます。
+  実際には、[**kafka** library](#srclibmqtt) の関数が使用されます: `sendKafkaNotification()`
 
 このライブラリのもう1つの重要な側面は、必要に応じてスレッド・プールを使用して、通知が個別のスレッドによって送信されることです。
 
@@ -401,7 +404,7 @@ Orionは、[CLI パラメータ](../admin/cli.md) `-notificationMode` を使用�
 
 このモジュールは、属性の更新/作成により、常に `processNotification()` から呼び出されます (図 [MD-01](mongoBackend.md#flow-md-01) を参照)。
 
-次の4つの図は、HTTP 通知とMQTT 通知の両方の場合に、スレッド・プールがある場合とない場合の
+次の4つの図は、HTTP 通知とMQTT/KAFKA 通知の両方の場合に、スレッド・プールがある場合とない場合の
 コンテキスト・エンティティ通知のプログラム・フローを示しています。
 
 <a name="flow-nf-01"></a>
@@ -415,12 +418,12 @@ _NF-01: スレッド・プールなしのエンティティ属性更新/作成�
 * `startSenderThread()` は、`SenderThreadParams` オブジェクトに対応する通知を送信する `doNotify()` 関数を呼び出します (ステップ4,5および6)。通知の受信者からのレスポンスが待機されます (タイムアウトあり)。
 
 <a name="flow-nf-01b"></a>
-![MQTT Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
+![MQTT/KAFKA Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
 
-_NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT 通知_
+_NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT/KAFKA 通知_
 
-* 手順1から4は、前の図と同じです。違いはステップ5と6にあり、MQTT ライブラリを使用して対応する MQTT broker に通知を公開します。MQTT broker への接続が
-  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
+* 手順1から4は、前の図と同じです。違いはステップ5と6にあり、MQTT または KAFKA ライブラリを使用して対応する MQTT または KAFKA broker に通知を公開します。MQTT broker への接続が
+  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` または `-kafkaMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
   接続は定期的にクリーンアップされます)
 
 <a name="flow-nf-03"></a>
@@ -444,12 +447,12 @@ _NF-03: スレッド・プールによるエンティティ属性の更新/作�
 * その後、ワーカー・スレッドはスリープして、キュー内の新しい項目を処理する必要があるときに起きるのを待っています
 
 <a name="flow-nf-03b"></a>
-![MQTT Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
+![MQTT/KAFKA Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
 
-_NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT 通知_
+_NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT/KAFKA 通知_
 
-* 手順1から5は、前の図と同じです。違いはステップ6と7にあり、MQTT ライブラリを使用して対応する MQTT broker に通知を公開します。MQTT broker への接続が
-  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
+* 手順1から5は、前の図と同じです。違いはステップ6と7にあり、MQTT または KAFKA ライブラリを使用して対応する MQTT または KAFKA broker に通知を公開します。MQTT broker への接続が
+  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` または `-kafkaMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
   接続は定期的にクリーンアップされます)
 
 [Top](#top)
@@ -458,8 +461,16 @@ _NF-03b: スレッド・プールを使用したエンティティ属性の更�
 ## src/lib/mqtt/
 
 このライブラリは、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) 外部ライブラリに基づいて MQTT 通知を処理します。 開いている MQTT
-接続の制御を維持し (`-maxMqttAge` キープ・アライブに基づいてアイドル状態の接続をクリーンアップ)、[**ngsiNotify** ライブラリ](#srclibngsinotify)
-で使用される `sendMqttNotification` を提供する `MqttConnectionManager` クラスのシングルトンとして実装された接続マネージャがあります。
+接続の制御を維持し (`-mqttMaxAge` キープ・アライブに基づいてアイドル状態の接続をクリーンアップ)、[**ngsiNotify** ライブラリ](#srclibngsinotify)
+g使用される `sendMqttNotification` を提供する `MqttConnectionManager` クラスのシングルトンとして実装された接続マネージャがあります。
+
+[トップ](#top)
+
+## src/lib/kafka/
+
+このライブラリは、[rdkafka](https://github.com/confluentinc/librdkafka) 外部ライブラリをベースにした KAFKA 通知を処理します。`KafkaConnectionManager`
+クラスのシングルトンとして実装された接続マネージャがあり、開かれた KAFKA 接続を制御し（`-kafkaMaxAge` キープアライブに基づいてアイドル接続を
+クリーンアップします）、また [**ngsiNotify** ライブラリ](#srclibngsinotify) で使用される `sendKafkaNotification` を提供します。
 
 [トップ](#top)
 

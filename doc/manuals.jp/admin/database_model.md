@@ -215,8 +215,9 @@ Orion はこれを文字列 (レガシー) または bool 型 (現行) として
 -   **expiration** : サブスクリプションの有効期限が切れるタイムスタンプです (整数、秒を意味します)。永続的なサブスクリプションの場合、不当に高い値が使用されます。ソースコードの PERMANENT_SUBS_DATETIME を参照してください
 -   **lastNotification** : 最後の通知が送信された時刻です (整数、秒を意味します)。これは、通知が送信されるたびに更新され、スロットリング違反を回避します
 -   **throttling** : 通知の最小間隔です。0または -1 は、スロットリングがないことを意味します
--   **reference** : 通知の URL です。HTTPまたはMQTTのいずれかを指定します
+-   **reference** : 通知の URL です。HTTP, MQTT または KAFKA のいずれかを指定します
 -   **topic**: MQTTトピック (MQTT 通知のみ)
+-   **kafkaTopic**: KAFAKA トピック (KAFKA 通知のみ)
 -   **qos**: MQTT QoS 値 (MQTT 通知のみ)
 -   **retain**: MQTT retain 値 (MQTT 通知のみ)
 -   **entities**: エンティティの配列 (必須)。各エンティティの JSON には、**id** (文字列)、**type** (文字列)、**isPattern** (ブール値)、**isTypePattern** (ブール値) (*) が含まれます。

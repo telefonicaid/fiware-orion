@@ -56,9 +56,12 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-localIp <ip>** : broker がリッスンする IP インタフェースを指定します。デフォルトでは、すべてのインタフェースをリッスンします
 -   **-pidpath <pid_file>** : broker プロセスの PID を格納するファイルを指定します
 -   **-httpTimeout <interval>** : メッセージの転送と通知のタイムアウトをミリ秒単位で指定します。HTTP 転送メッセージおよび通知のデフォルトのタイムアウト (このパラメータが指定されていない場合)。デフォルトのタイムアウト (このパラメータが指定されていない場合) は 5000 (5 秒) です。最大値は 1800000 (30分) です。 このパラメータは、サブスクリプションに対して個別に定義できます。サブスクリプションの JSON で定義されている場合、デフォルトのパラメータは無視されます。[`subscription.notification.http`](../orion-api.md#subscriptionnotificationhttp)のセクションを参照してください
--   **-mqttTimeout <interval>**. MQTT 通知での MQTT ブローカーへの接続のタイムアウトをミリ秒単位で指定します。
+-   **-mqttTimeout <interval>** : MQTT 通知での MQTT ブローカーへの接続のタイムアウトをミリ秒単位で指定します。
     デフォルトのタイムアウト (このパラメータが指定されていない場合) は 5000 (5秒) です。
     最大値は、1800000 (30分) です。
+-   **-kafkaTimeout <interval>**. KAFKA通知におけるKAFKAブローカーへの接続のタイムアウトをミリ秒単位で指定します。
+    このパラメータが指定されていない場合のデフォルトのタイムアウトは5000（5秒）です。
+    最大値は1800000（30分）です。
 -   **-reqTimeout <interval>** : REST 接続のタイムアウトを秒単位で指定します。デフォルト値はゼロ、つまりタイムアウトなし (永遠に待機) であることに注意してください
 -   **-cprForwardLimit** : 単一のクライアント要求に対するコンテキスト・プロバイダへの転送リクエストの最大数 (デフォルトは制限なし)。コンテキスト・プロバイダの転送を完全に無効にするには、0を使用します。
 -   **-corsOrigin <domain>** : 許可された発信元を指定して、クロス・ソース・リソースの共有を有効にします (`*` に `__ALL` を使用)。Orion での CORS サポートの詳細については、[ユーザ・マニュアル](../user/cors.md)を参照してください。
@@ -96,6 +99,7 @@ broker はデフォルトでバックグラウンドで実行されるため、�
 -   **-disableMetrics** : 'metrics' 機能をオフにします。メトリックの収集は、システムコールやセマフォが関与するため、少しコストがかかります。メトリックオーバーヘッドなしで broker を起動するには、このパラメータを使用します
 -   **-insecureNotif** : 既知の CA 証明書で認証できないピアへの HTTPS 通知を許可する。これは、curl コマンドのパラメータ `-k` または `--insecureparameteres` に似ています
 -   **-mqttMaxAge** : 未使用の MQTT 接続が保持される最大時間 (分単位)。デフォルト値: 60
+-   **-kafkaMaxAge** :  未使用の KAFKA 接続を保持する最大時間（分単位）。デフォルト：43200
 -   **-logDeprecate** : 非推奨の使用法を警告として記録します。詳細については、[ドキュメントのこのセクション](../deprecated.md#log-deprecation-warnings) を参照してください。デフォルトは false です。これは、Orion の起動後に [log admin REST API](management_api.md#log-configs-and-trace-levels) を使用して `deprecated` フィールドを使用して変更できます
 
 ## 環境変数を使用した設定
@@ -135,6 +139,7 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_MULTI_SERVICE |   multiservice    |
 |   ORION_HTTP_TIMEOUT  |   httpTimeout |
 |   ORION_MQTT_TIMEOUT	|   mqttTimeout |
+|   ORION_KAFKA_TIMEOUT |   kafkaTimeout |
 |   ORION_REQ_TIMEOUT   |   reqTimeout  |
 |   ORION_MUTEX_POLICY  |   reqMutexPolicy  |
 |   ORION_MONGO_WRITE_CONCERN   |   writeConcern    |
@@ -165,3 +170,4 @@ Orion は、環境変数を使用した引数の受け渡しをサポートし�
 |   ORION_DISABLE_METRICS   |   disableMetrics  |
 |   ORION_INSECURE_NOTIF    |   insecureNotif   |
 |   ORION_MQTT_MAX_AGE      |  mqttMaxAge  |
+|  ORION_KAFKA_MAX_AGE | kafkaMaxAge |
