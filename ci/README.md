@@ -32,7 +32,7 @@ docker compose -f ci/deb/docker-compose-ci.yml -f ci/deb/docker-compose-ci.funct
 
 That would set up all the needed services (MongoDB, MQTT broker, Kafka broker, etc.) with the `docker-compose-ci.yml` and run the tests with `docker-compose-ci.functional.yml` (which uses the `telefonicaiot/fiware-orion:ci` for that).
 
-Alternativelly you can run the valgrind tests with:
+Alternatively you can run the valgrind tests with:
 
 ```
 docker compose -f ci/deb/docker-compose-ci.yml -f ci/deb/docker-compose-ci.valgrind.yml --project-directory . up
