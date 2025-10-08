@@ -227,7 +227,7 @@ Content-Length: 0
 POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 121
-User-Agent: orion/4.2.0-next libcurl/7.88.1
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
 Accept: application/json
@@ -406,7 +406,7 @@ Content-Length: 1369
 POST http://localhost:9997/notify
 Fiware-Servicepath: /
 Content-Length: 121
-User-Agent: orion/4.2.0-next libcurl/7.88.1
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: localhost:9997
 Accept: application/json
