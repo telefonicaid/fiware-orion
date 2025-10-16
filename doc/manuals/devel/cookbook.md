@@ -133,7 +133,7 @@ NOTE:
 
 * Item 1: `Metadata` would have to be added as an enum constant in the `enum RequestType` in `src/lib/ngsi/Request.h`
 * Item 3: `"*"`. An asterisc in the component vector `RestService::compV` matches ANY string, and whenever a path including entity id, attribute name, etc is defined, `"*"` must be used.
-* Item 5: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for NGSIv2 service routines is `src/lib/serviceRoutinesV2` (see [library description](sourceCode.md#srclibserviceroutinesv2)).
+* Item 5: `putMetadata()` is the service routine for `PUT /v2/entities/*/attrs/*/metadata/*` and the function must be implemented. The directory of the library for service routines is `src/lib/serviceRoutinesV2` (see [library description](sourceCode.md#srclibserviceroutinesv2)).
 
 Note also that in `orionRestServices.cpp`, these `RestService` vector lines are really long, and our style guide is against too long lines. However, making the lines shorter by using definitions just make the code more difficult to understand and we don't want that.
 
@@ -158,7 +158,7 @@ The `entity id`, `attribute name`, and `metadata name` (all part of the URL path
   std::string metadataName  = compV[6];  
 ```
 
-All service routines that modify/create entities/attributes/metadata rely on the NGSIv1 service routine `postUpdateContext()`, and `putMetadata()` is no exception. So, what needs to be done in `putMetadata()` is to build a `UpdateContextRequest` object using the parameters of `putMetadata()` and call `postUpdateContext()`. Something like this:
+All service routines that modify/create entities/attributes/metadata rely on service routine `postUpdateContext()`, and `putMetadata()` is no exception. So, what needs to be done in `putMetadata()` is to build a `UpdateContextRequest` object using the parameters of `putMetadata()` and call `postUpdateContext()`. Something like this:
 
 ```
   parseDataP->upcr.res.fill(entityId, attributeName, metadataName, ActionTypeAppend);
@@ -485,7 +485,7 @@ The output of the valgrind run is saved to a file with the same name as the test
 
 Normally, the broker has no memory leaks, so to make an exercise **with** a memory leak, we'll have to temporarily add one:
 
-* Open the file `src/lib/ngsi10/UpdateContextRequest.cpp` in your favorite editor
+* Open the file `src/lib/ngsi/UpdateContextRequest.cpp` in your favorite editor
 * Find the method `UpdateContextRequest::release()` and comment the call to `contextElementVector.release()`:
   ```
   void UpdateContextRequest::release(void)  

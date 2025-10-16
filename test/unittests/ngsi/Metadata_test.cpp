@@ -34,11 +34,11 @@
 */
 TEST(Metadata, constructor)
 {
+  utInit();
+
   Metadata m1;
   Metadata m2("n2", "t2", "v2");
   Metadata m3(&m2);
-
-  utInit();
 
   EXPECT_EQ("", m1.name);
   EXPECT_EQ("n2", m2.name);
@@ -56,6 +56,8 @@ TEST(Metadata, constructor)
 */
 TEST(Metadata, render)
 {
+  utInit();
+
   std::string  out;
   Metadata     m1;
   Metadata     m2("Name", "Integer", "19");
@@ -63,13 +65,11 @@ TEST(Metadata, render)
   const char*  outfile1 = "ngsi.metdata.render1.middle.json";
   const char*  outfile2 = "ngsi.metdata.render2.middle.json";
 
-  utInit();
-
-  out = m1.toJsonV1(false);
+  out = m1.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = m2.toJsonV1(false);
+  out = m2.toJson();
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -91,13 +91,13 @@ TEST(Metadata, check)
 
   utInit();
 
-  checked = m1.check(V1);
-  EXPECT_STREQ("missing metadata name", checked.c_str());
+  checked = m1.check();
+  EXPECT_STREQ("metadata name length: 0, min length supported: 1", checked.c_str());
 
-  checked = m2.check(V1);
-  EXPECT_STREQ("missing metadata value", checked.c_str());
+  checked = m2.check();
+  EXPECT_STREQ("OK", checked.c_str());
 
-  checked = m3.check(V1);
+  checked = m3.check();
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

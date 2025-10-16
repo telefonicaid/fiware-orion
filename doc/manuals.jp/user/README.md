@@ -8,6 +8,7 @@
   * [API ウォークスルー](walkthrough_apiv2.md) (API Walkthrough)
   * [クロス・オリジン・リソース共有 (CORS)](cors.md) (Cross Origin Resource Sharing)
   * [MQTT 通知](mqtt_notifications.md) (MQTT notifications)
+  * [KAFKA 通知](kafka_notifications.md)
   * [属性値の更新演算子](update_operators.md) (Update operators for attribute values)
   * [コンテキスト・プロバイダとリクエスト転送](context_providers.md) (Context Providers registration and request forwarding)
   * [Context broker のフェデレーション](federation.md) (Context broker federation)

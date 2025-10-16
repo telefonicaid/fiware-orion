@@ -18,13 +18,12 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
     doNotify.cpp
     Notifier.cpp
     senderThread.cpp
-    ContextSubscriptionInfo.cpp
     QueueWorkers.cpp
     ServiceQueue.cpp
     QueueNotifier.cpp
@@ -33,7 +32,6 @@ SET (SOURCES
 
 SET (HEADERS
     doNotify.h
-    ContextSubscriptionInfo.h
     Notifier.h
     senderThread.h
     QueueWorkers.h

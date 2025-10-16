@@ -32,6 +32,9 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
+# Note the usage of evalPriority in some cases to ensure that attributes that depend on other
+# attributes are calculated in the right order
+#
 # 01. Create custom sub with several attributes with transformations
 # 02. Create entity E1
 # 03. Update entity E1
@@ -61,7 +64,13 @@ payload='{
         },
         "ratio": {
           "value": "${count.sum/count.count}",
-          "type": "Calculated"
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 1,
+              "type": "Number"
+            }
+          }
         },
         "code": {
           "value": "${code||'\''invalid'\''}",
@@ -73,7 +82,13 @@ payload='{
         },
         "count": {
           "value": "${{count:count.count+1, sum:count.sum+((speed|split('\'' '\''))[0]|parseInt)}}",
-          "type": "Calculated"
+          "type": "Calculated",
+          "metadata": {
+            "evalPriority": {
+              "value": 2,
+              "type": "Number"
+            }
+          }
         }
       }
     },
@@ -191,7 +206,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 =========================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 379
+Content-Length: 463
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -213,7 +228,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "value": "invalid"
             },
             "count": {
-                "metadata": {},
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 2
+                    }
+                },
                 "type": "Calculated",
                 "value": {
                     "count": 6,
@@ -222,7 +242,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             },
             "id": "E1",
             "ratio": {
-                "metadata": {},
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 1
+                    }
+                },
                 "type": "Calculated",
                 "value": 20
             },
@@ -239,7 +264,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 375
+Content-Length: 459
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -261,7 +286,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
                 "value": 456
             },
             "count": {
-                "metadata": {},
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 2
+                    }
+                },
                 "type": "Calculated",
                 "value": {
                     "count": 6,
@@ -270,7 +300,12 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
             },
             "id": "E1",
             "ratio": {
-                "metadata": {},
+                "metadata": {
+                    "evalPriority": {
+                        "type": "Number",
+                        "value": 1
+                    }
+                },
                 "type": "Calculated",
                 "value": 100
             },

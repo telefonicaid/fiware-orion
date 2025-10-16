@@ -51,7 +51,6 @@
 * USING - 
 */
 using ngsiv2::Subscription;
-using ngsiv2::EntID;
 
 
 
@@ -90,12 +89,28 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
     orion::BSONObj ent           = ents[ix].embeddedObject();
     std::string    id            = getStringFieldF(ent, CSUB_ENTITY_ID);
     std::string    type          = ent.hasField(CSUB_ENTITY_TYPE)? getStringFieldF(ent, CSUB_ENTITY_TYPE) : "";
-    std::string    isPattern     = getStringFieldF(ent, CSUB_ENTITY_ISPATTERN);
     bool           isTypePattern = ent.hasField(CSUB_ENTITY_ISTYPEPATTERN)?
                                      getBoolFieldF(ent, CSUB_ENTITY_ISTYPEPATTERN) : false;
 
-    EntID en;
-    if (isFalse(isPattern))
+    bool isPattern = false;
+    if (ent.hasField(CSUB_ENTITY_ISPATTERN))
+    {
+      if (getFieldF(ent, CSUB_ENTITY_ISPATTERN).type() != orion::Bool)
+      {
+        // Old versions of the csubs model (previous to Orion 4.3.0) use isPattern as string
+        // Although from 4.3.0 on isPattern is always stored as boolean, we need this guard to avoid
+        // problems with old csubs. Maybe in the future we can clean our database and remove
+        // this guard
+        isPattern = (getStringFieldF(ent, CSUB_ENTITY_ISPATTERN) == "true");
+      }
+      else
+      {
+        isPattern = getBoolFieldF(ent, CSUB_ENTITY_ISPATTERN);
+      }
+    }
+
+    EntityId en;
+    if (!isPattern)
     {
       en.id = id;
     }
@@ -178,6 +193,11 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   {
     subP->notification.type = ngsiv2::MqttNotification;
     subP->notification.mqttInfo.fill(r);
+  }
+  else if (r.hasField(CSUB_KAFKATOPIC))
+  {
+    subP->notification.type = ngsiv2::KafkaNotification;
+    subP->notification.kafkaInfo.fill(r);
   }
   else
   {

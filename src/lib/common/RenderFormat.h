@@ -59,7 +59,7 @@ typedef enum RenderFormat
 *
 * renderFormatToString - 
 */
-extern const char* renderFormatToString(RenderFormat format, bool noDefault = true, bool userLegacyWord = false);
+extern const char* renderFormatToString(RenderFormat format);
 
 
 

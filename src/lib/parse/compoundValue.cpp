@@ -60,36 +60,6 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
     alarmMgr.badInput(clientIp, ciP->answer);
   }
 
-  //
-  // Give the root pointer of this Compound to the active ContextAttribute
-  // lastContextAttribute is set in the JSON v1 parsing routines, to point at the
-  // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
-  // owner of this compound value tree.
-  //
-
-  LM_T(LmtCompoundValue, ("Set compoundValueP (%p) for attribute at %p",
-                          ciP->compoundValueRoot,
-                          parseDataP->lastContextAttribute));
-
-  //
-  // Special case for updateContextAttributeRequest. This payload has no
-  // ContextAttribute to point to by lastContextAttribute, as the whole payload
-  // is a part of a ContextAttribute.
-  //
-  RequestType requestType = ciP->restServiceP->request;
-  
-  if ((requestType == AttributeValueInstance)                           ||
-      (requestType == AttributeValueInstanceWithTypeAndId)              ||
-      (requestType == IndividualContextEntityAttribute)                 ||
-      (requestType == IndividualContextEntityAttributeWithTypeAndId))
-  {
-    parseDataP->upcar.res.compoundValueP = ciP->compoundValueRoot;
-  }
-  else
-  {
-    parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
-  }
-
   // Reset the Compound stuff in ConnectionInfo
   ciP->compoundValueRoot = NULL;
   ciP->compoundValueP    = NULL;

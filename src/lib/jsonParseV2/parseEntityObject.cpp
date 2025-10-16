@@ -69,6 +69,7 @@ std::string parseEntityObject
     return "nor /id/ nor /idPattern/ present";
   }
 
+  bool typeGiven = false;
   for (rapidjson::Value::ConstMemberIterator iter = valueP->MemberBegin(); iter != valueP->MemberEnd(); ++iter)
   {
     std::string name  = iter->name.GetString();
@@ -81,9 +82,9 @@ std::string parseEntityObject
         return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID;
       }
 
-      eP->id = iter->value.GetString();
+      eP->entityId.id = iter->value.GetString();
 
-      if (forbiddenIdChars(V2, eP->id.c_str(), ""))
+      if (forbiddenIdChars(eP->entityId.id.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID;
       }
@@ -106,8 +107,7 @@ std::string parseEntityObject
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
-      eP->id        = iter->value.GetString();
-      eP->isPattern = "true";
+      eP->entityId.idPattern = iter->value.GetString();
     }
     else if (name == "type")
     {
@@ -116,15 +116,15 @@ std::string parseEntityObject
         return ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE;
       }
 
-      eP->type      = iter->value.GetString();
-      eP->typeGiven = true;
+      eP->entityId.type  = iter->value.GetString();
+      typeGiven          = true;
 
-      if (eP->type.empty())
+      if (eP->entityId.type.empty())
       {
         return ERROR_DESC_BAD_REQUEST_EMPTY_ENTTYPE;
       }
 
-      if (forbiddenIdChars(V2, eP->type.c_str(), ""))
+      if (forbiddenIdChars(eP->entityId.type.c_str(), ""))
       {
         return ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE;
       }
@@ -143,8 +143,8 @@ std::string parseEntityObject
       }
       regfree(&re);  // If regcomp fails it frees up itself (see glibc sources for details)
 
-      eP->type          = iter->value.GetString();
-      eP->isTypePattern = true;
+      eP->entityId.typePattern  = iter->value.GetString();
+      typeGiven          = true;
     }
     else
     {
@@ -170,5 +170,10 @@ std::string parseEntityObject
     }
   }
 
-  return eP->check(V2, ciP->requestType);
+  if (!typeGiven)
+  {
+    eP->entityId.typePattern = ".*";
+  }
+
+  return eP->check(ciP->requestType);
 }

@@ -54,7 +54,7 @@ payload='{
       "topic": "topic1",
       "url": "mqtt://localhost:1883",
       "ngsi": {
-        "A1": {
+        "A11": {
           "value": {
             "other": {
               "text": "${A1}",
@@ -64,7 +64,7 @@ payload='{
           },
           "type": "StructuredValue"
         },
-        "A2": {
+        "A22": {
           "value": [
             "${A1}",
             {
@@ -75,7 +75,8 @@ payload='{
           "type": "StructuredValue"
         }
       }
-    }
+    },
+    "attrs": [ "A11", "A22" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -170,7 +171,7 @@ MQTT message at topic topic1:
 {
     "data": [
         {
-            "A1": {
+            "A11": {
                 "metadata": {},
                 "type": "StructuredValue",
                 "value": {
@@ -184,7 +185,7 @@ MQTT message at topic topic1:
                     }
                 }
             },
-            "A2": {
+            "A22": {
                 "metadata": {},
                 "type": "StructuredValue",
                 "value": [
@@ -209,7 +210,7 @@ MQTT message at topic topic1:
 {
     "data": [
         {
-            "A1": {
+            "A11": {
                 "metadata": {},
                 "type": "StructuredValue",
                 "value": {
@@ -223,7 +224,7 @@ MQTT message at topic topic1:
                     }
                 }
             },
-            "A2": {
+            "A22": {
                 "metadata": {},
                 "type": "StructuredValue",
                 "value": [

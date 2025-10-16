@@ -59,7 +59,6 @@
 * USING
 */
 using ngsiv2::SubscriptionUpdate;
-using ngsiv2::EntID;
 using rapidjson::Value;
 
 
@@ -433,7 +432,7 @@ std::string parseCustomJson
   else
   {
     delete *json;
-    return "json fields in httpCustom or mqttCustom must be object or array";
+    return "json fields in httpCustom, mqttCustom or kafkaCustom must be object or array";
   }
 
   return "";
@@ -445,7 +444,7 @@ std::string parseCustomJson
 *
 * parseCustomPayload -
 *
-* Both for HTTP and MQTT notifications
+* Both for HTTP / MQTT / KAFKA notifications
 */
 static std::string parseCustomPayload
 (
@@ -468,7 +467,7 @@ static std::string parseCustomPayload
 
   if (n > 1)
   {
-    return badInput(ciP, "only one of payload, json or ngsi fields accepted at the same time in httpCustom or mqttCustom");
+    return badInput(ciP, "only one of payload, json or ngsi fields accepted at the same time in httpCustom, mqttCustom or kafkaCustom");
   }
 
   if (holder.HasMember("payload"))
@@ -498,7 +497,7 @@ static std::string parseCustomPayload
       *payload = payloadOpt.value;
     }
   }
-  else  if (holder.HasMember("json"))
+  else if (holder.HasMember("json"))
   {
     *payloadType = ngsiv2::CustomPayloadType::Json;
 
@@ -524,7 +523,7 @@ static std::string parseCustomPayload
           return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTID);
         }
 
-        ngsi->id = iter->value.GetString();
+        ngsi->entityId.id = iter->value.GetString();
       }
       else if (name == "type")
       {
@@ -533,7 +532,7 @@ static std::string parseCustomPayload
           return badInput(ciP, ERROR_DESC_BAD_REQUEST_INVALID_JTYPE_ENTTYPE);
         }
 
-        ngsi->type = iter->value.GetString();
+        ngsi->entityId.type = iter->value.GetString();
       }
       else  // attribute
       {
@@ -630,6 +629,49 @@ static std::string parseMqttUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   return "";
 }
 
+/* ****************************************************************************
+*
+* parseKafkaUrl -
+*/
+static std::string parseKafkaUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& kafka)
+{
+  Opt<std::string> urlOpt = getStringMust(kafka, "url", "url kafka notification");
+
+  if (!urlOpt.ok())
+  {
+    return badInput(ciP, urlOpt.error);
+  }
+  if (!urlOpt.given)
+  {
+    return badInput(ciP, "mandatory kafka field /url/");
+  }
+
+  if (forbiddenChars(urlOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in kafka field /url/");
+  }
+
+  std::string cleanBrokers;
+  std::string protocol;
+  std::string  path;
+
+  if (!parseKafkaBrokerList(urlOpt.value, &cleanBrokers, &protocol, &path))
+  {
+    return badInput(ciP, "invalid kafka /url/");
+  }
+
+  if (protocol != "kafka:")
+  {
+    return badInput(ciP, "kafka schema is not used in URL");
+  }
+  if (path != "/")
+  {
+    return badInput(ciP, "path cannot be used in kafka url, use topic instead");
+  }
+
+  subsP->notification.kafkaInfo.url = "kafka://" + cleanBrokers;
+  return "";
+}
 
 
 /* ****************************************************************************
@@ -723,6 +765,44 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
   }
 
   subsP->notification.mqttInfo.topic = topicOpt.value;
+
+  return "";
+}
+
+/* ****************************************************************************
+*
+* parseKafkaTopic -
+*/
+static std::string parseKafkaTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& kafka)
+{
+  Opt<std::string> topicOpt = getStringMust(kafka, "topic", "topic kafka notification");
+
+  if (!topicOpt.ok())
+  {
+    return badInput(ciP, topicOpt.error);
+  }
+  if (!topicOpt.given)
+  {
+    return badInput(ciP, "mandatory kafka field /topic/");
+  }
+
+  if (topicOpt.value.empty())
+  {
+    return badInput(ciP, "empty kafka field /topic/");
+  }
+
+  if (forbiddenKafkaTopic(topicOpt.value.c_str()))
+  {
+    return badInput(ciP, "+, # and / are not allowed in kafka field /topic/");
+  }
+
+
+  if (forbiddenChars(topicOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in kafka field /topic/");
+  }
+
+  subsP->notification.kafkaInfo.topic = topicOpt.value;
 
   return "";
 }
@@ -836,13 +916,15 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
   if (notification.HasMember("httpCustom"))  n++;
   if (notification.HasMember("mqtt"))        n++;
   if (notification.HasMember("mqttCustom"))  n++;
+  if (notification.HasMember("kafka"))        n++;
+  if (notification.HasMember("kafkaCustom"))  n++;
   if (n > 1)
   {
-    return badInput(ciP, "only one of http, httpCustom, mqtt or mqttCustom is allowed");
+    return badInput(ciP, "only one of http, httpCustom, mqtt, mqttCustom, kafka or kafkaCustom is allowed");
   }
   else if (n == 0)
   {
-    return badInput(ciP, "http, httpCustom, mqtt or mqttCustom is missing");
+    return badInput(ciP, "http, httpCustom, mqtt, mqttCustom, kafka or kafkaCustom is missing");
   }
 
   // Callback
@@ -889,6 +971,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       if (protocol == "mqtt:")
       {
         return badInput(ciP, "mqtt URL cannot be used in http notifications");
+      }
+      if (protocol == "kafka:")
+      {
+        return badInput(ciP, "kafka URL cannot be used in http notifications");
       }
 
       subsP->notification.httpInfo.url    = urlOpt.value;
@@ -939,6 +1025,10 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
         if (protocol == "mqtt:")
         {
           return badInput(ciP, "mqtt URL cannot be used in http notifications");
+        }
+        if (protocol == "kafka:")
+        {
+          return badInput(ciP, "kafka URL cannot be used in http notifications");
         }
       }
 
@@ -1153,6 +1243,74 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     subsP->notification.mqttInfo.custom = true;
   }
+  else if (notification.HasMember("kafka"))
+  {
+    subsP->notification.type = ngsiv2::KafkaNotification;
+
+    const Value& kafka = notification["kafka"];
+
+    if (!kafka.IsObject())
+    {
+      return badInput(ciP, "kafka notification is not an object");
+    }
+
+    // url
+    r = parseKafkaUrl(ciP, subsP, kafka);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // topic
+    r = parseKafkaTopic(ciP, subsP, kafka);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    subsP->notification.kafkaInfo.custom = false;
+  }
+  else if (notification.HasMember("kafkaCustom"))
+  {
+    subsP->notification.type = ngsiv2::KafkaNotification;
+
+    const Value& kafkaCustom = notification["kafkaCustom"];
+
+    if (!kafkaCustom.IsObject())
+    {
+      return badInput(ciP, "kafkaCustom notification is not an object");
+    }
+
+    // url (same as in not custom mqtt)
+    r = parseKafkaUrl(ciP, subsP, kafkaCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // topic (same as in not custom mqtt)
+    r = parseKafkaTopic(ciP, subsP, kafkaCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // payload
+    r = parseCustomPayload(ciP,
+                           &subsP->notification.kafkaInfo.payloadType,
+                           &subsP->notification.kafkaInfo.payload,
+                           &subsP->notification.kafkaInfo.includePayload,
+                           &subsP->notification.kafkaInfo.json,
+                           &subsP->notification.kafkaInfo.ngsi,
+                           kafkaCustom);
+
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    subsP->notification.kafkaInfo.custom = true;
+  }
 
   // Attributes
   std::string errorString;
@@ -1330,7 +1488,7 @@ static std::string parseNotifyConditionVector
   // Expression
   if (condition.HasMember("expression"))
   {
-    std::string r = parseExpression(condition["expression"], &subsP->restriction.scopeVector, subsP);
+    std::string r = parseExpression(condition["expression"], subsP->subject.condition.expression);
 
     if (r != "OK")
     {

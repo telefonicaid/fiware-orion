@@ -16,8 +16,6 @@ Related to request management (RQ management):
 
 Related to parsing (PP prefix):
 
-* [PP-01: Parsing an NGSIv1 payload](jsonParse.md#flow-pp-01)
-    * Continues from RQ-02, FW-02 or FW-04 
 * [PP-02: Parsing a text payload](sourceCode.md#flow-pp-02)
 	* Continues from RQ-02
 * [PP-03: Parsing an NGSIv2 payload](jsonParseV2.md#flow-pp-03)
@@ -40,25 +38,25 @@ Related to forwarding (FW prefix):
 	
 Related to mongoBackend logic (MB and MD prefixes):
 
-* [MB-01: mongoUpdate - UPDATE/REPLACE - entity found](mongoBackend.md#flow-mb-01)
+* [MB-01: mongoUpdate - update/replace - entity found](mongoBackend.md#flow-mb-01)
     * Continues from RQ-02 or FW-01
     * Continues in MD-01
     * Continues in MD-02
-* [MB-02: mongoUpdate - UPDATE/REPLACE - entity not found](mongoBackend.md#flow-mb-02)
+* [MB-02: mongoUpdate - update/replace - entity not found](mongoBackend.md#flow-mb-02)
     * Continues from RQ-02 or FW-01   
     * Continues in MD-02 
-* [MB-03: mongoUpdate - APPEND/APPEND_STRICT - existing entity](mongoBackend.md#flow-mb-03)
+* [MB-03: mongoUpdate - append/appendStrict - existing entity](mongoBackend.md#flow-mb-03)
     * Continues from RQ-02
     * Continues in MD-01
     * Continues in MD-02 
-* [MB-04: mongoUpdate - APPEND/APPEND_STRICT - new entity](mongoBackend.md#flow-mb-04)
+* [MB-04: mongoUpdate - append/appendStrict - new entity](mongoBackend.md#flow-mb-04)
     * Continues from RQ-02
     * Continues in MD-01
-* [MB-05: mongoUpdate - DELETE - not remove entity](mongoBackend.md#flow-mb-05)
+* [MB-05: mongoUpdate - delete - not remove entity](mongoBackend.md#flow-mb-05)
     * Continues from RQ-02
     * Continues in MD-01
     * Continues in MD-02  
-* [MB-06: mongoUpdate - DELETE - remove entity](mongoBackend.md#flow-mb-06)
+* [MB-06: mongoUpdate - delete - remove entity](mongoBackend.md#flow-mb-06)
 	* Continues from RQ-02 
 * [MB-07: mongoQueryContext](mongoBackend.md#flow-mb-07)
 	* Continues from RQ-02 or FW-03
@@ -77,16 +75,6 @@ Related to mongoBackend logic (MB and MD prefixes):
 * [MB-14: mongoListSubscriptions](mongoBackend.md#flow-mb-14)
 	* Continues from RQ-02
 * [MB-15: mongoUnsbuscribeContext](mongoBackend.md#flow-mb-15)
-	* Continues from RQ-02
-* [MB-16: mongoSubscribeContext](mongoBackend.md#flow-mb-16)
-	* Continues from RQ-02
-	* Continues in MB-11
-* [MB-17: mongoUpdateContextSubscription](mongoBackend.md#flow-mb-17)
-	* Continues from RQ-02
-	* Continues in MB-12
-* [MB-18: mongoRegisterContext](mongoBackend.md#flow-mb-18)
-	* Continues from RQ-02
-* [MB-19: mongoDiscoverContextAvailability](mongoBackend.md#flow-mb-19)
 	* Continues from RQ-02
 * [MB-23: mongoRegistrationGet](mongoBackend.md#flow-mb-23)
 	* Continues from RQ-02
@@ -108,11 +96,11 @@ Related to notifications (NF prefix):
 
 * [NF-01: HTTP Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01)
   * Continues from MD-01
-* [NF-01b: MQTT Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01b)
+* [NF-01b: MQTT/KAFKA Notification on entity-attribute update/creation without thread pool](sourceCode.md#flow-nf-01b)
   * Continues from MD-01
 * [NF-03: HTTP Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03)
   * Continues from MD-01
-* [NF-03b: MQTT Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03b)
+* [NF-03b: MQTT/KAFKA Notification on entity-attribute update/creation with thread pool](sourceCode.md#flow-nf-03b)
   * Continues from MD-01
 
 Related to the subscription cache (SC prefix):

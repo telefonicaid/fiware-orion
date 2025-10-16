@@ -47,11 +47,16 @@ apt-get -y install \
   uuid-dev \
   libgnutls28-dev \
   libsasl2-dev \
-  libgcrypt-dev
+  libgcrypt-dev \
+  librdkafka-dev \
+  openjdk-17-jre-headless \
+  zlib1g-dev\
+  libzstd-dev  \
+  liblz4-dev
 
 echo "INSTALL: MongoDB shell" \
-&& curl -L https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
-&& echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list \
+&& curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg --dearmor \
+&& echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list \
 && apt-get -y update \
 && apt-get -y install mongodb-mongosh
 
@@ -63,6 +68,7 @@ echo "INSTALL: python special dependencies" \
 && pip install Werkzeug==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
 && pip install amqtt==0.11.0b1 \
+&& pip install confluent-kafka==2.11.0 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
@@ -103,6 +109,12 @@ echo "INSTALL: mosquitto" \
 && sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk \
 && make \
 && make install
+
+# Note in this case the directory created in /opt contains the software itself
+# (i.e. there isn't a install step itself). Note also due to this there isn't a removal (rm) at the end
+echo "INSTALL: Kafka" \
+&& curl -fsSL "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar xzC /opt \
+&& mv /opt/kafka_2.12-3.9.1 /opt/kafka
 
 ldconfig
 

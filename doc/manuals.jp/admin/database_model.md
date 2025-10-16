@@ -156,9 +156,12 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **fwdMode**: プロバイダがサポートするフォワーディング・モード : `all`, `query`, `update` または `none`.
     省略した場合 (2.6.0 より前の Orion バージョン)、`all` が想定されます。
 -   **contextRegistration** : 要素に以下の情報が含まれる配列です :
-    -   **entities** : エンティティのリストを含む配列です (必須)。各エンティティの JSON には、**id**, **type** および **isPattern** が含まれています
+    -   **entities**: エンティティのリストを含む配列 (必須)。各エンティティの JSON には、**id** (文字列)、**type** (文字列)、*isPattern** (ブール値)、および**isTypePattern** (ブール値）（*) が含まれます
     -   **attrs** : 属性のリストを含む配列です (オプション)。各属性の JSON には、**name** および **type** が含まれています
     -   **providingApplication** : このレジストレーションのための提供アプリケーションの URL です (必須)
+
+(*) Orion 4.3.0 より前のバージョンでは、`isPattern` を文字列 (`"true"` または `"false"`) として使用していました。
+Orion はこれを文字列 (レガシー) または bool 型 (現行) として読み取ることをサポートしていますが、常に bool 型 (`true` または `false`) として保存します。
 
 サンプルドキュメント :
 
@@ -174,12 +177,12 @@ Orion Context Broker は、データベース内で次のサブセクション�
                {
                    "id": "E1",
                    "type": "T1",
-                   "isPattern": "false"
+                   "isPattern": false
                },
                {
                    "id": "E2",
                    "type": "T2",
-                   "isPattern": "false"
+                   "isPattern": false
                }
            ],
            "attrs": [
@@ -212,11 +215,12 @@ Orion Context Broker は、データベース内で次のサブセクション�
 -   **expiration** : サブスクリプションの有効期限が切れるタイムスタンプです (整数、秒を意味します)。永続的なサブスクリプションの場合、不当に高い値が使用されます。ソースコードの PERMANENT_SUBS_DATETIME を参照してください
 -   **lastNotification** : 最後の通知が送信された時刻です (整数、秒を意味します)。これは、通知が送信されるたびに更新され、スロットリング違反を回避します
 -   **throttling** : 通知の最小間隔です。0または -1 は、スロットリングがないことを意味します
--   **reference** : 通知の URL です。HTTPまたはMQTTのいずれかを指定します
+-   **reference** : 通知の URL です。HTTP, MQTT または KAFKA のいずれかを指定します
 -   **topic**: MQTTトピック (MQTT 通知のみ)
+-   **kafkaTopic**: KAFAKA トピック (KAFKA 通知のみ)
 -   **qos**: MQTT QoS 値 (MQTT 通知のみ)
 -   **retain**: MQTT retain 値 (MQTT 通知のみ)
--   **entities** : エンティティの配列 (必須) です。各エンティティの JSON には、**id**, **type**, **isPattern** および **isTypePattern** が含まれています。従来の理由から、**isPattern** は `"true"` または `"false"` (テキスト) で、**isTypePattern** は `true` または `false` (ブール値) であることに注意してください
+-   **entities**: エンティティの配列 (必須)。各エンティティの JSON には、**id** (文字列)、**type** (文字列)、**isPattern** (ブール値)、**isTypePattern** (ブール値) (*) が含まれます。
 -   **attrs** : 属性名の配列 (文字列) (オプション) です
 -   **blacklist** : `attrs` をホワイトリスト (もし `blacklist` が `false` また存在しない場合) またはブラックリスト (もし `blackslist` が `true` の場合) として解釈する必要があるかどうかを指定するブール値フィールドです
 -   **onlyChanged**: 変更された属性のみを通知に含める必要があるか (onlyChanged が true
@@ -258,6 +262,9 @@ Orion Context Broker は、データベース内で次のサブセクション�
     を参照してください。
 -   **notifyOnMetadataChange**: `true` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされます。`false` の場合、メタデータはサブスクリプションのトリガーに関する属性の値の一部と見なされません。 デフォルトの動作 (省略された場合) は `true` の動作です。
 
+(*) Orion 4.3.0 より前のバージョンでは、`isPattern` を文字列 (`"true"` または `"false"`) として使用していました。
+Orion はこれを文字列 (レガシー) または bool 型 (現行) として読み取ることをサポートしていますが、常に bool 型 (`true` または `false`) として保存します。
+
 サンプルドキュメント :
 
 ```
@@ -270,7 +277,7 @@ Orion Context Broker は、データベース内で次のサブセクション�
                 {
                         "id" : ".*",
                         "type" : "Room",
-                        "isPattern" : "true",
+                        "isPattern" : true,
                         "isTypePattern": false
                 }
         ],

@@ -336,10 +336,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 30
+Content-Length: 57
 
 {
-    "error": "log config missing"
+    "description": "log config missing",
+    "error": "BadRequest"
 }
 
 
@@ -390,10 +391,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 29
+Content-Length: 56
 
 {
-    "error": "invalid log level"
+    "description": "invalid log level",
+    "error": "BadRequest"
 }
 
 
@@ -469,10 +471,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 68
+Content-Length: 95
 
 {
-    "error": "Empty right-hand-side for URI param /infoPayloadMaxSize/"
+    "description": "Empty right-hand-side for URI param /infoPayloadMaxSize/",
+    "error": "BadRequest"
 }
 
 
@@ -498,10 +501,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 90
+Content-Length: 117
 
 {
-    "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
+    "description": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0",
+    "error": "BadRequest"
 }
 
 
@@ -527,10 +531,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 90
+Content-Length: 117
 
 {
-    "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
+    "description": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0",
+    "error": "BadRequest"
 }
 
 
@@ -556,10 +561,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 90
+Content-Length: 117
 
 {
-    "error": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0"
+    "description": "invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0",
+    "error": "BadRequest"
 }
 
 
@@ -635,10 +641,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 61
+Content-Length: 88
 
 {
-    "error": "Empty right-hand-side for URI param /lineMaxSize/"
+    "description": "Empty right-hand-side for URI param /lineMaxSize/",
+    "error": "BadRequest"
 }
 
 
@@ -664,10 +671,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 76
+Content-Length: 103
 
 {
-    "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
+    "description": "invalid lineMaxSize, lineMaxSize should be an integer number > 0",
+    "error": "BadRequest"
 }
 
 
@@ -693,10 +701,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 76
+Content-Length: 103
 
 {
-    "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
+    "description": "invalid lineMaxSize, lineMaxSize should be an integer number > 0",
+    "error": "BadRequest"
 }
 
 
@@ -722,10 +731,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 76
+Content-Length: 103
 
 {
-    "error": "invalid lineMaxSize, lineMaxSize should be an integer number > 0"
+    "description": "invalid lineMaxSize, lineMaxSize should be an integer number > 0",
+    "error": "BadRequest"
 }
 
 

@@ -34,17 +34,6 @@
 
 /* ****************************************************************************
 *
-* isNgsiV1Url
-*/
-inline bool isNgsiV1Url(const char* url)
-{
-  return (strstr(url, "/v1/") || strcasestr(url, "/ngsi10/") || strcasestr(url, "/ngsi9/"));
-}
-
-
-
-/* ****************************************************************************
-*
 * truncatePayload -
 *
 * NOTE: this function allocated dynamic memory, be careful with memory leaks!
@@ -125,10 +114,11 @@ void logInfoHttpNotification
 
 /* ****************************************************************************
 *
-* logInfoMqttNotification
+* logInfoNonRequestNotification
 */
-void logInfoMqttNotification
+void logInfoNonRequestNotification
 (
+  const char*  prefix,
   const char*  subId,
   const char*  endpoint,
   const char*  resource,
@@ -148,7 +138,7 @@ void logInfoMqttNotification
     effectivePayload = (char*) payload;
   }
 
-  LM_I(("MQTT Notif delivered (subId: %s): broker: %s, topic: %s, payload (%d bytes): %s", subId, endpoint, resource, strlen(payload), effectivePayload));
+  LM_I(("%s Notif delivered (subId: %s): broker: %s, topic: %s, payload (%d bytes): %s", prefix, subId, endpoint, resource, strlen(payload), effectivePayload));
 
   if (cleanAfterUse)
   {
@@ -170,15 +160,6 @@ void logInfoRequestWithoutPayload
 )
 {
   LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
-
-  if (isNgsiV1Url(url))
-  {
-    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated NGSIv1 request received: %s %s, response code: %d", verb, url, rc));
-    }
-  }
 }
 
 
@@ -209,15 +190,6 @@ void logInfoRequestWithPayload
   }
 
   LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
-
-  if (isNgsiV1Url(url))
-  {
-    __sync_fetch_and_add(&noOfDprNgsiv1Request, 1);
-    if (logDeprecate)
-    {
-      LM_W(("Deprecated NGSIv1 request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
-    }
-  }
 
   if (cleanAfterUse)
   {
@@ -258,7 +230,15 @@ void logInfoFwdRequest
 {
   char buffer[STRING_SIZE_FOR_INT];
   snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoFwdRequest(regId, verb, url, requestPayload, responsePayload, buffer);
+
+  if (responsePayload == NULL)
+  {
+    logInfoFwdRequest(regId, verb, url, requestPayload, "", buffer);
+  }
+  else
+  {
+    logInfoFwdRequest(regId, verb, url, requestPayload, responsePayload, buffer);
+  }
 }
 
 

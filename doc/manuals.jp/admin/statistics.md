@@ -44,8 +44,7 @@ Orion Context broker は、`GET /statistics` と `GET /cache/statistics` を介�
   "counters": {
     "deprecatedFeatures": {
       "geoFormat": 2,
-      "ngsiv1Forwarding": 4,
-      "ngsiv1Requests": 4
+      "ngsiv1Forwarding": 4
     },
     "invalidRequests": 2,
     "jsonRequests": 4,
@@ -113,7 +112,6 @@ SemWait ブロックは、メインの内部セマフォの累積待ち時間を
   ...
   "timing": {
     "accumulated": {
-      "jsonV1Parse": 7.860908311,
       "jsonV2Parse": 120.680244446,
       "mongoBackend": 12778.52734375,
       "mongoReadWait": 7532.301757812,
@@ -143,7 +141,6 @@ SemWait ブロックは、メインの内部セマフォの累積待ち時間を
 特定のカウンタは次のとおりです :
 
 * `total` : HTTP ライブラリがリクエスト/レスポンス・ディスパッチ (擬似エンド・ツー・エンド時間) にかかる時間を除く、リクエスト全体の処理時間です
-* `jsonV1Parse` : NGSIv1 JSON パース・モジュールで渡された時間です (疑似セルフタイム)
 * `jsonV2Parse` : NGSIv2 JSON パース・モジュールで渡された時間です (疑似セルフタイム)
 * `mongoBackend` : mongoBackend モジュールで渡された時間です (疑似セルフタイム)
 * `render` : レンダリングモジュールに渡された時間です (擬似セルフタイム)

@@ -637,8 +637,9 @@ EOF
 ```
 
 * 通知はいくつかの方法でカスタマイズできます。まず、`notification` の中の `attrsFormat` フィールド内のフィールドを使用して、通知のエンティティ表現形式を調整できます。次に、カスタム通知 HTTP verb (PUT など)、カスタム HTTP ヘッダ、カスタム URL クエリパラメータ、カスタムペイロード (必ずしも JSON ではなく) を使用できます。Orion API 仕様の [通知メッセージ](../orion-api.md#notification-messages) と [カスタム通知](../orion-api.md#custom-notifications) を見てください。
-* このセクションで説明されている HTTP 通知に加えて、Orion は MQTT 通知もサポートしています。
-  このトピックについては、[このドキュメント](mqtt_notifications.md) で詳しく説明されています。
+
+* このセクションで説明した HTTP 通知に加えて、Orion は [MQTT 通知](mqtt_notifications.md) と
+  [KAFKA 通知](kafka_notifications.md) もサポートしています。
 
 [トップ](#top)
 

@@ -31,7 +31,6 @@
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
 #include "mongoBackend/mongoUnsubscribeContext.h"
-#include "ngsi10/UnsubscribeContextResponse.h"
 
 #include "serviceRoutinesV2/deleteSubscription.h"
 
@@ -57,20 +56,17 @@ std::string deleteSubscription
   ParseData*                 parseDataP
 )
 {
-  std::string                 subscriptionId =  compV[2];
-  UnsubscribeContextResponse  uncr;
+  std::string  subscriptionId =  compV[2];
+  OrionError   oe;
 
-  // 'Fill In' UnsubscribeContextRequest
-  parseDataP->uncr.res.subscriptionId.set(subscriptionId);
-
-  TIMED_MONGO(mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant));
+  TIMED_MONGO(mongoUnsubscribeContext(subscriptionId, &oe, ciP->tenant));
 
   // Check for potential error
   std::string  answer = "";
-  if (uncr.oe.code != SccNone )
+  if (oe.code != SccNone )
   {
-    TIMED_RENDER(answer = uncr.oe.toJson());
-    ciP->httpStatusCode = uncr.oe.code;
+    TIMED_RENDER(answer = oe.toJson());
+    ciP->httpStatusCode = oe.code;
   }
   else
   {

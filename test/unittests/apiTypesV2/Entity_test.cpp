@@ -43,34 +43,35 @@ TEST(Entity, check)
   utInit();
 
   Entity* enP         = new Entity();
-  enP->id             = "E";
-  enP->type           = "T";
-  enP->isPattern      = "false";
-  enP->isTypePattern  = false;
+  enP->entityId.id    = "E";
+  enP->entityId.type  = "T";
 
   ContextAttribute* caP = new ContextAttribute("A", "T", "val");
   enP->attributeVector.push_back(caP);
 
-  EXPECT_EQ("OK", enP->check(V2, EntitiesRequest));
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
 
-  enP->id = "";
-  EXPECT_EQ("entity id length: 0, min length supported: 1", enP->check(V2, EntitiesRequest));
+  enP->entityId.id = "";
+  EXPECT_EQ("id and idPattern cannot be both empty at the same time", enP->check(EntitiesRequest));
 
-  enP->id = "E<1>";
-  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, enP->check(V2, EntitiesRequest));
-  enP->isPattern = "true";
-  EXPECT_EQ("OK", enP->check(V2, EntitiesRequest));
-  enP->id        = "E";
-  enP->isPattern = "false";
+  enP->entityId.id = "E<1>";
+  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTID, enP->check(EntitiesRequest));
 
-  enP->type = "T<1>";
-  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(V2, EntitiesRequest));
-  enP->isTypePattern  = true;
-  EXPECT_EQ("OK", enP->check(V2, EntitiesRequest));
-  enP->type = "T";
+  enP->entityId.idPattern = "E<1>";
+  enP->entityId.id        = "";
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
 
-  enP->isPattern = "<false>";
-  EXPECT_EQ("Invalid value for isPattern", enP->check(V2, EntitiesRequest));
+  enP->entityId.id        = "E";
+  enP->entityId.idPattern = "";
+
+  enP->entityId.type = "T<1>";
+  EXPECT_EQ(ERROR_DESC_BAD_REQUEST_INVALID_CHAR_ENTTYPE, enP->check(EntitiesRequest));
+
+  enP->entityId.typePattern = "T<1>";
+  enP->entityId.type        = "";
+  EXPECT_EQ("OK", enP->check(EntitiesRequest));
+
+  delete enP;
 
   utExit();
 }
@@ -84,42 +85,40 @@ TEST(Entity, check)
 */
 TEST(Entity, checkV1)
 {
-  Entity* enP = new Entity();
-
   utInit();
 
-  enP->id = "";
-  EXPECT_EQ(enP->check(V1, UpdateContext), "empty entityId:id");
+  Entity* enP = new Entity();
 
-  enP->id = "id";
-  EXPECT_EQ(enP->check(V1, UpdateContext), "OK");
+  enP->entityId.id = "";
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "id and idPattern cannot be both empty at the same time");
+
+  enP->entityId.id = "id";
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "type and typePattern cannot be both empty at the same time");
 
   ContextAttribute* aP = new ContextAttribute();
   aP->name  = "";
   aP->stringValue = "V";
   enP->attributeVector.push_back(aP);
-  EXPECT_EQ(enP->check(V1, UpdateContext), "missing attribute name");
+  EXPECT_EQ(enP->check(BatchUpdateRequest), "type and typePattern cannot be both empty at the same time");
   aP->name = "name";
 
-  Entity* en2P = new Entity("id", "", "false");
+  Entity* en2P = new Entity("id", "", "", "");
+  en2P->renderId = true;
 
   EntityVector* ceVectorP = new EntityVector();
 
-  EXPECT_EQ(ceVectorP->check(V1, UpdateContext), "No context elements");
-
   ceVectorP->push_back(enP);
   ceVectorP->push_back(en2P);
-  EXPECT_EQ(ceVectorP->check(V1, UpdateContext), "OK");
 
   // render
   const char*               outfile1 = "ngsi.contextelement.check.middle.json";
   std::string               out;
 
-  out = en2P->toJsonV1(false, UpdateContextElement, false, false, false);
+  out = en2P->toJson(NGSI_V2_NORMALIZED, false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", ceVectorP->check(V1, UpdateContext));
+  delete ceVectorP;
 
   utExit();
 }

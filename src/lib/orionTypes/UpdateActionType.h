@@ -52,7 +52,7 @@ typedef enum ActionType
 *
 * actionTypeString -
 */
-extern std::string actionTypeString(ApiVersion apiVersion, ActionType action);
+extern std::string actionTypeString(ActionType action);
 
 
 
@@ -66,9 +66,9 @@ extern ActionType parseActionTypeV1(const std::string& action);
 
 /* ****************************************************************************
 *
-* parseActionTypeV2 -
+* parseActionType -
 */
-extern ActionType parseActionTypeV2(const std::string& actionType);
+extern ActionType parseActionType(const std::string& actionType);
 
 
 

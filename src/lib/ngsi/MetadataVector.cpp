@@ -30,7 +30,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/JsonHelper.h"
 #include "ngsi/MetadataVector.h"
@@ -50,60 +49,7 @@ MetadataVector::MetadataVector(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::toJsonV1 -
-*
-* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
-*/
-std::string MetadataVector::toJsonV1(const std::vector<Metadata*>& orderedMetadata, bool comma)
-{
-  std::string out = "";
-
-  if (orderedMetadata.size() == 0)
-  {
-    return "";
-  }
-
-  out += startTag("metadatas", true);
-  for (unsigned int ix = 0; ix < orderedMetadata.size(); ++ix)
-  {
-    out += orderedMetadata[ix]->toJsonV1(ix != orderedMetadata.size() - 1);
-  }
-  out += endTag(comma, true);
-
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* MetadataVector::matchFilter -
-*
-*/
-bool MetadataVector::matchFilter(const std::string& mdName, const std::vector<std::string>& metadataFilter)
-{
-  /* Metadata filtering only in the case of actual metadata vector not containing "*" */
-  if ((metadataFilter.size() == 0) || (std::find(metadataFilter.begin(), metadataFilter.end(), NGSI_MD_ALL) != metadataFilter.end()))
-  {
-    return true;
-  }
-
-  return std::find(metadataFilter.begin(), metadataFilter.end(), mdName) != metadataFilter.end();
-}
-
-
-
-/* ****************************************************************************
-*
 * MetadataVector::toJson -
-*
-* Metadatas named 'value' or 'type' are not rendered in API version 2, due to the 
-* compact way in which API v2 is rendered. Metadatas named 'value' or 'type' would simply
-* collide with the 'value' and 'type' of the attribute itself (holder of the metadata).
-*
-* If anybody needs a metadata named 'value' or 'type', then API v1
-* will have to be used to retreive that information.
 *
 */
 std::string MetadataVector::toJson(const std::vector<Metadata*>& orderedMetadata)
@@ -124,13 +70,13 @@ std::string MetadataVector::toJson(const std::vector<Metadata*>& orderedMetadata
 *
 * MetadataVector::check -
 */
-std::string MetadataVector::check(ApiVersion apiVersion)
+std::string MetadataVector::check(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion)) != "OK")
+    if ((res = vec[ix]->check()) != "OK")
     {
       return res;
     }
@@ -199,22 +145,6 @@ void MetadataVector::release(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::fill -
-*/
-void MetadataVector::fill(MetadataVector* mvP)
-{
-  for (unsigned int ix = 0; ix < mvP->size(); ++ix)
-  {
-    Metadata* mP = new Metadata((*mvP)[ix]);
-
-    push_back(mP);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * MetadataVector::lookupByName - 
 */
 Metadata* MetadataVector::lookupByName(const std::string& _name) const
@@ -236,13 +166,13 @@ Metadata* MetadataVector::lookupByName(const std::string& _name) const
 *
 * MetadataVector::toBson -
 */
-void MetadataVector::toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType)
+void MetadataVector::toBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames)
 {
   for (unsigned int ix = 0; ix < this->vec.size(); ++ix)
   {
-    this->vec[ix]->appendToBsoN(md, mdNames, useDefaultType);
+    this->vec[ix]->appendToBson(md, mdNames);
 
     LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      this->vec[ix]->name.c_str(), this->vec[ix]->type.c_str(), this->vec[ix]->toStringValue().c_str()));
+                      this->vec[ix]->name.c_str(), this->vec[ix]->type.c_str(), this->vec[ix]->toJson().c_str()));
   }
 }

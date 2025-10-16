@@ -497,7 +497,7 @@ def ruleE22(entity):
         return None, None
 
     sp = entity['_id']['servicePath']
-    # Scope must start with / (only "absolute" scopes are allowed)
+    # Service path must start with / (only "absolute" service paths are allowed)
     if not sp.startswith('/'):
         return f"servicePath '{sp}' does not starts with '/'", None
 
@@ -506,7 +506,7 @@ def ruleE22(entity):
     if sp == '/':
         return None, None
 
-    # 10 maximum scope levels in a path
+    # 10 maximum levels in a path
     sp_levels = sp[1:].split('/')
     if len(sp_levels) > 10:
         return f"servicePath has {len(sp_levels)} tokens but the limit is 10", None

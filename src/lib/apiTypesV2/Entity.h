@@ -32,7 +32,6 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/EntityId.h"
 #include "rest/OrionError.h"
-#include "expressions/ExprContext.h"
 
 
 
@@ -51,77 +50,51 @@ struct QueryContextResponse;
 class Entity
 {
  public:
-  std::string             id;               // Mandatory
-  std::string             type;             // Optional
-  std::string             isPattern;        // Optional
-  bool                    isTypePattern;
+  EntityId                entityId;         // Mandatory
   ContextAttributeVector  attributeVector;  // Optional
 
   std::string             servicePath;      // Not part of payload, just an internal field
-  bool                    typeGiven;        // Was 'type' part of the incoming payload?
   bool                    renderId;         // Should id and type be rendered in JSON?
 
   double                  creDate;          // used by dateCreated functionality in NGSIv2
   double                  modDate;          // used by dateModified functionality in NGSIv2
 
-  std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
+  std::vector<ngsiv2::Provider> providerList;      // Used internally for CPr forwarding functionality
+  std::vector<std::string>      providerRegIdList; // Side vector to providerList, to hold the reg ids where they come (used for login purposes)
 
   Entity();
-  Entity(const std::string& id, const std::string& type, const std::string& isPattern, bool isTypePattern = false);
-  explicit Entity(EntityId* eP);
-  explicit Entity(Entity* eP);
+  Entity(const std::string& id, const std::string& idPattern, const std::string& type, const std::string& typePattern);
 
   ~Entity();
-
-  std::string  toJsonV1(bool                             asJsonObject,
-                        RequestType                      requestType,
-                        const std::vector<std::string>&  attrsFilter,
-                        bool                             blacklist,
-                        const std::vector<std::string>&  metadataFilter,
-                        bool                             comma,
-                        bool                             omitAttributeValues = false);
-
-  std::string  toJsonV1(bool                             asJsonObject,
-                        RequestType                      requestType,
-                        bool                             blacklist,
-                        bool                             comma,
-                        bool                             omitAttributeValues = false);
 
   std::string  toJson(RenderFormat                         renderFormat,
                       const std::vector<std::string>&      attrsFilter,
                       bool                                 blacklist,
                       const std::vector<std::string>&      metadataFilter,
-                      bool                                 renderNgsiField    = false,
-                      ExprContextObject*                   exprContextObjectP = NULL);
+                      bool                                 renderNgsiField    = false);
 
   std::string  toJson(RenderFormat                     renderFormat,
                       bool                             renderNgsiField = false);
 
-  std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
+  std::string  toString(void);
 
-  std::string  check(ApiVersion apiVersion, RequestType requestType);
+  std::string  check(RequestType requestType);
 
   void         applyUpdateOperators(void);
 
   void         release(void);
 
-  void         fill(const std::string&             id,
-                    const std::string&             type,
-                    const std::string&             isPattern,
+  void         fill(const EntityId&                entId,
                     const ContextAttributeVector&  caV,
                     double                         creDate,
                     double                         modDate);
 
-  void         fill(const std::string&  id,
-                    const std::string&  type,
-                    const std::string&  isPattern,
+  void         fill(const EntityId&     entId,
                     const std::string&  servicePath,
                     double              creDate = 0,
                     double              modDate = 0);
 
-  void         fill(const std::string&  id,
-                    const std::string&  type,
-                    const std::string&  isPattern);
+  void         fill(const EntityId& entId);
 
   void         fill(const Entity& en, bool useDefaultType = false, bool cloneCompounds = false);
 
@@ -145,8 +118,12 @@ class Entity
   std::string toJsonKeyvalues(const std::vector<ContextAttribute*>& orderedAttrs);
   std::string toJsonNormalized(const std::vector<ContextAttribute*>&  orderedAttrs,
                                const std::vector<std::string>&        metadataFilter,
-                               bool                                   renderNgsiField   = false,
-                               ExprContextObject*                     exprContextObject = NULL);
+                               bool                                   renderNgsiField   = false);
+
+  std::string  checkId(RequestType requestType);
+  std::string  checkIdPattern(RequestType requestType);
+  std::string  checkType(RequestType requestType);
+  std::string  checkTypePattern(RequestType requestType);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

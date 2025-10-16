@@ -36,6 +36,16 @@
 // the same macro in parseArg library
 #define FT(x) (x == true)? "true" : "false"
 
+
+
+/* ****************************************************************************
+*
+* Macros for JSON rendering
+*/
+#define JSON_STR(value)                std::string("\"" + std::string(value) + "\"")
+
+
+
 /* ****************************************************************************
 *
 * isIPv6 -
@@ -65,37 +75,23 @@ extern bool parseUrl
   std::string&        protocol
 );
 
-
-
 /* ****************************************************************************
 *
-* validUrl - check validity of a URL
+* parseKafkaBrokerList -
 */
-extern bool validUrl(const std::string& url);
-
-
-
-/* ****************************************************************************
-*
-* i2s - integer to string
-*/
-extern char* i2s(int i, char* placeholder, int placeholderSize);
-
-
+extern bool parseKafkaBrokerList
+(
+  const std::string&  url,
+  std::string*        cleanListOut,
+  std::string*        protocol,
+  std::string*        path
+);
 
 /* ****************************************************************************
 *
 * parsedUptime
 */
 extern std::string parsedUptime(int uptime);
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - 
-*/
-extern bool onlyWs(const char* s);
 
 
 
@@ -143,21 +139,6 @@ extern unsigned long atoUL(const char* string, std::string* errorMsg);
 * strToLower - 
 */
 extern char* strToLower(char* to, const char* from, int toSize);
-
-
-
-/* ****************************************************************************
-*
-* strReplace - 
-*/
-extern void strReplace
-(
-  char*       to,
-  int         toLen,
-  const char* from,
-  const char* newString,
-  const char* oldString
-);
 
 
 
@@ -234,6 +215,27 @@ inline std::string removeQuotes(std::string s)
     return s;
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* getEndpoint -
+*/
+inline std::string getEndpoint(const std::string& host, int port)
+{
+  char  portV[STRING_SIZE_FOR_INT];
+  snprintf(portV, sizeof(portV), "%d", port);
+  return host + ":" + portV;
+}
+
+
+
+/* ****************************************************************************
+*
+* htmlEscape - 
+*/
+extern char* htmlEscape(const char* s);
 
 
 

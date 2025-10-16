@@ -74,9 +74,8 @@ typedef enum TraceLevels
   LmtCompoundValueRaw,
   LmtCompoundValueContainer,
   LmtCompoundValueStep,
-  LmtCompoundValueShow,
-  LmtJsonAttributes = 55,
-  LmtRegexError,
+  LmtJsonAttributes,
+  LmtRegexError = 55,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,
@@ -95,13 +94,13 @@ typedef enum TraceLevels
   /* Types (140-159) */
   LmtEntityId = 140,
   LmtRestriction,
-  LmtScope,
 
   /* Notifications (160-179) */
   LmtNotifier = 160,
   LmtNotificationRequestPayload,
   LmtNotificationResponsePayload,
   LmtMqttNotif,
+  LmtKafkaNotif,
 
   /* Input/Output payloads (180-199) */
   LmtServiceInputPayload = 180,

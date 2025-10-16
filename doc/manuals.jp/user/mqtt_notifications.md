@@ -49,7 +49,7 @@ MQTT サブスクリプションのカスタム通知 ([Orion API 仕様のカ�
 * `httpCustom` の代わりに `mqttCustom` が使用されます
 * `mqtt` で使用されているのと同じフィールドを `mqttCustom` で使用できます
 * `headers`, `qs` と `method` は MQTT で同等ではないため、使用できません
-* マクロ置換は `topic` および `payload` フィールドで実行されます。`url`, `qos`, `retain`, `user` と `passwd` は固定値です
+* マクロ置換は `topic`, `payload`, `json` および `ngsi` フィールドで実行されます。`url`, `qos`, `retain`, `user` と `passwd` は固定値です
 
 ## 接続管理
 

@@ -30,7 +30,6 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 
 #include "ngsi/ParseData.h"
@@ -40,6 +39,7 @@
 #include "serviceRoutinesV2/semStateTreat.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mqtt/mqttMgr.h"
+#include "kafka/kafkaMgr.h"
 #include "metricsMgr/metricsMgr.h"
 #include "mongoDriver/mongoConnectionPool.h"
 
@@ -95,6 +95,7 @@ std::string semStateTreat
   jh.addRaw("logMsg",              semRender(lmSemGet()));
   jh.addRaw("alarmMgr",            semRender(alarmMgr.semGet()));
   jh.addRaw("mqttMgr",             semRender(mqttMgr.semGet()));
+  jh.addRaw("kafkaMgr",            semRender(kafkaMgr.semGet()));
   jh.addRaw("metricsMgr",          semRender(metricsMgr.semStateGet()));
   jh.addRaw("connectionContext",   semRender(connectionSubContextSemGet()));
   jh.addRaw("connectionEndpoints", semRender(connectionSubContextSemGet()));

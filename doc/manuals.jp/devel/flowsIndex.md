@@ -16,8 +16,6 @@
 
 パーシングに関連する図 (PP prefix) : 
 
-* [PP-01: NGSIv1 ペイロードのパーシング](jsonParse.md#flow-pp-01)
-    * RQ-02, FW-02 または FW-04 からの続きです
 * [PP-02: テキスト・ペイロードのパーシング](sourceCode.md#flow-pp-02)
     * RQ-02 からの続きです
 * [PP-03: NGSIv2 ペイロードのパーシング](jsonParseV2.md#flow-pp-03)
@@ -40,25 +38,25 @@
 
 mongoBackend ロジックに関連する図 (MB and MD prefixes):
 
-* [MB-01: mongoUpdate - UPDATE/REPLACE - entity found](mongoBackend.md#flow-mb-01)
+* [MB-01: mongoUpdate - update/replace - entity found](mongoBackend.md#flow-mb-01)
     * RQ-02 または FW-01 からの続きです
     * MD-01 に続きます
     * MD-02 に続きます
-* [MB-02: mongoUpdate - UPDATE/REPLACE - entity not found](mongoBackend.md#flow-mb-02)
+* [MB-02: mongoUpdate - update/replace - entity not found](mongoBackend.md#flow-mb-02)
     * RQ-02またはFW-01 からの続きです
     * MD-02 に続きます
-* [MB-03: mongoUpdate - APPEND/APPEND_STRICT - existing entity](mongoBackend.md#flow-mb-03)
+* [MB-03: mongoUpdate - append/appendStrict - existing entity](mongoBackend.md#flow-mb-03)
     * RQ-02 からの続きです
     * MD-01 に続きます
     * MD-02 に続きます
-* [MB-04: mongoUpdate - APPEND/APPEND_STRICT - new entity](mongoBackend.md#flow-mb-04)
+* [MB-04: mongoUpdate - append/appendStrict - new entity](mongoBackend.md#flow-mb-04)
     * RQ-02 からの続きです
     * MD-01 に続きます
-* [MB-05: mongoUpdate - DELETE - not remove entity](mongoBackend.md#flow-mb-05)
+* [MB-05: mongoUpdate - delete - not remove entity](mongoBackend.md#flow-mb-05)
     * RQ-02 からの続きです
     * MD-01 に続きます
     * MD-02 に続きます
-* [MB-06: mongoUpdate - DELETE - remove entity](mongoBackend.md#flow-mb-06)
+* [MB-06: mongoUpdate - delete - remove entity](mongoBackend.md#flow-mb-06)
     * RQ-02 からの続きです
 * [MB-07: mongoQueryContext](mongoBackend.md#flow-mb-07)
     * RQ-02 または FW-03 からの続きです
@@ -77,16 +75,6 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
 * [MB-14: mongoListSubscriptions](mongoBackend.md#flow-mb-14)
     * RQ-02 からの続きです
 * [MB-15: mongoUnsbuscribeContext](mongoBackend.md#flow-mb-15)
-    * RQ-02 からの続きです
-* [MB-16: mongoSubscribeContext](mongoBackend.md#flow-mb-16)
-    * RQ-02 からの続きです
-    * MB-11 に続きます
-* [MB-17: mongoUpdateContextSubscription](mongoBackend.md#flow-mb-17)
-    * RQ-02 からの続きです
-    * MB-12 に続きます
-* [MB-18: mongoRegisterContext](mongoBackend.md#flow-mb-18)
-    * RQ-02 からの続きです
-* [MB-19: mongoDiscoverContextAvailability](mongoBackend.md#flow-mb-19)
     * RQ-02 からの続きです
 * [MB-23: mongoRegistrationGet](mongoBackend.md#flow-mb-23)
     * RQ-02 からの続きです
@@ -108,11 +96,11 @@ mongoBackend ロジックに関連する図 (MB and MD prefixes):
 
 * [NF-01: スレッド・プールを使用しないエンティティ属性の更新/作成に関する HTTP 通知](sourceCode.md#flow-nf-01)
   * MD-01 からの続きです
-* [NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT 通知](sourceCode.md#flow-nf-01b)
+* [NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT/KAFKA 通知](sourceCode.md#flow-nf-01b)
   * MD-01 からの続きです
 * [NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する HTTP 通知](sourceCode.md#flow-nf-03)
   * MD-01 からの続きです
-* [NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT 通知](sourceCode.md#flow-nf-03b)
+* [NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT/KAFKA 通知](sourceCode.md#flow-nf-03b)
   * MD-01 からの続きです
 
 サブスクリプション・キャッシュに関連する図 (SC prefix):

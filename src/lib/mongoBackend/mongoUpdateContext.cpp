@@ -34,9 +34,8 @@
 #include "common/limits.h"
 #include "common/errorMessages.h"
 #include "alarmMgr/alarmMgr.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
-#include "ngsi/NotifyCondition.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "ngsi/UpdateContextResponse.h"
 #include "rest/HttpStatusCode.h"
 
 #include "ngsiNotify/QueueNotifier.h"
@@ -115,14 +114,13 @@ HttpStatusCode mongoUpdateContext
   const std::string&                    ngsiV2AttrsFormat,
   const bool&                           forcedUpdate,
   const bool&                           overrideMetadata,
-  ApiVersion                            apiVersion,
   Ngsiv2Flavour                         ngsiv2Flavour,
   bool                                  flowControl
 )
 {
   bool reqSemTaken;
 
-  reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
+  reqSemTake(__FUNCTION__, "update request", SemWriteOp, &reqSemTaken);
 
   // Initial size of notification queue (could be used by flow control algorithm)
   unsigned int q0 = 0;
@@ -144,8 +142,8 @@ HttpStatusCode mongoUpdateContext
 
     std::string details = std::string("service path length ") + lenV + " is greater than the one in update";
     alarmMgr.badInput(clientIp, details);
-    responseP->errorCode.fill(SccBadRequest, "service path length greater than the one in update");
-    responseP->oe.fill(SccBadRequest, "service path length greater than the one in update", ERROR_BAD_REQUEST);
+    responseP->error.fill(SccBadRequest, "service path length greater than the one in update");
+    responseP->error.fill(SccBadRequest, "service path length greater than the one in update", ERROR_BAD_REQUEST);
   }
   else
   {
@@ -166,7 +164,6 @@ HttpStatusCode mongoUpdateContext
                                          forcedUpdate,
                                          overrideMetadata,
                                          notifSent,
-                                         apiVersion,
                                          ngsiv2Flavour,
                                          &entityUpdateCoverage);
       switch(updateCoverage)
@@ -221,22 +218,25 @@ HttpStatusCode mongoUpdateContext
     // Other cases follow the usual response processing flow (whatever it is :)
     if (updateCoverage == UC_PARTIAL)
     {
-      responseP->oe.code  = SccInvalidModification;
-      responseP->oe.error = ERROR_PARTIAL_UPDATE;
+      responseP->error.code  = SccInvalidModification;
+      responseP->error.error = ERROR_PARTIAL_UPDATE;
     }
 
     LM_T(LmtNotifier, ("total notifications sent during update: %d", notifSent));
 
     /* Note that although individual processContextElements() invocations return ConnectionError, this
-       error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
+       error gets "encapsulated" in the OrionError of the corresponding ContextElementResponse and we
        consider the overall mongoUpdateContext() as OK.
     */
-    responseP->errorCode.fill(SccOk);
+    if (responseP->error.code == SccNone)
+    {
+      responseP->error.fill(SccOk);
+    }
   }
 
-  reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+  reqSemGive(__FUNCTION__, "update request", reqSemTaken);
 
-  if (flowControl && fcEnabled && (responseP->errorCode.code == SccOk))
+  if (flowControl && fcEnabled && (responseP->error.code == SccOk))
   {
     LM_T(LmtNotifier, ("start notification flow control algorithm"));
     flowControlAwait(q0, notifSent, tenant);

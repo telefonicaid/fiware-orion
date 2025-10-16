@@ -38,17 +38,9 @@ extern bool forbiddenChars(const char* s, const char* exceptions = NULL);
 
 /* ****************************************************************************
 *
-* forbiddenIdChars -
-*/
-extern bool forbiddenIdChars(int api, const char* s, const char* exceptions = NULL);
-
-
-
-/* ****************************************************************************
-*
 * forbiddenIdCharsV2 -
 */
-extern bool forbiddenIdCharsV2(const char* s, const char* exceptions = NULL);
+extern bool forbiddenIdChars(const char* s, const char* exceptions = NULL);
 
 
 
@@ -65,5 +57,12 @@ extern bool forbiddenQuotes(char* s);
 * forbiddenMqttTopic -
 */
 extern bool forbiddenMqttTopic(const char* s);
+
+
+/* ****************************************************************************
+*
+* forbiddenKafkaTopic -
+*/
+extern bool forbiddenKafkaTopic(const char* s);
 
 #endif  // SRC_LIB_PARSE_FORBIDDENCHARS_H_

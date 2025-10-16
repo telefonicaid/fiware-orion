@@ -10,6 +10,5 @@ services:
     command: -dbURI mongodb://mongo
 
   mongo:
-    image: mongo:6.0
-    command: --nojournal
+    image: mongo:8.0
 

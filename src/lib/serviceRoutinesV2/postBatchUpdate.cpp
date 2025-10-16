@@ -34,10 +34,9 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "rest/OrionError.h"
-#include "apiTypesV2/Entities.h"
 #include "serviceRoutinesV2/postBatchUpdate.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "serviceRoutines/postUpdateContext.h"
+#include "ngsi/UpdateContextRequest.h"
+#include "serviceRoutinesV2/postUpdateContext.h"
 
 #include "alarmMgr/alarmMgr.h"
 
@@ -67,7 +66,7 @@ std::string postBatchUpdate
 {
   BatchUpdate*           buP    = &parseDataP->bu.res;
   UpdateContextRequest*  upcrP  = &parseDataP->upcr.res;
-  Entities               entities;
+  EntityVector           entities;
 
   upcrP->fill(&buP->entities, buP->updateActionType);
   buP->release();  // upcrP just 'took over' the data from buP, buP is no longer needed
@@ -78,7 +77,7 @@ std::string postBatchUpdate
     OrionError oe(SccBadRequest, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
     alarmMgr.badInput(clientIp, ERROR_DESC_BAD_REQUEST_EMPTY_ENTITIES_VECTOR);
 
-    TIMED_RENDER(answer = oe.smartRender(V2));
+    TIMED_RENDER(answer = oe.toJson());
     ciP->httpStatusCode = SccBadRequest;
 
     return answer;
@@ -87,10 +86,10 @@ std::string postBatchUpdate
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // Check potential error
-  if (parseDataP->upcrs.res.oe.code != SccNone )
+  if ((parseDataP->upcrs.res.error.code != SccNone ) && (parseDataP->upcrs.res.error.code != SccOk))
   {
-    TIMED_RENDER(answer = parseDataP->upcrs.res.oe.toJson());
-    ciP->httpStatusCode = parseDataP->upcrs.res.oe.code;
+    TIMED_RENDER(answer = parseDataP->upcrs.res.error.toJson());
+    ciP->httpStatusCode = parseDataP->upcrs.res.error.code;
   }
   else
   {

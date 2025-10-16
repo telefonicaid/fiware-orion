@@ -1,3 +1,36 @@
+4.3.0 (October 8th, 2025)
+
+- Add: support for Kafka based notifications (#4666)
+- Add: new CLI parameters kafkaTimeout and kafkaMaxAge (and associated env vars ORION_KAFKA_TIMEOUT and ORION_KAFKA_MAX_AGE) (#4666)
+- Fix: JEXL expressions evalPriority not working correctly is some cases (#4689)
+- Fix: id and type wrong calculation in custom notification ngsi payload when they depend on calculated expressions
+- Fix: registrations with more than one contextRegistration element (not possible in NGSIv2) are logged as Runtime Errors
+- Fix: POST /v2/op/notify proper response (formerly it was using NSGIv1 format payload) (#4681)
+- Fix: some error messages in corner case situations (405, 406, 415 and some cases of 400) were not strictly following NGSIv2 error response syntax
+- Fix: admin log operations error responses were not following NGSIv2 error response syntax
+- Fix: memory leak in POST /v2/op/notify operation (#4261)
+- Fix: memory leaks in parse logic in case of parse error (possibly)
+- Fix: csubs and registrations now use isPattern as bool instead of string (legacy from NGSIv1 model), although strings are still supported (#4681)
+- Fix: use warning instead of Runtime Error when adding an object or array in basic expressions mode
+- Hardening: remove a huge amount of NGSIv1 related dead-code (#4681)
+
+4.2.0 (May 9th, 2025)
+
+- Fix: rendering of large float numbers (according IEEE754 standard) (#4642)
+- Fix: notification was not triggered in subs using entityUpdate alterationType when some attribute not included in condition.attrs has an actual value change (#4647)
+- Fix: previousValue metadata was not taken into account in attributes not in the update that triggers the notification (#4643)
+- Fix: detects duplication in orderBy tokens responding with 400 Bad Request in that case (#4664)
+- Fix: improve attribute and metadata invalid format dates for DateTime types in logs (#4616)
+- Fix: attrsFormat keyValues and values were not working in custom notifications using ngsi payloads (#4644)
+- Fix: JEXL expressions were not working in attrsFormat simplifiedKeyValues, keyValues or values (#4645)
+- Fix: env vars values with unsigned int or long types where not correctly printed at startup time in INFO log level (#4668)
+- Hardening: upgrade microhttpd dependency from 0.9.76 to 1.0.1
+- Hardening: upgrade libmosquitto dependency from 2.0.15 to 2.0.20
+- Hardening: upgrade libmongoc dependency from 1.24.3 to 1.29.0
+- Upgrade cjexl version from 0.4.0 to 0.6.0 (new transformations: nMapper, arrMax, arrMin, arrMed, arrSort and arrReverse )
+- Upgrade Debian version from 12.6 to 12.10 in Dockerfile
+- Reference MongoDB version changed from 6.0 to 8.0
+
 4.1.0 (September 12th, 2024)
 
 - Add: custom notification ngsi patching evaluation priority based in evalPriority builtin metadata (#4556)

@@ -211,14 +211,15 @@ Fields:
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of
-        entities (mandatory). The JSON for each entity contains **id**,
-        **type**, **isPattern** and **isTypePattern**. Note that, due to legacy
-        reasons, **isPattern** may be `"true"` or `"false"` (text) while
-        **isTypePattern** may be `true` or `false` (boolean).
+        entities (mandatory). The JSON for each entity contains **id** (string),
+        **type** (string), **isPattern** (bool) and **isTypePattern** (bool) (*).
     -   **attrs**: an array containing a list of attributes (optional).
         The JSON for each attribute contains **name** and **type**.
     -   **providingApplication**: the URL of the providing application
         for this registration (mandatory)
+
+(*) Versions previous to Orion 4.3.0 use `isPattern` as strings (`"true"` or `"false"`). Orion suppports
+reading this as strings (legacy) or as bool (current) but always stores them as bool (`true` or `false`).
 
 Example document:
 
@@ -234,12 +235,12 @@ Example document:
                {
                    "id": "E1",
                    "type": "T1",
-                   "isPattern": "false"
+                   "isPattern": false
                },
                {
                    "id": "E2",
                    "type": "T2",
-                   "isPattern": "false"
+                   "isPattern": false
                }
            ],
            "attrs": [
@@ -282,14 +283,13 @@ Fields:
 -   **lastNotification**: the time (as integer number, meaning seconds) when last notification was sent. This
     is updated each time a notification is sent, to avoid violating throttling.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
--   **reference**: the URL for notifications, either HTTP or MQTT
+-   **reference**: the URL for notifications, either HTTP, MQTT or KAFKA
 -   **topic**: MQTT topic (only in MQTT notifications)
+-   **kafkaTopic**: KAFKA topic (only in KAFKA notifications)
 -   **qos**: MQTT QoS value (only in MQTT notifications)
 -   **retain**: MQTT retain value (only in MQTT notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each
-    entity contains **id**, **type**, **isPattern** and **isTypePattern**. Note that,
-    due to legacy reasons, **isPattern** may be `"true"` or `"false"` (text) while
-    **isTypePattern** may be `true` or `false` (boolean).
+    entity contains **id** (string), **type** (string), **isPattern** (bool)  **isTypePattern** (bool) (*).
 -   **attrs**: an array of attribute names (strings) (optional).
 -   **blacklist**: a boolean field that specifies if `attrs` has to be interpreted
     as a whitelist (if `blacklist` is equal to `false` or doesn't exist) or a
@@ -345,6 +345,9 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     More information in [covered subscription section in Orion API specification](../orion-api.md#covered-subscriptions).
 -   **notifyOnMetadataChange**: if `true` metadata is considered part of the value of the attribute regarding subscription triggering. If `false` metadata is not considered part of the value of the attribute regarding subscription triggering. Default behaviour (if omitted) is the one for `true`.
 
+(*) Versions previous to Orion 4.3.0 use `isPattern` as strings (`"true"` or `"false"`). Orion suppports
+reading this as strings (legacy) or as bool (current) but always stores them as bool (`true` or `false`).
+
 Example document:
 
 ```
@@ -357,7 +360,7 @@ Example document:
                 {
                         "id" : ".*",
                         "type" : "Room",
-                        "isPattern" : "true",
+                        "isPattern" : true,
                         "isTypePattern": false
                 }
         ],

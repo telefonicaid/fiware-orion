@@ -18,20 +18,15 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
     MongoGlobal.cpp
     MongoCommonUpdate.cpp
-    MongoCommonRegister.cpp
     MongoCommonSubscription.cpp
-    mongoRegisterContext.cpp
-    mongoDiscoverContextAvailability.cpp   
     mongoUpdateContext.cpp
     mongoQueryContext.cpp
-    mongoSubscribeContext.cpp
     mongoUnsubscribeContext.cpp
-    mongoUpdateContextSubscription.cpp
     mongoNotifyContext.cpp
     mongoQueryTypes.cpp
     mongoCreateSubscription.cpp
@@ -52,15 +47,10 @@ SET (HEADERS
     dbConstants.h
     MongoGlobal.h
     MongoCommonUpdate.h
-    MongoCommonRegister.h
     MongoCommonSubscription.h
-    mongoRegisterContext.h
-    mongoDiscoverContextAvailability.h
     mongoUpdateContext.h
     mongoQueryContext.h
-    mongoSubscribeContext.h
     mongoUnsubscribeContext.h
-    mongoUpdateContextSubscription.h
     mongoNotifyContext.h
     mongoQueryTypes.h
     mongoCreateSubscription.h

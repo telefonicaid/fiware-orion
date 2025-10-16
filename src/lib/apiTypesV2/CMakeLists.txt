@@ -18,35 +18,35 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET (SOURCES
     Entity.cpp
     EntityVector.cpp
-    Entities.cpp
-    Attribute.cpp
     Subscription.cpp
     Registration.cpp
-    EntID.cpp
     BatchQuery.cpp
     BatchUpdate.cpp
     HttpInfo.cpp
     MqttInfo.cpp
+    GeoFilter.cpp
+    Expression.cpp
+    KafkaInfo.cpp
 )
 
 SET (HEADERS
     Entity.h
     EntityVector.h
-    Entities.h    
-    Attribute.h
     Subscription.h
     Registration.h
-    EntID.h
     BatchQuery.h
     BatchUpdate.h
     CustomPayloadType.h
     HttpInfo.h
     MqttInfo.h
+    GeoFilter.h
+    Expression.h
+    KafkaInfo.h
 )
 
 

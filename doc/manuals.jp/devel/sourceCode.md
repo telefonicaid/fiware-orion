@@ -7,19 +7,15 @@
 * [src/lib/orionTypes/](#srcliboriontypes) (共通タイプ)
 * [src/lib/rest/](#srclibrest) (REST インタフェース、外部ライブラリ microhttpd を使用)
 * [src/lib/ngsi/](#srclibngsi) (一般的な NGSI タイプ)
-* [src/lib/ngsi10/](#srclibngsi10) (一般的な NGSI10 タイプ, NGSI10 = コンテキスト管理)
-* [src/lib/ngsi9/](#srclibngsi9) (C一般的な NGSI9 タイプ, NGSI9 = コンテキスト・アベイラビリティ管理)
 * [src/lib/apiTypesV2/](#srclibapitypesv2) (NGSIv2 タイプ)
 * [src/lib/parse/](#srclibparse) (ペイロード・パーシングのための共通の関数とタイプ)
-* [src/lib/jsonParse/](#srclibjsonparse) (外部ライブラリ Boost property_tree を使用した NGSIv1 リクエストの JSON ペイロードのパーシング)
 * [src/lib/jsonParseV2/](#srclibjsonparsev2) (外部ライブラリ rapidjson を使用して NGSIv2 リクエストの JSON ペイロードのパーシング)
-* [src/lib/serviceRoutines/](#srclibserviceroutines) (NGSIv1 のサービス・ルーチン)
 * [src/lib/serviceRoutinesV2/](#srclibserviceroutinesv2) (NGSIv2 のサービス・ルーチン)
-* [src/lib/convenience/](#srclibconvenience) (NGSIv1 のコンビニエンス・オペレーション)
 * [src/lib/mongoBackend/](#srclibmongobackend) (データベース操作の実装)
 * [src/lib/mongoDriver/](#srclibmongodriver) (MongoDB へのデータベース・インターフェース)
 * [src/lib/ngsiNotify/](#srclibngsinotify) (NGSI 通知)
 * [src/lib/mqtt/](#srclibmqtt) (MQTT 通知)
+* [src/lib/kafka/](#srclibkafka) (KAFKA 通知)
 * [src/lib/alarmMgr/](#srclibalarmmgr) (アラーム管理の実装)
 * [src/lib/cache/](#srclibcache) (サブスクリプション・キャッシュの実装)
 * [src/lib/logSummary/](#srcliblogsummary) (ログ・サマリの実装)
@@ -100,6 +96,8 @@ CLI パラメータのパーシングは、**parseArgs** ライブラリによ�
 * OrionValueType は、属性/メタデータ値の "JSON タイプ" を追跡するために使用されるタイプです
 * areas は、Point, Line, Box, Circle, Polygon などの幾何学的図形を含みます
 
+**ngsi**、**orionTypes**、および **apiTypesV2** を単一の型セットにマージする [保留中のタスク](architecture.md#still-pending) があります。
+
 [トップ](#top)
 
 <a name="srclibrest"></a>
@@ -156,7 +154,7 @@ _RQ-02: リクエストの処理_
 
 * `orion::requestServe()` は `restService()` を呼び出します (ステップ1)。
 * また、ペイロードが存在する場合は、`restService()` は、`payloadParse()` を呼び出してペイロードのパーシングします (ステップ2)。詳細は、図 [PP-01](#flow-pp-01) に記載されています
-* リクエストのサービス機能が引き継ぎます (ステップ3)。サービス機能は、リクエストに使用された **URL パス** と **HTTP メソッド** に基づいて選択されます。すべてのサービス関数 (lib/serviceFunctions と lib/serviceFunctionV2 にあります) を確認するには、 [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker) の `RestService` ベクタを参照してください
+* リクエストのサービス機能が引き継ぎます (ステップ3)。サービス機能は、リクエストに使用された **URL パス** と **HTTP メソッド** に基づいて選択されます。すべてのサービス関数 (lib/serviceRoutinesV2 にあります) を確認するには、 [`src/app/contextBroker/orionRestServices.cpp`](#srcappcontextbroker) の `RestService` ベクタを参照してください
 * サービス機能は、より低いレベルのサービス機能を呼び出すことができます。詳細は、[サービス・ルーチン・マッピングドのキュメント](ServiceRoutines.txt)を参照してください (ステップ4)
 * 最後に、[**mongoBackend** ライブラリ](#srclibmongobackend) の関数が呼び出されます (ステップ5)。 MB 図には、さまざまなケースの詳細な説明があります
 * レスポンス文字列がサービス・ルーチンによって作成され、`restService()` に返されます (ステップ6)
@@ -166,9 +164,8 @@ _RQ-02: リクエストの処理_
 
 ### `payloadParse()`
 
-Orion へのペイロードは3種類あります : 
+Orion へのペイロードは2種類あります : 
 
-* V1 JSON,
 * V2 JSON,
 * Plain Text
 
@@ -183,7 +180,23 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 <a name="srclibngsi"></a>
 ## src/lib/ngsi/
 
-**ngsi** ライブラリは ngsi9 と ngsi10 プロトコルの共通部分を構成するさまざまなペイロードのためのクラスのコレクションが含まれています。ここでは、次のような基本的なクラスが見つかります :
+**ngsi** ライブラリには、NGSI API の旧バージョン (NGSIv1) から派生したさまざまなペイロード用のクラスのコレクションが含まれています。
+
+**ngsi**、**orionTypes**、および **apiTypesV2** を単一の型セットに統合する [保留中のタスク](architecture.md#still-pending) があります。
+
+リクエスト (およびレスポンス) の最上位階層クラスが含まれています:
+
+* `UpdateContextRequest`
+* `UpdateContextResponse`
+* `QueryContextRequest`
+* `QueryContextResponse`
+* `SubscribeContextRequest`
+* `SubscribeContextResponse`
+* `UnsubscribeContextRequest`
+* `UnsubscribeContextResponse`
+* `NotifyContextRequest` (Orion からサブスクライバに通知するために送信される送信リクエスト)
+
+基本クラス:
 
 * `EntityId`
 * `EntityIdVector`
@@ -191,20 +204,20 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 * `ContextAttributeVector`
 * `Metadata`
 * `MetadataVector`
+* etc.
 
 ### メソッドと階層
 
-これらのクラスだけでなく、ライブラリ内の`ngsi9`, `ngsi10`, `convenience` クラスのすべてのメソッドの標準セットを持っています : 
+これらのクラスにはすべて、標準的なメソッド・セットがあります:
 
-* `toJson()`, JSON 文字列 (NGSIv2 用) にレンダリングします。このメソッドは、レンダリング・プロセスを単純化するために、`JsonObjectHelper` と `JsonVectorHelper` を優先します。この方法では、`add*()` メソッドを使ってプリントする必要がある要素を追加するだけで、開始/終了の大括弧、引用符、コンマの制御を気にする必要はありません
-* `toJsonV1()`, JSON 文字列 (NGSIv1 用) にレンダリングします
+* `toJson()`, JSON 文字列にレンダリングします。このメソッドは、レンダリング・プロセスを単純化するために、`JsonObjectHelper` と `JsonVectorHelper` を優先します。この方法では、`add*()` メソッドを使ってプリントする必要がある要素を追加するだけで、開始/終了の大括弧、引用符、コンマの制御を気にする必要はありません
 * `present()`, デバッグ用。オブジェクトはログ・ファイルにテキストとしてダンプされます
 * `release()`, オブジェクトのすべての割り当てられたリソースを解放します
 * `check()`, オブジェクトがルールに従うこと、すなわち禁止されていない文字や必須フィールドがないことなどを確認します
 
-クラスは階層に従います。たとえば、`UpdateContextRequest` (ngsi10 ライブラリにある最上位の階層クラス) には `EntityVector` が含まれます。もちろん、`EntityVector` は `Entity` のベクトルです。
+クラスは階層に従います。たとえば、`UpdateContextRequest` (ngsi ライブラリにある最上位の階層クラス) には `EntityVector` が含まれます。もちろん、`EntityVector` は `Entity` のベクトルです。
 
-`EntityVector` クラスと `Entity` クラスはこのライブラリに属していませんが、[`src/lib/apiTypesV2`](#srclibapitypesv2) に属することに注意してください。一般的に、NGSIv1 は非難されているので、可能な限り NGSIv2 クラスを使用して、`src/lib/ngsi` 内の等価クラスの数を減らそうとします。
+`EntityVector` クラスと `Entity` クラスはこのライブラリに属していませんが、[`src/lib/apiTypesV2`](#srclibapitypesv2) に属することに注意してください。
 
 `toJson()`, `check()`, `release()` などのメソッドはツリー構造で呼び出されます。たとえば、`UpdateContextRequest` :
 
@@ -220,46 +233,14 @@ JSON パース実装は専用ライブラリにありますが、テキスト・
 
 [トップ](#top)
 
-<a name="srclibngsi10"></a>
-## src/lib/ngsi10/
-**ngsi10** ライブラリは NGSI10 (NGSIv1) リクエスト、およびレスポンスのトップ階層のクラスが含まれています : 
-
-* `UpdateContextRequest`
-* `UpdateContextResponse`
-* `QueryContextRequest`
-* `QueryContextResponse`
-* `SubscribeContextRequest`
-* `SubscribeContextResponse`
-* `UpdateContextSubscriptionRequest`
-* `UpdateContextSubscriptionResponse`
-* `UnsubscribeContextRequest`
-* `UnsubscribeContextResponse`
-* `NotifyContextRequest` (Orion から送信された、発信者からの通知リクエスト)
-* `NotifyContextResponse` (サブスクライバーからの着信レスポンス)
-
-[**ngsi** ライブラリ](#methods-and-hierarchy)のメソッドと階層の説明を参照してください。
-
-[トップ](#top)
-
-<a name="srclibngsi9"></a>
-## src/lib/ngsi9/
-ただ、ngsi10 ライブラリと同様、**ngsi9** ライブラリが NGSI9(NGSIv1) リクエストのトップクラスのクラスが含まれています :
-
-* `RegisterContextRequest`
-* `RegisterContextResponse`
-* `DiscoverContextAvailabilityRequest`
-* `DiscoverContextAvailabilityResponse`
-
-[**ngsi** ライブラリ](#methods-and-hierarchy)のメソッドと階層の説明を参照してください。
-
-[トップ](#top)
-
 <a name="srclibapitypesv2"></a>
 ## src/lib/apiTypesV2/
 
-**apiTypesV2** ライブラリは、**ngsi** ライブラリと同様に、クラスを含んでいます。 改善された NGSI プロトコルの NGSIv2 のための、**ngsi** ライブラリのような基本クラスと、**ngsi9** と **ngsi10** ライブラリのようなトップ階層クラスの両方のクラスをサポートしています。
+**apiTypesV2** ライブラリには、ngsi ライブラリと同様に、基本クラスと最上位階層クラスの両方のクラスが含まれています。
 
 これらのクラスには、階層的メソッド `release()`, `toJson()`, `check()` などもあります。
+
+**ngsi**、**orionTypes**、および **apiTypesV2** を単一の型セットにマージする [保留中のタスク](architecture.md#still-pending) があります。
 
 [トップ](#top)
 
@@ -279,16 +260,6 @@ _PP-02: テキストペイロードのパーシング_
 
 [トップ](#top)
 
-<a name="srclibjsonparse"></a>
-## src/lib/jsonParse/
-このライブラリは、NGSIv1 リクエストに対するペイロードの JSON パーシングを処理します。これは、[Boostライブラリの property_tree](https://theboostcpplibraries.com/boost.propertytree)に依存し、SAX を使用して着信 JSON テキストを ngsi クラスに変換します
-
-このライブラリには、`JsonRequest` タイプのベクトルが含まれています。このベクトルは、さまざまなリクエストをパースする方法を定義しています。`jsonTreat()` はパーシング・メソッドを選択し、`jsonParse()`はパーシングのために Boost property_tree ライブラリの助けを借りて処理します。
-
-[専用ドキュメント](jsonParse.md)の V1 JSON パース実装の詳細な説明を参照してください。
-
-[トップ](#top)
-
 <a name="srclibjsonparsev2"></a>
 ## src/lib/jsonParseV2/
 これは DOM を使用して、新しい NGSIv2 リクエスト・ペイロードがパースされる場所です。JSON ペイロードをパースするために [rapidjson](http://rapidjson.org/) ライブラリが使用されていますが、rapidjson の呼び出しは別として **jsonParseV2** の目的は、JSON ペイロードを表すオブジェクトのツリーを構築することです。
@@ -299,9 +270,9 @@ _PP-02: テキストペイロードのパーシング_
 
 [トップ](#top)
 
-<a name="srclibserviceroutines"></a>
-## src/lib/serviceRoutines/
-**serviceRoutines** ライブラリは着信リクエストを処理し、最終処理のために [**mongoBackend** ライブラリ](#srclibmongobackend) に送信する場所です。
+<a name="srclibserviceroutinesv2"></a>
+## src/lib/serviceRoutinesV2/
+**serviceRoutinesV2** ライブラリは着信リクエストを処理し、最終処理のために [**mongoBackend** ライブラリ](#srclibmongobackend) に送信する場所です。
 
 他の多くのサービス・ルーチンがそれらを呼び出すため、2つのサービス・ルーチンが特に重要です。詳細は[サービス・ルーチン・マッピングのドキュメント](ServiceRoutines.txt) を参照してください :
 
@@ -345,22 +316,7 @@ typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vecto
 
 したがって、残りのライブラリが入ってくるリクエストのサービス・ルーチンを見つけるためには、渡された `RestService` のベクトルを `restInit()` の最初の7つのパラメータとして渡します。これらのパラメータは動詞/メソッドに一致する項目まで検索され、URL パス と `RestService` 項目が見つかったときに、それは ` RestService` 項目の一部であるため、サービス・ルーチンも見つかります。
 
-[トップ](#top)
-
-<a name="srclibserviceroutinesv2"></a>
-## src/lib/serviceRoutinesV2/
-
-上記の **serviceRoutines** ライブラリと同様に、**serviceRoutinesV2** ライブラリには、NGSIv2 リクエストのサービス・ルーチンが含まれています。
-
-いくつかの NGSIv2 サービス・ルーチンは、 [**mongoBackend**](#srclibmongobackend) を直接呼び出すものがあります。他のものは、より低いレベルのサービス・ルーチンに頼っています。詳細については、[サービス・ルーチン・マッピングのドキュメントt](ServiceRoutines.txt)を参照してください。
-
-[トップ](#top)
-
-<a name="srclibconvenience"></a>
-## src/lib/convenience/
-**convenience** ライブラリは NGSIv1 コンビニエンス・オペレーションのトップ階層のクラスが含まれています。これらのリクエストの完全なリスト、およびそれが基づいているサービス・ルーチンについては、[サービス・ルーチン・マッピングのドキュメント](ServiceRoutines.txt)を参照してください。
-
-このライブラリは、[**ngsi9**](#srclibngsi9) および [**ngsi10**](#srclibngsi10) ライブラリに似ています。
+一部のサービスルーチンは他のサービスルーチンを呼び出すことに注意してください。詳細は[サービス・ルーチン・マッピング・ドキュメント](ServiceRoutines.txt)をご覧ください。
 
 [トップ](#top)
 
@@ -439,6 +395,8 @@ typedef struct MongoConnection
   [**rest**ライブラリ](#srclibrest) の関数 `httpRequestSend()` が使用されます
 * MQTT 通知には、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) が使用されます。
   実際には、[**mqtt** ライブラリ](#srclibmqtt) の関数が使用されます: `sendMqttNotification()`
+* KAFKA 通知には、[rdkafka](https://github.com/confluentinc/librdkafka) が使用されます。
+  実際には、[**kafka** library](#srclibmqtt) の関数が使用されます: `sendKafkaNotification()`
 
 このライブラリのもう1つの重要な側面は、必要に応じてスレッド・プールを使用して、通知が個別のスレッドによって送信されることです。
 
@@ -446,7 +404,7 @@ Orionは、[CLI パラメータ](../admin/cli.md) `-notificationMode` を使用�
 
 このモジュールは、属性の更新/作成により、常に `processNotification()` から呼び出されます (図 [MD-01](mongoBackend.md#flow-md-01) を参照)。
 
-次の4つの図は、HTTP 通知とMQTT 通知の両方の場合に、スレッド・プールがある場合とない場合の
+次の4つの図は、HTTP 通知とMQTT/KAFKA 通知の両方の場合に、スレッド・プールがある場合とない場合の
 コンテキスト・エンティティ通知のプログラム・フローを示しています。
 
 <a name="flow-nf-01"></a>
@@ -460,12 +418,12 @@ _NF-01: スレッド・プールなしのエンティティ属性更新/作成�
 * `startSenderThread()` は、`SenderThreadParams` オブジェクトに対応する通知を送信する `doNotify()` 関数を呼び出します (ステップ4,5および6)。通知の受信者からのレスポンスが待機されます (タイムアウトあり)。
 
 <a name="flow-nf-01b"></a>
-![MQTT Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
+![MQTT/KAFKA Notification on entity-attribute Update/Creation without thread pool](images/Flow-NF-01b.png)
 
-_NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT 通知_
+_NF-01b: スレッド・プールなしのエンティティ属性の更新/作成に関する MQTT/KAFKA 通知_
 
-* 手順1から4は、前の図と同じです。違いはステップ5と6にあり、MQTT ライブラリを使用して対応する MQTT broker に通知を公開します。MQTT broker への接続が
-  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
+* 手順1から4は、前の図と同じです。違いはステップ5と6にあり、MQTT または KAFKA ライブラリを使用して対応する MQTT または KAFKA broker に通知を公開します。MQTT broker への接続が
+  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` または `-kafkaMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
   接続は定期的にクリーンアップされます)
 
 <a name="flow-nf-03"></a>
@@ -489,12 +447,12 @@ _NF-03: スレッド・プールによるエンティティ属性の更新/作�
 * その後、ワーカー・スレッドはスリープして、キュー内の新しい項目を処理する必要があるときに起きるのを待っています
 
 <a name="flow-nf-03b"></a>
-![MQTT Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
+![MQTT/KAFKA Notification on entity-attribute Update/Creation with thread pool](images/Flow-NF-03b.png)
 
-_NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT 通知_
+_NF-03b: スレッド・プールを使用したエンティティ属性の更新/作成に関する MQTT/KAFKA 通知_
 
-* 手順1から5は、前の図と同じです。違いはステップ6と7にあり、MQTT ライブラリを使用して対応する MQTT broker に通知を公開します。MQTT broker への接続が
-  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
+* 手順1から5は、前の図と同じです。違いはステップ6と7にあり、MQTT または KAFKA ライブラリを使用して対応する MQTT または KAFKA broker に通知を公開します。MQTT broker への接続が
+  以前に存在しなかった場合は、通知プロセスの一部として作成されます (`-mqttMaxAge` または `-kafkaMaxAge` CLI で構成されたキープ・アライブ時間が存在するため、アイドル状態の
   接続は定期的にクリーンアップされます)
 
 [Top](#top)
@@ -503,8 +461,16 @@ _NF-03b: スレッド・プールを使用したエンティティ属性の更�
 ## src/lib/mqtt/
 
 このライブラリは、[mosquitto](https://mosquitto.org/api/files/mosquitto-h.html) 外部ライブラリに基づいて MQTT 通知を処理します。 開いている MQTT
-接続の制御を維持し (`-maxMqttAge` キープ・アライブに基づいてアイドル状態の接続をクリーンアップ)、[**ngsiNotify** ライブラリ](#srclibngsinotify)
-で使用される `sendMqttNotification` を提供する `MqttConnectionManager` クラスのシングルトンとして実装された接続マネージャがあります。
+接続の制御を維持し (`-mqttMaxAge` キープ・アライブに基づいてアイドル状態の接続をクリーンアップ)、[**ngsiNotify** ライブラリ](#srclibngsinotify)
+g使用される `sendMqttNotification` を提供する `MqttConnectionManager` クラスのシングルトンとして実装された接続マネージャがあります。
+
+[トップ](#top)
+
+## src/lib/kafka/
+
+このライブラリは、[rdkafka](https://github.com/confluentinc/librdkafka) 外部ライブラリをベースにした KAFKA 通知を処理します。`KafkaConnectionManager`
+クラスのシングルトンとして実装された接続マネージャがあり、開かれた KAFKA 接続を制御し（`-kafkaMaxAge` キープアライブに基づいてアイドル接続を
+クリーンアップします）、また [**ngsiNotify** ライブラリ](#srclibngsinotify) で使用される `sendKafkaNotification` を提供します。
 
 [トップ](#top)
 

@@ -59,22 +59,13 @@ typedef struct ContextAttributeVector
   ContextAttribute*  operator[](unsigned int ix) const;
 
 
-  std::string        check(ApiVersion apiVersion, RequestType requestType);
-
-  std::string        toJsonV1(bool                                   asJsonObject,
-                              RequestType                            requestType,
-                              const std::vector<ContextAttribute*>&  orderedAttrs,
-                              const std::vector<std::string>&        metadataFilter,
-                              bool                                   comma       = false,
-                              bool                                   omitValue   = false,
-                              bool                                   attrsAsName = false);
+  std::string        check(bool asValue);
 
   std::string        toJsonTypes(void);
 
   void               toBson(double                    now,
                             orion::BSONObjBuilder*    attrsToAdd,
-                            orion::BSONArrayBuilder*  attrNamesToAdd,
-                            ApiVersion                apiVersion) const;
+                            orion::BSONArrayBuilder*  attrNamesToAdd) const;
 
   void               applyUpdateOperators(void);
 

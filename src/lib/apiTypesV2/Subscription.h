@@ -28,13 +28,11 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/Duration.h"
-#include "ngsi/Throttling.h"
-#include "apiTypesV2/EntID.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
-#include "apiTypesV2/SubscriptionExpression.h"
-#include "ngsi/Restriction.h"
+#include "apiTypesV2/KafkaInfo.h"
+#include "apiTypesV2/Expression.h"
+#include "ngsi/EntityId.h"
 #include "common/RenderFormat.h"
 
 namespace ngsiv2
@@ -46,7 +44,8 @@ namespace ngsiv2
 typedef enum NotificationType
 {
   HttpNotification,
-  MqttNotification
+  MqttNotification,
+  KafkaNotification
 } NotificationType;
 
 
@@ -87,6 +86,7 @@ struct Notification
   long long                lastNotification;
   HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
   MqttInfo                 mqttInfo;
+  KafkaInfo                kafkaInfo;
   NotificationType         type;
   long long                lastFailure;
   long long                lastSuccess;
@@ -107,6 +107,7 @@ struct Notification
     lastNotification(-1),
     httpInfo(),
     mqttInfo(),
+    kafkaInfo(),
     type(HttpNotification),
     lastFailure(-1),
     lastSuccess(-1),
@@ -124,7 +125,7 @@ struct Notification
 struct Condition
 {
   std::vector<std::string>  attributes;
-  SubscriptionExpression    expression;
+  Expression                expression;
   std::vector<SubAltType>   altTypes;
   bool                      notifyOnMetadataChange;
   std::string               toJson();
@@ -142,9 +143,9 @@ struct Condition
 */
 struct Subject
 {
-  std::vector<EntID> entities;
-  Condition          condition;
-  std::string        toJson();
+  std::vector<EntityId> entities;
+  Condition             condition;
+  std::string           toJson();
 };
 
 
@@ -165,7 +166,6 @@ public:
   Notification  notification;
   long long     throttling;
   RenderFormat  attrsFormat;
-  Restriction   restriction;
   std::string   toJson();
   void          release();
 

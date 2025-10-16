@@ -30,12 +30,12 @@
 #include <vector>
 
 #include "common/RenderFormat.h"
-#include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/StringList.h"
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
-#include "apiTypesV2/SubscriptionExpression.h"
+#include "apiTypesV2/KafkaInfo.h"
+#include "apiTypesV2/Expression.h"
 #include "apiTypesV2/Subscription.h"
 
 
@@ -76,7 +76,7 @@ struct EntityInfo
 
 
   EntityInfo() {}
-  EntityInfo(const std::string& _entityId, const std::string& _entityType, const std::string& _isPattern,
+  EntityInfo(const std::string& _entityId, const std::string& _entityType, bool _isPattern,
              bool _isTypePattern);
   ~EntityInfo() { release(); }
 
@@ -111,13 +111,14 @@ struct CachedSubscription
   double                           statusLastChange;
   int64_t                          count;
   RenderFormat                     renderFormat;
-  SubscriptionExpression           expression;
+  Expression                       expression;
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
   bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
+  ngsiv2::KafkaInfo                kafkaInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
   int64_t                          lastSuccess;  // timestamp of last successful notification
   std::string                      lastFailureReason;
@@ -197,7 +198,8 @@ extern void subCacheItemInsert
   const char*                        servicePath,
   const ngsiv2::HttpInfo&            httpInfo,
   const ngsiv2::MqttInfo&            mqttInfo,
-  const std::vector<ngsiv2::EntID>&  entities,
+  const ngsiv2::KafkaInfo&           kafkaInfo,
+  const std::vector<EntityId>&       entities,
   const std::vector<std::string>&    attributes,
   const std::vector<std::string>&    metadata,
   const std::vector<std::string>&    conditionAttrs,

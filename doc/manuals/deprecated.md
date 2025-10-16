@@ -15,6 +15,8 @@ not maintained or evolved any longer. In particular:
 
 A list of deprecated features and the version in which they were deprecated follows:
 
+* String values for `isPattern` (`"true"` or `"false"`) in subscriptions and registrations database model in Orion 4.3.0.
+  Orion suppports reading this as strings (deprecated) or as bool but always stores them as bool (`true` or `false`).
 * CLI parameters (and associated env vars): `-dbhost`, `-rplSet`, `-dbTimeout`, `-dbuser`,
   `-dbAuthMech`, `-dbAuthDb`, `-dbSSL` and `-dbDisableRetryWrites` in Orion 3.12.0. Use `dbURI` instead,
   checking [this section](#mapping-to-mongouri-from-old-cli-parameters) if you need to know hot to build the MongoDB URI (removed in Orion 4.0.0).
@@ -136,6 +138,7 @@ The following table provides information about the last Orion version supporting
 
 | **Removed feature**                                                        | **Last Orion version supporting feature** | **That version release date**   |
 |----------------------------------------------------------------------------|-------------------------------------------|---------------------------------|
+| String values for `isPattern` in subscriptions and registrations database model | Not yet defined                           | Not yet defined                 |
 | `attributes` field in `POST /v2/entities` operation                        | Not yet defined                           | Not yet defined                 |
 | `APPEND`, `UPDATE`, etc. action types in `POST /v2/op/update`              | Not yet defined                           | Not yet defined                 |
 | `dateCreated` and `dateModified` in `options` URI parameter                | Not yet defined                           | Not yet defined                 |

@@ -30,7 +30,6 @@
 
 #include "common/string.h"
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/JsonHelper.h"
 
 #include "ngsi/ParseData.h"

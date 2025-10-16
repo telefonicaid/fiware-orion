@@ -104,11 +104,17 @@
         - [`replaceRegex`](#replaceregex)
         - [`matchRegex`](#matchregex)
         - [`mapper`](#mapper)
+        - [`nMapper`](#nmapper)
         - [`thMapper`](#thmapper)
         - [`values`](#values)
         - [`keys`](#keys)
         - [`arrSum`](#arrsum)
         - [`arrAvg`](#arravg)
+        - [`arrMax`](#arrmax)
+        - [`arrMin`](#arrmin)
+        - [`arrMed`](#arrmed)
+        - [`arrSort`](#arrsort)
+        - [`arrReverse`](#arrreverse)
         - [`now`](#now)
         - [`toIsoString`](#toisostring)
         - [`getTime`](#gettime)
@@ -149,8 +155,10 @@
             - [`subscription.notification`](#subscriptionnotification)
             - [`subscription.notification.http`](#subscriptionnotificationhttp)
             - [`subscription.notification.mqtt`](#subscriptionnotificationmqtt)
+            - [`subscription.notification.kafka`](#subscriptionnotificationkafka)
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
             - [`subscription.notification.mqttCustom`](#subscriptionnotificationmqttcustom)
+            - [`subscription.notification.kafkaCustom`](#subscriptionnotificationkafkacustom)
         - [Subscription List](#subscription-list)
             - [List Subscriptions `GET /v2/subscriptions`](#list-subscriptions-get-v2subscriptions)
             - [Create Subscription `POST /v2/subscriptions`](#create-subscription-post-v2subscriptions)
@@ -362,7 +370,7 @@ representations of entities.
 [ 'Ford', 'black', 78.3 ]
 ```
 
-* *unique mode*. This mode is just like *values mode*, except that values are not repeated.
+* *unique mode*. This mode is just like *values mode*, except that values are not repeated. Note this mode is not supported in `attrsFormat` in subscriptions (see [Notification Messages section](#notification-messages)).
 
 ## Partial Representations
 
@@ -558,23 +566,23 @@ notifications.
 
 ### Entity service path
 
-Orion supports hierarchical scopes, so entities can be
-assigned to a scope [at creation time](user/walkthrough_apiv2.md#entity-creation).
+Orion supports hierarchical service paths, so entities can be
+assigned to a service path [at creation time](user/walkthrough_apiv2.md#entity-creation).
 Then, [query](user/walkthrough_apiv2.md#query-entity) and [subscription](user/walkthrough_apiv2.md#subscriptions)
-can be also scoped to locate entities in the corresponding scopes.
+can be also scoped to locate entities in the corresponding service path.
 
 For example, consider an Orion-based application using the following
-scopes (shown in the figure):
+service paths (shown in the figure):
 
--   `Madrid`, as first level scope
--   `Gardens` and `Districts`, as second-level scope (children of Madrid)
+-   `Madrid`, as first level
+-   `Gardens` and `Districts`, as second-level (children of Madrid)
 -   `ParqueNorte`, `ParqueOeste` and `ParqueSur` (children of Gardens) and
     `Fuencarral` and `Latina` (children of Districts)
 -   `Parterre1` and `Parterre2` (children of ParqueNorte)
 
 ![](ServicePathExample.png "ServicePathExample.png")
 
-The scope to use is specified using the `Fiware-ServicePath` HTTP header
+The service path to use is specified using the `Fiware-ServicePath` HTTP header
 in update/query request. For example, to create the entity `Tree1` of type
 `Tree` in `Parterre1` the following Fiware-ServicePath will be used:
 
@@ -582,15 +590,15 @@ in update/query request. For example, to create the entity `Tree1` of type
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
 ```
 
-In order to search for `Tree1` in that scope, the same
+In order to search for `Tree1` in that service path, the same
 Fiware-ServicePath will be used.
 
-Scopes are hierarchical and hierarchical search can be done. In order to
+Service paths are hierarchical and hierarchical search can be done. In order to
 do that the `#` special keyword is used. Thus, a query with
 pattern entity id `.*` of type `Tree` in `/Madrid/Gardens/ParqueNorte/#`
 will return all the trees in `ParqueNorte`, `Parterre1` and `Parterre2`.
 
-Finally, you can query for disjoint scopes, using a comma-separated list
+Finally, you can query for disjoint service paths, using a comma-separated list
 in the `Fiware-ServicePath` header. For example, to get all trees in both
 `ParqueNorte` and `ParqueOeste` (but not `ParqueSur`) the following
 `Fiware-ServicePath` would be used in query request:
@@ -602,47 +610,47 @@ in the `Fiware-ServicePath` header. For example, to get all trees in both
 Some additional remarks:
 
 -   Limitations:
-    -   Scope must start with `/` (only "absolute" scopes are allowed)
-    -   10 maximum scope levels in a path
+    -   Service paths must start with `/` (only "absolute" service paths are allowed)
+    -   10 maximum levels in a path
     -   50 maximum characters in each level (1 char is minimum),
         only alphanumeric and underscore allowed
-    -   10 maximum disjoint scope paths in a comma-separated list in
-        query `Fiware-ServicePath` header (no more than 1 scope path in
+    -   10 maximum disjoint service paths in a comma-separated list in
+        query `Fiware-ServicePath` header (no more than 1 service path in
         update `Fiware-ServicePath` header)
     -   Trailing slashes are discarded
 
 -   `Fiware-ServicePath` is an optional header. It is assumed that all the
     entities created without `Fiware-ServicePath` (or that don't include
-    service path information in the database) belongs to a root scope
+    service path information in the database) belongs to a root service path
     `/` implicitly. All the queries without using `Fiware-ServicePath`
     (including subscriptions) are on `/#` implicitly. This behavior
     ensures backward compatibility to pre-0.14.0 versions.
 
 -   It is possible to have an entity with the same ID and type in
-    different Scopes. E.g. we can create entity ID `Tree1` of type
+    different service paths. E.g. we can create entity ID `Tree1` of type
     `Tree` in `/Madrid/Gardens/ParqueNorte/Parterre1` and another entity
     with ID `Tree1` of type `Tree` in `Madrid/Gardens/ParqueOeste` without
     getting any error. However, query can be weird in this
     scenario (e.g. a query in `Fiware-ServicePath /Madrid/Gardens`
     will returns two entities with the same ID and type in the
-    query response, making hard to distinguish to which scope
+    query response, making hard to distinguish to which service path
     belongs each one)
 
--   Entities belongs to one (and only one) scope.
+-   Entities belongs to one (and only one) service path.
 
 -   `Fiware-ServicePath` header is included in notification requests sent by Orion.
 
 -   You can use the [`servicePath` builtin attribute](#builtin-attributes) to get the entity service path.
 
--   The scopes entities can be combined orthogonally with the
+-   The service paths can be combined orthogonally with the
     [multi-tenancy functionality](#multi-tenancy). In that case,
-    each `scope tree` lives in a different service/tenant and they can
+    each "service paths tree" lives in a different service/tenant and they can
     use even the same names with complete database-based isolation. See
     figure below.
 
 ![](ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
 
--   Current version doesn’t allow to change the scope to which an entity
+-   Current version doesn’t allow to change the service path to which an entity
     belongs through the API (a workaround is to modify the
     `_id.servicePath` field in the [entities collection](admin/database_model.md#entities-collection) directly).
 
@@ -714,7 +722,7 @@ The list of builtin attributes is as follows:
   controls entity expiration is described in [Transient entities section](#transient-entities).
 
 * `alterationType` (type: `Text`): specifies the change that triggers the notification. It is related with
-the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions_alttype) section). This attribute
+the subscriptions based in alteration type features (see [Subscription based in alteration type](#subscriptions-based-in-alteration-type) section). This attribute
 
   can be used only in notifications, it does not appear when querying it (`GET /v2/entities?attrs=alterationType`) and can take the following values:
    * `entityCreate` if the update that triggers the notification is a entity creation operation
@@ -2584,6 +2592,7 @@ In order to overcome this problem, the `evalPriority` metadata can be used to de
 * Expressions are evaluated in incresing order of priority
 * In case of ties, Orion does not guarantee a particular evaluation order. Thus, expressions in the same priority level must be considered independent, and expressions using other attributes with the same or lower priority would result in unexpected values.
 * If no `evalPriority` is set, default 100000 is used
+* Note `evalPriority` cannot be associated to `id` or `type`. They are always calculated at the end (as they have 100001 priority order)
 * `evalPriority` only has a meaning in `notification.httpCustom.ngsi` in subscriptions. As metadata in regular entities (e.g. an entity created with `POST /v2/entities`) Orion doesn't implements any semantic for it
 
 Using `evalPriority` the above example could be reformuled this way:
@@ -3075,13 +3084,19 @@ results in
 
 #### mapper
 
-Returns a value among several choices based in one to one mapping. This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
-
-This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, the input is not an string, etc.)
+Returns a value among several choices based in one to one mapping (for strings). This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
 
 Extra arguments:
 * values array
 * choices array
+
+Note that:
+
+* Input has to be a string
+* `values` elements have to be strings
+* `choices` elements can be of any type
+
+This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, etc.)
 
 Example (being context `{"c": "fr", "values": ["es", "fr", "de"], "choices": ["Spain", "France", "Germany"]}`):
 
@@ -3093,6 +3108,35 @@ results in
 
 ```
 "France"
+```
+
+#### nMapper
+
+Returns a value among several choices based in one to one mapping (for numbers). This function is based in an array of *values* and an array of *choices* (which length is exactly the same). Thus, if the input value is equal to the *i*-th item of *values*, then *i*-th item of *choices* is returned.
+
+Extra arguments:
+* values array
+* choices array
+
+Note that:
+
+* Input has to be a number
+* `values` elements have to be numbers
+* `choices` elements can be of any type
+* Numbers are supposed to be integers (in the insane case of using floats, they are rounded to closest integer)
+
+This transformation returns `null` if some problem with the arguments is found (i.e. input is not found among the values, choices length is not exacly the same as values, etc.)
+
+Example (being context `{"c": 20, "values": [10, 20, 30], "choices": ["low", "medium", "high"]}`):
+
+```
+c|mapper(values,choices)
+```
+
+results in
+
+```
+"medium"
 ```
 
 #### thMapper
@@ -3155,9 +3199,15 @@ results in
 
 #### arrSum
 
-Returns the sum of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+Returns the sum of the elements of an array.
 
 Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3173,9 +3223,15 @@ results in
 
 #### arrAvg
 
-Returns the average of the elements of an array (or `null` if the input in an array or the array contains some not numberic item).
+Returns the average of the elements of an array
 
 Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
 
 Example (being context `{"c": [1, 5]}`):
 
@@ -3187,6 +3243,135 @@ results in
 
 ```
 3
+```
+
+#### arrMax
+
+Returns the maximum of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrMax
+```
+
+results in
+
+```
+5
+```
+
+#### arrMin
+
+Returns the minimum of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 5]}`):
+
+```
+c|arrMin
+```
+
+results in
+
+```
+1
+```
+
+#### arrMed
+
+Returns the median value of the elements of an array
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array is empty
+* The array contains some non numeric item
+
+Example (being context `{"c": [1, 3, 3, 6, 7, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+results in
+
+```
+6
+```
+
+Example (being context `{"c": [1, 2, 3, 4, 5, 6, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+results in
+
+```
+4.5
+```
+
+#### arrSort
+
+Returns the sorted version of the array used as input
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+* The array contains some non numeric item
+
+Example (being context `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrSort
+```
+
+results in
+
+```
+[1, 3, 3, 6, 7, 8, 9]
+```
+
+#### arrReverse
+
+Returns the the reserved version of the array used as input
+
+Extra arguments: none
+
+This transformation will return `null` in the following cases:
+
+* The input is not an array
+
+Example (being context `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrReverse
+```
+
+results in
+
+```
+[6, 8, 7, 9, 3, 1, 3]
 ```
 
 #### now
@@ -3429,6 +3614,10 @@ update takes place. The elements in the `alterationTypes` array are interpreted 
 Default `alterationTypes` (i.e. the one for subscription not explicitly specifying it)
 is `["entityCreate", "entityChange"]`.
 
+In the case of using `entityChange` and `entityUpdate` at the same time, `entityUpdate` takes precedence
+(in other words, using `"alterationTypes": [ "entityUpdate", "entityChange" ]` is equivalente to
+use `"alterationTypes": [ "entityUpdate" ]`).
+
 The particular alteration type can be got in notifications using the
 [`alterationType` builtin attribute](#builtin-attributes).
 
@@ -3514,6 +3703,17 @@ in the case of temperature ties.
 Note that the [builtin attributes](#builtin-attributes) `dateCreated` and `dateModified` can be used as
 elements in the `orderBy` comma-separated list (including the `!` syntax) to mean
 entity creation time and entity modification time respectively.
+
+Note that the same ordering token cannot be repeated in `orderBy`. For instance, the following requests are not allowed
+and would result in 400 Bad Request response:
+
+```
+GET /v2/entities?orderBy=age,age
+GET /v2/entities?orderBy=!age,!age
+GET /v2/entities?orderBy=age,!age
+GET /v2/entities?orderBy=age,name,age
+GET /v2/entities?orderBy=age,name,!age
+```
 
 With regards of the ordering of attributes which values belong to several JSON types, Orion
 uses the same criteria as the one used by the underlying implementation (MongoDB). See
@@ -4841,22 +5041,22 @@ is described in [this specific section](#notification-triggering).
 
 A `notification` object contains the following subfields:
 
-| Parameter          | Optional          | Type    | Description                                                                                                                                                                       |
-|--------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `attrs` or `exceptAttrs` |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field. It must be a non-empty list.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
-| [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) or [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
-| `attrsFormat`          | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
-| `metadata`         | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
-| `onlyChangedAttrs` | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is omitted)) |
-| `covered`          | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |
-| `timesSent`        | Only on retrieval | number  | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                              |
-| `lastNotification` | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                      |
-| `lastFailure`      | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications.                   |
-| `lastSuccess`      | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification. |
-| `lastFailureReason`| Only on retrieval | string  | Not editable, only present in GET operations. Describes the cause of the last failure (i.e. the failure occurred at `lastFailure` time). Not included in MQTT subscriptions.|
-| `lastSuccessCode`  | Only on retrieval | number  | Not editable, only present in GET operations. the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last time a successful notification was sent (i.e. the success occurred at `lastSuccess` time). Not included in MQTT subscriptions.|
-| `failsCounter`     | Only on retrieval | number  | Not editable, only present in GET operations. The number of consecutive failing notifications associated to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).|
-| `maxFailsLimit`    | ✓                 | number  | Establishes a maximum allowed number of consecutive fails. If the number of fails overpasses the value of `maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then Orion automatically passes the subscription to `inactive` state. A subscription update operation (`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state `active` again). |
+| Parameter                                                                                                                                                                                                                                                                                      | Optional          | Type    | Description                                                                                                                                                                       |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `attrs` or `exceptAttrs`                                                                                                                                                                                                                                                                       |          | array | Both cannot be used at the same time. <ul><li><code>attrs</code>: List of attributes to be included in notification messages. It also defines the order in which attributes must appear in notifications when <code>attrsFormat</code> <code>value</code> is used (see [Notification Messages](#notification-messages) section). An empty list means that all attributes are to be included in notifications. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.</li><li><code>exceptAttrs</code>: List of attributes to be excluded from the notification message, i.e. a notification message includes all entity attributes except the ones listed in this field. It must be a non-empty list.</li><li>If neither <code>attrs</code> nor <code>exceptAttrs</code> is specified, all attributes are included in notifications.</li></ul>|
+| [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt), [`mqttCustom`](#subscriptionnotificationmqttcustom), [`kafka`](#subscriptionnotificationkafka) or [`kafkaCustom`](#subscriptionnotificationkafkacustom) | ✓                 | object | One of them must be present, but not more than one at the same time. It is used to convey parameters for notifications delivered through the transport protocol. |
+| `attrsFormat`                                                                                                                                                                                                                                                                                  | ✓                 | string | Specifies how the entities are represented in notifications. Accepted values are `normalized` (default), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, or `values`.<br> If `attrsFormat` takes any value different than those, an error is raised. See detail in [Notification Messages](#notification-messages) section. |
+| `metadata`                                                                                                                                                                                                                                                                                     | ✓                 | string  | List of metadata to be included in notification messages. See [Filtering out attributes and metadata](#filtering-out-attributes-and-metadata) section for more detail.            |
+| `onlyChangedAttrs`                                                                                                                                                                                                                                                                             | ✓                 | boolean | If `true` then notifications will include only attributes that changed in the triggering update request, in combination with the `attrs` or `exceptAttrs` field. (default is `false` if the field is omitted)) |
+| `covered`                                                                                                                                                                                                                                                                                      | ✓                 | boolean | If `true` then notifications will include all the attributes defined in `attrs` field, even if they are not present in the entity (in this, case, with `null` value). (default value is false). For further information see [Covered subscriptions](#covered-subscriptions) section |
+| `timesSent`                                                                                                                                                                                                                                                                                    | Only on retrieval | number  | Not editable, only present in GET operations. Number of notifications sent due to this subscription.                                                                              |
+| `lastNotification`                                                                                                                                                                                                                                                                             | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last notification timestamp in ISO8601 format.                                                                                      |
+| `lastFailure`                                                                                                                                                                                                                                                                                  | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Last failure timestamp in ISO8601 format. Not present if subscription has never had a problem with notifications.                   |
+| `lastSuccess`                                                                                                                                                                                                                                                                                  | Only on retrieval | ISO8601 | Not editable, only present in GET operations. Timestamp in ISO8601 format for last successful notification.  Not present if subscription has never had a successful notification. |
+| `lastFailureReason`                                                                                                                                                                                                                                                                            | Only on retrieval | string  | Not editable, only present in GET operations. Describes the cause of the last failure (i.e. the failure occurred at `lastFailure` time). Not included in MQTT subscriptions.|
+| `lastSuccessCode`                                                                                                                                                                                                                                                                              | Only on retrieval | number  | Not editable, only present in GET operations. the HTTP code (200, 400, 404, 500, etc.) returned by receiving endpoint last time a successful notification was sent (i.e. the success occurred at `lastSuccess` time). Not included in MQTT subscriptions.|
+| `failsCounter`                                                                                                                                                                                                                                                                                 | Only on retrieval | number  | Not editable, only present in GET operations. The number of consecutive failing notifications associated to the subscription. `failsCounter` is increased by one each time a notification attempt fails and reset to 0 if a notification attempt successes (`failsCounter` is ommitted in this case).|
+| `maxFailsLimit`                                                                                                                                                                                                                                                                                | ✓                 | number  | Establishes a maximum allowed number of consecutive fails. If the number of fails overpasses the value of `maxFailsLimit` (i.e. at a given moment `failsCounter` is greater than `maxFailsLimit`) then Orion automatically passes the subscription to `inactive` state. A subscription update operation (`PATCH /v2/subscription/subId`) is needed to re-enable the subscription (setting its state `active` again). |
 
 Regarding `onlyChangedAttrs` field, as an example, if `attrs` is `[A, B, C]` for a given subscription, the default behavior 
 (when `onlyChangedAttrs` is `false`) and the triggering update modified only A, then A, B and C are notified (in other 
@@ -4898,6 +5098,17 @@ A `mqtt` object contains the following subfields:
 
 For further information about MQTT notifications, see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
+#### `subscription.notification.kafka`
+
+A `kafka` object contains the following subfields:
+
+| Parameter | Optional | Type   | Description                                                                                                                           |
+|-----------|----------|--------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port) |
+| `topic`   |          | string | Represent the KAFKA topic to use                                                                                                      |
+
+For further information about KAFKA notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
+
 #### `subscription.notification.httpCustom`
 
 A `httpCustom` object contains the following subfields.
@@ -4937,6 +5148,22 @@ A `mqttCustom` object contains the following subfields.
 
 If `mqttCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about MQTT notifications, 
 see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
+
+#### `subscription.notification.kafkaCustom`
+
+A `kafkaCustom` object contains the following subfields.
+
+| Parameter | Optional | Type   | Description                                                                                                                                |
+|-----------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port)        |
+| `topic`   |          | string | Represent the KAFKA topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
+| `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
+| `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
+
+`payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
+
+If `kafkaCustom` is used, then the considerations described in [Custom Notifications](#custom-notifications) section apply. For further information about KAFKA notifications, see the specific [KAFKA notifications](user/kafka_notifications.md) documentation.
 
 ### Subscription List
 

@@ -9,6 +9,7 @@ Orion manages a number of semaphores for protection of delicate data and resourc
 * [Metrics Manager](#metrics-manager-semaphore)
 * [Alarm Manager](#alarm-manager-semaphore)
 * [MQTT Connection Manager](#mqtt-connection-manager-semaphore)
+* [KAFKA Connection Manager](#kafka-connection-manager-semaphore)
 * [Log file](#log-file-semaphore)
 * [Notification queue](#notification-queue-semaphore)
 * [Notification queue statistics](#notification-queue-statistics-semaphore)
@@ -154,8 +155,22 @@ The MQTT Connection Manager is pretty similar to the Metrics Manager, and its se
 
 The semaphore protects the access to the connections hashmap and is accessed by the following methods:
 
-* `sendMqttNotification()`
-* `cleanup()`
+* `MqttConnectionManager::sendMqttNotification()`
+* `MqttConnectionManager::cleanup()`
+
+[Top](#top)
+
+## KAFKA Connection Manager semaphore
+The KAFKA Connection Manager is pretty similar to the Metrics Manager, and its semaphore follows the same pattern. The class `KafkaConnectionManager` has a private field called `sem` and methods:
+
+* `KafkaConnectionManager::semTake()`
+* `KafkaConnectionManager::semGive()`
+
+The semaphore protects the access to the connections hashmap and is accessed by the following methods:
+
+* `KafkaConnectionManager::sendKafkaNotification()`
+* `KafkaConnectionManager::dispatchKafkaCallbacks()`
+* `KafkaConnectionManager::cleanup()`
 
 [Top](#top)
 

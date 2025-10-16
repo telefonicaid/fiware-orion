@@ -89,25 +89,9 @@ bool forbiddenChars(const char* s, const char* exceptions)
 
 /* ****************************************************************************
 *
-* forbiddenIdChars -
-*/
-bool forbiddenIdChars(int api, const char* s, const char* exceptions)
-{
-  if (api == 1 && !checkIdv1)
-  {
-    return forbiddenChars(s, exceptions);  // old behavior
-  }
-
-  return forbiddenIdCharsV2(s, exceptions);
-}
-
-
-
-/* ****************************************************************************
-*
 * forbiddenIdCharsV2 -
 */
-bool forbiddenIdCharsV2(const char* s, const char* exceptions)
+bool forbiddenIdChars(const char* s, const char* exceptions)
 {
   if (s == (void*) 0)
   {
@@ -209,6 +193,33 @@ bool forbiddenMqttTopic(const char* s)
     {
     case '+':
     case '#':
+      return true;
+    }
+
+    ++s;
+  }
+
+  return false;
+}
+
+/* ****************************************************************************
+*
+* forbiddenKafkaTopic -
+*/
+bool forbiddenKafkaTopic(const char* s)
+{
+  if (s == (void*) 0)
+  {
+    return false;
+  }
+
+  while (*s != 0)
+  {
+    switch (*s)
+    {
+    case '+':
+    case '#':
+    case '/':
       return true;
     }
 

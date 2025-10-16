@@ -99,8 +99,11 @@ curl <host>:<port>/admin/sem
     },
     "metrics": {
         "status": "free"
-     },
+    },
     "mqttMgr": {
+        "status": "free"
+    },
+    "kafkaMgr": {
         "status": "free"
     },
     "request": {
@@ -127,6 +130,8 @@ curl <host>:<port>/admin/sem
 * **DBConnection** : mongoDB のコネクション・プールのセットを保護します。
 * **LOGMSG** : 2つのメッセージが同時にログ・ファイルに書き込まれないことを確認します。
 * **metrics** : Metrics Manager リクエストの内部データを保護し、mongodb への2つの同時要求がないことを確認します。
+* **mqttMgr** : MTTQ 接続マネージャーのデータを保護します。
+* **kafkaMgr** : KAFKA 接続マネージャーのデータを保護します。
 * **request** : mongodb への2つの同時リクエストがないことを確認します。
 * **subCache** : Subscription Cache を保護します。
 * **timeStat** : タイミング統計のためにデータを保護する。

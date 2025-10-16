@@ -104,11 +104,17 @@
         - [`replaceRegex`](#replaceregex)
         - [`matchRegex`](#matchregex)
         - [`mapper`](#mapper)
+        - [`nMapper`](#nmapper)
         - [`thMapper`](#thmapper)
         - [`values`](#values)
         - [`keys`](#keys)
         - [`arrSum`](#arrsum)
         - [`arrAvg`](#arravg)
+        - [`arrMax`](#arrmax)
+        - [`arrMin`](#arrmin)
+        - [`arrMed`](#arrmed)
+        - [`arrSort`](#arrsort)
+        - [`arrReverse`](#arrreverse)
         - [`now`](#now)
         - [`toIsoString`](#toisostring)
         - [`getTime`](#gettime)
@@ -150,8 +156,10 @@
             - [`subscription.notification`](#subscriptionnotification)
             - [`subscription.notification.http`](#subscriptionnotificationhttp)
             - [`subscription.notification.mqtt`](#subscriptionnotificationmqtt)
+            - [`subscription.notification.kafka`](#subscriptionnotificationkafka)
             - [`subscription.notification.httpCustom`](#subscriptionnotificationhttpcustom)
             - [`subscription.notification.mqttCustom`](#subscriptionnotificationmqttcustom)
+            - [`subscription.notification.kafkaCustom`](#subscriptionnotificationkafkacustom)
         - [サブスクリプションのリスト](#subscription-list)
             - [サブスクリプションをリスト `GET /v2/subscriptions`](#list-subscriptions-get-v2subscriptions)
             - [サブスクリプションを作成 `POST /v2/subscriptions`](#create-subscription-post-v2subscriptions)
@@ -362,7 +370,7 @@ NGSI では、メタデータにネストされたメタデータが含まれる
 [ 'Ford', 'black', 78.3 ]
 ```
 
--   *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モードと同じです
+-   *unique* モード。このモードは、値が繰り返されない点を除いて、*values* モードと同じです。このモードはサブスクリプションの `attrsFormat` ではサポートされていないことに注意してください ([通知メッセージのセクション](#notification-messages)を参照)
 
 <a name="partial-representations"></a>
 
@@ -548,34 +556,34 @@ Content-Type: application/json
 
 ### エンティティのサービス・パス (Entity service path)
 
-Orion は階層スコープをサポートしているため、エンティティの[作成時に](user/walkthrough_apiv2.md#entity-creation)、
-スコープに割り当てることができます。次に、[クエリ](user/walkthrough_apiv2.md#query-entity)と
-[サブスクリプション](user/walkthrough_apiv2.md#subscriptions)のスコープを設定して、対応するスコープ内のエンティティを
+Orion は階層サービス・パスをサポートしているため、エンティティの[作成時に](user/walkthrough_apiv2.md#entity-creation)、
+サービス・パスに割り当てることができます。次に、[クエリ](user/walkthrough_apiv2.md#query-entity)と
+[サブスクリプション](user/walkthrough_apiv2.md#subscriptions)のスコープを設定して、対応するサービス・パス内のエンティティを
 見つけることもできます。
 
-たとえば、次のスコープを使用する Orion ベースのアプリケーションを考えてみます (図を参照):
+たとえば、次のサービス・パスを使用する Orion ベースのアプリケーションを考えてみます (図を参照):
 
--   第1レベルのスコープとして、`Madrid`
--   第2レベルのスコープ (Madrid の子供たち) としての `Gardens` と `Districts`
+-   第1レベルとして、`Madrid`
+-   第2レベル (Madrid の子供たち) としての `Gardens` と `Districts`
 -   `ParqueNorte`, `ParqueOeste`, `ParqueSur` (Gardens の子) および `Fuencarral` と `Latina` (Districts の子)
 -   `Parterre1` と `Parterre2` (ParqueNorte の子)
 
 ![](../manuals/ServicePathExample.png "ServicePathExample.png")
 
-使用するスコープは、更新/クエリのリクエストで `Fiware-ServicePath` HTTP ヘッダを使用して指定されます。たとえば、
+使用するサービス・パスは、更新/クエリのリクエストで `Fiware-ServicePath` HTTP ヘッダを使用して指定されます。たとえば、
 `Parterre1` に `Tree` 型のエンティティ `Tree1` を作成するには、次の Fiware-ServicePath が使用されます:
 
 ```
     Fiware-ServicePath: /Madrid/Gardens/ParqueNorte/Parterre1
 ```
 
-そのスコープで `Tree1` を検索するために、同じ Fiware-ServicePath が使用されます。
+そのサービス・パスで `Tree1` を検索するために、同じ Fiware-ServicePath が使用されます。
 
-スコープは階層的で、階層的な検索が可能です。これを行うために、`#` 特別なキーワードが使用されます。 したがって、
+サービス・パスは階層的で、階層的な検索が可能です。これを行うために、`#` 特別なキーワードが使用されます。 したがって、
 `/Madrid/Gardens/ParqueNorte/#` の `Tree` 型のエンティティ ID `.*` のパターンを持つ query は、`ParqueNorte`,
 `Parterre1`, `Parterre2` のすべてのツリー (trees) を返します。
 
-最後に、`Fiware-ServicePath` ヘッダでカンマ区切りのリストを使用して、ばらばらなスコープをクエリできます。たとえば、
+最後に、`Fiware-ServicePath` ヘッダでカンマ区切りのリストを使用して、ばらばらなサービス・パスをクエリできます。たとえば、
 `ParqueNorte` と `ParqueOeste` の両方ですべてのツリーを取得するには (`ParqueSur` ではなく)、次の `Fiware-ServicePath`
 を query リクエストで使用します:
 
@@ -586,37 +594,37 @@ Orion は階層スコープをサポートしているため、エンティテ�
 いくつかの追加のコメント:
 
 -   制限:
-    -   スコープは `/` で始まる必要があります ("絶対" (absolute) スコープのみが許可されます)
-    -   1つのパスで最大10のスコープ・レベル
+    -   サービス・パスは `/` で始まる必要があります ("絶対" (absolute) サービス・パスのみが許可されます)
+    -   1つのパスで最大10のレベル
     -   各レベルで最大50文字 (最低1文字)、英数字とアンダー・スコアのみ使用可能
-    -   クエリ `Fiware-ServicePath` ヘッダのコンマ区切りリスト内の最大10個のばらばらなスコープ・パス (アップデート
-        `Fiware-ServicePath` ヘッダのスコープ・パスは1つ以下)
+    -   クエリ `Fiware-ServicePath` ヘッダのコンマ区切りリスト内の最大10個のばらばらなサービス・パス (アップデート
+        `Fiware-ServicePath` ヘッダのサービス・パスは1つ以下)
     -   末尾のスラッシュは破棄されます
 
 -   `Fiware-ServicePath` はオプションのヘッダです。`Fiware-ServicePath` なしで作成された (またはデータベースにサービス
-   ・パス情報を含まない) すべてのエンティティは、暗黙的にルート・スコープ `/` に属していると想定されます。
+   ・パス情報を含まない) すべてのエンティティは、暗黙的にルート・サービス・パス `/` に属していると想定されます。
     `Fiware-ServicePath` を使用しないすべてのクエリ (サブスクリプションを含む) は、暗黙的に `/#` にあります。
     この動作により、0.14.0より前のバージョンとの下位互換性が保証されます
 
--   異なるスコープで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
+-   異なるサービス・パスで同じID と型を持つエンティティを持つことが可能です。例えば、`/Madrid/Gardens/ParqueNorte/Parterre1`
     に `Tree` 型のエンティティ ID `Tree1` を作成し、`Madrid/Gardens/ParqueOeste` に `Tree` 型の ID `Tree1`
     の別のエンティティをエラーなしで作成できます。ただし、このシナリオでは query が奇妙になる可能性があります
     (たとえば、`Fiware-ServicePath /Madrid/Gardens` のクエリは、クエリ・レスポンスで同じ ID と型を持つ2つの
-    エンティティを返すため、それぞれがどのスコープに属しているかを区別するのが難しくなります)
+    エンティティを返すため、それぞれがどのサービス・パスに属しているかを区別するのが難しくなります)
 
--   エンティティは1つの (そして、1つだけの) スコープに属します
+-   エンティティは1つの (そして、1つだけの) サービス・パスに属します
 
 -   `Fiware-ServicePath` ヘッダは、Orion から送信される通知リクエストに含まれています
 
 -   [`servicePath` 組み込み属性](#builtin-attributes)を使用してエンティティ・サービス・パスを取得できます
 
--   スコープ・エンティティは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
-    その場合、各 `scope tree` (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
+-   サービス・パスは、[マルチ・テナンシー機能](#multi-tenancy) と直交的に組み合わせることができます。
+    その場合、各 "service paths tree" (スコープ・ツリー) は異なるサービス/テナントに存在し、完全なデータベース ベースの分離で
     同じ名前を使用することもできます。下の図を参照してください。
 
 ![](../manuals/ServicePathWithMultiservice.png "ServicePathWithMultiservice.png")
 
--   現在のバージョンでは、API を介してエンティティが属するスコープを変更することはできません (回避策は、
+-   現在のバージョンでは、API を介してエンティティが属するサービス・パスを変更することはできません (回避策は、
     [エンティティ・コレクション](admin/database_model.md#entities-collection) の `_id.servicePath`
     フィールドを直接変更することです)
 
@@ -683,7 +691,7 @@ Orion は階層スコープをサポートしているため、エンティテ�
 -   `dateExpires` (型: `DateTime`): エンティティの有効期限。ISO 8601 文字列です。Orion がエンティティの有効期限を制御
     する方法については、[一時エンティティのセクション](#transient-entities) で説明されています
 -   `alterationType` (タイプ: `Text`): 通知をトリガーする変更を指定します。これは、変更タイプの機能に基づく
-    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions_alttype)のセクションを
+    サブスクリプションに関連しています ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを
     参照)
     この属性は通知でのみ使用できます。クエリ (`GET /v2/entities?attrs=alterationType`) を実行しても表示されず、次の値を
     取ることができます:
@@ -2591,6 +2599,7 @@ Orion は、この機能を提供するために cjexl ライブラリに依存�
 - 式は優先度の昇順で評価されます
 - 同順位の場合、Orion は特定の評価順序を保証しません。したがって、同じ優先度レベルの式は独立していると見なす必要があり、同じまたはより低い優先度の他の属性を使用する式は予期しない値になります
 - `evalPriority` が設定されていない場合は、デフォルトの 100000 が使用されます
+- `evalPriority` は `id` や `type` には関連付けられません。これらは常に最後に計算されます (優先順位が 100001 であるため)
 - `evalPriority` は、サブスクリプションの `notification.httpCustom.ngsi` でのみ意味を持ちます。通常のエンティティのメタデータ (`POST /v2/entities` で作成されたエンティティなど) として、Orion はそれに対するセマンティクスを実装しません
 
 `evalPriority` を使用すると、上記の例は次のように書き直すことができます:
@@ -3136,13 +3145,19 @@ c|matchRegex('\d+`)
 
 #### mapper
 
-1 対 1 のマッピングに基づいて、複数の選択肢の中から値を返します。この関数は、値の配列 (*value*) と選択肢の配列 (*choices*) に基づいています (長さはまったく同じ) 。したがって、入力値が *values* の *i* 番目の項目と等しい場合は、*choices* の *i* 番目の項目が返されます。
-
-この変換は、引数に何らかの問題が見つかった場合 (つまり、入力が値の中に見つからない、選択肢の長さが値とまったく同じではない、入力が文字列ではないなど)、`null` を返します。
+文字列の場合、1 対 1 のマッピングに基づいて複数の選択肢から値を返します。この関数は、*value* の配列と *choices* の配列 (長さが全く同じ) に基づいています。したがって、入力値が *value* の *i* 番目の項目と等しい場合、*choices* の *i* 番目の項目が返されます。
 
 追加引数:
 * 値の配列 (values array)
 * 選択肢の配列 (choices array)
+
+以下の点にご注意ください:
+
+* 入力は文字列である必要があります
+* `values` 要素は文字列である必要があります
+* `choices` 要素は任意の型にすることができます
+
+この変換は、引数に何らかの問題が見つかった場合 (つまり、入力が値の中に見つからない、選択肢の長さが値と完全に一致しないなど)、`null` を返します。
 
 例 (コンテキスト `{"c": "fr", "values": ["es", "fr", "de"], "choices": ["Spain", "France", "Germany"]}`):
 
@@ -3154,6 +3169,37 @@ c|mapper(values,choices)
 
 ```
 "France"
+```
+
+<a name="nmapper"></a>
+
+#### nMapper
+
+数値の場合、1 対 1 のマッピングに基づいて複数の選択肢から値を返します。この関数は、*value* の配列と *choices* の配列 (長さが全く同じ) に基づいています。したがって、入力値が *value* の *i* 番目の項目と等しい場合、*choices* の *i* 番目の項目が返されます。
+
+追加引数:
+* 値の配列 (values array)
+* 選択肢の配列 (choices array)
+
+以下の点にご注意ください:
+
+* 入力は数値である必要があります
+* `values` 要素は数値である必要があります
+* `choices` 要素は任意の型にすることができます
+* 数値は整数である必要があります (浮動小数点数を使用する場合は、最も近い整数に切り上げられます)
+
+この変換は、引数に何らかの問題が見つかった場合 (つまり、値の中に入力が見つからない、選択肢の長さが値と正確に同じではないなど)、`null` を返します。
+
+例 (コンテキスト `{"c": 20, "values": [10, 20, 30], "choices": ["low", "medium", "high"]}`):
+
+```
+c|mapper(values,choices)
+```
+
+results in
+
+```
+"medium"
 ```
 
 <a name="thmapper"></a>
@@ -3224,9 +3270,15 @@ c|keys
 
 #### arrSum
 
-配列の要素の合計を返します (配列内の入力または配列に数値以外の項目が含まれている場合は `null` を返します)。
+配列の要素の合計を返します。
 
 追加引数: なし
+
+この変換は、次の場合に `null` を返します:
+
+* 入力が配列ではない
+* 配列が空である
+* 配列に数値以外の項目が含まれている
 
 例 (コンテキスト `{"c": [1, 5]}`):
 
@@ -3244,9 +3296,15 @@ c|arrSum
 
 #### arrAvg
 
-配列の要素の平均を返します (配列内の入力または配列に数値以外の項目が含まれている場合は `null` を返します)。
+配列の要素の平均を返します。
 
 追加引数: なし
+
+この変換は、次の場合に `null` を返します:
+
+* 入力が配列ではない
+* 配列が空である
+* 配列に数値以外の項目が含まれている
 
 例 (コンテキスト `{"c": [1, 5]}`):
 
@@ -3258,6 +3316,145 @@ c|arrAvg
 
 ```
 3
+```
+
+<a name="arrMax"></a>
+
+#### arrMax
+
+配列の要素の最大値を返します。
+
+追加の引数: なし
+
+この変換は、次の場合に `null` を返します:
+
+* 入力が配列ではない
+* 配列が空である
+* 配列に数値以外の項目が含まれている
+
+例 (コンテキスト `{"c": [1, 5]}`):
+
+```
+c|arrMax
+```
+
+結果は
+
+```
+5
+```
+
+<a name="arrMin"></a>
+
+#### arrMin
+
+配列の要素の最小値を返します。
+
+追加の引数: なし
+
+この変換は、次の場合に `null` を返します:
+
+* 入力が配列ではない
+* 配列が空である
+* 配列に数値以外の項目が含まれている
+
+例 (コンテキスト `{"c": [1, 5]}`):
+
+```
+c|arrMin
+```
+
+結果in
+
+```
+1
+```
+
+<a name="arrMed"></a>
+
+#### arrMed
+
+配列の要素の中央値を返します。
+
+追加引数: なし
+
+この変換は、次の場合に `null` を返します:
+
+* 入力が配列ではない
+* 配列が空である
+* 配列に数値以外の項目が含まれている
+
+例 (コンテキスト `{"c": [1, 3, 3, 6, 7, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+結果は
+
+```
+6
+```
+
+例 (コンテキスト `{"c": [1, 2, 3, 4, 5, 6, 8, 9]}`):
+
+```
+c|arrMed
+```
+
+結果は
+
+```
+4.5
+```
+
+<a name="arrSort"></a>
+
+#### arrSort
+
+入力として使用された配列のソートされたバージョンを返します。
+
+追加の引数: なし
+
+この変換は、次の場合に `null` を返します:
+
+* 入力が配列ではない
+* 配列に数値以外の項目が含まれている
+
+例 (コンテキスト `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrSort
+```
+
+結果は次のようになります
+
+```
+[1, 3, 3, 6, 7, 8, 9]
+```
+
+<a name="arrReverse"></a>
+
+#### arrReverse
+
+入力として使用される配列の予約バージョンを返します。
+
+追加の引数: なし
+
+この変換は、次の場合に `null` を返します:
+
+* 入力が配列ではない
+
+例 (コンテキスト `{"c": [3, 1, 3, 9, 7, 8, 6]}`):
+
+```
+c|arrReverse
+```
+
+結果は
+
+```
+[6, 8, 7, 9, 3, 1, 3]
 ```
 
 <a name="now"></a>
@@ -3509,6 +3706,8 @@ EOF
 デフォルトの `alterationTypes` (つまり、明示的に指定されていないサブスクリプション用のもの) は
 `["entityCreate", "entityChange"]` です。
 
+`entityChange` と `entityUpdate` を同時に使用する場合、`entityUpdate` が優先されます (つまり、`"alterationTypes": [ "entityUpdate", "entityChange" ]` を使用することは、`"alterationTypes": [ "entityUpdate" ]` を使用することと同等です)。
+
 特定の変更タイプは、[`alterationType` 組み込み属性](#builtin-attributes)を使用して通知で取得できます。
 
 <a name="pagination"></a>
@@ -3579,6 +3778,28 @@ GET /v2/entities?orderBy=temperature,!humidity
 -   カンマで区切られた属性のリストです。組み込み属性、エンティティ id の `id`、エンティティ型の `type` などがあります。
     たとえば、`temperature,!humidity`。結果は最初のフィールドで並べられます。続いて、結果は2番目のフィールドなどの順序で
     並べられます。フィールド名の前の "!" は、順序が逆になっていることを示します
+
+例:
+
+```
+GET /v2/entities?orderBy=temperature,!humidity
+```
+
+は、まず temperature の昇順で並べ替え、temperature が同点の場合は humidity の降順で並べ替えます。
+
+[組み込み属性](#builtin-attributes) `dateCreated` と `dateModified` は、`orderBy` のコンマ区切りリスト
+(`!` 構文を含む) の要素として使用でき、それぞれエンティティの作成時刻と変更時刻を表します。
+
+`orderBy` では同じ順序トークンを繰り返すことはできません。例えば、以下のリクエストは許可されておらず、
+400 Bad Request レスポンスが返されます:
+
+```
+GET /v2/entities?orderBy=age,age
+GET /v2/entities?orderBy=!age,!age
+GET /v2/entities?orderBy=age,!age
+GET /v2/entities?orderBy=age,name,age
+GET /v2/entities?orderBy=age,name,!age
+```
 
 値が複数の JSON タイプに属する属性の順序に関して、Orion は、基礎となる実装 (MongoDB) で使用される基準と同じ基準を
 使用します。詳細については、
@@ -4976,22 +5197,22 @@ _**レスポンス・ペイロード**_
 
 `notification` オブジェクトには、次のサブフィールドが含まれています:
 
-| パラメータ                                                                                                                                                                                      | オプション | タイプ  | 説明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `attrs` または `exceptAttrs`                                                                                                                                                                    |            | array   | 両方を同時に使用することはできません。<ul><li><code>attrs</code>: 通知メッセージに含まれる属性のリスト。また、<code>attrsFormat</code> <code>value</code> が使用されたときに属性が通知に表示される順序も定義します ("通知メッセージ" のセクションを参照)。空のリストは、すべての属性が通知に含まれることを意味します。詳細については、[属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)のセクションを参照してください</li><li><code>exceptAttrs</code>: 通知メッセージから除外される属性のリスト。つまり、通知メッセージには、このフィールドにリストされているものを除くすべてのエンティティ属性が含まれます。 空でないリストでなければなりません。</li><li><code>attrs</code> も <code>exceptAttrs</code> も指定されていない場合、すべての属性が通知に含まれます</li></ul> |
-| [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt) または [`mqttCustom`](#subscriptionnotificationmqttcustom)| ✓          | object  | それらの1つが存在する必要がありますが、同時に1つを超えてはなりません。x トランスポート・プロトコルを介して配信される通知のパラメータを伝達するために使用されます                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `attrsFormat`                                                                                                                                                                                   | ✓          | string  | エンティティが通知でどのように表されるかを指定します。受け入れられる値は、`normalized` (デフォルト), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, または `values` です。<br> `attrsFormat` がそれらとは異なる値をとると、エラーが発生します。 詳細については、[通知メッセージ](#notification-messages)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `metadata`                                                                                                                                                                                      | ✓          | string  | 通知メッセージに含まれるメタデータのリスト。詳細については、[属性とメタデータの除外](#filtering-out-attributes-and-metadata)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `onlyChangedAttrs`                                                                                                                                                                              | ✓          | boolean | `true` の場合、通知には、`attrs` または `exceptAttrs` フィールドと組み合わせて、トリガー更新リクエストで変更された属性のみが含まれます。(フィールドが省略されている場合、デフォルトは `false` です))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `covered`                                                                                                                                                                                       | ✓          | boolean | `true` の場合、通知には、エンティティに存在しない場合でも (この場合、`null` 値で) `attrs` フィールドで定義されたすべての属性が含まれます。(デフォルト値は false です)。詳細については、[対象サブスクリプション](#covered-subscriptions)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `timesSent`                                                                                                                                                                                     | 取得時のみ | number  | 編集できません。GET 操作にのみ存在します。このサブスクリプションのために送信された通知の数                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `lastNotification`                                                                                                                                                                              | 取得時のみ | ISO8601 | 編集できません。GET 操作にのみ存在します。ISO8601 形式の最終通知タイムスタンプ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `lastFailure`                                                                                                                                                                                   | 取得時のみ | ISO8601 | 編集できません。GET 操作にのみ存在します。ISO8601 形式の最後の障害タイムスタンプ。サブスクリプションで通知に問題が発生したことがない場合は存在しません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `lastSuccess`                                                                                                                                                                                   | 取得時のみ | ISO8601 | 編集できません。GET 操作にのみ存在します。最後に成功した通知の ISO8601 形式のタイムスタンプ。サブスクリプションに通知が成功したことがない場合は存在しません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `lastFailureReason`                                                                                                                                                                             | 取得時のみ | string  | 編集できません。GET 操作にのみ存在します。最後の失敗の原因を説明します (つまり、失敗は `lastFailure` 時に発生しました)。MQTT サブスクリプションには含まれていません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `lastSuccessCode`                                                                                                                                                                               | 取得時のみ | number  | 編集できません。GET 操作にのみ存在します。成功した通知が最後に送信されたときに受信エンドポイントによって返された HTTP コード (200, 400, 404, 500など) (つまり、成功は `lastSuccess `時間に発生しました)。MQTT サブスクリプションには含まれていません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `failsCounter`                                                                                                                                                                                  | 取得時のみ | number  | 編集できません。GET 操作にのみ存在します。サブスクリプションに関連付けられた連続して失敗した通知の数。`failsCounter` は、通知の試行が失敗するたびに1ずつ増加し、通知の試行が成功すると0にリセットされます (この場合、` failsCounter` は省略されます)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `maxFailsLimit`                                                                                                                                                                                 | ✓          | number  | 連続した失敗の最大許容数を確立します。失敗の数が `maxFailsLimit` の値を超えた場合 (つまり、ある時点で `failsCounter` が `maxFailsLimit` より大きい場合)、Orion はサブスクリプションを自動的に `inactive` 状態に渡します。サブスクリプションを再度有効にする (状態を再び `active` に設定する) には、サブスクリプションの更新操作 (`PATCH /v2/subscription/subId`) が必要です                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| パラメータ                                                                                                                                                                                                                                                                                         | オプション | タイプ  | 説明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `attrs` または `exceptAttrs`                                                                                                                                                                                                                                                                       |            | array   | 両方を同時に使用することはできません。<ul><li><code>attrs</code>: 通知メッセージに含まれる属性のリスト。また、<code>attrsFormat</code> <code>value</code> が使用されたときに属性が通知に表示される順序も定義します ("通知メッセージ" のセクションを参照)。空のリストは、すべての属性が通知に含まれることを意味します。詳細については、[属性とメタデータのフィルタリング](#filtering-out-attributes-and-metadata)のセクションを参照してください</li><li><code>exceptAttrs</code>: 通知メッセージから除外される属性のリスト。つまり、通知メッセージには、このフィールドにリストされているものを除くすべてのエンティティ属性が含まれます。 空でないリストでなければなりません。</li><li><code>attrs</code> も <code>exceptAttrs</code> も指定されていない場合、すべての属性が通知に含まれます</li></ul> |
+| [`http`](#subscriptionnotificationhttp), [`httpCustom`](#subscriptionnotificationhttpcustom), [`mqtt`](#subscriptionnotificationmqtt), [`mqttCustom`](#subscriptionnotificationmqttcustom), [`kafka`](#subscriptionnotificationkafka) または [`kafkaCustom`](#subscriptionnotificationkafkacustom) | ✓          | object  | それらの1つが存在する必要がありますが、同時に1つを超えてはなりません。x トランスポート・プロトコルを介して配信される通知のパラメータを伝達するために使用されます                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `attrsFormat`                                                                                                                                                                                                                                                                                      | ✓          | string  | エンティティが通知でどのように表されるかを指定します。受け入れられる値は、`normalized` (デフォルト), `simplifiedNormalized`, `keyValues`, `simplifiedKeyValues`, または `values` です。<br> `attrsFormat` がそれらとは異なる値をとると、エラーが発生します。 詳細については、[通知メッセージ](#notification-messages)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `metadata`                                                                                                                                                                                                                                                                                         | ✓          | string  | 通知メッセージに含まれるメタデータのリスト。詳細については、[属性とメタデータの除外](#filtering-out-attributes-and-metadata)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `onlyChangedAttrs`                                                                                                                                                                                                                                                                                 | ✓          | boolean | `true` の場合、通知には、`attrs` または `exceptAttrs` フィールドと組み合わせて、トリガー更新リクエストで変更された属性のみが含まれます。(フィールドが省略されている場合、デフォルトは `false` です))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `covered`                                                                                                                                                                                                                                                                                          | ✓          | boolean | `true` の場合、通知には、エンティティに存在しない場合でも (この場合、`null` 値で) `attrs` フィールドで定義されたすべての属性が含まれます。(デフォルト値は false です)。詳細については、[対象サブスクリプション](#covered-subscriptions)のセクションを参照してください                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `timesSent`                                                                                                                                                                                                                                                                                        | 取得時のみ | number  | 編集できません。GET 操作にのみ存在します。このサブスクリプションのために送信された通知の数                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `lastNotification`                                                                                                                                                                                                                                                                                 | 取得時のみ | ISO8601 | 編集できません。GET 操作にのみ存在します。ISO8601 形式の最終通知タイムスタンプ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `lastFailure`                                                                                                                                                                                                                                                                                      | 取得時のみ | ISO8601 | 編集できません。GET 操作にのみ存在します。ISO8601 形式の最後の障害タイムスタンプ。サブスクリプションで通知に問題が発生したことがない場合は存在しません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `lastSuccess`                                                                                                                                                                                                                                                                                      | 取得時のみ | ISO8601 | 編集できません。GET 操作にのみ存在します。最後に成功した通知の ISO8601 形式のタイムスタンプ。サブスクリプションに通知が成功したことがない場合は存在しません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `lastFailureReason`                                                                                                                                                                                                                                                                                | 取得時のみ | string  | 編集できません。GET 操作にのみ存在します。最後の失敗の原因を説明します (つまり、失敗は `lastFailure` 時に発生しました)。MQTT サブスクリプションには含まれていません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `lastSuccessCode`                                                                                                                                                                                                                                                                                  | 取得時のみ | number  | 編集できません。GET 操作にのみ存在します。成功した通知が最後に送信されたときに受信エンドポイントによって返された HTTP コード (200, 400, 404, 500など) (つまり、成功は `lastSuccess `時間に発生しました)。MQTT サブスクリプションには含まれていません                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `failsCounter`                                                                                                                                                                                                                                                                                     | 取得時のみ | number  | 編集できません。GET 操作にのみ存在します。サブスクリプションに関連付けられた連続して失敗した通知の数。`failsCounter` は、通知の試行が失敗するたびに1ずつ増加し、通知の試行が成功すると0にリセットされます (この場合、` failsCounter` は省略されます)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `maxFailsLimit`                                                                                                                                                                                                                                                                                    | ✓          | number  | 連続した失敗の最大許容数を確立します。失敗の数が `maxFailsLimit` の値を超えた場合 (つまり、ある時点で `failsCounter` が `maxFailsLimit` より大きい場合)、Orion はサブスクリプションを自動的に `inactive` 状態に渡します。サブスクリプションを再度有効にする (状態を再び `active` に設定する) には、サブスクリプションの更新操作 (`PATCH /v2/subscription/subId`) が必要です                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 `onlyChangedAttrs` フィールドに関しては、例として、特定のサブスクリプションで `attrs` が `[A、B、C]` の場合、
 デフォルトの動作 (`onlyChangedAttrs` が `false` の場合) とトリガー更新はAのみを変更します。次に、A, B, およびC
@@ -5037,6 +5258,19 @@ time=... | lvl=WARN | corr=... | trans=... | from=... | srv=... | subsrv=... | c
 
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。
 
+<a name="subscriptionnotificationkafka"></a>
+
+#### `subscription.notification.kafka`
+
+`kafka`オブジェクトには以下のサブフィールドが含まれています:
+
+| パラメータ | オプション | タイプ  | 説明                                                                                                                                           |
+|------------|------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`      |            | string  | 使用する KAFKA ブローカーのエンドポイントを表します。URL は `kafka://` で始まる必要があり、パスは含まれません (ホストとポートのみが含まれます) |
+| `topic`    |            | string  | 使用する KAFKA トピックを表す                                                                                                                  |
+
+KAFKA 通知の詳細については、[KAFKA 通知](user/kafka_notifications.md) ドキュメントを参照してください。
+
 <a name="subscriptionnotificationhttpcustom"></a>
 
 #### `subscription.notification.httpCustom`
@@ -5080,6 +5314,25 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 
 `mqttCustom` を使用する場合は、[カスタム通知](#custom-notifications)のセクションで説明されている考慮事項が適用されます。
 MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)のドキュメントを参照してください。
+
+
+<a name="subscriptionnotificationkafkacustom"></a>
+
+#### `subscription.notification.kafkaCustom`
+
+`kafkaCustom` オブジェクトには次のサブフィールドが含まれています。
+
+| パラメータ | オプション | タイプ  | 説明                                                                                                                                                                                                                        |
+|------------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`      |            | string  | 使用する KAFKA ブローカーのエンドポイントを表します。URL は `kafka://` で始まる必要があり、パスは含まれません (ホストとポートのみが含まれます)                                                                              |
+| `topic`    |            | string  | 使用するKAFKAトピックを表します。このフィールドではマクロ置換も実行されます（例：属性に基づくトピック）                                                                                                                     |
+| `payload`  | ✓          | string  | 通知で使用するテキストベースのペイロード。空文字列または省略された場合は、デフォルトのペイロード（[通知メッセージ](#notification-messages)セクションを参照）が使用されます。`null` の場合、通知にはペイロードは含まれません |
+| `json`     | ✓          | object  | 通知で使用するJSONベースのペイロードです。詳細については[JSONペイロード](#json-payloads)セクションを参照してください                                                                                                        |
+| `ngsi`     | ✓          | object  | 通知で使用されるペイロードのNGSIパッチ適用。詳細については、[NGSIペイロードパッチ適用](#ngsi-payload-patching)セクションを参照してください                                                                                  |
+
+`payload`、`json`、`ngsi` は同時に使用できません。これらは相互に排他的です。
+
+`kafkaCustom` を使用する場合は、[カスタム通知](#custom-notifications) セクションで説明されている考慮事項が適用されます。KAFKA 通知の詳細については、[KAFKA 通知](user/kafka_notifications.md) のドキュメントを参照してください。
 
 <a name="subscription-list"></a>
 

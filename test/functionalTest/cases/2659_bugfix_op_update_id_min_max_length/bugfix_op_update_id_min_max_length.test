@@ -100,10 +100,10 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 83
+Content-Length: 93
 
 {
-    "description": "entity id length: 0, min length supported: 1",
+    "description": "id and idPattern cannot be both empty at the same time",
     "error": "BadRequest"
 }
 

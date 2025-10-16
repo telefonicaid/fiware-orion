@@ -89,18 +89,15 @@ typedef struct Metadata
   Metadata(const std::string& _name, const orion::BSONObj& mdB);
   ~Metadata();
 
-  std::string  toJsonV1(bool comma);
   std::string  toJson(void);
   void         release(void);
-  void         fill(const struct Metadata& md);
-  std::string  toStringValue(void) const;
   bool         compoundItemExists(const std::string& compoundPath, orion::CompoundValueNode** compoundItemPP = NULL);
 
-  void         appendToBsoN(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames, bool useDefaultType);
+  void         appendToBson(orion::BSONObjBuilder* md, orion::BSONArrayBuilder* mdNames);
 
   void         addToContext(ExprContextObject* exprContextObjectP, bool legacy);
 
-  std::string  check(ApiVersion apiVersion);
+  std::string  check(void);
 } Metadata;
 
 #endif  // SRC_LIB_NGSI_METADATA_H_

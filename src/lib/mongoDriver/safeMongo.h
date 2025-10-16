@@ -28,9 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/SubscriptionId.h"
-#include "ngsi/RegistrationId.h"
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 
 #include "mongoDriver/DBCursor.h"
 #include "mongoDriver/BSONObj.h"

@@ -303,10 +303,11 @@ HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 29
+Content-Length: 56
 
 {
-    "error": "invalid log level"
+    "description": "invalid log level",
+    "error": "BadRequest"
 }
 
 

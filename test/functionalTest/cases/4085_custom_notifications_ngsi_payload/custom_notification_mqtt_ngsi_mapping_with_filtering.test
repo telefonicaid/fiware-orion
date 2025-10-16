@@ -54,33 +54,33 @@ payload='{
       "topic": "topic1",
       "url": "mqtt://localhost:1883",
       "ngsi": {
-        "A1": {
+        "A11": {
           "value": "${A6}",
           "type": "None"
         },
-        "A2": {
+        "A22": {
           "value": "${A5}",
           "type": "Array"
         },
-        "A3": {
+        "A33": {
           "value": "${A4}",
           "type": "Object"
         },
-        "A4": {
+        "A44": {
           "value": "${A3}",
           "type": "Boolean"
         },
-        "A5": {
+        "A55": {
           "value": "${A2}",
           "type": "Number"
         },
-        "A6": {
+        "A66": {
           "value": "${A1}",
           "type": "Text"
         }
       }
     },
-    "attrs": [ "A3", "A4", "A5" ]
+    "attrs": [ "A33", "A44", "A55" ]
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -207,7 +207,7 @@ MQTT message at topic topic1:
 {
     "data": [
         {
-            "A3": {
+            "A33": {
                 "metadata": {},
                 "type": "Object",
                 "value": {
@@ -215,12 +215,12 @@ MQTT message at topic topic1:
                     "y": 2
                 }
             },
-            "A4": {
+            "A44": {
                 "metadata": {},
                 "type": "Boolean",
                 "value": true
             },
-            "A5": {
+            "A55": {
                 "metadata": {},
                 "type": "Number",
                 "value": 1
@@ -236,7 +236,7 @@ MQTT message at topic topic1:
 {
     "data": [
         {
-            "A3": {
+            "A33": {
                 "metadata": {},
                 "type": "Object",
                 "value": {
@@ -244,12 +244,12 @@ MQTT message at topic topic1:
                     "z": 10
                 }
             },
-            "A4": {
+            "A44": {
                 "metadata": {},
                 "type": "Boolean",
                 "value": false
             },
-            "A5": {
+            "A55": {
                 "metadata": {},
                 "type": "Number",
                 "value": 10

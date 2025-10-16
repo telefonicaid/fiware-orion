@@ -58,7 +58,11 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       util-linux-dev \
       gnutls-dev \
       libgcrypt-dev \
-      cyrus-sasl-dev && \
+      cyrus-sasl-dev \
+      librdkafka-dev \
+      zlib-dev \
+      zstd-dev \
+      lz4-dev && \
     # Install libmicrohttpd from source
     echo =====================MARK1 && \
     cd /opt && \
@@ -108,7 +112,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
-    bash get_cjexl.sh 0.4.0 $(cat /run/secrets/repo_token) && \
+    ash get_cjexl.sh 0.6.0 $(cat /run/secrets/repo_token) && \
     # patch bash and mktemp statement in build script, as in alpine is slightly different
     sed -i 's/mktemp \/tmp\/compileInfo.h.XXXX/mktemp/g' scripts/build/compileInfo.sh && \
     sed -i 's/bash/ash/g' scripts/build/compileInfo.sh && \
@@ -142,6 +146,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # remove the same packages we installed at the beginning to build Orion
     apk del \
       curl \
+      librdkafka \
       cmake \
       make \
       gcc \
@@ -163,14 +168,18 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       gnutls \
       libsasl \ 
       icu-libs \
-      libstdc++ && \
+      libstdc++ \
+      librdkafka-dev \
+      zlib-dev \
+      zstd-dev \
+      lz4-dev && \
     # Don't need old log files inside docker images
     rm -f /var/log/*log
 
 WORKDIR /
 
 # Note we disable log file as docker container will output by stdout
-ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast", "-disableFileLog" ]
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-disableFileLog" ]
 EXPOSE 1026
 
 LABEL "maintainer"="Orion Team. Telefónica I+D"

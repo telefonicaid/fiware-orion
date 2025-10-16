@@ -31,7 +31,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/string.h"
 #include "common/RenderFormat.h"
 #include "common/JsonHelper.h"
@@ -121,86 +120,15 @@ std::string ContextAttributeVector::toJsonTypes(void)
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::toJsonV1 -
-*
-* FIXME P5: this method doesn't depend on the class object. Should be moved out of the class?
-* Maybe included in the Entiy class render logic.
-*/
-std::string ContextAttributeVector::toJsonV1
-(  
-  bool                                   asJsonObject,
-  RequestType                            request,
-  const std::vector<ContextAttribute*>&  orderedAttrs,
-  const std::vector<std::string>&        metadataFilter,
-  bool                                   comma,
-  bool                                   omitValue,
-  bool                                   attrsAsName
-)
-{
-  std::string out = "";
-
-  if (orderedAttrs.size() == 0)
-  {
-    return "";
-  }
-
-  //
-  // NOTE:
-  // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
-  // is to be rendered as objects for JSON, and not as a vector.
-  //
-  if (asJsonObject)
-  {
-    // Note that in the case of attribute as name, we have to use a vector, thus using
-    // attrsAsName variable as value for isVector parameter
-    out += startTag("attributes", attrsAsName);
-    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
-    {
-      bool comma = (ix != orderedAttrs.size() -1);
-      if (attrsAsName)
-      {
-        out += orderedAttrs[ix]->toJsonV1AsNameString(comma);
-      }
-      else
-      {
-        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, comma, omitValue);
-      }
-    }   
-    out += endTag(comma, attrsAsName);
-  }
-  else
-  {
-    out += startTag("attributes", true);
-    for (unsigned int ix = 0; ix < orderedAttrs.size(); ++ix)
-    {
-      if (attrsAsName)
-      {
-        out += orderedAttrs[ix]->toJsonV1AsNameString(ix != orderedAttrs.size() - 1);
-      }
-      else
-      {
-        out += orderedAttrs[ix]->toJsonV1(asJsonObject, request, metadataFilter, ix != orderedAttrs.size() - 1, omitValue);
-      }
-    }
-    out += endTag(comma, true);
-  }
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(ApiVersion apiVersion, RequestType requestType)
+std::string ContextAttributeVector::check(bool asValue)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
-    if ((res = vec[ix]->check(apiVersion, requestType)) != "OK")
+    if ((res = vec[ix]->check(asValue)) != "OK")
       return res;
   }
 
@@ -465,8 +393,7 @@ void ContextAttributeVector::toBson
 (
   double                    now,
   orion::BSONObjBuilder*    attrsToAdd,
-  orion::BSONArrayBuilder*  attrNamesToAdd,
-  ApiVersion                apiVersion
+  orion::BSONArrayBuilder*  attrNamesToAdd
 ) const
 {
   for (unsigned int ix = 0; ix < this->vec.size(); ++ix)
@@ -475,7 +402,7 @@ void ContextAttributeVector::toBson
 
     std::string attrType;
 
-    if (!this->vec[ix]->typeGiven && (apiVersion == V2))
+    if (!this->vec[ix]->typeGiven)
     {
       if ((this->vec[ix]->compoundValueP == NULL) || (this->vec[ix]->compoundValueP->valueType != orion::ValueTypeVector))
       {
@@ -502,7 +429,7 @@ void ContextAttributeVector::toBson
     }
 
     // FIXME P7: boolean return value should be managed?
-    this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType, ngsiv1Autocast && (apiVersion == V1));
+    this->vec[ix]->valueBson(std::string(ENT_ATTRS_VALUE), &bsonAttr, attrType);
 
     std::string effectiveName = dbEncode(this->vec[ix]->name);
 
@@ -515,7 +442,7 @@ void ContextAttributeVector::toBson
     orion::BSONObjBuilder    md;
     orion::BSONArrayBuilder  mdNames;
 
-    this->vec[ix]->metadataVector.toBson(&md, &mdNames, apiVersion == V2);
+    this->vec[ix]->metadataVector.toBson(&md, &mdNames);
     if (mdNames.arrSize())
     {
       bsonAttr.append(ENT_ATTRS_MD, md.obj());

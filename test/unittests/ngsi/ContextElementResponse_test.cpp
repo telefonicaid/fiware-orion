@@ -33,55 +33,26 @@
 
 /* ****************************************************************************
 *
-* check -
-*/
-TEST(ContextElementResponse, check)
-{
-   ContextElementResponse  cer;
-   std::string             out;
-
-   utInit();
-
-   out = cer.check(V1, UpdateContext, "", 0);
-   EXPECT_STREQ("empty entityId:id", out.c_str());
-
-   cer.entity.id         = "ID";
-   cer.entity.type       = "Type";
-   cer.entity.isPattern  = "false";
-
-   out = cer.check(V1, UpdateContext, "", 0);
-   EXPECT_STREQ("no code", out.c_str());
-
-   cer.statusCode.fill(SccOk, "details");
-   out = cer.check(V1, UpdateContext, "", 0);
-   EXPECT_STREQ("OK", out.c_str());
-
-   utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * render -
 */
 TEST(ContextElementResponse, render)
 {
+  utInit();
+
   ContextElementResponse  cer;
   const char*             outfile = "ngsi.contextElementResponse.render.middle.json";
   std::string             out;
 
-   utInit();
+  std::vector<std::string> emptyV;
+   
+  cer.entity.entityId.id    = "ID";
+  cer.entity.entityId.type  = "Type";
 
-   cer.entity.id         = "ID";
-   cer.entity.type       = "Type";
-   cer.entity.isPattern  = "false";
+  cer.error.fill(SccOk, "details");
 
-   cer.statusCode.fill(SccOk, "details");
+  out = cer.toJson(NGSI_V2_NORMALIZED, emptyV, false, emptyV);;
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-   out = cer.toJsonV1(false, UpdateContextElement, false, false);
-   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-   EXPECT_STREQ(expectedBuf, out.c_str());
-
-   utExit();
+  utExit();
 }

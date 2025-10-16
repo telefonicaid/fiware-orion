@@ -30,6 +30,7 @@
 
 #include "apiTypesV2/HttpInfo.h"
 #include "apiTypesV2/MqttInfo.h"
+#include "apiTypesV2/KafkaInfo.h"
 #include "common/RenderFormat.h"
 #include "ngsi/StringList.h"
 #include "rest/StringFilter.h"
@@ -45,10 +46,6 @@
 * the csbubs collection. Note that adding all the BSON object retrieved from the
 * csubs collection is not efficient, so we use only the needed fields-
 *
-* We use the same class for both NGSI10 and NGSI9 subscription. The only difference
-* is that throttling and lastNotification are not needed in the second case (note
-* that there are different constructor depending the case)
-*
 */
 class TriggeredSubscription
 {
@@ -60,6 +57,7 @@ class TriggeredSubscription
   RenderFormat              renderFormat;
   ngsiv2::HttpInfo          httpInfo;
   ngsiv2::MqttInfo          mqttInfo;
+  ngsiv2::KafkaInfo         kafkaInfo;
   StringList                attrL;
   std::string               cacheSubId;
   std::string               tenant;
@@ -74,7 +72,7 @@ class TriggeredSubscription
     std::string               geometry;
     std::string               coords;
     std::string               georel;
-  }                        expression;      // Only used by NGSIv2 subscription
+  } expression;
 
   TriggeredSubscription(long long                _throttling,
                         long long                _maxFailsLimit,
@@ -83,6 +81,7 @@ class TriggeredSubscription
                         RenderFormat             _renderFormat,
                         const ngsiv2::HttpInfo&  _httpInfo,
                         const ngsiv2::MqttInfo&  _mqttInfo,
+                        const ngsiv2::KafkaInfo&  _kafkaInfo,
                         const StringList&        _attrL,
                         const std::string&       _cacheSubId,
                         const char*              _tenant,
@@ -94,7 +93,6 @@ class TriggeredSubscription
   void         fillExpression(const std::string& georel, const std::string& geometry, const std::string& coords);
   bool         stringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
   bool         mdStringFilterSet(StringFilter* _stringFilterP, std::string* errorStringP);
-  std::string  toString(const std::string& delimiter);
 };
 
 #endif  // SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_

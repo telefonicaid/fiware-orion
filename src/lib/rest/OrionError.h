@@ -29,7 +29,7 @@
 
 #include "common/globals.h"
 
-#include "ngsi/StatusCode.h"
+#include "rest/OrionError.h"
 #include "rest/HttpStatusCode.h"
 
 
@@ -47,20 +47,14 @@ public:
   bool            filled;
 
   OrionError();
-  OrionError(StatusCode& statusCode);
   OrionError(HttpStatusCode _code, const std::string& _description = "", const std::string& _error = "");
 
-  std::string  smartRender(ApiVersion apiVersion);
-  std::string  setStatusCodeAndSmartRender(ApiVersion apiVersion, HttpStatusCode* scP);
+  std::string  setSCAndRender(HttpStatusCode* scP);
   std::string  toJson(void);
-  std::string  toJsonV1(void);
   void         fill(HttpStatusCode _code, const std::string& _description,  const std::string& _error = "");
-  void         fill(const StatusCode& sc);
+  void         fill(const OrionError& oe);
+  void         fill(OrionError* oeP);
   void         fillOrAppend(HttpStatusCode _code, const std::string& fullDetails, const std::string& appendDetail, const std::string& _error);
-
-
-private:
-  void         shrinkError(void);
 
 } OrionError;
 

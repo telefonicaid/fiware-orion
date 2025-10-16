@@ -38,7 +38,6 @@
 #include "apiTypesV2/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubCache.h"
-#include "ngsi10/SubscribeContextRequest.h"
 #include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
 #include "mongoBackend/dbConstants.h"
@@ -61,9 +60,7 @@ volatile SubCacheState subCacheState = ScsIdle;
 //
 // The 'mongo part' of the cache is implemented in mongoBackend/mongoSubCache.cpp/h and used in:
 //   - MongoCommonUpdate.cpp               (in function addTriggeredSubscriptions_withCache)
-//   - mongoSubscribeContext.cpp           (in function mongoSubscribeContext)
 //   - mongoUnsubscribeContext.cpp         (in function mongoUnsubscribeContext)
-//   - mongoUpdateContextSubscription.cpp  (in function mongoUpdateContextSubscription)
 //   - contextBroker.cpp                   (to initialize and sybchronize)
 //
 // To manipulate the subscription cache, a semaphore is necessary, as various threads can be
@@ -82,14 +79,12 @@ EntityInfo::EntityInfo
 (
   const std::string&  _entityId,
   const std::string&  _entityType,
-  const std::string&  _isPattern,
+  bool                _isPattern,
   bool                _isTypePattern
 )
 :
-entityId(_entityId), entityType(_entityType), isTypePattern(_isTypePattern)
+entityId(_entityId), isPattern(_isPattern), entityType(_entityType), isTypePattern(_isTypePattern)
 {
-  isPattern    = (_isPattern == "true") || (_isPattern == "TRUE") || (_isPattern == "True");
-
   if (isPattern)
   {
     if (!regComp(&entityIdPattern, _entityId.c_str(), REG_EXTENDED))
@@ -395,6 +390,28 @@ static bool servicePathMatch(CachedSubscription* cSubP, char* servicePath)
 
 /* ****************************************************************************
 *
+* subHasAltType
+*
+*/
+static bool subHasAltType(CachedSubscription* cSubP, ngsiv2::SubAltType targetAltType)
+{
+  if (cSubP->subAltTypeV.size() != 0)
+  {
+    for (unsigned int ix = 0; ix < cSubP->subAltTypeV.size(); ix++)
+    {
+      if (cSubP->subAltTypeV[ix] == targetAltType)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * matchAltType -
 *
 */
@@ -497,14 +514,16 @@ static bool subMatch
   }
 
   //
-  // If one of the attribute names in the scope vector
+  // If one of the attribute names in the expression
   // of the subscription has the same name as the incoming attribute. there is a match.
   // Additionaly, if the attribute list in cSubP is empty, there is a match (this is the
   // case of ONANYCHANGE subscriptions).
   //
   // Depending of the alteration type, we use the list of attributes in the request or the list
   // with effective modifications. Note that EntityDelete doesn't check the list
-  if (targetAltType == ngsiv2::EntityUpdate)
+  // The second part of the || (i.e. isChangeAltType and sub alt types include entityUpdate) is due to issue #4647
+  // (not sure if a smarter and cleaner solution is possible...)
+  if ((targetAltType == ngsiv2::EntityUpdate) || ((isChangeAltType(targetAltType)) && (subHasAltType(cSubP, ngsiv2::EntityUpdate))))
   {
     if (!attributeMatch(cSubP, attributes))
     {
@@ -637,6 +656,7 @@ void subCacheItemDestroy(CachedSubscription* cSubP)
 
   cSubP->httpInfo.release();
   cSubP->mqttInfo.release();
+  cSubP->kafkaInfo.release();
 
   for (unsigned int ix = 0; ix < cSubP->entityIdInfos.size(); ++ix)
   {
@@ -821,7 +841,8 @@ void subCacheItemInsert
   const char*                             servicePath,
   const ngsiv2::HttpInfo&                 httpInfo,
   const ngsiv2::MqttInfo&                 mqttInfo,
-  const std::vector<ngsiv2::EntID>&       entIdVector,
+  const ngsiv2::KafkaInfo&                kafkaInfo,
+  const std::vector<EntityId>&            entIdVector,
   const std::vector<std::string>&         attributes,
   const std::vector<std::string>&         metadata,
   const std::vector<std::string>&         conditionAttrs,
@@ -898,6 +919,7 @@ void subCacheItemInsert
 
   cSubP->httpInfo.fill(httpInfo);
   cSubP->mqttInfo.fill(mqttInfo);
+  cSubP->kafkaInfo.fill(kafkaInfo);
 
   //
   // String filters
@@ -929,8 +951,8 @@ void subCacheItemInsert
   //
   for (unsigned int ix = 0; ix < entIdVector.size(); ++ix)
   {
-    const ngsiv2::EntID* eIdP = &entIdVector[ix];
-    std::string          isPattern      = (eIdP->id.empty())? "true" : "false";
+    const EntityId*      eIdP = &entIdVector[ix];
+    bool                 isPattern      = (eIdP->id.empty());
     bool                 isTypePattern  = (eIdP->type.empty());
     std::string          id             = (eIdP->id.empty())? eIdP->idPattern   : eIdP->id;
     std::string          type           = (eIdP->type.empty())? eIdP->typePattern : eIdP->type;
@@ -1182,7 +1204,7 @@ typedef struct CachedSubSaved
 *   execute until the point where the temporal objects are deleted (See '6. Free the vector savedSubV').
 *   To fix this little problem, we have created a variable 'subCacheState' that is set to ScsSynchronizing while
 *   the sub-cache synchronization is working.
-*   In serviceRoutines/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
+*   In serviceRoutinesV2/exitTreat.cpp this variable is checked and if iot is set to ScsSynchronizing, then a
 *   sleep for a few seconds is performed before the broker exits (this is only for DEBUG compilations).
 */
 void subCacheSync(void)

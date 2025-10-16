@@ -33,7 +33,6 @@
 #include "common/errorMessages.h"
 #include "alarmMgr/AlarmManager.h"
 #include "alarmMgr/alarmMgr.h"
-#include "apiTypesV2/Entities.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "jsonParseV2/parseEntityObject.h"
@@ -55,7 +54,7 @@
 * of forwarded request so maybe it can be simplified)
 *
 */
-bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, Entities* evP, OrionError* oeP)
+bool parseEntitiesResponse(ConnectionInfo* ciP, const char* payload, EntityVector* evP, OrionError* oeP)
 {
   rapidjson::Document  document;
 

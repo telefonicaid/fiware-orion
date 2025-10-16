@@ -67,13 +67,14 @@ When the broker starts, the subscription cache is populated with the subscriptio
   double                           statusLastChange;
   int64_t                          count;
   RenderFormat                     renderFormat;
-  SubscriptionExpression           expression;
+  Expression                       expression;
   bool                             blacklist;
   bool                             onlyChanged;
   bool                             covered;
   bool                             notifyOnMetadataChange;
   ngsiv2::HttpInfo                 httpInfo;
   ngsiv2::MqttInfo                 mqttInfo;
+  ngsiv2::KafkaInfo                kafkaInfo;
   int64_t                          lastFailure;  // timestamp of last notification failure
   int64_t                          lastSuccess;  // timestamp of last successful notification
   std::string                      lastFailureReason;

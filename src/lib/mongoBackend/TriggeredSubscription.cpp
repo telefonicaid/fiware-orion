@@ -46,6 +46,7 @@ TriggeredSubscription::TriggeredSubscription
   RenderFormat             _renderFormat,
   const ngsiv2::HttpInfo&  _httpInfo,
   const ngsiv2::MqttInfo&  _mqttInfo,
+  const ngsiv2::KafkaInfo&  _kafkaInfo,
   const StringList&        _attrL,
   const std::string&       _cacheSubId,
   const char*              _tenant,
@@ -67,6 +68,7 @@ TriggeredSubscription::TriggeredSubscription
 {
   httpInfo.fill(_httpInfo);
   mqttInfo.fill(_mqttInfo);
+  kafkaInfo.fill(_kafkaInfo);
 }
 
 
@@ -92,6 +94,7 @@ TriggeredSubscription::~TriggeredSubscription()
   // Only one of the release operations will actually do something
   httpInfo.release();
   mqttInfo.release();
+  kafkaInfo.release();
 }
 
 
@@ -99,10 +102,6 @@ TriggeredSubscription::~TriggeredSubscription()
 /* ****************************************************************************
 *
 * TriggeredSubscription::fillExpression -
-*
-* TriggeredSubscription class is shared for NGSI9 and NGSI10 subscriptions, so it is better
-* to keep expressions (an artifact for NGSI10) out of the constructor, in its independent fill
-* method
 */
 void TriggeredSubscription::fillExpression
 (
@@ -114,21 +113,6 @@ void TriggeredSubscription::fillExpression
   expression.georel   = georel;
   expression.geometry = geometry;
   expression.coords   = coords;
-}
-
-
-/* ****************************************************************************
-*
-* TriggeredSubscription::toString -
-*/
-std::string TriggeredSubscription::toString(const std::string& delimiter)
-{
-  std::stringstream ss;
-
-  ss << throttling << delimiter << lastNotification << delimiter << renderFormatToString(renderFormat) << delimiter << httpInfo.url;
-  ss << expression.georel << delimiter << expression.coords << delimiter << expression.geometry << delimiter;
-
-  return ss.str();
 }
 
 

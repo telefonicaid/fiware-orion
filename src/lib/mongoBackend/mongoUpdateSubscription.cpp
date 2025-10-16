@@ -54,7 +54,6 @@
 using ngsiv2::HttpInfo;
 using ngsiv2::Subscription;
 using ngsiv2::SubscriptionUpdate;
-using ngsiv2::EntID;
 
 
 /* ****************************************************************************
@@ -71,6 +70,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_MQTTTOPIC, 1);
     unsetB->append(CSUB_MQTTQOS,   1);
     unsetB->append(CSUB_MQTTRETAIN, 1);
+    unsetB->append(CSUB_KAFKATOPIC, 1);
     unsetB->append(CSUB_USER,      1);
     unsetB->append(CSUB_PASSWD,    1);
 
@@ -95,7 +95,7 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_JSON, 1);
     }
   }
-  else  // MqttNotification
+  else if (sub.notification.type == ngsiv2::MqttNotification) // MqttNotification
   {
     unsetB->append(CSUB_TIMEOUT, 1);
     unsetB->append(CSUB_METHOD,  1);
@@ -129,6 +129,41 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PAYLOAD, 1);
     }
   }
+  else // KafkaNotification
+  {
+    unsetB->append(CSUB_TIMEOUT, 1);
+    unsetB->append(CSUB_METHOD,  1);
+    unsetB->append(CSUB_HEADERS, 1);
+    unsetB->append(CSUB_QS,      1);
+
+    // FIXME #4714: not yet in use
+    /*if (!sub.notification.kafkaInfo.providedAuth)
+    {
+      unsetB->append(CSUB_USER,   1);
+      unsetB->append(CSUB_PASSWD, 1);
+    }*/
+
+    if  (sub.notification.kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Text)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_NGSI, 1);
+      // Sometimes there is no payload in the sub request, in which case we also have to unset
+      if ((sub.notification.kafkaInfo.includePayload) && (sub.notification.kafkaInfo.payload.empty()))
+      {
+        unsetB->append(CSUB_PAYLOAD, 1);
+      }
+    }
+    else if (sub.notification.kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Json)
+    {
+      unsetB->append(CSUB_PAYLOAD, 1);
+      unsetB->append(CSUB_NGSI, 1);
+    }
+    else  // (sub.notification.kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Ngsi)
+    {
+      unsetB->append(CSUB_JSON, 1);
+      unsetB->append(CSUB_PAYLOAD, 1);
+    }
+  }
 
   setNotificationInfo(sub, setB);
 }
@@ -146,26 +181,22 @@ static void updateInCache
   const std::string&         tenant
 )
 {
-  //
-  // StringFilter in Scope?
-  //
-  // Any Scope of type SCOPE_TYPE_SIMPLE_QUERY in subUp.restriction.scopeVector?
-  // If so, set it as string filter to the sub-cache item
-  //
-  StringFilter*  stringFilterP   = NULL;
-  StringFilter*  mdStringFilterP = NULL;
+  // set strinFilterP and mdStringFilterP (they will be used later in subCacheItemInsert)
+  std::string err;
 
-  for (unsigned int ix = 0; ix < subUp.restriction.scopeVector.size(); ++ix)
+  StringFilter* stringFilterP = subUp.subject.condition.expression.stringFilter.clone(&err);
+  if (stringFilterP == NULL)
   {
-    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY)
-    {
-      stringFilterP = subUp.restriction.scopeVector[ix]->stringFilterP;
-    }
+    LM_E(("Runtime Error (cloning stringFilter: %s)", err.c_str()));
+    return;
+  }
 
-    if (subUp.restriction.scopeVector[ix]->type == SCOPE_TYPE_SIMPLE_QUERY_MD)
-    {
-      mdStringFilterP = subUp.restriction.scopeVector[ix]->mdStringFilterP;
-    }
+  StringFilter* mdStringFilterP = subUp.subject.condition.expression.mdStringFilter.clone(&err);
+  if (mdStringFilterP == NULL)
+  {
+    delete stringFilterP;
+    LM_E(("Runtime Error (cloning mdStringFilterP: %s)", err.c_str()));
+    return;
   }
 
   //
@@ -312,6 +343,11 @@ static void updateInCache
   }
 
   cacheSemGive(__FUNCTION__, "Updating cached subscription");
+
+  // Release dynamic memory allocated by clone() methods
+  // (note stringFilterP and mdStringFilterP can be not NULL as that condition is already checked above)
+  delete stringFilterP;
+  delete mdStringFilterP;
 }
 
 
@@ -353,7 +389,7 @@ std::string mongoUpdateSubscription
 
   setServicePath(servicePath, &setB);
 
-  if (subUp.subjectProvided)       setEntities(subUp, &setB, subUp.fromNgsiv1);
+  if (subUp.subjectProvided)       setEntities(subUp, &setB);
   if (subUp.subjectProvided)       setConds(subUp, &setB);
   if (subUp.subjectProvided)       setOperations(subUp, &setB);
   if (subUp.subjectProvided)       setExpression(subUp, &setB);

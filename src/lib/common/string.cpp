@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -36,6 +37,7 @@
 #include "common/wsStrip.h"
 #include "common/limits.h"
 #include "alarmMgr/alarmMgr.h"
+#include "parse/forbiddenChars.h"
 
 
 
@@ -156,6 +158,49 @@ bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort
   return isIPv6(res);
 }
 
+
+/* ****************************************************************************
+*
+* getIPv4HostPort -
+*/
+bool getIPv4HostPort(const std::string& broker, std::string& host, int& port, const std::string& protocol)
+{
+  // IPv4
+  std::vector<std::string>  hostTokens;
+  int   components = stringSplit(broker, ':', hostTokens);
+
+  /* some.host.com:8080
+   *              ^
+   *              |
+   * ------------- ----
+   *   0             1  position in urlTokens vector
+   * 1            2     components
+   */
+
+  /* Sanity check */
+  if (components > 2)
+  {
+    return false;
+  }
+
+  host = hostTokens[0];
+
+  if (components == 2)
+  {
+    /* Sanity check (corresponding to http://xxxx:/path) */
+    if (hostTokens[1].empty())
+    {
+      return false;
+    }
+
+    port = atoi(hostTokens[1].c_str());
+  }
+  else  // port not given - using default ports
+  {
+    port = protocol == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
+  }
+  return true;
+}
 
 
 /* ****************************************************************************
@@ -358,13 +403,13 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
   /* First: split by the first '/' to get host:ip and path */
   std::vector<std::string>  urlTokens;
-  int                       components = stringSplit(url, '/', urlTokens);  
+  int                       components = stringSplit(url, '/', urlTokens);
 
   //
   // Ensuring the scheme is present
   // Note that although mqtt:// is not officially supported it is used de facto (see for instance https://github.com/mqtt/mqtt.org/wiki/URI-Scheme)
   //
-  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:")))
+  if ((urlTokens.size() == 0) || ((urlTokens[0] != "https:") && (urlTokens[0] != "http:") && (urlTokens[0] != "mqtt:") && (urlTokens[0] != "kafka:")))
   {
     return false;
   }
@@ -414,38 +459,9 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
   else
   {
     // IPv4
-    std::vector<std::string>  hostTokens;
-    components = stringSplit(urlTokens[2], ':', hostTokens);
-
-    /* some.host.com:8080
-     *              ^
-     *              |
-     * ------------- ----
-     *   0             1  position in urlTokens vector
-     * 1            2     components
-     */
-
-    /* Sanity check */
-    if (components > 2)
+    if (!getIPv4HostPort(urlTokens[2], host, port, protocol))
     {
       return false;
-    }
-
-    host = hostTokens[0];
-
-    if (components == 2)
-    {
-      /* Sanity check (corresponding to http://xxxx:/path) */
-      if (hostTokens[1].empty())
-      {
-        return false;
-      }
-
-      port = atoi(hostTokens[1].c_str());
-    }
-    else  // port not given - using default ports
-    {
-      port = urlTokens[0] == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }
   }
 
@@ -471,30 +487,127 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
 /* ****************************************************************************
 *
-* validUrl - check validity of a URL
+* parseKafkaBrokerList
 */
-bool validUrl(const std::string& url)
+bool  parseKafkaBrokerList(const std::string& url, std::string* cleanListOut, std::string* protocol, std::string* path)
 {
-  std::string  host;
-  int          port;
-  std::string  path;
-  std::string  protocol;
+  if (url.empty())
+  {
+    return false;
+  }
 
-  return parseUrl(url, host, port, path, protocol);
+  // Validate output pointers
+  if (!cleanListOut || !protocol || !path)
+  {
+    return false;
+  }
+
+  std::stringstream        ss(url);
+  std::string              rawBroker;
+  std::vector<std::string> cleaned;
+
+  /* First: split by the first '/' to get host:ip and path */
+  std::vector<std::string>  urlTokens;
+  int components = stringSplit(url, '/', urlTokens);
+  (void)components;
+
+  //
+  //
+  // // Accept only kafka://
+  //
+  *protocol = urlTokens[0];
+
+  while (std::getline(ss, rawBroker, ','))
+  {
+    // Trim
+    rawBroker.erase(0, rawBroker.find_first_not_of(" \t\n\r"));
+    rawBroker.erase(rawBroker.find_last_not_of(" \t\n\r") + 1);
+    if (rawBroker.empty())
+    {
+      continue;
+    }
+
+    // Prefix kafka://
+    const std::string prefix = *protocol + "//";
+
+    if (rawBroker.rfind(prefix, 0) == 0)
+    {
+      rawBroker.erase(0, prefix.size());
+    }
+
+    // reject if it contains '/' (there should be no path)
+    if (path->empty())
+    {
+      /* Minimum path is always "/" */
+      *path = "/";
+    }
+
+    size_t slashPos = rawBroker.find('/');
+    if (slashPos != std::string::npos)
+    {
+      *path = rawBroker.substr(slashPos);
+    }
+
+    // Validations
+    std::string host, portStr;
+    int         port = 0;
+
+    // IPv6  [addr]:port
+    if (getIPv6Port(rawBroker, host, portStr))
+    {
+      if (portStr.empty())
+      {
+        return false;
+      }
+      port = atoi(portStr.c_str());
+    }
+    else
+    {
+      // IPv4 addr:port
+      if (!getIPv4HostPort(rawBroker, host, port, *protocol))
+      {
+        return false;
+      }
+    }
+
+    //
+    // Is 'port' a valid number?
+    // MAX_PORT is the maximum number that a port can have.
+    // Negative port numbers cannot exist and 0 is reserved.
+    //
+    if ((port > MAX_PORT) || (port <= 0))
+    {
+      return false;
+    }
+
+    if (forbiddenChars(host.c_str()) || !hostnameIsValid(host.c_str()))
+      return false;
+
+    // normalize and save
+    // For IPv6 we keep brackets
+    if (host.find(':') != std::string::npos && host.front() != '[')
+    {
+      host = "[" + host + "]";
+    }
+
+    cleaned.push_back(host + ":" + std::to_string(port));
+  }
+
+  if (cleaned.empty())
+  {
+    return false;
+  }
+
+  // Rebuild final list
+  cleanListOut->clear();
+  for (size_t i = 0; i < cleaned.size(); ++i)
+  {
+    if (i) *cleanListOut += ',';
+    *cleanListOut += cleaned[i];
+  }
+
+  return true;
 }
-
-
-
-/* ****************************************************************************
-*
-* i2s - integer to string
-*/
-char* i2s(int i, char* placeholder, int placeholderSize)
-{
-  snprintf(placeholder, placeholderSize, "%d", i);
-  return placeholder;
-}
-
 
 
 /* ****************************************************************************
@@ -520,32 +633,6 @@ std::string parsedUptime(int uptime)
 
   snprintf(s, sizeof(s), "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
-}
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - 
-*/
-bool onlyWs(const char* s)
-{
-  if (*s == 0)
-  {
-    return true;
-  }
-
-  while (*s != 0)
-  {
-    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
-    {
-      return false;
-    }
-
-    ++s;
-  }
-
-  return true;
 }
 
 
@@ -813,38 +900,6 @@ char* strToLower(char* to, const char* from, int toSize)
 
 /* ****************************************************************************
 *
-* strReplace - 
-*/
-void strReplace(char* to, int toLen, const char* from, const char* oldString, const char* newString)
-{
-  int toIx   = 0;
-  int fromIx = 0;
-  int oldLen = strlen(oldString);
-  int newLen = strlen(newString);
-
-  while (from[fromIx] != 0)
-  {
-    if (strncmp(&from[fromIx], oldString, oldLen) == 0)
-    {
-      strncat(to, newString, toLen - strlen(to));
-      toIx   += newLen;
-      fromIx += oldLen;
-    }
-    else
-    {
-      to[toIx] = from[fromIx];
-      toIx   += 1;
-      fromIx += 1;
-    }
-  }
-
-  to[toIx] = 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * servicePathCheck - check one single component of the service-path
 *
 * NOTE
@@ -964,11 +1019,17 @@ std::string double2string(double f)
   long long  intPart   = (long long) f;
   double     diff      = f - intPart;
   bool       isInteger = false;
+  bool       large     = false;
 
   // abs value for 'diff'
   diff = (diff < 0)? -diff : diff;
 
-  if (diff > 0.9999999998)
+  if (diff > 1)
+  {
+    // this is an overflow situation, pe. f = 1.79e308
+    large = true;
+  }
+  else if (diff > 0.9999999998)
   {
     intPart += 1;
     isInteger = true;
@@ -984,7 +1045,14 @@ std::string double2string(double f)
   }
   else
   {
-    snprintf(buf, bufSize, "%.9f", f);
+    if (large)
+    {
+      snprintf(buf, bufSize, "%.17g", f);
+    }
+    else
+    {
+      snprintf(buf, bufSize, "%.9f", f);
+    }
 
     // Clear out any unwanted trailing zeroes
     char* last = &buf[strlen(buf) - 1];
@@ -1138,4 +1206,114 @@ bool regComp(regex_t* re, const char* pattern, int flags)
   LM_T(LmtRegexError, ("regcomp() failed for pattern '%s': %s", pattern, buffer));
 
   return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* htmlEscape - 
+*
+* Allocate a new buffer to hold an escaped version of the input buffer 's'.
+* Escaping characters demands more space in the buffer, for some characters up to six
+* characters - double-quote (") needs SIX chars: &quot;
+* So, when allocating room for the output (escaped) buffer, we need to consider the worst case
+* and six times the length of the input buffer is allocated (plus one byte for the zero-termination.
+*
+* See http://www.anglesanddangles.com/asciichart.php for more info on the 'html-escpaing' of ASCII chars.
+*/
+char* htmlEscape(const char* s)
+{
+  int   newLen  = strlen(s) * 6 + 1;  // See function header comment
+  char* out     = (char*) calloc(1, newLen);
+  int   sIx     = 0;
+  int   outIx   = 0;
+  
+  if (out == NULL)
+  {
+    LM_E(("Runtime Error (allocating %d bytes: %s)", newLen, strerror(errno)));
+    return NULL;
+  }
+
+  while (s[sIx] != 0)
+  {
+    switch (s[sIx])
+    {
+    case '<':
+      out[outIx++] = '&';
+      out[outIx++] = 'l';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '>':
+      out[outIx++] = '&';
+      out[outIx++] = 'g';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '(':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '0';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ')':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '=':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '6';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '\'':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '3';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '"':
+      out[outIx++] = '&';
+      out[outIx++] = 'q';
+      out[outIx++] = 'u';
+      out[outIx++] = 'o';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ';':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '5';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    default:
+      out[outIx++] = s[sIx++];
+    }
+  }
+
+  return out;
 }

@@ -30,7 +30,6 @@
 #include "logMsg/logMsg.h"
 
 #include "common/globals.h"
-#include "common/tag.h"
 #include "common/limits.h"
 #include "common/JsonHelper.h"
 #include "alarmMgr/alarmMgr.h"
@@ -42,69 +41,11 @@
 
 /* ****************************************************************************
 *
-* EntityTypeResponse::toJsonV1 -
-*/
-std::string EntityTypeResponse::toJsonV1
-(
-  bool  asJsonObject,
-  bool  asJsonOut,
-  bool  collapsed
-)
-{
-  std::string out = "";
-
-  out += startTag();
-
-  out += entityType.toJsonV1(asJsonObject, asJsonOut, collapsed, true, true);
-  out += statusCode.toJsonV1(false);
-
-  out += endTag();
-
-  return out;
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeResponse::check -
-*/
-std::string EntityTypeResponse::check
-(
-  ApiVersion          apiVersion,
-  bool                asJsonObject,
-  bool                asJsonOut,
-  bool                collapsed,
-  const std::string&  predetectedError
-)
-{
-  std::string res;
-
-  if (!predetectedError.empty())
-  {
-    statusCode.fill(SccBadRequest, predetectedError);
-  }
-  else if ((res = entityType.check(apiVersion, predetectedError)) != "OK")
-  {
-    alarmMgr.badInput(clientIp, res);
-    statusCode.fill(SccBadRequest, res);
-  }
-  else
-    return "OK";
-
-  return toJsonV1(asJsonObject, asJsonOut, collapsed);
-}
-
-
-
-/* ****************************************************************************
-*
 * EntityTypeResponse::release -
 */
 void EntityTypeResponse::release(void)
 {
   entityType.release();
-  statusCode.release();
 }
 
 

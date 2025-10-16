@@ -37,24 +37,24 @@
 */
 TEST(ContextAttribute, checkOne)
 {
-  ContextAttribute*  caP = new ContextAttribute();
-  std::string       res;
-
   utInit();
 
+  ContextAttribute*  caP = new ContextAttribute();
+  std::string       res;  
+
   caP->name = "";
-  res     = caP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "missing attribute name");
+  res     = caP->check(false);
+  EXPECT_EQ(res, "attribute name length: 0, min length supported: 1");
 
   caP->name  = "Algo, lo que sea!";
   caP->stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
-  res     = caP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "OK");
+  res     = caP->check(false);
+  EXPECT_EQ(res, "Invalid characters in attribute name");
 
   caP->stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-  res     = caP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "OK");
+  res     = caP->check(false);
+  EXPECT_EQ(res, "Invalid characters in attribute name");
 
   utExit();
 }
@@ -82,8 +82,8 @@ TEST(ContextAttribute, checkVector)
   caVectorP->push_back(ca0P);
   caVectorP->push_back(ca1P);
 
-  res     = caVectorP->check(V1, RegisterContext);
-  EXPECT_TRUE(res == "OK");
+  res     = caVectorP->check(false);
+  EXPECT_EQ(res, "Invalid characters in attribute name");
 
   utExit();
 }
@@ -104,7 +104,7 @@ TEST(ContextAttribute, render)
 
   std::vector<std::string> emptyMdV;
 
-  out = caP->toJsonV1(false, UpdateContext, emptyMdV, false);
+  out = caP->toJson(emptyMdV, false, NULL);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -28,18 +28,10 @@
 
 #include "common/MimeType.h"
 #include "common/limits.h"
-#include "ngsi/StatusCode.h"
 #include "metricsMgr/metricsMgr.h"
 
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "ngsi9/RegisterContextResponse.h"
-
-#include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/SubscribeContextResponse.h"
-#include "ngsi10/UnsubscribeContextResponse.h"
-#include "ngsi10/UpdateContextResponse.h"
-#include "ngsi10/UpdateContextSubscriptionResponse.h"
-#include "ngsi10/NotifyContextResponse.h"
+#include "ngsi/QueryContextResponse.h"
+#include "ngsi/UpdateContextResponse.h"
 
 #include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
@@ -102,44 +94,41 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   }
 
   // Check if CORS is enabled, the Origin header is present in the request and the response is not a bad verb response
-  if ((corsEnabled == true) && (!ciP->httpHeaders.origin.empty()) && (ciP->httpStatusCode != SccBadVerb))
+  // Only for NGSIv2 methods (this exclusdes eg. "GET /version")
+  if ((corsEnabled == true) && (!ciP->httpHeaders.origin.empty()) && (ciP->httpStatusCode != SccBadVerb) && (ciP->url.compare(0, 3, "/v2") == 0))
   {
-    // Only GET method is supported for V1 API
-    if ((ciP->apiVersion == V2) || (ciP->apiVersion == V1 && ciP->verb == GET))
+    bool originAllowed = true;
+
+    // If any origin is allowed, the header is sent always with "any" as value
+    if (strcmp(corsOrigin, "__ALL") == 0)
     {
-      bool originAllowed = true;
+      MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+    }
+    // If a specific origin is allowed, the header is only sent if the origins match
+    else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
+    {
+      MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
+    }
+    // If there is no match, originAllowed flag is set to false
+    else
+    {
+      originAllowed = false;
+    }
 
-      // If any origin is allowed, the header is sent always with "any" as value
-      if (strcmp(corsOrigin, "__ALL") == 0)
+    // If the origin is not allowed, no headers are added to the response
+    if (originAllowed)
+    {
+      // Add Access-Control-Expose-Headers to the response
+      MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
+
+      if (ciP->verb == OPTIONS)
       {
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
-      }
-      // If a specific origin is allowed, the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), corsOrigin) == 0)
-      {
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_ORIGIN, corsOrigin);
-      }
-      // If there is no match, originAllowed flag is set to false
-      else
-      {
-        originAllowed = false;
-      }
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
 
-      // If the origin is not allowed, no headers are added to the response
-      if (originAllowed)
-      {
-        // Add Access-Control-Expose-Headers to the response
-        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_EXPOSE_HEADERS, CORS_EXPOSED_HEADERS);
+        char maxAge[STRING_SIZE_FOR_INT];
+        snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
 
-        if (ciP->verb == OPTIONS)
-        {
-          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_ALLOW_HEADERS, CORS_ALLOWED_HEADERS);
-
-          char maxAge[STRING_SIZE_FOR_INT];
-          snprintf(maxAge, sizeof(maxAge), "%d", corsMaxAge);
-
-          MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE, maxAge);
-        }
+        MHD_add_response_header(response, HTTP_ACCESS_CONTROL_MAX_AGE, maxAge);
       }
     }
   }
@@ -148,73 +137,3 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   MHD_destroy_response(response);
 }
 
-
-
-/* ****************************************************************************
-*
-* restErrorReplyGet -
-*
-* This function renders an error reply depending on the type of the request (ciP->restServiceP->request).
-*
-* The function is called from more than one place, especially from
-* restErrorReply(), but also from where the payload type is matched against the request URL.
-* Where the payload type is matched against the request URL, the incoming 'request' is a
-* request and not a response.
-*/
-void restErrorReplyGet(ConnectionInfo* ciP, HttpStatusCode code, const std::string& details, std::string* outStringP)
-{
-  StatusCode  errorCode(code, details, "errorCode");
-
-  ciP->httpStatusCode = SccOk;
-
-  if (ciP->restServiceP->request == RegisterContext)
-  {
-    RegisterContextResponse rcr("000000000000000000000000", errorCode);
-    *outStringP = rcr.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == DiscoverContextAvailability)
-  {
-    DiscoverContextAvailabilityResponse dcar(errorCode);
-    *outStringP = dcar.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == QueryContext)
-  {
-    QueryContextResponse  qcr(errorCode);
-    bool                  asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-    *outStringP = qcr.toJsonV1(asJsonObject);
-  }
-  else if (ciP->restServiceP->request == SubscribeContext)
-  {
-    SubscribeContextResponse scr(errorCode);
-    *outStringP = scr.toJsonV1();
-  }
-  else if ((ciP->restServiceP->request == UpdateContextSubscription) || (ciP->restServiceP->request == Ngsi10SubscriptionsConvOp))
-  {
-    UpdateContextSubscriptionResponse ucsr(errorCode);
-    *outStringP = ucsr.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == UnsubscribeContext)
-  {
-    UnsubscribeContextResponse uncr(errorCode);
-    *outStringP = uncr.toJsonV1();
-  }
-  else if (ciP->restServiceP->request == UpdateContext)
-  {
-    UpdateContextResponse ucr(errorCode);
-    bool asJsonObject = (ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object" && ciP->outMimeType == JSON);
-    *outStringP = ucr.toJsonV1(asJsonObject);
-  }
-  else if (ciP->restServiceP->request == NotifyContext)
-  {
-    NotifyContextResponse ncr(errorCode);
-    *outStringP = ncr.toJsonV1();
-  }
-  else
-  {
-    OrionError oe(errorCode);
-
-    LM_T(LmtRest, ("Unknown request type: '%d'", ciP->restServiceP->request));
-    ciP->httpStatusCode = oe.code;
-    *outStringP = oe.setStatusCodeAndSmartRender(ciP->apiVersion, &ciP->httpStatusCode);
-  }
-}

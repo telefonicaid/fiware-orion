@@ -1,0 +1,44 @@
+{
+    // Put this file in .vscode/launch.json in your project folder to use it for debugging.
+    // The example "args" are the usual ones for running ORion Context for functional tests,
+    // change them as you need.    
+
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Context Broker (gdb)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/BUILD_DEBUG/src/app/contextBroker/contextBroker",
+            "args": [
+                "-fg",
+                "-harakiri",
+                "-port", "9999",
+                "-pidpath", "/tmp/orion_9999.pid",
+                "-dbURI", "mongodb://localhost:27017",
+                "-db", "ftest",
+                "-dbPoolSize", "10",
+                "-t 0-255",
+                "-logLevel", "DEBUG",    
+                "-notificationMode", "threadpool:200:20",
+                "-noCache"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+
+    ]
+}

@@ -20,7 +20,7 @@
 #
 
 ARG  IMAGE_NAME=debian
-ARG  IMAGE_TAG=12.7-slim
+ARG  IMAGE_TAG=12.10-slim
 FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -46,6 +46,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # Install dependencies
     apt-get -y install \
       curl \
+      librdkafka1 \
       cmake \
       libssl-dev \
       git \
@@ -58,7 +59,11 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       uuid-dev \
       libgnutls28-dev \
       libsasl2-dev \
-      libgcrypt-dev && \
+      libgcrypt-dev \
+      librdkafka-dev \
+      zlib1g-dev \
+      libzstd-dev  \
+      liblz4-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
     curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz && \
@@ -102,7 +107,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     git clone https://github.com/${GIT_NAME}/fiware-orion && \
     cd fiware-orion && \
     git checkout ${GIT_REV_ORION} && \
-    bash get_cjexl.sh 0.4.0 $(cat /run/secrets/repo_token) && \
+    bash get_cjexl.sh 0.6.0 $(cat /run/secrets/repo_token) && \
     make && \
     make install && \
     # reduce size of installed binaries
@@ -145,7 +150,11 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       uuid-dev \
       libgnutls28-dev \
       libsasl2-dev \
-      libgcrypt-dev && \
+      libgcrypt-dev  \
+      librdkafka-dev \
+      zlib1g-dev \
+      libzstd-dev  \
+      liblz4-dev && \
     apt-get -y autoremove --purge && \
     # The above apt removal erases some dependencies needed by contextBroker. So we reinstall it
     apt-get -y install \
@@ -157,7 +166,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
 WORKDIR /
 
 # Note we disable log file as docker container will output by stdout
-ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-ngsiv1Autocast", "-disableFileLog" ]
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice", "-disableFileLog" ]
 EXPOSE 1026
 
 LABEL "maintainer"="Orion Team. Telefónica I+D"

@@ -30,6 +30,7 @@
 
 #include "common/statistics.h"
 #include "common/clockFunctions.h"
+#include "common/string.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -84,7 +85,7 @@ std::string changeLogConfig
   {
     ciP->httpStatusCode = SccBadRequest;
     alarmMgr.badInput(clientIp, "no log configs in URI param");
-    return "{\"error\":\"log config missing\"}";
+    return "{\"error\":\"BadRequest\",\"description\":\"log config missing\"}";
   }
 
   if (!logSize.empty())
@@ -97,7 +98,7 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid logLineMaxSize in URI param", logSize);
-      return "{\"error\":\"invalid lineMaxSize, lineMaxSize should be an integer number > 0\"}";
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid lineMaxSize, lineMaxSize should be an integer number > 0\"}";
     }
   }
 
@@ -111,7 +112,7 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid logInfoPayloadMaxSize in URI param", payloadSize);
-      return "{\"error\":\"invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0\"}";
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid infoPayloadMaxSize, infoPayloadMaxSize should be an integer number > 0\"}";
     }
   }
 
@@ -148,7 +149,7 @@ std::string changeLogConfig
     {
       ciP->httpStatusCode = SccBadRequest;
       alarmMgr.badInput(clientIp, "invalid log level in URI param", level);
-      return "{\"error\":\"invalid log level\"}";
+      return "{\"error\":\"BadRequest\",\"description\":\"invalid log level\"}";
     }
   }
 
@@ -172,7 +173,7 @@ std::string getLogConfig
   std::string  level = lmLevelMaskStringGet();
   std::string  payloadMaxSize = std::to_string(logInfoPayloadMaxSize);
   std::string  lineMaxSize    = std::to_string(logLineMaxSize);
-  std::string  deprecate     = logDeprecate ? "true" : "false";
+  std::string  deprecate      = FT(logDeprecate);
 
   return "{\"level\":\"" + level + "\", \
            \"infoPayloadMaxSize\":" + payloadMaxSize + ", \
