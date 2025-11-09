@@ -91,6 +91,11 @@ std::string KafkaInfo::toJson()
       jh.addRaw("ngsi", this->ngsi.toJson(NGSI_V2_NORMALIZED, true));
       break;
     }
+
+    if (headers.size() != 0)
+    {
+      jh.addRaw("headers", objectToJson(headers));
+    }
   }
 
   return jh.str();
@@ -204,6 +209,12 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
         this->ngsi.attributeVector.fill(getObjectFieldF(ngsiObj, ENT_ATTRS));
       }
     }
+
+    if (bo.hasField(CSUB_HEADERS))
+    {
+      orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
+      headers.toStringMap(&this->headers);
+    }
   }
 }
 
@@ -218,6 +229,7 @@ void KafkaInfo::fill(const KafkaInfo& _kafkaInfo)
   this->url            = _kafkaInfo.url;
   this->topic          = _kafkaInfo.topic;
   this->custom         = _kafkaInfo.custom;
+  this->headers        = _kafkaInfo.headers;
   this->payload        = _kafkaInfo.payload;
   this->payloadType    = _kafkaInfo.payloadType;
   this->includePayload = _kafkaInfo.includePayload;

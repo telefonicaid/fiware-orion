@@ -71,7 +71,8 @@ public:
   const std::string& content,
   const std::string& subscriptionId,
   const std::string& tenant,
-  const std::string& servicePath
+  const std::string& servicePath,
+  const std::map<std::string, std::string>& customHeaders
  );
 
  void cleanup(double maxAge);  // Cleaning inactive connections

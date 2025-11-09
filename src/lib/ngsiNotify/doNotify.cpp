@@ -188,13 +188,14 @@ static void doNotifyKafka(SenderThreadParams* params)
 
   // Note in the case of HTTP this lmTransactionStart is done internally in httpRequestSend
   std::string protocol = params->protocol + "//";
+
   correlatorIdSet(params->fiwareCorrelator.c_str());
   lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
                      params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
   // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
   // lastFailureReason and lastSuccessCode in KAFKA notifications (they don't have sense in this case)
-  if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, params->subscriptionId, params->tenant, params->servicePath))
+  if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, params->subscriptionId, params->tenant, params->servicePath, params->extraHeaders))
   {
     logInfoNonRequestNotification("KAFKA", params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");

@@ -25,6 +25,7 @@
 
 #include "kafka/KafkaConnectionManager.h"
 
+#include <algorithm>
 #include <iostream>
 #include <mosquitto.h>
 #include <string>
@@ -333,15 +334,115 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
 
 /* ****************************************************************************
 *
+* KafkaConnectionManager::kafkaHeaderAdd -
+*
+*/
+static void kafkaHeaderAdd(
+  rd_kafka_headers_t*                         headers,
+  const std::string&                          headerName,
+  const std::string&                          headerValue, // default
+  const std::map<std::string, std::string>&   extraHeaders, // claves en minúsculas
+  std::map<std::string, bool>&                usedExtraHeaders
+)
+{
+  std::string headerNameLower = headerName;
+  std::transform(headerNameLower.begin(), headerNameLower.end(), headerNameLower.begin(), ::tolower);
+
+  // By default, we use the “official” value.
+  const std::string* valueToUse = &headerValue;
+
+  // If there is an override in extraHeaders (by lowercase key), custom wins
+  std::map<std::string, std::string>::const_iterator it = extraHeaders.find(headerNameLower);
+  if (it != extraHeaders.end())
+  {
+    valueToUse = &it->second;
+    usedExtraHeaders[headerNameLower] = true;
+  }
+
+  rd_kafka_header_add(headers,
+                      headerName.c_str(),
+                      -1,
+                      valueToUse->c_str(),
+                      static_cast<int>(valueToUse->size()));
+}
+
+
+
+/* ****************************************************************************
+*
+* KafkaConnectionManager::build_kafka_headers -
+*
+*/
+static rd_kafka_headers_t* build_kafka_headers(
+  const std::map<std::string, std::string>& extraHeaders,
+  const std::string&                        tenant,
+  const std::string&                        servicePath
+)
+{
+  rd_kafka_headers_t* headers = rd_kafka_headers_new(0);
+  if (!headers)
+  {
+    return NULL;
+  }
+
+  std::map<std::string, bool> usedExtraHeaders;
+
+  // Tenant (Fiware-Service)
+  if (!tenant.empty())
+  {
+    kafkaHeaderAdd(headers,
+                   HTTP_FIWARE_SERVICE,
+                   tenant,              // default if not included as an extra
+                   extraHeaders,
+                   usedExtraHeaders);
+  }
+
+  // Service-Path (fallback "/")
+  const std::string sp = servicePath.empty() ? "/" : servicePath;
+  kafkaHeaderAdd(headers,
+                 HTTP_FIWARE_SERVICEPATH,
+                 sp,
+                 extraHeaders,
+                 usedExtraHeaders);
+
+  // Remaining extra headers (not used above) -> sent as is
+  for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin();
+       it != extraHeaders.end(); ++it)
+  {
+    const std::string& lowerKey = it->first;   // now in lowercase
+    if (usedExtraHeaders[lowerKey])
+    {
+      continue; // already used to overwrite service/servicepath
+    }
+
+    const std::string& headerName  = it->first;   // if you save lower, lower is sent (same as HTTP)
+    const std::string& headerValue = it->second;
+
+    rd_kafka_header_add(headers,
+                        headerName.c_str(),
+                        -1,
+                        headerValue.c_str(),
+                        static_cast<int>(headerValue.size()));
+  }
+
+  return headers;
+}
+
+
+
+/* ****************************************************************************
+*
 * KafkaConnectionManager::sendKafkaNotification -
 */
 bool KafkaConnectionManager::sendKafkaNotification(
-    const std::string& endpoint,
-    const std::string& topic,
-    const std::string& content,
-    const std::string& subscriptionId,
-    const std::string& tenant,
-    const std::string& servicePath)
+  const std::string& endpoint,
+  const std::string& topic,
+  const std::string& content,
+  const std::string& subscriptionId,
+  const std::string& tenant,
+  const std::string& servicePath,
+  const std::map<std::string, std::string>& customHeaders
+  )
 
 {
 
@@ -371,17 +472,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   // Messages with the same key → Same partition (guarantees order).
 
 
-  rd_kafka_headers_t* headers = rd_kafka_headers_new(0); // Initially without headers
-
-  if (!tenant.empty())
-  {
-    rd_kafka_header_add(headers, HTTP_FIWARE_SERVICE, -1, tenant.c_str(), tenant.size());
-  }
-
-  if (!servicePath.empty())
-  {
-    rd_kafka_header_add(headers, HTTP_FIWARE_SERVICEPATH, -1, servicePath.c_str(), servicePath.size());
-  }
+  rd_kafka_headers_t* headers = build_kafka_headers(customHeaders, tenant, servicePath); // Initially without headers
 
   bool retval = false;
   int resultCode = rd_kafka_producev(
