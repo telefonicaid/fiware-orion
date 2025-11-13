@@ -1,0 +1,1 @@
+-Add: extraHeaders support for kafkaCustom notification and allow overriding the default Fiware-Service and Fiware-ServicePath Kafka headers via extraHeaders

@@ -331,6 +331,19 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
 }
 
 
+/* ****************************************************************************
+*
+* KafkaConnectionManager::toLower helper -
+*
+*/
+static std::string toLower(const std::string& s)
+{
+  std::string out = s;
+  std::transform(out.begin(), out.end(), out.begin(), ::tolower);
+  return out;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -338,32 +351,18 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
 *
 */
 static void kafkaHeaderAdd(
-  rd_kafka_headers_t*                         headers,
-  const std::string&                          headerName,
-  const std::string&                          headerValue, // default
-  const std::map<std::string, std::string>&   extraHeaders, // claves en minúsculas
-  std::map<std::string, bool>&                usedExtraHeaders
+  std::map<std::string, std::string>& outHeaders,
+  const std::string&                  headerName,
+  const std::string&                  headerValue
 )
 {
-  std::string headerNameLower = headerName;
-  std::transform(headerNameLower.begin(), headerNameLower.end(), headerNameLower.begin(), ::tolower);
-
-  // By default, we use the “official” value.
-  const std::string* valueToUse = &headerValue;
-
-  // If there is an override in extraHeaders (by lowercase key), custom wins
-  std::map<std::string, std::string>::const_iterator it = extraHeaders.find(headerNameLower);
-  if (it != extraHeaders.end())
+  if (headerName.empty() || headerValue.empty())
   {
-    valueToUse = &it->second;
-    usedExtraHeaders[headerNameLower] = true;
+    return;
   }
 
-  rd_kafka_header_add(headers,
-                      headerName.c_str(),
-                      -1,
-                      valueToUse->c_str(),
-                      static_cast<int>(valueToUse->size()));
+  std::string keyLower = toLower(headerName);
+  outHeaders[keyLower] = headerValue;
 }
 
 
@@ -385,38 +384,47 @@ static rd_kafka_headers_t* build_kafka_headers(
     return NULL;
   }
 
-  std::map<std::string, bool> usedExtraHeaders;
+  std::map<std::string, std::string> outHeaders;
+
+  const std::string fiwareServiceLower     = toLower(HTTP_FIWARE_SERVICE);
+  const std::string fiwareServicePathLower = toLower(HTTP_FIWARE_SERVICEPATH);
 
   // Tenant (Fiware-Service)
   if (!tenant.empty())
   {
-    kafkaHeaderAdd(headers,
-                   HTTP_FIWARE_SERVICE,
-                   tenant,              // default if not included as an extra
-                   extraHeaders,
-                   usedExtraHeaders);
+    kafkaHeaderAdd(outHeaders, HTTP_FIWARE_SERVICE, tenant);
   }
 
   // Service-Path (fallback "/")
   const std::string sp = servicePath.empty() ? "/" : servicePath;
-  kafkaHeaderAdd(headers,
-                 HTTP_FIWARE_SERVICEPATH,
-                 sp,
-                 extraHeaders,
-                 usedExtraHeaders);
+  kafkaHeaderAdd(outHeaders, HTTP_FIWARE_SERVICEPATH, sp);
 
-  // Remaining extra headers (not used above) -> sent as is
   for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin();
        it != extraHeaders.end(); ++it)
   {
-    const std::string& lowerKey = it->first;   // now in lowercase
-    if (usedExtraHeaders[lowerKey])
-    {
-      continue; // already used to overwrite service/servicepath
-    }
+    kafkaHeaderAdd(outHeaders, it->first, it->second);
+  }
 
-    const std::string& headerName  = it->first;   // if you save lower, lower is sent (same as HTTP)
+  for (std::map<std::string, std::string>::const_iterator it = outHeaders.begin();
+       it != outHeaders.end(); ++it)
+  {
+    const std::string& keyLower   = it->first;
     const std::string& headerValue = it->second;
+
+    std::string headerName;
+
+    if (keyLower == fiwareServiceLower)
+    {
+      headerName = HTTP_FIWARE_SERVICE;
+    }
+    else if (keyLower == fiwareServicePathLower)
+    {
+      headerName = HTTP_FIWARE_SERVICEPATH;
+    }
+    else
+    {
+      headerName = keyLower; // extra headers always in lowercase
+    }
 
     rd_kafka_header_add(headers,
                         headerName.c_str(),
