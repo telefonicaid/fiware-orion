@@ -623,7 +623,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
 
   //
-  // 5. HTTP Headers (only in the case of HTTP notifications)
+  // 5. Headers (only in the case of HTTP and Kafka notifications). In the case of HTTP, we use proper HTTP headers, in the case of Kafka, we use Kafka record headers
   //
   if (notification.type == ngsiv2::HttpNotification || notification.type == ngsiv2::KafkaNotification)
   {
