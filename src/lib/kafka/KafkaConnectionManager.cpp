@@ -443,8 +443,8 @@ static rd_kafka_headers_t* build_kafka_headers(
 * KafkaConnectionManager::sendKafkaNotification -
 */
 bool KafkaConnectionManager::sendKafkaNotification(
-  const std::string& endpoint,
-  const std::string& topic,
+    const std::string& endpoint,
+    const std::string& topic,
     const std::string& content,
     const std::string& subscriptionId,
     const std::string& tenant,
