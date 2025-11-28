@@ -1327,7 +1327,7 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       std::string r = parseDictionary(ciP,
                                       subsP->notification.kafkaInfo.headers,
                                       headers,
-                                      "notification httpCustom headers");
+                                      "notification kafkaCustom headers");
 
       if (!r.empty())
       {
