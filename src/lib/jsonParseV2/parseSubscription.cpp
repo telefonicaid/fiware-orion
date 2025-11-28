@@ -1309,6 +1309,32 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // headers
+    if (kafkaCustom.HasMember("headers"))
+    {
+      const Value& headers = kafkaCustom["headers"];
+
+      if (!headers.IsObject())
+      {
+        return badInput(ciP, "notification kafkaCustom headers is not an object");
+      }
+
+      if (headers.ObjectEmpty())
+      {
+        return badInput(ciP, "notification kafkaCustom headers is empty");
+      }
+
+      std::string r = parseDictionary(ciP,
+                                      subsP->notification.kafkaInfo.headers,
+                                      headers,
+                                      "notification kafkaCustom headers");
+
+      if (!r.empty())
+      {
+        return r;
+      }
+    }
+
     subsP->notification.kafkaInfo.custom = true;
   }
 

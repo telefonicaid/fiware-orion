@@ -25,6 +25,7 @@
 
 #include "kafka/KafkaConnectionManager.h"
 
+#include <algorithm>
 #include <iostream>
 #include <mosquitto.h>
 #include <string>
@@ -330,6 +331,112 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
 }
 
 
+/* ****************************************************************************
+*
+* KafkaConnectionManager::toLower helper -
+*
+*/
+static std::string toLower(const std::string& s)
+{
+  std::string out = s;
+  std::transform(out.begin(), out.end(), out.begin(), ::tolower);
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* KafkaConnectionManager::kafkaHeaderAdd -
+*
+*/
+static void kafkaHeaderAdd(
+  std::map<std::string, std::string>& outHeaders,
+  const std::string&                  headerName,
+  const std::string&                  headerValue
+)
+{
+  if (headerName.empty() || headerValue.empty())
+  {
+    return;
+  }
+
+  std::string keyLower = toLower(headerName);
+  outHeaders[keyLower] = headerValue;
+}
+
+
+
+/* ****************************************************************************
+*
+* KafkaConnectionManager::build_kafka_headers -
+*
+*/
+static rd_kafka_headers_t* build_kafka_headers(
+  const std::map<std::string, std::string>& extraHeaders,
+  const std::string&                        tenant,
+  const std::string&                        servicePath
+)
+{
+  rd_kafka_headers_t* headers = rd_kafka_headers_new(0);
+  if (!headers)
+  {
+    return NULL;
+  }
+
+  std::map<std::string, std::string> outHeaders;
+
+  const std::string fiwareServiceLower     = toLower(HTTP_FIWARE_SERVICE);
+  const std::string fiwareServicePathLower = toLower(HTTP_FIWARE_SERVICEPATH);
+
+  // Tenant (Fiware-Service)
+  if (!tenant.empty())
+  {
+    kafkaHeaderAdd(outHeaders, HTTP_FIWARE_SERVICE, tenant);
+  }
+
+  // Service-Path (fallback "/")
+  const std::string sp = servicePath.empty() ? "/" : servicePath;
+  kafkaHeaderAdd(outHeaders, HTTP_FIWARE_SERVICEPATH, sp);
+
+  for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin();
+       it != extraHeaders.end(); ++it)
+  {
+    kafkaHeaderAdd(outHeaders, it->first, it->second);
+  }
+
+  for (std::map<std::string, std::string>::const_iterator it = outHeaders.begin();
+       it != outHeaders.end(); ++it)
+  {
+    const std::string& keyLower   = it->first;
+    const std::string& headerValue = it->second;
+
+    std::string headerName;
+
+    if (keyLower == fiwareServiceLower)
+    {
+      headerName = HTTP_FIWARE_SERVICE;
+    }
+    else if (keyLower == fiwareServicePathLower)
+    {
+      headerName = HTTP_FIWARE_SERVICEPATH;
+    }
+    else
+    {
+      headerName = keyLower; // extra headers always in lowercase
+    }
+
+    rd_kafka_header_add(headers,
+                        headerName.c_str(),
+                        -1,
+                        headerValue.c_str(),
+                        static_cast<int>(headerValue.size()));
+  }
+
+  return headers;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -341,7 +448,9 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& content,
     const std::string& subscriptionId,
     const std::string& tenant,
-    const std::string& servicePath)
+    const std::string& servicePath,
+    const std::map<std::string, std::string>& customHeaders
+  )
 
 {
 
@@ -371,17 +480,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   // Messages with the same key → Same partition (guarantees order).
 
 
-  rd_kafka_headers_t* headers = rd_kafka_headers_new(0); // Initially without headers
-
-  if (!tenant.empty())
-  {
-    rd_kafka_header_add(headers, HTTP_FIWARE_SERVICE, -1, tenant.c_str(), tenant.size());
-  }
-
-  if (!servicePath.empty())
-  {
-    rd_kafka_header_add(headers, HTTP_FIWARE_SERVICEPATH, -1, servicePath.c_str(), servicePath.size());
-  }
+  rd_kafka_headers_t* headers = build_kafka_headers(customHeaders, tenant, servicePath); // Initially without headers
 
   bool retval = false;
   int resultCode = rd_kafka_producev(

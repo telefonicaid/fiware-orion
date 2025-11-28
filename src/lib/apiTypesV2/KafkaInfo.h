@@ -42,6 +42,7 @@ struct KafkaInfo
 {
   std::string   url;
   std::string   topic;
+  std::map<std::string, std::string>  headers;
 
   bool                       custom;
   std::string                payload;  // either payload, json or ngsi is used (depending on payloadType)

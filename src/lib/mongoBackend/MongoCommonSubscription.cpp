@@ -262,6 +262,19 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
 */
 static void setCustomKafkaInfo(const ngsiv2::KafkaInfo& kafkaInfo, orion::BSONObjBuilder* b)
 {
+  if (kafkaInfo.headers.size() > 0)
+  {
+    orion::BSONObjBuilder headersBuilder;
+
+    for (std::map<std::string, std::string>::const_iterator it = kafkaInfo.headers.begin(); it != kafkaInfo.headers.end(); ++it)
+    {
+      headersBuilder.append(it->first, it->second);
+    }
+    orion::BSONObj headersObj = headersBuilder.obj();
+
+    b->append(CSUB_HEADERS, headersObj);
+    LM_T(LmtMongo, ("Subscription headers: %s", headersObj.toString().c_str()));
+  }
   if (kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Text)
   {
     if (!kafkaInfo.includePayload)

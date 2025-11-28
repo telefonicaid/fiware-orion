@@ -1,0 +1,1 @@
+- Fix: kafkaCustom.headers support including the ability to override the default Fiware-Service and Fiware-ServicePath headers (#4726)

@@ -336,6 +336,42 @@ static bool setNgsiPayload
 
 /* ****************************************************************************
 *
+* appendHeadersFrom -
+*/
+static bool appendHeadersFrom(const std::map<std::string, std::string>& sourceHeaders, std::map<std::string, std::string>& destHeaders, ExprContextObject* exprContextObjectP)
+{
+  for (std::map<std::string, std::string>::const_iterator it = sourceHeaders.begin(); it != sourceHeaders.end(); ++it)
+  {
+    std::string key   = it->first;
+    std::string value = it->second;
+
+    if ((macroSubstitute(&key,   it->first,  exprContextObjectP, "", true) == false) || (macroSubstitute(&value, it->second, exprContextObjectP, "", true) == false))
+    {
+      // Warning already logged in macroSubstitute()
+      return false;
+    }
+
+    if (key.empty())
+    {
+      // To avoid empty header name
+      continue;
+    }
+
+    // Decode header value
+    char* pvalue = curl_unescape(value.c_str(), value.length());
+    value        = std::string(pvalue);
+    curl_free(pvalue);
+
+    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    destHeaders[key] = value;
+  }
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * buildSenderParamsCustom -
 */
 static SenderThreadParams* buildSenderParamsCustom
@@ -587,34 +623,15 @@ static SenderThreadParams* buildSenderParamsCustom
 
 
   //
-  // 5. HTTP Headers (only in the case of HTTP notifications)
+  // 5. Headers (only in the case of HTTP and Kafka notifications). In the case of HTTP, we use proper HTTP headers, in the case of Kafka, we use Kafka record headers
   //
-  if (notification.type == ngsiv2::HttpNotification)
+  if (notification.type == ngsiv2::HttpNotification || notification.type == ngsiv2::KafkaNotification)
   {
-    for (std::map<std::string, std::string>::const_iterator it = notification.httpInfo.headers.begin(); it != notification.httpInfo.headers.end(); ++it)
+    const std::map<std::string, std::string>* srcHeaders = (notification.type == ngsiv2::HttpNotification)? &notification.httpInfo.headers: &notification.kafkaInfo.headers;
+
+    if (srcHeaders && !appendHeadersFrom(*srcHeaders, headers, &exprContext))
     {
-      std::string key   = it->first;
-      std::string value = it->second;
-
-      if ((macroSubstitute(&key, it->first, &exprContext,  "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
-      {
-        // Warning already logged in macroSubstitute()
-        return NULL;
-      }
-
-      if (key.empty())
-      {
-        // To avoid empty header name
-        continue;
-      }
-
-      // Decode header value
-      char* pvalue = curl_unescape(value.c_str(), value.length());
-      value        = std::string(pvalue);
-      curl_free(pvalue);
-
-      std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-      headers[key] = value;
+      return NULL;
     }
   }
 
