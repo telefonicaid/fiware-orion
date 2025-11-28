@@ -1,0 +1,145 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Custom qs and headers names
+
+--SHELL-INIT--
+dbInit CB
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" orion
+brokerStart CB
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^orion.*"
+
+--SHELL--
+
+#
+# 01. Create subscription for E1 with custom header names
+# 02. Create E1 with attributes A1, and A2
+# 03. Dump accumulator, see 1 notification
+#
+
+echo "01. Create subscription for E1 with custom qs and header names"
+echo "=============================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E1"
+      }
+    ],
+    "condition": {
+      "attrs": []
+    }
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "headers": { "X-${A1}": "${A2}" }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create E1 with attributes A1 and A2"
+echo "======================================="
+payload='{
+  "id": "E1",
+  "A1": "myHeader",
+  "A2": "bar"
+}'
+orionCurl --url /v2/entities?options=keyValues --payload "$payload"
+echo
+echo
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
+# due to the lock in accumulator-server.py?
+sleep 1s
+
+
+echo "03. Dump accumulator, see 1 notification"
+echo "========================================"
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription for E1 with custom qs and header names
+==============================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create E1 with attributes A1 and A2
+=======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=Thing
+Content-Length: 0
+
+
+
+03. Dump accumulator, see 1 notification
+========================================
+Kafka message at topic orion
+Key: REGEX([0-9a-f\-]{24})
+Headers:
+  Fiware-Servicepath: /
+  x-myheader: bar
+Payload:
+{
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E1",
+            "type": "Thing",
+            "A1": {
+                "type": "Text",
+                "value": "myHeader",
+                "metadata": {}
+            },
+            "A2": {
+                "type": "Text",
+                "value": "bar",
+                "metadata": {}
+            }
+        }
+    ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" orion
