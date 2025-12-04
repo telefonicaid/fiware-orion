@@ -1,4 +1,4 @@
-# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,31 +21,29 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Check the use of macros in headers
+Custom qs and headers names
 
 --SHELL-INIT--
-dbInit CB
+dbInit CB s1
 kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" orion
-brokerStart CB 164 IPV4
+brokerStart CB 0 IPV4 -multiservice
 accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^orion.*"
 
 --SHELL--
 
 #
-#
-# 01. Create custom subscription with headers field using service, servicePath and authToken macros
-# 02. Create E/A with specific service, servicePath and authToken to trigger sub
-# 03. Check the use of macros in headers
+# 01. Create subscription for E1 with custom header names
+# 02. Create E1 with attributes A1, and A2
+# 03. Dump accumulator, see 1 notification
 #
 
-echo "01. Create custom subscription with headers field using service, servicePath and authToken macros"
-echo "================================================================================================="
+echo "01. Create subscription for E1 with custom qs and header names"
+echo "=============================================================="
 payload='{
   "subject": {
     "entities": [
       {
-          "idPattern": ".*",
-          "type": "T"
+        "id" : "E1"
       }
     ],
     "condition": {
@@ -54,29 +52,25 @@ payload='{
   },
   "notification": {
     "kafkaCustom": {
-          "url": "kafka://localhost:9092,localhost:9094",
-          "topic": "orion",
-          "payload": "{ %22A%22: %22${A}%22 }",
-          "headers": {"myHeader": "${servicePath}/${authToken}"}
-        }
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "headers": { "X-${A1}": "${A2}" }
+    }
   }
 }'
-orionCurl --url /v2/subscriptions --payload "$payload"
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant s1
 echo
 echo
 
 
-echo "02. Create E/A"
-echo "=============="
+echo "02. Create E1 with attributes A1 and A2"
+echo "======================================="
 payload='{
-  "id": "E",
-  "type": "T",
-  "A": {
-    "value": 1,
-    "type": "Number"
-  }
+  "id": "E1",
+  "A1": "myHeader",
+  "A2": "bar"
 }'
-orionCurl --url /v2/entities --payload "${payload}" --servicePath "/subservA" --xauthToken fgm
+orionCurl --url /v2/entities?options=keyValues --payload "$payload" --tenant s1
 echo
 echo
 
@@ -86,17 +80,16 @@ echo
 sleep 1s
 
 
-echo "03. Check the use of macros in headers"
-echo "======================================"
+echo "03. Dump accumulator, see 1 notification"
+echo "========================================"
 accumulatorDump
-accumulatorReset
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom subscription with headers field using service, servicePath and authToken macros
-=================================================================================================
+01. Create subscription for E1 with custom qs and header names
+==============================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -105,32 +98,49 @@ Content-Length: 0
 
 
 
-02. Create E/A
-==============
+02. Create E1 with attributes A1 and A2
+=======================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/E?type=T
+Location: /v2/entities/E1?type=Thing
 Content-Length: 0
 
 
 
-03. Check the use of macros in headers
-======================================
+03. Dump accumulator, see 1 notification
+========================================
 Kafka message at topic orion
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  Fiware-Servicepath: /subservA
-  myheader: /subservA/fgm
+  Fiware-Service: s1
+  Fiware-Servicepath: /
+  x-myheader: bar
 Payload:
 {
-    "A": "1"
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E1",
+            "type": "Thing",
+            "A1": {
+                "type": "Text",
+                "value": "myHeader",
+                "metadata": {}
+            },
+            "A2": {
+                "type": "Text",
+                "value": "bar",
+                "metadata": {}
+            }
+        }
+    ]
 }
 =======================================
 
 
 --TEARDOWN--
+brokerStop CB
+dbDrop CB s1
 accumulatorStop
 kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" orion
-brokerStop CB
-dbDrop CB

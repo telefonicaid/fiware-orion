@@ -1,4 +1,4 @@
-# Copyright 2022 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,44 +21,42 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Fiware-Service In Custom Notifications With Modification
+Fiware-ServicePath In Custom Notifications With Modification
 
 --SHELL-INIT--
-dbInit CB
+dbInit CB s1
 kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1
-brokerStart CB 164 IPV4
+brokerStart CB 164 IPV4 -multiservice
 accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
 
 --SHELL--
 
 #
 #
-# 01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu
-# 02. Create E/A, using Fiware-Service fgm
-# 03. Check that the Fiware-Service cucu (and not fgm) was propagated to accumulator
+# 01. Make accumulator subscribe to changes in E/A1 using custom notifications with Fiware-ServicePath cucu
+# 02. Create E/A1, using Fiware-ServicePath fgm
+# 03. Check that the Fiware-ServicePath cucu (and not fgm) was propagated to accumulator
 #
 
-echo "01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu"
-echo "======================================================================================================"
+echo "01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-ServicePath cucu"
+echo "=========================================================================================================="
 payload='{
+  "description": "KAFKA sub1",
   "subject": {
     "entities": [
       {
-          "idPattern": ".*",
-          "type": "T"
+        "idPattern": ".*",
+        "type": "T"
       }
-    ],
-    "condition": {
-      "attrs": []
-    }
+    ]
   },
   "notification": {
     "kafkaCustom": {
-          "url": "kafka://localhost:9092,localhost:9094",
-          "topic": "sub1",
-          "payload": "{ %22A%22: %22${A}%22 }",
-          "headers":  {"fiware-service": "cucu"}
-        }
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "sub1",
+      "payload": "{ %22A%22: %22${A}%22 }",
+      "headers":{"fiware-servicepath": "/cucu"}
+    }
   }
 }'
 orionCurl --url /v2/subscriptions --payload "$payload"
@@ -66,17 +64,17 @@ echo
 echo
 
 
-echo "02. Create E/A, without Fiware-Service"
-echo "=========================================="
+echo "02. Create E/A, using Fiware-ServicePath fgm"
+echo "=============================================="
 payload='{
   "id": "E",
   "type": "T",
   "A": {
     "value": 1,
-    "type": "Number"
+    "type": "Float"
   }
 }'
-orionCurl --url /v2/entities --payload "${payload}"
+orionCurl --url /v2/entities --payload "${payload}"  --servicePath /fgm
 echo
 echo
 
@@ -86,8 +84,8 @@ echo
 sleep 1s
 
 
-echo "03. Check that the Fiware-Service cucu (and not empty) was propagated to accumulator"
-echo "=================================================================================="
+echo "03. Check that the Fiware-ServicePath cucu (and not fgm) was propagated to accumulator"
+echo "======================================================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -95,8 +93,8 @@ echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu
-======================================================================================================
+01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-ServicePath cucu
+==========================================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -105,8 +103,8 @@ Content-Length: 0
 
 
 
-02. Create E/A, without Fiware-Service
-==========================================
+02. Create E/A, using Fiware-ServicePath fgm
+==============================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -115,13 +113,12 @@ Content-Length: 0
 
 
 
-03. Check that the Fiware-Service cucu (and not empty) was propagated to accumulator
-==================================================================================
+03. Check that the Fiware-ServicePath cucu (and not fgm) was propagated to accumulator
+======================================================================================
 Kafka message at topic sub1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  Fiware-Service: cucu
-  Fiware-Servicepath: /
+  Fiware-Servicepath: /cucu
 Payload:
 {
     "A": "1"
@@ -133,4 +130,5 @@ Payload:
 accumulatorStop
 kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1
 brokerStop CB
-dbDrop CB
+dbDrop CB s1
+

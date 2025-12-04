@@ -21,25 +21,25 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Fiware-Service In Custom Notifications With Modification
+no special custom headers Notifications
 
 --SHELL-INIT--
-dbInit CB
+dbInit CB s1
 kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1
-brokerStart CB 164 IPV4
+brokerStart CB 164 IPV4 -multiservice
 accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
 
 --SHELL--
 
 #
 #
-# 01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu
-# 02. Create E/A, using Fiware-Service fgm
-# 03. Check that the Fiware-Service cucu (and not fgm) was propagated to accumulator
+# 01. Make accumulator subscribe to changes in E/A using not special headers
+# 02. Create E/A
+# 03. Check that no special headers were propagated to accumulator
 #
 
-echo "01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu"
-echo "======================================================================================================"
+echo "01. Make accumulator subscribe to changes in E/A using not special headers"
+echo "=========================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -57,17 +57,17 @@ payload='{
           "url": "kafka://localhost:9092,localhost:9094",
           "topic": "sub1",
           "payload": "{ %22A%22: %22${A}%22 }",
-          "headers":  {"fiware-service": "cucu"}
+          "headers":  {"X-Device-Model": "Model-1", "X-Device-Type": "T"}
         }
   }
 }'
-orionCurl --url /v2/subscriptions --payload "$payload"
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant s1
 echo
 echo
 
 
-echo "02. Create E/A, without Fiware-Service"
-echo "=========================================="
+echo "02. Create E/A"
+echo "=============="
 payload='{
   "id": "E",
   "type": "T",
@@ -76,7 +76,7 @@ payload='{
     "type": "Number"
   }
 }'
-orionCurl --url /v2/entities --payload "${payload}"
+orionCurl --url /v2/entities --payload "${payload}" --tenant s1
 echo
 echo
 
@@ -86,8 +86,8 @@ echo
 sleep 1s
 
 
-echo "03. Check that the Fiware-Service cucu (and not empty) was propagated to accumulator"
-echo "=================================================================================="
+echo "03. Check that no special headers were propagated to accumulator"
+echo "================================================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -95,8 +95,8 @@ echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu
-======================================================================================================
+01. Make accumulator subscribe to changes in E/A using not special headers
+==========================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -105,8 +105,8 @@ Content-Length: 0
 
 
 
-02. Create E/A, without Fiware-Service
-==========================================
+02. Create E/A
+==============
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -115,13 +115,15 @@ Content-Length: 0
 
 
 
-03. Check that the Fiware-Service cucu (and not empty) was propagated to accumulator
-==================================================================================
+03. Check that no special headers were propagated to accumulator
+================================================================
 Kafka message at topic sub1
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  Fiware-Service: cucu
+  Fiware-Service: s1
   Fiware-Servicepath: /
+  x-device-model: Model-1
+  x-device-type: T
 Payload:
 {
     "A": "1"
@@ -133,4 +135,4 @@ Payload:
 accumulatorStop
 kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1
 brokerStop CB
-dbDrop CB
+dbDrop CB s1

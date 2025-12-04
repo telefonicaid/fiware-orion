@@ -21,25 +21,25 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Fiware-Service In Custom Notifications With Modification
+Check the use of macros in headers
 
 --SHELL-INIT--
-dbInit CB
-kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1
-brokerStart CB 164 IPV4
-accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
+dbInit CB s1
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" orion
+brokerStart CB 164 IPV4 -multiservice
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^orion.*"
 
 --SHELL--
 
 #
 #
-# 01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu
-# 02. Create E/A, using Fiware-Service fgm
-# 03. Check that the Fiware-Service cucu (and not fgm) was propagated to accumulator
+# 01. Create custom subscription with headers field using service, servicePath and authToken macros
+# 02. Create E/A with specific service, servicePath and authToken and some attribute overrides to trigger sub
+# 03. Check the use of macros in headers
 #
 
-echo "01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu"
-echo "======================================================================================================"
+echo "01. Create custom subscription with headers field using service, servicePath and authToken macros"
+echo "================================================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -55,28 +55,32 @@ payload='{
   "notification": {
     "kafkaCustom": {
           "url": "kafka://localhost:9092,localhost:9094",
-          "topic": "sub1",
+          "topic": "orion",
           "payload": "{ %22A%22: %22${A}%22 }",
-          "headers":  {"fiware-service": "cucu"}
+          "headers": {"myHeader": "${service}${servicePath}/${authToken}"}
         }
   }
 }'
-orionCurl --url /v2/subscriptions --payload "$payload"
+orionCurl --url /v2/subscriptions --payload "$payload" --tenant s1
 echo
 echo
 
 
-echo "02. Create E/A, without Fiware-Service"
-echo "=========================================="
+echo "02. Create E entity with specific service, servicePath and authToken and some attribute overrides to trigger sub"
+echo "================================================================================================================"
 payload='{
   "id": "E",
   "type": "T",
   "A": {
     "value": 1,
     "type": "Number"
-  }
+  },
+  "service": {
+      "value": "OVERRIDE",
+      "type": "Text"
+    }
 }'
-orionCurl --url /v2/entities --payload "${payload}"
+orionCurl --url /v2/entities --payload "${payload}" --tenant s1 --servicePath "/subservA" --xauthToken fgm
 echo
 echo
 
@@ -86,8 +90,8 @@ echo
 sleep 1s
 
 
-echo "03. Check that the Fiware-Service cucu (and not empty) was propagated to accumulator"
-echo "=================================================================================="
+echo "03. Check the use of macros in headers"
+echo "======================================"
 accumulatorDump
 accumulatorReset
 echo
@@ -95,8 +99,8 @@ echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-Service cucu
-======================================================================================================
+01. Create custom subscription with headers field using service, servicePath and authToken macros
+=================================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -105,8 +109,8 @@ Content-Length: 0
 
 
 
-02. Create E/A, without Fiware-Service
-==========================================
+02. Create E entity with specific service, servicePath and authToken and some attribute overrides to trigger sub
+================================================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -115,13 +119,14 @@ Content-Length: 0
 
 
 
-03. Check that the Fiware-Service cucu (and not empty) was propagated to accumulator
-==================================================================================
-Kafka message at topic sub1
+03. Check the use of macros in headers
+======================================
+Kafka message at topic orion
 Key: REGEX([0-9a-f\-]{24})
 Headers:
-  Fiware-Service: cucu
-  Fiware-Servicepath: /
+  Fiware-Service: s1
+  Fiware-Servicepath: /subservA
+  myheader: OVERRIDE/subservA/fgm
 Payload:
 {
     "A": "1"
@@ -131,6 +136,6 @@ Payload:
 
 --TEARDOWN--
 accumulatorStop
-kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" orion
 brokerStop CB
-dbDrop CB
+dbDrop CB s1
