@@ -658,7 +658,8 @@ int httpRequestSend
     }
     else
     {
-      LM_W(("Notification (%s) response NOT OK, http code: %d", idStringForLogs.c_str(), *statusCodeP));
+  		LM_W(("Notification (%s) response NOT OK, http code: %d, response body: %s",
+			idStringForLogs.c_str(), *statusCodeP, outP->c_str()));
     }
   }
 
