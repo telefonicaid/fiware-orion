@@ -214,6 +214,13 @@ static int contentLenParse(char* s)
 }
 
 
+std::string get_body(const std::string &raw) {
+  const size_t start = raw.find("{");
+  const size_t end = raw.rfind("}");
+  if (start == std::string::npos || end == std::string::npos) return "";
+  return raw.substr(start, end - start + 1);
+}
+
 
 /* ****************************************************************************
 *
@@ -659,7 +666,7 @@ int httpRequestSend
     else
     {
   		LM_W(("Notification (%s) response NOT OK, http code: %d, response body: %s",
-			idStringForLogs.c_str(), *statusCodeP, outP->c_str()));
+			idStringForLogs.c_str(), *statusCodeP, get_body(httpResponse->memory).c_str()));
     }
   }
 
