@@ -155,6 +155,13 @@ static void setSubject(Subscription* s, const orion::BSONObj& r)
     }
   }
 
+  // jexlExpression
+  if (r.hasField(CSUB_JEXL_EXPR))
+  {
+    std::string  jexlExpression      =  getStringFieldF(r, CSUB_JEXL_EXPR);
+    s->subject.condition.jexlExpression        = jexlExpression;
+  }
+
   // Expression
   if (r.hasField(CSUB_EXPR))
   {

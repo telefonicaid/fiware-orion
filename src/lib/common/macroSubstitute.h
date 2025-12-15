@@ -37,6 +37,7 @@
 extern std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault);
 
 
+extern bool smartBooleanValue(const std::string stringValue, ExprContextObject* exprContextObjectP);
 
 /* ****************************************************************************
 *

@@ -110,6 +110,7 @@ static void insertInCache
                      mdStringFilterP,
                      sub.status,
                      now,
+                     sub.subject.condition.jexlExpression,
                      sub.subject.condition.expression.q,
                      sub.subject.condition.expression.geometry,
                      sub.subject.condition.expression.coords,
@@ -183,6 +184,7 @@ std::string mongoCreateSubscription
   setConds(sub, &b);
 
   setExpression(sub, &b);
+  setJexlExpression(sub, &b);
   setOperations(sub, &b);
   setFormat(sub, &b);
 

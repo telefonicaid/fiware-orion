@@ -111,6 +111,7 @@ struct CachedSubscription
   double                           statusLastChange;
   int64_t                          count;
   RenderFormat                     renderFormat;
+  std::string                      jexlExpression;
   Expression                       expression;
   bool                             blacklist;
   bool                             onlyChanged;
@@ -218,6 +219,7 @@ extern void subCacheItemInsert
   StringFilter*                      mdStringFilterP,
   const std::string&                 status,
   double                             statusLastChange,
+  const std::string&                 jexlExpression,
   const std::string&                 q,
   const std::string&                 geometry,
   const std::string&                 coords,

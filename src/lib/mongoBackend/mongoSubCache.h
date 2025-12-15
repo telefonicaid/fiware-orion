@@ -68,6 +68,7 @@ extern int mongoSubCacheItemInsert
   long long              expirationTime,
   const std::string&     status,
   double                 statusLastChange,
+  const std::string&     jexlExpression,
   const std::string&     q,
   const std::string&     mq,
   const std::string&     geometry,

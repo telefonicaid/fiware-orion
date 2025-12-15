@@ -224,11 +224,14 @@ static void updateInCache
   // If inserted, subCacheUpdateStatisticsIncrement is called to update the statistics counter of insertions.
   //
 
+  std::string         jexlExpression;
   std::string         q;
   std::string         mq;
   std::string         geom;
   std::string         coords;
   std::string         georel;
+
+
   RenderFormat        renderFormat = NGSI_V2_NORMALIZED;  // Default value
 
   // 0. Field extraction from doc is done before cacheSemTake() to save some small time
@@ -246,6 +249,12 @@ static void updateInCache
     geom   = expr.hasField(CSUB_EXPR_GEOM)?   getStringFieldF(expr, CSUB_EXPR_GEOM)   : "";
     coords = expr.hasField(CSUB_EXPR_COORDS)? getStringFieldF(expr, CSUB_EXPR_COORDS) : "";
     georel = expr.hasField(CSUB_EXPR_GEOREL)? getStringFieldF(expr, CSUB_EXPR_GEOREL) : "";
+  }
+
+  // jexlExpression
+  if (doc.hasField(CSUB_JEXL_EXPR))
+  {
+    jexlExpression      =  getStringFieldF(doc, CSUB_JEXL_EXPR);
   }
 
   // 1. Lookup matching subscription in subscription-cache
@@ -322,6 +331,7 @@ static void updateInCache
                                           doc.hasField(CSUB_EXPIRATION)? getLongFieldF(doc, CSUB_EXPIRATION) : 0,
                                           effectiveStatus,
                                           effectiveStatusLastChante,
+                                          jexlExpression,
                                           q,
                                           mq,
                                           geom,
@@ -393,6 +403,7 @@ std::string mongoUpdateSubscription
   if (subUp.subjectProvided)       setConds(subUp, &setB);
   if (subUp.subjectProvided)       setOperations(subUp, &setB);
   if (subUp.subjectProvided)       setExpression(subUp, &setB);
+  if (subUp.subjectProvided)       setJexlExpression(subUp, &setB);
   if (subUp.notificationProvided)  setNotificationInfo(subUp, &setB, &unsetB);
   if (subUp.notificationProvided)  setAttrs(subUp, &setB);
   if (subUp.notificationProvided)  setMetadata(subUp, &setB);

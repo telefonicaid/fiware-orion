@@ -59,6 +59,8 @@
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 
+#include "expressions/exprMgr.h"
+#include "expressions/ExprResult.h"
 #include "mongoDriver/connectionOperations.h"
 #include "mongoDriver/mongoConnectionPool.h"
 #include "mongoDriver/safeMongo.h"
@@ -944,6 +946,8 @@ static bool addTriggeredSubscriptions_withCache
       subP->blacklist = cSubP->blacklist;
     }
     subP->metadata  = cSubP->metadata;
+
+    subP->jexlExpression = cSubP->jexlExpression;
 
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
@@ -2044,7 +2048,44 @@ static unsigned int processSubscriptions
       }
     }
 
-    /* Check 2: String Filters */
+    #ifdef EXPR_BASIC
+        bool basic = true;
+    #else
+        bool basic = false;
+    #endif
+
+    //
+    ExprContextObject exprContext(basic);
+    ExprContextObject exprMetadataContext(basic);
+    Entity&                             en      = notifyCerP->entity;
+
+    for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+    {
+      en.attributeVector[ix]->addToContext(&exprContext, basic);
+
+      // Add attribute metadata to context
+      ExprContextObject exprAttrMetadataContext(basic);
+      for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
+      {
+        en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
+      }
+      exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
+    }
+
+    /* Check 2: jexlExpression Filters */
+    const char* jexlExpression = tSubP->jexlExpression.c_str();
+    if (jexlExpression != nullptr)
+    {
+
+      // If the jexlExpression is null or empty, consider it valid and return true
+      ExprResult result = exprMgr.evaluate(&exprContext, jexlExpression);
+      if (!result.boolValue)
+      {
+        continue;
+      }
+    }
+
+    /* Check 3: String Filters */
     if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
     {
       continue;
@@ -2055,7 +2096,7 @@ static unsigned int processSubscriptions
       continue;
     }
 
-    /* Check 3: expression (georel, which also uses geometry and coords)
+    /* Check 4: expression (georel, which also uses geometry and coords)
      * This should be always the last check, as it is the most expensive one, given that it interacts with DB
      * (Issue #2396 should solve that) */
     if ((!tSubP->expression.georel.empty()) && (!tSubP->expression.coords.empty()) && (!tSubP->expression.geometry.empty()))
