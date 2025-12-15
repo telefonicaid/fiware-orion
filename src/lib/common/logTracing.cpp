@@ -38,8 +38,7 @@
 *
 * NOTE: this function allocated dynamic memory, be careful with memory leaks!
 */
-static char* truncatePayload(const char* payload)
-{
+static char* truncatePayload(const char* payload) {
   // +5 due to "(...)"
   // +1 due to '\0'
   unsigned int truncatedPayloadLengh = logInfoPayloadMaxSize + 5 + 1;
@@ -50,6 +49,54 @@ static char* truncatePayload(const char* payload)
   truncatedPayload[truncatedPayloadLengh - 1] = '\0';
 
   return truncatedPayload;
+}
+
+
+
+static char *get_body(const char *response) {
+  const char *start = strchr(response, '{');
+  if (!start) return NULL;
+
+  const char *end = strrchr(start, '}');
+  if (!end || end < start) return NULL;
+
+  size_t len = (size_t)(end - start + 1);
+
+  char *out = (char*)malloc(len + 1);
+  if (!out) return NULL;
+
+  memcpy(out, start, len);
+  out[len] = '\0';
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* logWarnHttpNotification
+*/
+void logWarnHttpNotification
+(
+  const char*  idStringForLogs,
+  long long httpCode,
+  const char*  responseBody
+)
+{
+  if (responseBody == NULL)
+  {
+    responseBody = "";
+  }
+
+  char* effectiveBody = get_body(responseBody);
+  LM_W(("Notification (%s) response NOT OK, http code: %d, response body: %s",
+        idStringForLogs, httpCode, effectiveBody));
+
+  if (effectiveBody)
+  {
+    free(effectiveBody);
+  }
 }
 
 
@@ -296,6 +343,3 @@ void logInfoFwdRequest
   }
 
 }
-
-
-
