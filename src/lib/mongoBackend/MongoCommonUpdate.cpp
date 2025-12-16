@@ -2074,7 +2074,7 @@ static unsigned int processSubscriptions
 
     /* Check 2: jexlExpression Filters */
     const char* jexlExpression = tSubP->jexlExpression.c_str();
-    if (jexlExpression != nullptr)
+    if (!tSubP->jexlExpression.empty())
     {
 
       // If the jexlExpression is null or empty, consider it valid and return true
