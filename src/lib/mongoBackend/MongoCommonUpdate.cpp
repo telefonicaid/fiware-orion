@@ -1826,6 +1826,11 @@ static bool addTriggeredSubscriptions_noCache
         setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
       }
 
+      if (sub.hasField(CSUB_JEXL_EXPR))
+      {
+        trigs->jexlExpression = getStringFieldF(sub, CSUB_JEXL_EXPR);
+      }
+
       if (sub.hasField(CSUB_EXPR))
       {
         orion::BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
