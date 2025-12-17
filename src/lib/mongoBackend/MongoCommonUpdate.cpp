@@ -2059,7 +2059,7 @@ static unsigned int processSubscriptions
         bool basic = false;
     #endif
 
-    //
+    // Build JEXL evaluation contexts using entity attributes and their metadata
     ExprContextObject exprContext(basic);
     ExprContextObject exprMetadataContext(basic);
     Entity&                             en      = notifyCerP->entity;

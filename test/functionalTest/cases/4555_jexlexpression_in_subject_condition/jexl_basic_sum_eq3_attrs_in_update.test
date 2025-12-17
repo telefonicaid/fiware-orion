@@ -1,4 +1,4 @@
-# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-JEXL basic expression in condition (source attributes in udpate)
+JEXL basic expression in condition jexlExpression (source attributes in update)
 
 --SHELL-INIT--
 dbInit CB

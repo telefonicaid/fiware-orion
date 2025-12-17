@@ -322,6 +322,11 @@ std::string Condition::toJson()
 
   jh.addRaw("attrs", vectorToJson(this->attributes));
 
+  if (!this->jexlExpression.empty())
+  {
+    jh.addString("jexlExpression", this->jexlExpression);
+  }
+
   JsonObjectHelper jhe;
 
   if (!this->expression.q.empty())        jhe.addString("q",        this->expression.q);

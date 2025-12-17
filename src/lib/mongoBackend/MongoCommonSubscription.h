@@ -171,6 +171,12 @@ extern void setLastSuccess(long long lastSuccess, long long lastSuccessCode, ori
 */
 extern void setExpression(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
+
+
+/* ****************************************************************************
+*
+* setJexlExpression -
+*/
 extern void setJexlExpression(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
 
 

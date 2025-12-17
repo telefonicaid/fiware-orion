@@ -1514,12 +1514,12 @@ static std::string parseNotifyConditionVector
   // jexlExpression
   if (condition.HasMember("jexlExpression"))
   {
-    const rapidjson::Value& jexlExpresion = condition["jexlExpression"];
-    if (!jexlExpresion.IsString())
+    const rapidjson::Value& jexlExpression = condition["jexlExpression"];
+    if (!jexlExpression.IsString())
     {
-      return badInput(ciP, "jexlExpression  is not a string");
+      return badInput(ciP, "jexlExpression is not a string");
     }
-    subsP->subject.condition.jexlExpression = jexlExpresion.GetString();
+    subsP->subject.condition.jexlExpression = jexlExpression.GetString();
   }
 
   // Expression
