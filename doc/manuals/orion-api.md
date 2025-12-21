@@ -1930,13 +1930,13 @@ be automatically deleted in an unwanted way**.
 Based on the [`condition` subscription field](#subscriptionsubjectcondition), upon
 entity update, the notification triggering rules are as follow:
 
-* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
-  the `attrs` list changes (or is deleted) and at the same time `expression` matches.
-* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
+* If `attrs` and one or both of `expression` and `jexlExpression` are used, a notification is sent whenever one of the attributes in
+  the `attrs` list changes (or is deleted) and at the same time `expression` and/or `jexlExpression` match.
+* If `attrs` is used and `expression` and `jexlExpression` are not used, a notification is sent whenever any of the
   attributes in the `attrs` list changes (or is deleted).
-* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
-  attributes of the entity changes (or is deleted) and at the same time `expression` matches.
-* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
+* If `attrs` is not used and `expression` and/or `jexlExpression` are used, a notification is sent whenever any of the
+  attributes of the entity change (or is deleted) and at the same time `expression` and/or `jexlExpression` match.
+* If neither `attrs`, `expression`, nor `jexlExpression` are used, a notification is sent whenever any of the
   attributes of the entity changes (or is deleted).
 
 Note that changing the metadata of a given attribute is considered a change even though the attribute
