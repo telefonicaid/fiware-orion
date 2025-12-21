@@ -30,16 +30,20 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create httpCustom sub with subject.condition.jexlExpression
-# 02. Get sub, see sub with subject.condition.jexlExpression
+# 01. Create httpCustom sub with subject.condition.jexlExpression c|parseFloat
+# 02. Get sub, see sub with subject.condition.jexlExpression c|parseFloat
 # 03. Update sub description
 # 04. Get sub, see subject.condition.jexlExpression
-# 05. Update sub subject.condition.jexlExpression
-# 06. see subject.condition.jexlExpression
+# 05. Update sub subject.condition.jexlExpression c|toString
+# 06. Get sub, see subject.condition.jexlExpression c|toString
+# 07. Update subject.condition removing jexlExpression
+# 08. Get sub, see now jexlExpression in subject.condition
+# 09. Update subject.condition adding jexlExpression again c|parseFloat
+# 10. Get sub, see subject.condition.jexlExpression c|parseFloat
 #
 
-echo '01. Create httpCustom sub with subject.condition.jexlExpression'
-echo "==============================================================="
+echo '01. Create httpCustom sub with subject.condition.jexlExpression c|parseFloat'
+echo "============================================================================"
 payload='{
   "description": "Original sub",
   "subject": {
@@ -51,7 +55,7 @@ payload='{
     ],
     "condition": {
         "attrs": [ ],
-        "jexlExpression": "1<2"
+        "jexlExpression": "c|parseFloat"
     }
   },
   "notification": {
@@ -92,8 +96,8 @@ echo
 echo
 
 
-echo "05. Update sub subject.condition.jexlExpression"
-echo "==============================================="
+echo "05. Update sub subject.condition.jexlExpression c|toString"
+echo "=========================================================="
 payload='{
     "subject": {
         "entities": [
@@ -104,7 +108,7 @@ payload='{
         ],
         "condition": {
             "attrs": [ ],
-            "jexlExpression": "2"
+            "jexlExpression": "c|toString"
         }
       }
 }'
@@ -113,17 +117,71 @@ echo
 echo
 
 
-echo '06. see subject.condition.jexlExpression'
-echo "========================================"
+echo '06. Get sub, see subject.condition.jexlExpression c|toString'
+echo "============================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID
 echo
 echo
 
 
+echo "07. Update subject.condition removing jexlExpression"
+echo "===================================================="
+payload='{
+    "subject": {
+        "entities": [
+          {
+            "id": "E1",
+            "type": "T1"
+          }
+        ],
+        "condition": {
+            "attrs": [ ]
+        }
+      }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo '08. Get sub, see now jexlExpression in subject.condition'
+echo "========================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Update subject.condition adding jexlExpression again c|parseFloat"
+echo "====================================================================="
+payload='{
+    "subject": {
+        "entities": [
+          {
+            "id": "E1",
+            "type": "T1"
+          }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "jexlExpression": "c|parseFloat"
+        }
+      }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo '10. Get sub, see subject.condition.jexlExpression c|parseFloat'
+echo "=============================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
 
 --REGEXPECT--
-01. Create httpCustom sub with subject.condition.jexlExpression
-===============================================================
+01. Create httpCustom sub with subject.condition.jexlExpression c|parseFloat
+============================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -138,7 +196,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 355
+Content-Length: 364
 
 {
     "description": "Original sub",
@@ -156,7 +214,7 @@ Content-Length: 355
     "subject": {
         "condition": {
             "attrs": [],
-            "jexlExpression": "1<2",
+            "jexlExpression": "c|parseFloat",
             "notifyOnMetadataChange": true
         },
         "entities": [
@@ -183,7 +241,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 355
+Content-Length: 364
 
 {
     "description": "Modified sub",
@@ -201,7 +259,7 @@ Content-Length: 355
     "subject": {
         "condition": {
             "attrs": [],
-            "jexlExpression": "1<2",
+            "jexlExpression": "c|parseFloat",
             "notifyOnMetadataChange": true
         },
         "entities": [
@@ -214,21 +272,21 @@ Content-Length: 355
 }
 
 
-05. Update sub subject.condition.jexlExpression
-===============================================
+05. Update sub subject.condition.jexlExpression c|toString
+==========================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-06. see subject.condition.jexlExpression
-========================================
+06. Get sub, see subject.condition.jexlExpression c|toString
+============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 353
+Content-Length: 362
 
 {
     "description": "Modified sub",
@@ -246,7 +304,96 @@ Content-Length: 353
     "subject": {
         "condition": {
             "attrs": [],
-            "jexlExpression": "2",
+            "jexlExpression": "c|toString",
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+07. Update subject.condition removing jexlExpression
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Get sub, see now jexlExpression in subject.condition
+========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 332
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+09. Update subject.condition adding jexlExpression again c|parseFloat
+=====================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Get sub, see subject.condition.jexlExpression c|parseFloat
+==============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 364
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "jexlExpression": "c|parseFloat",
             "notifyOnMetadataChange": true
         },
         "entities": [

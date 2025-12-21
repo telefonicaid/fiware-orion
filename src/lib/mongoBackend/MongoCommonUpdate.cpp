@@ -2053,6 +2053,17 @@ static unsigned int processSubscriptions
       }
     }
 
+    /* Check 2: String Filters */
+    if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
+    {
+      continue;
+    }
+
+    if ((tSubP->mdStringFilterP != NULL) && (!tSubP->mdStringFilterP->match(notifyCerP)))
+    {
+      continue;
+    }
+
     #ifdef EXPR_BASIC
         bool basic = true;
     #else
@@ -2077,28 +2088,17 @@ static unsigned int processSubscriptions
       exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
     }
 
-    /* Check 2: jexlExpression Filters */
+    /* Check 3: jexlExpression Filters */
     const char* jexlExpression = tSubP->jexlExpression.c_str();
     if (!tSubP->jexlExpression.empty())
     {
 
       // If the jexlExpression is null or empty, consider it valid and return true
       ExprResult result = exprMgr.evaluate(&exprContext, jexlExpression);
-      if (!result.boolValue)
+      if (result.valueType != orion::ValueType::ValueTypeBoolean || result.boolValue != true)
       {
         continue;
       }
-    }
-
-    /* Check 3: String Filters */
-    if ((tSubP->stringFilterP != NULL) && (!tSubP->stringFilterP->match(notifyCerP)))
-    {
-      continue;
-    }
-
-    if ((tSubP->mdStringFilterP != NULL) && (!tSubP->mdStringFilterP->match(notifyCerP)))
-    {
-      continue;
     }
 
     /* Check 4: expression (georel, which also uses geometry and coords)

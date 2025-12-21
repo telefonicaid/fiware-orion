@@ -73,7 +73,7 @@
       - [NGSI payload patching](#ngsi-payload-patching)
       - [Omitting payload](#omitting-payload)
       - [Additional considerations](#additional-considerations)
-    - [JEXL Support](#jexl-support)
+    - [JEXL support in custom notifications](#jexl-support-in-custom-notifications)
       - [JEXL usage example](#jexl-usage-example)
       - [Metadata support](#metadata-support)
       - [Evaluation priority](#evaluation-priority)
@@ -452,7 +452,7 @@ There are some exception cases in which the above restrictions do not apply. In 
 * URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
-* Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL expression syntax](#jexl-support))
+* Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL support in custom notifications](#jexl-support-in-custom-notifications))
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
 ## Identifiers syntax restrictions
@@ -478,7 +478,7 @@ In addition, the [General syntax restrictions](#general-syntax-restrictions) als
 
 In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
-Note that although `:` and `-` are allowed in identifiers, they are strongly discouraged, as they collide with the [JEXL syntax](#jexl-support). In particular, `-` is used for subtraction operation (e.g. `${A-B}`) and `:` is used in the ternary operator (eg. `A?'A is true':'A is false`). Thus, an attribute name `lower-temperature` in an expression `${lower-temperature}` would be interpreted as the value of `lower` attribute minus `temperature` attribute (and not as the value of an attribute named `lower-temperature`).
+Note that although `:` and `-` are allowed in identifiers, they are strongly discouraged, as they collide with the [JEXL syntax](#jexl-support-in-custom-notifications). In particular, `-` is used for subtraction operation (e.g. `${A-B}`) and `:` is used in the ternary operator (eg. `A?'A is true':'A is false`). Thus, an attribute name `lower-temperature` in an expression `${lower-temperature}` would be interpreted as the value of `lower` attribute minus `temperature` attribute (and not as the value of an attribute named `lower-temperature`).
 
 ## Error Responses
 
@@ -2069,7 +2069,7 @@ In case of `mqttCustom`:
 * `topic`
 
 Macro substitution for templates is based on the syntax `${<JEXL expression>}`. The support to JEXL
-is explained in [JEXL Support](#jexl-support) section. The following identifiers are included in
+is explained in [JEXL support in custom notifications](#jexl-support-in-custom-notifications) section. The following identifiers are included in
 the context evaluated by the JEXL expression:
 
 * `id`: for the `id` of the entity
@@ -2341,7 +2341,7 @@ Some considerations to take into account when using custom notifications:
   (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
   notification (given that the notification format is actually the same).
 
-## JEXL Support
+## JEXL support in custom notifications
 
 Orion Context Broker supports [JEXL expressions](https://github.com/TomFrost/Jexl) in custom notification [macro replacement](#macro-substitution). Thus, subscriptions like this can be defined:
 

@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-JEXL basic expression in condition jexlExpression (source attributes in update)
+jexlExpression in condition (mixed updated + existing attrs)
 
 --SHELL-INIT--
 dbInit CB
@@ -32,16 +32,16 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub with condition.JexlExpression A+B=3
-# 02. Create entity E1 with A=1 and B=2
-# 03. Update entity E1 with A=foo and B=bar
-# 04. Update entity E1 with A=2.1 and B=-3.8
-# 05. Dump accumulator and see ONE notification (only for step 02: A=1, B=2)
-#     (the updates in steps 03 and 04 must NOT trigger notifications)
+# 01. Create custom sub with jexlExpression in condition (A|isNaN) && (B|isNaN)
+# 02. Create entity E1 with A=1 and B=bar
+# 03. Update entity E1 with A=foo
+# 04. Update entity E1 with B=1
+# 05. Dump accumulator and see ONE notification (only for step 03: A=foo, B=bar)
+#     (steps 02 and 04 must NOT trigger notifications)
 
 
-echo "01. Create custom sub with condition.JexlExpression A+B=3"
-echo "========================================================="
+echo "01. Create custom sub with jexlExpression in condition (A|isNaN) && (B|isNaN)"
+echo "============================================================================="
 payload='{
   "subject": {
     "entities": [
@@ -52,7 +52,7 @@ payload='{
     ],
     "condition": {
                 "attrs": [ ],
-                "jexlExpression": "(A + B) == 3"
+                "jexlExpression": "(A|isNaN) && (B|isNaN)"
              }
   },
   "notification": {
@@ -66,8 +66,8 @@ echo
 echo
 
 
-echo "02. Create entity E1 with A=1 and B=2"
-echo "====================================="
+echo "02. Create entity E1 with A=1 and B=bar"
+echo "======================================="
 payload='{
   "id": "E1",
   "type": "T",
@@ -76,25 +76,21 @@ payload='{
     "type": "Number"
   },
   "B": {
-    "value": 2,
-    "type": "Number"
-  }
+        "value": "bar",
+        "type": "Text"
+    }
 }'
 orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
 
-echo "03. Update entity E1 with A=foo and B=bar"
-echo "========================================="
+echo "03. Update entity E1 with A=foo"
+echo "==============================="
 payload='{
   "A": {
     "value": "foo",
     "type": "Text"
-  },
-  "B": {
-    "value": "bar",
-    "type": "Text"
   }
 }'
 orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
@@ -102,16 +98,12 @@ echo
 echo
 
 
-echo "04. Update entity E1 with A=2.1 and B=-3.8"
-echo "=========================================="
+echo "04. Update entity E1 with B=1"
+echo "============================="
 payload='{
-  "A": {
-    "value": 2.1,
-    "type": "Number"
-  },
   "B": {
-    "value": -3.8,
-    "type": "Number"
+      "value": 1,
+      "type": "Number"
   }
 }'
 orionCurl --url /v2/entities/E1/attrs -X PATCH --payload "$payload"
@@ -119,16 +111,16 @@ echo
 echo
 
 
-echo "05. Dump accumulator and see ONE notification (only for step 02: A=1, B=2)"
-echo "=========================================================================="
+echo "05. Dump accumulator and see ONE notification (only for step 03: A=foo, B=bar)"
+echo "=============================================================================="
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create custom sub with condition.JexlExpression A+B=3
-=========================================================
+01. Create custom sub with jexlExpression in condition (A|isNaN) && (B|isNaN)
+=============================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -137,8 +129,8 @@ Content-Length: 0
 
 
 
-02. Create entity E1 with A=1 and B=2
-=====================================
+02. Create entity E1 with A=1 and B=bar
+=======================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -147,27 +139,27 @@ Content-Length: 0
 
 
 
-03. Update entity E1 with A=foo and B=bar
-=========================================
+03. Update entity E1 with A=foo
+===============================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-04. Update entity E1 with A=2.1 and B=-3.8
-==========================================
+04. Update entity E1 with B=1
+=============================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-05. Dump accumulator and see ONE notification (only for step 02: A=1, B=2)
-==========================================================================
+05. Dump accumulator and see ONE notification (only for step 03: A=foo, B=bar)
+==============================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
-Content-Length: 169
+Content-Length: 173
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Ngsiv2-Attrsformat: normalized
 Host: 127.0.0.1:REGEX(\d+)
@@ -180,13 +172,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
         {
             "A": {
                 "metadata": {},
-                "type": "Number",
-                "value": 1
+                "type": "Text",
+                "value": "foo"
             },
             "B": {
                 "metadata": {},
-                "type": "Number",
-                "value": 2
+                "type": "Text",
+                "value": "bar"
             },
             "id": "E1",
             "type": "T"
