@@ -2070,7 +2070,9 @@ static unsigned int processSubscriptions
         bool basic = false;
     #endif
 
+
     // Build JEXL evaluation contexts using entity attributes and their metadata
+    TIME_EXPR_CTXBLD_START();
     ExprContextObject exprContext(basic);
     ExprContextObject exprMetadataContext(basic);
     Entity&                             en      = notifyCerP->entity;
@@ -2087,6 +2089,7 @@ static unsigned int processSubscriptions
       }
       exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
     }
+    TIME_EXPR_CTXBLD_STOP();
 
     /* Check 3: jexlExpression Filters */
     const char* jexlExpression = tSubP->jexlExpression.c_str();

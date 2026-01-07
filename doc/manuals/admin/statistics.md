@@ -165,8 +165,8 @@ The particular counters are as follows:
   `last` includes the accumulation for all of them. In the case of mongoReadWait, only the time used
   to get the results cursor is taken into account, but not the time to process cursors results (which
   is time that belongs to mongoBackend counters).
-* `exprJexlCtxBld`: time passed building context for custom notification expression evaluation (see [macro substitution](../orion-api.md#macro-substitution) and [JEXL support in custom notifications](../orion-api.md#jexl-support-in-custom-notifications))
-* `exprJexlEval`: time passed evaluating custom notification expressions (see [macro substitution](../orion-api.md#macro-substitution) and [JEXL support in custom notifications](../orion-api.md#jexl-support-in-custom-notifications))
+* `exprJexlCtxBld`: time passed building context for custom notification expression evaluation (see [macro substitution](../orion-api.md#macro-substitution) and [JEXL support in custom notifications](../orion-api.md#jexl-support-in-custom-notifications)). This also includes the time passed using building context for `[`jexlExpressions`](../orion-api.md#subscriptionsubjectcondition).
+* `exprJexlEval`: time passed evaluating custom notification expressions (see [macro substitution](../orion-api.md#macro-substitution) and [JEXL support in custom notifications](../orion-api.md#jexl-support-in-custom-notifications)). This also includes the time passed using evaluating expressions for `[`jexlExpressions`](../orion-api.md#subscriptionsubjectcondition).
 
 *NOTE*: if Orion binary is build without using cjexl and only basic replacement is available, then `exprBasicCtxtBld` and `exprBasicEval`
 fields appear instead of `exprJexlCtxBld` and `exprJexlEval`.
