@@ -1930,17 +1930,24 @@ be automatically deleted in an unwanted way**.
 Based on the [`condition` subscription field](#subscriptionsubjectcondition), upon
 entity update, the notification triggering rules are as follow:
 
-* If `attrs` and one or both of `expression` and `jexlExpression` are used, a notification is sent whenever one of the attributes in
-  the `attrs` list changes (or is deleted) and at the same time `expression` and/or `jexlExpression` match.
-* If `attrs` is used and `expression` and `jexlExpression` are not used, a notification is sent whenever any of the
+* If `attrs` and expressions are used, a notification is sent whenever one of the attributes in
+  the `attrs` list changes (or is deleted) and at the same time expressions match.
+* If `attrs` is used and expressions are not used, a notification is sent whenever any of the
   attributes in the `attrs` list changes (or is deleted).
-* If `attrs` is not used and `expression` and/or `jexlExpression` are used, a notification is sent whenever any of the
-  attributes of the entity change (or is deleted) and at the same time `expression` and/or `jexlExpression` match.
-* If neither `attrs`, `expression`, nor `jexlExpression` are used, a notification is sent whenever any of the
+* If `attrs` is not used and expressions are used, a notification is sent whenever any of the
+  attributes of the entity change (or is deleted) and at the same time expressions match.
+* If neither `attrs` expressions are used, a notification is sent whenever any of the
   attributes of the entity changes (or is deleted).
 
 Note that changing the metadata of a given attribute is considered a change even though the attribute
 value itself hasn't changed.
+
+By *expressions* we mean at least one of the following
+
+* `expression`
+* `jexlExpression`
+
+If both are used (i.e. `expression` and a `jexlExpresion` at the same time) both must match to consider that expressions match in the above description of triggering rules.
 
 ## Notification Messages
 
@@ -5031,10 +5038,9 @@ A `condition` contains the following subfields:
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
 | `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed. `georel`, `geometry` and `coords` have to be used together (i.e. "all or nothing"). Check the example using geoquery as expression [below](#create-subscription-post-v2subscriptions).|
+| `jexlExpression` | ✓ | string | JEXL expression evaluated to determine whether a notification must be sent. If this field is used (note it is optional), the notification is triggered only when the expression evaluates to `true`. |
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 | `notifyOnMetadataChange` | ✓   | boolean | If `true` then metadata is considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is triggered. If `false` then the metadata is not considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is not triggered. Default value is `true`. |
-| `jexlExpression` | ✓ | string | JEXL expression evaluated to determine whether a notification must be sent. If this field is used (note it is optional), the notification is triggered only when the expression evaluates to `true`. |
-
 
 Notification triggering (i.e. when a notification is triggered based on entity updates)
 is described in [this specific section](#notification-triggering).
