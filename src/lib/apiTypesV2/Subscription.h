@@ -126,6 +126,7 @@ struct Condition
 {
   std::vector<std::string>  attributes;
   Expression                expression;
+  std::string               jexlExpression;
   std::vector<SubAltType>   altTypes;
   bool                      notifyOnMetadataChange;
   std::string               toJson();

@@ -210,6 +210,14 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
 
 
   //
+  // 04.4 jexlExpression
+  //
+  if (sub.hasField(CSUB_JEXL_EXPR))
+  {
+    cSubP->jexlExpression = getStringFieldF(sub, CSUB_JEXL_EXPR);
+  }
+
+  //
   // 05. Push Entity-data names to EntityInfo Vector (cSubP->entityInfos)
   //
   std::vector<orion::BSONElement>  eVec = getFieldF(sub, CSUB_ENTITIES).Array();
@@ -338,6 +346,7 @@ int mongoSubCacheItemInsert
   long long              expirationTime,
   const std::string&     status,
   double                 statusLastChange,
+  const std::string&     jexlExpression,
   const std::string&     q,
   const std::string&     mq,
   const std::string&     geometry,
@@ -436,6 +445,7 @@ int mongoSubCacheItemInsert
   cSubP->throttling            = sub.hasField(CSUB_THROTTLING)? getIntOrLongFieldAsLongF(sub, CSUB_THROTTLING) : -1;
   cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)? getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT) : -1;
   cSubP->expirationTime        = expirationTime;
+  cSubP->jexlExpression        = jexlExpression;
   cSubP->expression.q          = q;
   cSubP->expression.mq         = mq;
   cSubP->expression.geometry   = geometry;

@@ -86,6 +86,7 @@
 #define CSUB_LASTNOTIFICATION        "lastNotification"
 #define CSUB_REFERENCE               "reference"
 #define CSUB_CONDITIONS              "conditions"
+#define CSUB_JEXL_EXPR               "jexlExpression"
 #define CSUB_EXPR                    "expression"
 #define CSUB_EXPR_Q                  "q"
 #define CSUB_EXPR_MQ                 "mq"

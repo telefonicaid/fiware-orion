@@ -59,6 +59,8 @@
 #include "mongoBackend/compoundValueBson.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 
+#include "expressions/exprMgr.h"
+#include "expressions/ExprResult.h"
 #include "mongoDriver/connectionOperations.h"
 #include "mongoDriver/mongoConnectionPool.h"
 #include "mongoDriver/safeMongo.h"
@@ -945,6 +947,8 @@ static bool addTriggeredSubscriptions_withCache
     }
     subP->metadata  = cSubP->metadata;
 
+    subP->jexlExpression = cSubP->jexlExpression;
+
     subP->fillExpression(cSubP->expression.georel, cSubP->expression.geometry, cSubP->expression.coords);
 
     std::string errorString;
@@ -1822,6 +1826,11 @@ static bool addTriggeredSubscriptions_noCache
         setStringVectorF(sub, CSUB_METADATA, &(trigs->metadata));
       }
 
+      if (sub.hasField(CSUB_JEXL_EXPR))
+      {
+        trigs->jexlExpression = getStringFieldF(sub, CSUB_JEXL_EXPR);
+      }
+
       if (sub.hasField(CSUB_EXPR))
       {
         orion::BSONObj expr = getObjectFieldF(sub, CSUB_EXPR);
@@ -2055,7 +2064,47 @@ static unsigned int processSubscriptions
       continue;
     }
 
-    /* Check 3: expression (georel, which also uses geometry and coords)
+    #ifdef EXPR_BASIC
+        bool basic = true;
+    #else
+        bool basic = false;
+    #endif
+
+
+    // Build JEXL evaluation contexts using entity attributes and their metadata
+    TIME_EXPR_CTXBLD_START();
+    ExprContextObject exprContext(basic);
+    ExprContextObject exprMetadataContext(basic);
+    Entity&                             en      = notifyCerP->entity;
+
+    for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+    {
+      en.attributeVector[ix]->addToContext(&exprContext, basic);
+
+      // Add attribute metadata to context
+      ExprContextObject exprAttrMetadataContext(basic);
+      for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
+      {
+        en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
+      }
+      exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
+    }
+    TIME_EXPR_CTXBLD_STOP();
+
+    /* Check 3: jexlExpression Filters */
+    const char* jexlExpression = tSubP->jexlExpression.c_str();
+    if (!tSubP->jexlExpression.empty())
+    {
+
+      // If the jexlExpression is null or empty, consider it valid and return true
+      ExprResult result = exprMgr.evaluate(&exprContext, jexlExpression);
+      if (result.valueType != orion::ValueType::ValueTypeBoolean || result.boolValue != true)
+      {
+        continue;
+      }
+    }
+
+    /* Check 4: expression (georel, which also uses geometry and coords)
      * This should be always the last check, as it is the most expensive one, given that it interacts with DB
      * (Issue #2396 should solve that) */
     if ((!tSubP->expression.georel.empty()) && (!tSubP->expression.coords.empty()) && (!tSubP->expression.geometry.empty()))

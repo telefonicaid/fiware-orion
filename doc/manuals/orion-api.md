@@ -73,7 +73,7 @@
       - [NGSI payload patching](#ngsi-payload-patching)
       - [Omitting payload](#omitting-payload)
       - [Additional considerations](#additional-considerations)
-    - [JEXL Support](#jexl-support)
+    - [JEXL support in custom notifications](#jexl-support-in-custom-notifications)
       - [JEXL usage example](#jexl-usage-example)
       - [Metadata support](#metadata-support)
       - [Evaluation priority](#evaluation-priority)
@@ -452,7 +452,7 @@ There are some exception cases in which the above restrictions do not apply. In 
 * URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
-* Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL expression syntax](#jexl-support))
+* Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL support in custom notifications](#jexl-support-in-custom-notifications))
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
 ## Identifiers syntax restrictions
@@ -478,7 +478,7 @@ In addition, the [General syntax restrictions](#general-syntax-restrictions) als
 
 In case a client attempts to use a field that is invalid from a syntax point of view, the client gets a "Bad Request" error response, explaining the cause.
 
-Note that although `:` and `-` are allowed in identifiers, they are strongly discouraged, as they collide with the [JEXL syntax](#jexl-support). In particular, `-` is used for subtraction operation (e.g. `${A-B}`) and `:` is used in the ternary operator (eg. `A?'A is true':'A is false`). Thus, an attribute name `lower-temperature` in an expression `${lower-temperature}` would be interpreted as the value of `lower` attribute minus `temperature` attribute (and not as the value of an attribute named `lower-temperature`).
+Note that although `:` and `-` are allowed in identifiers, they are strongly discouraged, as they collide with the [JEXL syntax](#jexl-support-in-custom-notifications). In particular, `-` is used for subtraction operation (e.g. `${A-B}`) and `:` is used in the ternary operator (eg. `A?'A is true':'A is false`). Thus, an attribute name `lower-temperature` in an expression `${lower-temperature}` would be interpreted as the value of `lower` attribute minus `temperature` attribute (and not as the value of an attribute named `lower-temperature`).
 
 ## Error Responses
 
@@ -1930,17 +1930,24 @@ be automatically deleted in an unwanted way**.
 Based on the [`condition` subscription field](#subscriptionsubjectcondition), upon
 entity update, the notification triggering rules are as follow:
 
-* If `attrs` and `expression` are used, a notification is sent whenever one of the attributes in
-  the `attrs` list changes (or is deleted) and at the same time `expression` matches.
-* If `attrs` is used and `expression` is not used, a notification is sent whenever any of the
+* If `attrs` and expressions are used, a notification is sent whenever one of the attributes in
+  the `attrs` list changes (or is deleted) and at the same time expressions match.
+* If `attrs` is used and expressions are not used, a notification is sent whenever any of the
   attributes in the `attrs` list changes (or is deleted).
-* If `attrs` is not used and `expression` is used, a notification is sent whenever any of the
-  attributes of the entity changes (or is deleted) and at the same time `expression` matches.
-* If neither `attrs` nor `expression` are used, a notification is sent whenever any of the
+* If `attrs` is not used and expressions are used, a notification is sent whenever any of the
+  attributes of the entity change (or is deleted) and at the same time expressions match.
+* If neither `attrs` nor expressions are used, a notification is sent whenever any of the
   attributes of the entity changes (or is deleted).
 
 Note that changing the metadata of a given attribute is considered a change even though the attribute
 value itself hasn't changed.
+
+By *expressions* we mean at least one of the following
+
+* `expression`
+* `jexlExpression`
+
+If both are used (i.e. `expression` and a `jexlExpresion` at the same time) both must match to consider that expressions match in the above description of triggering rules.
 
 ## Notification Messages
 
@@ -2069,7 +2076,7 @@ In case of `mqttCustom`:
 * `topic`
 
 Macro substitution for templates is based on the syntax `${<JEXL expression>}`. The support to JEXL
-is explained in [JEXL Support](#jexl-support) section. The following identifiers are included in
+is explained in [JEXL support in custom notifications](#jexl-support-in-custom-notifications) section. The following identifiers are included in
 the context evaluated by the JEXL expression:
 
 * `id`: for the `id` of the entity
@@ -2341,7 +2348,7 @@ Some considerations to take into account when using custom notifications:
   (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
   notification (given that the notification format is actually the same).
 
-## JEXL Support
+## JEXL support in custom notifications
 
 Orion Context Broker supports [JEXL expressions](https://github.com/TomFrost/Jexl) in custom notification [macro replacement](#macro-substitution). Thus, subscriptions like this can be defined:
 
@@ -5031,6 +5038,7 @@ A `condition` contains the following subfields:
 |--------------|----------|-------|-------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`      | ✓        | array | Array of attribute names that will trigger the notification. Empty list is not allowed.                                       |
 | `expression` | ✓        | object| An expression composed of `q`, `mq`, `georel`, `geometry` and `coords` (see [List Entities](#list-entities-get-v2entities) operation above about this field). `expression` and sub elements (i.e. `q`) must have content, i.e. `{}` or `""` is not allowed. `georel`, `geometry` and `coords` have to be used together (i.e. "all or nothing"). Check the example using geoquery as expression [below](#create-subscription-post-v2subscriptions).|
+| `jexlExpression` | ✓ | string | JEXL expression evaluated to determine whether a notification must be sent. If this field is used (note it is optional), the notification is triggered only when the expression evaluates to `true`. It works in the same way as the [JEXL expressions in custom notifications](#jexl-support-in-custom-notifications).|
 | `alterationTypes` | ✓   | array | Specify under which alterations (entity creation, entity modification, etc.) the subscription is triggered (see section [Subscriptions based in alteration type](#subscriptions-based-in-alteration-type)) |
 | `notifyOnMetadataChange` | ✓   | boolean | If `true` then metadata is considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is triggered. If `false` then the metadata is not considered part of the value of the attribute in the context of notification, so if the value doesn't change but the metadata changes, then a notification is not triggered. Default value is `true`. |
 

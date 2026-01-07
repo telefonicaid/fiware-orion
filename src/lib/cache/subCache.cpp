@@ -861,6 +861,7 @@ void subCacheItemInsert
   StringFilter*                           mdStringFilterP,
   const std::string&                      status,
   double                                  statusLastChange,
+  const std::string&                      jexlExpression,
   const std::string&                      q,
   const std::string&                      geometry,
   const std::string&                      coords,
@@ -899,6 +900,7 @@ void subCacheItemInsert
   cSubP->failsCounter          = 0;
   cSubP->status                = status;
   cSubP->statusLastChange      = statusLastChange;
+  cSubP->jexlExpression        = jexlExpression;
   cSubP->expression.q          = q;
   cSubP->expression.geometry   = geometry;
   cSubP->expression.coords     = coords;

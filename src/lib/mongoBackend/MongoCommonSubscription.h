@@ -175,6 +175,14 @@ extern void setExpression(const ngsiv2::Subscription& sub, orion::BSONObjBuilder
 
 /* ****************************************************************************
 *
+* setJexlExpression -
+*/
+extern void setJexlExpression(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);
+
+
+
+/* ****************************************************************************
+*
 * setFormat -
 */
 extern void setFormat(const ngsiv2::Subscription& sub, orion::BSONObjBuilder* b);

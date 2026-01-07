@@ -61,6 +61,7 @@ class TriggeredSubscription
   StringList                attrL;
   std::string               cacheSubId;
   std::string               tenant;
+  std::string               jexlExpression;
   StringFilter*             stringFilterP;
   StringFilter*             mdStringFilterP;
   bool                      blacklist;

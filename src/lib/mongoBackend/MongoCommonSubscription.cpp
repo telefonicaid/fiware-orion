@@ -678,6 +678,18 @@ void setExpression(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
+* setJexlExpression -
+*/
+void setJexlExpression(const Subscription& sub, orion::BSONObjBuilder* b)
+{
+  b->append(CSUB_JEXL_EXPR, sub.subject.condition.jexlExpression);
+  LM_T(LmtMongo, ("Subscription jexlExpression: %s", sub.subject.condition.jexlExpression.c_str()));
+}
+
+
+
+/* ****************************************************************************
+*
 * setFormat -
 */
 void setFormat(const Subscription& sub, orion::BSONObjBuilder* b)

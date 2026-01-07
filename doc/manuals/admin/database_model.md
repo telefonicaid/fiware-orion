@@ -302,6 +302,8 @@ Fields:
 -   **expression**: an expression used to evaluate if notifications has
     to be sent or not when updates come. It may be composed of the following
     fields: q, mq, georel, geometry and/or coords (optional)
+-   **jexlExpression**: an expression used to determine whether a notification must be sent.
+    Notifications are triggered only when the expression evaluates to `true` if this field is used (it is optional).
 -   **count**: the number of notifications sent associated to
     the subscription.   
 -   **format**: the format to use to send notification, possible values are **normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues** and **values**.
@@ -376,6 +378,7 @@ Example document:
                 "coords" : "",
                 "georel" : ""
         },
+        "jexlExpression": "temperature > 40"
         "format" : "JSON",
         "status" : "active",
         "statusLastChange" : 1637226173.6940024

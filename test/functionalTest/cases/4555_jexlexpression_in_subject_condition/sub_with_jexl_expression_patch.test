@@ -1,0 +1,411 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+subcription update cases with
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create httpCustom sub with subject.condition.jexlExpression c|parseFloat
+# 02. Get sub, see sub with subject.condition.jexlExpression c|parseFloat
+# 03. Update sub description
+# 04. Get sub, see subject.condition.jexlExpression
+# 05. Update sub subject.condition.jexlExpression c|toString
+# 06. Get sub, see subject.condition.jexlExpression c|toString
+# 07. Update subject.condition removing jexlExpression
+# 08. Get sub, see now jexlExpression in subject.condition
+# 09. Update subject.condition adding jexlExpression again c|parseFloat
+# 10. Get sub, see subject.condition.jexlExpression c|parseFloat
+#
+
+echo '01. Create httpCustom sub with subject.condition.jexlExpression c|parseFloat'
+echo "============================================================================"
+payload='{
+  "description": "Original sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ],
+    "condition": {
+        "attrs": [ ],
+        "jexlExpression": "c|parseFloat"
+    }
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo '02. Get sub, see sub with subject.condition.jexlExpression'
+echo "=========================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03. Update sub description"
+echo "=========================="
+payload='{
+  "description": "Modified sub"
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo '04. Get sub, see subject.condition.jexlExpression'
+echo "================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "05. Update sub subject.condition.jexlExpression c|toString"
+echo "=========================================================="
+payload='{
+    "subject": {
+        "entities": [
+          {
+            "id": "E1",
+            "type": "T1"
+          }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "jexlExpression": "c|toString"
+        }
+      }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo '06. Get sub, see subject.condition.jexlExpression c|toString'
+echo "============================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "07. Update subject.condition removing jexlExpression"
+echo "===================================================="
+payload='{
+    "subject": {
+        "entities": [
+          {
+            "id": "E1",
+            "type": "T1"
+          }
+        ],
+        "condition": {
+            "attrs": [ ]
+        }
+      }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo '08. Get sub, see now jexlExpression in subject.condition'
+echo "========================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Update subject.condition adding jexlExpression again c|parseFloat"
+echo "====================================================================="
+payload='{
+    "subject": {
+        "entities": [
+          {
+            "id": "E1",
+            "type": "T1"
+          }
+        ],
+        "condition": {
+            "attrs": [ ],
+            "jexlExpression": "c|parseFloat"
+        }
+      }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo '10. Get sub, see subject.condition.jexlExpression c|parseFloat'
+echo "=============================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create httpCustom sub with subject.condition.jexlExpression c|parseFloat
+============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+02. Get sub, see sub with subject.condition.jexlExpression
+==========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 364
+
+{
+    "description": "Original sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "jexlExpression": "c|parseFloat",
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+03. Update sub description
+==========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Get sub, see subject.condition.jexlExpression
+=================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 364
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "jexlExpression": "c|parseFloat",
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+05. Update sub subject.condition.jexlExpression c|toString
+==========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Get sub, see subject.condition.jexlExpression c|toString
+============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 362
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "jexlExpression": "c|toString",
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+07. Update subject.condition removing jexlExpression
+====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Get sub, see now jexlExpression in subject.condition
+========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 332
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+09. Update subject.condition adding jexlExpression again c|parseFloat
+=====================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Get sub, see subject.condition.jexlExpression c|parseFloat
+==============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 364
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "jexlExpression": "c|parseFloat",
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
