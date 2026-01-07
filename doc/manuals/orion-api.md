@@ -1936,7 +1936,7 @@ entity update, the notification triggering rules are as follow:
   attributes in the `attrs` list changes (or is deleted).
 * If `attrs` is not used and expressions are used, a notification is sent whenever any of the
   attributes of the entity change (or is deleted) and at the same time expressions match.
-* If neither `attrs` expressions are used, a notification is sent whenever any of the
+* If neither `attrs` nor expressions are used, a notification is sent whenever any of the
   attributes of the entity changes (or is deleted).
 
 Note that changing the metadata of a given attribute is considered a change even though the attribute
