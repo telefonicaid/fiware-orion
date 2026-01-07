@@ -36,7 +36,7 @@ accumulatorStart --pretty-print
 # 02. Create entity E1 with A=foo and B=2
 # 03. Update entity E1 with A=1
 # 04. Update entity E1 with B=bar
-# 05. Dump accumulator and see ONE notification (only for step 02: A=1, B=2)
+# 05. Dump accumulator and see ONE notification (only for step 03: A=1, B=2)
 #     (the updates in steps 03 and 04 must NOT trigger notifications)
 
 
