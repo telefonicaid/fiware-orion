@@ -73,7 +73,7 @@
       - [NGSI ペイロードのパッチ適用 (NGSI payload patching)](#ngsi-payload-patching)
       - [ペイロードの省略 (Omitting payload)](#omitting-payload)
       - [その他の考慮事項](#additional-considerations)
-    - [JEXL サポート (JEXL Support)](#jexl-support)
+    - [カスタム通知での JEXL サポート (JEXL support in custom notifications)](#jexl-support-in-custom-notifications)
       - [JEXL 使用例 (JEXL usage example)](#jexl-usage-example)
       - [メタデータのサポート (Metadata support)](#metadata-support)
       - [評価の優先順位](#evaluation-priority)
@@ -445,7 +445,7 @@ GET /v2/entities/E%253C01%253E
 -   URL パラメータ `q` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
 -   URL パラメータ `mq` は、[シンプル・クエリ言語](#simple-query-language) に必要な特殊文字を許可します
 -   URL パラメータ `georel` と `coords` は `;` を許可します
--   [NGSI ペイロード パッチ](#ngsi-payload-patching) の `ngsi` (つまり `id`、`type`、および属性値) 内 ([JEXL 式構文](#jexl-support) で使用される文字をサポートするため)
+-   [NGSI ペイロード パッチ](#ngsi-payload-patching) の `ngsi` (つまり `id`、`type`、および属性値) 内 ([カスタム通知での JEXL サポート](#jexl-support-in-custom-notifications) で使用される文字をサポートするため)
 -   属性タイプとして `TextUnrestricted` を使用する属性値 ([特別な属性タイプ](#special-attribute-types)のセクションを参照)
 
 <a name="identifiers-syntax-restrictions"></a>
@@ -472,7 +472,7 @@ GET /v2/entities/E%253C01%253E
 クライアントが構文の観点から無効なフィールドを使用しようとすると、クライアントは、原因を説明する "Bad Request" エラーの
 レスポンスを受け取ります。
 
-`:` と `-` は識別子で使用できますが、[JEXL 構文](#jexl-support) と衝突するため、使用は強く推奨されません。特に、`-` は減算演算 (例: `${A-B}`) に使用され、`:` は三項演算子 (例: `A?'A is true':'A is false`) に使用されます。したがって、式 `${lower-temperature}` 内の属性名 `lower-temperature` は、`lower` 属性の値から `temperature` 属性を引いた値として解釈されます (`lower-temperature` という名前の属性の値として解釈されるわけではありません)。
+`:` と `-` は識別子で使用できますが、[JEXL 構文](#jexl-support-in-custom-notifications) と衝突するため、使用は強く推奨されません。特に、`-` は減算演算 (例: `${A-B}`) に使用され、`:` は三項演算子 (例: `A?'A is true':'A is false`) に使用されます。したがって、式 `${lower-temperature}` 内の属性名 `lower-temperature` は、`lower` 属性の値から `temperature` 属性を引いた値として解釈されます (`lower-temperature` という名前の属性の値として解釈されるわけではありません)。
 
 <a name="error-responses"></a>
 
@@ -1915,16 +1915,23 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
 [`condition` サブスクリプション・フィールド](#subscriptionsubjectcondition)に基づいて、エンティティの更新時に通知を
 トリガーするルールは次のとおりです。
 
--   `attrs` と `expression` が使用されている場合、`attrs` リスト内の属性のいずれかが変更 (または削除) され、同時に
-    `expression` が一致するたびに通知が送信されます
--   `attrs` が使用され、`expression` が使用されていない場合、`attrs` リスト内のいずれかの属性が変更 (または削除)
+-   `attrs` と式が使用されている場合、`attrs` リスト内の属性のいずれかが変更 (または削除) され、同時に
+    式が一致するたびに通知が送信されます
+-   `attrs` が使用され、式が使用されていない場合、`attrs` リスト内のいずれかの属性が変更 (または削除)
     されるたびに通知が送信されます
--   `attrs` を使用せず、`expression` を使用すると、エンティティのいずれかの属性が変更 (または削除) され、同時に
-    `expression` が一致するたびに通知が送信されます
--   `attrs` も `expression` も使用されていない場合、エンティティのいずれかの属性が変更 (または削除)
+-   `attrs` を使用せず、式を使用すると、エンティティのいずれかの属性が変更 (または削除) され、同時に
+    式が一致するたびに通知が送信されます
+-   `attrs` も式も使用されていない場合、エンティティのいずれかの属性が変更 (または削除)
     されるたびに通知が送信されます
 
 特定の属性のメタデータを変更すると、属性値自体が変更されていなくても、変更と見なされることに注意してください。
+
+*式*とは、少なくとも以下の1つを意味します。
+
+* `expression`
+* `jexlExpression`
+
+両方を使用する場合 (つまり、`expression` と `jexlExpresion` を同時に使用する場合)、上記のトリガー・ルールの説明で式が一致すると見なすには、両方が一致する必要があります。
 
 <a name="notification-messages"></a>
 
@@ -2056,7 +2063,7 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
 -   `topic`
 
 テンプレートのマクロ置換は、構文 `${<JEXL expression>}` に基づいています。JEXL のサポートについては、
-[JEXL サポート](#jexl-support) セクションで説明されています。JEXL 式によって評価されるコンテキストには、
+[カスタム通知での JEXL サポート](#jexl-support-in-custom-notifications) セクションで説明されています。JEXL 式によって評価されるコンテキストには、
 次の識別子が含まれます:
 
 -   `id`: エンティティの `id`
@@ -2340,9 +2347,9 @@ the value of the "temperature" attribute (of type Number) is 23.4
     `Ngsiv2-AttrsFormat` ヘッダは `custom` に設定されます。ただし、NGSI patch が使用される場合 (つまり、`ngsi` フィールド)、
     通常の通知と同様に、`Ngsiv2-AttrsFormat: normalized` が使用されることに注意してください (通知形式が実際には同じである場合)
 
-<a name="jexl-support"></a>
+<a name="jexl-support-in-custom-notifications"></a>
 
-## JEXL サポート (JEXL Support)
+## カスタム通知での JEXL サポート (JEXL support in custom notifications)
 
 Orion Context Brokerは、カスタム通知の[マクロ置換](#macro-substitution)で[JEXL式](https://github.com/TomFrost/Jexl)をサポートしています。したがって、次のようなサブスクリプションを定義できます:
 
@@ -5185,6 +5192,7 @@ _**レスポンス・ペイロード**_
 |-------------------|------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `attrs`           | ✓          | array  | 通知をトリガーする属性名の配列。空のリストは許可されていません                                                                                                                                                                                                                     |
 | `expression`      | ✓          | object | `q`, `mq`, `georel`, `geometry`, `coords` で構成される式 (このフィールドについては、上記の [エンティティをリスト](#list-entities-get-v2entities)操作を参照してください)。`expression` とサブ要素 (つまり `q`) にはコンテンツが必要です。つまり、`{}` または `""` は許可されません。`georel`, `geometry`, および `coords` は一緒に使用する必要があります (つまり、"全てか無しか")。 geoquery を式として使用する例は下記(#create-subscription-post-v2subscriptions) を確認してください |
+| `jexlExpression` | ✓           | string | 通知を送信する必要があるかどうかを判断するために評価されるJEXL式。このフィールドを使用する場合 (オプションであることに注意) 、式が `true` と評価された場合にのみ通知がトリガーされます。[カスタム通知における JEXL 式](#jexl-support-in-custom-notifications)と同じように機能します |
 | `alterationTypes` | ✓          | array  | サブスクリプションがトリガーされる変更 (エンティティの作成、エンティティの変更など) を指定します ([変更タイプに基づくサブスクリプション](#subscriptions-based-in-alteration-type)のセクションを参照)                                                                               |
 | `notifyOnMetadataChange` | ✓   | boolean | `true` の場合、メタデータは通知のコンテキストで属性の値の一部と見なされるため、値が変更されずにメタデータが変更された場合、通知がトリガーされます。`false` の場合、メタデータは通知のコンテキストで属性の値の一部と見なされないため、値が変更されずにメタデータが変更された場合、通知はトリガーされません。デフォルト値は `true` です |
 

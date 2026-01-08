@@ -228,6 +228,8 @@ Orion はこれを文字列 (レガシー) または bool 型 (現行) として
 -   **metadata** : メタデータ名 (文字列) の配列 (オプション) です
 -   **conditions** : 通知をトリガーする属性のリストです。
 -   **expression** : 更新が来たときに通知を送信するかどうかを評価するために使用される式です。 次のフィールドで構成されています : q, mq, georel, geometry and/or coords (オプション)
+-   **jexlExpression** : 通知を送信する必要があるかどうかを判断するために使用される式。
+    このフィールドが使用されている場合、式が `true` と評価された場合にのみ通知がトリガーされます (オプション)
 -   **count** : サブスクリプションに関連付けられて送信された通知の数です
 -   **format** : 通知を送信するために使用する形式。可能な値は、**normalized**, **keyValues**, **simplifiedNormalized**, **simplifiedKeyValues**, **values** です
 -   **status** : `active` (アクティブなサブスクリプションの場合) または `inactive` (非アクティブなサブスクリプションの場合)、
@@ -293,6 +295,7 @@ Orion はこれを文字列 (レガシー) または bool 型 (現行) として
                 "coords" : "",
                 "georel" : ""
         },
+        "jexlExpression": "temperature > 40"
         "format" : "JSON",
         "description": "this is an example subscription",
         "status" : "active",
