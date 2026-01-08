@@ -145,8 +145,8 @@ SemWait ブロックは、メインの内部セマフォの累積待ち時間を
 * `mongoBackend` : mongoBackend モジュールで渡された時間です (疑似セルフタイム)
 * `render` : レンダリングモジュールに渡された時間です (擬似セルフタイム)
 * `mongo*Wait``Read`, `Write` または `Cmd` オペレーションのために MongoDB を待っている時間です。与えられた要求が MongoDB への複数の read/write/cmd の呼び出しを含む場合、`last` 下の `mongo*Wait` に示された時間は、それらすべてのための蓄積を含むことに注意してください。mongoReadWait の場合、結果カーソルを取得するために使用された時間のみが考慮されますが、カーソル結果を処理する時間 (mongoBackend カウンタに属する時間) は考慮されません
-* `exprJexlCtxBld`: カスタム通知式の評価のためのコンテキストの構築にかかった時間 ([マクロ置換](../orion-api.md#macro-substitution) および [JEXL サポート](../orion-api.md#jexl-support) を参照)
-* `exprJexlEval`: カスタム通知式の評価にかかった時間 ([マクロ置換](../orion-api.md#macro-substitution) および [JEXL サポート](../orion-api.md#jexl-support) を参照)
+* `exprJexlCtxBld`: カスタム通知式の評価のためのコンテキストの構築にかかった時間 ([マクロ置換](../orion-api.md#macro-substitution) および [JEXL サポート](../orion-api.md#jexl-support) を参照)。これには、`[`jexlExpressions`](../orion-api.md#subscriptionsubjectcondition) のコンテキストの構築にかかった時間も含まれます
+* `exprJexlEval`: カスタム通知式の評価にかかった時間 ([マクロ置換](../orion-api.md#macro-substitution) および [JEXL サポート](../orion-api.md#jexl-support) を参照)。これには、`[`jexlExpressions`](../orion-api.md#subscriptionsubjectcondition) の式の評価にかかった時間も含まれます
 
 *注*: Orion バイナリが cjexl を使用せずにビルドされ、基本的な置換のみが使用可能な場合、`exprJexlCtxBld` および `exprJexlEval` の代わりに
 `exprBasicCtxtBld` フィールドと `exprBasicEval` フィールドが表示されます。
