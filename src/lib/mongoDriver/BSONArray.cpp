@@ -79,7 +79,7 @@ int BSONArray::nFields(void) const
 */
 std::string BSONArray::toString(void) const
 {
-  char* str = bson_array_as_json(b, NULL);
+  char* str = bson_array_as_canonical_extended_json(b, NULL);
   std::string s(str);
   bson_free(str);
   return s;
