@@ -95,7 +95,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # the MONGOC_TEST_USE_CRYPT_SHARED=FALSE. It needs Python and in this tiny image we don't have it
     # FIXME PR: compilation variables no longer used in 2.x?
     #cmake -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE .. && \
-    cmake && \
+    cmake .. && \
     make && \
     make install && \
     # Install rapidjson from source
