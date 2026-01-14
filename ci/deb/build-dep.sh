@@ -85,9 +85,11 @@ echo "INSTALL: mongodb c driver" \
 && make \
 && make install
 
+# NOTE: the sed line comments a problematic line in /usr/local/include/rapidjson/document.h with GCC14++
 echo "INSTALL: rapidjson" \
 && curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
-&& mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include
+&& mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include \
+&& sed -i 's/^.*GenericStringRef& operator=(const GenericStringRef& rhs).*$/\/\/&/' /usr/local/include/rapidjson/document.h
 
 echo "INSTALL: libmicrohttpd" \
 && curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.2.tar.gz | tar xzC /opt/ \

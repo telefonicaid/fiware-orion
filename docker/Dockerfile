@@ -99,10 +99,12 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     make && \
     make install && \
     # Install rapidjson from source
+    # NOTE: the sed line comments a problematic line in /usr/local/include/rapidjson/document.h with GCC14++
     cd /opt && \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz && \
     tar xfz v1.1.0.tar.gz && \
     mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include && \
+    sed -i 's/^.*GenericStringRef& operator=(const GenericStringRef& rhs).*$/\/\/&/' /usr/local/include/rapidjson/document.h && \
     # Install orion from source
     adduser ${ORION_USER} && \
     cd /opt && \
