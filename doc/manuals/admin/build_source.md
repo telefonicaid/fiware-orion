@@ -133,7 +133,7 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
 
 * Install the Kafka client (CLI).
 
-      sudo apt-get install openjdk-12-jre-headless
+      sudo apt-get install openjdk-21-jre-headless
       wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
       tar xvf kafka_2.12-3.9.1.tgz
       # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)

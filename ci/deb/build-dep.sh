@@ -49,7 +49,7 @@ apt-get -y install \
   libsasl2-dev \
   libgcrypt-dev \
   librdkafka-dev \
-  openjdk-17-jre-headless \
+  openjdk-21-jre-headless \
   zlib1g-dev\
   libzstd-dev  \
   liblz4-dev

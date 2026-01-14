@@ -134,7 +134,7 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
 * Kafkaクライアントをインストール (CLI).
 
-      sudo apt-get install openjdk-17-jre-headless
+      sudo apt-get install openjdk-21-jre-headless
       wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
       tar xvf kafka_2.12-3.9.1.tgz
       # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)
