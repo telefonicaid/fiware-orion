@@ -257,7 +257,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 565
+Content-Length: 566
 
 {
     "description": "A subscription to get info about Room1",
@@ -273,7 +273,7 @@ Content-Length: 565
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
@@ -311,7 +311,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 565
+Content-Length: 566
 
 {
     "description": "A subscription to get info about Room1",
@@ -327,7 +327,7 @@ Content-Length: 565
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
@@ -370,7 +370,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 611
+Content-Length: 612
 
 {
     "description": "A subscription to get info about Room1",
@@ -385,7 +385,7 @@ Content-Length: 611
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,

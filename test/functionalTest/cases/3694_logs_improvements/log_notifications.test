@@ -190,9 +190,9 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
  msg=Notif delivered (subId: SUB_ID1): POST localhost:9997/notify, payload (125 bytes): {"subscriptionId":"SUB_ID1","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: 200
  msg=Notif delivered (subId: SUB_ID1): POST localhost:9997/notify, payload (173 bytes): {"subscriptionId":"SUB_ID1","data":[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{}},"A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: 200
  msg=Notif delivered (subId: SUB_ID1): POST localhost:9997/notify, payload (173 bytes): {"subscriptionId":"SUB_ID1","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}},"A":{"type":"Text","value":"foo","metadata":{}}}]}, response code: 200
- msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (125 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Couldn't connect to server
- msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (173 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{}},"A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Couldn't connect to server
- msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (173 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}},"A":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Couldn't connect to server
+ msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (125 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Could not connect to server
+ msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (173 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A":{"type":"Text","value":"foo","metadata":{}},"A1":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Could not connect to server
+ msg=Notif delivered (subId: SUB_ID2): POST localhost:12345/notify, payload (173 bytes): {"subscriptionId":"SUB_ID2","data":[{"id":"E","type":"T","A1":{"type":"Text","value":"foo","metadata":{}},"A":{"type":"Text","value":"foo","metadata":{}}}]}, response code: Could not connect to server
 
 
 06. Check notification correlators (two blocks, corresponding to each update)
