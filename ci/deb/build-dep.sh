@@ -80,7 +80,6 @@ echo "INSTALL: mongodb c driver" \
 && cd /opt/mongo-c-driver-2.2.1 \
 && mkdir cmake-build \
 && cd cmake-build \
-#&& cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
 && cmake .. \
 && make \
 && make install
