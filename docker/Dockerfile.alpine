@@ -166,7 +166,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       cyrus-sasl-dev && \
     # The above apk removal erases some dependencies needed by contextBroker. So we reinstall it
     apk add --no-cache \
-      boost1.77-thread \
+      boost1.78-thread \
       libcurl \
       libuuid \
       gnutls \

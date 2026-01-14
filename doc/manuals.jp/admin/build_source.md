@@ -49,6 +49,8 @@ Orion Context Broker は、以下のライブラリをビルドの依存関係�
         wget https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz
         tar xfvz v1.1.0.tar.gz
         sudo mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include
+        # Next line is to comment a problematic line in document.h when GCC14+ is used
+        sudo sed -i 's/^.*GenericStringRef& operator=(const GenericStringRef& rhs).*$/\/\/&/' /usr/local/include/rapidjson/document.h
 
 * ソースから libmicrohttpd をインストールします (`./configure` 下のコマンドはライブラリの最小限のフットプリントを得るための推奨ビルド設定を示していますが、上級ユーザの方は好きなように設定できます)
 

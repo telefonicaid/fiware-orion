@@ -162,8 +162,8 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     apt-get -y autoremove --purge && \
     # The above apt removal erases some dependencies needed by contextBroker. So we reinstall it
     apt-get -y install \
-        libicu72 \
-        libboost-thread1.74.0 && \
+        libicu76 \
+        libboost-thread1.83.0 && \
     # Don't need old log files inside docker images
     rm -f /var/log/*log
 
