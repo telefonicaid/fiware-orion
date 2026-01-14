@@ -87,7 +87,7 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # Install mongodb driver from source
     cd /opt && \
     curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/2.2.1/mongo-c-driver-2.2.1.tar.gz && \
-    tar xfvz mongo-c-driver-2.1.1.tar.gz && \
+    tar xfvz mongo-c-driver-2.2.1.tar.gz && \
     cd mongo-c-driver-2.2.1 && \
     mkdir cmake-build && \
     cd cmake-build && \
