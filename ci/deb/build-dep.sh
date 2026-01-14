@@ -68,17 +68,20 @@ echo "INSTALL: python special dependencies" \
 && pip install Werkzeug==2.0.2 \
 && pip install paho-mqtt==1.6.1 \
 && pip install amqtt==0.11.0b1 \
+&& pip install setuptools==80.9.0 \
 && pip install confluent-kafka==2.11.0 \
 && deactivate
 
 # Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
 # see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
+# FIXME PR
 echo "INSTALL: mongodb c driver" \
-&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz | tar xzC /opt/ \
-&& cd /opt/mongo-c-driver-1.29.0 \
+&& curl -L https://github.com/mongodb/mongo-c-driver/releases/download/2.2.1/mongo-c-driver-2.2.1.tar.gz | tar xzC /opt/ \
+&& cd /opt/mongo-c-driver-2.2.1 \
 && mkdir cmake-build \
 && cd cmake-build \
-&& cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
+#&& cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. \
+&& cmake .. \
 && make \
 && make install
 
@@ -87,8 +90,8 @@ echo "INSTALL: rapidjson" \
 && mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include
 
 echo "INSTALL: libmicrohttpd" \
-&& curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz | tar xzC /opt/ \
-&& cd /opt/libmicrohttpd-1.0.1  \
+&& curl -L https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.2.tar.gz | tar xzC /opt/ \
+&& cd /opt/libmicrohttpd-1.0.2  \
 && ./configure --disable-messages --disable-postprocessor --disable-dauth  \
 && make \
 && make install
@@ -102,8 +105,8 @@ echo "INSTALL: gmock" \
 && make install
 
 echo "INSTALL: mosquitto" \
-&& curl -kL https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz | tar xzC /opt/ \
-&& cd /opt/mosquitto-2.0.20 \
+&& curl -kL https://mosquitto.org/files/source/mosquitto-2.0.22.tar.gz | tar xzC /opt/ \
+&& cd /opt/mosquitto-2.0.22 \
 && sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk \
 && sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk \
 && sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk \
@@ -119,8 +122,8 @@ echo "INSTALL: Kafka" \
 ldconfig
 
 apt-get -y clean \
-&& rm -Rf /opt/mongo-c-driver-1.29.0 \
+&& rm -Rf /opt/mongo-c-driver-2.2.1 \
 && rm -Rf /opt/rapidjson-1.1.0 \
-&& rm -Rf /opt/libmicrohttpd-1.0.1 \
-&& rm -Rf /opt/mosquitto-2.0.20 \
+&& rm -Rf /opt/libmicrohttpd-1.0.2 \
+&& rm -Rf /opt/mosquitto-2.0.22 \
 && rm -Rf /opt/gmock-1.5.0

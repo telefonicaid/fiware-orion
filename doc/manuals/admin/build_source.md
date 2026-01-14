@@ -1,24 +1,24 @@
 # Building from sources
 
-Orion Context Broker reference distribution is Debian 12. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section may include indications on how to build in other distributions, just in the case it may help people that don't use Debian. However, note that the only "officially supported" procedure is the one for Debian 12.
+Orion Context Broker reference distribution is Debian 13. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section may include indications on how to build in other distributions, just in the case it may help people that don't use Debian. However, note that the only "officially supported" procedure is the one for Debian 13.
 
 You can also have a look to [3.1 Building in not official distributions](../../../docker/README.md#31-building-in-not-official-distributions) section in the Docker documentation to check how to build Docker containers images in distributions other than the official one.
 
 *NOTE:* the build process described in this document does not include the cjexl library, as it is considered optional from the point of view of the basic building process.
 
-## Debian 12 (officially supported)
+## Debian 13 (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
 
-* boost: 1.74
-* libmicrohttpd: 1.0.1 (from source)
-* libcurl: 7.88.1
-* openssl: 3.0.15
-* libuuid: 2.38.1
-* zlib1g 1:1.2.13.dfsg-1
-* librdkafka: 2.0.2-1
-* libmosquitto: 2.0.20 (from source)
-* Mongo C driver: 1.29.0 (from source)
+* boost: 1.83
+* libmicrohttpd: 1.0.2 (from source)
+* libcurl: 8.14.1
+* openssl: 3.5.4
+* libuuid: 2.41
+* zlib1g 1:1.3.dfsg+really1.3.1-1+b1
+* librdkafka: 2.8.0
+* libmosquitto: 2.0.22 (from source)
+* Mongo C driver: 2.2.1 (from source)
 * rapidjson: 1.1.0 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
@@ -36,12 +36,12 @@ commands that require root privilege):
 
 * Install the Mongo Driver from source.
 
-        wget https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz
-        tar xfvz mongo-c-driver-1.29.0.tar.gz
-        cd mongo-c-driver-1.29.0
+        wget https://github.com/mongodb/mongo-c-driver/releases/download/2.2.1/mongo-c-driver-2.2.1.tar.gz
+        tar xfvz mongo-c-driver-2.2.1.tar.gz
+        cd mongo-c-driver-2.2.1
         mkdir cmake-build
         cd cmake-build
-        cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+        cmake ..
         make
         sudo make install
 
@@ -53,19 +53,19 @@ commands that require root privilege):
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)
 
-        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz
-        tar xvf libmicrohttpd-1.0.1.tar.gz
-        cd libmicrohttpd-1.0.1
+        wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.2.tar.gz
+        tar xvf libmicrohttpd-1.0.2.tar.gz
+        cd libmicrohttpd-1.0.2
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.20/ can be modified to fine tune the build)
+* Install mosquitto from sources (appart from changing WITH_CJSON, WITH_STATIC_LIBRARIES and WITH_SHARED_LIBRARIES settings, config.mk file under mosquitto-2.0.22/ can be modified to fine tune the build)
 
-        wget https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz
-        tar xvf mosquitto-2.0.20.tar.gz
-        cd mosquitto-2.0.20
+        wget https://mosquitto.org/files/source/mosquitto-2.0.22.tar.gz
+        tar xvf mosquitto-2.0.22.tar.gz
+        cd mosquitto-2.0.22
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
@@ -99,7 +99,7 @@ The Orion Context Broker comes with a suite of unit, valgrind and end-to-end tes
 
 * Install Google Test/Mock from sources. Previously the URL was http://googlemock.googlecode.com/files/gmock-1.5.0.tar.bz2 but Google removed that package in late August 2016 and it is no longer working.
 
-        wget https://nexus.lab.fiware.org/repository/raw/public/storage/gmock-1.5.0.tar.bz2
+        wget https://src.fedoraproject.org/repo/pkgs/gmock/gmock-1.5.0.tar.bz2/d738cfee341ad10ce0d7a0cc4209dd5e/gmock-1.5.0.tar.bz2
         tar xfvj gmock-1.5.0.tar.bz2
         cd gmock-1.5.0
         ./configure
@@ -129,11 +129,11 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
         . scripts/testEnv.sh
         python3 -m venv /opt/ft_env   # or 'virtualenv /opt/ft_env --python=/usr/bin/python3' in some systems
         . /opt/ft_env/bin/activate
-        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0
+        pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 setuptools==80.9.0 confluent-kafka==2.11.0
 
 * Install the Kafka client (CLI).
 
-      sudo apt-get install openjdk-17-jre-headless
+      sudo apt-get install openjdk-12-jre-headless
       wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
       tar xvf kafka_2.12-3.9.1.tgz
       # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)

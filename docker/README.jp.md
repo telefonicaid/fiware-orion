@@ -136,7 +136,7 @@ Orion Context Broker を試してみたいし、データベースについて�
 <a name="31-building-in-not-official-distributions"></a>
 ### 3.1 非公式ディストリビューションでのビルド
 
-[インストール・ドキュメントの要件セクション](../doc/manuals.jp/admin/install.md#requirements)で説明されているように、Debian 12 は公式にサポートされている唯一のディストリビューションです。ただし、次のコマンドは、代替ディストリビューションをベースとする Docker コンテナを構築するためにテストされています。
+[インストール・ドキュメントの要件セクション](../doc/manuals.jp/admin/install.md#requirements)で説明されているように、Debian 13 は公式にサポートされている唯一のディストリビューションです。ただし、次のコマンドは、代替ディストリビューションをベースとする Docker コンテナを構築するためにテストされています。
 
 * Ubuntu 22.04 LTS: `docker build -t orion-ubuntu22.04 --build-arg IMAGE_NAME=ubuntu --build-arg IMAGE_TAG=22.04 --build-arg CLEAN_DEV_TOOLS=0 .`
 * Alpine 3.16.0: `docker build -t orion-alpine3.16 -f Dockerfile.alpine .`
