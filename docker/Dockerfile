@@ -91,15 +91,12 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     cd mongo-c-driver-2.2.1 && \
     mkdir cmake-build && \
     cd cmake-build && \
-    # Different from ci/deb/build-dep.sh and build from source documentation, we add here also
-    # the MONGOC_TEST_USE_CRYPT_SHARED=FALSE. It needs Python and in this tiny image we don't have it
-    # FIXME PR: compilation variables no longer used in 2.x?
-    #cmake -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE .. && \
     cmake .. && \
     make && \
     make install && \
     # Install rapidjson from source
     # NOTE: the sed line comments a problematic line in /usr/local/include/rapidjson/document.h with GCC14++
+    # (it should be solved by rapidjson, see https://github.com/Tencent/rapidjson/issues/2277)
     cd /opt && \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz && \
     tar xfz v1.1.0.tar.gz && \

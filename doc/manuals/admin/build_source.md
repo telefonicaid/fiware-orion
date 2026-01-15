@@ -51,6 +51,7 @@ commands that require root privilege):
         tar xfvz v1.1.0.tar.gz
         sudo mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include
         # Next line is to comment a problematic line in document.h when GCC14+ is used
+        # (it should be solved by rapidjson, see https://github.com/Tencent/rapidjson/issues/2277)
         sudo sed -i 's/^.*GenericStringRef& operator=(const GenericStringRef& rhs).*$/\/\/&/' /usr/local/include/rapidjson/document.h
 
 * Install libmicrohttpd from sources (the `./configure` command below shows the recommended build configuration to get minimum library footprint, but if you are an advanced user, you can configure as you prefer)

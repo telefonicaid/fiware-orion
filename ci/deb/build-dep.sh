@@ -72,9 +72,6 @@ echo "INSTALL: python special dependencies" \
 && pip install confluent-kafka==2.11.0 \
 && deactivate
 
-# Recommended setting for DENABLE_AUTOMATIC_INIT_AND_CLEANUP, to be removed in 2.0.0
-# see http://mongoc.org/libmongoc/current/init-cleanup.html#deprecated-feature-automatic-initialization-and-cleanup
-# FIXME PR
 echo "INSTALL: mongodb c driver" \
 && curl -L https://github.com/mongodb/mongo-c-driver/releases/download/2.2.1/mongo-c-driver-2.2.1.tar.gz | tar xzC /opt/ \
 && cd /opt/mongo-c-driver-2.2.1 \
@@ -85,6 +82,7 @@ echo "INSTALL: mongodb c driver" \
 && make install
 
 # NOTE: the sed line comments a problematic line in /usr/local/include/rapidjson/document.h with GCC14++
+# (it should be solved by rapidjson, see https://github.com/Tencent/rapidjson/issues/2277)
 echo "INSTALL: rapidjson" \
 && curl -L https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz | tar xzC /opt/ \
 && mv /opt/rapidjson-1.1.0/include/rapidjson/ /usr/local/include \

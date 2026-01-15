@@ -48,8 +48,6 @@ def line_count(file_name):
 def escape(s):
     # Maybe some other "regex sensible" chars need to be escaped... this function will be
     # adjusted in that case
-    # FIXME PR: no longer valid in Python 3.12+
-    #return s.replace('[', '\[').replace(']', '\]').replace('{','\{').replace('}', '\}').replace('?', '\?')
     return (
         s.replace('[', '\\[')
          .replace(']', '\\]')
@@ -80,8 +78,6 @@ def diff_files(input_file, ref_file):
         input_line = input_line.rstrip()
 
         # Check if normal line or regex(using regex itself
-        # FIXME PR: no longer valid in Python 3.12+
-        #m = re.match('(.*)REGEX\((.*)\)(.*)', ref_line)
         m = re.match(r'(.*)REGEX\((.*)\)(.*)', ref_line)
         if m is not  None:
             # We build the regex, concatenating preamble,

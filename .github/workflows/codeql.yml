@@ -118,8 +118,6 @@ jobs:
         cd mongo-c-driver-2.2.1
         mkdir cmake-build
         cd cmake-build
-        # FIXME PR
-        #cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE ..
         cmake ..
         make
         sudo make install
