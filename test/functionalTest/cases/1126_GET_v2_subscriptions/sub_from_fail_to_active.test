@@ -34,7 +34,7 @@ brokerStart CB 0 IPv4
 # 01. Create sub
 # 02. Get subscription (no last* field)
 # 03. Create entity  (triggering notification)
-# 04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server
+# 04. Get subscription see failsCounter: 1, lastFailureReason: Could not connect to server
 # 05. Start endpoint
 # 06. Update entity (triggering notification)
 # 07. Get subscription see lastSuccessCode: 200 but not failsCounter (and also old lastFailure fields*)
@@ -83,8 +83,8 @@ echo
 echo
 
 
-echo "04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server"
-echo "======================================================================================="
+echo "04. Get subscription see failsCounter: 1, lastFailureReason: Could not connect to server"
+echo "========================================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
@@ -177,13 +177,13 @@ Content-Length: 0
 
 
 
-04. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server
-=======================================================================================
+04. Get subscription see failsCounter: 1, lastFailureReason: Could not connect to server
+========================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 490
+Content-Length: 491
 
 {
     "description": "The sub",
@@ -197,7 +197,7 @@ Content-Length: 490
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -237,7 +237,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 536
+Content-Length: 537
 
 {
     "description": "The sub",
@@ -250,7 +250,7 @@ Content-Length: 536
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,

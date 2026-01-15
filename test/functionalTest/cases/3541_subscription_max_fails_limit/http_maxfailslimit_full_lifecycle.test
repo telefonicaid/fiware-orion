@@ -478,7 +478,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 543
+Content-Length: 544
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -491,7 +491,7 @@ Content-Length: 543
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -530,7 +530,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 545
+Content-Length: 546
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -543,7 +543,7 @@ Content-Length: 545
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -591,7 +591,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 545
+Content-Length: 546
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -604,7 +604,7 @@ Content-Length: 545
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -651,7 +651,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 545
+Content-Length: 546
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -664,7 +664,7 @@ Content-Length: 545
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -711,7 +711,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 543
+Content-Length: 544
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -724,7 +724,7 @@ Content-Length: 543
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -763,7 +763,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 545
+Content-Length: 546
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -776,7 +776,7 @@ Content-Length: 545
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -824,7 +824,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 545
+Content-Length: 546
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -837,7 +837,7 @@ Content-Length: 545
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -889,7 +889,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 526
+Content-Length: 527
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -901,7 +901,7 @@ Content-Length: 526
             "url": "http://localhost:9997/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,

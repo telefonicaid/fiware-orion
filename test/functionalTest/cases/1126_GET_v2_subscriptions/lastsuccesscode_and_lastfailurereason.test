@@ -49,8 +49,8 @@ accumulatorStart --pretty-print
 # 12. Get sub3 see lastSuccessCode: 404 but not failsCounter
 # 13. Get sub4 see lastSuccessCode: 500 but not failsCounter
 # 14. Get sub5 see failsCounter: 1, lastFailureReason: Timeout was reached
-# 15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server
-# 16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name
+# 15. Get sub6 see failsCounter: 1, lastFailureReason: Could not connect to server
+# 16. Get sub7 see failsCounter: 1, lastFailureReason: Could not resolve host name
 # 17. Get sub8 see failsCounter: 1, lastFailureReason: Timeout was reached
 #
 
@@ -361,15 +361,15 @@ echo
 echo
 
 
-echo "15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server"
-echo "==============================================================================="
+echo "15. Get sub6 see failsCounter: 1, lastFailureReason: Could not connect to server"
+echo "================================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID6
 echo
 echo
 
 
-echo "16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name"
-echo "==============================================================================="
+echo "16. Get sub7 see failsCounter: 1, lastFailureReason: Could not resolve host name"
+echo "================================================================================"
 orionCurl --url /v2/subscriptions/$SUB_ID7
 echo
 echo
@@ -714,13 +714,13 @@ Content-Length: 499
 }
 
 
-15. Get sub6 see failsCounter: 1, lastFailureReason: Couldn't connect to server
-===============================================================================
+15. Get sub6 see failsCounter: 1, lastFailureReason: Could not connect to server
+================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 504
+Content-Length: 505
 
 {
     "description": "Test wrong port reponses",
@@ -734,7 +734,7 @@ Content-Length: 504
             "url": "http://localhost:6699/notify"
         },
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -755,8 +755,8 @@ Content-Length: 504
 }
 
 
-16. Get sub7 see failsCounter: 1, lastFailureReason: Couldn't resolve host name
-===============================================================================
+16. Get sub7 see failsCounter: 1, lastFailureReason: Could not resolve host name
+================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -775,7 +775,7 @@ Content-Length: 514
             "url": "http://foo.bar.bar.com:1028/notify"
         },
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastFailureReason": "Couldn't resolve host name",
+        "lastFailureReason": "Could not resolve hostname",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "onlyChangedAttrs": false,
         "timesSent": 1

@@ -28,6 +28,7 @@
 # Werkzeug==2.0.2
 # paho-mqtt==1.6.1
 # amqtt==0.11.0b1
+# setuptools==80.9.0
 # confluent-kafka==2.11.0
 #
 

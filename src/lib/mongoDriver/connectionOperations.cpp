@@ -736,7 +736,7 @@ bool orion::collectionAggregate
 
   // Get low level driver object
   bson_t* pipeline = _pipeline.get();
-  char* bsonStr = bson_array_as_json(pipeline, NULL);
+  char* bsonStr = bson_array_as_canonical_extended_json(pipeline, NULL);
 
   bson_t* opt = bson_new();
   BSON_APPEND_INT32(opt, "batchSize", batchSize);

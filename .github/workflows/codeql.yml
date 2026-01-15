@@ -85,7 +85,7 @@ jobs:
     - if: matrix.build-mode == 'manual'
       shell: bash
       run: |
-        # Ref: https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/build_source.md#debian-12-officially-supported
+        # Ref: https://github.com/telefonicaid/fiware-orion/blob/master/doc/manuals/admin/build_source.md#debian-13-officially-supported
         # Ref: https://github.com/telefonicaid/fiware-orion/blob/master/docker/Dockerfile
         export ORION_SRC=$(pwd)
         # Install dependencies
@@ -93,18 +93,18 @@ jobs:
         sudo apt-get install make cmake g++ libssl-dev libcurl4-openssl-dev libboost-dev libboost-regex-dev libboost-filesystem-dev libboost-thread-dev uuid-dev libgnutls28-dev libsasl2-dev libgcrypt-dev librdkafka-dev zlib1g-dev
         # Install libmicrohttpd from source
         cd /opt
-        curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz
-        tar xvf libmicrohttpd-1.0.1.tar.gz
-        cd libmicrohttpd-1.0.1
+        curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.2.tar.gz
+        tar xvf libmicrohttpd-1.0.2.tar.gz
+        cd libmicrohttpd-1.0.2
         ./configure --disable-messages --disable-postprocessor --disable-dauth
         make
         sudo make install
         sudo ldconfig
         # Install mosquitto from source
         cd /opt
-        curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz
-        tar xvf mosquitto-2.0.20.tar.gz
-        cd mosquitto-2.0.20
+        curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.22.tar.gz
+        tar xvf mosquitto-2.0.22.tar.gz
+        cd mosquitto-2.0.22
         sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk
         sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk
         sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk
@@ -113,12 +113,12 @@ jobs:
         sudo ldconfig
         # Install mongodb driver from source
         cd /opt
-        curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz
-        tar xfvz mongo-c-driver-1.29.0.tar.gz
-        cd mongo-c-driver-1.29.0
+        curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/2.2.1/mongo-c-driver-2.2.1.tar.gz
+        tar xfvz mongo-c-driver-2.2.1.tar.gz
+        cd mongo-c-driver-2.2.1
         mkdir cmake-build
         cd cmake-build
-        cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE ..
+        cmake ..
         make
         sudo make install
         # Install rapidjson from source

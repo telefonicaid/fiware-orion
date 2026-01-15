@@ -205,7 +205,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 462
+Content-Length: 463
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -218,7 +218,7 @@ Content-Length: 462
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "onlyChangedAttrs": false,
         "timesSent": 2
@@ -268,7 +268,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 525
+Content-Length: 526
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -281,7 +281,7 @@ Content-Length: 525
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -322,7 +322,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 508
+Content-Length: 509
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -334,7 +334,7 @@ Content-Length: 508
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
@@ -363,7 +363,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 508
+Content-Length: 509
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -375,7 +375,7 @@ Content-Length: 508
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,

@@ -38,7 +38,7 @@ accumulatorStart --pretty-print
 # 04. Get subscription see status: active, lastSuccessCode: 200
 # 05. Teardown endpoint
 # 06. Update entity (triggering notification)
-# 07. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
+# 07. Get subscription see failsCounter: 1, lastFailureReason: Could not connect to server (and also old lastSuccess fields*)
 #
 
 echo "01. Create sub"
@@ -113,8 +113,8 @@ echo
 echo
 
 
-echo "07. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)"
-echo "=========================================================================================================================="
+echo "07. Get subscription see failsCounter: 1, lastFailureReason: Could not connect to server (and also old lastSuccess fields*)"
+echo "==========================================================================================================================="
 orionCurl --url /v2/subscriptions/$SUB_ID1
 echo
 echo
@@ -229,13 +229,13 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-07. Get subscription see failsCounter: 1, lastFailureReason: Couldn't connect to server (and also old lastSuccess fields*)
-==========================================================================================================================
+07. Get subscription see failsCounter: 1, lastFailureReason: Could not connect to server (and also old lastSuccess fields*)
+===========================================================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 553
+Content-Length: 554
 
 {
     "description": "The sub",
@@ -249,7 +249,7 @@ Content-Length: 553
             "url": "http://localhost:9997/giveme200"
         },
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,

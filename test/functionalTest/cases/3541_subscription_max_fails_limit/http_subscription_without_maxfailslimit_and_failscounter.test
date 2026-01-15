@@ -194,7 +194,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 547
+Content-Length: 548
 
 {
     "description": "A subscription to get info about Room1",
@@ -210,7 +210,7 @@ Content-Length: 547
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "onlyChangedAttrs": false,
         "timesSent": 1

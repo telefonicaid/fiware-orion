@@ -241,7 +241,7 @@ Content-Length: 451
                 "url": "http://nohost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
-            "lastFailureReason": "Couldn't resolve host name",
+            "lastFailureReason": "Could not resolve hostname",
             "lastNotification": "REGEX(.*)",
             "onlyChangedAttrs": false,
             "timesSent": 1
@@ -297,7 +297,7 @@ Content-Length: 500
                 "url": "http://localhost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
-            "lastFailureReason": "Couldn't resolve host name",
+            "lastFailureReason": "Could not resolve hostname",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
@@ -385,7 +385,7 @@ Content-Length: 514
                 "url": "http://nohost:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
-            "lastFailureReason": "Couldn't resolve host name",
+            "lastFailureReason": "Could not resolve hostname",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,

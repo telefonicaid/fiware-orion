@@ -227,9 +227,9 @@ SET (BOOST_MT
 )
 
 # See http://mongoc.org/libmongoc/current/tutorial.html#cmake
-# This find_package() command provides the mongo::mongoc_static used in
-# SET for common static libs. We use 1.29.0 as reference version.
-find_package (mongoc-1.0 1.29.0 EXACT)
+# This find_package() command provides the mongo::mongoc used in
+# SET for common static libs. We use 2.2.1 as reference version.
+find_package (mongoc 2.2.1 EXACT)
 
 # Is cjexl lib available?
 find_library (HAVE_CJEXL cjexl PATHS /usr/lib /usr/lib64 /usr/local/lib64 /usr/local/lib)
@@ -239,7 +239,7 @@ if (HAVE_CJEXL)
         microhttpd.a
         mosquitto.a
         ${HAVE_CJEXL}
-        mongo::mongoc_static
+        mongoc::mongoc
     )
 else (HAVE_CJEXL)
     message("Not using cjexl")
@@ -247,7 +247,7 @@ else (HAVE_CJEXL)
     SET (COMMON_STATIC_LIBS
         microhttpd.a
         mosquitto.a
-        mongo::mongoc_static
+        mongoc::mongoc
     )
 endif (HAVE_CJEXL)
 
@@ -285,8 +285,8 @@ include_directories("/usr/include")
 
 # Needed for the new C driver
 include_directories("/usr/include/librdkafka")
-include_directories("/usr/local/include/libmongoc-1.0")
-include_directories("/usr/local/include/libbson-1.0")
+include_directories("/usr/local/include/bson-2.2.1")
+include_directories("/usr/local/include/mongoc-2.2.1")
 
 
 #

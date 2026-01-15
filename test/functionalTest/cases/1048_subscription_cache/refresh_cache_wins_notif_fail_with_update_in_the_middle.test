@@ -224,7 +224,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 464
+Content-Length: 465
 
 [
     {
@@ -238,7 +238,7 @@ Content-Length: 464
                 "url": "http://localhost:9997/notify"
             },
             "lastFailure": "202REGEX(.*)",
-            "lastFailureReason": "Couldn't connect to server",
+            "lastFailureReason": "Could not connect to server",
             "lastNotification": "202REGEX(.*)",
             "onlyChangedAttrs": false,
             "timesSent": 1
@@ -350,7 +350,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 501
+Content-Length: 502
 
 [
     {
@@ -365,7 +365,7 @@ Content-Length: 501
                 "url": "http://localhost:9997/notify"
             },
             "lastFailure": "202REGEX(.*)",
-            "lastFailureReason": "Couldn't connect to server",
+            "lastFailureReason": "Could not connect to server",
             "lastNotification": "202REGEX(.*)",
             "onlyChangedAttrs": false,
             "timesSent": 1
@@ -414,7 +414,7 @@ Content-Length: 501
     "failsCounter": 1,
     "format": "normalized",
     "lastFailure": REGEX(1[6-9]\d+),
-    "lastFailureReason": "Couldn't connect to server",
+    "lastFailureReason": "Could not connect to server",
     "lastNotification": REGEX(1[6-9]\d+),
     "metadata": [],
     "notifyOnMetadataChange": true,

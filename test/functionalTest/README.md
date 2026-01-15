@@ -44,6 +44,7 @@ pip install Flask==2.0.2
 pip install Werkzeug==2.0.2
 pip install paho-mqtt==1.6.1
 pip install amqtt==0.11.0b1  # Not actually an accumulator-server.py dependency, but needed by some tests
+pip install setuptools==80.9.0  # Requiered by amqtt but sometimes not automatically installed along with it
 pip install confluent-kafka==2.11.0
 ```
 
@@ -75,7 +76,7 @@ RUN python3 -m venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 # Install required packages within the virtual environment
-RUN pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 confluent-kafka==2.11.0
+RUN pip install Flask==2.0.2 Werkzeug==2.0.2 paho-mqtt==1.6.1 amqtt==0.11.0b1 setuptools==80.9.0 confluent-kafka==2.11.0
 
 COPY . /app
 WORKDIR /app

@@ -20,7 +20,7 @@
 #
 
 ARG  IMAGE_NAME=debian
-ARG  IMAGE_TAG=12.10-slim
+ARG  IMAGE_TAG=13.3-slim
 FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
 ARG GITHUB_ACCOUNT=telefonicaid
@@ -66,18 +66,18 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
       liblz4-dev && \
     # Install libmicrohttpd from source
     cd /opt && \
-    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.1.tar.gz && \
-    tar xvf libmicrohttpd-1.0.1.tar.gz && \
-    cd libmicrohttpd-1.0.1 && \
+    curl -kOL https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-1.0.2.tar.gz && \
+    tar xvf libmicrohttpd-1.0.2.tar.gz && \
+    cd libmicrohttpd-1.0.2 && \
     ./configure --disable-messages --disable-postprocessor --disable-dauth && \
     make && \
     make install && \
     ldconfig && \
     # Install mosquitto from source
     cd /opt && \
-    curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.20.tar.gz && \
-    tar xvf mosquitto-2.0.20.tar.gz && \
-    cd mosquitto-2.0.20 && \
+    curl -kOL https://mosquitto.org/files/source/mosquitto-2.0.22.tar.gz && \
+    tar xvf mosquitto-2.0.22.tar.gz && \
+    cd mosquitto-2.0.22 && \
     sed -i 's/WITH_CJSON:=yes/WITH_CJSON:=no/g' config.mk && \
     sed -i 's/WITH_STATIC_LIBRARIES:=no/WITH_STATIC_LIBRARIES:=yes/g' config.mk && \
     sed -i 's/WITH_SHARED_LIBRARIES:=yes/WITH_SHARED_LIBRARIES:=no/g' config.mk && \
@@ -86,21 +86,22 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     ldconfig && \
     # Install mongodb driver from source
     cd /opt && \
-    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/1.29.0/mongo-c-driver-1.29.0.tar.gz && \
-    tar xfvz mongo-c-driver-1.29.0.tar.gz && \
-    cd mongo-c-driver-1.29.0 && \
+    curl -kOL https://github.com/mongodb/mongo-c-driver/releases/download/2.2.1/mongo-c-driver-2.2.1.tar.gz && \
+    tar xfvz mongo-c-driver-2.2.1.tar.gz && \
+    cd mongo-c-driver-2.2.1 && \
     mkdir cmake-build && \
     cd cmake-build && \
-    # Different from ci/deb/build-dep.sh and build from source documentation, we add here also
-    # the MONGOC_TEST_USE_CRYPT_SHARED=FALSE. It needs Python and in this tiny image we don't have it
-    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DMONGOC_TEST_USE_CRYPT_SHARED=FALSE ..   && \
+    cmake .. && \
     make && \
     make install && \
     # Install rapidjson from source
+    # NOTE: the sed line comments a problematic line in /usr/local/include/rapidjson/document.h with GCC14++
+    # (it should be solved by rapidjson, see https://github.com/Tencent/rapidjson/issues/2277)
     cd /opt && \
     curl -kOL https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz && \
     tar xfz v1.1.0.tar.gz && \
     mv rapidjson-1.1.0/include/rapidjson/ /usr/local/include && \
+    sed -i 's/^.*GenericStringRef& operator=(const GenericStringRef& rhs).*$/\/\/&/' /usr/local/include/rapidjson/document.h && \
     # Install orion from source
     adduser ${ORION_USER} && \
     cd /opt && \
@@ -121,14 +122,14 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     # cleanup sources, dev tools and locales to reduce the final image size
     # FIXME: this could need more tunning. Have a look to old CentOS Docerkile and try to
     # reproduce the same steps
-    rm -rf /opt/libmicrohttpd-1.0.1.tar.gz \
+    rm -rf /opt/libmicrohttpd-1.0.2.tar.gz \
            /usr/local/include/microhttpd.h \
            /usr/local/lib/libmicrohttpd.* \
-           /opt/libmicrohttpd-1.0.1 \
-           /opt/mosquitto-2.0.20.tar.gz \
-           /opt/mosquitto-2.0.20 \
-           /opt/mongo-c-driver-1.29.0.tar.gz \
-           /opt/mongo-c-driver-1.29.0 \
+           /opt/libmicrohttpd-1.0.2 \
+           /opt/mosquitto-2.0.22.tar.gz \
+           /opt/mosquitto-2.0.22 \
+           /opt/mongo-c-driver-2.2.1.tar.gz \
+           /opt/mongo-c-driver-2.2.1 \
            /usr/local/include/mongo \
            /usr/local/lib/libmongoclient.a \
            /usr/local/lib/libcjexl.a \
@@ -158,8 +159,8 @@ RUN --mount=type=secret,id=repo_token,dst=/run/secrets/repo_token \
     apt-get -y autoremove --purge && \
     # The above apt removal erases some dependencies needed by contextBroker. So we reinstall it
     apt-get -y install \
-        libicu72 \
-        libboost-thread1.74.0 && \
+        libicu76 \
+        libboost-thread1.83.0 && \
     # Don't need old log files inside docker images
     rm -f /var/log/*log
 

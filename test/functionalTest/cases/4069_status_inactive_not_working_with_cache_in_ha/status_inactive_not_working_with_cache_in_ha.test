@@ -256,7 +256,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 527
+Content-Length: 528
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -269,7 +269,7 @@ Content-Length: 527
             "url": "http://localhost:1234"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
@@ -324,7 +324,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 529
+Content-Length: 530
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -337,7 +337,7 @@ Content-Length: 529
             "url": "http://localhost:1234"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
@@ -392,7 +392,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 527
+Content-Length: 528
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -405,7 +405,7 @@ Content-Length: 527
             "url": "http://localhost:1234"
         },
         "lastFailure": "REGEX(.*)",
-        "lastFailureReason": "Couldn't connect to server",
+        "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
