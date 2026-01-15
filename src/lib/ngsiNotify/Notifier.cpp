@@ -641,7 +641,7 @@ static SenderThreadParams* buildSenderParamsCustom
   //
   std::string  protocol;
   std::string  host;
-  int          port;
+  int          port = 0;
   std::string  uriPath;
   std::string cleanBrokers;   // FIXME #4705: host/port/cleanBrokers should be unified into connString or similar
 
