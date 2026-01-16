@@ -1,3 +1,12 @@
+4.4.0-next (January 16th, 2026)
+
+- Add: `jexlExpression` field to subscription conditions (`subject.condition`) (#4555)
+- Fix: kafkaCustom.headers support including the ability to override the default Fiware-Service and Fiware-ServicePath headers (#4726)
+- Hardening: upgrade microhttpd dependency from 1.0.1 to 1.0.2
+- Hardening: upgrade libmongoc dependency from 1.29.0 to 2.2.1
+- Hardening: upgrade libmosquitto dependency from 2.0.20 to 2.0.22
+- Upgrade Debian version from 12.10 to 13.3 in Dockerfile
+
 4.4.0 (January 16th, 2026)
 
 - Add: `jexlExpression` field to subscription conditions (`subject.condition`) (#4555)
