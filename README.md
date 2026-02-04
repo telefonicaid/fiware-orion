@@ -3,7 +3,7 @@
 <!-- Documentation badge line is processed by release.sh. Thus, if the structure of the URL changes,
      release.sh needs to be changed also -->
 
-[![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
+[![FIWARE Core Context Management](https://fiware.github.io/catalogue/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
 [![License badge](https://img.shields.io/github/license/telefonicaid/fiware-orion.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Quay badge](https://img.shields.io/badge/quay.io-fiware%2Forion-grey?logo=red%20hat&labelColor=EE0000)](https://quay.io/repository/fiware/orion)
 [![Docker badge](https://img.shields.io/badge/docker-telefonicaiot%2Ffiware--orion-blue?logo=docker)](https://registry.hub.docker.com/r/telefonicaiot/fiware-orion)
@@ -14,7 +14,7 @@
 ![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
 ![Unit Tests](https://github.com/telefonicaid/fiware-orion/workflows/Unit%20Tests/badge.svg)
 ![Functional Tests](https://github.com/telefonicaid/fiware-orion/workflows/Functional%20Tests/badge.svg)
-![Status](https://nexus.lab.fiware.org/static/badges/statuses/orion.svg)
+![Status](https://fiware.github.io/catalogue/badges/statuses/status-full.svg)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4520/badge)](https://bestpractices.coreinfrastructure.org/projects/4520)
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context

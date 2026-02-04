@@ -1,7 +1,7 @@
 # Orion Context Broker へようこそ
 
-[![FIWARE Core Context Management](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
-[![SOF support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/orion.svg)](http://stackoverflow.com/questions/tagged/fiware-orion)
+[![FIWARE Core Context Management](https://fiware.github.io/catalogue/badges/chapters/core.svg)](https://www.fiware.org/developers/catalogue/)
+[![SOF support badge](https://img.shields.io/badge/tag-fiware--orion-orange.svg?logo=stackoverflow)](http://stackoverflow.com/questions/tagged/fiware-orion)
 
 Orion は、FIWARE プラットフォームの一部として開発された NGSIv2 REST API バインディングの C++ 実装です。
 
