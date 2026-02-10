@@ -2077,6 +2077,16 @@ static unsigned int processSubscriptions
     ExprContextObject exprMetadataContext(basic);
     Entity&                             en      = notifyCerP->entity;
 
+    exprContext.add("id", en.entityId.id);
+    exprContext.add("type", en.entityId.type);
+
+    if (!basic)
+    {
+      exprContext.add("service", tenant);
+      exprContext.add("servicePath", en.servicePath);
+      exprContext.add("authToken", xauthToken);
+    }
+
     for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
     {
       en.attributeVector[ix]->addToContext(&exprContext, basic);
@@ -2089,6 +2099,10 @@ static unsigned int processSubscriptions
       }
       exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
     }
+
+    // Add all metadata under the "metadata" context key
+    // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
+    exprContext.add("metadata", exprMetadataContext);
     TIME_EXPR_CTXBLD_STOP();
 
     /* Check 3: jexlExpression Filters */
