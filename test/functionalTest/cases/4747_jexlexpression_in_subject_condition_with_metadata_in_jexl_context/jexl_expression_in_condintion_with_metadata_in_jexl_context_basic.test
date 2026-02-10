@@ -1,4 +1,4 @@
-# Copyright 2024 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -22,7 +22,7 @@
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
-Metadata in JEXL context (basic case) and jexlExpression in condition
+jexlExpression in condition with metadata in JEXL context (basic case)
 
 --SHELL-INIT--
 dbInit CB
@@ -32,16 +32,16 @@ accumulatorStart --pretty-print
 --SHELL--
 
 #
-# 01. Create custom sub with custom with jexlExpression in condition metadata.A.MD1+metadata.B.MD1=3
+# 01. Create custom sub with jexlExpression in condition metadata.A.MD1+metadata.B.MD1==3
 # 02. Create entity E1 with A.MD1=1 and B.MD1=2
 # 03. Update entity E1 with A.MD1=foo and B.MD1=bar
 # 04. Update entity E1 with A.MD1=2.1 and B.MD1=-3.8
-# 05. Dump accumulator and see three notifications (only for step 02: A.MD1=1 and B.MD1=2)
+# 05. Dump accumulator and see one notifications (only for step 02: A.MD1=1 and B.MD1=2)
 #
 
 
-echo "01.  Create custom sub with custom with jexlExpression in condition metadata.A.MD1+metadata.B.MD1=3"
-echo "==================================================================================================="
+echo "01.  Create custom sub with jexlExpression in condition metadata.A.MD1+metadata.B.MD1==3"
+echo "========================================================================================"
 payload='{
   "subject": {
     "entities": [
@@ -155,16 +155,16 @@ echo
 echo
 
 
-echo "05. Dump accumulator and see three notifications (only for step 02: A.MD1=1 and B.MD1=2)"
-echo "========================================================================================"
+echo "05. Dump accumulator and see one notifications (only for step 02: A.MD1=1 and B.MD1=2)"
+echo "======================================================================================"
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01.  Create custom sub with custom with jexlExpression in condition metadata.A.MD1+metadata.B.MD1=3
-===================================================================================================
+01.  Create custom sub with jexlExpression in condition metadata.A.MD1+metadata.B.MD1==3
+========================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -199,8 +199,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-05. Dump accumulator and see three notifications (only for step 02: A.MD1=1 and B.MD1=2)
-========================================================================================
+05. Dump accumulator and see one notifications (only for step 02: A.MD1=1 and B.MD1=2)
+======================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 237
