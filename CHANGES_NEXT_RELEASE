@@ -1,0 +1,1 @@
+Fix: Expose attribute metadata in the JEXL evaluation context for subscription conditions. (#4747)
