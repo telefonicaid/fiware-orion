@@ -398,14 +398,23 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
     LM_T(LmtMongo, ("Subscription kafkaTopic:  %s", sub.notification.kafkaInfo.topic.c_str()));
     LM_T(LmtMongo, ("Subscription custom:     %s", sub.notification.kafkaInfo.custom? "true" : "false"));
 
-    // FIXME #4714: not yet in use
-    /*if (sub.notification.mqttInfo.providedAuth)
+    if (sub.notification.kafkaInfo.providedAuth)
     {
       b->append(CSUB_USER,   sub.notification.kafkaInfo.user);
       b->append(CSUB_PASSWD, sub.notification.kafkaInfo.passwd);
+      b->append(CSUB_KAFKA_SASL_MECHANISM, sub.notification.kafkaInfo.saslMechanism);
+      if (!sub.notification.kafkaInfo.securityProtocol.empty())
+      {
+        b->append(CSUB_KAFKA_SECURITY_PROTOCOL, sub.notification.kafkaInfo.securityProtocol);
+      }
       LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.kafkaInfo.user.c_str()));
       LM_T(LmtMongo, ("Subscription passwd: *****"));
-    }*/
+      LM_T(LmtMongo, ("Subscription saslMechanism: %s", sub.notification.kafkaInfo.saslMechanism.c_str()));
+      if (!sub.notification.kafkaInfo.securityProtocol.empty())
+      {
+        LM_T(LmtMongo, ("Subscription securityProtocol: %s", sub.notification.kafkaInfo.securityProtocol.c_str()));
+      }
+    }
 
     if (sub.notification.kafkaInfo.custom)
     {

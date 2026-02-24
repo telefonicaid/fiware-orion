@@ -73,6 +73,8 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_KAFKATOPIC, 1);
     unsetB->append(CSUB_USER,      1);
     unsetB->append(CSUB_PASSWD,    1);
+    unsetB->append(CSUB_KAFKA_SECURITY_PROTOCOL, 1);
+    unsetB->append(CSUB_KAFKA_SASL_MECHANISM,    1);
 
     if  (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
     {
@@ -101,11 +103,15 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_METHOD,  1);
     unsetB->append(CSUB_HEADERS, 1);
     unsetB->append(CSUB_QS,      1);
+    unsetB->append(CSUB_KAFKA_SECURITY_PROTOCOL, 1);
+    unsetB->append(CSUB_KAFKA_SASL_MECHANISM,    1);
 
     if (!sub.notification.mqttInfo.providedAuth)
     {
       unsetB->append(CSUB_USER,   1);
       unsetB->append(CSUB_PASSWD, 1);
+      unsetB->append(CSUB_KAFKA_SECURITY_PROTOCOL, 1);
+      unsetB->append(CSUB_KAFKA_SASL_MECHANISM,    1);
     }
 
     if  (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
@@ -136,12 +142,13 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_HEADERS, 1);
     unsetB->append(CSUB_QS,      1);
 
-    // FIXME #4714: not yet in use
-    /*if (!sub.notification.kafkaInfo.providedAuth)
+    if (!sub.notification.kafkaInfo.providedAuth)
     {
       unsetB->append(CSUB_USER,   1);
       unsetB->append(CSUB_PASSWD, 1);
-    }*/
+      unsetB->append(CSUB_KAFKA_SECURITY_PROTOCOL, 1);
+      unsetB->append(CSUB_KAFKA_SASL_MECHANISM,    1);
+    }
 
     if  (sub.notification.kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Text)
     {

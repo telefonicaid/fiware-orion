@@ -897,6 +897,98 @@ static std::string parseMqttAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
 
 /* ****************************************************************************
 *
+* parseKafkaAuth -
+*/
+static std::string parseKafkaAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& kafka)
+{
+  unsigned int howMany = 0;
+  subsP->notification.kafkaInfo.providedAuth = false;
+
+  Opt<std::string> userOpt = getStringOpt(kafka, "user", "user kafka notification");
+  if (!userOpt.ok())
+  {
+    return badInput(ciP, userOpt.error);
+  }
+
+  if (userOpt.given  && forbiddenChars(userOpt.value.c_str()))
+  {
+    return badInput(ciP, "forbidden characters in kafka /user/");
+  }
+
+  if (userOpt.given)
+  {
+    subsP->notification.kafkaInfo.user = userOpt.value;
+    howMany++;
+  }
+
+  // Note there is no forbidden chars checking for password. It is not needed: this
+  // field is never rendered in the JSON response API, so there is no risk of injection attacks
+  Opt<std::string> passwdOpt = getStringOpt(kafka, "passwd", "passwd kafka notification");
+  if (!passwdOpt.ok())
+  {
+    return badInput(ciP, passwdOpt.error);
+  }
+  if (passwdOpt.given)
+  {
+    subsP->notification.kafkaInfo.passwd = passwdOpt.value;
+    howMany++;
+  }
+
+  // howMany has to be either 0 (no auth no pass) or 2 (auth and passwd)
+  if (howMany == 1)
+  {
+    return badInput(ciP, "you must use user and passwd fields simultaneously");
+  }
+  else if (howMany == 2)
+  {
+    subsP->notification.kafkaInfo.providedAuth = true;
+    // saslMechanism is mandatory when auth is provided
+    Opt<std::string> mechOpt = getStringMust(kafka, "saslMechanism", "saslMechanism kafka notification");
+    if (!mechOpt.ok())
+    {
+      return badInput(ciP, mechOpt.error);
+    }
+    if (!mechOpt.given || mechOpt.value.empty())
+    {
+      return badInput(ciP, "mandatory kafka field /saslMechanism/ when user/passwd are set");
+    }
+    if (mechOpt.value != "PLAIN" && mechOpt.value != "SCRAM-SHA-256" && mechOpt.value != "SCRAM-SHA-512")
+    {
+      return badInput(ciP, "invalid kafka /saslMechanism/ (allowed: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512)");
+    }
+    subsP->notification.kafkaInfo.saslMechanism = mechOpt.value;
+    // securityProtocol is optional; default SASL_SSL
+    Opt<std::string> protOpt = getStringOpt(kafka, "securityProtocol", "securityProtocol kafka notification");
+    if (!protOpt.ok())
+    {
+      return badInput(ciP, protOpt.error);
+    }
+    if (protOpt.given)
+    {
+      // (Opcional) validar valores permitidos
+      if (protOpt.value != "SASL_SSL" && protOpt.value != "SASL_PLAINTEXT")
+      {
+        return badInput(ciP, "invalid kafka /securityProtocol/ (allowed: SASL_SSL, SASL_PLAINTEXT)");
+      }
+      subsP->notification.kafkaInfo.securityProtocol = protOpt.value;
+    }
+  }
+  else
+  {
+    // no auth -> clear fields
+    subsP->notification.kafkaInfo.user = "";
+    subsP->notification.kafkaInfo.passwd = "";
+    subsP->notification.kafkaInfo.saslMechanism = "";
+    subsP->notification.kafkaInfo.securityProtocol = "";
+    subsP->notification.kafkaInfo.providedAuth = false;
+  }
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseNotification -
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
@@ -1268,6 +1360,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // auth
+    r = parseKafkaAuth(ciP, subsP, kafka);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     subsP->notification.kafkaInfo.custom = false;
   }
   else if (notification.HasMember("kafkaCustom"))
@@ -1290,6 +1389,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // topic (same as in not custom mqtt)
     r = parseKafkaTopic(ciP, subsP, kafkaCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // auth
+    r = parseKafkaAuth(ciP, subsP, kafkaCustom);
     if (!r.empty())
     {
       return r;

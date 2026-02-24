@@ -101,10 +101,10 @@ void KafkaConnectionManager::teardown(void)
 
   for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
-    std::string endpoint = iter->first;
+    std::string key = iter->first;
     KafkaConnection* cP   = iter->second;
 
-    disconnect(cP->producer, endpoint);
+    disconnect(cP->producer, cP->endpoint);
     cP->producer = NULL;
 
     delete cP;
@@ -274,25 +274,74 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* msg, void*
 
 /* ****************************************************************************
 *
+* connKey -
+*/
+static std::string connKey(const std::string& endpoint,
+                           const std::string& securityProtocol,
+                           const std::string& saslMechanism,
+                           const std::string& user)
+{
+  return endpoint + "|" + securityProtocol + "|" + saslMechanism + "|" + user;
+}
+
+
+/* ****************************************************************************
+*
+* kafkaConfSet -
+*/
+static bool kafkaConfSet(rd_kafka_conf_t*    conf,
+                          const std::string& name,
+                          const std::string& value,
+                          const std::string& endpoint)
+{
+  if (rd_kafka_conf_set(conf, name.c_str(), value.c_str(), NULL, 0) != RD_KAFKA_CONF_OK)
+  {
+    LM_E(("Kafka config error (%s) for %s", name.c_str(), endpoint.c_str()));
+    return false;
+  }
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * KafkaConnectionManager::getConnection -
 *
 */
-KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoint)
+KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoint, const std::string& user, const std::string& passwd, const std::string& saslMechanism, const std::string& securityProtocol)
 {
+  // Default protocol is applied at point of use
+  std::string proto = securityProtocol;
+  if ((!user.empty()) && (!passwd.empty()) && proto.empty())
+  {
+    proto = "SASL_SSL";
+  }
+
+  const std::string key = (!user.empty()) && (!passwd.empty()) ? connKey(endpoint, proto, saslMechanism, user) : endpoint;
+  
   // Kafka uses endpoint "broker1:9092,broker2:9092"
 
-  if (connections.find(endpoint) == connections.end())
+  if (connections.find(key) == connections.end())
   {
     LM_T(LmtKafkaNotif, ("Starting a new KAFKA broker connection for %s", endpoint.c_str()));
 
     KafkaConnection* kConn = new KafkaConnection();
-    kConn->endpoint = endpoint;
+    kConn->endpoint         = endpoint;
+    kConn->key              = key;
+    if ((!user.empty()) && (!passwd.empty()))
+    {
+      kConn->securityProtocol = proto;
+      kConn->saslMechanism    = saslMechanism;
+      kConn->user             = user;
+    }
 
     // Basic configuration (as in MQTT)
     rd_kafka_conf_t* conf = rd_kafka_conf_new();
     if (rd_kafka_conf_set(conf, "bootstrap.servers", endpoint.c_str(), NULL, 0) != RD_KAFKA_CONF_OK)
     {
       LM_E(("Runtime Error (Kafka config failed for %s)", endpoint.c_str()));
+      rd_kafka_conf_destroy(conf);
       delete kConn;
       return NULL;
     }
@@ -310,24 +359,39 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
     // As a consequence, we don't need to synchronize connection with semaphores as in MQTT.
     rd_kafka_conf_set_dr_msg_cb(conf, kafkaOnPublishCallback);
 
+    if ((!user.empty()) && (!passwd.empty()))
+    {
+      if (!kafkaConfSet(conf, "security.protocol", proto.c_str(), endpoint) ||
+          !kafkaConfSet(conf, "sasl.mechanism",    saslMechanism.c_str(), endpoint) ||
+          !kafkaConfSet(conf, "sasl.username",     user.c_str(), endpoint) ||
+          !kafkaConfSet(conf, "sasl.password",     passwd.c_str(), endpoint))
+      {
+        rd_kafka_conf_destroy(conf);
+        delete kConn;
+        return NULL;
+      }
+    }
+
     // Create producer
     kConn->producer = rd_kafka_new(RD_KAFKA_PRODUCER, conf, NULL, 0);
     if (!kConn->producer)
     {
       LM_E(("Runtime Error (Failed to create Kafka producer for %s)", endpoint.c_str()));
+      rd_kafka_conf_destroy(conf);
       delete kConn;
       return NULL;
     }
 
     LM_T(LmtKafkaNotif, ("KAFKA successful connection for %s", endpoint.c_str()));
 
-    connections[endpoint] = kConn;
+    connections[key] = kConn;
+    kConn->lastTime = getCurrentTime();
     return kConn;
   }
 
   LM_T(LmtKafkaNotif, ("Existing KAFKA broker connection for %s", endpoint.c_str()));
-  connections[endpoint]->lastTime = getCurrentTime();
-  return connections[endpoint];
+  connections[key]->lastTime = getCurrentTime();
+  return connections[key];
 }
 
 
@@ -449,14 +513,18 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& subscriptionId,
     const std::string& tenant,
     const std::string& servicePath,
-    const std::map<std::string, std::string>& customHeaders
+    const std::map<std::string, std::string>& customHeaders,
+    const std::string& user,
+    const std::string& passwd,
+    const std::string& saslMechanism,
+    const std::string& securityProtocol
   )
 
 {
 
   semTake(); // Synchronization
 
-  KafkaConnection* kConn = getConnection(endpoint);
+  KafkaConnection* kConn = getConnection(endpoint, user, passwd, saslMechanism, securityProtocol);
   rd_kafka_t* producer = kConn ? kConn->producer : NULL;
 
   if (producer == NULL)
@@ -496,7 +564,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   {
     LM_E(("Kafka notification failed to %s on topic %s", endpoint.c_str(), topic.c_str()));
     disconnect(kConn->producer, endpoint);
-    connections.erase(endpoint);
+    connections.erase(kConn->key);
     delete kConn;
     retval = false;
   }
@@ -533,16 +601,16 @@ void KafkaConnectionManager::cleanup(double maxAge)
 
   for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
-    std::string endpoint = iter->first;
+    std::string key = iter->first;
     KafkaConnection* kConn = iter->second;
     double age = getCurrentTime() - kConn->lastTime;
 
     if (age > maxAge)
     {
-      toErase.push_back(endpoint);
-      disconnect(kConn->producer, endpoint);
+      toErase.push_back(key);
+      disconnect(kConn->producer, kConn->endpoint);
       LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removed.",
-          endpoint.c_str(), age, maxAge));
+          kConn->endpoint.c_str(), age, maxAge));
       delete kConn;
     }
   }
