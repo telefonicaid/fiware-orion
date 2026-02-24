@@ -1,1 +1,1 @@
-Fix: Expose attribute metadata in the JEXL evaluation context for subscription conditions. (#4747)
+Fix: expose entity id/type and attribute metadata in the JEXL evaluation context for subscription conditions (#4747)
