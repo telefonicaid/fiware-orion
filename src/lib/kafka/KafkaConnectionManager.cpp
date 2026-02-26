@@ -274,14 +274,28 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* msg, void*
 
 /* ****************************************************************************
 *
+* hashForKey -
+*/
+static std::string hashForKey(const std::string& s)
+{
+  std::hash<std::string> h;
+  return std::to_string(h(s));
+}
+
+
+
+/* ****************************************************************************
+*
 * connKey -
 */
 static std::string connKey(const std::string& endpoint,
                            const std::string& securityProtocol,
                            const std::string& saslMechanism,
-                           const std::string& user)
+                           const std::string& user,
+                           const std::string& passwd)
 {
-  return endpoint + "|" + securityProtocol + "|" + saslMechanism + "|" + user;
+  // Hash to avoid storing plaintext password in key
+  return endpoint + "|" + securityProtocol + "|" + saslMechanism + "|" + user + "|" + hashForKey(passwd);
 }
 
 
@@ -318,7 +332,7 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
     proto = "SASL_SSL";
   }
 
-  const std::string key = (!user.empty()) && (!passwd.empty()) ? connKey(endpoint, proto, saslMechanism, user) : endpoint;
+  const std::string key = (!user.empty()) && (!passwd.empty()) ? connKey(endpoint, proto, saslMechanism, user, passwd) : endpoint;
   
   // Kafka uses endpoint "broker1:9092,broker2:9092"
 
@@ -361,10 +375,10 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
 
     if ((!user.empty()) && (!passwd.empty()))
     {
-      if (!kafkaConfSet(conf, "security.protocol", proto.c_str(), endpoint) ||
-          !kafkaConfSet(conf, "sasl.mechanism",    saslMechanism.c_str(), endpoint) ||
-          !kafkaConfSet(conf, "sasl.username",     user.c_str(), endpoint) ||
-          !kafkaConfSet(conf, "sasl.password",     passwd.c_str(), endpoint))
+      if (!kafkaConfSet(conf, "security.protocol", proto, endpoint) ||
+          !kafkaConfSet(conf, "sasl.mechanism",    saslMechanism, endpoint) ||
+          !kafkaConfSet(conf, "sasl.username",     user, endpoint) ||
+          !kafkaConfSet(conf, "sasl.password",     passwd, endpoint))
       {
         rd_kafka_conf_destroy(conf);
         delete kConn;
