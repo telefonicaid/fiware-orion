@@ -73,6 +73,7 @@ export LISTENER3_PORT=${LISTENER3_PORT:-9957}
 #
 export KAFKA_BOOTSTRAP_A="${KAFKA_BOOTSTRAP_A:-localhost:9092,localhost:9094}"
 export KAFKA_BOOTSTRAP_B="${KAFKA_BOOTSTRAP_B:-localhost:9095}"
+export KAFKA_BOOTSTRAP_SASL="${KAFKA_BOOTSTRAP_SASL:-localhost:9096}"
 
 
 # -----------------------------------------------------------------------------

@@ -51,9 +51,11 @@ struct KafkaInfo
   CustomPayloadType          payloadType;
   bool                       includePayload;
 
-  //bool          providedAuth;  // FIXME #4714: not yet in use
-  //std::string   user;          // FIXME #4714: not yet in use
-  //std::string   passwd;        // FIXME #4714: not yet in use
+  bool          providedAuth;
+  std::string   user;
+  std::string   passwd;
+  std::string   securityProtocol; // optional; default applied later (e.g. "SASL_SSL" when providedAuth)
+  std::string   saslMechanism;    // optional/required depending on your validation ("PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512")
 
   KafkaInfo();
 

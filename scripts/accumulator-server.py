@@ -99,6 +99,10 @@ def usage():
           --bootstrapServers <endpoint>: Kafka url example: brokerA:9092,brokerB:9094
           --kafkaTopic <topic>: Kafka topic (default 'accumulate_kafka')
           --kafkaGroupId <group_id>: Kafka consumer group ID (default 'accumulator_group')
+          --kafka_security_protocol
+          --kafka_sasl_mechanism
+          --kafka_sasl_user
+          --kafka_sasl_passwd
           --pretty-print: pretty print mode"
           --https: start in https"
           --key <key file>: (only used if https is enabled)"
@@ -123,6 +127,10 @@ mqtt_topic = 'accumulate_mqtt'
 bootstrap_servers = None
 kafka_topic = 'accumulate_kafka'
 kafka_group_id = 'accumulator_group'
+kafka_security_protocol = None
+kafka_sasl_mechanism = None
+kafka_sasl_user = None
+kafka_sasl_passwd = None
 server_url = '/accumulate'
 verbose = 0
 pretty = False
@@ -143,6 +151,10 @@ try:
             'mqttTopic=',
             'bootstrapServers=',
             'kafkaTopic=',
+            'kafkaSecurityProtocol=',
+            'kafkaSaslMechanism=',
+            'kafkaSaslUser=',
+            'kafkaSaslPasswd=',
             'kafkaGroupId=',
             'url=',
             'pretty-print',
@@ -172,6 +184,14 @@ for opt, arg in opts:
         kafka_topic = arg
     elif opt == '--kafkaGroupId':
         kafka_group_id = arg
+    elif opt == '--kafkaSecurityProtocol':
+        kafka_security_protocol = arg
+    elif opt == '--kafkaSaslMechanism':
+        kafka_sasl_mechanism = arg
+    elif opt == '--kafkaSaslUser':
+        kafka_sasl_user = arg
+    elif opt == '--kafkaSaslPasswd':
+        kafka_sasl_passwd = arg
     elif opt == '--port':
         try:
             port = int(arg)
@@ -824,13 +844,22 @@ class KafkaConsumerThread(threading.Thread):
         conf = {
             'bootstrap.servers': bootstrap_servers,
             'group.id': kafka_group_id,
-            'auto.offset.reset': 'latest',
+            'auto.offset.reset': 'earliest',
             'enable.auto.commit': True,
             'allow.auto.create.topics': True,
             'topic.metadata.refresh.interval.ms': 200,
             'session.timeout.ms': 6000,
             'max.poll.interval.ms': 10000
         }
+        # SASL (optional)
+        if kafka_security_protocol:
+            conf['security.protocol'] = kafka_security_protocol
+        if kafka_sasl_mechanism:
+            conf['sasl.mechanism'] = kafka_sasl_mechanism
+        if kafka_sasl_user is not None:
+            conf['sasl.username'] = kafka_sasl_user
+        if kafka_sasl_passwd is not None:
+            conf['sasl.password'] = kafka_sasl_passwd
         self.consumer = Consumer(conf)
         self.kafka_topic = kafka_topic
         self.is_regex = self.kafka_topic.startswith("^") or self.kafka_topic.startswith("regex:")
@@ -859,14 +888,23 @@ class KafkaConsumerThread(threading.Thread):
         # Main consumption loop
         while self.running:
             try:
-                msg = self.consumer.poll(1.0)
-                if msg is None:
-                    continue
-                self.process_message(msg)
-            except KafkaException as e:
-                print(f"Kafka's error: {e}")
-            except Exception as e:
-                print(f"Unexpected error: {e}")
+                while self.running:
+                    msg = self.consumer.poll(1.0)
+                    if msg is None:
+                        continue
+
+                    # ? MUY IMPORTANTE: manejar errores entregados por poll()
+                    if msg.error():
+                        # EOF es normal si habilitas enable.partition.eof; lo puedes ignorar
+                        if msg.error().code() == KafkaError._PARTITION_EOF:
+                            continue
+                        print(f"Consumer error from poll(): {msg.error()}")
+                        continue
+
+                    self.process_message(msg)
+
+            finally:
+                self.consumer.close()
 
     def on_assign(self, consumer, partitions):
         print(f"Assigned partitions: {partitions}")

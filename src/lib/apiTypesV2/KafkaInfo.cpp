@@ -41,7 +41,7 @@ namespace ngsiv2
 *
 * KafkaInfo::KafkaInfo - 
 */
-KafkaInfo::KafkaInfo() : custom(false), json(NULL), payloadType(Text), includePayload(true)/*, providedAuth(false)*/ // FIXME #4714: not yet in use
+KafkaInfo::KafkaInfo() : custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
 {
 }
 
@@ -58,12 +58,18 @@ std::string KafkaInfo::toJson()
   jh.addString("url", this->url);
   jh.addString("topic", this->topic);
 
-  // FIXME #4714: not yet in use
-  //if (providedAuth)
-  //{
-  //  jh.addString("user", this->user);
-  //  jh.addString("passwd", "*****");
-  //}
+  if (providedAuth)
+  {
+    jh.addString("user", this->user);
+    jh.addString("passwd", "*****");
+    jh.addString("saslMechanism", this->saslMechanism);
+
+    // securityProtocol is optional (defaults applied later if empty)
+    if (!this->securityProtocol.empty())
+    {
+      jh.addString("securityProtocol", this->securityProtocol);
+    }
+  }
 
   if (custom)
   {
@@ -113,20 +119,24 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
   this->topic  = bo.hasField(CSUB_KAFKATOPIC)? getStringFieldF(bo, CSUB_KAFKATOPIC) : "";
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
 
-  // FIXME #4714: not yet in use
-  // both user and passwd have to be used at the same time
-  /*if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))
+  //both user and passwd have to be used at the same time
+  if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))
   {
     this->user   = getStringFieldF(bo, CSUB_USER);
     this->passwd = getStringFieldF(bo, CSUB_PASSWD);
+    // Optional Kafka auth fields
+    this->securityProtocol = bo.hasField(CSUB_KAFKA_SECURITY_PROTOCOL) ? getStringFieldF(bo, CSUB_KAFKA_SECURITY_PROTOCOL) : "";
+    this->saslMechanism = bo.hasField(CSUB_KAFKA_SASL_MECHANISM) ? getStringFieldF(bo, CSUB_KAFKA_SASL_MECHANISM) : "";
     this->providedAuth = true;
   }
   else
   {
     this->user   = "";
     this->passwd = "";
+    this->securityProtocol = "";
+    this->saslMechanism    = "";
     this->providedAuth = false;
-  }*/
+  }
 
   if (this->custom)
   {
@@ -226,16 +236,18 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
 */
 void KafkaInfo::fill(const KafkaInfo& _kafkaInfo)
 {
-  this->url            = _kafkaInfo.url;
-  this->topic          = _kafkaInfo.topic;
-  this->custom         = _kafkaInfo.custom;
-  this->headers        = _kafkaInfo.headers;
-  this->payload        = _kafkaInfo.payload;
-  this->payloadType    = _kafkaInfo.payloadType;
-  this->includePayload = _kafkaInfo.includePayload;
-  //this->providedAuth   = _kafkaInfo.providedAuth;  // FIXME #4714: not yet in use
-  //this->user           = _kafkaInfo.user;          // FIXME #4714: not yet in use
-  //this->passwd         = _kafkaInfo.passwd;        // FIXME #4714: not yet in use
+  this->url              = _kafkaInfo.url;
+  this->topic            = _kafkaInfo.topic;
+  this->custom           = _kafkaInfo.custom;
+  this->headers          = _kafkaInfo.headers;
+  this->payload          = _kafkaInfo.payload;
+  this->payloadType      = _kafkaInfo.payloadType;
+  this->includePayload   = _kafkaInfo.includePayload;
+  this->providedAuth     = _kafkaInfo.providedAuth;
+  this->user             = _kafkaInfo.user;
+  this->passwd           = _kafkaInfo.passwd;
+  this->securityProtocol = _kafkaInfo.securityProtocol;
+  this->saslMechanism    = _kafkaInfo.saslMechanism;
 
   this->json = _kafkaInfo.json == NULL ? NULL : _kafkaInfo.json->clone();
 

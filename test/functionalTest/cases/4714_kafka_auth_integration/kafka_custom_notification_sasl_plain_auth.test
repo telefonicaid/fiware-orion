@@ -1,0 +1,287 @@
+# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+#   General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+KafkaCustom notification with SASL/PLAIN authentication
+
+--SHELL-INIT--
+dbInit CB
+
+# KAFKA_BOOTSTRAP_SASL should point to the new broker: kafkaSasl:9096 (CI) or localhost:9096 (local)
+
+#KAFKA_BOOTSTRAP_TOOLS="localhost:29096"
+kafkaCreateTopics "localhost:29096" sub_auth
+
+brokerStart CB 164 IPV4
+
+KAFKA_BOOTSTRAP_SASL="localhost:9096"
+
+accumulatorStart --pretty-print \
+  --bootstrapServers "${KAFKA_BOOTSTRAP_SASL}" \
+  --kafkaTopic "sub_auth" \
+  --kafkaSecurityProtocol "SASL_PLAINTEXT" \
+  --kafkaSaslMechanism "PLAIN" \
+  --kafkaSaslUser "test" \
+  --kafkaSaslPasswd "test-secret"
+
+--SHELL--
+
+#
+# Hint: A Kafka cluster accessible at localhost:9096 (SASL_PLAINTEXT + PLAIN) is required for this .test:
+#
+#
+# 01. Create KAFKA custom sub with WRONG user/pass (SASL_PLAINTEXT + PLAIN)
+# 02. Create entity E with A=1 (should NOT notify)
+# 03. Dump accumulator (expect EMPTY)
+# 04. PATCH subscription with correct user/pass
+# 05. Update entity E with A=2 (should notify)
+# 06. Dump accumulator (expect 1 message at topic sub_auth)
+# 07. GET subscriptions (passwd masked, saslMechanism present)
+#
+
+echo "01. Create KAFKA custom sub with WRONG user/pass (SASL_PLAINTEXT + PLAIN)"
+echo "========================================================================="
+payload='{
+  "description": "KAFKA SASL auth sub",
+  "subject": {
+    "entities": [
+      { "id": "E",
+      "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9096",
+      "topic": "sub_auth",
+      "user": "test",
+      "passwd": "WRONG",
+      "saslMechanism": "PLAIN",
+      "securityProtocol": "SASL_PLAINTEXT"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create entity E with A=1 (should NOT notify)"
+echo "================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
+# due to the lock in accumulator-server.py?
+sleep 2s
+
+
+echo "03. Dump accumulator (expect EMPTY)"
+echo "==================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "04. PATCH subscription with correct user/pass"
+echo "============================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9096",
+      "topic": "sub_auth",
+      "user": "test",
+      "passwd": "test-secret",
+      "saslMechanism": "PLAIN",
+      "securityProtocol": "SASL_PLAINTEXT"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "05. Update entity E with A=2 (should notify)"
+echo "============================================"
+payload='{
+  "A": {
+    "value": 2,
+    "type": "Float"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
+# due to the lock in accumulator-server.py?
+sleep 5s
+
+
+echo "06. Dump accumulator (expect 1 message at topic sub_auth)"
+echo "========================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. GET subscriptions (passwd masked, saslMechanism present)"
+echo "==========================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+--REGEXPECT--
+01. Create KAFKA custom sub with WRONG user/pass (SASL_PLAINTEXT + PLAIN)
+=========================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+02. Create entity E with A=1 (should NOT notify)
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. Dump accumulator (expect EMPTY)
+===================================
+
+
+04. PATCH subscription with correct user/pass
+=============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Update entity E with A=2 (should notify)
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Dump accumulator (expect 1 message at topic sub_auth)
+========================================================
+Kafka message at topic sub_auth
+Key: REGEX([0-9a-f\-]{24})
+Headers:
+  Fiware-Servicepath: /
+Payload:
+{
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E",
+            "type": "T",
+            "A": {
+                "type": "Float",
+                "value": 2,
+                "metadata": {}
+            }
+        }
+    ]
+}
+=======================================
+
+
+07. GET subscriptions (passwd masked, saslMechanism present)
+===========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 545
+
+[
+    {
+        "description": "KAFKA SASL auth sub",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "kafkaCustom": {
+                "passwd": "*****",
+                "saslMechanism": "PLAIN",
+                "securityProtocol": "SASL_PLAINTEXT",
+                "topic": "sub_auth",
+                "url": "kafka://localhost:9096",
+                "user": "test"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+accumulatorStop
+kafkaDestroyTopics "localhost:29096" sub_auth
+brokerStop CB
+dbDrop CB
