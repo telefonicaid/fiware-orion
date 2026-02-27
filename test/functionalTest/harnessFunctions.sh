@@ -782,6 +782,34 @@ function accumulatorStart()
     shift
   fi
 
+  if [ "$1" = "--kafkaSecurityProtocol" ]
+    then
+      kafkaSecurityProtocol="$1 $2"
+      shift
+      shift
+    fi
+
+    if [ "$1" = "--kafkaSaslMechanism" ]
+    then
+      kafkaSaslMechanism="$1 $2"
+      shift
+      shift
+    fi
+
+    if [ "$1" = "--kafkaSaslUser" ]
+    then
+      kafkaSaslUser="$1 $2"
+      shift
+      shift
+    fi
+
+    if [ "$1" = "--kafkaSaslPasswd" ]
+    then
+      kafkaSaslPasswd="$1 $2"
+      shift
+      shift
+    fi
+
   bindIp=$1
   port=$2
 
@@ -803,7 +831,7 @@ function accumulatorStart()
   if [ ! -z "$bootstrapServers" ]
   then
     # Start with KAFKA
-        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $bootstrapServers $kafkaTopic  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
+        accumulator-server.py --port $port --url $url --host $bindIp $pretty $https $key $cert $bootstrapServers $kafkaTopic $kafkaSecurityProtocol $kafkaSaslMechanism $kafkaSaslUser $kafkaSaslPasswd  > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
         echo accumulator running as PID $$
   elif [ ! -z "$mqttHost" ]
   then
