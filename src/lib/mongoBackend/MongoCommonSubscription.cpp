@@ -403,17 +403,13 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
       b->append(CSUB_USER,   sub.notification.kafkaInfo.user);
       b->append(CSUB_PASSWD, sub.notification.kafkaInfo.passwd);
       b->append(CSUB_KAFKA_SASL_MECHANISM, sub.notification.kafkaInfo.saslMechanism);
-      if (!sub.notification.kafkaInfo.securityProtocol.empty())
-      {
-        b->append(CSUB_KAFKA_SECURITY_PROTOCOL, sub.notification.kafkaInfo.securityProtocol);
-      }
+      b->append(CSUB_KAFKA_SECURITY_PROTOCOL, sub.notification.kafkaInfo.securityProtocol);
+
       LM_T(LmtMongo, ("Subscription user:   %s", sub.notification.kafkaInfo.user.c_str()));
       LM_T(LmtMongo, ("Subscription passwd: *****"));
       LM_T(LmtMongo, ("Subscription saslMechanism: %s", sub.notification.kafkaInfo.saslMechanism.c_str()));
-      if (!sub.notification.kafkaInfo.securityProtocol.empty())
-      {
-        LM_T(LmtMongo, ("Subscription securityProtocol: %s", sub.notification.kafkaInfo.securityProtocol.c_str()));
-      }
+      LM_T(LmtMongo, ("Subscription securityProtocol: %s", sub.notification.kafkaInfo.securityProtocol.c_str()));
+
     }
 
     if (sub.notification.kafkaInfo.custom)

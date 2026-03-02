@@ -972,6 +972,14 @@ static std::string parseKafkaAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP
       }
       subsP->notification.kafkaInfo.securityProtocol = protOpt.value;
     }
+    else
+    {
+      // Only default it if it's currently empty
+      if (subsP->notification.kafkaInfo.securityProtocol.empty())
+      {
+        subsP->notification.kafkaInfo.securityProtocol = "SASL_SSL";
+      }
+    }
   }
   else
   {
