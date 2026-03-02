@@ -1,0 +1,343 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+kafkaCustom subscription SCRAM mechanisms update and protocol default/override
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create kafkaCustom sub OK (SCRAM-SHA-256, default securityProtocol SASL_SSL)
+# 02. GET sub checking saslMechanism SCRAM-SHA-256 and securityProtocol SASL_SSL (passwd masked)
+# 03. PATCH sub changing saslMechanism to SCRAM-SHA-512 (keep default SASL_SSL)
+# 04. GET sub checking saslMechanism SCRAM-SHA-512 and securityProtocol SASL_SSL
+# 05. PATCH sub setting securityProtocol SASL_PLAINTEXT (explicit override) and keep SCRAM-SHA-512
+# 06. GET sub checking securityProtocol SASL_PLAINTEXT and saslMechanism SCRAM-SHA-512
+# 07. PATCH sub removing auth parameters
+# 08. GET sub checking auth fields not shown
+#
+
+echo "01. Create kafkaCustom sub OK (SCRAM-SHA-256, default securityProtocol SASL_SSL)"
+echo "============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1",
+      "passwd": "pass1",
+      "saslMechanism": "SCRAM-SHA-256"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. GET sub checking saslMechanism SCRAM-SHA-256 and securityProtocol SASL_SSL (passwd masked)"
+echo "=============================================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03. PATCH sub changing saslMechanism to SCRAM-SHA-512 (keep default SASL_SSL)"
+echo "============================================================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1",
+      "passwd": "pass2",
+      "saslMechanism": "SCRAM-SHA-512"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. GET sub checking saslMechanism SCRAM-SHA-512 and securityProtocol SASL_SSL"
+echo "=============================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "05. PATCH sub setting securityProtocol SASL_PLAINTEXT (explicit override) and keep SCRAM-SHA-512"
+echo "================================================================================================"
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1",
+      "passwd": "pass3",
+      "saslMechanism": "SCRAM-SHA-512",
+      "securityProtocol": "SASL_PLAINTEXT"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. GET sub checking securityProtocol SASL_PLAINTEXT and saslMechanism SCRAM-SHA-512"
+echo "===================================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "07. PATCH sub removing auth parameters"
+echo "======================================"
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. GET sub checking auth fields not shown"
+echo "=========================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create kafkaCustom sub OK (SCRAM-SHA-256, default securityProtocol SASL_SSL)
+=============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+02. GET sub checking saslMechanism SCRAM-SHA-256 and securityProtocol SASL_SSL (passwd masked)
+==============================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "passwd": "*****",
+            "saslMechanism": "SCRAM-SHA-256",
+            "securityProtocol": "SASL_SSL",
+            "topic": "orion",
+            "url": "kafka://localhost:9092,localhost:9094",
+            "user": "user1"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. PATCH sub changing saslMechanism to SCRAM-SHA-512 (keep default SASL_SSL)
+=============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. GET sub checking saslMechanism SCRAM-SHA-512 and securityProtocol SASL_SSL
+==============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "passwd": "*****",
+            "saslMechanism": "SCRAM-SHA-512",
+            "securityProtocol": "SASL_SSL",
+            "topic": "orion",
+            "url": "kafka://localhost:9092,localhost:9094",
+            "user": "user1"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. PATCH sub setting securityProtocol SASL_PLAINTEXT (explicit override) and keep SCRAM-SHA-512
+================================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. GET sub checking securityProtocol SASL_PLAINTEXT and saslMechanism SCRAM-SHA-512
+====================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "passwd": "*****",
+            "saslMechanism": "SCRAM-SHA-512",
+            "securityProtocol": "SASL_PLAINTEXT",
+            "topic": "orion",
+            "url": "kafka://localhost:9092,localhost:9094",
+            "user": "user1"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+07. PATCH sub removing auth parameters
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. GET sub checking auth fields not shown
+==========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "topic": "orion",
+            "url": "kafka://localhost:9092,localhost:9094"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
