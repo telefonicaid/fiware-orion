@@ -543,13 +543,13 @@ static void requestCompleted
 
   if ((ciP->verb != GET) && (ciP->verb != DELETE) && (ciP->payload != NULL) && (strlen(ciP->payload) > 0))
   {
-    // Variant with payload
-    logInfoRequestWithPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->payload, ciP->httpStatusCode);
+    // Variant with request payload
+    logInfoRequestWithPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->payload, ciP->httpStatusCode, ciP->answer.c_str());
   }
   else
   {
-    // Variant without payload
-    logInfoRequestWithoutPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->httpStatusCode);
+    // Variant without request payload
+    logInfoRequestWithoutPayload(ciP->method.c_str(), ciP->uriForLogs.c_str(), ciP->httpStatusCode, ciP->answer.c_str());
   }
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
@@ -1286,7 +1286,8 @@ static MHD_Result connectionTreat
       OrionError oe(SccRequestEntityTooLarge, details);
 
       ciP->httpStatusCode = oe.code;
-      restReply(ciP, oe.toJson());
+      ciP->answer         = oe.toJson();
+      restReply(ciP);
       return MHD_YES;
     }
 
@@ -1394,19 +1395,19 @@ static MHD_Result connectionTreat
   if (urlCheck(ciP, ciP->url) == false)
   {
     alarmMgr.badInput(clientIp, "error in URI path", ciP->url);
-    restReply(ciP, ciP->answer);
+    restReply(ciP);
     return MHD_YES;
   }
   else if (servicePathSplit(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "error in ServicePath http-header", ciP->httpHeaders.servicePath);
-    restReply(ciP, ciP->answer);
+    restReply(ciP);
     return MHD_YES;
   }
   else if (contentTypeCheck(ciP) != 0)
   {
     alarmMgr.badInput(clientIp, "invalid mime-type in Content-Type http-header", ciP->httpHeaders.contentType);
-    restReply(ciP, ciP->answer);
+    restReply(ciP);
     return MHD_YES;
   }
   else
@@ -1417,7 +1418,7 @@ static MHD_Result connectionTreat
   if (ciP->httpStatusCode != SccOk)
   {
     alarmMgr.badInput(clientIp, "error in URI parameters", ciP->uriForLogs);
-    restReply(ciP, ciP->answer);
+    restReply(ciP);
     return MHD_YES;
   }
 
@@ -1445,7 +1446,8 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, ciP->acceptHeaderError);
-    restReply(ciP, oe.toJson());
+    ciP->answer = oe.toJson();
+    restReply(ciP);
     return MHD_YES;
   }
 
@@ -1469,7 +1471,8 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.description);
-    restReply(ciP, oe.toJson());
+    ciP->answer = oe.toJson();
+    restReply(ciP);
     return MHD_YES;
   }
 
@@ -1495,7 +1498,8 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, oe.description);
-    restReply(ciP, oe.toJson());
+    ciP->answer = oe.toJson();
+    restReply(ciP);
     return MHD_YES;
   }
 
@@ -1510,7 +1514,8 @@ static MHD_Result connectionTreat
 
     ciP->httpStatusCode = oe.code;
     alarmMgr.badInput(clientIp, details);
-    restReply(ciP, oe.toJson());
+    ciP->answer = oe.toJson();
+    restReply(ciP);
     return MHD_YES;
   }
 
@@ -1528,13 +1533,14 @@ static MHD_Result connectionTreat
     OrionError oe(SccContentLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     std::string errorMsg = oe.toJson();
     ciP->httpStatusCode  = SccContentLengthRequired;
-    restReply(ciP, errorMsg);
-    alarmMgr.badInput(clientIp, errorMsg);
+    ciP->answer = errorMsg;
+    restReply(ciP);
+    alarmMgr.badInput(clientIp, ciP->answer);
   }
   else if (!ciP->answer.empty())
   {
     alarmMgr.badInput(clientIp, ciP->answer);
-    restReply(ciP, ciP->answer);
+    restReply(ciP);
   }
   else
   {

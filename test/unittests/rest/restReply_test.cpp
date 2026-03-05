@@ -55,7 +55,8 @@ TEST(restReply, MHD_create_response_from_data_error)
     memset(answer, 'x', TEST_SIZE - 1);
     answer[TEST_SIZE - 1] = 0;
 
-    restReply(&ci, answer);
+    ci.answer = answer;
+    restReply(&ci);
     free(answer);
   }
 
@@ -75,7 +76,8 @@ TEST(restReply, json)
   utInit();
 
   ci.outMimeType = JSON;
-  restReply(&ci, "123");
+  ci.answer = "123";
+  restReply(&ci);
 
   utExit();
 }

@@ -85,7 +85,8 @@ extern void logInfoRequestWithoutPayload
 (
   const char*  verb,
   const char*  url,
-  int          rc
+  int          rc,
+  const char*  responsePayload
 );
 
 
@@ -98,8 +99,9 @@ extern void logInfoRequestWithPayload
 (
   const char*  verb,
   const char*  url,
-  const char*  payload,
-  int          rc
+  const char*  requestPayload,
+  int          rc,
+  const char*  responsePayload
 );
 
 
