@@ -156,10 +156,19 @@ void logInfoRequestWithoutPayload
 (
   const char*  verb,
   const char*  url,
-  int          rc
+  int          rc,
+  const char*  responsePayload
 )
 {
-  LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
+  // If there is no response payload or the response code is 2xx, log without response payload (to avoid log pollution with non-error responses)
+  if ((strlen(responsePayload) == 0) || (rc <= 299))
+  {
+   LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
+  }
+  else
+  {
+    LM_I(("Request received: %s %s, response code: %d, response payload (%d bytes): %s", verb, url, rc, strlen(responsePayload), responsePayload));
+  }
 }
 
 
@@ -172,24 +181,35 @@ void logInfoRequestWithPayload
 (
   const char*  verb,
   const char*  url,
-  const char*  payload,
-  int          rc
+  const char*  requestPayload,
+  int          rc,
+  const char*  responsePayload
 )
 {
   bool cleanAfterUse = false;
   char* effectivePayload;
 
-  if (strlen(payload) > logInfoPayloadMaxSize)
+  if (strlen(requestPayload) > logInfoPayloadMaxSize)
   {
-    effectivePayload = truncatePayload(payload);
+    effectivePayload = truncatePayload(requestPayload);
     cleanAfterUse = true;
   }
   else
   {
-    effectivePayload = (char*) payload;
+    effectivePayload = (char*) requestPayload;
   }
 
-  LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+  // If there is no response payload or the response code is 2xx, log without response payload (to avoid log pollution with non-error responses)
+  if ((strlen(responsePayload) == 0) || (rc <= 299))
+  {
+    LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d",
+      verb, url, strlen(requestPayload), effectivePayload, rc));
+  }
+  else
+  {
+    LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d, response payload (%d bytes): %s",
+      verb, url, strlen(requestPayload), effectivePayload, rc, strlen(responsePayload), responsePayload));
+  }
 
   if (cleanAfterUse)
   {

@@ -41,7 +41,8 @@ std::string orionLogReply(ConnectionInfo* ciP, const std::string& what, const st
    std::string out = jh.str();
 
    ciP->httpStatusCode = SccOk;
-   restReply(ciP, out);
+   ciP->answer         = out;
+   restReply(ciP);
 
    return out;
 }
