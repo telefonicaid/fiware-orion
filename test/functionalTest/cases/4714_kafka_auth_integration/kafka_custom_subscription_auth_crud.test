@@ -1,0 +1,552 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+kafkaCustom subscription auth parameters CRUD (user and password)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create kafkaCustom sub only user, see error
+# 02. Create kafkaCustom sub only pass, see error
+# 03. Create kafkaCustom sub user and pass, but forbidden chars in user, see error
+# 04. Create kafkaCustom sub with user/pass but missing saslMechanism, see error
+# 05. Create kafkaCustom sub with invalid saslMechanism, see error
+# 06. Create kafkaCustom sub with invalid securityProtocol
+# 07. Create kafkaCustom sub OK (saslMechanism PLAIN, default securityProtocol SASL_SSL)
+# 08. GET sub checking user1, password obfuscated, and default securityProtocol (SASL_SSL)
+# 09. Get sub password pass1 from DB
+# 10. PATCH sub changing credentials to user10/pass10 and setting securityProtocol SASL_PLAINTEXT
+# 11. GET sub checking user10, password obfuscated, and securityProtocol SASL_PLAINTEXT
+# 12. Get sub password pass10 from DB
+# 13. PATCH sub removing auth parameters
+# 14. GET sub checking user and password are not shown
+# 15. Get sub from DB and check user/pass are not there
+#
+
+echo "01. Create kafkaCustom sub only user, see error"
+echo "==============================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create kafkaCustom sub only pass, see error"
+echo "==============================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "passwd": "pass1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create kafkaCustom sub user and pass, but forbidden chars in user, see error"
+echo "================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "forbidden;;",
+      "passwd": "passwd1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create kafkaCustom sub with user/pass but missing saslMechanism, see error"
+echo "============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1",
+      "passwd": "pass1"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "05. Create kafkaCustom sub with invalid saslMechanism, see error"
+echo "================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1",
+      "passwd": "pass1",
+      "saslMechanism": "foo"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create kafkaCustom sub with invalid securityProtocol"
+echo "========================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1",
+      "passwd": "pass1",
+      "saslMechanism": "PLAIN",
+      "securityProtocol": "foo"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "07. Create kafkaCustom sub OK (saslMechanism PLAIN, default securityProtocol SASL_SSL)"
+echo "====================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user1",
+      "passwd": "pass1",
+      "saslMechanism": "PLAIN"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+
+
+echo "08. GET sub checking user1, password obfuscated, and default securityProtocol (SASL_SSL)"
+echo "======================================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Get sub password pass1 from DB"
+echo "=================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).user'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).passwd'
+echo
+echo
+
+
+echo "10. PATCH sub changing credentials to user10/pass10 and setting securityProtocol SASL_PLAINTEXT"
+echo "==============================================================================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion",
+      "user": "user10",
+      "passwd": "pass10",
+      "saslMechanism": "PLAIN",
+      "securityProtocol": "SASL_PLAINTEXT"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "11. GET sub checking user10, password obfuscated, and securityProtocol SASL_PLAINTEXT"
+echo "===================================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "12. Get sub password pass10 from DB"
+echo "==================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).user'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).passwd'
+echo
+echo
+
+
+echo "13. PATCH sub removing auth parameters"
+echo "======================================"
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "14. GET sub checking user and password are not shown"
+echo "===================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "15. Get sub from DB and check user/pass are not there"
+echo "====================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).hasOwnProperty("user")'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}).hasOwnProperty("passwd")'
+echo
+echo
+
+
+--REGEXPECT--
+01. Create kafkaCustom sub only user, see error
+===============================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "description": "you must use user and passwd fields simultaneously",
+    "error": "BadRequest"
+}
+
+
+02. Create kafkaCustom sub only pass, see error
+===============================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "description": "you must use user and passwd fields simultaneously",
+    "error": "BadRequest"
+}
+
+
+03. Create kafkaCustom sub user and pass, but forbidden chars in user, see error
+=================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "description": "forbidden characters in kafka /user/",
+    "error": "BadRequest"
+}
+
+
+04. Create kafkaCustom sub with user/pass but missing saslMechanism, see error
+=============================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "description": "saslMechanism kafka notification is missing",
+    "error": "BadRequest"
+}
+
+
+05. Create kafkaCustom sub with invalid saslMechanism, see error
+=================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "description": "invalid kafka /saslMechanism/ &#40;allowed: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512&#41;",
+    "error": "BadRequest"
+}
+
+
+06. Create kafkaCustom sub with invalid securityProtocol
+========================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "description": "invalid kafka /securityProtocol/ &#40;allowed: SASL_SSL, SASL_PLAINTEXT&#41;",
+    "error": "BadRequest"
+}
+
+
+07. Create kafkaCustom sub OK (saslMechanism PLAIN, default securityProtocol SASL_SSL)
+=====================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+08. GET sub checking user1, password obfuscated, and default securityProtocol (SASL_SSL)
+=======================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "passwd": "*****",
+            "saslMechanism": "PLAIN",
+            "securityProtocol": "SASL_SSL",
+            "topic": "orion",
+            "url": "kafka://localhost:9092,localhost:9094",
+            "user": "user1"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+09. Get sub password pass1 from DB
+==================================
+"user1"
+"pass1"
+
+
+10. PATCH sub changing credentials to user10/pass10 and setting securityProtocol SASL_PLAINTEXT
+===============================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+11. GET sub checking user10, password obfuscated, and securityProtocol SASL_PLAINTEXT
+====================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "passwd": "*****",
+            "saslMechanism": "PLAIN",
+            "securityProtocol": "SASL_PLAINTEXT",
+            "topic": "orion",
+            "url": "kafka://localhost:9092,localhost:9094",
+            "user": "user10"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+12. Get sub password pass10 from DB
+===================================
+"user10"
+"pass10"
+
+
+13. PATCH sub removing auth parameters
+======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+14. GET sub checking user and password are not shown
+====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX([0-9]+)
+
+{
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "topic": "orion",
+            "url": "kafka://localhost:9092,localhost:9094"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+15. Get sub from DB and check user/pass are not there
+=====================================================
+false
+false
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
