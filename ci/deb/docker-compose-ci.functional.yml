@@ -34,4 +34,12 @@ services:
     volumes:
       - .:/opt/fiware-orion
     command:
-      build -miqts functional
+      - /bin/sh
+      - -lc
+      - |
+        echo "DEBUG PATH=$PATH"
+        command -v kafka-topics.sh || true
+        ls -l /opt/kafka/bin/kafka-topics.sh || true
+        /opt/kafka/bin/kafka-topics.sh --version || true
+        sleep 5
+        build -miqts functional
