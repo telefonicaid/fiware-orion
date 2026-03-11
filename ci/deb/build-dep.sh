@@ -119,12 +119,11 @@ echo "INSTALL: mosquitto" \
 #&& mv /opt/kafka_2.12-3.9.1 /opt/kafka
 
 echo "INSTALL: Kafka" \
-&& curl -fsSL -o /tmp/kafka.tgz "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" \
+&& curl -fsSL -o /tmp/kafka.tgz "https://archive.apache.org/dist/kafka/3.9.1/kafka_2.12-3.9.1.tgz" \
 && tar xzf /tmp/kafka.tgz -C /opt \
 && mv /opt/kafka_2.12-3.9.1 /opt/kafka \
 && test -x /opt/kafka/bin/kafka-topics.sh \
 && rm -f /tmp/kafka.tgz
-
 
 ldconfig
 
