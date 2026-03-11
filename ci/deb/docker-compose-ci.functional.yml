@@ -22,7 +22,10 @@
 services:
   # ─────────────────── Functional Tests ───────────────────
   tests:
-    image: ${TEST_IMAGE_NAME:-telefonicaiot/fiware-orion:ci}
+    build:
+      context: .
+      dockerfile: ci/deb/Dockerfile
+    image: fiware-orion:local-ci
     container_name: tests
     network_mode: host
     depends_on: [ mongodb, kafka1, kafka2, kafkaB, mosquitto, mosquitto-extra ]
