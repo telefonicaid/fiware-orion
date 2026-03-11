@@ -7,7 +7,8 @@ ADD fuse_gtest_files.py.patch /opt/archive/
 
 RUN ln -s /opt/bin/build.sh /usr/local/bin/build \
  && /opt/bin/build-dep.sh \
- && test -x /opt/kafka/bin/kafka-topics.sh
+ && test -x /opt/kafka/bin/kafka-topics.sh \
+ && ln -sf /opt/kafka/bin/kafka-topics.sh /usr/local/bin/kafka-topics.sh
 
 ENV PATH="/opt/kafka/bin:$PATH"
 
