@@ -21,7 +21,7 @@
 #
 # Author:               Dmitrii Demin
 # Re-worked for Debian: Fermín Galán
-
+set -eu
 # Install security updates
 apt-get -y update
 apt-get -y upgrade
@@ -112,11 +112,19 @@ echo "INSTALL: mosquitto" \
 && make \
 && make install
 
-# Note in this case the directory created in /opt contains the software itself
-# (i.e. there isn't a install step itself). Note also due to this there isn't a removal (rm) at the end
+## Note in this case the directory created in /opt contains the software itself
+## (i.e. there isn't a install step itself). Note also due to this there isn't a removal (rm) at the end
+#echo "INSTALL: Kafka" \
+#&& curl -fsSL "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar xzC /opt \
+#&& mv /opt/kafka_2.12-3.9.1 /opt/kafka
+
 echo "INSTALL: Kafka" \
-&& curl -fsSL "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar xzC /opt \
-&& mv /opt/kafka_2.12-3.9.1 /opt/kafka
+&& curl -fsSL -o /tmp/kafka.tgz "https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz" \
+&& tar xzf /tmp/kafka.tgz -C /opt \
+&& mv /opt/kafka_2.12-3.9.1 /opt/kafka \
+&& test -x /opt/kafka/bin/kafka-topics.sh \
+&& rm -f /tmp/kafka.tgz
+
 
 ldconfig
 
