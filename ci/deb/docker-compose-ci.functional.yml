@@ -37,9 +37,9 @@ services:
       - /bin/sh
       - -lc
       - |
-        echo "DEBUG PATH=$PATH"
+        echo "DEBUG PATH=$$PATH"
+        env | grep '^PATH=' || true
+        find /opt -maxdepth 3 -iname 'kafka-topics*' || true
         command -v kafka-topics.sh || true
         ls -l /opt/kafka/bin/kafka-topics.sh || true
-        /opt/kafka/bin/kafka-topics.sh --version || true
-        sleep 5
         build -miqts functional
