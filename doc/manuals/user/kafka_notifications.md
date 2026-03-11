@@ -27,6 +27,12 @@ The following elements can be used within `kafka`:
 * `url` to specify the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains
   a path (i.e. it only includes host and port)
 * `topic` to specify the KAFKA topic to use
+* `user` (optional) username for Kafka SASL authentication. It must be used together with `passwd`.
+* `passwd` (optional) password for Kafka SASL authentication. It must be used together with `user`.
+* `saslMechanism` (mandatory if `user`/`passwd` are set) SASL mechanism to use. Allowed values are:
+  `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`.
+* `securityProtocol` (optional) Kafka security protocol to use when SASL authentication is enabled.
+  Allowed values are: `SASL_PLAINTEXT`, `SASL_SSL`. 
 
 
 Another difference between KAFKA and HTTP subscriptions in that the former don't include the following

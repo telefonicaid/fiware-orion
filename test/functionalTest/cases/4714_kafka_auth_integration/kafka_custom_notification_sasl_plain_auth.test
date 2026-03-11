@@ -50,12 +50,16 @@ accumulatorStart --pretty-print \
 #
 #
 # 01. Create KAFKA custom sub with WRONG user/pass (SASL_PLAINTEXT + PLAIN)
-# 02. Create entity E with A=1 (should NOT notify)
+# 02. Upsert to trigger first KAFKA notification, which fails (should NOT notify)
 # 03. Dump accumulator (expect EMPTY)
-# 04. PATCH subscription with correct user/pass
-# 05. Update entity E with A=2 (should notify)
-# 06. Dump accumulator (expect 1 message at topic sub_auth)
-# 07. GET subscriptions (passwd masked, saslMechanism present)
+# 04. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
+# 05. Upsert to trigger second KAFKA notification, which fails (should NOT notify)
+# 06. Dump accumulator (expect EMPTY)
+# 07. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
+# 08. Dump accumulator (expect 1 message at topic sub_auth)
+# 09. PATCH subscription with correct user/pass
+# 10. Upsert to trigger third KAFKA notification, which is ok (should notify)
+# 11. Get sub and see timesSent:3, lastFailure (old) and lastSuccess but not failsCounter (passwd masked, saslMechanism present)
 #
 
 echo "01. Create KAFKA custom sub with WRONG user/pass (SASL_PLAINTEXT + PLAIN)"
@@ -87,8 +91,8 @@ echo
 SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
 
 
-echo "02. Create entity E with A=1 (should NOT notify)"
-echo "================================================"
+echo "02. Upsert to trigger first KAFKA notification, which fails (should NOT notify)"
+echo "==============================================================================="
 payload='{
   "id": "E",
   "type": "T",
@@ -97,7 +101,7 @@ payload='{
     "type": "Float"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload"
+orionCurl --url '/v2/entities?options=forcedUpdate,upsert' --payload "$payload"
 echo
 echo
 
@@ -105,7 +109,7 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 2s
+sleep 5s
 
 
 echo "03. Dump accumulator (expect EMPTY)"
@@ -116,7 +120,50 @@ echo
 echo
 
 
-echo "04. PATCH subscription with correct user/pass"
+echo "04. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)"
+echo "===================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "05. Upsert to trigger second KAFKA notification, which fails (should NOT notify)"
+echo "================================================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Float"
+  }
+}'
+orionCurl --url '/v2/entities?options=forcedUpdate,upsert' --payload "$payload"
+echo
+echo
+
+
+# Not sure but sometimes a notification may be lost at the accumulator if we
+# don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
+# due to the lock in accumulator-server.py?
+sleep 5s
+
+
+echo "06. Dump accumulator (expect EMPTY)"
+echo "==================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "07. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)"
+echo "===================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "08. PATCH subscription with correct user/pass"
 echo "============================================="
 payload='{
   "notification": {
@@ -135,8 +182,8 @@ echo
 echo
 
 
-echo "05. Update entity E with A=2 (should notify)"
-echo "============================================"
+echo "09. Upsert to trigger third KAFKA notification, which is ok (should notify)"
+echo "==========================================================================="
 payload='{
   "A": {
     "value": 2,
@@ -151,19 +198,19 @@ echo
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 5s
+sleep 2s
 
 
-echo "06. Dump accumulator (expect 1 message at topic sub_auth)"
-echo "========================================================"
+echo "10. Dump accumulator (expect 1 message at topic sub_auth)"
+echo "========================================================="
 accumulatorDump
 accumulatorReset
 echo
 echo
 
 
-echo "07. GET subscriptions (passwd masked, saslMechanism present)"
-echo "==========================================================="
+echo "11. Get sub and see timesSent:3, lastFailure (old) and lastSuccess but not failsCounter (passwd masked, saslMechanism present)"
+echo "=============================================================================================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
@@ -180,13 +227,12 @@ Content-Length: 0
 
 
 
-02. Create entity E with A=1 (should NOT notify)
-================================================
-HTTP/1.1 201 Created
+02. Upsert to trigger first KAFKA notification, which fails (should NOT notify)
+===============================================================================
+HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Location: /v2/entities/E?type=T
-Content-Length: 0
 
 
 
@@ -194,7 +240,114 @@ Content-Length: 0
 ===================================
 
 
-04. PATCH subscription with correct user/pass
+04. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
+====================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 562
+
+[
+    {
+        "description": "KAFKA SASL auth sub",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 1,
+            "kafkaCustom": {
+                "passwd": "*****",
+                "saslMechanism": "PLAIN",
+                "securityProtocol": "SASL_PLAINTEXT",
+                "topic": "sub_auth",
+                "url": "kafka://localhost:9096",
+                "user": "test"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+05. Upsert to trigger second KAFKA notification, which fails (should NOT notify)
+================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+
+
+
+06. Dump accumulator (expect EMPTY)
+===================================
+
+
+07. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
+====================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 562
+
+[
+    {
+        "description": "KAFKA SASL auth sub",
+        "id": "REGEX([0-9a-f\-]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "failsCounter": 2,
+            "kafkaCustom": {
+                "passwd": "*****",
+                "saslMechanism": "PLAIN",
+                "securityProtocol": "SASL_PLAINTEXT",
+                "topic": "sub_auth",
+                "url": "kafka://localhost:9096",
+                "user": "test"
+            },
+            "lastFailure": "REGEX(.*)",
+            "lastNotification": "REGEX(.*)",
+            "onlyChangedAttrs": false,
+            "timesSent": 2
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+08. PATCH subscription with correct user/pass
 =============================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
@@ -202,16 +355,16 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-05. Update entity E with A=2 (should notify)
-============================================
+09. Upsert to trigger third KAFKA notification, which is ok (should notify)
+===========================================================================
 HTTP/1.1 204 No Content
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-06. Dump accumulator (expect 1 message at topic sub_auth)
-========================================================
+10. Dump accumulator (expect 1 message at topic sub_auth)
+=========================================================
 Kafka message at topic sub_auth
 Key: REGEX([0-9a-f\-]{24})
 Headers:
@@ -234,13 +387,13 @@ Payload:
 =======================================
 
 
-07. GET subscriptions (passwd masked, saslMechanism present)
-===========================================================
+11. Get sub and see timesSent:3, lastFailure (old) and lastSuccess but not failsCounter (passwd masked, saslMechanism present)
+==============================================================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 545
+Content-Length: 586
 
 [
     {
@@ -258,10 +411,11 @@ Content-Length: 545
                 "url": "kafka://localhost:9096",
                 "user": "test"
             },
+            "lastFailure": "REGEX(.*)",
             "lastNotification": "REGEX(.*)",
             "lastSuccess": "REGEX(.*)",
             "onlyChangedAttrs": false,
-            "timesSent": 2
+            "timesSent": 3
         },
         "status": "active",
         "subject": {

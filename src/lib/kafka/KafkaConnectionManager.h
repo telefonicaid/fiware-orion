@@ -40,15 +40,26 @@
 */
 typedef struct KafkaConnection
 {
- rd_kafka_t*        producer;       // similar to mosquitto*
- std::string        endpoint;       // "broker1:9092,broker2:9092"
- double             lastTime;       // Last activity timestamp
+ rd_kafka_t*        producer;         // similar to mosquitto*
+ std::string        endpoint;         // "broker1:9092,broker2:9092"
+ double             lastTime;         // Last activity timestamp
  int                connectionResult; //  Error code (rd_kafka_resp_err_t)
- std::string        key;
- std::string        securityProtocol;
- std::string        saslMechanism;
- std::string        user;
+ std::string        connectionKey;
 } KafkaConnection;
+
+
+/* ****************************************************************************
+*
+* DeliveryCtx -
+*
+* Auxiliary context used by the Kafka delivery callback to keep tenant and subscription information.
+*/
+typedef struct DeliveryCtx
+{
+ std::string tenant;
+ std::string subscriptionId;
+} DeliveryCtx;
+
 
 
 /* ****************************************************************************
