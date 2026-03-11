@@ -24,7 +24,7 @@ services:
   tests:
     build:
       context: ./ci/deb
-      dockerfile: ci/deb/Dockerfile
+      dockerfile: Dockerfile
     image: fiware-orion:local-ci
     container_name: tests
     network_mode: host
@@ -45,4 +45,5 @@ services:
         find /opt -maxdepth 3 -iname 'kafka-topics*' || true
         command -v kafka-topics.sh || true
         ls -l /opt/kafka/bin/kafka-topics.sh || true
+        git config --global --add safe.directory /opt/fiware-orion
         build -miqts functional
