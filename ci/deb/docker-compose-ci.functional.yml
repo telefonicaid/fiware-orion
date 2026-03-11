@@ -23,7 +23,7 @@ services:
   # ─────────────────── Functional Tests ───────────────────
   tests:
     build:
-      context: .
+      context: ./ci/deb
       dockerfile: ci/deb/Dockerfile
     image: fiware-orion:local-ci
     container_name: tests
