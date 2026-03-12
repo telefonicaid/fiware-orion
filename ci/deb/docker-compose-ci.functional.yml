@@ -34,8 +34,4 @@ services:
     volumes:
       - .:/opt/fiware-orion
     command:
-      - /bin/sh
-      - -c
-      - |
-        export PATH="/opt/kafka/bin:$PATH"
         build -miqts functional

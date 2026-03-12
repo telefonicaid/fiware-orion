@@ -6,7 +6,10 @@ ADD makefile /opt/archive/
 ADD fuse_gtest_files.py.patch /opt/archive/
 
 RUN ln -s /opt/bin/build.sh /usr/local/bin/build \
-&& /opt/bin/build-dep.sh
+&& /opt/bin/build-dep.sh \
+&& test -x /opt/kafka/bin/kafka-topics.sh \
+&& printf '%s\n' '#!/bin/sh' 'exec /opt/kafka/bin/kafka-topics.sh "$@"' > /usr/local/bin/kafka-topics.sh \
+&& chmod +x /usr/local/bin/kafka-topics.sh
 
 ENV PATH="/opt/kafka/bin:$PATH"
 
