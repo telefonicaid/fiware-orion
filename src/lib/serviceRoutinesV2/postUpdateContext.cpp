@@ -45,18 +45,8 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
+#include "rest/rest.h"
 #include "serviceRoutinesV2/postUpdateContext.h"
-
-
-
-/* ****************************************************************************
-*
-* jsonPayloadClean -
-*/
-static char* jsonPayloadClean(const char* payload)
-{
-  return (char*) strstr(payload, "{");
-}
 
 
 

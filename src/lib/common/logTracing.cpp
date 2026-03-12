@@ -56,7 +56,7 @@ static char* truncatePayload(const char* payload)
 
 /* ****************************************************************************
 *
-* logInfoNotification - rc as int
+* logInfoNotification
 */
 void logInfoHttpNotification
 (
@@ -65,28 +65,71 @@ void logInfoHttpNotification
   const char*  verb,
   const char*  resource,
   const char*  payload,
-  int          rc
+  int          rc,
+  const char*  responsePayload
 )
 {
-  char buffer[STRING_SIZE_FOR_INT];
-  snprintf(buffer, sizeof(buffer), "%d", rc);
-  logInfoHttpNotification(subId, endpoint, verb, resource, payload, buffer);
+  bool cleanAfterUse = false;
+  char* effectivePayload;
+
+  bool cleanAfterUseRes = false;
+  char* effectiveResponsePayload;
+
+  if (strlen(payload) > logInfoPayloadMaxSize)
+  {
+    effectivePayload = truncatePayload(payload);
+    cleanAfterUse = true;
+  }
+  else
+  {
+    effectivePayload = (char*) payload;
+  }
+
+  if (strlen(responsePayload) > logInfoPayloadMaxSize)
+  {
+    effectiveResponsePayload = truncatePayload(responsePayload);
+    cleanAfterUseRes = true;
+  }
+  else
+  {
+    effectiveResponsePayload = (char*) responsePayload;
+  }
+
+  // If there is no response payload or the response code is 2xx, log without response payload (to avoid log pollution with non-error responses)
+  if ((strlen(responsePayload) == 0) || (rc <= 299))
+  {
+    LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %d", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc));
+  }
+  else
+  {
+    LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %d, response payload (%d bytes): %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc, strlen(responsePayload), effectiveResponsePayload));
+  }
+
+  if (cleanAfterUse)
+  {
+    free(effectivePayload);
+  }
+
+  if (cleanAfterUseRes)
+  {
+    free(effectiveResponsePayload);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* logInfoHttpNotification - rc as string
+* logInfoHttpNotificationNoResponse
 */
-void logInfoHttpNotification
+void logInfoHttpNotificationNoResponse
 (
   const char*  subId,
   const char*  endpoint,
   const char*  verb,
   const char*  resource,
   const char*  payload,
-  const char*  rc
+  const char*  reason
 )
 {
   bool cleanAfterUse = false;
@@ -102,7 +145,7 @@ void logInfoHttpNotification
     effectivePayload = (char*) payload;
   }
 
-  LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc));
+  LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, reason));
 
   if (cleanAfterUse)
   {
@@ -156,10 +199,37 @@ void logInfoRequestWithoutPayload
 (
   const char*  verb,
   const char*  url,
-  int          rc
+  int          rc,
+  const char*  responsePayload
 )
 {
-  LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
+  bool cleanAfterUseRes = false;
+  char* effectiveResponsePayload;
+
+  if (strlen(responsePayload) > logInfoPayloadMaxSize)
+  {
+    effectiveResponsePayload = truncatePayload(responsePayload);
+    cleanAfterUseRes = true;
+  }
+  else
+  {
+    effectiveResponsePayload = (char*) responsePayload;
+  }
+
+  // If there is no response payload or the response code is 2xx, log without response payload (to avoid log pollution with non-error responses)
+  if ((strlen(responsePayload) == 0) || (rc <= 299))
+  {
+   LM_I(("Request received: %s %s, response code: %d", verb, url, rc));
+  }
+  else
+  {
+    LM_I(("Request received: %s %s, response code: %d, response payload (%d bytes): %s", verb, url, rc, strlen(responsePayload), effectiveResponsePayload));
+  }
+
+  if (cleanAfterUseRes)
+  {
+    free(effectiveResponsePayload);
+  }
 }
 
 
@@ -172,28 +242,56 @@ void logInfoRequestWithPayload
 (
   const char*  verb,
   const char*  url,
-  const char*  payload,
-  int          rc
+  const char*  requestPayload,
+  int          rc,
+  const char*  responsePayload
 )
 {
   bool cleanAfterUse = false;
+  bool cleanAfterUseRes = false;
   char* effectivePayload;
+  char* effectiveResponsePayload;
 
-  if (strlen(payload) > logInfoPayloadMaxSize)
+  if (strlen(requestPayload) > logInfoPayloadMaxSize)
   {
-    effectivePayload = truncatePayload(payload);
+    effectivePayload = truncatePayload(requestPayload);
     cleanAfterUse = true;
   }
   else
   {
-    effectivePayload = (char*) payload;
+    effectivePayload = (char*) requestPayload;
   }
 
-  LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d", verb, url, strlen(payload), effectivePayload, rc));
+  if (strlen(responsePayload) > logInfoPayloadMaxSize)
+  {
+    effectiveResponsePayload = truncatePayload(responsePayload);
+    cleanAfterUseRes = true;
+  }
+  else
+  {
+    effectiveResponsePayload = (char*) responsePayload;
+  }
+
+  // If there is no response payload or the response code is 2xx, log without response payload (to avoid log pollution with non-error responses)
+  if ((strlen(responsePayload) == 0) || (rc <= 299))
+  {
+    LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d",
+      verb, url, strlen(requestPayload), effectivePayload, rc));
+  }
+  else
+  {
+    LM_I(("Request received: %s %s, request payload (%d bytes): %s, response code: %d, response payload (%d bytes): %s",
+      verb, url, strlen(requestPayload), effectivePayload, rc, strlen(responsePayload), effectiveResponsePayload));
+  }
 
   if (cleanAfterUse)
   {
     free(effectivePayload);
+  }
+
+  if (cleanAfterUseRes)
+  {
+    free(effectiveResponsePayload);
   }
 }
 

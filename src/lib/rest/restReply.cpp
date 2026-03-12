@@ -52,9 +52,10 @@ static int replyIx = 0;
 *
 * restReply -
 */
-void restReply(ConnectionInfo* ciP, const std::string& answer)
+void restReply(ConnectionInfo* ciP)
 {
   MHD_Response*  response;
+  std::string answer = ciP->answer;
 
   uint64_t       answerLen = answer.length();
   std::string    spath     = (ciP->servicePathV.size() > 0)? ciP->servicePathV[0] : "";

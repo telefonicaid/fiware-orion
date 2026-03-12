@@ -194,7 +194,8 @@ std::string payloadParse
 
   if (result != "OK")
   {
-    restReply(ciP, result);
+    ciP->answer = result;
+    restReply(ciP);
   }
 
   return result;
@@ -355,7 +356,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string response = error.toJson();
 
     alarmMgr.badInput(clientIp, "The Orion Context Broker is a REST service, not a 'web page'");
-    restReply(ciP, response);
+    ciP->answer = response;
+    restReply(ciP);
 
     return std::string("Empty URL");
   }
@@ -375,7 +377,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       alarmMgr.badInput(clientIp, oe.description);
       ciP->httpStatusCode = SccBadRequest;
-      restReply(ciP, oe.toJson());
+      ciP->answer = oe.toJson();
+      restReply(ciP);
       return "URL PATH component error";
     }
   }
@@ -431,7 +434,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       if (response != "OK")
       {
         alarmMgr.badInput(clientIp, response);
-        restReply(ciP, response);
+        ciP->answer = response;
+        restReply(ciP);
 
         delayedRelease(&jsonRelease);
 
@@ -462,7 +466,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       std::string  response = oe.setSCAndRender(&(ciP->httpStatusCode));
 
       alarmMgr.badInput(clientIp, result);
-      restReply(ciP, response);
+      ciP->answer = response;
+      restReply(ciP);
 
       delayedRelease(&jsonRelease);
 
@@ -494,7 +499,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       orionExitFunction(0, "Received a 'DIE' request on REST interface");
     }
 
-    restReply(ciP, response);
+    ciP->answer = response;
+    restReply(ciP);
     return response;
   }
 
@@ -530,7 +536,8 @@ static std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   std::string answer = oe.toJson();
   alarmMgr.badInput(clientIp, details);
   ciP->httpStatusCode = SccBadRequest;
-  restReply(ciP, answer);
+  ciP->answer = answer;
+  restReply(ciP);
 
   compV.clear();
   return answer;

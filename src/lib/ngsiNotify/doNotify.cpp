@@ -34,6 +34,7 @@
 #include "mqtt/mqttMgr.h"
 #include "kafka/kafkaMgr.h"
 #include "rest/httpRequestSend.h"
+#include "rest/rest.h"
 #include "cache/subCache.h"
 
 #include "logMsg/logMsg.h"
@@ -128,11 +129,13 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
   // Add notificacion result summary in log INFO level
   if (statusCode != -1)
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode);
+    // There is a response (e.g. 2xx, 4xx, 5xx)
+    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode, jsonPayloadClean(out.c_str()));
   }
   else
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
+    // There isn't a response (e.g. timeout)
+    logInfoHttpNotificationNoResponse(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
   }
 }
 

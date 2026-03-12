@@ -47,42 +47,13 @@
 #include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
 #include "rest/OrionError.h"
+#include "rest/rest.h"
 #include "serviceRoutinesV2/postQueryContext.h"
 #include "jsonParseV2/parseEntitiesResponse.h"
 #include "jsonParseV2/parseEntitiesResponseV1.h"
 
 // FIXME P3: matchEntity() should be in a better place, and the following include to be removed
 #include "mongoBackend/MongoGlobal.h"  // matchEntity()
-
-
-
-/* ****************************************************************************
-*
-* jsonPayloadClean -
-*/
-static char* jsonPayloadClean(const char* payload)
-{
-  //
-  // After HTTP headers comes an empty line.
-  // After this empty line comes the payload.
-  // This function returns a pointer to the first byte after an empty line, if found
-  // This "first byte" is the first byte of the payload
-  //
-  while (*payload != 0)
-  {
-    if (*payload == '\n')  // One newline is found
-    {
-      if (payload[1] == '\n')  // And the second one - we have found the start of the payload
-        return (char*) &payload[2];
-      if ((payload[1] == '\r') && (payload[2] == '\n'))  // "windows style newline with \r\n"
-        return (char*) &payload[3];
-    }
-
-    ++payload;
-  }
-
-  return NULL;
-}
 
 
 
