@@ -137,9 +137,9 @@ In the case of the aarch64 architecture, install libxslt using apt-get, and run 
 * Install the Kafka client (CLI).
 
       sudo apt-get install openjdk-21-jre-headless
-      wget https://downloads.apache.org/kafka/3.9.1/kafka_2.12-3.9.1.tgz
-      tar xvf kafka_2.12-3.9.1.tgz
-      # Add kafka_2.12-3.9.1/bin to your PATH (e.g. editing ~/.bashrc)
+      wget https://dlcdn.apache.org/kafka/4.2.0/kafka_2.13-4.2.0.tgz
+      tar xvf kafka_2.13-4.2.0.tgz
+      # Add kafka_2.13-4.2.0/bin to your PATH (e.g. editing ~/.bashrc)
 
 Next steps require to set up needed services for testing as described [in this documentation](../../../test/functionalTest/README.md#start-needed-services).
 
