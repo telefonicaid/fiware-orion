@@ -34,6 +34,7 @@
 #include "mqtt/mqttMgr.h"
 #include "kafka/kafkaMgr.h"
 #include "rest/httpRequestSend.h"
+#include "rest/rest.h"
 #include "cache/subCache.h"
 
 #include "logMsg/logMsg.h"
@@ -43,38 +44,6 @@
 #include "common/limits.h"
 #include "common/statistics.h"
 #include "common/logTracing.h"
-
-
-
-/* ****************************************************************************
-*
-* jsonPayloadClean -
-*
-* FIXME PR: unify (we have three copies of this function)
-*/
-static char* jsonPayloadClean(const char* payload)
-{
-  //
-  // After HTTP headers comes an empty line.
-  // After this empty line comes the payload.
-  // This function returns a pointer to the first byte after an empty line, if found
-  // This "first byte" is the first byte of the payload
-  //
-  while (*payload != 0)
-  {
-    if (*payload == '\n')  // One newline is found
-    {
-      if (payload[1] == '\n')  // And the second one - we have found the start of the payload
-        return (char*) &payload[2];
-      if ((payload[1] == '\r') && (payload[2] == '\n'))  // "windows style newline with \r\n"
-        return (char*) &payload[3];
-    }
-
-    ++payload;
-  }
-
-  return NULL;
-}
 
 
 

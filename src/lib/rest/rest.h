@@ -135,4 +135,15 @@ extern void firstServicePath(const char* servicePath, char* servicePath0, int se
 */
 extern bool isOriginAllowedForCORS(const std::string& requestOrigin);
 
+
+
+/* ****************************************************************************
+*
+* jsonPayloadClean -
+*
+*/
+extern char* jsonPayloadClean(const char* payload);
+
+
+
 #endif

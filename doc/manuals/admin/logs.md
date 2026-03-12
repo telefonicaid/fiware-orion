@@ -191,7 +191,7 @@ time=2020-10-22T19:51:03.565Z | lvl=INFO | corr=eabce3e2-149f-11eb-a2e8-000c29df
 
 Some additional considerations:
 
-* In client requests and notifications, in the case of response error (i.e. non-2xx code) and response payload (i.e. response payload length is not 0), the response payload is also included in the log trace. Note that in the case of forwarded requests, the response payload is *always* included (no matter if error response or not).
+* In client requests and notifications, in the case of response error (i.e. non-2xx code) and actual response payload (i.e. response payload length is not 0), the response payload is also included in the log trace. Note that in the case of forwarded requests, the response payload is *always* included (no matter if error response or not).
 
 ```
 time=2026-03-12T13:18:39.461Z | lvl=INFO | corr=fbe7731e-1e15-11f1-9ced-080027207a9f | trans=1773321518-670-00000000003 | from=0.0.0.0 | srv=<none> | subsrv=<none> | comp=Orion | op=logTracing.cpp[283]:logInfoRequestWithPayload | msg=Request received: POST /v2/op/update, request payload (110 bytes): { "actionType": "update", "entities": [ { "type": "T", "id": "E1", "B": { "type": "Number", "value": 2 } } ] }, response code: 422, response payload (68 bytes): {"error":"Unprocessable","description":"do not exist: E1/T - [ B ]"}
