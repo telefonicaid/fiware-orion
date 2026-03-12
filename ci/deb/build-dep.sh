@@ -23,6 +23,7 @@
 # Re-worked for Debian: Fermín Galán
 
 # Install security updates
+set -eu
 apt-get -y update
 apt-get -y upgrade
 # Install dependencies
@@ -115,8 +116,8 @@ echo "INSTALL: mosquitto" \
 # Note in this case the directory created in /opt contains the software itself
 # (i.e. there isn't a install step itself). Note also due to this there isn't a removal (rm) at the end
 echo "INSTALL: Kafka" \
-&& curl -fsSL "https://archive.apache.org/dist/kafka/3.9.1/kafka_2.12-3.9.1.tgz" | tar xzC /opt \
-&& mv /opt/kafka_2.12-3.9.1 /opt/kafka
+&& curl -fsSL "https://dlcdn.apache.org/kafka/4.2.0/kafka_2.13-4.2.0.tgz" | tar xzC /opt \
+&& mv /opt/kafka_2.13-4.2.0 /opt/kafka
 
 ldconfig
 
