@@ -284,17 +284,17 @@ Content-Length: 0
 Initializing KAFKA library
 Starting a new KAFKA broker connection for localhost:9092,localhost:9094
 KAFKA successful connection for localhost:9092,localhost:9094
-Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Kafka notification queued to localhost:9092,localhost:9094 on topic sub1
 Existing KAFKA broker connection for localhost:9092,localhost:9094
-Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification queued to localhost:9092,localhost:9094 on topic sub2
 Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
 Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
 Checking Kafka connections age
 Starting a new KAFKA broker connection for localhost:9095
 KAFKA successful connection for localhost:9095
-Kafka notification sent to localhost:9095 on topic sub3
+Kafka notification queued to localhost:9095 on topic sub3
 Existing KAFKA broker connection for localhost:9095
-Kafka notification sent to localhost:9095 on topic sub4
+Kafka notification queued to localhost:9095 on topic sub4
 Kafka notification successfully published at localhost:9095 on topic sub3
 Kafka notification successfully published at localhost:9095 on topic sub4
 Checking Kafka connections age
@@ -316,26 +316,26 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Initializing KAFKA library
 Starting a new KAFKA broker connection for localhost:9092,localhost:9094
 KAFKA successful connection for localhost:9092,localhost:9094
-Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Kafka notification queued to localhost:9092,localhost:9094 on topic sub1
 Existing KAFKA broker connection for localhost:9092,localhost:9094
-Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification queued to localhost:9092,localhost:9094 on topic sub2
 Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
 Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
 Checking Kafka connections age
 Starting a new KAFKA broker connection for localhost:9095
 KAFKA successful connection for localhost:9095
-Kafka notification sent to localhost:9095 on topic sub3
+Kafka notification queued to localhost:9095 on topic sub3
 Existing KAFKA broker connection for localhost:9095
-Kafka notification sent to localhost:9095 on topic sub4
+Kafka notification queued to localhost:9095 on topic sub4
 Kafka notification successfully published at localhost:9095 on topic sub3
 Kafka notification successfully published at localhost:9095 on topic sub4
 Checking Kafka connections age
 Kafka connection localhost:9092,localhost:9094 too old REGEX(.*)
 Starting a new KAFKA broker connection for localhost:9092,localhost:9094
 KAFKA successful connection for localhost:9092,localhost:9094
-Kafka notification sent to localhost:9092,localhost:9094 on topic sub1
+Kafka notification queued to localhost:9092,localhost:9094 on topic sub1
 Existing KAFKA broker connection for localhost:9092,localhost:9094
-Kafka notification sent to localhost:9092,localhost:9094 on topic sub2
+Kafka notification queued to localhost:9092,localhost:9094 on topic sub2
 Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub1
 Kafka notification successfully published at localhost:9092,localhost:9094 on topic sub2
 Checking Kafka connections age

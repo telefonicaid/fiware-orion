@@ -108,7 +108,7 @@ echo
 echo
 
 
-echo "05. Get sub and see timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)"
+echo "05. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)"
 echo "===================================================================================="
 orionCurl --url /v2/subscriptions
 echo
@@ -236,7 +236,7 @@ Location: /v2/entities/E?type=T
 
 
 
-05. Get sub and see timesSent:1, failsCounter:2 and lastFailure (but no lastSuccess)
+05. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)

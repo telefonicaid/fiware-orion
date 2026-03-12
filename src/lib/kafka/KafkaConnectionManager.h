@@ -40,11 +40,26 @@
 */
 typedef struct KafkaConnection
 {
- rd_kafka_t*        producer;       // similar to mosquitto*
- std::string        endpoint;       // "broker1:9092,broker2:9092"
- double             lastTime;       // Last activity timestamp
+ rd_kafka_t*        producer;         // similar to mosquitto*
+ std::string        endpoint;         // "broker1:9092,broker2:9092"
+ double             lastTime;         // Last activity timestamp
  int                connectionResult; //  Error code (rd_kafka_resp_err_t)
+ std::string        connectionKey;
 } KafkaConnection;
+
+
+/* ****************************************************************************
+*
+* DeliveryCtx -
+*
+* Auxiliary context used by the Kafka delivery callback to keep tenant and subscription information.
+*/
+typedef struct DeliveryCtx
+{
+ std::string tenant;
+ std::string subscriptionId;
+} DeliveryCtx;
+
 
 
 /* ****************************************************************************
@@ -72,7 +87,11 @@ public:
   const std::string& subscriptionId,
   const std::string& tenant,
   const std::string& servicePath,
-  const std::map<std::string, std::string>& customHeaders
+  const std::map<std::string, std::string>& customHeaders,
+  const std::string& user,
+  const std::string& passwd,
+  const std::string& saslMechanism,
+  const std::string& securityProtocol
  );
 
  void cleanup(double maxAge);  // Cleaning inactive connections
@@ -83,7 +102,11 @@ private:
  void semInit(void);
  void semTake(void);
  void semGive(void);
- KafkaConnection* getConnection(const std::string& endpoint);
+ KafkaConnection* getConnection(const std::string& endpoint,
+                                const std::string& user,
+                                const std::string& passwd,
+                                const std::string& saslMechanism,
+                                const std::string& securityProtocol);
 };
 
 #endif  // SRC_LIB_KAFKA_KAFKACONNECTIONMANAGER_H_

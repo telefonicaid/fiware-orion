@@ -35,6 +35,7 @@
 #include "logMsg/logMsg.h"
 #include "rest/HttpHeaders.h"
 #include "common/globals.h"
+#include "cache/subCache.h"
 #include "alarmMgr/alarmMgr.h"
 
 #include <librdkafka/rdkafka.h>
@@ -56,6 +57,30 @@
 
 #define KAFKA_MAX_BUFFERING_MS_STR  "10"
 #define KAFKA_MAX_MESSAGE_BYTES_STR "10000000"
+
+
+/* ****************************************************************************
+*
+* kafkaMetadataCheck -
+*
+*/
+static bool kafkaMetadataCheck(rd_kafka_t* producer, long timeout, rd_kafka_resp_err_t* errP)
+{
+  const struct rd_kafka_metadata* metadata = NULL;
+  rd_kafka_resp_err_t             err      = rd_kafka_metadata(producer, 0, NULL, &metadata, timeout);
+
+  if (metadata != NULL)
+  {
+    rd_kafka_metadata_destroy(metadata);
+  }
+
+  if (errP != NULL)
+  {
+    *errP = err;
+  }
+
+  return (err == RD_KAFKA_RESP_ERR_NO_ERROR);
+}
 
 
 
@@ -101,8 +126,8 @@ void KafkaConnectionManager::teardown(void)
 
   for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
-    std::string endpoint = iter->first;
     KafkaConnection* cP   = iter->second;
+    std::string      endpoint = cP->endpoint;
 
     disconnect(cP->producer, endpoint);
     cP->producer = NULL;
@@ -252,22 +277,86 @@ void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string&
 * kafkaOnPublishCallback -
 +
 */
-void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* msg, void* opaque)
+void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* rkmessage, void* opaque)
 {
   KafkaConnection* kConn = (KafkaConnection*) opaque;
+  DeliveryCtx*     ctx   = (DeliveryCtx*) rkmessage->_private;
 
-  if (msg->err == RD_KAFKA_RESP_ERR_NO_ERROR)
+  if (rkmessage->err == RD_KAFKA_RESP_ERR_NO_ERROR)
   {
     LM_T(LmtKafkaNotif, ("Kafka notification successfully published at %s on topic %s",
                          kConn->endpoint.c_str(),
-                         rd_kafka_topic_name(msg->rkt)));
+                         rd_kafka_topic_name(rkmessage->rkt)));
+
+    if (ctx != NULL)
+    {
+      subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, false, -1, "");
+    }
   }
   else
   {
     LM_E(("Kafka delivery failed at %s: %s",
           kConn->endpoint.c_str(),
-          rd_kafka_err2str(msg->err)));
+          rd_kafka_topic_name(rkmessage->rkt),
+          rd_kafka_err2str(rkmessage->err)));
+
+    if (ctx != NULL)
+    {
+      subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, true, -1, "");
+    }
   }
+
+  delete ctx;
+}
+
+
+/* ****************************************************************************
+*
+* hashForKey -
+*/
+static std::string hashForKey(const std::string& s)
+{
+  std::hash<std::string> h;
+  return std::to_string(h(s));
+}
+
+
+
+/* ****************************************************************************
+*
+* kafkaConnectionKey -
+*
+*/
+static std::string kafkaConnectionKey(
+  const std::string& endpoint,
+  const std::string& user,
+  const std::string& passwd,
+  const std::string& saslMechanism,
+  const std::string& securityProtocol
+)
+{
+  // Hash to avoid storing plaintext password in key
+  return endpoint + "|" + securityProtocol + "|" + saslMechanism + "|" + user + "|" + hashForKey(passwd);
+}
+
+
+
+/* ****************************************************************************
+*
+* kafkaConfSet -
+*/
+static bool kafkaConfSet(
+  rd_kafka_conf_t*    conf,
+  const std::string& name,
+  const std::string& value,
+  const std::string& endpoint)
+{
+  if (rd_kafka_conf_set(conf, name.c_str(), value.c_str(), NULL, 0) != RD_KAFKA_CONF_OK)
+  {
+    LM_E(("Kafka config error (%s) for %s", name.c_str(), endpoint.c_str()));
+    return false;
+  }
+  return true;
 }
 
 
@@ -277,16 +366,24 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* msg, void*
 * KafkaConnectionManager::getConnection -
 *
 */
-KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoint)
+KafkaConnection* KafkaConnectionManager::getConnection(
+  const std::string& endpoint,
+  const std::string& user,
+  const std::string& passwd,
+  const std::string& saslMechanism,
+  const std::string& securityProtocol
+)
 {
   // Kafka uses endpoint "broker1:9092,broker2:9092"
 
-  if (connections.find(endpoint) == connections.end())
+  std::string connectionKey = kafkaConnectionKey(endpoint, user, passwd, saslMechanism, securityProtocol);
+  if (connections.find(connectionKey) == connections.end())
   {
     LM_T(LmtKafkaNotif, ("Starting a new KAFKA broker connection for %s", endpoint.c_str()));
 
-    KafkaConnection* kConn = new KafkaConnection();
-    kConn->endpoint = endpoint;
+    KafkaConnection* kConn  = new KafkaConnection();
+    kConn->endpoint         = endpoint;
+    kConn->connectionKey    = connectionKey;
 
     // Basic configuration (as in MQTT)
     rd_kafka_conf_t* conf = rd_kafka_conf_new();
@@ -305,6 +402,20 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
     rd_kafka_conf_set(conf, "queue.buffering.max.ms", KAFKA_MAX_BUFFERING_MS_STR, NULL, 0);
     rd_kafka_conf_set(conf, "message.max.bytes", KAFKA_MAX_MESSAGE_BYTES_STR, NULL, 0);
 
+    //set authentication configuration
+    if ((!user.empty()) && (!passwd.empty()))
+    {
+      if (!kafkaConfSet(conf, "security.protocol", securityProtocol, endpoint) ||
+          !kafkaConfSet(conf, "sasl.mechanism",    saslMechanism, endpoint) ||
+          !kafkaConfSet(conf, "sasl.username",     user, endpoint) ||
+          !kafkaConfSet(conf, "sasl.password",     passwd, endpoint))
+      {
+        rd_kafka_conf_destroy(conf);
+        delete kConn;
+        return NULL;
+      }
+    }
+
     // Publication callback
     // Note that MQTT has a OnConnection callback and a OnPublish callback, but Kafka only has the former.
     // As a consequence, we don't need to synchronize connection with semaphores as in MQTT.
@@ -319,16 +430,30 @@ KafkaConnection* KafkaConnectionManager::getConnection(const std::string& endpoi
       return NULL;
     }
 
+    // Used to verify broker reachability early and fail fast before storing the connection.
+    rd_kafka_resp_err_t metadataErr = RD_KAFKA_RESP_ERR_NO_ERROR;
+    if (kafkaMetadataCheck(kConn->producer, timeout, &metadataErr) == false)
+    {
+      LM_E(("Runtime Error (Kafka metadata/connection check failed for %s: %s)",
+            endpoint.c_str(),
+            rd_kafka_err2str(metadataErr)));
+      disconnect(kConn->producer, endpoint);
+      kConn->producer = NULL;
+      delete kConn;
+      return NULL;
+    }
+
     LM_T(LmtKafkaNotif, ("KAFKA successful connection for %s", endpoint.c_str()));
 
-    connections[endpoint] = kConn;
+    connections[connectionKey] = kConn;
     return kConn;
   }
 
   LM_T(LmtKafkaNotif, ("Existing KAFKA broker connection for %s", endpoint.c_str()));
-  connections[endpoint]->lastTime = getCurrentTime();
-  return connections[endpoint];
+  connections[connectionKey]->lastTime = getCurrentTime();
+  return connections[connectionKey];
 }
+
 
 
 /* ****************************************************************************
@@ -449,14 +574,18 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& subscriptionId,
     const std::string& tenant,
     const std::string& servicePath,
-    const std::map<std::string, std::string>& customHeaders
+    const std::map<std::string, std::string>& customHeaders,
+    const std::string& user,
+    const std::string& passwd,
+    const std::string& saslMechanism,
+    const std::string& securityProtocol
   )
 
 {
 
   semTake(); // Synchronization
-
-  KafkaConnection* kConn = getConnection(endpoint);
+  std::string connectionKey = kafkaConnectionKey(endpoint, user, passwd, saslMechanism, securityProtocol);
+  KafkaConnection* kConn = getConnection(endpoint, user, passwd, saslMechanism, securityProtocol);
   rd_kafka_t* producer = kConn ? kConn->producer : NULL;
 
   if (producer == NULL)
@@ -479,8 +608,13 @@ bool KafkaConnectionManager::sendKafkaNotification(
   // Selects a partition based on that hash (using the default murmur2 algorithm).
   // Messages with the same key → Same partition (guarantees order).
 
+  // Store tenant and subscription information to recover it later in the delivery callback.
+  DeliveryCtx* ctx = new DeliveryCtx();
+  ctx->tenant = tenant;
+  ctx->subscriptionId = subscriptionId;
 
-  rd_kafka_headers_t* headers = build_kafka_headers(customHeaders, tenant, servicePath); // Initially without headers
+  // Initially without headers
+  rd_kafka_headers_t* headers = build_kafka_headers(customHeaders, tenant, servicePath);
 
   bool retval = false;
   int resultCode = rd_kafka_producev(
@@ -489,6 +623,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
             RD_KAFKA_V_KEY((void*)subscriptionId.data(), subscriptionId.size()),
             RD_KAFKA_V_VALUE(const_cast<char*>(content.data()), content.size()),
             RD_KAFKA_V_HEADERS(headers),
+            RD_KAFKA_V_OPAQUE(ctx), // // Opaque user context used later in the Kafka delivery callback
             RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
             RD_KAFKA_V_END);
 
@@ -496,7 +631,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   {
     LM_E(("Kafka notification failed to %s on topic %s", endpoint.c_str(), topic.c_str()));
     disconnect(kConn->producer, endpoint);
-    connections.erase(endpoint);
+    connections.erase(connectionKey);
     delete kConn;
     retval = false;
   }
@@ -507,7 +642,8 @@ bool KafkaConnectionManager::sendKafkaNotification(
     // be called in the perioricall invocation to dispatchKafkaCallbacks()
     kConn->lastTime = getCurrentTime();
     rd_kafka_poll(producer, 0);
-    LM_T(LmtKafkaNotif, ("Kafka notification sent to %s on topic %s", endpoint.c_str(), topic.c_str()));
+    // The message was successfully queued in the producer; delivery will be reported later by the callback
+    LM_T(LmtKafkaNotif, ("Kafka notification queued to %s on topic %s", endpoint.c_str(), topic.c_str()));
     retval = true;
   }
 
@@ -533,16 +669,16 @@ void KafkaConnectionManager::cleanup(double maxAge)
 
   for (std::map<std::string, KafkaConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
-    std::string endpoint = iter->first;
-    KafkaConnection* kConn = iter->second;
-    double age = getCurrentTime() - kConn->lastTime;
+    const std::string& connectionKey = iter->first;
+    KafkaConnection*   kConn         = iter->second;
+    std::string        endpoint      = kConn->endpoint;
+    double             age           = getCurrentTime() - kConn->lastTime;
 
     if (age > maxAge)
     {
-      toErase.push_back(endpoint);
+      toErase.push_back(connectionKey);
       disconnect(kConn->producer, endpoint);
-      LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removed.",
-          endpoint.c_str(), age, maxAge));
+      LM_T(LmtKafkaNotif, ("Kafka connection %s too old (age: %f, maxAge: %f), removed.", endpoint.c_str(), age, maxAge));
       delete kConn;
     }
   }

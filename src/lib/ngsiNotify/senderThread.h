@@ -64,6 +64,8 @@ typedef struct SenderThreadParams
   unsigned int                       retain;        // used only in MQTT notifications
   std::string                        user;          // for user/pass auth connections (only MQTT at the present moment)
   std::string                        passwd;        // for user/pass auth connections (only MQTT at the present moment)
+  std::string                        saslMechanism;
+  std::string                        securityProtocol;
   std::string                        content_type;
   std::string                        content;
   char                               transactionId[64];
