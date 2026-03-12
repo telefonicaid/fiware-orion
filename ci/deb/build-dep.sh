@@ -23,7 +23,6 @@
 # Re-worked for Debian: Fermín Galán
 
 # Install security updates
-set -eu
 apt-get -y update
 apt-get -y upgrade
 # Install dependencies

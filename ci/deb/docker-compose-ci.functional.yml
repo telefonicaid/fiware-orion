@@ -34,4 +34,4 @@ services:
     volumes:
       - .:/opt/fiware-orion
     command:
-        build -miqts functional
+      build -miqts functional
