@@ -52,6 +52,8 @@
 /* ****************************************************************************
 *
 * jsonPayloadClean -
+*
+* FIXME PR: unify (we have three copies of this function)
 */
 static char* jsonPayloadClean(const char* payload)
 {

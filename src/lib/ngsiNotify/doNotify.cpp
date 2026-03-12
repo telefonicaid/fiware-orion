@@ -48,6 +48,38 @@
 
 /* ****************************************************************************
 *
+* jsonPayloadClean -
+*
+* FIXME PR: unify (we have three copies of this function)
+*/
+static char* jsonPayloadClean(const char* payload)
+{
+  //
+  // After HTTP headers comes an empty line.
+  // After this empty line comes the payload.
+  // This function returns a pointer to the first byte after an empty line, if found
+  // This "first byte" is the first byte of the payload
+  //
+  while (*payload != 0)
+  {
+    if (*payload == '\n')  // One newline is found
+    {
+      if (payload[1] == '\n')  // And the second one - we have found the start of the payload
+        return (char*) &payload[2];
+      if ((payload[1] == '\r') && (payload[2] == '\n'))  // "windows style newline with \r\n"
+        return (char*) &payload[3];
+    }
+
+    ++payload;
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
 * doNotifyHttp -
 *
 */
@@ -128,11 +160,13 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
   // Add notificacion result summary in log INFO level
   if (statusCode != -1)
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode);
+    // There is a response (e.g. 2xx, 4xx, 5xx)
+    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), statusCode, jsonPayloadClean(out.c_str()));
   }
   else
   {
-    logInfoHttpNotification(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
+    // There isn't a response (e.g. timeout)
+    logInfoHttpNotificationNoResponse(params->subscriptionId.c_str(), endpoint.c_str(), params->verb.c_str(), params->resource.c_str(), params->content.c_str(), out.c_str());
   }
 }
 

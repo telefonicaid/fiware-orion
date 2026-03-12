@@ -1,0 +1,152 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Add response payload to INFO traces on error (notifications)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create sub for 400 endpoint
+# 02. Create sub for normal endpoint
+# 03. Create entity E1 (type T) with A=1 triggering both subs
+# 04. Check log INFO traces (response payload only for the 400 error)
+#
+
+echo "01. Create sub for 400 endpoint"
+echo "==============================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/giveme400"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+REG_ID1=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Create sub for normal endpoint"
+echo "=================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "${payload}"
+echo
+echo
+
+
+REG_ID2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "03. Create entity E1 (type T) with A=1 triggering both subs"
+echo "==========================================================="
+payload='{
+  "id": "E1",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Check log INFO traces (response payload only for the 400 error)"
+echo "==================================================================="
+cat /tmp/contextBroker.log | grep 'INFO' | awk -F 'msg=' '{print $2}' | grep "Notif delivered" | sed -e "s/$REG_ID1/REG_ID1/g" | sed -e "s/$REG_ID2/REG_ID2/g" | sort
+echo
+echo
+
+
+--REGEXPECT--
+01. Create sub for 400 endpoint
+===============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create sub for normal endpoint
+==================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Create entity E1 (type T) with A=1 triggering both subs
+===========================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E1?type=T
+Content-Length: 0
+
+
+
+04. Check log INFO traces (response payload only for the 400 error)
+===================================================================
+Notif delivered (subId: REG_ID1): POST localhost:9997/giveme400, payload (123 bytes): {"subscriptionId":"REG_ID1","data":[{"id":"E1","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: 400, response payload (93 bytes): {"error": "FakeError", "description": "this is a forged error response for testing purposes"}
+Notif delivered (subId: REG_ID2): POST localhost:9997/notify, payload (123 bytes): {"subscriptionId":"REG_ID2","data":[{"id":"E1","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: 200
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

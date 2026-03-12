@@ -701,7 +701,9 @@ def giveme200():
 
 @app.route("/giveme400", methods=['POST'])
 def giveme400():
-    return Response(status=400)
+    r = Response(status=400)
+    r.data = '{"error": "FakeError", "description": "this is a forged error response for testing purposes"}'
+    return r
 
 
 @app.route("/giveme404", methods=['POST'])

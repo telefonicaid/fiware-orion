@@ -32,7 +32,7 @@
 
 /* ****************************************************************************
 *
-* logInfoHttpNotification - rc as int
+* logInfoHttpNotification
 */
 extern void logInfoHttpNotification
 (
@@ -41,23 +41,24 @@ extern void logInfoHttpNotification
   const char*  verb,
   const char*  resource,
   const char*  payload,
-  int          rc
+  int          rc,
+  const char*  responsePayload
 );
 
 
 
 /* ****************************************************************************
 *
-* logInfoHttpNotification - rc as string
+* logInfoHttpNotificationNoResponse
 */
-extern void logInfoHttpNotification
+extern void logInfoHttpNotificationNoResponse
 (
   const char*  subId,
   const char*  endpoint,
   const char*  verb,
   const char*  resource,
   const char*  payload,
-  const char*  rc
+  const char*  reason
 );
 
 
