@@ -5161,13 +5161,14 @@ see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
 A `kafkaCustom` object contains the following subfields.
 
-| Parameter | Optional | Type   | Description                                                                                                                                |
-|-----------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `url`     |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port)        |
-| `topic`   |          | string | Represent the KAFKA topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                  |
+| Parameter | Optional | Type   | Description                                                                                                                                                                                                                           |
+|-----------|----------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`     |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port)                                                                                                 |
+| `topic`   |          | string | Represent the KAFKA topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                                                                                                            |
+| `headers` | ✓        | object | A key-map of HTTP headers that are included in notification messages. Must not be empty.                                                                                                                                              |
 | `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
-| `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
-| `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
+| `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details.                                                                                                                         |
+| `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details.                                                                                                  |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
