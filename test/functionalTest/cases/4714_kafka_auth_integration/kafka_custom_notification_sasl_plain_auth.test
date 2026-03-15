@@ -51,11 +51,11 @@ accumulatorStart --pretty-print \
 #
 # 01. Create KAFKA custom sub with WRONG user/pass (SASL_PLAINTEXT + PLAIN)
 # 02. Upsert to trigger first KAFKA notification, which fails (should NOT notify)
-# 03. Dump accumulator (expect EMPTY)
-# 04. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
+# 03. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
+# 04. Dump accumulator (expect EMPTY)
 # 05. Upsert to trigger second KAFKA notification, which fails (should NOT notify)
-# 06. Dump accumulator (expect EMPTY)
-# 07. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
+# 06. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
+# 07. Dump accumulator (expect EMPTY)
 # 08. Dump accumulator (expect 1 message at topic sub_auth)
 # 09. PATCH subscription with correct user/pass
 # 10. Upsert to trigger third KAFKA notification, which is ok (should notify)
@@ -105,24 +105,24 @@ orionCurl --url '/v2/entities?options=forcedUpdate,upsert' --payload "$payload"
 echo
 echo
 
+sleep 0.5s
+echo "03. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)"
+echo "===================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
 
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 5s
+sleep 2s
 
 
-echo "03. Dump accumulator (expect EMPTY)"
+echo "04. Dump accumulator (expect EMPTY)"
 echo "==================================="
 accumulatorDump
 accumulatorReset
-echo
-echo
-
-
-echo "04. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)"
-echo "===================================================================================="
-orionCurl --url /v2/subscriptions
 echo
 echo
 
@@ -141,24 +141,24 @@ orionCurl --url '/v2/entities?options=forcedUpdate,upsert' --payload "$payload"
 echo
 echo
 
+sleep 0.5s
+echo "06. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)"
+echo "===================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
 
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 5s
+sleep 2s
 
 
-echo "06. Dump accumulator (expect EMPTY)"
+echo "07. Dump accumulator (expect EMPTY)"
 echo "==================================="
 accumulatorDump
 accumulatorReset
-echo
-echo
-
-
-echo "07. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)"
-echo "===================================================================================="
-orionCurl --url /v2/subscriptions
 echo
 echo
 
@@ -236,11 +236,7 @@ Location: /v2/entities/E?type=T
 
 
 
-03. Dump accumulator (expect EMPTY)
-===================================
-
-
-04. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
+03. Get sub and see timesSent:1, failsCounter:1 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -287,6 +283,10 @@ Content-Length: 562
 ]
 
 
+04. Dump accumulator (expect EMPTY)
+===================================
+
+
 05. Upsert to trigger second KAFKA notification, which fails (should NOT notify)
 ================================================================================
 HTTP/1.1 204 No Content
@@ -296,11 +296,7 @@ Location: /v2/entities/E?type=T
 
 
 
-06. Dump accumulator (expect EMPTY)
-===================================
-
-
-07. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
+06. Get sub and see timesSent:2, failsCounter:2 and lastFailure (but no lastSuccess)
 ====================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
@@ -345,6 +341,10 @@ Content-Length: 562
         }
     }
 ]
+
+
+07. Dump accumulator (expect EMPTY)
+===================================
 
 
 08. PATCH subscription with correct user/pass

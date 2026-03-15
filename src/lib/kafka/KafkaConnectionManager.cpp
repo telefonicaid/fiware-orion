@@ -57,6 +57,7 @@
 
 #define KAFKA_MAX_BUFFERING_MS_STR  "10"
 #define KAFKA_MAX_MESSAGE_BYTES_STR "10000000"
+#define KAFKA_METADATA_TIMEOUT_MS 500
 
 
 /* ****************************************************************************
@@ -297,7 +298,6 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* rkmessage,
   {
     LM_E(("Kafka delivery failed at %s: %s",
           kConn->endpoint.c_str(),
-          rd_kafka_topic_name(rkmessage->rkt),
           rd_kafka_err2str(rkmessage->err)));
 
     if (ctx != NULL)
@@ -432,7 +432,7 @@ KafkaConnection* KafkaConnectionManager::getConnection(
 
     // Used to verify broker reachability early and fail fast before storing the connection.
     rd_kafka_resp_err_t metadataErr = RD_KAFKA_RESP_ERR_NO_ERROR;
-    if (kafkaMetadataCheck(kConn->producer, timeout, &metadataErr) == false)
+    if (kafkaMetadataCheck(kConn->producer, KAFKA_METADATA_TIMEOUT_MS, &metadataErr) == false)
     {
       LM_E(("Runtime Error (Kafka metadata/connection check failed for %s: %s)",
             endpoint.c_str(),
@@ -630,6 +630,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
     LM_E(("Kafka notification failed to %s on topic %s", endpoint.c_str(), topic.c_str()));
+    delete ctx;
     disconnect(kConn->producer, endpoint);
     connections.erase(connectionKey);
     delete kConn;
