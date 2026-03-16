@@ -135,7 +135,6 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
   {
     unsetB->append(CSUB_TIMEOUT, 1);
     unsetB->append(CSUB_METHOD,  1);
-    unsetB->append(CSUB_HEADERS, 1);
     unsetB->append(CSUB_QS,      1);
 
     if (!sub.notification.kafkaInfo.providedAuth)
