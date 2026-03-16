@@ -1,0 +1,477 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+kafkaCustom subscription update cases with headers
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create kafkaCustom sub without headers
+# 02. Get sub, see only url and topic in notification
+# 03. Update sub element different to notification
+# 04. Get sub, see only change the description
+# 05. Update the sub and add fiware-service in notification headers
+# 06. Get sub, see url, topic and fiware-service header in notification
+# 07. Update the sub, add a custom header, and remove fiware-service
+# 08. Get sub, see custom header, and verify removed fiware-service header
+# 09. Update sub, change url to kafka://localhost:9095, keep headers unchanged
+# 10. Get sub, see url changed to kafka://localhost:9095, topic and headers
+# 11. Update sub to change headers
+# 12. Get sub, verify that url, topic and headers were updated
+#
+
+echo "01. Create kafkaCustom sub without headers"
+echo "=========================================="
+payload='{
+  "description": "Original sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "orion"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Get sub, see only url and topic in notification"
+echo "==================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03. Update sub element different to notification"
+echo "================================================"
+payload='{
+  "description": "Modified sub"
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "04. Get sub, see only change the description"
+echo "============================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "05. Update the sub and add fiware-service in notification headers"
+echo "================================================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9093",
+      "topic": "cb",
+      "headers":  {"fiware-service": "cucu"}
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "06. Get sub, see url, topic and fiware-service header in notification"
+echo "====================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "07. Update the sub, add a custom header, and remove fiware-service"
+echo "=================================================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9094",
+      "topic": "orion",
+      "headers":  {"X-Device-Model": "Model-1"}
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "08. Get sub, see custom header, and verify removed fiware-service header"
+echo "========================================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Update sub, change url to kafka://localhost:9095, keep headers unchanged"
+echo "============================================================================"
+payload='{
+  "notification": {
+    "kafkaCustom": {
+        "url": "kafka://localhost:9095",
+        "topic": "orion"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "10. Get sub, see url changed to kafka://localhost:9095, topic and headers"
+echo "========================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "11. Update sub to change headers"
+echo "================================"
+payload='{
+  "notification": {
+    "kafkaCustom": {
+        "url": "kafka://localhost:9095",
+        "topic": "orion",
+        "headers":  {"fiware-service": "cucu", "X-Device-Model": "Model-1"}
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "12. Get sub, see url, topic and headers were updated"
+echo "===================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create kafkaCustom sub without headers
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f\-]{24})
+Content-Length: 0
+
+
+
+02. Get sub, see only url and topic in notification
+===================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 343
+
+{
+    "description": "Original sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "topic": "orion",
+            "url": "kafka://localhost:9092"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+03. Update sub element different to notification
+================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Get sub, see only change the description
+============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 343
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "topic": "orion",
+            "url": "kafka://localhost:9092"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+05. Update the sub and add fiware-service in notification headers
+=================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Get sub, see url, topic and fiware-service header in notification
+=====================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 376
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "headers": {
+                "fiware-service": "cucu"
+            },
+            "topic": "cb",
+            "url": "kafka://localhost:9093"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+07. Update the sub, add a custom header, and remove fiware-service
+==================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Get sub, see custom header, and verify removed fiware-service header
+========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 382
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "headers": {
+                "X-Device-Model": "Model-1"
+            },
+            "topic": "orion",
+            "url": "kafka://localhost:9094"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+09. Update sub, change url to kafka://localhost:9095, keep headers unchanged
+============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Get sub, see url changed to kafka://localhost:9095, topic and headers
+=========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 382
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "headers": {
+                "X-Device-Model": "Model-1"
+            },
+            "topic": "orion",
+            "url": "kafka://localhost:9095"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+11. Update sub to change headers
+================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+12. Get sub, see url, topic and headers were updated
+====================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 406
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f\-]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "headers": {
+                "X-Device-Model": "Model-1",
+                "fiware-service": "cucu"
+            },
+            "topic": "orion",
+            "url": "kafka://localhost:9095"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
