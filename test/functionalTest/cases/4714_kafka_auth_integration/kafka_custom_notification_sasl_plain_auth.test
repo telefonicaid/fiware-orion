@@ -28,12 +28,10 @@ dbInit CB
 
 # KAFKA_BOOTSTRAP_SASL should point to the new broker: kafkaSasl:9096 (CI) or localhost:9096 (local)
 
-#KAFKA_BOOTSTRAP_TOOLS="localhost:29096"
-kafkaCreateTopics "localhost:29096" sub_auth
+# Topic creation is performed through KAFKA_BOOTSTRAP_TOOLS, which uses a non-authenticated broker endpoint
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_TOOLS}" sub_auth
 
 brokerStart CB 164 IPV4
-
-KAFKA_BOOTSTRAP_SASL="localhost:9096"
 
 accumulatorStart --pretty-print \
   --bootstrapServers "${KAFKA_BOOTSTRAP_SASL}" \

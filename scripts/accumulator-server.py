@@ -890,23 +890,14 @@ class KafkaConsumerThread(threading.Thread):
         # Main consumption loop
         while self.running:
             try:
-                while self.running:
-                    msg = self.consumer.poll(1.0)
-                    if msg is None:
-                        continue
-
-                    # ? MUY IMPORTANTE: manejar errores entregados por poll()
-                    if msg.error():
-                        # EOF es normal si habilitas enable.partition.eof; lo puedes ignorar
-                        if msg.error().code() == KafkaError._PARTITION_EOF:
-                            continue
-                        print(f"Consumer error from poll(): {msg.error()}")
-                        continue
-
-                    self.process_message(msg)
-
-            finally:
-                self.consumer.close()
+                msg = self.consumer.poll(1.0)
+                if msg is None:
+                    continue
+                self.process_message(msg)
+            except KafkaException as e:
+                print(f"Kafka's error: {e}")
+            except Exception as e:
+                print(f"Unexpected error: {e}")
 
     def on_assign(self, consumer, partitions):
         print(f"Assigned partitions: {partitions}")
