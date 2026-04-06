@@ -609,6 +609,8 @@ bool KafkaConnectionManager::sendKafkaNotification(
   // Messages with the same key → Same partition (guarantees order).
 
   // Store tenant and subscription information to recover it later in the delivery callback.
+  // (the allocated memory for ctx is freed in kafkaOnPublishCallback() in regular case, or in this same
+  // function in case build_kafka_headers() fails)
   DeliveryCtx* ctx = new DeliveryCtx();
   ctx->tenant = tenant;
   ctx->subscriptionId = subscriptionId;
