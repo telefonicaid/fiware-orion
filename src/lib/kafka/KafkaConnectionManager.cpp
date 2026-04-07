@@ -283,16 +283,20 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* rkmessage,
   KafkaConnection* kConn = (KafkaConnection*) opaque;
   DeliveryCtx*     ctx   = (DeliveryCtx*) rkmessage->_private;
 
+  if (ctx == NULL)
+  {
+    LM_E(("Runtime Error (DeliveryCtx is null)"));
+    return;
+  }
+
   if (rkmessage->err == RD_KAFKA_RESP_ERR_NO_ERROR)
   {
     LM_T(LmtKafkaNotif, ("Kafka notification successfully published at %s on topic %s",
                          kConn->endpoint.c_str(),
                          rd_kafka_topic_name(rkmessage->rkt)));
 
-    if (ctx != NULL)
-    {
-      subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, false, -1, "");
-    }
+    subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, false, -1, "");
+
   }
   else
   {
@@ -300,10 +304,8 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* rkmessage,
           kConn->endpoint.c_str(),
           rd_kafka_err2str(rkmessage->err)));
 
-    if (ctx != NULL)
-    {
-      subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, true, -1, "");
-    }
+    subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, true, -1, "");
+
   }
 
   delete ctx;
