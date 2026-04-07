@@ -627,7 +627,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
             RD_KAFKA_V_KEY((void*)subscriptionId.data(), subscriptionId.size()),
             RD_KAFKA_V_VALUE(const_cast<char*>(content.data()), content.size()),
             RD_KAFKA_V_HEADERS(headers),
-            RD_KAFKA_V_OPAQUE(ctx), // // Opaque user context used later in the Kafka delivery callback
+            RD_KAFKA_V_OPAQUE(ctx),  // Opaque user context used later in the Kafka delivery callback
             RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
             RD_KAFKA_V_END);
 
