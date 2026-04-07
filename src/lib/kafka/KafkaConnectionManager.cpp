@@ -612,6 +612,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   // Store tenant and subscription information to recover it later in the delivery callback.
   // (the allocated memory for ctx is freed in kafkaOnPublishCallback() in regular case, or in this same
+  // function in case rd_kafka_producev() fails)
   DeliveryCtx* ctx = new DeliveryCtx();
   ctx->tenant = tenant;
   ctx->subscriptionId = subscriptionId;
