@@ -29,6 +29,10 @@ x-kafka-env: &kafka_env
   KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
   KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
 # Common for the 2-node cluster (kafka1/kafka2)
 x-kafka-env-2node: &kafka_env_2node
   <<: *kafka_env
@@ -112,3 +116,35 @@ services:
       # Valid CLUSTER_ID derived from “cluster_test_2” (22 chars Base64 URL-safe)
       CLUSTER_ID: 4aHwR_RyUaG-30kA4XyKpQ
 
+  kafkaSasl:
+    <<: *kafka_svc
+    container_name: kafkaSasl
+    ports:
+      - "9096:9096"     # SASL_PLAINTEXT client listener (Orion)
+      - "29096:29096"   # PLAINTEXT tools listener (kafkaCreateTopics/accumulator from host)
+      - "49093:49093"   # controller (optional to expose; harmless)
+    environment:
+      <<: *kafka_env
+      KAFKA_NODE_ID: 1
+
+      # KRaft controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafkaSasl:49093
+      CLUSTER_ID: 9Qq1d3m8R5q2kW0mXyZ1AA
+
+      # Listeners:
+      # - TOOLS: PLAINTEXT (no auth) for test utilities
+      # - EXTERNAL: SASL_PLAINTEXT (auth) for Orion
+      # - INTERNAL/CONTROLLER: PLAINTEXT (kraft/internal)
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:19096,TOOLS://0.0.0.0:29096,EXTERNAL://0.0.0.0:9096,CONTROLLER://0.0.0.0:49093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafkaSasl:19096,TOOLS://localhost:29096,EXTERNAL://localhost:9096
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,TOOLS:PLAINTEXT,EXTERNAL:SASL_PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      # SASL PLAIN
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_LISTENER_NAME_EXTERNAL_PLAIN_SASL_JAAS_CONFIG: >-
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="admin"
+        password="admin-secret"
+        user_admin="admin-secret"
+        user_test="test-secret";

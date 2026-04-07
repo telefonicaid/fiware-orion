@@ -711,6 +711,34 @@ static SenderThreadParams* buildSenderParamsCustom
     }
   }
 
+  // 10. Kafka/MQTT auth parameters
+  bool        providedAuth     = false;
+  std::string user;
+  std::string passwd;
+  std::string saslMechanism;
+  std::string securityProtocol;
+
+  if (notification.type == ngsiv2::MqttNotification)
+  {
+    providedAuth = notification.mqttInfo.providedAuth;
+    if (providedAuth)
+    {
+      user   = notification.mqttInfo.user;
+      passwd = notification.mqttInfo.passwd;
+    }
+  }
+  else if (notification.type == ngsiv2::KafkaNotification)
+  {
+    providedAuth = notification.kafkaInfo.providedAuth;
+    if (providedAuth)
+    {
+      user             = notification.kafkaInfo.user;
+      passwd           = notification.kafkaInfo.passwd;
+      saslMechanism    = notification.kafkaInfo.saslMechanism;
+      securityProtocol = notification.kafkaInfo.securityProtocol;
+    }
+  }
+
   SenderThreadParams*  paramsP = new SenderThreadParams();
 
   paramsP->type             = QUEUE_MSG_NOTIF;
@@ -736,8 +764,10 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->qos              = notification.mqttInfo.qos;     // unspecified in case of HTTP notifications
   paramsP->retain           = notification.mqttInfo.retain;  // unspecified in case of HTTP notifications
   paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
-  paramsP->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
-  paramsP->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
+  paramsP->user             = user;
+  paramsP->passwd           = passwd;
+  paramsP->saslMechanism    = saslMechanism;
+  paramsP->securityProtocol = securityProtocol;
 
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
@@ -936,6 +966,33 @@ SenderThreadParams* Notifier::buildSenderParams
       break;
     }
 
+    bool        providedAuth     = false;
+    std::string user;
+    std::string passwd;
+    std::string saslMechanism;
+    std::string securityProtocol;
+
+    if (notification.type == ngsiv2::MqttNotification)
+    {
+      providedAuth = notification.mqttInfo.providedAuth;
+      if (providedAuth)
+      {
+        user   = notification.mqttInfo.user;
+        passwd = notification.mqttInfo.passwd;
+      }
+    }
+    else if (notification.type == ngsiv2::KafkaNotification)
+    {
+      providedAuth = notification.kafkaInfo.providedAuth;
+      if (providedAuth)
+      {
+        user             = notification.kafkaInfo.user;
+        passwd           = notification.kafkaInfo.passwd;
+        saslMechanism    = notification.kafkaInfo.saslMechanism;
+        securityProtocol = notification.kafkaInfo.securityProtocol;
+      }
+    }
+
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
     paramsP->ip               = host;
@@ -958,8 +1015,10 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->qos              = notification.mqttInfo.qos; // unspecified in case of HTTP notifications
     paramsP->retain           = notification.mqttInfo.retain; // unspecified in case of HTTP notifications
     paramsP->timeout          = notification.httpInfo.timeout; // unspecified in case of MQTT notifications
-    paramsP->user             = notification.mqttInfo.user;   // unspecified in case of HTTP notifications
-    paramsP->passwd           = notification.mqttInfo.passwd; // unspecified in case of HTTP notifications
+    paramsP->user             = user;
+    paramsP->passwd           = passwd;
+    paramsP->saslMechanism    = saslMechanism;
+    paramsP->securityProtocol = securityProtocol;
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
