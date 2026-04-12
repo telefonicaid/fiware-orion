@@ -57,7 +57,7 @@ in KAFKA subscriptions work the same as in HTTP subscriptions, taking into accou
 
 ## Structure of a message in Kafka notifications
 
-* `Key`: This is a string/byte value used by Kafka to determine the partition where the message will be stored. In Orion, the key used corresponds to the subscription ID that generated the notification.
+* `Key`: message field used by Kafka for partitioning. In Orion, this field is sent with a null value, so the destination partition is assigned automatically according to the producer configuration.
 * `Headers`: Kafka supports message headers encoded as key-value pairs. Orion includes the following default headers:
 
 - `Fiware-Service`
