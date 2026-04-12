@@ -134,6 +134,7 @@
 #define CSUB_KAFKATOPIC              "kafkaTopic"
 #define CSUB_KAFKA_SECURITY_PROTOCOL  "securityProtocol"
 #define CSUB_KAFKA_SASL_MECHANISM     "saslMechanism"
+#define CSUB_KAFKAKEY                "key"
 
 #define CSUB_USER                    "user"
 #define CSUB_PASSWD                  "passwd"

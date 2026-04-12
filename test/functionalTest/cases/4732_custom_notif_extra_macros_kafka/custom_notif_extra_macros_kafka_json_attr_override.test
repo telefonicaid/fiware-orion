@@ -117,7 +117,7 @@ Content-Length: 0
 03. Dump accumulator, see 1 notification
 ========================================
 Kafka message at topic orion_OVERRIDE_fgm
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Service: s1
   Fiware-Servicepath: /subservA

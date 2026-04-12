@@ -364,7 +364,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 10. Dump accumulator (expect 1 message at topic sub_auth)
 =========================================================
 Kafka message at topic sub_auth
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
