@@ -43,6 +43,7 @@
 #include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsiNotify/Notifier.h"
+#include "expressions/exprMgr.h"
 
 
 
@@ -106,6 +107,150 @@ void Notifier::sendNotifyContextRequest
     pthread_detach(tid);
   }
 }
+
+
+/* ****************************************************************************
+*
+* buildExprContext -
+*
+*/
+static void buildExprContext
+(
+  ExprContextObject*        exprContextP,
+  ContextElementResponse*   notifyCerP,
+  const std::string&        tenant,
+  const std::string&        xauthToken,
+  bool                      basic
+)
+{
+  Entity& en = notifyCerP->entity;
+
+  ExprContextObject exprMetadataContext(basic);
+
+  TIME_EXPR_CTXBLD_START();
+
+  exprContextP->add("id",   en.entityId.id);
+  exprContextP->add("type", en.entityId.type);
+
+  if (!basic)
+  {
+    exprContextP->add("service",     tenant);
+    exprContextP->add("servicePath", en.servicePath);
+    exprContextP->add("authToken",   xauthToken);
+  }
+
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    en.attributeVector[ix]->addToContext(exprContextP, basic);
+
+    ExprContextObject exprAttrMetadataContext(basic);
+    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
+    {
+      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
+    }
+
+    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
+  }
+
+  exprContextP->add("metadata", exprMetadataContext);
+
+  if (basic)
+  {
+    exprContextP->add("service",     tenant);
+    exprContextP->add("servicePath", en.servicePath);
+    exprContextP->add("authToken",   xauthToken);
+  }
+
+  TIME_EXPR_CTXBLD_STOP();
+}
+
+
+
+
+/* ****************************************************************************
+*
+* resolveKafkaKey -
+*
+* Final sending semantics:
+* - key not provided           -> kafkaKeyIsNull=true,  kafkaKey=""
+* - key explicitly null        -> kafkaKeyIsNull=true,  kafkaKey=""
+* - key is a pure macro -> null-> kafkaKeyIsNull=true,  kafkaKey=""
+* - otherwise                  -> kafkaKeyIsNull=false, kafkaKey="<resolved string>"
+*
+* We preserve null only when the whole key is exactly one macro, e.g. "${id}".
+* Composite expressions such as "${a}${b}" or "prefix-${a}" are treated as strings
+* after macro substitution, even if some inner macros evaluate to null.
+*
+*/
+static bool resolveKafkaKey
+(
+  const ngsiv2::KafkaInfo&  kafkaInfo,
+  ExprContextObject*        exprContextObjectP,
+  bool*                     kafkaKeyIsNullP,
+  std::string*              kafkaKeyP
+)
+{
+  *kafkaKeyIsNullP = true;
+  *kafkaKeyP       = "";
+
+  // Not provided -> final sending semantics is null
+  if (kafkaInfo.keyProvided == false)
+  {
+    return true;
+  }
+
+  // Explicit null from API/DB
+  if (kafkaInfo.keyIsNull)
+  {
+    return true;
+  }
+
+  const std::string& keyTemplate = kafkaInfo.key;
+
+  // Preserve null only for a single pure macro: "${...}"
+  bool pureMacro =
+    (keyTemplate.size() >= 4) &&
+    (keyTemplate.compare(0, 2, "${") == 0) &&
+    (keyTemplate[keyTemplate.size() - 1] == '}') &&
+    (keyTemplate.find("${", 2) == std::string::npos) &&
+    (keyTemplate.find('}') == keyTemplate.size() - 1);
+
+  if (pureMacro)
+  {
+    std::string macroName = keyTemplate.substr(2, keyTemplate.size() - 3);
+    ExprResult  r         = exprMgr.evaluate(exprContextObjectP, macroName);
+
+    if (r.valueType == orion::ValueTypeNull)
+    {
+      r.release();
+      return true;
+    }
+
+    std::string s = r.toString();
+
+    // Keep same semantics as stringValueOrNothing(..., raw=true)
+    if (exprContextObjectP->isBasic())
+    {
+      s = removeQuotes(s);
+    }
+
+    *kafkaKeyP       = removeQuotes(s);
+    *kafkaKeyIsNullP = false;
+
+    r.release();
+    return true;
+  }
+
+  // Composite expression -> normal substitution, result is always a string
+  if (macroSubstitute(kafkaKeyP, keyTemplate, exprContextObjectP, "", true) == false)
+  {
+    return false;
+  }
+
+  *kafkaKeyIsNullP = false;
+  return true;
+}
+
 
 
 
@@ -408,48 +553,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
-  ExprContextObject exprMetadataContext(basic);
-
-  // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
-  // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
-  // exists, the operation is ignored (in other words, the first added key is the one that takes precedence). Taking
-  // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
-  // over the ones comming from headers of the same name, we conditionally add them depending the case
-  TIME_EXPR_CTXBLD_START();
-  exprContext.add("id", en.entityId.id);
-  exprContext.add("type", en.entityId.type);
-
-  if (!basic)
-  {
-    exprContext.add("service", tenant);
-    exprContext.add("servicePath", en.servicePath);
-    exprContext.add("authToken", xauthToken);
-  }
-
-  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    en.attributeVector[ix]->addToContext(&exprContext, basic);
-
-    // Add attribute metadata to context
-    ExprContextObject exprAttrMetadataContext(basic);
-    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
-    {
-      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
-    }
-    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
-  }
-
-  // Add all metadata under the "metadata" context key
-  // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
-  exprContext.add("metadata", exprMetadataContext);
-
-  if (basic)
-  {
-    exprContext.add("service", tenant);
-    exprContext.add("servicePath", en.servicePath);
-    exprContext.add("authToken", xauthToken);
-  }
-  TIME_EXPR_CTXBLD_STOP();
+  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken, basic);
 
   //
   // 1. Verb/Method
@@ -739,6 +843,22 @@ static SenderThreadParams* buildSenderParamsCustom
     }
   }
 
+
+  // 11. KafkaKey (only kafka notifications)
+
+  bool        kafkaKeyIsNull = true;
+  std::string kafkaKey       = "";
+
+  if (notification.type == ngsiv2::KafkaNotification)
+  {
+    if (!resolveKafkaKey(notification.kafkaInfo, &exprContext, &kafkaKeyIsNull, &kafkaKey))
+    {
+      return NULL;
+    }
+  }
+
+
+
   SenderThreadParams*  paramsP = new SenderThreadParams();
 
   paramsP->type             = QUEUE_MSG_NOTIF;
@@ -768,6 +888,8 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->passwd           = passwd;
   paramsP->saslMechanism    = saslMechanism;
   paramsP->securityProtocol = securityProtocol;
+  paramsP->kafkaKeyIsNull   = kafkaKeyIsNull;
+  paramsP->kafkaKey         = kafkaKey;
 
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
@@ -853,6 +975,16 @@ SenderThreadParams* Notifier::buildSenderParams
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
+
+#ifdef EXPR_BASIC
+  bool basic = true;
+#else
+  bool basic = false;
+#endif
+
+  ExprContextObject exprContext(basic);
+  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken, basic);
+
     bool custom;
     switch (notification.type)
     {
@@ -993,6 +1125,17 @@ SenderThreadParams* Notifier::buildSenderParams
       }
     }
 
+    bool        kafkaKeyIsNull = true;
+    std::string kafkaKey       = "";
+
+    if (notification.type == ngsiv2::KafkaNotification)
+    {
+      if (!resolveKafkaKey(notification.kafkaInfo, &exprContext, &kafkaKeyIsNull, &kafkaKey))
+      {
+        return NULL;
+      }
+    }
+
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
     paramsP->ip               = host;
@@ -1019,6 +1162,8 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->passwd           = passwd;
     paramsP->saslMechanism    = saslMechanism;
     paramsP->securityProtocol = securityProtocol;
+    paramsP->kafkaKeyIsNull   = kafkaKeyIsNull;
+    paramsP->kafkaKey         = kafkaKey;
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);

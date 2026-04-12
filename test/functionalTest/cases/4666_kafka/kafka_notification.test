@@ -250,7 +250,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
 }
 =======================================
 REGEX(^Kafka message at topic sub\d+$)
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
@@ -270,7 +270,7 @@ Payload:
 }
 =======================================
 REGEX(^Kafka message at topic sub\d+$)
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
@@ -430,7 +430,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
 #SORT_START
 =======================================
 Kafka message at topic sub1
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
@@ -450,7 +450,7 @@ Payload:
 }
 =======================================
 Kafka message at topic sub2
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:

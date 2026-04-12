@@ -580,7 +580,9 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& user,
     const std::string& passwd,
     const std::string& saslMechanism,
-    const std::string& securityProtocol
+    const std::string& securityProtocol,
+    bool kafkaKeyIsNull,
+    const std::string& kafkaKey
   )
 
 {
@@ -620,11 +622,20 @@ bool KafkaConnectionManager::sendKafkaNotification(
   // Initially without headers
   rd_kafka_headers_t* headers = build_kafka_headers(customHeaders, tenant, servicePath);
 
+  const void* keyPtr  = NULL;
+  size_t      keySize = 0;
+
+  if (!kafkaKeyIsNull)
+  {
+    keyPtr  = (const void*) kafkaKey.data();
+    keySize = kafkaKey.size();
+  }
+
   bool retval = false;
   int resultCode = rd_kafka_producev(
             producer,
             RD_KAFKA_V_TOPIC(topic.c_str()),
-            RD_KAFKA_V_KEY((void*)subscriptionId.data(), subscriptionId.size()),
+            RD_KAFKA_V_KEY((void*) keyPtr, keySize),
             RD_KAFKA_V_VALUE(const_cast<char*>(content.data()), content.size()),
             RD_KAFKA_V_HEADERS(headers),
             RD_KAFKA_V_OPAQUE(ctx),  // Opaque user context used later in the Kafka delivery callback

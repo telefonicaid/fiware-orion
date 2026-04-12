@@ -118,7 +118,7 @@ Content-Length: 0
 03. Check the use of macros in headers
 ======================================
 Kafka message at topic orion
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Service: s1
   Fiware-Servicepath: /subservA
