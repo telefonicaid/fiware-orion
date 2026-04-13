@@ -2,3 +2,4 @@
 - Fix: add response payload to INFO traces on error (#4756)
 - Fix: allow PATCH updates on kafkaCustom subscriptions to add headers (#4761)
 - Fix: support authentication parameters in Kafka notifications (#4714)
+- Fix: Kafka notification key to use null instead of the subscriptionId (#4749)
