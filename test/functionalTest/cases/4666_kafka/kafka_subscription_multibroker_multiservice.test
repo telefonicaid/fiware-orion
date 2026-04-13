@@ -347,7 +347,7 @@ Kafka connection localhost:9095 too old REGEX(.*)
 ==============================================================================
 #SORT_START
 Kafka message at topic sub1
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Service: s1
   Fiware-Servicepath: /
@@ -368,7 +368,7 @@ Payload:
 }
 =======================================
 Kafka message at topic sub2
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Service: s1
   Fiware-Servicepath: /
@@ -389,7 +389,7 @@ Payload:
 }
 =======================================
 Kafka message at topic sub1
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Service: s1
   Fiware-Servicepath: /
@@ -410,7 +410,7 @@ Payload:
 }
 =======================================
 Kafka message at topic sub2
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Service: s1
   Fiware-Servicepath: /

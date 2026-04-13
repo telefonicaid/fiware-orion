@@ -216,7 +216,7 @@ Content-Length: 0
 03. Dump and reset accumulator, see: 1 KAFKA sub_E1 E A:1
 =========================================================
 Kafka message at topic sub_E1
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
@@ -239,7 +239,7 @@ Content-Length: 0
 05. Dump and reset accumulator, see: 1 KAFKA sub_E2 A:2
 =======================================================
 Kafka message at topic sub_E2
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
@@ -260,7 +260,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 07. Dump and reset accumulator, see: 1 KAFKA sub/E1 E A:10
 ==========================================================
 Kafka message at topic sub_E1
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
@@ -281,7 +281,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 09. Dump and reset accumulator, see: 1 KAFKA sub/E2 A:20
 ========================================================
 Kafka message at topic sub_E2
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:

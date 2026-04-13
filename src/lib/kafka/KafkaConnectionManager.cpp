@@ -624,7 +624,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   int resultCode = rd_kafka_producev(
             producer,
             RD_KAFKA_V_TOPIC(topic.c_str()),
-            RD_KAFKA_V_KEY((void*)subscriptionId.data(), subscriptionId.size()),
+            RD_KAFKA_V_KEY(NULL, 0),
             RD_KAFKA_V_VALUE(const_cast<char*>(content.data()), content.size()),
             RD_KAFKA_V_HEADERS(headers),
             RD_KAFKA_V_OPAQUE(ctx),  // Opaque user context used later in the Kafka delivery callback

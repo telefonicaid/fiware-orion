@@ -118,7 +118,7 @@ Content-Length: 0
 03. Check that the Fiware-Service cucu (and not fgm) was propagated to accumulator
 ==================================================================================
 Kafka message at topic sub1
-Key: REGEX([0-9a-f\-]{24})
+Key: (null)
 Headers:
   Fiware-Service: cucu
   Fiware-Servicepath: /
