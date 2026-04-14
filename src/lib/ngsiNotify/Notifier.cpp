@@ -766,15 +766,22 @@ static SenderThreadParams* buildSenderParamsCustom
 
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "null", true);
+    if (notification.kafkaInfo.keyProvided == true)
+    {
+      rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "", true);
 
-    if (rc == -1)
+      if (rc == -1)
+      {
+        kafkaKeyIsNull = true;
+      }
+      if (rc == 1)
+      {
+        return NULL;
+      }
+    }
+    else
     {
       kafkaKeyIsNull = true;
-    }
-    if (rc == 0)
-    {
-      return NULL;
     }
   }
 
@@ -1053,15 +1060,22 @@ SenderThreadParams* Notifier::buildSenderParams
 
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "", true);
+    if (notification.kafkaInfo.keyProvided == true)
+    {
+      rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "", true);
 
-    if (rc == -1)
+      if (rc == -1)
+      {
+        kafkaKeyIsNull = true;
+      }
+      if (rc == 1)
+      {
+        return NULL;
+      }
+    }
+    else
     {
       kafkaKeyIsNull = true;
-    }
-    if (rc == 1)
-    {
-      return NULL;
     }
   }
 
