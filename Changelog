@@ -5,6 +5,7 @@
 - Fix: allow PATCH updates on kafkaCustom subscriptions to add headers (#4761)
 - Fix: support authentication parameters in Kafka notifications (#4714)
 - Fix: Kafka notification key to use null instead of the subscriptionId (#4749)
+
 4.4.0 (January 16th, 2026)
 
 - Add: `jexlExpression` field to subscription conditions (`subject.condition`) (#4555)
