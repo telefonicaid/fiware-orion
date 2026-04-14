@@ -102,16 +102,22 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
 * stringValueOrNothing -
 *
 */
-static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, const std::string key, const std::string& notFoundDefault, bool raw)
+struct OptString
 {
-  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
-  std::string result;
+  bool        isNull = true;
+  std::string value;
+};
 
-  if (r.valueType == orion::ValueTypeNull)
-  {
-    result = notFoundDefault;
-  }
-  else
+static OptString stringValueOrNothing(ExprContextObject* exprContextObjectP,
+                                      const std::string& key,
+                                      const std::string& notFoundDefault,
+                                      bool raw)
+{
+  OptString out;
+  out.value = notFoundDefault;
+  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
+
+  if (r.valueType != orion::ValueTypeNull)
   {
     std::string s = r.toString();
 
@@ -123,20 +129,17 @@ static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, c
 
     if (raw)
     {
-      // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
-      // so double quotes have to be be removed
-      result = removeQuotes(s);
+      // Expression is in the middle of the string, so double quotes must be removed
+      s = removeQuotes(s);
     }
-    else
-    {
-      result = s;
-    }
+
+    out.isNull = false;
+    out.value  = std::move(s);
   }
 
   r.release();
-  return result;
+  return out;
 }
-
 
 
 /* ****************************************************************************
@@ -164,7 +167,7 @@ static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, c
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
+int macroSubstituteInt(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
 {
   // Initial size check: is the string to convert too big?
   //
@@ -185,7 +188,7 @@ bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject
   {
     LM_E(("Runtime Error (too large initial string, before substitution)"));
     *to = "";
-    return false;
+    return 0;
   }
 
   // Look for macros (using a hash map to count how many times each macro appears)
@@ -200,7 +203,7 @@ bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject
     {
       LM_W(("macro end not found, syntax error, aborting substitution"));
       *to = "";
-      return false;
+      return 0;
     }
 
     std::string macroName = from.substr(macroStart + 2, macroEnd - (macroStart + 2));
@@ -227,32 +230,45 @@ bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw).length() * times;
+    toAdd += stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw).value.length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
     LM_E(("Runtime Error (too large final string, after substitution)"));
     *to = "";
-    return false;
+    return 0;
   }
 
   // Macro replace
   *to = from;
+  int iterations = 0;
+  OptString lastReplacedValue;
   for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
   {
     std::string macroName = it->first;
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw);
+    OptString value = stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)
     {
-      to->replace(to->find(macro), macro.length(), value);
+      lastReplacedValue = value;
+      to->replace(to->find(macro), macro.length(), value.value);
+      iterations++;
     }
   }
 
-  return true;
+  if (iterations == 1 && lastReplacedValue.isNull && *to == lastReplacedValue.value) {
+    return  -1;
+  }
+
+  return 1;
+}
+
+bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
+{
+  return macroSubstituteInt(to, from, exprContextObjectP, notFoundDefault, raw) != 0;
 }

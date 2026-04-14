@@ -169,93 +169,6 @@ static void buildExprContext
 
 /* ****************************************************************************
 *
-* resolveKafkaKey -
-*
-* Final sending semantics:
-* - key not provided           -> kafkaKeyIsNull=true,  kafkaKey=""
-* - key explicitly null        -> kafkaKeyIsNull=true,  kafkaKey=""
-* - key is a pure macro -> null-> kafkaKeyIsNull=true,  kafkaKey=""
-* - otherwise                  -> kafkaKeyIsNull=false, kafkaKey="<resolved string>"
-*
-* We preserve null only when the whole key is exactly one macro, e.g. "${id}".
-* Composite expressions such as "${a}${b}" or "prefix-${a}" are treated as strings
-* after macro substitution, even if some inner macros evaluate to null.
-*
-*/
-static bool resolveKafkaKey
-(
-  const ngsiv2::KafkaInfo&  kafkaInfo,
-  ExprContextObject*        exprContextObjectP,
-  bool*                     kafkaKeyIsNullP,
-  std::string*              kafkaKeyP
-)
-{
-  *kafkaKeyIsNullP = true;
-  *kafkaKeyP       = "";
-
-  // Not provided -> final sending semantics is null
-  if (kafkaInfo.keyProvided == false)
-  {
-    return true;
-  }
-
-  // Explicit null from API/DB
-  if (kafkaInfo.keyIsNull)
-  {
-    return true;
-  }
-
-  const std::string& keyTemplate = kafkaInfo.key;
-
-  // Preserve null only for a single pure macro: "${...}"
-  bool pureMacro =
-    (keyTemplate.size() >= 4) &&
-    (keyTemplate.compare(0, 2, "${") == 0) &&
-    (keyTemplate[keyTemplate.size() - 1] == '}') &&
-    (keyTemplate.find("${", 2) == std::string::npos) &&
-    (keyTemplate.find('}') == keyTemplate.size() - 1);
-
-  if (pureMacro)
-  {
-    std::string macroName = keyTemplate.substr(2, keyTemplate.size() - 3);
-    ExprResult  r         = exprMgr.evaluate(exprContextObjectP, macroName);
-
-    if (r.valueType == orion::ValueTypeNull)
-    {
-      r.release();
-      return true;
-    }
-
-    std::string s = r.toString();
-
-    // Keep same semantics as stringValueOrNothing(..., raw=true)
-    if (exprContextObjectP->isBasic())
-    {
-      s = removeQuotes(s);
-    }
-
-    *kafkaKeyP       = removeQuotes(s);
-    *kafkaKeyIsNullP = false;
-
-    r.release();
-    return true;
-  }
-
-  // Composite expression -> normal substitution, result is always a string
-  if (macroSubstitute(kafkaKeyP, keyTemplate, exprContextObjectP, "", true) == false)
-  {
-    return false;
-  }
-
-  *kafkaKeyIsNullP = false;
-  return true;
-}
-
-
-
-
-/* ****************************************************************************
-*
 * setPayload -
 *
 * Return false if some problem occur
@@ -489,14 +402,16 @@ static bool appendHeadersFrom(const std::map<std::string, std::string>& sourceHe
   {
     std::string key   = it->first;
     std::string value = it->second;
+    int keySub = macroSubstituteInt(&key,   it->first,  exprContextObjectP, "null", true);
+    int valueSub = macroSubstituteInt(&value, it->second, exprContextObjectP, "null", true);
 
-    if ((macroSubstitute(&key,   it->first,  exprContextObjectP, "", true) == false) || (macroSubstitute(&value, it->second, exprContextObjectP, "", true) == false))
+    if (keySub == 0 || valueSub == 0)
     {
       // Warning already logged in macroSubstitute()
       return false;
     }
 
-    if (key.empty())
+    if (key.empty() || valueSub == -1)
     {
       // To avoid empty header name
       continue;
@@ -845,13 +760,19 @@ static SenderThreadParams* buildSenderParamsCustom
 
 
   // 11. KafkaKey (only kafka notifications)
-
-  bool        kafkaKeyIsNull = true;
+  bool        kafkaKeyIsNull = false;
   std::string kafkaKey       = "";
+  int         rc ;
 
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    if (!resolveKafkaKey(notification.kafkaInfo, &exprContext, &kafkaKeyIsNull, &kafkaKey))
+    rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "null", true);
+
+    if (rc == -1)
+    {
+      kafkaKeyIsNull = true;
+    }
+    if (rc == 0)
     {
       return NULL;
     }
@@ -1125,16 +1046,24 @@ SenderThreadParams* Notifier::buildSenderParams
       }
     }
 
-    bool        kafkaKeyIsNull = true;
-    std::string kafkaKey       = "";
+  // 11. KafkaKey (only kafka notifications)
+  bool        kafkaKeyIsNull = false;
+  std::string kafkaKey;
+  int         rc ;
 
-    if (notification.type == ngsiv2::KafkaNotification)
+  if (notification.type == ngsiv2::KafkaNotification)
+  {
+    rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "", true);
+
+    if (rc == -1)
     {
-      if (!resolveKafkaKey(notification.kafkaInfo, &exprContext, &kafkaKeyIsNull, &kafkaKey))
-      {
-        return NULL;
-      }
+      kafkaKeyIsNull = true;
     }
+    if (rc == 1)
+    {
+      return NULL;
+    }
+  }
 
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
