@@ -43,6 +43,7 @@
 #include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsiNotify/Notifier.h"
+#include "expressions/exprMgr.h"
 
 
 
@@ -106,6 +107,63 @@ void Notifier::sendNotifyContextRequest
     pthread_detach(tid);
   }
 }
+
+
+/* ****************************************************************************
+*
+* buildExprContext -
+*
+*/
+static void buildExprContext
+(
+  ExprContextObject*        exprContextP,
+  ContextElementResponse*   notifyCerP,
+  const std::string&        tenant,
+  const std::string&        xauthToken,
+  bool                      basic
+)
+{
+  Entity& en = notifyCerP->entity;
+
+  ExprContextObject exprMetadataContext(basic);
+
+  TIME_EXPR_CTXBLD_START();
+
+  exprContextP->add("id",   en.entityId.id);
+  exprContextP->add("type", en.entityId.type);
+
+  if (!basic)
+  {
+    exprContextP->add("service",     tenant);
+    exprContextP->add("servicePath", en.servicePath);
+    exprContextP->add("authToken",   xauthToken);
+  }
+
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    en.attributeVector[ix]->addToContext(exprContextP, basic);
+
+    ExprContextObject exprAttrMetadataContext(basic);
+    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
+    {
+      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
+    }
+
+    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
+  }
+
+  exprContextP->add("metadata", exprMetadataContext);
+
+  if (basic)
+  {
+    exprContextP->add("service",     tenant);
+    exprContextP->add("servicePath", en.servicePath);
+    exprContextP->add("authToken",   xauthToken);
+  }
+
+  TIME_EXPR_CTXBLD_STOP();
+}
+
 
 
 
@@ -344,14 +402,16 @@ static bool appendHeadersFrom(const std::map<std::string, std::string>& sourceHe
   {
     std::string key   = it->first;
     std::string value = it->second;
+    int keySub = macroSubstituteInt(&key,   it->first,  exprContextObjectP, "null", true);
+    int valueSub = macroSubstituteInt(&value, it->second, exprContextObjectP, "null", true);
 
-    if ((macroSubstitute(&key,   it->first,  exprContextObjectP, "", true) == false) || (macroSubstitute(&value, it->second, exprContextObjectP, "", true) == false))
+    if (keySub == 0 || valueSub == 0)
     {
       // Warning already logged in macroSubstitute()
       return false;
     }
 
-    if (key.empty())
+    if (key.empty() || valueSub == -1)
     {
       // To avoid empty header name
       continue;
@@ -408,48 +468,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
-  ExprContextObject exprMetadataContext(basic);
-
-  // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
-  // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
-  // exists, the operation is ignored (in other words, the first added key is the one that takes precedence). Taking
-  // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
-  // over the ones comming from headers of the same name, we conditionally add them depending the case
-  TIME_EXPR_CTXBLD_START();
-  exprContext.add("id", en.entityId.id);
-  exprContext.add("type", en.entityId.type);
-
-  if (!basic)
-  {
-    exprContext.add("service", tenant);
-    exprContext.add("servicePath", en.servicePath);
-    exprContext.add("authToken", xauthToken);
-  }
-
-  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    en.attributeVector[ix]->addToContext(&exprContext, basic);
-
-    // Add attribute metadata to context
-    ExprContextObject exprAttrMetadataContext(basic);
-    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
-    {
-      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
-    }
-    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
-  }
-
-  // Add all metadata under the "metadata" context key
-  // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
-  exprContext.add("metadata", exprMetadataContext);
-
-  if (basic)
-  {
-    exprContext.add("service", tenant);
-    exprContext.add("servicePath", en.servicePath);
-    exprContext.add("authToken", xauthToken);
-  }
-  TIME_EXPR_CTXBLD_STOP();
+  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken, basic);
 
   //
   // 1. Verb/Method
@@ -739,6 +758,35 @@ static SenderThreadParams* buildSenderParamsCustom
     }
   }
 
+
+  // 11. KafkaKey (only kafka notifications)
+  bool        kafkaKeyIsNull = false;
+  std::string kafkaKey       = "";
+  int         rc ;
+
+  if (notification.type == ngsiv2::KafkaNotification)
+  {
+    if (notification.kafkaInfo.keyProvided == true && notification.kafkaInfo.keyIsNull == false)
+    {
+      rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "null", true);
+
+      if (rc == -1)
+      {
+        kafkaKeyIsNull = true;
+      }
+      if (rc == 0)
+      {
+        return NULL;
+      }
+    }
+    if (notification.kafkaInfo.keyProvided == false ||  notification.kafkaInfo.keyIsNull == true)
+    {
+      kafkaKeyIsNull = true;
+    }
+  }
+
+
+
   SenderThreadParams*  paramsP = new SenderThreadParams();
 
   paramsP->type             = QUEUE_MSG_NOTIF;
@@ -768,6 +816,8 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->passwd           = passwd;
   paramsP->saslMechanism    = saslMechanism;
   paramsP->securityProtocol = securityProtocol;
+  paramsP->kafkaKeyIsNull   = kafkaKeyIsNull;
+  paramsP->kafkaKey         = kafkaKey;
 
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
@@ -853,6 +903,16 @@ SenderThreadParams* Notifier::buildSenderParams
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
+
+#ifdef EXPR_BASIC
+  bool basic = true;
+#else
+  bool basic = false;
+#endif
+
+  ExprContextObject exprContext(basic);
+  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken, basic);
+
     bool custom;
     switch (notification.type)
     {
@@ -993,6 +1053,32 @@ SenderThreadParams* Notifier::buildSenderParams
       }
     }
 
+  // 11. KafkaKey (only kafka notifications)
+  bool        kafkaKeyIsNull = false;
+  std::string kafkaKey;
+  int         rc ;
+
+  if (notification.type == ngsiv2::KafkaNotification)
+  {
+    if (notification.kafkaInfo.keyProvided == true && notification.kafkaInfo.keyIsNull == false)
+    {
+      rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "null", true);
+
+      if (rc == -1)
+      {
+        kafkaKeyIsNull = true;
+      }
+      if (rc == 0)
+      {
+        return NULL;
+      }
+    }
+    if (notification.kafkaInfo.keyProvided == false ||  notification.kafkaInfo.keyIsNull == true)
+    {
+      kafkaKeyIsNull = true;
+    }
+  }
+
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
     paramsP->ip               = host;
@@ -1019,6 +1105,8 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->passwd           = passwd;
     paramsP->saslMechanism    = saslMechanism;
     paramsP->securityProtocol = securityProtocol;
+    paramsP->kafkaKeyIsNull   = kafkaKeyIsNull;
+    paramsP->kafkaKey         = kafkaKey;
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);

@@ -44,5 +44,6 @@ extern std::string smartStringValue(const std::string stringValue, ExprContextOb
 *
 */
 extern bool macroSubstitute(std::string* sP, const std::string& in, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw = false);
+extern int macroSubstituteInt(std::string* sP, const std::string& in, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw = false);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

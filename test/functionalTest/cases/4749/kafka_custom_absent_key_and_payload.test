@@ -1,0 +1,188 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Verify default behavior when key and payload are absent in kafkaCustom subscriptions
+
+--SHELL-INIT--
+dbInit CB
+kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" orion
+brokerStart CB 0 IPV4
+accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^orion.*"
+
+--SHELL--
+
+#
+# 01. Create a custom Kafka subscription without key and payload fields
+# 02. Create entity E to trigger the subscription
+# 03. Get subscriptions and verify that key and payload are absent from kafkaCustom
+# 04. Dump accumulator and verify that the emitted Kafka message has no key and the default payload
+#
+
+echo "01. Create a custom Kafka subscription without key and payload fields"
+echo "====================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id" : "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092,localhost:9094",
+      "topic": "orion"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E to trigger the subscription"
+echo "==============================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+# Wait briefly to ensure the Kafka notification is stored by the accumulator
+# before requesting the dump.
+sleep 2s
+
+
+echo "03. Get subscriptions and verify that key and payload are absent from kafkaCustom"
+echo "=================================================================================="
+orionCurl --url /v2/subscriptions
+echo
+echo
+
+
+echo "04. Dump accumulator and verify that the emitted Kafka message has no key and the default payload"
+echo "================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create a custom Kafka subscription without key and payload fields
+=====================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Create entity E to trigger the subscription
+===============================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. Get subscriptions and verify that key and payload are absent from kafkaCustom
+==================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 430
+
+[
+    {
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "kafkaCustom": {
+                "topic": "orion",
+                "url": "kafka://localhost:9092,localhost:9094"
+            },
+            "lastNotification": "REGEX(.*)",
+            "lastSuccess": "REGEX(.*)",
+            "onlyChangedAttrs": false,
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "id": "E",
+                    "type": "T"
+                }
+            ]
+        }
+    }
+]
+
+
+04. Dump accumulator and verify that the emitted Kafka message has no key and the default payload
+=================================================================================================
+Kafka message at topic orion
+Key: (null)
+Headers:
+  Fiware-Servicepath: /
+Payload:
+{
+    "subscriptionId": "REGEX([0-9a-f\-]{24})",
+    "data": [
+        {
+            "id": "E",
+            "type": "T",
+            "A": {
+                "type": "Number",
+                "value": 1,
+                "metadata": {}
+            }
+        }
+    ]
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
+kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" orion
