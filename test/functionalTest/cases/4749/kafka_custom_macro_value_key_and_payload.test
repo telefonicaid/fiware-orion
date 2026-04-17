@@ -80,7 +80,7 @@ echo
 
 # Wait briefly to ensure the Kafka notification is stored by the accumulator
 # before requesting the dump.
-sleep 2s
+sleep 3s
 
 
 echo "03. Get subscriptions and verify that the key and payload expressions are stored"
