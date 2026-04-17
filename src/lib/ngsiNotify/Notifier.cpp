@@ -1060,7 +1060,7 @@ SenderThreadParams* Notifier::buildSenderParams
 
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    if (notification.kafkaInfo.keyProvided == true)
+    if (notification.kafkaInfo.keyProvided == true && notification.kafkaInfo.keyIsNull == false)
     {
       rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "null", true);
 
@@ -1073,7 +1073,7 @@ SenderThreadParams* Notifier::buildSenderParams
         return NULL;
       }
     }
-    else
+    if (notification.kafkaInfo.keyProvided == false ||  notification.kafkaInfo.keyIsNull == true)
     {
       kafkaKeyIsNull = true;
     }
