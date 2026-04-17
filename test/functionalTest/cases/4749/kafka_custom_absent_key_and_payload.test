@@ -78,7 +78,7 @@ echo
 
 # Wait briefly to ensure the Kafka notification is stored by the accumulator
 # before requesting the dump.
-sleep 1s
+sleep 2s
 
 
 echo "03. Get subscriptions and verify that key and payload are absent from kafkaCustom"
