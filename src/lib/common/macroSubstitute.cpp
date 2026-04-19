@@ -43,7 +43,7 @@
 * Returns the effective string value, taking into account replacements
 *
 */
-std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault)
+std::string smartStringValue(const std::string& stringValue, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault)
 {
   // This code is pretty similar to the one in CompoundValueNode::toJson()
   // The program logic branching is the same, but the result at the end of each if-else
@@ -77,14 +77,18 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
   }
   else if (exprContextObjectP != NULL)
   {
-    // "Partial replacement" case. In this case, the result is always a string
-    std::string effectiveValue;
-    if (!macroSubstitute(&effectiveValue, stringValue, exprContextObjectP, "null", true))
+    ResolveResult r = macroSubstitute(stringValue, exprContextObjectP, "null", true);
+    std::string   effectiveValue;
+
+    if (r.status == ResolveError)
     {
       // error already logged in macroSubstitute, using stringValue itself as failsafe
       effectiveValue = stringValue;
     }
-
+    else
+    {
+      effectiveValue = r.value;
+    }
     // toJsonString will stringfly JSON values in macros
     return '"' + toJsonString(effectiveValue) + '"';
   }
@@ -167,8 +171,11 @@ static OptString stringValueOrNothing(ExprContextObject* exprContextObjectP,
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-int macroSubstituteInt(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
+ResolveResult macroSubstitute(const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
 {
+  ResolveResult out;
+  out.status = ResolveError;
+  out.value  = "";
   // Initial size check: is the string to convert too big?
   //
   // If the string to convert is bigger than the maximum allowed buffer size (outReqMsgMaxSize),
@@ -187,8 +194,7 @@ int macroSubstituteInt(std::string* to, const std::string& from, ExprContextObje
   if (from.size() > outReqMsgMaxSize)
   {
     LM_E(("Runtime Error (too large initial string, before substitution)"));
-    *to = "";
-    return 0;
+    return out;
   }
 
   // Look for macros (using a hash map to count how many times each macro appears)
@@ -202,8 +208,7 @@ int macroSubstituteInt(std::string* to, const std::string& from, ExprContextObje
     if (macroEnd == std::string::npos)
     {
       LM_W(("macro end not found, syntax error, aborting substitution"));
-      *to = "";
-      return 0;
+      return out;
     }
 
     std::string macroName = from.substr(macroStart + 2, macroEnd - (macroStart + 2));
@@ -236,12 +241,11 @@ int macroSubstituteInt(std::string* to, const std::string& from, ExprContextObje
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
     LM_E(("Runtime Error (too large final string, after substitution)"));
-    *to = "";
-    return 0;
+    return out;
   }
 
   // Macro replace
-  *to = from;
+  out.value = from;
   int iterations = 0;
   OptString lastReplacedValue;
   for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
@@ -256,19 +260,17 @@ int macroSubstituteInt(std::string* to, const std::string& from, ExprContextObje
     for (unsigned int ix = 0; ix < times; ix++)
     {
       lastReplacedValue = value;
-      to->replace(to->find(macro), macro.length(), value.value);
+      out.value.replace(out.value.find(macro), macro.length(), value.value);
       iterations++;
     }
   }
 
-  if (iterations == 1 && lastReplacedValue.isNull && *to == lastReplacedValue.value) {
-    return  -1;
+  if (iterations == 1 && lastReplacedValue.isNull && out.value == lastReplacedValue.value) {
+    out.status = ResolveNull;
+    return out;
   }
 
-  return 1;
+  out.status = ResolveOk;
+  return out;
 }
 
-bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
-{
-  return macroSubstituteInt(to, from, exprContextObjectP, notFoundDefault, raw) != 0;
-}

@@ -217,11 +217,12 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, exprContextObjectP, "null", true))
+    ResolveResult payloadSub = macroSubstitute(notifPayload, exprContextObjectP, "null", true);
+    if (payloadSub.status == ResolveError)
     {
       return false;
     }
-
+    *payloadP = payloadSub.value;
     char* pload    = curl_unescape(payloadP->c_str(), payloadP->length());
     *payloadP      = std::string(pload);
     *renderFormatP = NGSI_V2_CUSTOM;
@@ -402,16 +403,19 @@ static bool appendHeadersFrom(const std::map<std::string, std::string>& sourceHe
   {
     std::string key   = it->first;
     std::string value = it->second;
-    int keySub = macroSubstituteInt(&key,   it->first,  exprContextObjectP, "null", true);
-    int valueSub = macroSubstituteInt(&value, it->second, exprContextObjectP, "null", true);
+    ResolveResult keySub   = macroSubstitute(it->first,  exprContextObjectP, "null", true);
+    ResolveResult valueSub = macroSubstitute(it->second, exprContextObjectP, "null", true);
 
-    if (keySub == 0 || valueSub == 0)
+    if (keySub.status == ResolveError || valueSub.status == ResolveError)
     {
       // Warning already logged in macroSubstitute()
       return false;
     }
 
-    if (key.empty() || valueSub == -1)
+    key   = keySub.value;
+    value = valueSub.value;
+
+    if (key.empty() || key == "null" || valueSub.status == ResolveNull)
     {
       // To avoid empty header name
       continue;
@@ -425,6 +429,43 @@ static bool appendHeadersFrom(const std::map<std::string, std::string>& sourceHe
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     destHeaders[key] = value;
   }
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* resolveKafkaKey -
+*/
+static bool resolveKafkaKey(const ngsiv2::Notification& notification,
+                            ExprContextObject* exprContextObjectP,
+                            bool* kafkaKeyIsNull,
+                            std::string* kafkaKey)
+{
+  *kafkaKeyIsNull = false;
+  *kafkaKey       = "";
+
+  if (notification.kafkaInfo.keyProvided == false || notification.kafkaInfo.keyIsNull == true)
+  {
+    *kafkaKeyIsNull = true;
+    return true;
+  }
+
+  ResolveResult keySub = macroSubstitute(notification.kafkaInfo.key, exprContextObjectP, "null", true);
+
+  if (keySub.status == ResolveError)
+  {
+    return false;
+  }
+
+  if (keySub.status == ResolveNull)
+  {
+    *kafkaKeyIsNull = true;
+    return true;
+  }
+
+  *kafkaKey = keySub.value;
   return true;
 }
 
@@ -510,11 +551,12 @@ static SenderThreadParams* buildSenderParamsCustom
     notifUrl = notification.kafkaInfo.url;
     break;
   }
-  if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
+  ResolveResult urlSub = macroSubstitute(notifUrl, &exprContext, "", true);
+  if (urlSub.status == ResolveError)
   {
-    // Warning already logged in macroSubstitute()
     return NULL;
   }
+  url = urlSub.value;
 
 
   //
@@ -625,12 +667,16 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &exprContext, "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
+      ResolveResult keySub   = macroSubstitute(it->first,  &exprContext, "", true);
+      ResolveResult valueSub = macroSubstitute(it->second, &exprContext, "", true);
+
+      if (keySub.status == ResolveError || valueSub.status == ResolveError)
       {
-        // Warning already logged in macroSubstitute()
         return NULL;
       }
 
+      key   = keySub.value;
+      value = valueSub.value;
       if ((value.empty()) || (key.empty()))
       {
         // To avoid e.g '?a=&b=&c='
@@ -714,20 +760,27 @@ static SenderThreadParams* buildSenderParamsCustom
   // 8. Topic (only in the case of MQTT notifications)
   if (notification.type == ngsiv2::MqttNotification)
   {
-    if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
+    ResolveResult topicSub = macroSubstitute(notification.mqttInfo.topic, &exprContext, "", true);
+    if (topicSub.status == ResolveError)
     {
       // Warning already logged in macroSubstitute()
       return NULL;
     }
+
+    topic = topicSub.value;
   }
   // 9. Topic (only in the case of KAFKA notifications)
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    if (macroSubstitute(&topic, notification.kafkaInfo.topic, &exprContext, "", true) == false)
+    ResolveResult topicSub = macroSubstitute(notification.kafkaInfo.topic, &exprContext, "", true);
+
+    if (topicSub.status == ResolveError)
     {
       // Warning already logged in macroSubstitute()
       return NULL;
     }
+
+    topic = topicSub.value;
   }
 
   // 10. Kafka/MQTT auth parameters
@@ -762,30 +815,14 @@ static SenderThreadParams* buildSenderParamsCustom
   // 11. KafkaKey (only kafka notifications)
   bool        kafkaKeyIsNull = false;
   std::string kafkaKey       = "";
-  int         rc ;
 
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    if (notification.kafkaInfo.keyProvided == true && notification.kafkaInfo.keyIsNull == false)
+    if (!resolveKafkaKey(notification, &exprContext, &kafkaKeyIsNull, &kafkaKey))
     {
-      rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "null", true);
-
-      if (rc == -1)
-      {
-        kafkaKeyIsNull = true;
-      }
-      if (rc == 0)
-      {
-        return NULL;
-      }
-    }
-    if (notification.kafkaInfo.keyProvided == false ||  notification.kafkaInfo.keyIsNull == true)
-    {
-      kafkaKeyIsNull = true;
+      return NULL;
     }
   }
-
-
 
   SenderThreadParams*  paramsP = new SenderThreadParams();
 
@@ -1053,29 +1090,15 @@ SenderThreadParams* Notifier::buildSenderParams
       }
     }
 
-  // 11. KafkaKey (only kafka notifications)
+  // KafkaKey (only kafka notifications)
   bool        kafkaKeyIsNull = false;
-  std::string kafkaKey;
-  int         rc ;
+  std::string kafkaKey       = "";
 
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    if (notification.kafkaInfo.keyProvided == true && notification.kafkaInfo.keyIsNull == false)
+    if (!resolveKafkaKey(notification, &exprContext, &kafkaKeyIsNull, &kafkaKey))
     {
-      rc = macroSubstituteInt(&kafkaKey, notification.kafkaInfo.key, &exprContext, "null", true);
-
-      if (rc == -1)
-      {
-        kafkaKeyIsNull = true;
-      }
-      if (rc == 0)
-      {
-        return NULL;
-      }
-    }
-    if (notification.kafkaInfo.keyProvided == false ||  notification.kafkaInfo.keyIsNull == true)
-    {
-      kafkaKeyIsNull = true;
+      return NULL;
     }
   }
 

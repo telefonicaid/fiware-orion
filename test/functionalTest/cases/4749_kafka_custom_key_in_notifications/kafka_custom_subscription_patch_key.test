@@ -1,0 +1,539 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+kafkaCustom subscription patch cases with key
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create kafkaCustom sub without key
+# 02. Get sub, see only url and topic in notification
+# 03. Update sub element different to notification
+# 04. Get sub, see only description changed and key still absent
+# 05. Update sub and add key in notification
+# 06. Get sub, see url, topic and key in notification
+# 07. Update sub and change key value
+# 08. Get sub, see updated key value
+# 09. Update sub without key and keep previous key value
+# 10. Get sub, see updated url and topic and preserved key
+# 11. Update sub and set key to empty string
+# 12. Get sub, see empty key stored in notification
+# 13. Update sub and set key to null
+# 14. Get sub, see null key stored in notification
+#
+
+echo "01. Create kafkaCustom sub without key"
+echo "======================================"
+payload='{
+  "description": "Original sub",
+  "subject": {
+    "entities": [
+      {
+        "id": "E1",
+        "type": "T1"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "orion"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. Get sub, see only url and topic in notification"
+echo "==================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03. Update sub element different to notification"
+echo "================================================"
+payload='{
+  "description": "Modified sub"
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "04. Get sub, see only description changed and key still absent"
+echo "=============================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "05. Update sub and add key in notification"
+echo "=========================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "orion",
+      "key": "tenant-id"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "06. Get sub, see url, topic and key in notification"
+echo "==================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "07. Update sub and change key value"
+echo "==================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "orion",
+      "key": "device-id"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "08. Get sub, see updated key value"
+echo "=================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Update sub without key and keep previous key value"
+echo "====================================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9093",
+      "topic": "cb"
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "10. Get sub, see updated url and topic and preserved key"
+echo "========================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "11. Update sub and set key to empty string"
+echo "=========================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9093",
+      "topic": "cb",
+      "key": ""
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "12. Get sub, see empty key stored in notification"
+echo "================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "13. Update sub and set key to null"
+echo "=================================="
+payload='{
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9093",
+      "topic": "cb",
+      "key": null
+    }
+  }
+}'
+orionCurl -X PATCH --url "/v2/subscriptions/$SUB_ID" --payload "$payload"
+echo
+echo
+
+
+echo "14. Get sub, see null key stored in notification"
+echo "================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create kafkaCustom sub without key
+======================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Get sub, see only url and topic in notification
+===================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 343
+
+{
+    "description": "Original sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "topic": "orion",
+            "url": "kafka://localhost:9092"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+03. Update sub element different to notification
+================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Get sub, see only description changed and key still absent
+==============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 343
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "topic": "orion",
+            "url": "kafka://localhost:9092"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+05. Update sub and add key in notification
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Get sub, see url, topic and key in notification
+===================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 361
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "key": "tenant-id",
+            "topic": "orion",
+            "url": "kafka://localhost:9092"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+07. Update sub and change key value
+===================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Get sub, see updated key value
+==================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 361
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "key": "device-id",
+            "topic": "orion",
+            "url": "kafka://localhost:9092"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+09. Update sub without key and keep previous key value
+=====================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Get sub, see updated url and topic and preserved key
+========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 358
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "key": "device-id",
+            "topic": "cb",
+            "url": "kafka://localhost:9093"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+11. Update sub and set key to empty string
+==========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+12. Get sub, see empty key stored in notification
+=================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 349
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "key": "",
+            "topic": "cb",
+            "url": "kafka://localhost:9093"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+13. Update sub and set key to null
+==================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+14. Get sub, see null key stored in notification
+================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 351
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "key": null,
+            "topic": "cb",
+            "url": "kafka://localhost:9093"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E1",
+                "type": "T1"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
