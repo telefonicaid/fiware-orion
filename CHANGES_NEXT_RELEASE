@@ -1,0 +1,1 @@
+Fix: hardwired Kafka notification key by supporting string, absent, and null keys for Kafka notifications, including macro-substituted keys in kafkaCustom (#4749)
