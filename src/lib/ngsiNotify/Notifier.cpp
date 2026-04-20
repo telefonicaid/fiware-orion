@@ -1080,21 +1080,21 @@ SenderThreadParams* Notifier::buildSenderParams
       }
     }
 
-  // KafkaKey (only kafka notifications)
-  bool        kafkaKeyIsNull = false;
-  std::string kafkaKey       = "";
+    // KafkaKey (only kafka notifications)
+    bool        kafkaKeyIsNull = false;
+    std::string kafkaKey       = "";
 
-  if (notification.type == ngsiv2::KafkaNotification)
-  {
-    if (notification.kafkaInfo.keyProvided == false || notification.kafkaInfo.keyIsNull == true)
+    if (notification.type == ngsiv2::KafkaNotification)
     {
-      kafkaKeyIsNull = true;
+      if (notification.kafkaInfo.keyProvided == false || notification.kafkaInfo.keyIsNull == true)
+      {
+        kafkaKeyIsNull = true;
+      }
+      else
+      {
+        kafkaKey = notification.kafkaInfo.key;
+      }
     }
-    else
-    {
-      kafkaKey = notification.kafkaInfo.key;
-    }
-  }
 
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
