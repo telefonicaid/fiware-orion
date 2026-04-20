@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Verify empty key and default payload behavior in kafkaCustom subscriptions
+Verify null key in kafka subscriptions
 
 --SHELL-INIT--
 dbInit CB
@@ -32,14 +32,14 @@ accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafk
 --SHELL--
 
 #
-# 01. Create a custom Kafka subscription with empty key and empty payload
+# 01. Create a Kafka subscription with null key
 # 02. Create entity E to trigger the subscription
-# 03. Get subscriptions and verify that the empty key is stored, while the empty payload is not persisted
-# 04. Dump accumulator and verify that the emitted Kafka message has an empty key and the default payload
+# 03. Get subscriptions and verify that the null key is stored
+# 04. Dump accumulator and verify that the emitted Kafka message has a null key and the default payload
 #
 
-echo "01. Create a custom Kafka subscription with empty key and empty payload"
-echo "======================================================================="
+echo "01. Create a Kafka subscription with null key"
+echo "============================================="
 payload='{
   "subject": {
     "entities": [
@@ -50,11 +50,10 @@ payload='{
     ]
   },
   "notification": {
-    "kafkaCustom": {
+    "kafka": {
       "url": "kafka://localhost:9092,localhost:9094",
       "topic": "orion",
-      "key": "",
-      "payload": ""
+      "key": null
     }
   }
 }'
@@ -69,8 +68,8 @@ payload='{
   "id": "E",
   "type": "T",
   "A": {
-    "value": 1,
-    "type": "Number"
+    "value": "valueA",
+    "type": "Text"
   }
 }'
 orionCurl --url /v2/entities --payload "$payload"
@@ -80,26 +79,26 @@ echo
 
 # Wait briefly so the Kafka delivery callback can update lastSuccess
 # before querying the subscription.
-sleep 2s
+sleep 3s
 
 
-echo "03. Get subscriptions and verify that the empty key is stored, while the empty payload is not persisted"
-echo "======================================================================================================="
+echo "03. Get subscriptions and verify that the null key is stored"
+echo "============================================================="
 orionCurl --url /v2/subscriptions
 echo
 echo
 
 
-echo "04. Dump accumulator and verify that the emitted Kafka message has an empty key and the default payload"
-echo "======================================================================================================="
+echo "04. Dump accumulator and verify that the emitted Kafka message has a null key and the default payload"
+echo "======================================================================================================"
 accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Create a custom Kafka subscription with empty key and empty payload
-=======================================================================
+01. Create a Kafka subscription with null key
+=============================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -118,13 +117,13 @@ Content-Length: 0
 
 
 
-03. Get subscriptions and verify that the empty key is stored, while the empty payload is not persisted
-=======================================================================================================
+03. Get subscriptions and verify that the null key is stored
+=============================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 439
+Content-Length: REGEX([0-9]+)
 
 [
     {
@@ -133,8 +132,8 @@ Content-Length: 439
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
-            "kafkaCustom": {
-                "key": "",
+            "kafka": {
+                "key": null,
                 "topic": "orion",
                 "url": "kafka://localhost:9092,localhost:9094"
             },
@@ -160,10 +159,10 @@ Content-Length: 439
 ]
 
 
-04. Dump accumulator and verify that the emitted Kafka message has an empty key and the default payload
-=======================================================================================================
+04. Dump accumulator and verify that the emitted Kafka message has a null key and the default payload
+======================================================================================================
 Kafka message at topic orion
-Key:
+Key: (null)
 Headers:
   Fiware-Servicepath: /
 Payload:
@@ -174,8 +173,8 @@ Payload:
             "id": "E",
             "type": "T",
             "A": {
-                "type": "Number",
-                "value": 1,
+                "type": "Text",
+                "value": "valueA",
                 "metadata": {}
             }
         }

@@ -78,8 +78,8 @@ echo
 echo
 
 
-# Wait briefly to ensure the Kafka notification is stored by the accumulator
-# before requesting the dump.
+# Wait briefly so the Kafka delivery callback can update lastSuccess
+# before querying the subscription.
 sleep 2s
 
 

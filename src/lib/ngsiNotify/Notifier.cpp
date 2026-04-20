@@ -940,16 +940,6 @@ SenderThreadParams* Notifier::buildSenderParams
     //
     // Note that disableCusNotif (taken from CLI) could disable custom notifications and force to use regular ones
     //
-
-#ifdef EXPR_BASIC
-  bool basic = true;
-#else
-  bool basic = false;
-#endif
-
-  ExprContextObject exprContext(basic);
-  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken, basic);
-
     bool custom;
     switch (notification.type)
     {
@@ -1096,9 +1086,13 @@ SenderThreadParams* Notifier::buildSenderParams
 
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    if (!resolveKafkaKey(notification, &exprContext, &kafkaKeyIsNull, &kafkaKey))
+    if (notification.kafkaInfo.keyProvided == false || notification.kafkaInfo.keyIsNull == true)
     {
-      return NULL;
+      kafkaKeyIsNull = true;
+    }
+    else
+    {
+      kafkaKey = notification.kafkaInfo.key;
     }
   }
 
