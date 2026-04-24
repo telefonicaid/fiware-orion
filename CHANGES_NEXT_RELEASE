@@ -1,1 +1,1 @@
-Fix: hardwired Kafka notification key by supporting string, absent, and null keys for Kafka notifications, including macro-substituted keys in kafkaCustom (#4749)
+- Add: new subscription field notification.kafka.key/notification.kafkaCustom.key (supporting macro substitution in the latter case) (#4749)
