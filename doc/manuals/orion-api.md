@@ -452,6 +452,7 @@ There are some exception cases in which the above restrictions do not apply. In 
 * URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
+* HTTP and Kafka custom header values allow the `'` and `"` quote characters to support quoted string literals in JEXL expressions
 * Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL support in custom notifications](#jexl-support-in-custom-notifications))
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
@@ -2055,7 +2056,7 @@ a legacy.
 ### Macro substitution
 
 Clients can customize notification messages using a simple template mechanism when
-`notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
+`notification.httpCustom`, `notification.mqttCustom` or `notification.kafkaCustom` are used. Which fields can be templatized
 depends on the protocol type.
 
 In case of `httpCustom`:
@@ -2072,6 +2073,12 @@ HEAD, OPTIONS, TRACE, and CONNECT.
 
 In case of `mqttCustom`:
 
+* `payload`, `json` and `ngsi` (all them payload related fields)
+* `topic`
+
+In case of `kafkaCustom`:
+
+* `headers` (both header name and value can be templatized).
 * `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
 
