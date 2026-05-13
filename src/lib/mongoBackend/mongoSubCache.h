@@ -57,6 +57,8 @@ extern int mongoSubCacheItemInsert
   const char*            subscriptionId,
   const char*            servicePath,
   long long              lastNotificationTime,
+  long long              lastNotificationDuration,
+  long long              accumulatedNotificationDuration,
   long long              lastFailure,
   const std::string&     lastFailureReason,
   long long              lastSuccess,
@@ -107,6 +109,20 @@ extern void mongoSubUpdateOnNotif
   long long           statusCode,
   const std::string&  status,
   double              statusLastChange
+);
+
+
+/* ****************************************************************************
+*
+* mongoSubUpdateNotificationDuration -
+*
+* Used in notification logic
+*/
+extern void mongoSubUpdateNotificationDuration
+(
+  const std::string&  tenant,
+  const std::string&  subId,
+  long long           notificationDurationMs
 );
 
 

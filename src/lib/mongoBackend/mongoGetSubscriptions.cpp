@@ -225,6 +225,8 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
 
   subP->throttling      = r.hasField(CSUB_THROTTLING)?       getIntOrLongFieldAsLongF(r, CSUB_THROTTLING)       : -1;
   nP->lastNotification  = r.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATION) : -1;
+  nP->lastNotificationDuration =r.hasField(CSUB_LASTNOTIFICATIONDURATION)? getIntOrLongFieldAsLongF(r, CSUB_LASTNOTIFICATIONDURATION) : -1;
+  nP->accumulatedNotificationDuration =r.hasField(CSUB_ACCUMULATEDNOTIFICATIONDURATION)?getIntOrLongFieldAsLongF(r, CSUB_ACCUMULATEDNOTIFICATIONDURATION) : 0;
   nP->timesSent         = r.hasField(CSUB_COUNT)?            getIntOrLongFieldAsLongF(r, CSUB_COUNT)            : 0;
   nP->failsCounter      = r.hasField(CSUB_FAILSCOUNTER)?     getIntOrLongFieldAsLongF(r, CSUB_FAILSCOUNTER)     : 0;
   nP->maxFailsLimit     = r.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(r, CSUB_MAXFAILSLIMIT)    : -1;
@@ -248,6 +250,8 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
   {
     subP->notification.timesSent    += cSubP->count;
 
+    // subP->notification.accumulatedNotificationDuration = cSubP->accumulatedNotificationDuration;
+
     if (cSubP->lastSuccess > subP->notification.lastFailure)
     {
       // this means that the lastFailure in the DB is stale, so the failsCounter at DB
@@ -263,7 +267,9 @@ static void setNotification(Subscription* subP, const orion::BSONObj& r, const s
 
     if (cSubP->lastNotificationTime > subP->notification.lastNotification)
     {
-      subP->notification.lastNotification = cSubP->lastNotificationTime;
+       subP->notification.lastNotification = cSubP->lastNotificationTime;
+       subP->notification.lastNotificationDuration = cSubP->lastNotificationDuration;
+
     }
 
     if (cSubP->lastFailure > subP->notification.lastFailure)

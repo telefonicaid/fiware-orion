@@ -55,6 +55,7 @@
 static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<SenderThreadParams*>*  queue)
 {
   long long    statusCode = -1;
+  long long    httpRequestDurationMs = 0;
   std::string  out;
 
   char                portV[STRING_SIZE_FOR_INT];
@@ -82,6 +83,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
                        params->renderFormat,
                        &out,
                        &statusCode,
+                       &httpRequestDurationMs,
                        params->extraHeaders,
                        "",                         //default acceptFormat
                        params->timeout);
@@ -124,6 +126,11 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
     {
       subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, out, params->failsCounter, params->maxFailsLimit);
     }
+  }
+
+  if (params->registration == false)
+  {
+    subNotificationDurationUpdate(params->tenant, params->subscriptionId, httpRequestDurationMs);
   }
 
   // Add notificacion result summary in log INFO level

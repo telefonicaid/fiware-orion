@@ -108,6 +108,8 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       :  0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
+  cSubP->lastNotificationDuration        = sub.hasField(CSUB_LASTNOTIFICATIONDURATION)?     getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATIONDURATION)     : -1;
+  cSubP->accumulatedNotificationDuration = sub.hasField(CSUB_ACCUMULATEDNOTIFICATIONDURATION)? getIntOrLongFieldAsLongF(sub, CSUB_ACCUMULATEDNOTIFICATIONDURATION) : 0;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
   cSubP->statusLastChange      = sub.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(sub, CSUB_STATUS_LAST_CHANGE)      : -1;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
@@ -335,6 +337,8 @@ int mongoSubCacheItemInsert
   const char*            subscriptionId,
   const char*            servicePath,
   long long              lastNotificationTime,
+  long long              lastNotificationDuration,
+  long long              accumulatedNotificationDuration,
   long long              lastFailure,
   const std::string&     lastFailureReason,
   long long              lastSuccess,
@@ -456,7 +460,9 @@ int mongoSubCacheItemInsert
   cSubP->covered               = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
   cSubP->notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
 
-  cSubP->lastNotificationTime  = lastNotificationTime;
+  cSubP->lastNotificationTime            = lastNotificationTime;
+  cSubP->lastNotificationDuration        = lastNotificationDuration;
+  cSubP->accumulatedNotificationDuration = accumulatedNotificationDuration;
   cSubP->lastFailure           = lastFailure;
   cSubP->lastFailureReason     = lastFailureReason;
   cSubP->lastSuccess           = lastSuccess;
@@ -870,6 +876,81 @@ void mongoSubUpdateOnNotif
     mongoSubCountersUpdateLastSuccess(db, COL_CSUBS, subId, lastSuccess, statusCode);
   }
 }
+
+
+/* ****************************************************************************
+*
+* mongoSubCountersUpdateNotificationDuration -
+*/
+static void mongoSubCountersUpdateNotificationDuration
+(
+  const std::string&  db,
+  const std::string&  collection,
+  const std::string&  subId,
+  long long           notificationDurationMs
+)
+{
+  std::string err;
+
+  if (notificationDurationMs < 0)
+  {
+    return;
+  }
+
+  orion::BSONObjBuilder condition;
+  condition.append("_id", orion::OID(subId));
+
+  orion::BSONObjBuilder update;
+
+  orion::BSONObjBuilder setB;
+  setB.append(CSUB_LASTNOTIFICATIONDURATION, notificationDurationMs);
+
+  orion::BSONObjBuilder incB;
+  incB.append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, notificationDurationMs);
+
+  update.append("$set", setB.obj());
+  update.append("$inc", incB.obj());
+
+  if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
+  {
+    LM_E(("Runtime Error (error updating notification duration for a subscription)"));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoSubUpdateNotificationDuration -
+*/
+void mongoSubUpdateNotificationDuration
+(
+  const std::string&  tenant,
+  const std::string&  subId,
+  long long           notificationDurationMs
+)
+{
+  if (subId.empty())
+  {
+    LM_E(("Runtime Error (empty subscription id)"));
+    return;
+  }
+
+  if (notificationDurationMs < 0)
+  {
+    return;
+  }
+
+  std::string db = composeDatabaseName(tenant);
+
+  mongoSubCountersUpdateNotificationDuration(
+    db,
+    COL_CSUBS,
+    subId,
+    notificationDurationMs
+  );
+}
+
 
 
 /* ****************************************************************************

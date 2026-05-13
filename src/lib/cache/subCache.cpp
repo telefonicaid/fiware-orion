@@ -1495,3 +1495,47 @@ void subNotificationErrorStatus
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
 }
+
+
+
+/* ****************************************************************************
+*
+* subNotificationHttpDurationUpdate -
+*/
+void subNotificationDurationUpdate
+(
+  const std::string&  tenant,
+  const std::string&  subscriptionId,
+  long long           httpRequestDurationMs
+)
+{
+  if (httpRequestDurationMs < 0)
+  {
+    return;
+  }
+
+  if (noCache)
+  {
+    mongoSubUpdateNotificationDuration(tenant, subscriptionId, httpRequestDurationMs);
+    return;
+  }
+
+  cacheSemTake(__FUNCTION__, "Looking up an item for notification duration");
+
+  CachedSubscription* subP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
+
+  if (subP == NULL)
+  {
+    cacheSemGive(__FUNCTION__, "Looking up an item for notification duration");
+
+    const char* errorString = "intent to update notification duration of non-existing subscription";
+    alarmMgr.badInput(clientIp, errorString);
+
+    return;
+  }
+
+  subP->lastNotificationDuration         = httpRequestDurationMs;
+  subP->accumulatedNotificationDuration += httpRequestDurationMs;
+
+  cacheSemGive(__FUNCTION__, "Looking up an item for notification duration");
+}

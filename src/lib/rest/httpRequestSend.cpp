@@ -31,6 +31,7 @@
 #include <netdb.h>                              // gethostbyname
 #include <arpa/inet.h>                          // inet_ntoa
 #include <netinet/tcp.h>                        // TCP_NODELAY
+#include <time.h>
 #include <curl/curl.h>
 
 #include <string>
@@ -256,6 +257,7 @@ int httpRequestSend
    const std::string&                         ngsiv2AttrFormat,
    std::string*                               outP,
    long long*                                 statusCodeP,
+   long long*                                 httpRequestDurationMsP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
    long                                       timeoutInMilliseconds,
@@ -299,6 +301,9 @@ int httpRequestSend
   struct curl_slist*              headers            = NULL;
   MemoryStruct*                   httpResponse       = NULL;
   CURLcode                        res;
+  struct timespec                 notificationStartTime;
+  struct timespec                 notificationEndTime;
+  long long                       httpRequestDurationMs = 0;
   int                             outgoingMsgSize    = 0;
   std::string                     content_type(orig_content_type);
   std::map<std::string, bool>     usedExtraHeaders;
@@ -627,7 +632,15 @@ int httpRequestSend
   //
   LM_T(LmtOldInfo, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
 
+  clock_gettime(CLOCK_MONOTONIC, &notificationStartTime);
   res = curl_easy_perform(curl);
+  clock_gettime(CLOCK_MONOTONIC, &notificationEndTime);
+  httpRequestDurationMs =((notificationEndTime.tv_sec - notificationStartTime.tv_sec) * 1000) + ((notificationEndTime.tv_nsec - notificationStartTime.tv_nsec) / 1000000);
+  if (httpRequestDurationMsP != NULL)
+  {
+    *httpRequestDurationMsP = httpRequestDurationMs;
+  }
+
   if (res != CURLE_OK)
   {
     //
