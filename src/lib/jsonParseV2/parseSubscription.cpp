@@ -73,7 +73,8 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionU
 static std::string parseDictionary(ConnectionInfo*                      ciP,
                                    std::map<std::string, std::string>&  dict,
                                    const Value&                         object,
-                                   const std::string&                   name);
+                                   const std::string&                   name,
+                                   const char*                          valueExceptions = NULL);
 
 
 
@@ -1216,7 +1217,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       std::string r = parseDictionary(ciP,
                                       subsP->notification.httpInfo.headers,
                                       headers,
-                                      "notification httpCustom headers");
+                                      "notification httpCustom headers",
+                                      "'\"");
 
       if (!r.empty())
       {
@@ -1441,7 +1443,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       std::string r = parseDictionary(ciP,
                                       subsP->notification.kafkaInfo.headers,
                                       headers,
-                                      "notification kafkaCustom headers");
+                                      "notification kafkaCustom headers",
+                                      "'\"");
 
       if (!r.empty())
       {
@@ -1707,7 +1710,8 @@ static std::string parseDictionary
   ConnectionInfo*                      ciP,
   std::map<std::string, std::string>&  dict,
   const Value&                         object,
-  const std::string&                   name
+  const std::string&                   name,
+  const char*                          valueExceptions
 )
 {
   if (!object.IsObject())
@@ -1725,7 +1729,7 @@ static std::string parseDictionary
     std::string value = iter->value.GetString();
     std::string key   = iter->name.GetString();
 
-    if (forbiddenChars(value.c_str()))
+    if (forbiddenChars(value.c_str(), valueExceptions))
     {
       return badInput(ciP, std::string("forbidden characters in custom ") + name);
     }

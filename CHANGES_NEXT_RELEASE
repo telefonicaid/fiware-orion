@@ -1,0 +1,1 @@
+- Fix: allow quotes in HTTP and Kafka custom header values for use in JEXL expressions (#4779)
