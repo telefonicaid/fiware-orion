@@ -62,10 +62,12 @@ typedef struct SenderThreadParams
   std::string                        resource;      // path for HTTP notifications, topic for MQTT notifications
   unsigned int                       qos;           // used only in MQTT notifications
   unsigned int                       retain;        // used only in MQTT notifications
-  std::string                        user;          // for user/pass auth connections (only MQTT at the present moment)
-  std::string                        passwd;        // for user/pass auth connections (only MQTT at the present moment)
+  std::string                        user;          // for user/pass auth connections (only MQTT and KAFKA at the present moment)
+  std::string                        passwd;        // for user/pass auth connections (only MQTT and KAFKA at the present moment)
   std::string                        saslMechanism;
   std::string                        securityProtocol;
+  bool                               kafkaKeyIsNull;
+  std::string                        kafkaKey;
   std::string                        content_type;
   std::string                        content;
   char                               transactionId[64];

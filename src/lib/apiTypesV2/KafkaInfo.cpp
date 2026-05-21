@@ -41,7 +41,14 @@ namespace ngsiv2
 *
 * KafkaInfo::KafkaInfo - 
 */
-KafkaInfo::KafkaInfo() : custom(false), json(NULL), payloadType(Text), includePayload(true), providedAuth(false)
+KafkaInfo::KafkaInfo()
+  : keyProvided(false),
+    keyIsNull(false),
+    custom(false),
+    json(NULL),
+    payloadType(Text),
+    includePayload(true),
+    providedAuth(false)
 {
 }
 
@@ -57,6 +64,18 @@ std::string KafkaInfo::toJson()
 
   jh.addString("url", this->url);
   jh.addString("topic", this->topic);
+
+  if (keyProvided)
+  {
+    if (keyIsNull)
+    {
+      jh.addNull("key");
+    }
+    else
+    {
+      jh.addString("key", this->key);
+    }
+  }
 
   if (providedAuth)
   {
@@ -118,6 +137,29 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
   this->url    = bo.hasField(CSUB_REFERENCE)? getStringFieldF(bo, CSUB_REFERENCE) : "";
   this->topic  = bo.hasField(CSUB_KAFKATOPIC)? getStringFieldF(bo, CSUB_KAFKATOPIC) : "";
   this->custom = bo.hasField(CSUB_CUSTOM)?    getBoolFieldF(bo, CSUB_CUSTOM)      : false;
+
+  // key
+  if (bo.hasField(CSUB_KAFKAKEY))
+  {
+    if (getFieldF(bo, CSUB_KAFKAKEY).isNull())
+    {
+      this->keyProvided = true;
+      this->keyIsNull   = true;
+      this->key         = "";
+    }
+    else
+    {
+      this->keyProvided = true;
+      this->keyIsNull   = false;
+      this->key         = getStringFieldF(bo, CSUB_KAFKAKEY);
+    }
+  }
+  else
+  {
+    this->keyProvided = false;
+    this->keyIsNull   = false;
+    this->key         = "";
+  }
 
   //both user and passwd have to be used at the same time
   if ((bo.hasField(CSUB_USER)) && (bo.hasField(CSUB_PASSWD)))
@@ -238,6 +280,9 @@ void KafkaInfo::fill(const KafkaInfo& _kafkaInfo)
 {
   this->url              = _kafkaInfo.url;
   this->topic            = _kafkaInfo.topic;
+  this->keyProvided      = _kafkaInfo.keyProvided;
+  this->keyIsNull        = _kafkaInfo.keyIsNull;
+  this->key              = _kafkaInfo.key;
   this->custom           = _kafkaInfo.custom;
   this->headers          = _kafkaInfo.headers;
   this->payload          = _kafkaInfo.payload;

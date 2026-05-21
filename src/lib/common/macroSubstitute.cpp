@@ -43,7 +43,7 @@
 * Returns the effective string value, taking into account replacements
 *
 */
-std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault)
+std::string smartStringValue(const std::string& stringValue, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault)
 {
   // This code is pretty similar to the one in CompoundValueNode::toJson()
   // The program logic branching is the same, but the result at the end of each if-else
@@ -78,13 +78,18 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
   else if (exprContextObjectP != NULL)
   {
     // "Partial replacement" case. In this case, the result is always a string
-    std::string effectiveValue;
-    if (!macroSubstitute(&effectiveValue, stringValue, exprContextObjectP, "null", true))
+    ResolveResult r = macroSubstitute(stringValue, exprContextObjectP, "null", true);
+    std::string   effectiveValue;
+
+    if (r.status == ResolveError)
     {
       // error already logged in macroSubstitute, using stringValue itself as failsafe
       effectiveValue = stringValue;
     }
-
+    else
+    {
+      effectiveValue = r.value;
+    }
     // toJsonString will stringfly JSON values in macros
     return '"' + toJsonString(effectiveValue) + '"';
   }
@@ -102,16 +107,22 @@ std::string smartStringValue(const std::string stringValue, ExprContextObject* e
 * stringValueOrNothing -
 *
 */
-static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, const std::string key, const std::string& notFoundDefault, bool raw)
+struct OptString
 {
-  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
-  std::string result;
+  bool        isNull = true;
+  std::string value;
+};
 
-  if (r.valueType == orion::ValueTypeNull)
-  {
-    result = notFoundDefault;
-  }
-  else
+static OptString stringValueOrNothing(ExprContextObject* exprContextObjectP,
+                                      const std::string& key,
+                                      const std::string& notFoundDefault,
+                                      bool raw)
+{
+  OptString out;
+  out.value = notFoundDefault;
+  ExprResult r = exprMgr.evaluate(exprContextObjectP, key);
+
+  if (r.valueType != orion::ValueTypeNull)
   {
     std::string s = r.toString();
 
@@ -123,20 +134,17 @@ static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, c
 
     if (raw)
     {
-      // This means that the expression is in the middle of the string (i.e. partial replacement and not full replacement),
-      // so double quotes have to be be removed
-      result = removeQuotes(s);
+      // Expression is in the middle of the string (i.e. partial replacement and not full replacement), so double quotes must be removed
+      s = removeQuotes(s);
     }
-    else
-    {
-      result = s;
-    }
+
+    out.isNull = false;
+    out.value  = std::move(s);
   }
 
   r.release();
-  return result;
+  return out;
 }
-
 
 
 /* ****************************************************************************
@@ -164,8 +172,11 @@ static std::string stringValueOrNothing(ExprContextObject* exprContextObjectP, c
 *   Date:   Mon Jun 19 16:33:29 2017 +0200
 *
 */
-bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
+ResolveResult macroSubstitute(const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw)
 {
+  ResolveResult out;
+  out.status = ResolveError;
+  out.value  = "";
   // Initial size check: is the string to convert too big?
   //
   // If the string to convert is bigger than the maximum allowed buffer size (outReqMsgMaxSize),
@@ -184,8 +195,7 @@ bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject
   if (from.size() > outReqMsgMaxSize)
   {
     LM_E(("Runtime Error (too large initial string, before substitution)"));
-    *to = "";
-    return false;
+    return out;
   }
 
   // Look for macros (using a hash map to count how many times each macro appears)
@@ -199,8 +209,7 @@ bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject
     if (macroEnd == std::string::npos)
     {
       LM_W(("macro end not found, syntax error, aborting substitution"));
-      *to = "";
-      return false;
+      return out;
     }
 
     std::string macroName = from.substr(macroStart + 2, macroEnd - (macroStart + 2));
@@ -227,32 +236,48 @@ bool macroSubstitute(std::string* to, const std::string& from, ExprContextObject
 
     // The +3 is due to "${" and "}"
     toReduce += (macroName.length() + 3) * times;
-    toAdd += stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw).length() * times;
+    toAdd += stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw).value.length() * times;
   }
 
   if (from.length() + toAdd - toReduce > outReqMsgMaxSize)
   {
     LM_E(("Runtime Error (too large final string, after substitution)"));
-    *to = "";
-    return false;
+    return out;
   }
 
   // Macro replace
-  *to = from;
+  out.value = from;
+  int iterations = 0;
+  OptString lastReplacedValue;
   for (std::map<std::string, unsigned int>::iterator it = macroNames.begin(); it != macroNames.end(); ++it)
   {
     std::string macroName = it->first;
     unsigned int times    = it->second;
 
     std::string macro = "${" + macroName + "}";
-    std::string value = stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw);
+    OptString value = stringValueOrNothing(exprContextObjectP, macroName, notFoundDefault, raw);
 
     // We have to do the replace operation as many times as macro occurrences
     for (unsigned int ix = 0; ix < times; ix++)
     {
-      to->replace(to->find(macro), macro.length(), value);
+      lastReplacedValue = value;
+      out.value.replace(out.value.find(macro), macro.length(), value.value);
+      iterations++;
     }
   }
 
-  return true;
+  // If there was exactly one replacement and the replaced value was null,
+  // return ResolveNull only when the whole output is exactly the replaced value.
+  // This avoids treating strings like "value is ${x}" as null:
+  // "${x}" -> "" == "" => ResolveNull
+  // "value is ${x}" -> "value is " == "" => ResolveOk
+  if ((iterations == 1) && lastReplacedValue.isNull && (out.value == lastReplacedValue.value))
+  {
+    out.status = ResolveNull;
+    return out;
+  }
+
+  out.status = ResolveOk;
+  return out;
 }
+

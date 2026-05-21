@@ -198,7 +198,7 @@ static void doNotifyKafka(SenderThreadParams* params)
 
   // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReason "" to avoid using
   // lastFailureReason and lastSuccessCode in KAFKA notifications (they don't have sense in this case)
-  if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, params->subscriptionId, params->tenant, params->servicePath, params->extraHeaders, params->user, params->passwd, params->saslMechanism, params->securityProtocol))
+  if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, params->subscriptionId, params->tenant, params->servicePath, params->extraHeaders, params->user, params->passwd, params->saslMechanism, params->securityProtocol, params->kafkaKeyIsNull, params->kafkaKey))
   {
     logInfoNonRequestNotification("KAFKA", params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
     // For Kafka, sendKafkaNotification() returning true only means the producer accepted

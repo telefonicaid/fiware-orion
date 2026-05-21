@@ -1,1 +1,2 @@
+- Add: new subscription field notification.kafka.key/notification.kafkaCustom.key (supporting macro substitution in the latter case) (#4749)
 - Fix: allow quotes in HTTP and Kafka custom header values for use in JEXL expressions (#4779)

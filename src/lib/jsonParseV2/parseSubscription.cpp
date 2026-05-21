@@ -630,6 +630,8 @@ static std::string parseMqttUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   return "";
 }
 
+
+
 /* ****************************************************************************
 *
 * parseKafkaUrl -
@@ -673,6 +675,7 @@ static std::string parseKafkaUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
   subsP->notification.kafkaInfo.url = "kafka://" + cleanBrokers;
   return "";
 }
+
 
 
 /* ****************************************************************************
@@ -769,6 +772,8 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
 
   return "";
 }
+
+
 
 /* ****************************************************************************
 *
@@ -991,6 +996,41 @@ static std::string parseKafkaAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP
     subsP->notification.kafkaInfo.securityProtocol = "";
     subsP->notification.kafkaInfo.providedAuth = false;
   }
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseKafkaKey -
+*/
+static std::string parseKafkaKey(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& kafka)
+{
+  subsP->notification.kafkaInfo.keyProvided = false;
+  subsP->notification.kafkaInfo.keyIsNull   = false;
+  subsP->notification.kafkaInfo.key         = "";
+
+  if (!kafka.HasMember("key"))
+  {
+    return "";
+  }
+
+  subsP->notification.kafkaInfo.keyProvided = true;
+
+  if (isNull(kafka, "key"))
+  {
+    subsP->notification.kafkaInfo.keyIsNull = true;
+    return "";
+  }
+
+  Opt<std::string> keyOpt = getStringOpt(kafka, "key", "key kafka notification");
+  if (!keyOpt.ok())
+  {
+    return badInput(ciP, keyOpt.error);
+  }
+
+  subsP->notification.kafkaInfo.key = keyOpt.value;
   return "";
 }
 
@@ -1377,6 +1417,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // key
+    r = parseKafkaKey(ciP, subsP, kafka);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     subsP->notification.kafkaInfo.custom = false;
   }
   else if (notification.HasMember("kafkaCustom"))
@@ -1406,6 +1453,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // auth
     r = parseKafkaAuth(ciP, subsP, kafkaCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // key
+    r = parseKafkaKey(ciP, subsP, kafkaCustom);
     if (!r.empty())
     {
       return r;

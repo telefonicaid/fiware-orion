@@ -42,6 +42,11 @@ struct KafkaInfo
 {
   std::string   url;
   std::string   topic;
+
+  bool        keyProvided;
+  bool        keyIsNull;
+  std::string key;
+
   std::map<std::string, std::string>  headers;
 
   bool                       custom;
