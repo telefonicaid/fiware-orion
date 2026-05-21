@@ -134,7 +134,7 @@ static OptString stringValueOrNothing(ExprContextObject* exprContextObjectP,
 
     if (raw)
     {
-      // Expression is in the middle of the string, so double quotes must be removed
+      // Expression is in the middle of the string (i.e. partial replacement and not full replacement), so double quotes must be removed
       s = removeQuotes(s);
     }
 
@@ -266,7 +266,8 @@ ResolveResult macroSubstitute(const std::string& from, ExprContextObject* exprCo
     }
   }
 
-  if (iterations == 1 && lastReplacedValue.isNull && out.value == lastReplacedValue.value) {
+  if ((iterations == 1) && lastReplacedValue.isNull && (out.value == lastReplacedValue.value))
+  {
     out.status = ResolveNull;
     return out;
   }
