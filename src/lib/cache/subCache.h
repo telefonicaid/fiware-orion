@@ -108,7 +108,7 @@ struct CachedSubscription
   int64_t                          expirationTime;
   int64_t                          lastNotificationTime;
   int64_t                          lastNotificationDuration;
-  int64_t                          accumulatedNotificationDuration;
+  int64_t                          notificationDurationDelta;
   std::string                      status;
   double                           statusLastChange;
   int64_t                          count;

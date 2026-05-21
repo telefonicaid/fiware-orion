@@ -1171,6 +1171,8 @@ void subCacheRefresh(void)
 typedef struct CachedSubSaved
 {
   int64_t      lastNotificationTime;
+  int64_t      lastNotificationDuration;
+  int64_t      notificationDurationDelta;
   int64_t      count;
   int64_t      failsCounter;
   int64_t      lastFailure;
@@ -1236,15 +1238,17 @@ void subCacheSync(void)
 
     CachedSubSaved* cssP       = new CachedSubSaved();
 
-    cssP->lastNotificationTime = cSubP->lastNotificationTime;
-    cssP->count                = cSubP->count;
-    cssP->failsCounter         = cSubP->failsCounter;
-    cssP->lastFailure          = cSubP->lastFailure;
-    cssP->lastSuccess          = cSubP->lastSuccess;
-    cssP->lastFailureReason    = cSubP->lastFailureReason;
-    cssP->lastSuccessCode      = cSubP->lastSuccessCode;
-    cssP->status               = cSubP->status;
-    cssP->statusLastChange     = cSubP->statusLastChange;
+    cssP->lastNotificationTime      = cSubP->lastNotificationTime;
+    cssP->count                     = cSubP->count;
+    cssP->lastNotificationDuration  = cSubP->lastNotificationDuration;
+    cssP->notificationDurationDelta = cSubP->notificationDurationDelta;
+    cssP->failsCounter              = cSubP->failsCounter;
+    cssP->lastFailure               = cSubP->lastFailure;
+    cssP->lastSuccess               = cSubP->lastSuccess;
+    cssP->lastFailureReason         = cSubP->lastFailureReason;
+    cssP->lastSuccessCode           = cSubP->lastSuccessCode;
+    cssP->status                    = cSubP->status;
+    cssP->statusLastChange          = cSubP->statusLastChange;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1268,21 +1272,25 @@ void subCacheSync(void)
     // Note that count and failsCounter are special: they are update in DB
     // using $inc and not $set and they are flushed during the cache refresh process.
     // There aren't pointer for them
-    int64_t*      lastNotificationTimeP = NULL;
-    int64_t*      lastFailureP          = NULL;
-    int64_t*      lastSuccessP          = NULL;
-    std::string*  failureReasonP        = NULL;
-    int64_t*      statusCodeP           = NULL;
-    std::string*  statusP               = NULL;
-    double*       statusLastChangeP     = NULL;
+    int64_t*      lastNotificationTimeP     = NULL;
+    int64_t*      lastNotificationDurationP = NULL;
+    int64_t*      lastFailureP              = NULL;
+    int64_t*      lastSuccessP              = NULL;
+    std::string*  failureReasonP            = NULL;
+    int64_t*      statusCodeP               = NULL;
+    std::string*  statusP                   = NULL;
+    double*       statusLastChangeP         = NULL;
 
     if (cssP != NULL)
     {
       if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
       {
         // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
-        cSubP->lastNotificationTime = cssP->lastNotificationTime;
-        lastNotificationTimeP = &cSubP->lastNotificationTime;
+        cSubP->lastNotificationTime     = cssP->lastNotificationTime;
+        cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
+
+        lastNotificationTimeP     = &cSubP->lastNotificationTime;
+        lastNotificationDurationP = &cSubP->lastNotificationDuration;
       }
 
       if (cssP->lastFailure > cSubP->lastFailure)
@@ -1323,6 +1331,8 @@ void subCacheSync(void)
                                 cSubP->subscriptionId,
                                 cssP->count,
                                 cssP->failsCounter,
+                                cssP->notificationDurationDelta,
+                                lastNotificationDurationP,
                                 lastNotificationTimeP,
                                 lastFailureP,
                                 lastSuccessP,
@@ -1534,8 +1544,8 @@ void subNotificationDurationUpdate
     return;
   }
 
-  subP->lastNotificationDuration         = httpRequestDurationMs;
-  subP->accumulatedNotificationDuration += httpRequestDurationMs;
+  subP->lastNotificationDuration  = httpRequestDurationMs;
+  subP->notificationDurationDelta += httpRequestDurationMs;
 
   cacheSemGive(__FUNCTION__, "Looking up an item for notification duration");
 }

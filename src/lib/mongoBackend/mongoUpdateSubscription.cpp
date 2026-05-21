@@ -270,7 +270,7 @@ static void updateInCache
 
   long long    lastNotificationTime;
   long long    lastNotificationDuration;
-  long long    accumulatedNotificationDuration;
+  long long    notificationDurationDelta;
   long long    lastFailure;
   std::string  lastFailureReason;
   long long    lastSuccess;
@@ -286,7 +286,7 @@ static void updateInCache
   {
     lastNotificationTime            = subCacheP->lastNotificationTime;
     lastNotificationDuration        = subCacheP->lastNotificationDuration;
-    accumulatedNotificationDuration = subCacheP->accumulatedNotificationDuration;
+    notificationDurationDelta       = subCacheP->notificationDurationDelta;
     lastFailure                     = subCacheP->lastFailure;
     lastFailureReason               = subCacheP->lastFailureReason;
     lastSuccess                     = subCacheP->lastSuccess;
@@ -302,7 +302,7 @@ static void updateInCache
   {
     lastNotificationTime            = -1;
     lastNotificationDuration        = -1;
-    accumulatedNotificationDuration = 0;
+    notificationDurationDelta = 0;
     lastFailure                     = -1;
     lastFailureReason               = "";
     lastSuccess                     = -1;
@@ -329,7 +329,7 @@ static void updateInCache
                                           servicePathCache,
                                           lastNotificationTime,
                                           lastNotificationDuration,
-                                          accumulatedNotificationDuration,
+                                          notificationDurationDelta,
                                           lastFailure,
                                           lastFailureReason,
                                           lastSuccess,

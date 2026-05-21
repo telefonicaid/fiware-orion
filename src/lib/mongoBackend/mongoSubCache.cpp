@@ -109,7 +109,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       :  0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
   cSubP->lastNotificationDuration        = sub.hasField(CSUB_LASTNOTIFICATIONDURATION)?     getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATIONDURATION)     : -1;
-  cSubP->accumulatedNotificationDuration = sub.hasField(CSUB_ACCUMULATEDNOTIFICATIONDURATION)? getIntOrLongFieldAsLongF(sub, CSUB_ACCUMULATEDNOTIFICATIONDURATION) : 0;
+  cSubP->notificationDurationDelta = 0;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
   cSubP->statusLastChange      = sub.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(sub, CSUB_STATUS_LAST_CHANGE)      : -1;
   cSubP->blacklist             = sub.hasField(CSUB_BLACKLIST)?        getBoolFieldF(sub, CSUB_BLACKLIST)                   : false;
@@ -338,7 +338,7 @@ int mongoSubCacheItemInsert
   const char*            servicePath,
   long long              lastNotificationTime,
   long long              lastNotificationDuration,
-  long long              accumulatedNotificationDuration,
+  long long              notificationDurationDelta,
   long long              lastFailure,
   const std::string&     lastFailureReason,
   long long              lastSuccess,
@@ -460,9 +460,7 @@ int mongoSubCacheItemInsert
   cSubP->covered               = sub.hasField(CSUB_COVERED)? getBoolFieldF(sub, CSUB_COVERED) : false;
   cSubP->notifyOnMetadataChange = sub.hasField(CSUB_NOTIFYONMETADATACHANGE)? getBoolFieldF(sub, CSUB_NOTIFYONMETADATACHANGE) : true;
 
-  cSubP->lastNotificationTime            = lastNotificationTime;
-  cSubP->lastNotificationDuration        = lastNotificationDuration;
-  cSubP->accumulatedNotificationDuration = accumulatedNotificationDuration;
+  cSubP->lastNotificationTime  = lastNotificationTime;
   cSubP->lastFailure           = lastFailure;
   cSubP->lastFailureReason     = lastFailureReason;
   cSubP->lastSuccess           = lastSuccess;
@@ -473,6 +471,8 @@ int mongoSubCacheItemInsert
   cSubP->failsCounterFromDbValid  = failsCounterFromDbValid;
   cSubP->status                = status;
   cSubP->statusLastChange      = statusLastChange;
+  cSubP->lastNotificationDuration  = lastNotificationDuration;
+  cSubP->notificationDurationDelta = notificationDurationDelta;
 
   //
   // httpInfo & mqttInfo
@@ -965,7 +965,9 @@ void mongoSubUpdateOnCacheSync
   const std::string&  subId,
   long long           count,
   long long           failsCounter,
+  long long           notificationDurationDelta,
   int64_t*            lastNotificationTimeP,
+  int64_t*            lastNotificationDurationP,
   int64_t*            lastFailureP,
   int64_t*            lastSuccessP,
   std::string*        failureReasonP,
@@ -995,9 +997,18 @@ void mongoSubUpdateOnCacheSync
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
 
+  if (notificationDurationDelta > 0)
+  {
+    incB.append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, notificationDurationDelta);
+  }
+
   if ((lastNotificationTimeP != NULL) && (*lastNotificationTimeP > 0))
   {
     setB.append(CSUB_LASTNOTIFICATION, (long long) *lastNotificationTimeP);
+    if ((lastNotificationDurationP != NULL) && (*lastNotificationDurationP >= 0))
+    {
+      setB.append(CSUB_LASTNOTIFICATIONDURATION, (long long) *lastNotificationDurationP);
+    }
   }
   if ((lastFailureP != NULL) && (*lastFailureP > 0))
   {
