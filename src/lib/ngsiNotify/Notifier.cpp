@@ -119,14 +119,19 @@ static void buildExprContext
   ExprContextObject*        exprContextP,
   ContextElementResponse*   notifyCerP,
   const std::string&        tenant,
-  const std::string&        xauthToken,
-  bool                      basic
+  const std::string&        xauthToken
 )
 {
   Entity& en = notifyCerP->entity;
+  bool basic = exprContextP->isBasic();
 
   ExprContextObject exprMetadataContext(basic);
 
+  // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
+  // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
+  // exists, the operation is ignored (in other words, the first added key is the one that takes precedence). Taking
+  // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
+  // over the ones comming from headers of the same name, we conditionally add them depending the case
   TIME_EXPR_CTXBLD_START();
 
   exprContextP->add("id",   en.entityId.id);
@@ -143,6 +148,7 @@ static void buildExprContext
   {
     en.attributeVector[ix]->addToContext(exprContextP, basic);
 
+    // Add attribute metadata to context
     ExprContextObject exprAttrMetadataContext(basic);
     for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
     {
@@ -152,6 +158,8 @@ static void buildExprContext
     exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
   }
 
+  // Add all metadata under the "metadata" context key
+  // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
   exprContextP->add("metadata", exprMetadataContext);
 
   if (basic)
@@ -509,7 +517,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
-  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken, basic);
+  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken);
 
   //
   // 1. Verb/Method

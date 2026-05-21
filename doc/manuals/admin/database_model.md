@@ -288,6 +288,7 @@ Fields:
 -   **kafkaTopic**: KAFKA topic (only in KAFKA notifications)
 -   **qos**: MQTT QoS value (only in MQTT notifications)
 -   **retain**: MQTT retain value (only in MQTT notifications)
+-   **key**: KAFKA key value (only in KAFKA notifications)
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id** (string), **type** (string), **isPattern** (bool)  **isTypePattern** (bool) (*).
 -   **attrs**: an array of attribute names (strings) (optional).
