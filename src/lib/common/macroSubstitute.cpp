@@ -77,6 +77,7 @@ std::string smartStringValue(const std::string& stringValue, ExprContextObject* 
   }
   else if (exprContextObjectP != NULL)
   {
+    // "Partial replacement" case. In this case, the result is always a string
     ResolveResult r = macroSubstitute(stringValue, exprContextObjectP, "null", true);
     std::string   effectiveValue;
 
