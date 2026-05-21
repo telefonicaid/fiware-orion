@@ -266,6 +266,11 @@ ResolveResult macroSubstitute(const std::string& from, ExprContextObject* exprCo
     }
   }
 
+  // If there was exactly one replacement and the replaced value was null,
+  // return ResolveNull only when the whole output is exactly the replaced value.
+  // This avoids treating strings like "value is ${x}" as null:
+  // "${x}" -> "" == "" => ResolveNull
+  // "value is ${x}" -> "value is " == "" => ResolveOk
   if ((iterations == 1) && lastReplacedValue.isNull && (out.value == lastReplacedValue.value))
   {
     out.status = ResolveNull;
