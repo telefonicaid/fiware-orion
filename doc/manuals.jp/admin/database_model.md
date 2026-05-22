@@ -220,6 +220,7 @@ Orion はこれを文字列 (レガシー) または bool 型 (現行) として
 -   **kafkaTopic**: KAFAKA トピック (KAFKA 通知のみ)
 -   **qos**: MQTT QoS 値 (MQTT 通知のみ)
 -   **retain**: MQTT retain 値 (MQTT 通知のみ)
+-   **key**: KAFKA キー値 (KAFKA 通知のみ)
 -   **entities**: エンティティの配列 (必須)。各エンティティの JSON には、**id** (文字列)、**type** (文字列)、**isPattern** (ブール値)、**isTypePattern** (ブール値) (*) が含まれます。
 -   **attrs** : 属性名の配列 (文字列) (オプション) です
 -   **blacklist** : `attrs` をホワイトリスト (もし `blacklist` が `false` また存在しない場合) またはブラックリスト (もし `blackslist` が `true` の場合) として解釈する必要があるかどうかを指定するブール値フィールドです
