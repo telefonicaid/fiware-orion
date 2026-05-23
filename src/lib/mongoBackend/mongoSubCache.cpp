@@ -1005,10 +1005,10 @@ void mongoSubUpdateOnCacheSync
   if ((lastNotificationTimeP != NULL) && (*lastNotificationTimeP > 0))
   {
     setB.append(CSUB_LASTNOTIFICATION, (long long) *lastNotificationTimeP);
-    if ((lastNotificationDurationP != NULL) && (*lastNotificationDurationP >= 0))
-    {
-      setB.append(CSUB_LASTNOTIFICATIONDURATION, (long long) *lastNotificationDurationP);
-    }
+  }
+  if ((lastNotificationDurationP != NULL) && (*lastNotificationDurationP >= 0))
+  {
+    setB.append(CSUB_LASTNOTIFICATIONDURATION, (long long) *lastNotificationDurationP);
   }
   if ((lastFailureP != NULL) && (*lastFailureP > 0))
   {

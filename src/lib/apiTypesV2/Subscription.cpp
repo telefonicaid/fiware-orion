@@ -192,14 +192,17 @@ std::string Notification::toJson(const std::string& attrsFormat)
     jh.addDate("lastNotification", this->lastNotification);
   }
 
-  if ((this->lastNotification > 0) && (this->lastNotificationDuration >= 0))
+  if ((this->type != MqttNotification) && (this->type != KafkaNotification))
   {
-    jh.addNumber("lastNotificationDuration", this->lastNotificationDuration);
-  }
+    if ((this->lastNotification > 0) && (this->lastNotificationDuration >= 0))
+    {
+      jh.addNumber("lastNotificationDuration", this->lastNotificationDuration);
+    }
 
-  if (this->accumulatedNotificationDuration > 0)
-  {
-    jh.addNumber("accumulatedNotificationDuration", this->accumulatedNotificationDuration);
+    if (this->accumulatedNotificationDuration > 0)
+    {
+      jh.addNumber("accumulatedNotificationDuration", this->accumulatedNotificationDuration);
+    }
   }
 
   if (this->blacklist)

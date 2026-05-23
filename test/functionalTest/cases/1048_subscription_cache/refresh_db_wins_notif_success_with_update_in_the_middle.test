@@ -223,12 +223,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 420
+Content-Length: 456
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -348,13 +349,14 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 457
+Content-Length: 522
 
 [
     {
         "description": "A little description",
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -362,6 +364,7 @@ Content-Length: 457
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "2050-01-01T10:00:00.000Z",
             "lastSuccessCode": 211,
             "onlyChangedAttrs": false,
@@ -387,6 +390,7 @@ Content-Length: 457
 08. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1 + description
 ====================================================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -411,6 +415,7 @@ Content-Length: 457
     "failsCounter": 0,
     "format": "normalized",
     "lastNotification": 2524644000,
+    "lastNotificationDuration": REGEX(\d+),
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],

@@ -416,11 +416,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 436
+Content-Length: 501
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -428,6 +429,7 @@ Content-Length: 436
             "url": "http://localhost:9997/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 2,
@@ -478,11 +480,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 544
+Content-Length: 608
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -493,6 +496,7 @@ Content-Length: 544
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 2,
@@ -530,11 +534,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 546
+Content-Length: 610
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -545,6 +550,7 @@ Content-Length: 546
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 2,
@@ -591,11 +597,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 546
+Content-Length: 610
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -606,6 +613,7 @@ Content-Length: 546
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 2,
@@ -651,11 +659,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 546
+Content-Length: 610
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -666,6 +675,7 @@ Content-Length: 546
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 2,
@@ -711,11 +721,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 544
+Content-Length: 608
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -726,6 +737,7 @@ Content-Length: 544
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 5,
@@ -763,11 +775,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 546
+Content-Length: 610
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -778,6 +791,7 @@ Content-Length: 546
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 5,
@@ -824,11 +838,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 546
+Content-Length: 610
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -839,6 +854,7 @@ Content-Length: 546
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 5,
@@ -889,11 +905,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 527
+Content-Length: 591
 
 {
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -903,6 +920,7 @@ Content-Length: 527
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "maxFailsLimit": 5,

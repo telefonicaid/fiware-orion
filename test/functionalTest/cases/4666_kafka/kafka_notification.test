@@ -305,7 +305,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 1369
+Content-Length: 1434
 
 [
     {
@@ -372,6 +372,7 @@ Content-Length: 1369
         "description": "HTTP sub",
         "id": "REGEX([0-9a-f\-]{24})",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -379,6 +380,7 @@ Content-Length: 1369
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
             "onlyChangedAttrs": false,

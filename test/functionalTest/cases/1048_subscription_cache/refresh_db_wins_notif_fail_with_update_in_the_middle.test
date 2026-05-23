@@ -347,7 +347,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 486
+Content-Length: 515
 
 [
     {
@@ -364,6 +364,7 @@ Content-Length: 486
             "lastFailure": "2050-01-01T10:00:00.000Z",
             "lastFailureReason": "some reason",
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -413,6 +414,7 @@ Content-Length: 486
     "lastFailure": 2524644000,
     "lastFailureReason": "some reason",
     "lastNotification": 2524644000,
+    "lastNotificationDuration": REGEX(\d+),
     "metadata": [],
     "notifyOnMetadataChange": true,
     "onlyChanged": false,

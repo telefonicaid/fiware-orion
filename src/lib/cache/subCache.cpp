@@ -1287,11 +1287,14 @@ void subCacheSync(void)
       {
         // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
         cSubP->lastNotificationTime     = cssP->lastNotificationTime;
-        cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
-
         lastNotificationTimeP     = &cSubP->lastNotificationTime;
-        lastNotificationDurationP = &cSubP->lastNotificationDuration;
       }
+      if (cssP->lastNotificationDuration != cSubP->lastNotificationDuration)
+      {
+        cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
+        lastNotificationDurationP       = &cSubP->lastNotificationDuration;
+      }
+
 
       if (cssP->lastFailure > cSubP->lastFailure)
       {
@@ -1332,8 +1335,8 @@ void subCacheSync(void)
                                 cssP->count,
                                 cssP->failsCounter,
                                 cssP->notificationDurationDelta,
-                                lastNotificationDurationP,
                                 lastNotificationTimeP,
+                                lastNotificationDurationP,
                                 lastFailureP,
                                 lastSuccessP,
                                 failureReasonP,

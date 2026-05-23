@@ -326,7 +326,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 594
 
 {
     "description": "A subscription to get info about Room1",
@@ -344,6 +344,7 @@ Content-Length: 566
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
         "timesSent": 1
@@ -380,7 +381,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 594
 
 {
     "description": "A subscription to get info about Room1",
@@ -398,6 +399,7 @@ Content-Length: 566
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
         "timesSent": 2
@@ -434,7 +436,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 594
 
 {
     "description": "A subscription to get info about Room1",
@@ -452,6 +454,7 @@ Content-Length: 566
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
         "timesSent": 3
@@ -488,7 +491,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 594
 
 {
     "description": "A subscription to get info about Room1",
@@ -506,6 +509,7 @@ Content-Length: 566
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
         "timesSent": 4
@@ -542,7 +546,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 594
 
 {
     "description": "A subscription to get info about Room1",
@@ -560,6 +564,7 @@ Content-Length: 566
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
         "timesSent": 5
@@ -596,7 +601,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 568
+Content-Length: 596
 
 {
     "description": "A subscription to get info about Room1",
@@ -614,6 +619,7 @@ Content-Length: 568
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "maxFailsLimit": 5,
         "onlyChangedAttrs": false,
         "timesSent": 6

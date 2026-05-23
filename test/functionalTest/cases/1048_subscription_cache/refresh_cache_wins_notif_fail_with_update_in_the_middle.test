@@ -224,7 +224,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 465
+Content-Length: 493
 
 [
     {
@@ -240,6 +240,7 @@ Content-Length: 465
             "lastFailure": "202REGEX(.*)",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "202REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -350,7 +351,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 502
+Content-Length: 530
 
 [
     {
@@ -367,6 +368,7 @@ Content-Length: 502
             "lastFailure": "202REGEX(.*)",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "202REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -416,6 +418,7 @@ Content-Length: 502
     "lastFailure": REGEX(1[6-9]\d+),
     "lastFailureReason": "Could not connect to server",
     "lastNotification": REGEX(1[6-9]\d+),
+    "lastNotificationDuration": REGEX(\d+),
     "metadata": [],
     "notifyOnMetadataChange": true,
     "onlyChanged": false,

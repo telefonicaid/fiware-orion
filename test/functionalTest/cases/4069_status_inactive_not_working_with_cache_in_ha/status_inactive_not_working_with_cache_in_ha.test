@@ -256,7 +256,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 528
+Content-Length: 556
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -271,6 +271,7 @@ Content-Length: 528
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,
@@ -324,7 +325,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 530
+Content-Length: 558
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -339,6 +340,7 @@ Content-Length: 530
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,
@@ -392,7 +394,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 528
+Content-Length: 556
 
 {
     "id": "620e0d04219c8378695c822b",
@@ -407,6 +409,7 @@ Content-Length: 528
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,

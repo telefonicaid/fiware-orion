@@ -227,12 +227,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 451
+Content-Length: REGEX(\d+)
 
 [
     {
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -243,6 +244,7 @@ Content-Length: 451
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Could not resolve hostname",
             "lastNotification": "REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -284,12 +286,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 500
+Content-Length: REGEX(\d+)
 
 [
     {
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -299,6 +302,7 @@ Content-Length: 500
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Could not resolve hostname",
             "lastNotification": "REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
             "onlyChangedAttrs": false,
@@ -371,12 +375,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 514
+Content-Length: REGEX(\d+)
 
 [
     {
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -387,6 +392,7 @@ Content-Length: 514
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Could not resolve hostname",
             "lastNotification": "REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 200,
             "onlyChangedAttrs": false,
