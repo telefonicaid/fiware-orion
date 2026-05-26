@@ -194,7 +194,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 576
+Content-Length: 577
 
 {
     "description": "A subscription to get info about Room1",

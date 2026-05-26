@@ -257,7 +257,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 594
+Content-Length: 595
 
 {
     "description": "A subscription to get info about Room1",
@@ -312,7 +312,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 594
+Content-Length: 595
 
 {
     "description": "A subscription to get info about Room1",
@@ -372,7 +372,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 676
+Content-Length: 677
 
 {
     "description": "A subscription to get info about Room1",

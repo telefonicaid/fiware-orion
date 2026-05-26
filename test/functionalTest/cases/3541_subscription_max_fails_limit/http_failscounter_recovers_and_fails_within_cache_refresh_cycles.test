@@ -205,7 +205,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 491
+Content-Length: 492
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -269,7 +269,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 590
+Content-Length: 591
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -325,7 +325,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 573
+Content-Length: 574
 
 {
     "id": "REGEX([0-9a-f]{24})",
@@ -368,7 +368,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 573
+Content-Length: 574
 
 {
     "id": "REGEX([0-9a-f]{24})",
