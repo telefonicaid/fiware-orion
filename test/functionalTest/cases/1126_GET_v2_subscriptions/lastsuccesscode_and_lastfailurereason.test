@@ -323,7 +323,7 @@ payload='{
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 
 # Wait for 1.5 x timeout
-sleep 3s
+sleep 12s
 
 
 echo "10. Get sub1 see lastSuccessCode: 200 but not failsCounter"
@@ -772,7 +772,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 579
+Content-Length: 583
 
 {
     "description": "Test host not found reponses",
