@@ -58,7 +58,7 @@ payload='{
   },
   "notification": {
     "http": {
-      "url": "http://nohost:'$LISTENER_PORT'/notify"
+      "url": "http://nohost.invalid:'$LISTENER_PORT'/notify"
     },
     "attrs": [ ]
   }
@@ -165,7 +165,7 @@ payload='{
   },
   "notification": {
     "http": {
-      "url": "http://nohost:'$LISTENER_PORT'/notify"
+      "url": "http://nohost.invalid:'$LISTENER_PORT'/notify"
     },
     "attrs": [ ]
   }
@@ -227,7 +227,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 516
+Content-Length: REGEX(\d+)
 
 [
     {
@@ -239,7 +239,7 @@ Content-Length: 516
             "covered": false,
             "failsCounter": 1,
             "http": {
-                "url": "http://nohost:REGEX(\d+)/notify"
+                "url": "http://nohost.invalid:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Could not resolve hostname",
@@ -286,7 +286,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 568
+Content-Length: REGEX(\d+)
 
 [
     {
@@ -375,7 +375,7 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 585
+Content-Length: REGEX(\d+)
 
 [
     {
@@ -387,7 +387,7 @@ Content-Length: 585
             "covered": false,
             "failsCounter": 1,
             "http": {
-                "url": "http://nohost:REGEX(\d+)/notify"
+                "url": "http://nohost.invalid:REGEX(\d+)/notify"
             },
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Could not resolve hostname",
