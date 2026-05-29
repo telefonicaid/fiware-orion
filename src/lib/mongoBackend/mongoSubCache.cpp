@@ -997,7 +997,7 @@ void mongoSubUpdateOnCacheSync
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
 
-  if (notificationDurationDelta > 0)
+  if (count > 0)
   {
     incB.append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, notificationDurationDelta);
   }

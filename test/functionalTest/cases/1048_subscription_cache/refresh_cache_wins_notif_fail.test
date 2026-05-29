@@ -327,6 +327,7 @@ Content-Length: 530
 06. Get doc in DB after cache refresh and see lastNotification/Failure in the present and reason 'could not connect' and count 1 and failsCounter 1
 ===================================================================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],

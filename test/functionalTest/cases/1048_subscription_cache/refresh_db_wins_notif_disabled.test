@@ -344,6 +344,7 @@ Content-Length: 548
 07. Get doc in DB after cache refresh and see status active changed in a far future and count 2, failsCounter 2
 ===============================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
