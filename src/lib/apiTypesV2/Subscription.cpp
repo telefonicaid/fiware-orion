@@ -197,10 +197,6 @@ std::string Notification::toJson(const std::string& attrsFormat)
     if ((this->lastNotification > 0) && (this->lastNotificationDuration >= 0))
     {
       jh.addNumber("lastNotificationDuration", this->lastNotificationDuration);
-    }
-
-    if (this->accumulatedNotificationDuration > 0)
-    {
       jh.addNumber("accumulatedNotificationDuration", this->accumulatedNotificationDuration);
     }
   }

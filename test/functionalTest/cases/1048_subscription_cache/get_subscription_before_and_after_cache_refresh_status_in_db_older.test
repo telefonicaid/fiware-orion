@@ -111,7 +111,9 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa26230323
     count: NumberLong("25"),
     failsCounter: NumberLong("8"),
     status: "inactive",
-    statusLastChange: 1577869200
+    statusLastChange: 1577869200,
+    lastNotificationDuration: NumberLong("10"),
+    accumulatedNotificationDuration: NumberLong("22")
   }
 })'
 echo
@@ -149,7 +151,7 @@ Content-Length: 617
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
-            "accumulatedNotificationDuration": REGEX(\d+),
+            "accumulatedNotificationDuration": 12,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -160,7 +162,7 @@ Content-Length: 617
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "2020-01-01T10:00:00.000Z",
-            "lastNotificationDuration": REGEX(\d+),
+            "lastNotificationDuration": 8,
             "lastSuccess": "2020-01-01T09:00:00.000Z",
             "lastSuccessCode": 200,
             "maxFailsLimit": 1,
@@ -195,13 +197,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 597
+Content-Length: 598
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
-            "accumulatedNotificationDuration": REGEX(\d+),
+            "accumulatedNotificationDuration": 22,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -212,7 +214,7 @@ Content-Length: 597
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Timeout",
             "lastNotification": "2020-01-01T11:00:00.000Z",
-            "lastNotificationDuration": REGEX(\d+),
+            "lastNotificationDuration": 10,
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,
@@ -242,13 +244,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 580
+Content-Length: 581
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
-            "accumulatedNotificationDuration": REGEX(\d+),
+            "accumulatedNotificationDuration": 22,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -258,7 +260,7 @@ Content-Length: 580
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Timeout",
             "lastNotification": "2020-01-01T11:00:00.000Z",
-            "lastNotificationDuration": REGEX(\d+),
+            "lastNotificationDuration": 10,
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,

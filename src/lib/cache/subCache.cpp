@@ -1283,16 +1283,19 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
-      if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
+      if (cssP->lastNotificationTime >= cSubP->lastNotificationTime)
       {
-        // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
-        cSubP->lastNotificationTime     = cssP->lastNotificationTime;
-        lastNotificationTimeP     = &cSubP->lastNotificationTime;
-      }
-      if (cssP->lastNotificationDuration != cSubP->lastNotificationDuration)
-      {
-        cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
-        lastNotificationDurationP       = &cSubP->lastNotificationDuration;
+        if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
+        {
+          // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
+          cSubP->lastNotificationTime     = cssP->lastNotificationTime;
+          lastNotificationTimeP     = &cSubP->lastNotificationTime;
+        }
+        if (cssP->lastNotificationDuration >= 0 && cssP->lastNotificationDuration != cSubP->lastNotificationDuration)
+        {
+          cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
+          lastNotificationDurationP       = &cSubP->lastNotificationDuration;
+        }
       }
 
 

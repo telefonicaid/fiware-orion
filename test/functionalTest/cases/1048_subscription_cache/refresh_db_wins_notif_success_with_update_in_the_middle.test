@@ -223,13 +223,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 456
+Content-Length: 420
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
-            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -390,7 +389,6 @@ Content-Length: 522
 08. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1 + description
 ====================================================================================================================================
 {
-    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
