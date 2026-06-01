@@ -452,6 +452,7 @@ There are some exception cases in which the above restrictions do not apply. In 
 * URL parameter `q` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `mq` allows the special characters needed by the [Simple Query Language](#simple-query-language)
 * URL parameter `georel` and `coords` allow `;`
+* HTTP and Kafka custom header values allow the `'` and `"` quote characters to support quoted string literals in JEXL expressions
 * Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL support in custom notifications](#jexl-support-in-custom-notifications))
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
 
@@ -2055,7 +2056,7 @@ a legacy.
 ### Macro substitution
 
 Clients can customize notification messages using a simple template mechanism when
-`notification.httpCustom` or `notification.mqttCustom` are used. Which fields can be templatized
+`notification.httpCustom`, `notification.mqttCustom` or `notification.kafkaCustom` are used. Which fields can be templatized
 depends on the protocol type.
 
 In case of `httpCustom`:
@@ -2074,6 +2075,13 @@ In case of `mqttCustom`:
 
 * `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
+
+In case of `kafkaCustom`:
+
+* `headers` (both header name and value can be templatized).
+* `payload`, `json` and `ngsi` (all them payload related fields)
+* `topic`
+* `key`
 
 Macro substitution for templates is based on the syntax `${<JEXL expression>}`. The support to JEXL
 is explained in [JEXL support in custom notifications](#jexl-support-in-custom-notifications) section. The following identifiers are included in
@@ -5116,6 +5124,7 @@ A `kafka` object contains the following subfields:
 |--------------------|----------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `url`              |          | string | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port)                                                                                          |
 | `topic`            |          | string | Represent the KAFKA topic to use                                                                                                                                                                                               |
+| `key`              | ✓        | string | Represent the Kafka message key to use. If omitted or set to `null`, the notification is sent with a null key. Otherwise, the provided string value is used as the Kafka message key.                                          |
 | `user`             | ✓        | string | User name used for Kafka SASL authentication. Must be used together with `passwd`.                                                                                                                                             |
 | `passwd`           | ✓        | string | Passphrase used for Kafka SASL authentication. Must be used together with `user`. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).                                             |
 | `saslMechanism`    | ✓        | string | SASL mechanism to use when authentication is enabled. Allowed values: `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`. Mandatory if `user`/`passwd` are set.                                                                         |
@@ -5167,18 +5176,19 @@ see the specific [MQTT notifications](user/mqtt_notifications.md) documentation.
 
 A `kafkaCustom` object contains the following subfields.
 
-| Parameter          | Optional | Type    | Description                                                                                                                                                                                                                        |
-|--------------------|----------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `url`              |          | string  | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port)                                                                                              |
-| `topic`            |          | string  | Represent the KAFKA topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                                                                                                         |
-| `headers`          | ✓        | object | A key-map of headers that are included in notification messages. Must not be empty.                                                                                                                                                   |
-| `payload`          | ✓        | string  | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
-| `json`             | ✓        | object  | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details.                                                                                                                      |
-| `ngsi`             | ✓        |  object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details.                                                                                               |
-| `user`             | ✓        | string  | User name used for Kafka SASL authentication. Must be used together with `passwd`.                                                                                                                                                 |
-| `passwd`           | ✓        | string  | Passphrase used for Kafka SASL authentication. Must be used together with `user`. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).                                                 |
-| `saslMechanism`    | ✓        | string  | SASL mechanism to use when authentication is enabled. Allowed values: `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`. Mandatory if `user`/`passwd` are set.                                                                             |
-| `securityProtocol` | ✓        | string  | Kafka security protocol to use when authentication is enabled. Allowed values: `SASL_PLAINTEXT`, `SASL_SSL`. If omitted, `SASL_SSL` is used by default when authentication is enabled (i.e. when `user` and `passwd` are set).     |
+| Parameter          | Optional | Type     | Description                                                                                                                                                                                                                           |
+|--------------------|----------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `url`              |          | string   | Represent the KAFKA broker endpoint to use. URL must start with `kafka://` and never contains a path (it only includes host and port)                                                                                                 |
+| `topic`            |          | string   | Represent the KAFKA topic to use. Macro replacement is also performed for this field (i.e: a topic based on an attribute )                                                                                                            |
+| `key`              | ✓        | string   | Represent the Kafka message key to use. Macro replacement is also performed for this field. If omitted or set to `null`, the notification is sent with a null key.                                                                    |
+| `headers`          | ✓        | object   | A key-map of headers that are included in notification messages. Must not be empty.                                                                                                                                                   |
+| `payload`          | ✓        | string   | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
+| `json`             | ✓        | object   | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details.                                                                                                                         |
+| `ngsi`             | ✓        | object   | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details.                                                                                                  |
+| `user`             | ✓        | string   | User name used for Kafka SASL authentication. Must be used together with `passwd`.                                                                                                                                                    |
+| `passwd`           | ✓        | string   | Passphrase used for Kafka SASL authentication. Must be used together with `user`. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).                                                    |
+| `saslMechanism`    | ✓        | string   | SASL mechanism to use when authentication is enabled. Allowed values: `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`. Mandatory if `user`/`passwd` are set.                                                                                |
+| `securityProtocol` | ✓        | string   | Kafka security protocol to use when authentication is enabled. Allowed values: `SASL_PLAINTEXT`, `SASL_SSL`. If omitted, `SASL_SSL` is used by default when authentication is enabled (i.e. when `user` and `passwd` are set).        |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 

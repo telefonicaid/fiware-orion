@@ -73,7 +73,8 @@ static std::string parseNotifyConditionVector(ConnectionInfo* ciP, SubscriptionU
 static std::string parseDictionary(ConnectionInfo*                      ciP,
                                    std::map<std::string, std::string>&  dict,
                                    const Value&                         object,
-                                   const std::string&                   name);
+                                   const std::string&                   name,
+                                   const char*                          valueExceptions = NULL);
 
 
 
@@ -629,6 +630,8 @@ static std::string parseMqttUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP, 
   return "";
 }
 
+
+
 /* ****************************************************************************
 *
 * parseKafkaUrl -
@@ -672,6 +675,7 @@ static std::string parseKafkaUrl(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
   subsP->notification.kafkaInfo.url = "kafka://" + cleanBrokers;
   return "";
 }
+
 
 
 /* ****************************************************************************
@@ -768,6 +772,8 @@ static std::string parseMqttTopic(ConnectionInfo* ciP, SubscriptionUpdate* subsP
 
   return "";
 }
+
+
 
 /* ****************************************************************************
 *
@@ -997,6 +1003,41 @@ static std::string parseKafkaAuth(ConnectionInfo* ciP, SubscriptionUpdate* subsP
 
 /* ****************************************************************************
 *
+* parseKafkaKey -
+*/
+static std::string parseKafkaKey(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& kafka)
+{
+  subsP->notification.kafkaInfo.keyProvided = false;
+  subsP->notification.kafkaInfo.keyIsNull   = false;
+  subsP->notification.kafkaInfo.key         = "";
+
+  if (!kafka.HasMember("key"))
+  {
+    return "";
+  }
+
+  subsP->notification.kafkaInfo.keyProvided = true;
+
+  if (isNull(kafka, "key"))
+  {
+    subsP->notification.kafkaInfo.keyIsNull = true;
+    return "";
+  }
+
+  Opt<std::string> keyOpt = getStringOpt(kafka, "key", "key kafka notification");
+  if (!keyOpt.ok())
+  {
+    return badInput(ciP, keyOpt.error);
+  }
+
+  subsP->notification.kafkaInfo.key = keyOpt.value;
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseNotification -
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
@@ -1216,7 +1257,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       std::string r = parseDictionary(ciP,
                                       subsP->notification.httpInfo.headers,
                                       headers,
-                                      "notification httpCustom headers");
+                                      "notification httpCustom headers",
+                                      "'\"");
 
       if (!r.empty())
       {
@@ -1375,6 +1417,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // key
+    r = parseKafkaKey(ciP, subsP, kafka);
+    if (!r.empty())
+    {
+      return r;
+    }
+
     subsP->notification.kafkaInfo.custom = false;
   }
   else if (notification.HasMember("kafkaCustom"))
@@ -1404,6 +1453,13 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
 
     // auth
     r = parseKafkaAuth(ciP, subsP, kafkaCustom);
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // key
+    r = parseKafkaKey(ciP, subsP, kafkaCustom);
     if (!r.empty())
     {
       return r;
@@ -1441,7 +1497,8 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       std::string r = parseDictionary(ciP,
                                       subsP->notification.kafkaInfo.headers,
                                       headers,
-                                      "notification kafkaCustom headers");
+                                      "notification kafkaCustom headers",
+                                      "'\"");
 
       if (!r.empty())
       {
@@ -1707,7 +1764,8 @@ static std::string parseDictionary
   ConnectionInfo*                      ciP,
   std::map<std::string, std::string>&  dict,
   const Value&                         object,
-  const std::string&                   name
+  const std::string&                   name,
+  const char*                          valueExceptions
 )
 {
   if (!object.IsObject())
@@ -1725,7 +1783,7 @@ static std::string parseDictionary
     std::string value = iter->value.GetString();
     std::string key   = iter->name.GetString();
 
-    if (forbiddenChars(value.c_str()))
+    if (forbiddenChars(value.c_str(), valueExceptions))
     {
       return badInput(ciP, std::string("forbidden characters in custom ") + name);
     }

@@ -91,7 +91,9 @@ public:
   const std::string& user,
   const std::string& passwd,
   const std::string& saslMechanism,
-  const std::string& securityProtocol
+  const std::string& securityProtocol,
+  bool  kafkaKeyIsNull,
+  const std::string& kafkaKey
  );
 
  void cleanup(double maxAge);  // Cleaning inactive connections

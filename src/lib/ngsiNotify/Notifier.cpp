@@ -43,6 +43,7 @@
 #include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsiNotify/Notifier.h"
+#include "expressions/exprMgr.h"
 
 
 
@@ -108,6 +109,71 @@ void Notifier::sendNotifyContextRequest
 }
 
 
+/* ****************************************************************************
+*
+* buildExprContext -
+*
+*/
+static void buildExprContext
+(
+  ExprContextObject*        exprContextP,
+  ContextElementResponse*   notifyCerP,
+  const std::string&        tenant,
+  const std::string&        xauthToken
+)
+{
+  Entity& en = notifyCerP->entity;
+  bool basic = exprContextP->isBasic();
+
+  ExprContextObject exprMetadataContext(basic);
+
+  // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
+  // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
+  // exists, the operation is ignored (in other words, the first added key is the one that takes precedence). Taking
+  // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
+  // over the ones comming from headers of the same name, we conditionally add them depending the case
+  TIME_EXPR_CTXBLD_START();
+
+  exprContextP->add("id",   en.entityId.id);
+  exprContextP->add("type", en.entityId.type);
+
+  if (!basic)
+  {
+    exprContextP->add("service",     tenant);
+    exprContextP->add("servicePath", en.servicePath);
+    exprContextP->add("authToken",   xauthToken);
+  }
+
+  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
+  {
+    en.attributeVector[ix]->addToContext(exprContextP, basic);
+
+    // Add attribute metadata to context
+    ExprContextObject exprAttrMetadataContext(basic);
+    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
+    {
+      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
+    }
+
+    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
+  }
+
+  // Add all metadata under the "metadata" context key
+  // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
+  exprContextP->add("metadata", exprMetadataContext);
+
+  if (basic)
+  {
+    exprContextP->add("service",     tenant);
+    exprContextP->add("servicePath", en.servicePath);
+    exprContextP->add("authToken",   xauthToken);
+  }
+
+  TIME_EXPR_CTXBLD_STOP();
+}
+
+
+
 
 /* ****************************************************************************
 *
@@ -159,11 +225,12 @@ static bool setPayload
   }
   else
   {
-    if (!macroSubstitute(payloadP, notifPayload, exprContextObjectP, "null", true))
+    ResolveResult payloadSub = macroSubstitute(notifPayload, exprContextObjectP, "null", true);
+    if (payloadSub.status == ResolveError)
     {
       return false;
     }
-
+    *payloadP = payloadSub.value;
     char* pload    = curl_unescape(payloadP->c_str(), payloadP->length());
     *payloadP      = std::string(pload);
     *renderFormatP = NGSI_V2_CUSTOM;
@@ -344,14 +411,19 @@ static bool appendHeadersFrom(const std::map<std::string, std::string>& sourceHe
   {
     std::string key   = it->first;
     std::string value = it->second;
+    ResolveResult keySub   = macroSubstitute(it->first,  exprContextObjectP, "null", true);
+    ResolveResult valueSub = macroSubstitute(it->second, exprContextObjectP, "null", true);
 
-    if ((macroSubstitute(&key,   it->first,  exprContextObjectP, "", true) == false) || (macroSubstitute(&value, it->second, exprContextObjectP, "", true) == false))
+    if (keySub.status == ResolveError || valueSub.status == ResolveError)
     {
       // Warning already logged in macroSubstitute()
       return false;
     }
 
-    if (key.empty())
+    key   = keySub.value;
+    value = valueSub.value;
+
+    if (key.empty() || key == "null" || valueSub.status == ResolveNull)
     {
       // To avoid empty header name
       continue;
@@ -365,6 +437,43 @@ static bool appendHeadersFrom(const std::map<std::string, std::string>& sourceHe
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     destHeaders[key] = value;
   }
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* resolveKafkaKey -
+*/
+static bool resolveKafkaKey(const ngsiv2::Notification& notification,
+                            ExprContextObject* exprContextObjectP,
+                            bool* kafkaKeyIsNull,
+                            std::string* kafkaKey)
+{
+  *kafkaKeyIsNull = false;
+  *kafkaKey       = "";
+
+  if (notification.kafkaInfo.keyProvided == false || notification.kafkaInfo.keyIsNull == true)
+  {
+    *kafkaKeyIsNull = true;
+    return true;
+  }
+
+  ResolveResult keySub = macroSubstitute(notification.kafkaInfo.key, exprContextObjectP, "null", true);
+
+  if (keySub.status == ResolveError)
+  {
+    return false;
+  }
+
+  if (keySub.status == ResolveNull)
+  {
+    *kafkaKeyIsNull = true;
+    return true;
+  }
+
+  *kafkaKey = keySub.value;
   return true;
 }
 
@@ -408,48 +517,7 @@ static SenderThreadParams* buildSenderParamsCustom
 
   // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
-  ExprContextObject exprMetadataContext(basic);
-
-  // It seems that add() semantics are different in basic and jexl mode. In jexl mode, if the key already exists, it is
-  // updated (in other words, the last added keys is the one that takes precedence). In basic model, if the key already
-  // exists, the operation is ignored (in other words, the first added key is the one that takes precedence). Taking
-  // into account that in the case of an attribute with name "service", "servicePath" or "authToken", it must have precedence
-  // over the ones comming from headers of the same name, we conditionally add them depending the case
-  TIME_EXPR_CTXBLD_START();
-  exprContext.add("id", en.entityId.id);
-  exprContext.add("type", en.entityId.type);
-
-  if (!basic)
-  {
-    exprContext.add("service", tenant);
-    exprContext.add("servicePath", en.servicePath);
-    exprContext.add("authToken", xauthToken);
-  }
-
-  for (unsigned int ix = 0; ix < en.attributeVector.size(); ix++)
-  {
-    en.attributeVector[ix]->addToContext(&exprContext, basic);
-
-    // Add attribute metadata to context
-    ExprContextObject exprAttrMetadataContext(basic);
-    for (unsigned int jx = 0; jx < en.attributeVector[ix]->metadataVector.size(); jx++)
-    {
-      en.attributeVector[ix]->metadataVector[jx]->addToContext(&exprAttrMetadataContext, basic);
-    }
-    exprMetadataContext.add(en.attributeVector[ix]->name, exprAttrMetadataContext);
-  }
-
-  // Add all metadata under the "metadata" context key
-  // (note that in JEXL if the key already exists, it is updated, so attribute with name "metadata" will never be appear in context)
-  exprContext.add("metadata", exprMetadataContext);
-
-  if (basic)
-  {
-    exprContext.add("service", tenant);
-    exprContext.add("servicePath", en.servicePath);
-    exprContext.add("authToken", xauthToken);
-  }
-  TIME_EXPR_CTXBLD_STOP();
+  buildExprContext(&exprContext, notifyCerP, tenant, xauthToken);
 
   //
   // 1. Verb/Method
@@ -491,11 +559,12 @@ static SenderThreadParams* buildSenderParamsCustom
     notifUrl = notification.kafkaInfo.url;
     break;
   }
-  if (macroSubstitute(&url, notifUrl, &exprContext, "", true) == false)
+  ResolveResult urlSub = macroSubstitute(notifUrl, &exprContext, "", true);
+  if (urlSub.status == ResolveError)
   {
-    // Warning already logged in macroSubstitute()
     return NULL;
   }
+  url = urlSub.value;
 
 
   //
@@ -606,12 +675,16 @@ static SenderThreadParams* buildSenderParamsCustom
       std::string key   = it->first;
       std::string value = it->second;
 
-      if ((macroSubstitute(&key, it->first, &exprContext, "", true) == false) || (macroSubstitute(&value, it->second, &exprContext, "", true) == false))
+      ResolveResult keySub   = macroSubstitute(it->first,  &exprContext, "", true);
+      ResolveResult valueSub = macroSubstitute(it->second, &exprContext, "", true);
+
+      if (keySub.status == ResolveError || valueSub.status == ResolveError)
       {
-        // Warning already logged in macroSubstitute()
         return NULL;
       }
 
+      key   = keySub.value;
+      value = valueSub.value;
       if ((value.empty()) || (key.empty()))
       {
         // To avoid e.g '?a=&b=&c='
@@ -695,20 +768,27 @@ static SenderThreadParams* buildSenderParamsCustom
   // 8. Topic (only in the case of MQTT notifications)
   if (notification.type == ngsiv2::MqttNotification)
   {
-    if (macroSubstitute(&topic, notification.mqttInfo.topic, &exprContext, "", true) == false)
+    ResolveResult topicSub = macroSubstitute(notification.mqttInfo.topic, &exprContext, "", true);
+    if (topicSub.status == ResolveError)
     {
       // Warning already logged in macroSubstitute()
       return NULL;
     }
+
+    topic = topicSub.value;
   }
   // 9. Topic (only in the case of KAFKA notifications)
   if (notification.type == ngsiv2::KafkaNotification)
   {
-    if (macroSubstitute(&topic, notification.kafkaInfo.topic, &exprContext, "", true) == false)
+    ResolveResult topicSub = macroSubstitute(notification.kafkaInfo.topic, &exprContext, "", true);
+
+    if (topicSub.status == ResolveError)
     {
       // Warning already logged in macroSubstitute()
       return NULL;
     }
+
+    topic = topicSub.value;
   }
 
   // 10. Kafka/MQTT auth parameters
@@ -736,6 +816,19 @@ static SenderThreadParams* buildSenderParamsCustom
       passwd           = notification.kafkaInfo.passwd;
       saslMechanism    = notification.kafkaInfo.saslMechanism;
       securityProtocol = notification.kafkaInfo.securityProtocol;
+    }
+  }
+
+
+  // 11. KafkaKey (only kafka notifications)
+  bool        kafkaKeyIsNull = false;
+  std::string kafkaKey       = "";
+
+  if (notification.type == ngsiv2::KafkaNotification)
+  {
+    if (!resolveKafkaKey(notification, &exprContext, &kafkaKeyIsNull, &kafkaKey))
+    {
+      return NULL;
     }
   }
 
@@ -768,6 +861,8 @@ static SenderThreadParams* buildSenderParamsCustom
   paramsP->passwd           = passwd;
   paramsP->saslMechanism    = saslMechanism;
   paramsP->securityProtocol = securityProtocol;
+  paramsP->kafkaKeyIsNull   = kafkaKeyIsNull;
+  paramsP->kafkaKey         = kafkaKey;
 
   char suffix[STRING_SIZE_FOR_INT];
   snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);
@@ -993,6 +1088,22 @@ SenderThreadParams* Notifier::buildSenderParams
       }
     }
 
+    // KafkaKey (only kafka notifications)
+    bool        kafkaKeyIsNull = false;
+    std::string kafkaKey       = "";
+
+    if (notification.type == ngsiv2::KafkaNotification)
+    {
+      if (notification.kafkaInfo.keyProvided == false || notification.kafkaInfo.keyIsNull == true)
+      {
+        kafkaKeyIsNull = true;
+      }
+      else
+      {
+        kafkaKey = notification.kafkaInfo.key;
+      }
+    }
+
     paramsP->type             = QUEUE_MSG_NOTIF;
     paramsP->from             = fromIp;  // note fromIp is a thread variable
     paramsP->ip               = host;
@@ -1019,6 +1130,8 @@ SenderThreadParams* Notifier::buildSenderParams
     paramsP->passwd           = passwd;
     paramsP->saslMechanism    = saslMechanism;
     paramsP->securityProtocol = securityProtocol;
+    paramsP->kafkaKeyIsNull   = kafkaKeyIsNull;
+    paramsP->kafkaKey         = kafkaKey;
 
     char suffix[STRING_SIZE_FOR_INT];
     snprintf(suffix, sizeof(suffix), "%u", correlatorCounter);

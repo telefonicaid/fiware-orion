@@ -28,13 +28,35 @@
 #include <string>
 
 #include "apiTypesV2/Entity.h"
+/* ****************************************************************************
+*
+* ResolveStatus -
+*
+*/
+enum ResolveStatus
+{
+    ResolveError = 0,
+    ResolveOk,
+    ResolveNull
+  };
+
+/* ****************************************************************************
+*
+* ResolveResult -
+*
+*/
+struct ResolveResult
+{
+    ResolveStatus status;
+    std::string   value;
+};
 
 /* ****************************************************************************
 *
 * smartStringValue -
 *
 */
-extern std::string smartStringValue(const std::string stringValue, ExprContextObject* exprContextObjectP, const std::string notFoundDefault);
+extern std::string smartStringValue(const std::string& stringValue, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault);
 
 
 
@@ -43,6 +65,6 @@ extern std::string smartStringValue(const std::string stringValue, ExprContextOb
 * macroSubstitute -
 *
 */
-extern bool macroSubstitute(std::string* sP, const std::string& in, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw = false);
+extern ResolveResult macroSubstitute(const std::string& from, ExprContextObject* exprContextObjectP, const std::string& notFoundDefault, bool raw = false);
 
 #endif  // SRC_LIB_COMMON_MACROSUBSTITUTE_H_

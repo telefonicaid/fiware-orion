@@ -412,6 +412,20 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* b)
 
     }
 
+    if (sub.notification.kafkaInfo.keyProvided)
+    {
+      if (sub.notification.kafkaInfo.keyIsNull)
+      {
+        b->appendNull(CSUB_KAFKAKEY);
+        LM_T(LmtMongo, ("Subscription kafkaKey: null"));
+      }
+      else
+      {
+        b->append(CSUB_KAFKAKEY, sub.notification.kafkaInfo.key);
+        LM_T(LmtMongo, ("Subscription kafkaKey: %s", sub.notification.kafkaInfo.key.c_str()));
+      }
+    }
+
     if (sub.notification.kafkaInfo.custom)
     {
       setCustomKafkaInfo(sub.notification.kafkaInfo, b);
