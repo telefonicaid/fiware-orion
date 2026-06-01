@@ -282,6 +282,8 @@ Fields:
     an absurdly high value is used (see PERMANENT_SUBS_DATETIME in the source code).
 -   **lastNotification**: the time (as integer number, meaning seconds) when last notification was sent. This
     is updated each time a notification is sent, to avoid violating throttling.
+-   **lastNotificationDuration**: the duration (as integer number, meaning milliseconds) of the last notification attempt.
+-   **accumulatedNotificationDuration**: the sum of the durations (as integer number, meaning milliseconds) of all notification attempts.
 -   **throttling**: minimum interval between notifications. 0 or -1 means no throttling.
 -   **reference**: the URL for notifications, either HTTP, MQTT or KAFKA
 -   **topic**: MQTT topic (only in MQTT notifications)

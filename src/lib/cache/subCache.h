@@ -361,7 +361,7 @@ extern void subNotificationErrorStatus
 
 /* ****************************************************************************
 *
-* subNotificationHttpDurationUpdate -
+* subNotificationDurationUpdate -
 */
 extern void subNotificationDurationUpdate(
   const std::string&  tenant,

@@ -157,8 +157,8 @@ echo
 echo
 
 
-echo "08. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1 + description"
-echo "===================================================================================================================================="
+echo "08. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1 + description + accumulatedNotificationDuration incremented but lastNotificationDuration preserved"
+echo "========================================================================================================================================================================================================================="
 mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
@@ -181,7 +181,7 @@ Content-Length: 472
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
-            "accumulatedNotificationDuration": REGEX(\d+),
+            "accumulatedNotificationDuration": 12,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -189,7 +189,7 @@ Content-Length: 472
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "2050-01-01T10:00:00.000Z",
-            "lastNotificationDuration": REGEX(\d+),
+            "lastNotificationDuration": 8,
             "lastSuccess": "2050-01-01T10:00:00.000Z",
             "lastSuccessCode": 211,
             "onlyChangedAttrs": false
@@ -396,8 +396,8 @@ Content-Length: 523
 ]
 
 
-08. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1 + description
-====================================================================================================================================
+08. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1 + description + accumulatedNotificationDuration incremented but lastNotificationDuration preserved
+=========================================================================================================================================================================================================================
 {
     "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
@@ -424,7 +424,7 @@ Content-Length: 523
     "failsCounter": 0,
     "format": "normalized",
     "lastNotification": 2524644000,
-    "lastNotificationDuration": REGEX(\d+),
+    "lastNotificationDuration": 8,
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],

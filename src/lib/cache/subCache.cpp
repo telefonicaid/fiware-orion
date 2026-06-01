@@ -1516,7 +1516,7 @@ void subNotificationErrorStatus
 
 /* ****************************************************************************
 *
-* subNotificationHttpDurationUpdate -
+* subNotificationDurationUpdate -
 */
 void subNotificationDurationUpdate
 (

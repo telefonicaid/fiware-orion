@@ -635,7 +635,9 @@ int httpRequestSend
   clock_gettime(CLOCK_MONOTONIC, &notificationStartTime);
   res = curl_easy_perform(curl);
   clock_gettime(CLOCK_MONOTONIC, &notificationEndTime);
-  httpRequestDurationMs =((notificationEndTime.tv_sec - notificationStartTime.tv_sec) * 1000) + ((notificationEndTime.tv_nsec - notificationStartTime.tv_nsec) / 1000000);
+  long long start_ns = (long long)notificationStartTime.tv_sec * 1000000000LL + notificationStartTime.tv_nsec;
+  long long end_ns   = (long long)notificationEndTime.tv_sec * 1000000000LL + notificationEndTime.tv_nsec;
+  httpRequestDurationMs = (end_ns - start_ns) / 1000000LL;
   if (httpRequestDurationMsP != NULL)
   {
     *httpRequestDurationMsP = httpRequestDurationMs;
