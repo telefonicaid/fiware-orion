@@ -30,18 +30,10 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity User1: name=John, surname=Doe,      age=36
-# 02. Create entity User2: name=John, surname=Smith,    age=37
-# 03. Create entity User3: name=Jane, surname=Simpson,  age=27
-# 04. Create entity User4: name=Jane, surname=Thompson, age=18
-# 05. Get sorted by age, age (see error)
-# 06. Get sorted by age in reserve order, age in reverse order: error
-# 07. Get sorted by name, name, then age: error
-# 08. Get sorted by reverse name, reverse name, then age: error
-# 09. Get sorted by name, then reserve age, reverse age: error
-# 10. Get sorted by name, then reserve age, name: error
-# 11. Get sorted by name, then reserve age, then reverse name: error
-# 12. Get sorted by age, then reserve age: error
+# 01. Create entity test1907
+# 01. Create entity Test1907
+# 03. GET ~=Test to get E_upper
+# 04. GET /v2/op/entities ~=Test to get E_upper
 #
 
 echo "01. Create entity test1907"
