@@ -72,7 +72,7 @@ accumulatorStart
 # 00. (Done before starting Context Broker) Insert subscription with http/url pointing to givemeDelay/3 endpoint
 # 01. Trigger notification by updating entity
 # 02. Query subscription from Orion (gets from cache) after waiting 1.5s: verify lastNotification is updated but duration metrics are not yet present
-# 03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410)
+# 03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410) but duration metrics are not yet present
 # 04. Query subscription from Orion (gets from cache) after waiting 2.5s more: verify lastSuccess and duration metrics have been updated to the present date
 # 05. Check DB directly after waiting 2.5s more: verify lastSuccess and duration metrics are updated (newer than 1546337410)
 #
@@ -94,13 +94,13 @@ echo
 sleep 1.5s
 
 echo "02. Query subscription from Orion (gets from cache) after waiting 1.5s: verify lastNotification is updated but duration metrics are not yet present"
-echo "========================================================================================================================================"
+echo "==================================================================================================================================================="
 orionCurl --url /v2/subscriptions/61960a51596aa2623032357d
 echo
 echo
 
-echo "03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410)"
-echo "====================================================================================================="
+echo "03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410) but duration metrics are not yet present"
+echo "============================================================================================================================================="
 mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
@@ -109,15 +109,15 @@ echo
 sleep 2.5s
 
 echo "04. Query subscription from Orion (gets from cache) after waiting 2.5s more: verify lastSuccess and duration metrics have been updated to the present date"
-echo "============================================================================================================================================================="
+echo "=========================================================================================================================================================="
 orionCurl --url /v2/subscriptions/61960a51596aa2623032357d
 echo
 echo
 
 echo "05. Check DB directly after waiting 2.5s more: verify lastSuccess and duration metrics are updated (newer than 1546337410)"
 echo "=========================================================================================================================="
-# Note: lastNotification timestamp here is equal to the one in Step 03, but the duration metrics
-# are successfully synchronized because of the >= condition in subCache.cpp.
+# Note: Verifies that lastNotificationDuration and accumulatedNotificationDuration are synced
+# to the database despite having an identical timestamp to the previous cache cycle.
 mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
@@ -134,7 +134,7 @@ Content-Length: 0
 
 
 02. Query subscription from Orion (gets from cache) after waiting 1.5s: verify lastNotification is updated but duration metrics are not yet present
-========================================================================================================================================
+===================================================================================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -172,8 +172,8 @@ Content-Length: REGEX(\d+)
 }
 
 
-03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410)
-=====================================================================================================
+03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410) but duration metrics are not yet present
+=============================================================================================================================================
 {
     "attrs": [],
     "blacklist": false,
@@ -212,7 +212,7 @@ Content-Length: REGEX(\d+)
 
 
 04. Query subscription from Orion (gets from cache) after waiting 2.5s more: verify lastSuccess and duration metrics have been updated to the present date
-=============================================================================================================================================================
+==========================================================================================================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})

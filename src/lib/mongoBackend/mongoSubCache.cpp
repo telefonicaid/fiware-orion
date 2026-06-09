@@ -997,6 +997,9 @@ void mongoSubUpdateOnCacheSync
     setB.append(CSUB_FAILSCOUNTER, 0);
   }
 
+  // Accumulate notification duration. We avoid using >= 0 for notificationDurationDelta because it is initialized to 0
+  // and would trigger redundant updates. Instead, we use count > 0 and check if the last notification duration
+  // has changed/been updated (lastNotificationDurationP != NULL) to handle fast (0ms) notifications.
   if (notificationDurationDelta > 0 || (count > 0 && lastNotificationDurationP != NULL))
   {
     incB.append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, notificationDurationDelta);

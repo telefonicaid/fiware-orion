@@ -883,38 +883,38 @@ void subCacheItemInsert
   //
   // First the non-complex values
   //
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
-  cSubP->servicePath           = strdup(servicePath);
-  cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->expirationTime        = expirationTime;
-  cSubP->maxFailsLimit         = maxFailsLimit;
-  cSubP->throttling            = throttling;
-  cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->lastFailure           = lastNotificationFailureTime;
-  cSubP->lastSuccess           = lastNotificationSuccessTime;
-  cSubP->lastFailureReason     = lastFailureReason;
-  cSubP->lastSuccessCode       = lastSuccessCode;
-  cSubP->renderFormat          = renderFormat;
+  cSubP->tenant                    = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->servicePath               = strdup(servicePath);
+  cSubP->subscriptionId            = strdup(subscriptionId);
+  cSubP->expirationTime            = expirationTime;
+  cSubP->maxFailsLimit             = maxFailsLimit;
+  cSubP->throttling                = throttling;
+  cSubP->lastNotificationTime      = lastNotificationTime;
   cSubP->lastNotificationDuration  = -1;
+  cSubP->lastFailure               = lastNotificationFailureTime;
+  cSubP->lastSuccess               = lastNotificationSuccessTime;
+  cSubP->lastFailureReason         = lastFailureReason;
+  cSubP->lastSuccessCode           = lastSuccessCode;
+  cSubP->renderFormat              = renderFormat;
+  cSubP->next                      = NULL;
+  cSubP->count                     = 0;
   cSubP->notificationDurationDelta = 0;
-  cSubP->next                  = NULL;
-  cSubP->count                 = 0;
-  cSubP->failsCounter          = 0;
-  cSubP->status                = status;
-  cSubP->statusLastChange      = statusLastChange;
-  cSubP->jexlExpression        = jexlExpression;
-  cSubP->expression.q          = q;
-  cSubP->expression.geometry   = geometry;
-  cSubP->expression.coords     = coords;
-  cSubP->expression.georel     = georel;
-  cSubP->blacklist             = blacklist;
-  cSubP->onlyChanged           = onlyChanged;
-  cSubP->covered               = covered;
-  cSubP->notifyOnMetadataChange= notifyOnMetadataChange;
-  cSubP->notifyConditionV      = conditionAttrs;
-  cSubP->subAltTypeV           = altTypes;
-  cSubP->attributes            = attributes;
-  cSubP->metadata              = metadata;
+  cSubP->failsCounter              = 0;
+  cSubP->status                    = status;
+  cSubP->statusLastChange          = statusLastChange;
+  cSubP->jexlExpression            = jexlExpression;
+  cSubP->expression.q              = q;
+  cSubP->expression.geometry       = geometry;
+  cSubP->expression.coords         = coords;
+  cSubP->expression.georel         = georel;
+  cSubP->blacklist                 = blacklist;
+  cSubP->onlyChanged               = onlyChanged;
+  cSubP->covered                   = covered;
+  cSubP->notifyOnMetadataChange    = notifyOnMetadataChange;
+  cSubP->notifyConditionV          = conditionAttrs;
+  cSubP->subAltTypeV               = altTypes;
+  cSubP->attributes                = attributes;
+  cSubP->metadata                  = metadata;
 
   // empty cache entry, no relation with DB actually exists
   // (thus validity flag set to false)
@@ -1285,19 +1285,26 @@ void subCacheSync(void)
 
     if (cssP != NULL)
     {
-      if (cssP->lastNotificationTime >= cSubP->lastNotificationTime)
+      bool lastNotificationTimeIsNewer        = (cssP->lastNotificationTime > cSubP->lastNotificationTime);
+      bool lastNotificationTimeIsNewerOrEqual = (cssP->lastNotificationTime >= cSubP->lastNotificationTime);
+
+      if (lastNotificationTimeIsNewer)
       {
-        if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
-        {
-          // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
-          cSubP->lastNotificationTime     = cssP->lastNotificationTime;
-          lastNotificationTimeP     = &cSubP->lastNotificationTime;
-        }
-        if (cssP->lastNotificationDuration >= 0 && cssP->lastNotificationDuration != cSubP->lastNotificationDuration)
-        {
-          cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
-          lastNotificationDurationP       = &cSubP->lastNotificationDuration;
-        }
+        // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
+        cSubP->lastNotificationTime     = cssP->lastNotificationTime;
+        lastNotificationTimeP     = &cSubP->lastNotificationTime;
+      }
+
+      //the notification trigger and completion can happen in different cache synchronization cycles. In this case:
+      // - The trigger updates lastNotificationTime in cycle N.
+      // - The completion updates lastNotificationDuration in cycle N+1.
+      // Consequently, during cycle N+1, the timestamps in memory and DB are equal (newer or equal is true),
+      // but the durations differ. Using 'lastNotificationTimeIsNewerOrEqual' ensures the duration is
+      // correctly synchronized to the database rather than being ignored due to identical timestamps.
+      if (lastNotificationTimeIsNewerOrEqual && cssP->lastNotificationDuration >= 0 && cssP->lastNotificationDuration != cSubP->lastNotificationDuration)
+      {
+        cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
+        lastNotificationDurationP       = &cSubP->lastNotificationDuration;
       }
 
 

@@ -304,7 +304,7 @@ static void updateInCache
   {
     lastNotificationTime            = -1;
     lastNotificationDuration        = -1;
-    notificationDurationDelta = 0;
+    notificationDurationDelta       = 0;
     lastFailure                     = -1;
     lastFailureReason               = "";
     lastSuccess                     = -1;
