@@ -65,8 +65,8 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "lastSuccessCode": NumberLong(200),
 })'
 
-# Start broker with cache sync interval of 2s
-brokerStart CB 0 IPv4 -subCacheIval 2 --cache
+# Start broker with cache sync interval of 4s
+brokerStart CB 0 IPv4 -subCacheIval 4 --cache
 
 --SHELL--
 
@@ -74,7 +74,7 @@ brokerStart CB 0 IPv4 -subCacheIval 2 --cache
 # 00. (Done before starting Context Broker) Insert subscription in DB and start broker with cache enabled
 # 01. Query subscription from Orion to verify it has been loaded into the cache
 # 02. Update lastNotificationDuration to 999 in DB to simulate out-of-sync
-#     (Wait 2.5s for cache sync)
+#     (Wait 4.5s for cache sync)
 # 03. Query DB to verify lastNotificationDuration is restored to 5
 #
 
@@ -93,7 +93,7 @@ echo
 echo
 
 # Wait for cache sync
-sleep 2.5s
+sleep 4.5s
 
 echo "03. Query DB to verify lastNotificationDuration is restored to 5"
 echo "================================================================"
