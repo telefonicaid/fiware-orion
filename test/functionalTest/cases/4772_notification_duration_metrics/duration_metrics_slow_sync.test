@@ -1,0 +1,299 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Verify lastNotificationDuration synchronization with slow notification and fast cache sync
+
+--SHELL-INIT--
+dbInit CB
+
+# (Done before starting Context Broker) Insert crafted subscription in DB
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("61960a51596aa2623032357d"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:'${LISTENER_PORT}'/givemeDelay/3",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 1546337410,
+        "entities" : [
+                {
+                        "id" : "E",
+                        "isPattern" : false,
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "lastNotification" : NumberLong(1546337410),
+        "lastSuccess" : NumberLong(1546337410),
+        "lastSuccessCode": NumberLong(200),
+})'
+
+brokerStart CB 0 IPv4 -subCacheIval 1 --cache
+accumulatorStart
+
+--SHELL--
+
+#
+# 00. (Done before starting Context Broker) Insert subscription with http/url pointing to givemeDelay/3 endpoint
+# 01. Trigger notification by updating entity
+# 02. Query subscription from Orion (gets from cache) after waiting 1.5s: verify lastNotification is updated but duration metrics are not yet present
+# 03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410)
+# 04. Query subscription from Orion (gets from cache) after waiting 2.5s more: verify lastSuccess and duration metrics have been updated to the present date
+# 05. Check DB directly after waiting 2.5s more: verify lastSuccess and duration metrics are updated (newer than 1546337410)
+#
+
+echo "01. Trigger notification by updating entity"
+echo "==========================================="
+payload='{
+    "id": "E",
+    "type": "T",
+    "A": {
+        "value": "1"
+    }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+# Wait for the first cache sync cycle to run. The slow 3s notification is still in progress.
+sleep 1.5s
+
+echo "02. Query subscription from Orion (gets from cache) after waiting 1.5s: verify lastNotification is updated but duration metrics are not yet present"
+echo "========================================================================================================================================"
+orionCurl --url /v2/subscriptions/61960a51596aa2623032357d
+echo
+echo
+
+echo "03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410)"
+echo "====================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+# Wait for the slow notification to finish and the second cache sync cycle to execute.
+sleep 2.5s
+
+echo "04. Query subscription from Orion (gets from cache) after waiting 2.5s more: verify lastSuccess and duration metrics have been updated to the present date"
+echo "============================================================================================================================================================="
+orionCurl --url /v2/subscriptions/61960a51596aa2623032357d
+echo
+echo
+
+echo "05. Check DB directly after waiting 2.5s more: verify lastSuccess and duration metrics are updated (newer than 1546337410)"
+echo "=========================================================================================================================="
+# Note: lastNotification timestamp here is equal to the one in Step 03, but the duration metrics
+# are successfully synchronized because of the >= condition in subCache.cpp.
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+--REGEXPECT--
+01. Trigger notification by updating entity
+===========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. Query subscription from Orion (gets from cache) after waiting 1.5s: verify lastNotification is updated but duration metrics are not yet present
+========================================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "61960a51596aa2623032357d",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/givemeDelay/3"
+        },
+        "lastNotification": "REGEX(202.*)",
+        "lastSuccess": "2019-01-01T10:10:10.000Z",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Check DB directly after waiting 1.5s: verify lastNotification is updated (newer than 1546337410)
+=====================================================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "count": 1,
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": false,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "failsCounter": 0,
+    "format": "normalized",
+    "lastNotification": REGEX(1[6-9]\d+),
+    "lastSuccess": 1546337410,
+    "lastSuccessCode": 200,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/givemeDelay/3",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 1546337410,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+04. Query subscription from Orion (gets from cache) after waiting 2.5s more: verify lastSuccess and duration metrics have been updated to the present date
+=============================================================================================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "61960a51596aa2623032357d",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX((29\d\d|3\d\d\d)),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/givemeDelay/3"
+        },
+        "lastNotification": "REGEX(202.*)",
+        "lastNotificationDuration": REGEX((29\d\d|3\d\d\d)),
+        "lastSuccess": "REGEX(202.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Check DB directly after waiting 2.5s more: verify lastSuccess and duration metrics are updated (newer than 1546337410)
+==========================================================================================================================
+{
+    "accumulatedNotificationDuration": REGEX((29\d\d|3\d\d\d)),
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "count": 1,
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": false,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "failsCounter": 0,
+    "format": "normalized",
+    "lastNotification": REGEX(1[6-9]\d+),
+    "lastNotificationDuration": REGEX((29\d\d|3\d\d\d)),
+    "lastSuccess": REGEX(1[6-9]\d+),
+    "lastSuccessCode": 200,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/givemeDelay/3",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 1546337410,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

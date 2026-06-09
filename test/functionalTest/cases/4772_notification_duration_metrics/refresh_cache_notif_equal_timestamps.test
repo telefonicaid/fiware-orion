@@ -1,0 +1,132 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Verify lastNotificationDuration synchronization when lastNotification timestamps are equal
+
+--SHELL-INIT--
+dbInit CB
+
+# Insert subscription with a fixed past timestamp and lastNotificationDuration = 5
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("61960a51596aa2623032357d"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:9997/notify",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "maxFailsLimit" : NumberLong(1),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 1546337410,
+        "entities" : [
+                {
+                        "id" : "E",
+                        "isPattern" : false,
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "lastNotification" : NumberLong(1546337410),
+        "lastNotificationDuration" : NumberLong(5),
+        "lastSuccess" : NumberLong(1546337410),
+        "lastSuccessCode": NumberLong(200),
+})'
+
+# Start broker with cache sync interval of 2s
+brokerStart CB 0 IPv4 -subCacheIval 2 --cache
+
+--SHELL--
+
+echo "01. Update lastNotificationDuration to 999 in DB to simulate out-of-sync"
+echo "=========================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa2623032357d")}, {$set: {lastNotificationDuration: NumberLong("999")}})'
+echo
+echo
+
+
+echo "02. Wait 2.5s for cache sync"
+echo "============================"
+sleep 2.5s
+echo
+
+
+echo "03. Get doc in DB and verify lastNotificationDuration is restored to 5"
+echo "======================================================================"
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration:0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+--REGEXPECT--
+01. Update lastNotificationDuration to 999 in DB to simulate out-of-sync
+==========================================================================
+REGEX(.*)
+
+
+02. Wait 2.5s for cache sync
+============================
+
+03. Get doc in DB and verify lastNotificationDuration is restored to 5
+======================================================================
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": false,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "lastNotification": 1546337410,
+    "lastNotificationDuration": 5,
+    "lastSuccess": 1546337410,
+    "lastSuccessCode": 200,
+    "maxFailsLimit": 1,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 1546337410,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

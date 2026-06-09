@@ -1,0 +1,243 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Verify lastNotificationDuration and accumulatedNotificationDuration calculation with delays
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 --cache
+accumulatorStart
+
+--SHELL--
+
+echo "01. Create subscription with a 10-second delay endpoint"
+echo "======================================================="
+payload='{
+    "subject": {
+        "entities": [{"idPattern": ".*", "type": "T"}],
+        "condition": {"attrs": ["A"]}
+    },
+    "notification": {
+        "http": {
+            "url": "http://localhost:'${LISTENER_PORT}'/givemeDelay/10",
+            "timeout": 15000
+        },
+        "attrs": []
+    },
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+id=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Trigger first notification and check metrics"
+echo "================================================"
+payload='{"id": "E", "type": "T", "A": {"value": "1"}}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+sleep 10.5s
+# Query subscription from Orion (gets from cache)
+orionCurl --url /v2/subscriptions/$id
+echo
+echo
+
+
+echo "03. Trigger second notification and check metrics"
+echo "================================================="
+payload='{"A": {"value": "2"}}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+sleep 10.5s
+# Query subscription from Orion (gets from cache)
+orionCurl --url /v2/subscriptions/$id
+echo
+echo
+
+
+echo "04. Trigger third notification and check metrics"
+echo "================================================="
+payload='{"A": {"value": "3"}}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+sleep 10.5s
+# Query subscription from Orion (gets from cache)
+orionCurl --url /v2/subscriptions/$id
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with a 10-second delay endpoint
+=======================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Trigger first notification and check metrics
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "timeout": 15000,
+            "url": "http://localhost:9997/givemeDelay/10"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Trigger second notification and check metrics
+=================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX((19|20|21|22)\d\d\d),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "timeout": 15000,
+            "url": "http://localhost:9997/givemeDelay/10"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+04. Trigger third notification and check metrics
+=================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX((29|30|31|32)\d\d\d),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "timeout": 15000,
+            "url": "http://localhost:9997/givemeDelay/10"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 3
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

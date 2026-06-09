@@ -895,6 +895,8 @@ void subCacheItemInsert
   cSubP->lastFailureReason     = lastFailureReason;
   cSubP->lastSuccessCode       = lastSuccessCode;
   cSubP->renderFormat          = renderFormat;
+  cSubP->lastNotificationDuration  = -1;
+  cSubP->notificationDurationDelta = 0;
   cSubP->next                  = NULL;
   cSubP->count                 = 0;
   cSubP->failsCounter          = 0;
