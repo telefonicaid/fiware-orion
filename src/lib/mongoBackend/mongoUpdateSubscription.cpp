@@ -173,6 +173,17 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
 }
 
 
+/* ****************************************************************************
+*
+* unsetHttpNotificationDurationMetrics -
+*
+*/
+static void unsetHttpNotificationDurationMetrics(orion::BSONObjBuilder* unsetB)
+{
+  unsetB->append(CSUB_LASTNOTIFICATIONDURATION, 1);
+  unsetB->append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, 1);
+}
+
 
 /* ****************************************************************************
 *
@@ -317,6 +328,14 @@ static void updateInCache
     statusLastChange                = -1;
   }
 
+  // HTTP duration metrics don't apply to MQTT or Kafka notifications
+  if (subUp.notificationProvided &&
+      subUp.notification.type != ngsiv2::HttpNotification)
+  {
+    lastNotificationDuration  = -1;
+    notificationDurationDelta = 0;
+  }
+
   // different for other fields grabbed from the cache, status could be included in the sub update
   // thus, effective status is the newest one in cache or in DB
   double statusLastChangeAtDb = doc.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(doc, CSUB_STATUS_LAST_CHANGE) : -1;
@@ -439,6 +458,14 @@ std::string mongoUpdateSubscription
     else
     {
       setDescription(subUp, &setB);
+    }
+  }
+
+  if (subUp.notificationProvided)
+  {
+    if (subUp.notification.type != ngsiv2::HttpNotification)
+    {
+      unsetHttpNotificationDurationMetrics(&unsetB);
     }
   }
 
