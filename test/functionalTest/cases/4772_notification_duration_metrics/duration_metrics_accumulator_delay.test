@@ -25,7 +25,7 @@ Verify lastNotificationDuration and accumulatedNotificationDuration calculation 
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 --cache
+brokerStart CB 0 IPv4 -subCacheIval 1 --cache
 accumulatorStart
 
 
@@ -35,14 +35,15 @@ accumulatorStart
 # 00. (Done before starting Context Broker) Start Broker with cache enabled and start accumulator
 # 01. Create subscription with a 10-second delay endpoint
 # 02. Trigger first notification by creating entity
-#     (Wait 10.5s for the delayed notification to be completed)
-# 03. Query subscription to verify duration metrics after first notification
+#     (Wait 12s for the delayed notification to be completed)
+# 03. Get Query subscription to verify duration metrics after first notification
 # 04. Trigger second notification by updating entity
-#     (Wait 10.5s for the delayed notification to be completed)
-# 05. Query subscription to verify duration metrics after second notification
+#     (Wait 12s for the delayed notification to be completed)
+# 05. Get Query subscription to verify duration metrics after second notification
 # 06. Trigger third notification by updating entity
-#     (Wait 10.5s for the delayed notification to be completed)
-# 07. Query subscription to verify duration metrics after third notification
+#     (Wait 12s for the delayed notification to be completed)
+# 07. Get Query subscription to verify duration metrics after third notification
+# 08. Check DB directly after third notification: verify accumulated notification duration is correct
 #
 
 
@@ -90,10 +91,10 @@ echo
 echo
 
 # Wait for the delayed notification to be completed
-sleep 10.5s
+sleep 12s
 
-echo "03. Query subscription to verify duration metrics after first notification"
-echo "=========================================================================="
+echo "03. Get Query subscription to verify duration metrics after first notification"
+echo "=============================================================================="
 orionCurl --url /v2/subscriptions/$id
 echo
 echo
@@ -107,10 +108,10 @@ echo
 echo
 
 # Wait for the delayed notification to be completed
-sleep 10.5s
+sleep 12s
 
-echo "05. Query subscription to verify duration metrics after second notification"
-echo "==========================================================================="
+echo "05. Get Query subscription to verify duration metrics after second notification"
+echo "==============================================================================="
 orionCurl --url /v2/subscriptions/$id
 echo
 echo
@@ -124,11 +125,17 @@ echo
 echo
 
 # Wait for the delayed notification to be completed
-sleep 10.5s
+sleep 12s
 
-echo "07. Query subscription to verify duration metrics after third notification"
-echo "=========================================================================="
+echo "07. Get Query subscription to verify duration metrics after third notification"
+echo "=============================================================================="
 orionCurl --url /v2/subscriptions/$id
+echo
+echo
+
+echo "08. Check DB directly after third notification: verify accumulated notification duration is correct"
+echo "=================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$id'")}, {_id:0, expiration:0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
 
@@ -154,8 +161,8 @@ Content-Length: 0
 
 
 
-03. Query subscription to verify duration metrics after first notification
-==========================================================================
+03. Get Query subscription to verify duration metrics after first notification
+==============================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -206,8 +213,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-05. Query subscription to verify duration metrics after second notification
-===========================================================================
+05. Get Query subscription to verify duration metrics after second notification
+===============================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -258,8 +265,8 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 
 
 
-07. Query subscription to verify duration metrics after third notification
-==========================================================================
+07. Get Query subscription to verify duration metrics after third notification
+==============================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -299,6 +306,54 @@ Content-Length: REGEX(\d+)
             }
         ]
     }
+}
+
+
+08. Check DB directly after third notification: verify accumulated notification duration is correct
+==================================================================================================
+{
+    "accumulatedNotificationDuration": REGEX((29|30|31|32)\d\d\d),
+    "altTypes": [],
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [
+        "A"
+    ],
+    "count": 3,
+    "covered": false,
+    "custom": false,
+    "entities": [
+        {
+            "id": ".*",
+            "isPattern": true,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "failsCounter": 0,
+    "format": "normalized",
+    "jexlExpression": "",
+    "lastNotification": REGEX(1[6-9]\d+),
+    "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+    "lastSuccess": REGEX(1[6-9]\d+),
+    "lastSuccessCode": 200,
+    "maxFailsLimit": -1,
+    "metadata": [],
+    "notifyOnMetadataChange": true,
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/givemeDelay/10",
+    "servicePath": "/#",
+    "status": "active",
+    "statusLastChange": REGEX(1[6-9]\d+\.\d+),
+    "throttling": 0,
+    "timeout": 15000
 }
 
 
