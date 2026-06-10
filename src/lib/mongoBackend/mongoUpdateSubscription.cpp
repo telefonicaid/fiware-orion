@@ -313,19 +313,19 @@ static void updateInCache
   }
   else
   {
-    lastNotificationTime            = -1;
-    lastNotificationDuration        = -1;
-    notificationDurationDelta       = 0;
-    lastFailure                     = -1;
-    lastFailureReason               = "";
-    lastSuccess                     = -1;
-    lastSuccessCode                 = -1;
-    count                           = 0;
-    failsCounter                    = 0;
-    failsCounterFromDb              = 0;
-    failsCounterFromDbValid         = false;
-    status                          = "";
-    statusLastChange                = -1;
+    lastNotificationTime      = -1;
+    lastNotificationDuration  = -1;
+    notificationDurationDelta = 0;
+    lastFailure               = -1;
+    lastFailureReason         = "";
+    lastSuccess               = -1;
+    lastSuccessCode           = -1;
+    count                     = 0;
+    failsCounter              = 0;
+    failsCounterFromDb        = 0;
+    failsCounterFromDbValid   = false;
+    status                    = "";
+    statusLastChange          = -1;
   }
 
   // HTTP duration metrics don't apply to MQTT or Kafka notifications

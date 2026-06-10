@@ -1291,8 +1291,8 @@ void subCacheSync(void)
       if (lastNotificationTimeIsNewer)
       {
         // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
-        cSubP->lastNotificationTime     = cssP->lastNotificationTime;
-        lastNotificationTimeP     = &cSubP->lastNotificationTime;
+        cSubP->lastNotificationTime = cssP->lastNotificationTime;
+        lastNotificationTimeP = &cSubP->lastNotificationTime;
       }
 
       //the notification trigger and completion can happen in different cache synchronization cycles. In this case:

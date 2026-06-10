@@ -108,7 +108,7 @@ int mongoSubCacheItemInsert(const char* tenant, const orion::BSONObj& sub)
   cSubP->maxFailsLimit         = sub.hasField(CSUB_MAXFAILSLIMIT)?    getIntOrLongFieldAsLongF(sub, CSUB_MAXFAILSLIMIT)    : -1;
   cSubP->expirationTime        = sub.hasField(CSUB_EXPIRATION)?       getIntOrLongFieldAsLongF(sub, CSUB_EXPIRATION)       :  0;
   cSubP->lastNotificationTime  = sub.hasField(CSUB_LASTNOTIFICATION)? getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATION) : -1;
-  cSubP->lastNotificationDuration        = sub.hasField(CSUB_LASTNOTIFICATIONDURATION)?     getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATIONDURATION)     : -1;
+  cSubP->lastNotificationDuration  = sub.hasField(CSUB_LASTNOTIFICATIONDURATION)?     getIntOrLongFieldAsLongF(sub, CSUB_LASTNOTIFICATIONDURATION)     : -1;
   cSubP->notificationDurationDelta = 0;
   cSubP->status                = sub.hasField(CSUB_STATUS)?           getStringFieldF(sub, CSUB_STATUS)                    : "active";
   cSubP->statusLastChange      = sub.hasField(CSUB_STATUS_LAST_CHANGE)? getNumberFieldF(sub, CSUB_STATUS_LAST_CHANGE)      : -1;
