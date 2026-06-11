@@ -455,6 +455,7 @@ There are some exception cases in which the above restrictions do not apply. In 
 * HTTP and Kafka custom header values allow the `'` and `"` quote characters to support quoted string literals in JEXL expressions
 * Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL support in custom notifications](#jexl-support-in-custom-notifications))
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
+* Whichever attribute value which has a boolean metadata named `TextUnrestricted` with value `true` (see [Special Attribute Types](#special-attribute-types) section)
 
 ## Identifiers syntax restrictions
 
@@ -699,6 +700,23 @@ meaning:
   "forbiddenAttr": {
    "type": "TextUnrestricted",
    "value": "I'm a unrestricted (and I'm using forbidden chars, the apostrophe)"
+  }
+}
+```
+
+Alternatively, syntax checks can be skipped by using a metadata named `TextUnrestricted` with value `true` of type `Boolean` (leaving the attribute type free for other custom types). For instance:
+
+```json
+{
+  "funnyAttr": {
+    "type": "FunnyType",
+    "value": "Value with <forbidden> characters (like = or ;)",
+    "metadata": {
+      "TextUnrestricted": {
+        "value": true,
+        "type": "Boolean"
+      }
+    }
   }
 }
 ```

@@ -30,18 +30,18 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Create entity with unrestricted metadata value: true (should succeed)
-# 02. Get the entity and verify the unrestricted value and metadata
-# 03. Create entity with unrestricted metadata value: false (should fail)
-# 04. Create entity with unrestricted metadata missing (should fail)
+# 01. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata true
+# 02. Get the entity and verify attribute value and TextUnrestricted metadata
+# 03. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata false, get error
+# 04. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata missing, get error
 #
 
-echo '01. Create entity with unrestricted metadata value: true'
-echo '========================================================='
+echo '01. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata true'
+echo '=========================================================================================================================='
 payload='{
   "id": "E1",
   "type": "T",
-  "funnyAttr": {
+  "A": {
     "type": "FunnyType",
     "value": "Value with <forbidden> characters (like = or ;)",
     "metadata": {
@@ -56,18 +56,20 @@ orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
-echo '02. Get the entity and verify the unrestricted value and metadata'
-echo '=================================================================='
+
+echo '02. Get the entity and verify attribute value and TextUnrestricted metadata'
+echo '==========================================================================='
 orionCurl --url /v2/entities/E1
 echo
 echo
 
-echo '03. Create entity with unrestricted metadata value: false'
-echo '=========================================================='
+
+echo '03. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata false, get error'
+echo '======================================================================================================================================'
 payload='{
   "id": "E2",
   "type": "T",
-  "funnyAttr": {
+  "A": {
     "type": "FunnyType",
     "value": "Value with <forbidden> characters (like = or ;)",
     "metadata": {
@@ -82,12 +84,13 @@ orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
 
-echo '04. Create entity with unrestricted metadata missing'
-echo '====================================================='
+
+echo '04. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata missing, get error'
+echo '========================================================================================================================================'
 payload='{
   "id": "E3",
   "type": "T",
-  "funnyAttr": {
+  "A": {
     "type": "FunnyType",
     "value": "Value with <forbidden> characters (like = or ;)"
   }
@@ -98,8 +101,8 @@ echo
 
 
 --REGEXPECT--
-01. Create entity with unrestricted metadata value: true
-=========================================================
+01. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata true
+==========================================================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -108,8 +111,8 @@ Content-Length: 0
 
 
 
-02. Get the entity and verify the unrestricted value and metadata
-==================================================================
+02. Get the entity and verify attribute value and TextUnrestricted metadata
+===========================================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -117,7 +120,7 @@ Content-Type: application/json
 Content-Length: REGEX(\d+)
 
 {
-    "funnyAttr": {
+    "A": {
         "metadata": {
             "TextUnrestricted": {
                 "type": "Boolean",
@@ -132,8 +135,8 @@ Content-Length: REGEX(\d+)
 }
 
 
-03. Create entity with unrestricted metadata value: false
-==========================================================
+03. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata false, get error
+======================================================================================================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -146,8 +149,8 @@ Content-Length: 76
 }
 
 
-04. Create entity with unrestricted metadata missing
-=====================================================
+04. Create entity with a custom type attribute containing forbidden characters in value and TextUnrestricted metadata missing, get error
+========================================================================================================================================
 HTTP/1.1 400 Bad Request
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
