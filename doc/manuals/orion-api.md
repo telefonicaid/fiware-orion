@@ -455,7 +455,7 @@ There are some exception cases in which the above restrictions do not apply. In 
 * HTTP and Kafka custom header values allow the `'` and `"` quote characters to support quoted string literals in JEXL expressions
 * Within `ngsi` (i.e. `id`, `type` and attribute values) in [NGSI Payload patching](#ngsi-payload-patching) (to support characters used in the [JEXL support in custom notifications](#jexl-support-in-custom-notifications))
 * Whichever attribute value which uses `TextUnrestricted` as attribute type (see [Special Attribute Types](#special-attribute-types) section)
-* Whichever attribute value which has a boolean metadata named `TextUnrestricted` with value `true` (see [Special Attribute Types](#special-attribute-types) section)
+* Whichever attribute value which has a boolean metadata named `TextUnrestricted` with value `true` (see [Special Metadata Types](#special-metadata-types) section)
 
 ## Identifiers syntax restrictions
 
@@ -704,23 +704,6 @@ meaning:
 }
 ```
 
-Alternatively, syntax checks can be skipped by using a metadata named `TextUnrestricted` with value `true` of type `Boolean` (leaving the attribute type free for other custom types). For instance:
-
-```json
-{
-  "funnyAttr": {
-    "type": "FunnyType",
-    "value": "Value with <forbidden> characters (like = or ;)",
-    "metadata": {
-      "TextUnrestricted": {
-        "value": true,
-        "type": "Boolean"
-      }
-    }
-  }
-}
-```
-
 ## Builtin Attributes
 
 There are entity properties that are not directly modifiable by clients, but that can be
@@ -779,6 +762,23 @@ type has an special semantic for Orion:
    * `geo:json`
 
 * `evalPriority`: used by expression evaluation. Have a look to [this specific section](#evaluation-priority) for details.
+
+* `TextUnrestricted`: when a boolean metadata named `TextUnrestricted` with value `true` is added to an attribute, Orion will skip [syntax restrictions](#general-syntax-restrictions) checkings on the attribute value. This leaves the attribute type free for other custom types. For instance:
+
+  ```json
+  {
+    "funnyAttr": {
+      "type": "FunnyType",
+      "value": "Value with <forbidden> characters (like = or ;)",
+      "metadata": {
+        "TextUnrestricted": {
+          "value": true,
+          "type": "Boolean"
+        }
+      }
+    }
+  }
+  ```
 
 At the present moment `ignoreType` is supported only for geo-location types, this way allowing a
 mechanism to overcome the limit of only one geo-location per entity (more details
