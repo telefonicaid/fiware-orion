@@ -1301,7 +1301,7 @@ void subCacheSync(void)
       // Consequently, during cycle N+1, the timestamps in memory and DB are equal (newer or equal is true),
       // but the durations differ. Using 'lastNotificationTimeIsNewerOrEqual' ensures the duration is
       // correctly synchronized to the database rather than being ignored due to identical timestamps.
-      if (lastNotificationTimeIsNewerOrEqual && cssP->lastNotificationDuration >= 0 && cssP->lastNotificationDuration != cSubP->lastNotificationDuration)
+      if (lastNotificationTimeIsNewerOrEqual && (cssP->lastNotificationDuration >= 0) && (cssP->lastNotificationDuration != cSubP->lastNotificationDuration))
       {
         cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
         lastNotificationDurationP       = &cSubP->lastNotificationDuration;
