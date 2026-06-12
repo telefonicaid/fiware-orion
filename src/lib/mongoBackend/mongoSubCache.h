@@ -108,21 +108,8 @@ extern void mongoSubUpdateOnNotif
   const std::string&  failureReason,
   long long           statusCode,
   const std::string&  status,
-  double              statusLastChange
-);
-
-
-/* ****************************************************************************
-*
-* mongoSubUpdateNotificationDuration -
-*
-* Used in notification logic
-*/
-extern void mongoSubUpdateNotificationDuration
-(
-  const std::string&  tenant,
-  const std::string&  subId,
-  long long           notificationDurationMs
+  double              statusLastChange,
+  long long           notificationDurationMs = -1
 );
 
 

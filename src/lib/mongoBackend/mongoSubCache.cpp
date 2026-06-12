@@ -614,16 +614,17 @@ void mongoSubCacheRefresh(const std::string& database)
 
 /* ****************************************************************************
 *
-* mongoSubCountersUpdateFailsAndStatus -
+* mongoSubCountersUpdateFailsStatusAndDuration -
 */
-static void mongoSubCountersUpdateFailsAndStatus
+static void mongoSubCountersUpdateFailsStatusAndDuration
 (
   const std::string&  db,
   const std::string&  collection,
   const std::string&  subId,
   long long           fails,
   const std::string&  status,
-  double              statusLastChange
+  double              statusLastChange,
+  long long           notificationDurationMs
 )
 {
   orion::BSONObjBuilder  condition;
@@ -653,6 +654,12 @@ static void mongoSubCountersUpdateFailsAndStatus
     setB.append(CSUB_STATUS_LAST_CHANGE, statusLastChange);
   }
 
+  if (notificationDurationMs >= 0)
+  {
+    setB.append(CSUB_LASTNOTIFICATIONDURATION, notificationDurationMs);
+    incB.append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, notificationDurationMs);
+  }
+
   if ((incB.nFields() == 0) && (setB.nFields() == 0))
   {
     // no info to update
@@ -670,7 +677,7 @@ static void mongoSubCountersUpdateFailsAndStatus
 
   if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
   {
-    LM_E(("Runtime Error (error updating 'count', 'failsCounter', 'status' and/or 'statusLastChange' for a subscription)"));
+    LM_E(("Runtime Error (error updating 'count', 'failsCounter', 'status', 'statusLastChange' and/or duration metrics for a subscription)"));
   }
 }
 
@@ -848,7 +855,8 @@ void mongoSubUpdateOnNotif
   const std::string&  failureReason,
   long long           statusCode,
   const std::string&  status,
-  double              statusLastChange
+  double              statusLastChange,
+  long long           notificationDurationMs
 )
 {
   if (subId.empty())
@@ -859,7 +867,7 @@ void mongoSubUpdateOnNotif
 
   std::string db = composeDatabaseName(tenant);
 
-  mongoSubCountersUpdateFailsAndStatus(db, COL_CSUBS, subId, failsCounter, status, statusLastChange);
+  mongoSubCountersUpdateFailsStatusAndDuration(db, COL_CSUBS, subId, failsCounter, status, statusLastChange, notificationDurationMs);
 
   if (lastNotificationTime > 0)
   {
@@ -875,80 +883,6 @@ void mongoSubUpdateOnNotif
   {
     mongoSubCountersUpdateLastSuccess(db, COL_CSUBS, subId, lastSuccess, statusCode);
   }
-}
-
-
-/* ****************************************************************************
-*
-* mongoSubCountersUpdateNotificationDuration -
-*/
-static void mongoSubCountersUpdateNotificationDuration
-(
-  const std::string&  db,
-  const std::string&  collection,
-  const std::string&  subId,
-  long long           notificationDurationMs
-)
-{
-  std::string err;
-
-  if (notificationDurationMs < 0)
-  {
-    return;
-  }
-
-  orion::BSONObjBuilder condition;
-  condition.append("_id", orion::OID(subId));
-
-  orion::BSONObjBuilder update;
-
-  orion::BSONObjBuilder setB;
-  setB.append(CSUB_LASTNOTIFICATIONDURATION, notificationDurationMs);
-
-  orion::BSONObjBuilder incB;
-  incB.append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, notificationDurationMs);
-
-  update.append("$set", setB.obj());
-  update.append("$inc", incB.obj());
-
-  if (collectionUpdate(db, collection, condition.obj(), update.obj(), false, &err) != true)
-  {
-    LM_E(("Runtime Error (error updating notification duration for a subscription)"));
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSubUpdateNotificationDuration -
-*/
-void mongoSubUpdateNotificationDuration
-(
-  const std::string&  tenant,
-  const std::string&  subId,
-  long long           notificationDurationMs
-)
-{
-  if (subId.empty())
-  {
-    LM_E(("Runtime Error (empty subscription id)"));
-    return;
-  }
-
-  if (notificationDurationMs < 0)
-  {
-    return;
-  }
-
-  std::string db = composeDatabaseName(tenant);
-
-  mongoSubCountersUpdateNotificationDuration(
-    db,
-    COL_CSUBS,
-    subId,
-    notificationDurationMs
-  );
 }
 
 

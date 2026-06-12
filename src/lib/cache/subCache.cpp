@@ -1422,16 +1422,18 @@ void subCacheStart(void)
 extern bool noCache;
 /* ****************************************************************************
 *
-* subNotificationErrorStatus -
+* subNotificationOutcome -
 *
 * This function marks a subscription to be erroneous, i.e. notifications are
 * not working.
 * A timestamp for this last failure is set for the sub-item in the sub-cache  and
 * the consecutive number of notification errors for the subscription is incremented.
 *
-* If error == true, then the subscription is marked as non-erroneous.
+* If error == false, then the subscription is marked as non-erroneous.
+*
+* The notification duration metrics are updated if a valid notificationDurationMs is provided.
 */
-void subNotificationErrorStatus
+void subNotificationOutcome
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
@@ -1439,7 +1441,8 @@ void subNotificationErrorStatus
   long long           statusCode,
   const std::string&  failureReason,
   long long           failsCounter,
-  long long           maxFailsLimit
+  long long           maxFailsLimit,
+  long long           notificationDurationMs
 )
 {
   bool maxFailsReached = maxFailsLimit > 0 && failsCounter >= maxFailsLimit;
@@ -1464,12 +1467,12 @@ void subNotificationErrorStatus
         statusLastChange = getCurrentTime();
       }
       // fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
-      mongoSubUpdateOnNotif(tenant, subscriptionId, 1, now, now, -1, failureReason, -1, status, statusLastChange);
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 1, now, now, -1, failureReason, -1, status, statusLastChange, notificationDurationMs);
     }
     else
     {
       // fails = 0, lastFailure == -1, failureReason == "", status == ""
-      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, now, -1, now, "", statusCode, "", -1);
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, now, -1, now, "", statusCode, "", -1, notificationDurationMs);
     }
 
     return;
@@ -1518,49 +1521,11 @@ void subNotificationErrorStatus
     subP->failsCounterFromDbValid = false;
   }
 
+  if (notificationDurationMs >= 0)
+  {
+    subP->lastNotificationDuration  = notificationDurationMs;
+    subP->notificationDurationDelta += notificationDurationMs;
+  }
+
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");
-}
-
-
-
-/* ****************************************************************************
-*
-* subNotificationDurationUpdate -
-*/
-void subNotificationDurationUpdate
-(
-  const std::string&  tenant,
-  const std::string&  subscriptionId,
-  long long           httpRequestDurationMs
-)
-{
-  if (httpRequestDurationMs < 0)
-  {
-    return;
-  }
-
-  if (noCache)
-  {
-    mongoSubUpdateNotificationDuration(tenant, subscriptionId, httpRequestDurationMs);
-    return;
-  }
-
-  cacheSemTake(__FUNCTION__, "Looking up an item for notification duration");
-
-  CachedSubscription* subP = subCacheItemLookup(tenant.c_str(), subscriptionId.c_str());
-
-  if (subP == NULL)
-  {
-    cacheSemGive(__FUNCTION__, "Looking up an item for notification duration");
-
-    const char* errorString = "intent to update notification duration of non-existing subscription";
-    alarmMgr.badInput(clientIp, errorString);
-
-    return;
-  }
-
-  subP->lastNotificationDuration  = httpRequestDurationMs;
-  subP->notificationDurationDelta += httpRequestDurationMs;
-
-  cacheSemGive(__FUNCTION__, "Looking up an item for notification duration");
 }

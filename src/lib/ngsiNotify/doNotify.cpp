@@ -108,7 +108,7 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
     // but it's safer this way...
     if (params->registration == false)
     {
-      subNotificationErrorStatus(params->tenant, params->subscriptionId, false, statusCode, "");
+      subNotificationOutcome(params->tenant, params->subscriptionId, false, statusCode, "", params->failsCounter, params->maxFailsLimit, httpRequestDurationMs);
     }
   }
   else
@@ -124,13 +124,8 @@ static void doNotifyHttp(SenderThreadParams* params, CURL* curl, SyncQOverflow<S
     // but it's safer this way...
     if (params->registration == false)
     {
-      subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, out, params->failsCounter, params->maxFailsLimit);
+      subNotificationOutcome(params->tenant, params->subscriptionId, true, -1, out, params->failsCounter, params->maxFailsLimit, httpRequestDurationMs);
     }
-  }
-
-  if (params->registration == false)
-  {
-    subNotificationDurationUpdate(params->tenant, params->subscriptionId, httpRequestDurationMs);
   }
 
   // Add notificacion result summary in log INFO level
@@ -167,7 +162,7 @@ static void doNotifyMqtt(SenderThreadParams* params)
   lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
                      params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
-  // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReson "" to avoid using
+  // Note that we use in subNotificationOutcome() statusCode -1 and failureReson "" to avoid using
   // lastFailureReason and lastSuccessCode in MQTT notifications (they don't have sense in this case)
   if (mqttMgr.sendMqttNotification(params->ip, params->port, params->user, params->passwd, params->content, params->resource, params->qos, params->retain))
   {
@@ -176,11 +171,11 @@ static void doNotifyMqtt(SenderThreadParams* params)
     // DEBUG log level). Note however that even if mqttOnPublishCallback() is called there is no actual
     // guarantee if MQTT QoS is 0
     logInfoNonRequestNotification("MQTT", params->subscriptionId.c_str(), endpoint.c_str(), params->resource.c_str(), params->content.c_str());
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, false, -1, "");
+    subNotificationOutcome(params->tenant, params->subscriptionId, false, -1, "");
   }
   else
   {
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
+    subNotificationOutcome(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
   }
 }
 
@@ -203,7 +198,7 @@ static void doNotifyKafka(SenderThreadParams* params)
   lmTransactionStart("to", protocol.c_str(), + params->ip.c_str(), params->port, params->resource.c_str(),
                      params->tenant.c_str(), params->servicePath.c_str(), params->from.c_str());
 
-  // Note that we use in subNotificationErrorStatus() statusCode -1 and failureReason "" to avoid using
+  // Note that we use in subNotificationOutcome() statusCode -1 and failureReason "" to avoid using
   // lastFailureReason and lastSuccessCode in KAFKA notifications (they don't have sense in this case)
   if (kafkaMgr.sendKafkaNotification(endpoint.c_str(), params->resource, params->content, params->subscriptionId, params->tenant, params->servicePath, params->extraHeaders, params->user, params->passwd, params->saslMechanism, params->securityProtocol, params->kafkaKeyIsNull, params->kafkaKey))
   {
@@ -214,7 +209,7 @@ static void doNotifyKafka(SenderThreadParams* params)
   }
   else
   {
-    subNotificationErrorStatus(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
+    subNotificationOutcome(params->tenant, params->subscriptionId, true, -1, "", params->failsCounter, params->maxFailsLimit);
   }
 }
 

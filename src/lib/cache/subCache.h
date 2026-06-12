@@ -345,9 +345,9 @@ extern void subCacheStatisticsReset(const char* by);
 
 /* ****************************************************************************
 *
-* subNotificationErrorStatus -
+* subNotificationOutcome -
 */
-extern void subNotificationErrorStatus
+extern void subNotificationOutcome
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
@@ -355,18 +355,8 @@ extern void subNotificationErrorStatus
   long long           statusCode,
   const std::string&  failureReason,
   long long           failsCounter = -1,
-  long long           maxFailsLimit = -1
-);
-
-
-/* ****************************************************************************
-*
-* subNotificationDurationUpdate -
-*/
-extern void subNotificationDurationUpdate(
-  const std::string&  tenant,
-  const std::string&  subscriptionId,
-  long long           httpRequestDurationMs
+  long long           maxFailsLimit = -1,
+  long long           notificationDurationMs = -1
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_
