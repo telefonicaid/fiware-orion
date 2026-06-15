@@ -164,7 +164,9 @@ Content-Length: 433
 Kafka message at topic orion
 Key:
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: normalized
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",

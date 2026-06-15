@@ -24,7 +24,7 @@
 Fiware-Service In Custom Notifications With Modification
 
 --SHELL-INIT--
-dbInit CB s1
+dbInit CB fgm
 kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1
 brokerStart CB 164 IPV4 -multiservice
 accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
@@ -120,8 +120,10 @@ Content-Length: 0
 Kafka message at topic sub1
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Service: cucu
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: custom
 Payload:
 {
     "A": "1"
@@ -133,4 +135,4 @@ Payload:
 accumulatorStop
 kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1
 brokerStop CB
-dbDrop CB s1
+dbDrop CB fgm

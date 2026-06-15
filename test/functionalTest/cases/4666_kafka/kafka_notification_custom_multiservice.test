@@ -218,8 +218,10 @@ Content-Length: 0
 Kafka message at topic sub_E1
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: custom
 Payload:
 {
     "A": "1"
@@ -242,8 +244,10 @@ Content-Length: 0
 Kafka message at topic sub_E2
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: custom
 Payload:
 {
     "A": "2"
@@ -264,8 +268,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Kafka message at topic sub_E1
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: custom
 Payload:
 {
     "A": "10"
@@ -286,8 +292,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Kafka message at topic sub_E2
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: custom
 Payload:
 {
     "A": "20"

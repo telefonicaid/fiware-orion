@@ -2078,7 +2078,9 @@ In case of `mqttCustom`:
 
 In case of `kafkaCustom`:
 
-* `headers` (both header name and value can be templatized).
+* `headers` (both header name and value can be templatized). Note that `Fiware-Correlator` and
+  `Ngsiv2-AttrsFormat` headers cannot be overwritten in custom notifications. Any attempt of
+  doing so (e.g. `"kafkaCustom": { ... "headers": {"Fiware-Correlator": "foo"} ...}` will be ignored.
 * `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
 * `key`

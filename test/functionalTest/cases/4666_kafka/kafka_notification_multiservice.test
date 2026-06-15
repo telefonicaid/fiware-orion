@@ -233,7 +233,7 @@ Host: localhost:9997
 Accept: application/json
 Fiware-Service: s1
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1-3])
 
 {
     "data": [
@@ -253,8 +253,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
 REGEX(^Kafka message at topic sub\d+$)
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1-3])
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: normalized
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -274,8 +276,10 @@ Payload:
 REGEX(^Kafka message at topic sub\d+$)
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1-3])
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: normalized
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -415,7 +419,7 @@ Host: localhost:9997
 Accept: application/json
 Fiware-Service: s1
 Content-Type: application/json; charset=utf-8
-Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
+Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1-3])
 
 {
     "data": [
@@ -436,8 +440,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[13])
 Kafka message at topic sub1
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1-3])
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: normalized
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",
@@ -457,8 +463,10 @@ Payload:
 Kafka message at topic sub2
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=[1-3])
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: normalized
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",

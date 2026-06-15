@@ -1,0 +1,1 @@
+- Fix: include Fiware-Correlator and Ngsiv2-AttrsFormat headers in Kafka notifications (#4791)

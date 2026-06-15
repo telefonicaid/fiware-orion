@@ -118,7 +118,9 @@ Content-Length: 0
 Kafka message at topic sub1
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Servicepath: /cucu
+  Ngsiv2-AttrsFormat: custom
 Payload:
 {
     "A": "1"

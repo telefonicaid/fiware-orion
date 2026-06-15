@@ -62,6 +62,8 @@ in KAFKA subscriptions work the same as in HTTP subscriptions, taking into accou
 
 - `Fiware-Service`
 - `Fiware-ServicePath`
+- `Fiware-Correlator`
+- `Ngsiv2-AttrsFormat`
 
 In `kafkaCustom` notifications, these headers can be overwritten, and additional custom headers can be defined in the subscription.
 
