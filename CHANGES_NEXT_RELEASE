@@ -1,0 +1,1 @@
+- Add: avoid forbidden character checks in attribute values using TextUnrestricted metadata (#4792)

@@ -1134,14 +1134,20 @@ std::string ContextAttribute::check(bool asValue, bool relaxForbiddenCheck)
     return "Invalid characters in attribute type";
   }
 
-  if ((!relaxForbiddenCheck) && (compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (type != TEXT_UNRESTRICTED_TYPE))
+  Metadata* textUnrestrictedMdP = metadataVector.lookupByName(TEXT_UNRESTRICTED_TYPE);
+  bool isUnrestricted = (type == TEXT_UNRESTRICTED_TYPE) || 
+                        (textUnrestrictedMdP != NULL && 
+                         textUnrestrictedMdP->valueType == orion::ValueTypeBoolean && 
+                         textUnrestrictedMdP->boolValue == true);
+
+  if ((!relaxForbiddenCheck) && (compoundValueP != NULL) && (compoundValueP->childV.size() != 0)  && (!isUnrestricted))
   {
     return compoundValueP->check("");
   }
 
   if (valueType == orion::ValueTypeString)
   {
-    if ((!relaxForbiddenCheck) && (type != TEXT_UNRESTRICTED_TYPE) && (forbiddenChars(stringValue.c_str())))
+    if ((!relaxForbiddenCheck) && (!isUnrestricted) && (forbiddenChars(stringValue.c_str())))
     {
       alarmMgr.badInput(clientIp, "found a forbidden character in the value of an attribute", stringValue);
       return "Invalid characters in attribute value";
