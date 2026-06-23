@@ -93,7 +93,9 @@ public:
   const std::string& saslMechanism,
   const std::string& securityProtocol,
   bool  kafkaKeyIsNull,
-  const std::string& kafkaKey
+  const std::string& kafkaKey,
+  const std::string& fiwareCorrelator,
+  const std::string& ngsiv2AttrFormat
  );
 
  void cleanup(double maxAge);  // Cleaning inactive connections

@@ -159,8 +159,10 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Kafka message at topic orion
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Service: s1
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: normalized
 Payload:
 {
     "subscriptionId": "REGEX([0-9a-f\-]{24})",

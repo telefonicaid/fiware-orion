@@ -1,0 +1,171 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+TextUnrestricted metadata CRUD transitions support
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create entity E with a custom type attribute and no TextUnrestricted metadata
+# 02. Update attribute with forbidden chars and NO metadata, get error
+# 03. Update attribute with forbidden chars and TextUnrestricted metadata as true
+# 04. Update attribute with forbidden chars and TextUnrestricted metadata as false, get error
+# 05. Update attribute with forbidden chars and empty metadata to remove it, get error
+#
+
+echo '01. Create entity E with a custom type attribute and no TextUnrestricted metadata'
+echo '================================================================================='
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "type": "FunnyType",
+    "value": "initial value"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Update attribute with forbidden chars and NO metadata, get error'
+echo '===================================================================='
+payload='{
+  "value": "Value with <forbidden> characters (like = or ;)"
+}'
+orionCurl --url /v2/entities/E/attrs/A --payload "$payload" -X PUT
+echo
+echo
+
+
+echo '03. Update attribute with forbidden chars and TextUnrestricted metadata as true'
+echo '==============================================================================='
+payload='{
+  "value": "Value with <forbidden> characters (like = or ;)",
+  "metadata": {
+    "TextUnrestricted": {
+      "value": true,
+      "type": "Boolean"
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs/A --payload "$payload" -X PUT
+echo
+echo
+
+
+echo '04. Update attribute with forbidden chars and TextUnrestricted metadata as false, get error'
+echo '==========================================================================================='
+payload='{
+  "value": "Value with <forbidden> characters (like = or ;)",
+  "metadata": {
+    "TextUnrestricted": {
+      "value": false,
+      "type": "Boolean"
+    }
+  }
+}'
+orionCurl --url /v2/entities/E/attrs/A --payload "$payload" -X PUT
+echo
+echo
+
+
+echo '05. Update attribute with forbidden chars and empty metadata to remove it, get error'
+echo '===================================================================================='
+payload='{
+  "value": "Value with <forbidden> characters (like = or ;)",
+  "metadata": {}
+}'
+orionCurl --url /v2/entities/E/attrs/A --payload "$payload" -X PUT
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E with a custom type attribute and no TextUnrestricted metadata
+=================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. Update attribute with forbidden chars and NO metadata, get error
+====================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "Invalid characters in attribute value",
+    "error": "BadRequest"
+}
+
+
+03. Update attribute with forbidden chars and TextUnrestricted metadata as true
+===============================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Update attribute with forbidden chars and TextUnrestricted metadata as false, get error
+===========================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "Invalid characters in attribute value",
+    "error": "BadRequest"
+}
+
+
+05. Update attribute with forbidden chars and empty metadata to remove it, get error
+====================================================================================
+HTTP/1.1 400 Bad Request
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 76
+
+{
+    "description": "Invalid characters in attribute value",
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

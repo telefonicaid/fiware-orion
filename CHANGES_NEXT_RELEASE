@@ -1,1 +1,3 @@
 - Add: HTTP notification duration metrics (lastNotificationDuration and accumulatedNotificationDuration) to subscriptions (#4772)
+- Add: include Fiware-Correlator and Ngsiv2-AttrsFormat headers in Kafka notifications (#4791)
+- Add: avoid forbidden character checks in attribute values using TextUnrestricted metadata (#4792)
