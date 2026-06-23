@@ -323,7 +323,7 @@ payload='{
 orionCurl --url '/v2/entities?options=keyValues' --payload "$payload"
 
 # Wait for 1.5 x timeout
-sleep 3s
+sleep 12s
 
 
 echo "10. Get sub1 see lastSuccessCode: 200 but not failsCounter"
@@ -519,12 +519,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 456
+Content-Length: 521
 
 {
     "description": "Test 200 reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -532,6 +533,7 @@ Content-Length: 456
             "url": "http://localhost:REGEX(\d+)/giveme200"
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
@@ -559,12 +561,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 456
+Content-Length: 521
 
 {
     "description": "Test 400 reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -572,6 +575,7 @@ Content-Length: 456
             "url": "http://localhost:REGEX(\d+)/giveme400"
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 400,
         "onlyChangedAttrs": false,
@@ -599,12 +603,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 456
+Content-Length: 521
 
 {
     "description": "Test 404 reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -612,6 +617,7 @@ Content-Length: 456
             "url": "http://localhost:REGEX(\d+)/giveme404"
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,
@@ -639,12 +645,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 456
+Content-Length: 521
 
 {
     "description": "Test 500 reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -652,6 +659,7 @@ Content-Length: 456
             "url": "http://localhost:REGEX(\d+)/giveme500"
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 500,
         "onlyChangedAttrs": false,
@@ -679,12 +687,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 499
+Content-Length: 570
 
 {
     "description": "Test timeout reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -695,6 +704,7 @@ Content-Length: 499
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Timeout was reached",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -720,12 +730,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 505
+Content-Length: 570
 
 {
     "description": "Test wrong port reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -736,6 +747,7 @@ Content-Length: 505
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -761,12 +773,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 514
+Content-Length: REGEX(\d+)
 
 {
     "description": "Test host not found reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -777,6 +790,7 @@ Content-Length: 514
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Could not resolve hostname",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -802,12 +816,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 500
+Content-Length: 571
 
 {
     "description": "Test wrong IP reponses",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -818,6 +833,7 @@ Content-Length: 500
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Timeout was reached",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "onlyChangedAttrs": false,
         "timesSent": 1
     },

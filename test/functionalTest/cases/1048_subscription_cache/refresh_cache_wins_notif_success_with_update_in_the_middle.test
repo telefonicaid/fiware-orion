@@ -226,12 +226,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 420
+Content-Length: 485
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -239,6 +240,7 @@ Content-Length: 420
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "202REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "202REGEX(.*)",
             "lastSuccessCode": 200,
             "onlyChangedAttrs": false,
@@ -351,13 +353,14 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 457
+Content-Length: 522
 
 [
     {
         "description": "A little description",
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -365,6 +368,7 @@ Content-Length: 457
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "202REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "202REGEX(.*)",
             "lastSuccessCode": 200,
             "onlyChangedAttrs": false,
@@ -390,6 +394,7 @@ Content-Length: 457
 08. Get doc in DB after cache refresh and see lastNotification/Success in the present and status code 200 and count 1 + description
 ===================================================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -414,6 +419,7 @@ Content-Length: 457
     "failsCounter": 0,
     "format": "normalized",
     "lastNotification": REGEX(1[6-9]\d+),
+    "lastNotificationDuration": REGEX(\d+),
     "lastSuccess": REGEX(1[6-9]\d+),
     "lastSuccessCode": 200,
     "metadata": [],

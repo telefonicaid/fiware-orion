@@ -173,6 +173,17 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
 }
 
 
+/* ****************************************************************************
+*
+* unsetHttpNotificationDurationMetrics -
+*
+*/
+static void unsetHttpNotificationDurationMetrics(orion::BSONObjBuilder* unsetB)
+{
+  unsetB->append(CSUB_LASTNOTIFICATIONDURATION, 1);
+  unsetB->append(CSUB_ACCUMULATEDNOTIFICATIONDURATION, 1);
+}
+
 
 /* ****************************************************************************
 *
@@ -271,6 +282,8 @@ static void updateInCache
   LM_T(LmtSubCache, ("update: %s", doc.toString().c_str()));
 
   long long    lastNotificationTime;
+  long long    lastNotificationDuration;
+  long long    notificationDurationDelta;
   long long    lastFailure;
   std::string  lastFailureReason;
   long long    lastSuccess;
@@ -284,31 +297,43 @@ static void updateInCache
 
   if (subCacheP != NULL)
   {
-    lastNotificationTime = subCacheP->lastNotificationTime;
-    lastFailure          = subCacheP->lastFailure;
-    lastFailureReason    = subCacheP->lastFailureReason;
-    lastSuccess          = subCacheP->lastSuccess;
-    lastSuccessCode      = subCacheP->lastSuccessCode;
-    count                = subCacheP->count;
-    failsCounter         = subCacheP->failsCounter;
-    failsCounterFromDb   = subCacheP->failsCounterFromDb;
-    failsCounterFromDbValid = subCacheP->failsCounterFromDbValid;
-    status               = subCacheP->status;
-    statusLastChange     = subCacheP->statusLastChange;
+    lastNotificationTime            = subCacheP->lastNotificationTime;
+    lastNotificationDuration        = subCacheP->lastNotificationDuration;
+    notificationDurationDelta       = subCacheP->notificationDurationDelta;
+    lastFailure                     = subCacheP->lastFailure;
+    lastFailureReason               = subCacheP->lastFailureReason;
+    lastSuccess                     = subCacheP->lastSuccess;
+    lastSuccessCode                 = subCacheP->lastSuccessCode;
+    count                           = subCacheP->count;
+    failsCounter                    = subCacheP->failsCounter;
+    failsCounterFromDb              = subCacheP->failsCounterFromDb;
+    failsCounterFromDbValid         = subCacheP->failsCounterFromDbValid;
+    status                          = subCacheP->status;
+    statusLastChange                = subCacheP->statusLastChange;
   }
   else
   {
-    lastNotificationTime = -1;
-    lastFailure          = -1;
-    lastFailureReason    = "";
-    lastSuccess          = -1;
-    lastSuccessCode      = -1;
-    count                = 0;
-    failsCounter         = 0;
-    failsCounterFromDb   = 0;
-    failsCounterFromDbValid = false;
-    status               = "";
-    statusLastChange     = -1;
+    lastNotificationTime      = -1;
+    lastNotificationDuration  = -1;
+    notificationDurationDelta = 0;
+    lastFailure               = -1;
+    lastFailureReason         = "";
+    lastSuccess               = -1;
+    lastSuccessCode           = -1;
+    count                     = 0;
+    failsCounter              = 0;
+    failsCounterFromDb        = 0;
+    failsCounterFromDbValid   = false;
+    status                    = "";
+    statusLastChange          = -1;
+  }
+
+  // HTTP duration metrics don't apply to MQTT or Kafka notifications
+  if (subUp.notificationProvided &&
+      subUp.notification.type != ngsiv2::HttpNotification)
+  {
+    lastNotificationDuration  = -1;
+    notificationDurationDelta = 0;
   }
 
   // different for other fields grabbed from the cache, status could be included in the sub update
@@ -324,6 +349,8 @@ static void updateInCache
                                           subUp.id.c_str(),
                                           servicePathCache,
                                           lastNotificationTime,
+                                          lastNotificationDuration,
+                                          notificationDurationDelta,
                                           lastFailure,
                                           lastFailureReason,
                                           lastSuccess,
@@ -431,6 +458,14 @@ std::string mongoUpdateSubscription
     else
     {
       setDescription(subUp, &setB);
+    }
+  }
+
+  if (subUp.notificationProvided)
+  {
+    if (subUp.notification.type != ngsiv2::HttpNotification)
+    {
+      unsetHttpNotificationDurationMetrics(&unsetB);
     }
   }
 

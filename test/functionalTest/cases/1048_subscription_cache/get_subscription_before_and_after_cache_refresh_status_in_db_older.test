@@ -60,11 +60,13 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "format" : "normalized",
         "failsCounter" : NumberLong(4),
         "count" : NumberLong(10),
+        "accumulatedNotificationDuration" : NumberLong(12),
         "lastNotification" : NumberLong(1577872800),
+        "lastNotificationDuration" : NumberLong(8),
         "lastFailure" : NumberLong(1577872800),
         "lastSuccess" : NumberLong(1577869200),
         "lastFailureReason" : "Could not connect to server",
-        "lastSuccessCode": NumberLong(200),
+        "lastSuccessCode": NumberLong(200)
 })'
 
 brokerStart CB 0 IPv4 -subCacheIval 2 --cache
@@ -109,7 +111,9 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa26230323
     count: NumberLong("25"),
     failsCounter: NumberLong("8"),
     status: "inactive",
-    statusLastChange: 1577869200
+    statusLastChange: 1577869200,
+    lastNotificationDuration: NumberLong("10"),
+    accumulatedNotificationDuration: NumberLong("22")
   }
 })'
 echo
@@ -141,12 +145,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 551
+Content-Length: 617
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": 12,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -157,6 +162,7 @@ Content-Length: 551
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "2020-01-01T10:00:00.000Z",
+            "lastNotificationDuration": 8,
             "lastSuccess": "2020-01-01T09:00:00.000Z",
             "lastSuccessCode": 200,
             "maxFailsLimit": 1,
@@ -191,12 +197,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 531
+Content-Length: 598
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": 22,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -207,6 +214,7 @@ Content-Length: 531
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Timeout",
             "lastNotification": "2020-01-01T11:00:00.000Z",
+            "lastNotificationDuration": 10,
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,
@@ -236,12 +244,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 514
+Content-Length: 581
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": 22,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -251,6 +260,7 @@ Content-Length: 514
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Timeout",
             "lastNotification": "2020-01-01T11:00:00.000Z",
+            "lastNotificationDuration": 10,
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,

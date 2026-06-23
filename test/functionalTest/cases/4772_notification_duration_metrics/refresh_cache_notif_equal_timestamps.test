@@ -1,0 +1,232 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Verify lastNotificationDuration synchronization when lastNotification timestamps are equal
+
+--SHELL-INIT--
+dbInit CB
+
+# Insert subscription with a fixed past timestamp and lastNotificationDuration = 5
+mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
+        "_id" : ObjectId("61960a51596aa2623032357d"),
+        "expiration" : NumberLong("9223372036854775807"),
+        "reference" : "http://localhost:9997/notify",
+        "custom" : false,
+        "timeout" : NumberLong(0),
+        "throttling" : NumberLong(0),
+        "maxFailsLimit" : NumberLong(1),
+        "servicePath" : "/",
+        "status" : "active",
+        "statusLastChange" : 1546337410,
+        "entities" : [
+                {
+                        "id" : "E",
+                        "isPattern" : false,
+                        "type" : "T",
+                        "isTypePattern" : false
+                }
+        ],
+        "attrs" : [ ],
+        "metadata" : [ ],
+        "blacklist" : false,
+        "onlyChanged" : false,
+        "conditions" : [ ],
+        "expression" : {
+                "q" : "",
+                "mq" : "",
+                "geometry" : "",
+                "coords" : "",
+                "georel" : ""
+        },
+        "format" : "normalized",
+        "lastNotification" : NumberLong(1546337410),
+        "lastNotificationDuration" : NumberLong(5),
+        "lastSuccess" : NumberLong(1546337410),
+        "lastSuccessCode": NumberLong(200),
+})'
+
+# Start broker with cache sync interval of 4s
+brokerStart CB 0 IPv4 -subCacheIval 4 --cache
+
+--SHELL--
+
+#
+# 00. (Done before starting Context Broker) Insert subscription in DB and start broker with cache enabled
+# 01. Query subscription from Orion to verify it has been loaded into the cache
+# 02. Update lastNotificationDuration to 999 in DB to simulate out-of-sync
+#     (Wait 4.5s for cache sync)
+# 03. Query DB to verify lastNotificationDuration is restored to 5
+#
+
+echo "01. Query subscription from Orion to verify it has been loaded into the cache"
+echo "============================================================================="
+orionCurl --url /v2/subscriptions/61960a51596aa2623032357d
+echo
+echo
+
+
+echo "02. Update lastNotificationDuration to 999 in DB to simulate out-of-sync"
+echo "=========================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa2623032357d")}, {$set: {lastNotificationDuration: NumberLong("999")}})'
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration:0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+# Wait for cache sync
+sleep 4.5s
+
+echo "03. Query DB to verify lastNotificationDuration is restored to 5"
+echo "================================================================"
+echo "# Note: Verification succeeds because the cache sync updates the duration metric"
+echo "# even though the lastNotification timestamp is identical in the cache and DB."
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration:0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+--REGEXPECT--
+01. Query subscription from Orion to verify it has been loaded into the cache
+=============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "61960a51596aa2623032357d",
+    "notification": {
+        "accumulatedNotificationDuration": 0,
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "2019-01-01T10:10:10.000Z",
+        "lastNotificationDuration": 5,
+        "lastSuccess": "2019-01-01T10:10:10.000Z",
+        "lastSuccessCode": 200,
+        "maxFailsLimit": 1,
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+02. Update lastNotificationDuration to 999 in DB to simulate out-of-sync
+==========================================================================
+REGEX(.*)
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": false,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "lastNotification": 1546337410,
+    "lastNotificationDuration": 999,
+    "lastSuccess": 1546337410,
+    "lastSuccessCode": 200,
+    "maxFailsLimit": 1,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 1546337410,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+03. Query DB to verify lastNotificationDuration is restored to 5
+================================================================
+# Note: Verification succeeds because the cache sync updates the duration metric
+# even though the lastNotification timestamp is identical in the cache and DB.
+{
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "custom": false,
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": false,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "lastNotification": 1546337410,
+    "lastNotificationDuration": 5,
+    "lastSuccess": 1546337410,
+    "lastSuccessCode": 200,
+    "maxFailsLimit": 1,
+    "metadata": [],
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/notify",
+    "servicePath": "/",
+    "status": "active",
+    "statusLastChange": 1546337410,
+    "throttling": 0,
+    "timeout": 0
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
