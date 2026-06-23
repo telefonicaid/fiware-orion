@@ -502,7 +502,9 @@ static void kafkaHeaderAdd(
 static rd_kafka_headers_t* build_kafka_headers(
   const std::map<std::string, std::string>& extraHeaders,
   const std::string&                        tenant,
-  const std::string&                        servicePath
+  const std::string&                        servicePath,
+  const std::string&                        fiwareCorrelator,
+  const std::string&                        ngsiv2AttrFormat
 )
 {
   rd_kafka_headers_t* headers = rd_kafka_headers_new(0);
@@ -515,6 +517,8 @@ static rd_kafka_headers_t* build_kafka_headers(
 
   const std::string fiwareServiceLower     = toLower(HTTP_FIWARE_SERVICE);
   const std::string fiwareServicePathLower = toLower(HTTP_FIWARE_SERVICEPATH);
+  const std::string fiwareCorrelatorLower  = toLower(HTTP_FIWARE_CORRELATOR);
+  const std::string fiwareAttrsFormatLower = toLower(HTTP_NGSIV2_ATTRSFORMAT);
 
   // Tenant (Fiware-Service)
   if (!tenant.empty())
@@ -526,9 +530,26 @@ static rd_kafka_headers_t* build_kafka_headers(
   const std::string sp = servicePath.empty() ? "/" : servicePath;
   kafkaHeaderAdd(outHeaders, HTTP_FIWARE_SERVICEPATH, sp);
 
+  // Correlator (Fiware-Correlator)
+  if (!fiwareCorrelator.empty())
+  {
+    kafkaHeaderAdd(outHeaders, HTTP_FIWARE_CORRELATOR, fiwareCorrelator);
+  }
+
+  // Format (Ngsiv2-AttrsFormat)
+  if ((!ngsiv2AttrFormat.empty()) && (ngsiv2AttrFormat != "JSON") && (ngsiv2AttrFormat != "legacy"))
+  {
+    kafkaHeaderAdd(outHeaders, HTTP_NGSIV2_ATTRSFORMAT, ngsiv2AttrFormat);
+  }
+
   for (std::map<std::string, std::string>::const_iterator it = extraHeaders.begin();
        it != extraHeaders.end(); ++it)
   {
+    std::string keyLower = toLower(it->first);
+    if ((keyLower == toLower(HTTP_FIWARE_CORRELATOR)) || (keyLower == toLower(HTTP_NGSIV2_ATTRSFORMAT)))
+    {
+      continue;
+    }
     kafkaHeaderAdd(outHeaders, it->first, it->second);
   }
 
@@ -547,6 +568,14 @@ static rd_kafka_headers_t* build_kafka_headers(
     else if (keyLower == fiwareServicePathLower)
     {
       headerName = HTTP_FIWARE_SERVICEPATH;
+    }
+    else if (keyLower == fiwareCorrelatorLower)
+    {
+      headerName = HTTP_FIWARE_CORRELATOR;
+    }
+    else if (keyLower == fiwareAttrsFormatLower)
+    {
+      headerName = HTTP_NGSIV2_ATTRSFORMAT;
     }
     else
     {
@@ -582,7 +611,9 @@ bool KafkaConnectionManager::sendKafkaNotification(
     const std::string& saslMechanism,
     const std::string& securityProtocol,
     bool kafkaKeyIsNull,
-    const std::string& kafkaKey
+    const std::string& kafkaKey,
+    const std::string& fiwareCorrelator,
+    const std::string& ngsiv2AttrFormat
   )
 
 {
@@ -620,7 +651,7 @@ bool KafkaConnectionManager::sendKafkaNotification(
   ctx->subscriptionId = subscriptionId;
 
   // Initially without headers
-  rd_kafka_headers_t* headers = build_kafka_headers(customHeaders, tenant, servicePath);
+  rd_kafka_headers_t* headers = build_kafka_headers(customHeaders, tenant, servicePath, fiwareCorrelator, ngsiv2AttrFormat);
 
   const void* keyPtr  = NULL;
   size_t      keySize = 0;

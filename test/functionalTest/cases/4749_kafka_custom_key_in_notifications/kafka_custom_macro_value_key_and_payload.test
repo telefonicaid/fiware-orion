@@ -166,7 +166,9 @@ Content-Length: REGEX([0-9]+)
 Kafka message at topic orion
 Key: valueA
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: custom
 Payload:
 valueA
 =======================================

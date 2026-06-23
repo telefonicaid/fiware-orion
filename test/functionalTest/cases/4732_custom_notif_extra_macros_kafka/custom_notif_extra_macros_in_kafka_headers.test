@@ -120,8 +120,10 @@ Content-Length: 0
 Kafka message at topic orion
 Key: (null)
 Headers:
+  Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
   Fiware-Servicepath: /subservA
   myheader: /subservA/fgm
+  Ngsiv2-AttrsFormat: custom
 Payload:
 {
     "A": "1"

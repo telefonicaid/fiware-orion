@@ -1,4 +1,4 @@
-# Copyright 2025 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,80 +21,78 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Fiware-ServicePath In Custom Notifications With Modification
+Verify Ngsiv2-AttrsFormat header for keyValues format in Kafka notifications
 
 --SHELL-INIT--
-dbInit CB s1
+dbInit CB
 kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1
-brokerStart CB 164 IPV4 -multiservice
+brokerStart CB 164 IPV4
 accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
 
 --SHELL--
 
 #
-#
-# 01. Make accumulator subscribe to changes in E/A1 using custom notifications with Fiware-ServicePath cucu
-# 02. Create E/A1, using Fiware-ServicePath fgm
-# 03. Check that the Fiware-ServicePath cucu (and not fgm) was propagated to accumulator
+# 01. Create KAFKA sub with attrsFormat: keyValues
+# 02. Create entity E to trigger the subscription
+# 03. Dump accumulator and verify Ngsiv2-AttrsFormat header
 #
 
-echo "01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-ServicePath cucu"
-echo "=========================================================================================================="
+echo "01. Create KAFKA sub with attrsFormat: keyValues"
+echo "================================================"
 payload='{
-  "description": "KAFKA sub1",
+  "description": "Create KAFKA sub with attrsFormat: keyValues",
   "subject": {
     "entities": [
       {
-        "idPattern": ".*",
+        "id": "E",
         "type": "T"
       }
     ]
   },
   "notification": {
-    "kafkaCustom": {
+    "attrsFormat": "keyValues",
+    "kafka": {
       "url": "kafka://localhost:9092,localhost:9094",
-      "topic": "sub1",
-      "payload": "{ %22A%22: %22${A}%22 }",
-      "headers":{"fiware-servicepath": "/cucu"}
+      "topic": "sub1"
     }
   }
 }'
-orionCurl --url /v2/subscriptions --payload "$payload" --tenant s1
+orionCurl --url /v2/subscriptions --payload "$payload"
 echo
 echo
 
 
-echo "02. Create E/A, using Fiware-ServicePath fgm"
-echo "=============================================="
+echo "02. Create entity E to trigger the subscription"
+echo "==============================================="
 payload='{
   "id": "E",
   "type": "T",
   "A": {
-    "value": 1,
-    "type": "Float"
+    "value": 42,
+    "type": "Number"
   }
 }'
-orionCurl --url /v2/entities --payload "${payload}" --tenant s1 --servicePath /fgm
+orionCurl --url /v2/entities --payload "$payload"
 echo
 echo
+
 
 # Not sure but sometimes a notification may be lost at the accumulator if we
 # don't wait. Maybe the dump requests is faster than the storing of KAFKA notifications
 # due to the lock in accumulator-server.py?
-sleep 1s
+sleep 2s
 
 
-echo "03. Check that the Fiware-ServicePath cucu (and not fgm) was propagated to accumulator"
-echo "======================================================================================"
+echo "03. Dump accumulator and verify Ngsiv2-AttrsFormat header"
+echo "=========================================================="
 accumulatorDump
-accumulatorReset
 echo
 echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to changes in E/A using custom notifications with Fiware-ServicePath cucu
-==========================================================================================================
+01. Create KAFKA sub with attrsFormat: keyValues
+================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -103,8 +101,8 @@ Content-Length: 0
 
 
 
-02. Create E/A, using Fiware-ServicePath fgm
-==============================================
+02. Create entity E to trigger the subscription
+===============================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -113,25 +111,30 @@ Content-Length: 0
 
 
 
-03. Check that the Fiware-ServicePath cucu (and not fgm) was propagated to accumulator
-======================================================================================
+03. Dump accumulator and verify Ngsiv2-AttrsFormat header
+==========================================================
 Kafka message at topic sub1
 Key: (null)
 Headers:
   Fiware-Correlator: REGEX([0-9a-f\-]{36}; cbnotif=1)
-  Fiware-Service: s1
-  Fiware-Servicepath: /cucu
-  Ngsiv2-AttrsFormat: custom
+  Fiware-Servicepath: /
+  Ngsiv2-AttrsFormat: keyValues
 Payload:
 {
-    "A": "1"
+    "subscriptionId": "REGEX([0-9a-f]{24})",
+    "data": [
+        {
+            "id": "E",
+            "type": "T",
+            "A": 42
+        }
+    ]
 }
 =======================================
 
 
 --TEARDOWN--
+brokerStop CB
+dbDrop CB
 accumulatorStop
 kafkaDestroyTopics "${KAFKA_BOOTSTRAP_A}" sub1
-brokerStop CB
-dbDrop CB s1
-
