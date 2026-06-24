@@ -1,2 +1,0 @@
-- Add: include Fiware-Correlator and Ngsiv2-AttrsFormat headers in Kafka notifications (#4791)
-- Add: avoid forbidden character checks in attribute values using TextUnrestricted metadata (#4792)
