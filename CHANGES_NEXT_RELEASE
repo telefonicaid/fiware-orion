@@ -1,0 +1,1 @@
+- Fix: use WARN level and "Notif failure" message for failed notifications (#4800)
