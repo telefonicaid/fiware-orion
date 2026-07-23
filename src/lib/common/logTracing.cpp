@@ -96,20 +96,13 @@ void logInfoHttpNotification
   }
 
   // If there is no response payload or the response code is 2xx, log without response payload (to avoid log pollution with non-error responses)
-  if (rc <= 299)
+  if ((strlen(responsePayload) == 0) || (rc <= 299))
   {
     LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %d", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc));
   }
   else
   {
-    if (strlen(responsePayload) == 0)
-    {
-      LM_W(("Notif failure (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %d", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc));
-    }
-    else
-    {
-      LM_W(("Notif failure (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %d, response payload (%d bytes): %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc, strlen(responsePayload), effectiveResponsePayload));
-    }
+    LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %d, response payload (%d bytes): %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, rc, strlen(responsePayload), effectiveResponsePayload));
   }
 
   if (cleanAfterUse)

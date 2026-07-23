@@ -198,7 +198,7 @@ time=2026-03-12T13:18:39.461Z | lvl=INFO | corr=fbe7731e-1e15-11f1-9ced-08002720
 
 ...
 
-time=2026-03-12T13:16:09.473Z | lvl=WARN | corr=a280a8ae-1e15-11f1-ae2a-080027207a9f; cbnotif=1 | trans=1773321367-657-00000000004 | from=0.0.0.0 | srv=<none> | subsrv=/ | comp=Orion | op=logTracing.cpp[105]:logInfoHttpNotification | msg=Notif failure (subId: 69b2bc999bb797a5cd07dc74): POST localhost:9997/giveme400, payload (123 bytes): {"subscriptionId":"69b2bc999bb797a5cd07dc74","data":[{"id":"E1","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: 400, response payload (93 bytes): {"error": "FakeError", "description": "this is a forged error response for testing purposes"}
+time=2026-03-12T13:16:09.473Z | lvl=INFO | corr=a280a8ae-1e15-11f1-ae2a-080027207a9f; cbnotif=1 | trans=1773321367-657-00000000004 | from=0.0.0.0 | srv=<none> | subsrv=/ | comp=Orion | op=logTracing.cpp[105]:logInfoHttpNotification | msg=Notif delivered (subId: 69b2bc999bb797a5cd07dc74): POST localhost:9997/giveme400, payload (123 bytes): {"subscriptionId":"69b2bc999bb797a5cd07dc74","data":[{"id":"E1","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: 400, response payload (93 bytes): {"error": "FakeError", "description": "this is a forged error response for testing purposes"}
 ```
 
 * The `-logInfoPayloadMaxSize` CLI setting (or `infoPayloadMaxSize` parameter in the [log admin REST API](management_api.md#log-configs-and-trace-levels))
@@ -363,21 +363,21 @@ Notification endpoint response with 400 (a WARN trace is printed) (*NOTE*: we as
 
 ```
 time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e1fdb14e7532482ac795) response NOT OK, http code: 400
-time=2020-10-26T14:49:34.619Z | lvl=WARN | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, payload (123 bytes): {"subscriptionId":"5f96e1fdb14e7532482ac795","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 400
+time=2020-10-26T14:49:34.619Z | lvl=INFO | corr=7689f6ba-179a-11eb-ac4c-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000009 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e1fdb14e7532482ac795): POST localhost:1028/giveme400, payload (123 bytes): {"subscriptionId":"5f96e1fdb14e7532482ac795","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 400
 ```
 
 Notification endpoint response with 404 (a WARN trace is printed) (*NOTE*: we assume in the example below that no payload comes in the response, otherwise the response payload will be also included):
 
 ```
 time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e27cb14e7532482ac796) response NOT OK, http code: 404
-time=2020-10-26T14:51:40.764Z | lvl=WARN | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, payload (123 bytes): {"subscriptionId":"5f96e27cb14e7532482ac796","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 404
+time=2020-10-26T14:51:40.764Z | lvl=INFO | corr=c1b8e9c0-179a-11eb-9edc-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000012 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e27cb14e7532482ac796): POST localhost:1028/giveme404, payload (123 bytes): {"subscriptionId":"5f96e27cb14e7532482ac796","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 404
 ```
 
 Notification endpoint response with 500 (a WARN trace is printed) (*NOTE*: we assume in the example below that no payload comes in the response, otherwise the response payload will be also included)
 
 ```
 time=2020-10-26T14:53:04.246Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=httpRequestSend.cpp[583]:httpRequestSend | msg=Notification (subId: 5f96e2cfb14e7532482ac797) response NOT OK, http code: 500
-time=2020-10-26T14:53:04.247Z | lvl=WARN | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, payload (123 bytes): {"subscriptionId":"5f96e2cfb14e7532482ac797","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 500
+time=2020-10-26T14:53:04.247Z | lvl=INFO | corr=f37b5024-179a-11eb-9ce6-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000015 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif delivered (subId: 5f96e2cfb14e7532482ac797): POST localhost:1028/giveme500, payload (123 bytes): {"subscriptionId":"5f96e2cfb14e7532482ac797","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: 500
 ```
 
 Endpoint not responding within 10 seconds timeout or some other connection error (alarm is raised in WARN level):

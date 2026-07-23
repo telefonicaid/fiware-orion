@@ -104,8 +104,7 @@ echo
 
 echo "04. Check log INFO traces (response payload only for the 400 error)"
 echo "==================================================================="
-cat /tmp/contextBroker.log | grep 'INFO' | awk -F 'msg=' '{print $2}' | grep "Notif delivered" | sed -e "s/$REG_ID2/REG_ID2/g"
-cat /tmp/contextBroker.log | grep 'WARN' | awk -F 'msg=' '{print $2}' | grep "Notif failure" | sed -e "s/$REG_ID1/REG_ID1/g"
+cat /tmp/contextBroker.log | grep 'INFO' | awk -F 'msg=' '{print $2}' | grep "Notif delivered" | sed -e "s/$REG_ID1/REG_ID1/g" | sed -e "s/$REG_ID2/REG_ID2/g" | sort
 echo
 echo
 
@@ -143,8 +142,8 @@ Content-Length: 0
 
 04. Check log INFO traces (response payload only for the 400 error)
 ===================================================================
+Notif delivered (subId: REG_ID1): POST localhost:9997/giveme400, payload (123 bytes): {"subscriptionId":"REG_ID1","data":[{"id":"E1","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: 400, response payload (93 bytes): {"error": "FakeError", "description": "this is a forged error response for testing purposes"}
 Notif delivered (subId: REG_ID2): POST localhost:9997/notify, payload (123 bytes): {"subscriptionId":"REG_ID2","data":[{"id":"E1","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: 200
-Notif failure (subId: REG_ID1): POST localhost:9997/giveme400, payload (123 bytes): {"subscriptionId":"REG_ID1","data":[{"id":"E1","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: 400, response payload (93 bytes): {"error": "FakeError", "description": "this is a forged error response for testing purposes"}
 
 
 --TEARDOWN--
