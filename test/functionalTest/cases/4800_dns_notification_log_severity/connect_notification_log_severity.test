@@ -101,7 +101,7 @@ Content-Length: 0
 
 03. Check logs to verify warning notification trace for Connection failure
 ==========================================================================
- lvl=WARN  msg=Notif failure (subId: SUB_ID): POST localhost:12345/notify, payload (122 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: Could not connect to server
+ lvl=WARN  msg=Notif failure (subId: SUB_ID): POST localhost:12345/notify, payload (122 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, reason: Could not connect to server
 
 
 --TEARDOWN--

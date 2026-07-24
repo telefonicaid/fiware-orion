@@ -101,7 +101,7 @@ Content-Length: 0
 
 03. Check logs to verify warning notification trace for Timeout
 ===============================================================
- lvl=WARN  msg=Notif failure (subId: SUB_ID): POST localhost:PORT/givemeDelay, payload (122 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, response code: Timeout was reached
+ lvl=WARN  msg=Notif failure (subId: SUB_ID): POST localhost:PORT/givemeDelay, payload (122 bytes): {"subscriptionId":"SUB_ID","data":[{"id":"E","type":"T","A":{"type":"Number","value":1,"metadata":{}}}]}, reason: Timeout was reached
 
 
 --TEARDOWN--

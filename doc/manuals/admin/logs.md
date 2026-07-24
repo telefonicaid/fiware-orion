@@ -205,12 +205,12 @@ time=2026-03-12T13:16:09.473Z | lvl=INFO | corr=a280a8ae-1e15-11f1-ae2a-08002720
   is used to specify the maximum size that the payloads in the
   above traces may have. If the payload overpasses this limit, then only the first info payload max size
   bytes are printed (and an ellipsis in the form of `(...)` is shown in traces). Default value: 5 Kbytes.
-* The response code in notifications and forwarding traces can be either a number (corresponding to the
-  HTTP response code of the notification or forwarded request) or a string when some connectivity problem
-  occurs. For instance:
+* The response code in notifications and forwarding traces is a number corresponding to the
+  HTTP response code of the notification or forwarded request.
+* In case of a connectivity problem (when the notification fails to reach the destination), the trace prints the reason instead of the response code. For instance:
 
 ```
-time=2020-10-26T10:32:22.145Z | lvl=WARN | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f914177334436ea590f6edb","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't connect to server
+time=2020-10-26T10:32:22.145Z | lvl=WARN | corr=87f708a8-1776-11eb-b327-000c29df7908; cbnotif=1 | trans=1603707992-318-00000000003 | from=0.0.0.0 | srv=s1| subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f914177334436ea590f6edb): POST localhost:1028/accumulate, payload (123 bytes): {"subscriptionId":"5f914177334436ea590f6edb","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, reason: Couldn't connect to server
 ```
 
 * When a client request triggers forwarding to Context Providers, a `Starting forwarding for <client request URL>`
@@ -384,28 +384,28 @@ Endpoint not responding within 10 seconds timeout or some other connection error
 
 ```
 time=2020-10-26T14:54:15.996Z | lvl=WARN | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:1028/givemeDelay: notification failure for queue worker: Timeout was reached
-time=2020-10-26T14:54:15.996Z | lvl=WARN | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, payload (123 bytes): {"subscriptionId":"5f96e30db14e7532482ac798","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Timeout was reached
+time=2020-10-26T14:54:15.996Z | lvl=WARN | corr=184b8b80-179b-11eb-9c52-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000018 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e30db14e7532482ac798): POST localhost:1028/givemeDelay, payload (123 bytes): {"subscriptionId":"5f96e30db14e7532482ac798","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, reason: Timeout was reached
 ```
 
 Endpoint in not responding port, e.g. localhost:9999 (alarm is raised in WARN log level):
 
 ```
 time=2020-10-26T15:01:50.659Z | lvl=WARN | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError localhost:9999/giveme: notification failure for queue worker: Couldn't connect to server
-time=2020-10-26T15:01:50.659Z | lvl=WARN | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e4deb14e7532482ac79c","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't connect to server
+time=2020-10-26T15:01:50.659Z | lvl=WARN | corr=2d3e4cfc-179c-11eb-b667-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000030 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e4deb14e7532482ac79c): POST localhost:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e4deb14e7532482ac79c","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, reason: Couldn't connect to server
 ```
 
 Endpoint in unresolvable name, e.g. foo.bar.bar.com (alarm is raised in WARN log level):
 
 ```
 time=2020-10-26T15:03:54.258Z | lvl=WARN | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError foo.bar.bar.com:9999/giveme: notification failure for queue worker: Couldn't resolve host name
-time=2020-10-26T15:03:54.258Z | lvl=WARN | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e559b14e7532482ac79d","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Couldn't resolve host name
+time=2020-10-26T15:03:54.258Z | lvl=WARN | corr=769f8d8e-179c-11eb-960f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000033 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e559b14e7532482ac79d): POST foo.bar.bar.com:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e559b14e7532482ac79d","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, reason: Couldn't resolve host name
 ```
 
 Endpoint in unreachable IP, e.g. 12.34.56.87 (alarm is raised in WARN log level):
 
 ```
 time=2020-10-26T15:06:14.642Z | lvl=WARN | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=AlarmManager.cpp[328]:notificationError | msg=Raising alarm NotificationError 12.34.56.78:9999/giveme: notification failure for queue worker: Timeout was reached
-time=2020-10-26T15:06:14.642Z | lvl=WARN | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e5dbb14e7532482ac79e","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, response code: Timeout was reached
+time=2020-10-26T15:06:14.642Z | lvl=WARN | corr=c4a3192e-179c-11eb-ac8f-000c29df7908; cbnotif=1 | trans=1603722272-416-00000000036 | from=0.0.0.0 | srv=s1 | subsrv=/A | comp=Orion | op=logTracing.cpp[63]:logInfoHttpNotification | msg=Notif failure (subId: 5f96e5dbb14e7532482ac79e): POST 12.34.56.78:9999/giveme, payload (123 bytes): {"subscriptionId":"5f96e5dbb14e7532482ac79e","data":[{"id":"E","type":"T","A":{"type":"Number","value":42,"metadata":{}}}]}, reason: Timeout was reached
 ```
 
 [Top](#top)
