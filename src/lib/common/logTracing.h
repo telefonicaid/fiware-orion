@@ -146,6 +146,19 @@ extern void logInfoFwdRequest
 );
 
 
+/* ****************************************************************************
+*
+* logWarnHttpNotification
+*/
+extern void logWarnHttpNotification
+(
+  const char*  idStringForLogs,
+  long long          httpCode,
+  const char*  responseBody
+);
+
+
+
 
 #endif // SRC_LIB_COMMON_LOGTRACING_H_
 
