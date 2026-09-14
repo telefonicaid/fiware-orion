@@ -31,6 +31,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <rdkafka.h>
 
 
@@ -69,7 +70,8 @@ typedef struct DeliveryCtx
 class KafkaConnectionManager
 {
 private:
- std::map<std::string, KafkaConnection*>  connections;  // Map by endpoint
+ std::map<std::string, KafkaConnection*>  connections;         // Map by endpoint
+ std::vector<KafkaConnection*>            retiredConnections;  // Pending retirement connections
  long                                    timeout;       // Timeout in ms
  sem_t                                   sem;           // Global traffic light
 
@@ -103,6 +105,8 @@ public:
 
 private:
  void disconnect(rd_kafka_t* producer, const std::string& endpoint);
+ void retireConnection(const std::string& connectionKey, KafkaConnection* kConn);
+ void destroyRetiredConnections(void);
  void semInit(void);
  void semTake(void);
  void semGive(void);

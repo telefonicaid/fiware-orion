@@ -1,1 +1,3 @@
 - Fix: use WARN level and "Notif failure" message for notifications failing to reach destination (#4800)
+- Fix: race condition between Kafka notifications and callbacks dispatcher
+- Fix: avoid destroying Kafka producer on recoverable notification errors
