@@ -386,7 +386,6 @@ std::string mongoUpdateSubscription
 
   reqSemTake(__FUNCTION__, "ngsiv2 update subscription request", SemWriteOp, &reqSemTaken);
 
-  std::string      servicePath = servicePathV[0].empty() ? SERVICE_PATH_ALL : servicePathV[0];
   double           now         = getCurrentTime();
 
   // Previous versions of the sub up logic calculate the final document mixing the
@@ -401,7 +400,8 @@ std::string mongoUpdateSubscription
   orion::BSONObjBuilder setB;
   orion::BSONObjBuilder unsetB;
 
-  setServicePath(servicePath, &setB);
+  // Note servicePath is not updated: changing the subservice of an existing subscription
+  // is not allowed (see issue #4809)
 
   if (subUp.subjectProvided)       setEntities(subUp, &setB);
   if (subUp.subjectProvided)       setConds(subUp, &setB);
@@ -443,10 +443,22 @@ std::string mongoUpdateSubscription
   {
     update.append("$unset", unsetB.obj());
   }
+  if (update.nFields() == 0)
+  {
+    // Nothing to update (e.g. payload with only unknown fields). An empty $set is used, so
+    // findAndModify doesn't interpret the update as a full document replacement
+    update.append("$set", orion::BSONObj());
+  }
 
   // Update in DB
+  // If servicePath is provided in the request, the subscription has to belong to it
+  // or it will be considered as not found (same as if a wrong subscription id were used)
   orion::BSONObjBuilder id;
   id.append("_id", orion::OID(subUp.id));
+  if (!servicePathV[0].empty())
+  {
+    id.append(CSUB_SERVICE_PATH, servicePathV[0]);
+  }
 
   std::string err;
   orion::BSONObj result;

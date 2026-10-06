@@ -34,9 +34,9 @@ brokerStart CB
 # 02. Get subscriptions by /sp1 and get it
 # 03. Update subscription with service path /sp1
 # 04. Get subscriptions by /sp1 and get it
-# 05. Update subscription with service path /sp2
-# 06. Get subscriptions by /sp1 without results
-# 07. Get subscriptions by /sp2 and get it
+# 05. Update subscription with service path /sp2, see 404 Not Found
+# 06. Get subscriptions by /sp1 and get it (not modified)
+# 07. Get subscriptions by /sp2 without results
 #
 
 echo "01. Create subscription in service path /sp1"
@@ -101,8 +101,8 @@ echo
 echo
 
 
-echo "05. Update subscription with service path /sp2"
-echo "=============================================="
+echo "05. Update subscription with service path /sp2, see 404 Not Found"
+echo "================================================================="
 payload='
 {
     "notification": {
@@ -118,15 +118,15 @@ echo
 echo
 
 
-echo "06. Get subscriptions by /sp1 without results"
-echo "============================================="
+echo "06. Get subscriptions by /sp1 and get it (not modified)"
+echo "======================================================="
 orionCurl --url /v2/subscriptions --servicePath /s1
 echo
 echo
 
 
-echo "07. Get subscriptions by /sp2 and get it"
-echo "========================================"
+echo "07. Get subscriptions by /sp2 without results"
+echo "============================================="
 orionCurl --url /v2/subscriptions --servicePath /s2
 echo
 echo
@@ -235,27 +235,22 @@ Content-Length: 361
 ]
 
 
-05. Update subscription with service path /sp2
-==============================================
-HTTP/1.1 204 No Content
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-
-
-
-06. Get subscriptions by /sp1 without results
-=============================================
-HTTP/1.1 200 OK
+05. Update subscription with service path /sp2, see 404 Not Found
+=================================================================
+HTTP/1.1 404 Not Found
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 62
 
-[]
+{
+    "description": "subscription id not found",
+    "error": "NotFound"
+}
 
 
-07. Get subscriptions by /sp2 and get it
-========================================
+06. Get subscriptions by /sp1 and get it (not modified)
+=======================================================
 HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -268,12 +263,12 @@ Content-Length: 361
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attrs": [
-                "humidity"
+                "pressure"
             ],
             "attrsFormat": "normalized",
             "covered": false,
             "http": {
-                "url": "http://localhost:9999"
+                "url": "http://localhost:5678"
             },
             "onlyChangedAttrs": false
         },
@@ -294,6 +289,17 @@ Content-Length: 361
         }
     }
 ]
+
+
+07. Get subscriptions by /sp2 without results
+=============================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
 
 
 --TEARDOWN--

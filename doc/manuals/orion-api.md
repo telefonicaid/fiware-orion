@@ -671,6 +671,9 @@ Taking this into consideration, the following rules apply:
 * `Fiware-ServicePath` header is taken into account in `GET /v2/subscriptions` and `GET /v2/registrations`
   in order to narrow down the results to subscriptions/registrations that use *exactly*
   that service path as query.
+* `Fiware-ServicePath` header is taken into account in `PATCH /v2/subscriptions/{id}`: if it is
+  used, it has to match *exactly* the service path of the subscription (otherwise 404 Not Found is returned).
+  Note that the service path of an existing subscription cannot be changed.
 * At the present moment hierarchical service paths (i.e. the ones using ending with `#`) are not allowed
   in registrations. We have [an issue about it at Github](https://github.com/telefonicaid/fiware-orion/issues/3078) and
   the limitation could be eventually solved.
@@ -5461,6 +5464,10 @@ Example:
 #### Update Subscription `PATCH /v2/subscriptions/{subscriptionId}`
 
 Only the fields included in the request are updated in the subscription.
+
+The service path of the subscription cannot be changed using this operation. If `Fiware-ServicePath`
+header is included in the request, it has to match the service path of the subscription. Otherwise,
+404 Not Found is returned (the same response used when the subscription id is not found).
 
 _**Request URL parameters**_
 
