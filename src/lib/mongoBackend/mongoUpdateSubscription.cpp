@@ -453,16 +453,16 @@ std::string mongoUpdateSubscription
   // Update in DB
   // If servicePath is provided in the request, the subscription has to belong to it
   // or it will be considered as not found (same as if a wrong subscription id were used)
-  orion::BSONObjBuilder id;
-  id.append("_id", orion::OID(subUp.id));
+  orion::BSONObjBuilder query;
+  query.append("_id", orion::OID(subUp.id));
   if (!servicePathV[0].empty())
   {
-    id.append(CSUB_SERVICE_PATH, servicePathV[0]);
+    query.append(CSUB_SERVICE_PATH, servicePathV[0]);
   }
 
   std::string err;
   orion::BSONObj result;
-  if (!collectionFindAndModify(composeDatabaseName(tenant), COL_CSUBS, id.obj(), update.obj(), true, &result, &err))
+  if (!collectionFindAndModify(composeDatabaseName(tenant), COL_CSUBS, query.obj(), update.obj(), true, &result, &err))
   {
     reqSemGive(__FUNCTION__, "ngsiv2 update subscription request (mongo db exception)", reqSemTaken);
     oe->fill(SccReceiverInternalError, err);
