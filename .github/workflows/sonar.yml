@@ -41,7 +41,7 @@ jobs:
               pip install -q gcovr &&
               cd /opt/fiware-orion &&
               gcovr -r . --filter 'src/' --exclude '.*parseArgs.*' --exclude '.*logMsg.*' --xml -o coverage.xml BUILD_UNIT &&
-              sed -i 's#/opt/fiware-orion/##g' coverage.xml
+              sed -i 's#/opt/fiware-orion/\?##g' coverage.xml
             "
 
       - name: Run cppcheck
