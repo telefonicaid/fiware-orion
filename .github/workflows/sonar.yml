@@ -1,0 +1,68 @@
+name: Sonar
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+env:
+  TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
+
+jobs:
+  sonar:
+    name: Build and analyze
+    runs-on: ubuntu-22.04
+
+    services:
+      mongodb:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Run unit tests with coverage
+        env:
+          REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+        run: |
+          docker run --network host --rm -e REPO_ACCESS_TOKEN=$REPO_ACCESS_TOKEN -v $(pwd):/opt/fiware-orion \
+            --entrypoint /bin/bash ${{ env.TEST_IMAGE_NAME }} -c "
+              build -miqts unit &&
+              . /opt/ft_env/bin/activate &&
+              pip install -q gcovr &&
+              cd /opt/fiware-orion &&
+              gcovr -r . --filter 'src/' --exclude '.*parseArgs.*' --exclude '.*logMsg.*' --xml -o coverage.xml BUILD_UNIT &&
+              sed -i 's#/opt/fiware-orion/\?##g' coverage.xml
+            "
+
+      - name: Run cppcheck
+        run: |
+          docker run --rm -v $(pwd):/opt/fiware-orion --entrypoint /bin/bash ${{ env.TEST_IMAGE_NAME }} -c "
+            apt-get -y -q update &&
+            apt-get -y -q install cppcheck &&
+            cd /opt/fiware-orion &&
+            cppcheck --xml --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2> cppcheck-result.xml &&
+            sed -i 's#/opt/fiware-orion/##g' cppcheck-result.xml
+          "
+
+      - uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      # We do not recommend to use this in a pull request. Prefer using pull request
+      # decoration instead.
+      # - uses: SonarSource/sonarqube-quality-gate-action@v1
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
