@@ -40,7 +40,8 @@ jobs:
               . /opt/ft_env/bin/activate &&
               pip install -q gcovr &&
               cd /opt/fiware-orion &&
-              gcovr -r . --filter 'src/' --exclude '.*parseArgs.*' --exclude '.*logMsg.*' --xml -o coverage.xml BUILD_UNIT
+              gcovr -r . --filter 'src/' --exclude '.*parseArgs.*' --exclude '.*logMsg.*' --xml -o coverage.xml BUILD_UNIT &&
+              sed -i 's#/opt/fiware-orion/##g' coverage.xml
             "
 
       - name: Run cppcheck
@@ -49,7 +50,8 @@ jobs:
             apt-get -y -q update &&
             apt-get -y -q install cppcheck &&
             cd /opt/fiware-orion &&
-            cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2> cppcheck-result.xml
+            cppcheck --xml --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2> cppcheck-result.xml &&
+            sed -i 's#/opt/fiware-orion/##g' cppcheck-result.xml
           "
 
       - uses: SonarSource/sonarqube-scan-action@v6
