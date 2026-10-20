@@ -1,17 +1,8 @@
 name: Functional Tests
 
+# Called from ci.yml, which runs the coverage analysis (sonar.yml) after the tests
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-      - '!checkvalgrind**'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 env:
   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
@@ -38,14 +29,17 @@ jobs:
     name: functional - ${{ matrix.batch.name }}
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      # COVERAGE builds the binary instrumented with gcov (DEBUG build type, see ci/deb/makefile)
       - name: Run functional test
         env:
           REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
           FT_FROM_IX: ${{ matrix.batch.FT_FROM_IX }}
           FT_TO_IX:   ${{ matrix.batch.FT_TO_IX }}
           CB_NO_CACHE: ${{ matrix.batch.CB_NO_CACHE }}
+          COVERAGE: "True"
           TEST_IMAGE_NAME: ${{ env.TEST_IMAGE_NAME }}
         run: |
           docker compose \
@@ -55,3 +49,17 @@ jobs:
             up  --build --abort-on-container-exit --exit-code-from tests \
             --attach tests \
             --no-log-prefix
+
+      # Failing tests should not prevent the coverage report from being generated
+      - name: Generate coverage report
+        if: ${{ !cancelled() }}
+        uses: ./.github/actions/gcovr
+        with:
+          gcovr-args: -j 4 --json -o coverage-functional-${{ strategy.job-index }}.json BUILD_FUNCTIONAL
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-functional-${{ strategy.job-index }}
+          path: coverage-functional-${{ strategy.job-index }}.json

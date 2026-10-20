@@ -1,0 +1,33 @@
+name: CI
+
+# Unit and functional tests are run only once (instrumented with gcov) and their coverage
+# reports are then reused by the Sonar analysis
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+# Do not cancel runs in master, so every commit gets its Sonar analysis
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  unit:
+    uses: ./.github/workflows/unit.yml
+    secrets: inherit
+
+  functional:
+    uses: ./.github/workflows/functional.yml
+    secrets: inherit
+
+  sonar:
+    needs: [unit, functional]
+    if: ${{ !cancelled() }}
+    uses: ./.github/workflows/sonar.yml
+    secrets: inherit
