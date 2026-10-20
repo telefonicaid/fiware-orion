@@ -31,6 +31,7 @@ services:
       FT_FROM_IX: ${FT_FROM_IX}
       FT_TO_IX: ${FT_TO_IX}
       CB_NO_CACHE: ${CB_NO_CACHE}
+      COVERAGE: ${COVERAGE}
     volumes:
       - .:/opt/fiware-orion
     command:
