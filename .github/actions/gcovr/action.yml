@@ -1,0 +1,29 @@
+name: gcovr
+description: Run gcovr inside the CI image (same gcovr version everywhere, so intermediate JSON reports can be merged)
+
+inputs:
+  gcovr-args:
+    description: Arguments passed to gcovr (after '-r .')
+    required: true
+  filters:
+    description: Whether to apply the source filters (not needed when merging already filtered reports)
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Run gcovr
+      shell: bash
+      env:
+        TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
+        GCOVR_VERSION: "8.3"
+        GCOVR_FILTERS: ${{ inputs.filters == 'true' && '--filter ''src/'' --exclude ''.*parseArgs.*'' --exclude ''.*logMsg.*''' || '' }}
+        GCOVR_ARGS: ${{ inputs.gcovr-args }}
+      run: |
+        docker run --rm -v $(pwd):/opt/fiware-orion --entrypoint /bin/bash $TEST_IMAGE_NAME -c "
+          . /opt/ft_env/bin/activate &&
+          pip install -q gcovr==$GCOVR_VERSION &&
+          cd /opt/fiware-orion &&
+          gcovr -r . $GCOVR_FILTERS $GCOVR_ARGS
+        "
