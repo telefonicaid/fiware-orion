@@ -18,7 +18,7 @@ runs:
       env:
         TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
         GCOVR_VERSION: "8.3"
-        GCOVR_FILTERS: ${{ inputs.filters == 'true' && '--filter ''src/'' --exclude ''.*parseArgs.*'' --exclude ''.*logMsg.*''' || '' }}
+        GCOVR_FILTERS: ${{ inputs.filters == 'true' && '--filter ''src/'' --exclude ''.*parseArgs.*'' --exclude ''.*logMsg.*'' --gcov-ignore-parse-errors=negative_hits.warn_once_per_file' || '' }}
         GCOVR_ARGS: ${{ inputs.gcovr-args }}
       run: |
         docker run --rm -v $(pwd):/opt/fiware-orion --entrypoint /bin/bash $TEST_IMAGE_NAME -c "
