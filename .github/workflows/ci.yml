@@ -1,6 +1,7 @@
 name: CI
 
-# Unit and functional tests are run only once (instrumented with gcov) and their coverage
+# Unit tests are run only once (instrumented with gcov). Functional tests are run twice: in RELEASE
+# mode to validate the binary that is published, and with coverage (DEBUG build type). The coverage
 # reports are then reused by the Sonar analysis
 on:
   push:
@@ -26,8 +27,14 @@ jobs:
     uses: ./.github/workflows/functional.yml
     secrets: inherit
 
+  functional-coverage:
+    uses: ./.github/workflows/functional.yml
+    with:
+      coverage: true
+    secrets: inherit
+
   sonar:
-    needs: [unit, functional]
+    needs: [unit, functional-coverage]
     if: ${{ !cancelled() }}
     uses: ./.github/workflows/sonar.yml
     secrets: inherit

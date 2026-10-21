@@ -1,8 +1,14 @@
 name: Functional Tests
 
-# Called from ci.yml, which runs the coverage analysis (sonar.yml) after the tests
+# Called from ci.yml twice: in RELEASE mode to validate the binary that is published, and
+# with coverage (DEBUG build type) to generate the reports used by the Sonar analysis (sonar.yml)
 on:
   workflow_call:
+    inputs:
+      coverage:
+        description: Build the binary instrumented with gcov and upload the coverage reports
+        type: boolean
+        default: false
 
 env:
   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
@@ -26,24 +32,25 @@ jobs:
           - { name: "batch 4 - no cache", FT_FROM_IX: 901, FT_TO_IX: 1200, CB_NO_CACHE: "ON" }
           - { name: "batch 5 - no cache", FT_FROM_IX: 1201,FT_TO_IX: "",   CB_NO_CACHE: "ON" }
 
-    name: functional - ${{ matrix.batch.name }}
+    name: functional${{ inputs.coverage && ' (coverage)' || '' }} - ${{ matrix.batch.name }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # COVERAGE builds the binary instrumented with gcov (DEBUG build type, see ci/deb/makefile)
+      # COVERAGE builds the binary instrumented with gcov (DEBUG build type), otherwise RELEASE
+      # build type is used (see ci/deb/makefile)
       - name: Run functional test
         env:
           REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
           FT_FROM_IX: ${{ matrix.batch.FT_FROM_IX }}
           FT_TO_IX:   ${{ matrix.batch.FT_TO_IX }}
           CB_NO_CACHE: ${{ matrix.batch.CB_NO_CACHE }}
-          COVERAGE: "True"
+          COVERAGE: ${{ inputs.coverage && 'True' || '' }}
           TEST_IMAGE_NAME: ${{ env.TEST_IMAGE_NAME }}
         run: |
           docker compose \
-            --project-name functional-${{ github.run_id }}-${{ strategy.job-index }} \
+            --project-name functional-${{ inputs.coverage && 'coverage' || 'release' }}-${{ github.run_id }}-${{ strategy.job-index }} \
             -f ./ci/deb/docker-compose-ci.yml -f ./ci/deb/docker-compose-ci.functional.yml \
             --project-directory . \
             up  --build --abort-on-container-exit --exit-code-from tests \
@@ -52,13 +59,13 @@ jobs:
 
       # Failing tests should not prevent the coverage report from being generated
       - name: Generate coverage report
-        if: ${{ !cancelled() }}
+        if: ${{ inputs.coverage && !cancelled() }}
         uses: ./.github/actions/gcovr
         with:
           gcovr-args: -j 4 --json -o coverage-functional-${{ strategy.job-index }}.json BUILD_FUNCTIONAL
 
       - name: Upload coverage report
-        if: ${{ !cancelled() }}
+        if: ${{ inputs.coverage && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-functional-${{ strategy.job-index }}
