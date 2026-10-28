@@ -27,6 +27,7 @@ jobs:
     uses: ./.github/workflows/functional.yml
     secrets: inherit
 
+  # Note we don't need unit-coverage job (as the unit job does it, see unit.yml)
   functional-coverage:
     uses: ./.github/workflows/functional.yml
     with:
