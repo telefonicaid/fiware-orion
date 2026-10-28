@@ -146,7 +146,7 @@ if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
         # Removing LM_T macros make that some variables get unused, thus -Wno-unused-variable have to be used
         # -fprofile-update=atomic avoids lost counter updates in multithreaded code (notification threads), which
         # otherwise lead to negative hit counts in gcov (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68080)
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -fprofile-arcs -ftest-coverage -fprofile-update=atomic")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable -fprofile-arcs -ftest-coverage -fprofile-update=atomic -O3")
         set (CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage -fprofile-update=atomic")
     endif (COVERAGE)
 
