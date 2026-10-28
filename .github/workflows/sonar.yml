@@ -1,14 +1,8 @@
 name: Sonar
 
+# Called from ci.yml once unit and functional tests have uploaded their coverage reports
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-permissions:
-  contents: read
+  workflow_call:
 
 env:
   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
@@ -18,31 +12,37 @@ jobs:
     name: Build and analyze
     runs-on: ubuntu-22.04
 
-    services:
-      mongodb:
-        image: mongo:8.0
-        ports:
-          - 27017:27017
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: Run unit tests with coverage
-        env:
-          REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+
+      # Merge unit and functional coverage into a single Cobertura report
+      - name: Merge coverage reports
+        uses: ./.github/actions/gcovr
+        with:
+          filters: "false"
+          gcovr-args: --add-tracefile 'coverage-*.json' --xml -o coverage.xml --print-summary
+
+      - name: Fix paths in coverage report
         run: |
-          docker run --network host --rm -e REPO_ACCESS_TOKEN=$REPO_ACCESS_TOKEN -v $(pwd):/opt/fiware-orion \
-            --entrypoint /bin/bash ${{ env.TEST_IMAGE_NAME }} -c "
-              build -miqts unit &&
-              . /opt/ft_env/bin/activate &&
-              pip install -q gcovr &&
-              cd /opt/fiware-orion &&
-              gcovr -r . --filter 'src/' --exclude '.*parseArgs.*' --exclude '.*logMsg.*' --xml -o coverage.xml BUILD_UNIT &&
-              sed -i 's#/opt/fiware-orion/\?##g' coverage.xml
-            "
+          ls -l coverage-*.json
+          sed -i 's#/opt/fiware-orion/\?##g' coverage.xml
+
+      # Same merged report used by Sonar, published in Coveralls (public coverage figures)
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: coverage.xml
+          format: cobertura
+          fail-on-error: false
 
       - name: Run cppcheck
         run: |
