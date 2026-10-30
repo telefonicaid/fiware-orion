@@ -164,3 +164,5 @@ You can generate coverage reports for the Orion Context Broker using the followi
         make coverage INSTALL_DIR=~
 
 *NOTE*: Functional tests relying in debug traces are expected to fail under coverage execution (e.g. notification_different_sizes or not_posix_regex_idpattern.test). This is due to the LM_T macros used by the debug traces are disabled in the coverage code build, as they add "noise" in condition coverage. This way coverage reports are more useful.
+
+*NOTE*: coverage information is also reported in [Coveralls](https://coveralls.io/github/telefonicaid/fiware-orion?branch=master). Note that the configuration used for Coveralls (automated by a GitHub Action based on `gcovr`, see [specific configuration](https://github.com/telefonicaid/fiware-orion/blob/master/.github/actions/gcovr/action.yml) for details) is different from the one used for `make coverage` (based on `lcov`, see coverage related targets in `makefile` for details). Although in general both are pretty similar, the Coveralls metrics are considered richer and more accurate than the ones provided by local `make coverage` execution, which is somewhat deprecated.
