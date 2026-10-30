@@ -19,7 +19,10 @@ runs:
         TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
         GCOVR_VERSION: "8.3"
         # Note we are not using  --gcov-ignore-parse-errors=negative_hits.warn_once_per_file as the -fprofile-update=atomic introduced in CMakeLists.txt should avoid errors due to negative hits (using this filter would shadow that cases, better to have the error if due to some unexpected behaviour it happens)
-        GCOVR_FILTERS: ${{ inputs.filters == 'true' && '--filter ''src/'' --exclude ''.*parseArgs.*'' --exclude ''.*logMsg.*''' || '' }}
+        # --exclude-throw-branches skips the branches gcov creates for C++ exception paths (any call that may throw),
+        # which are not decisions in our code and are never taken by the tests
+        # (see discussion here: https://github.com/telefonicaid/fiware-orion/pull/4823#issuecomment-6493603740)
+        GCOVR_FILTERS: ${{ inputs.filters == 'true' && '--filter ''src/'' --exclude ''.*parseArgs.*'' --exclude ''.*logMsg.*'' --exclude-throw-branches' || '' }}
         GCOVR_ARGS: ${{ inputs.gcovr-args }}
       run: |
         docker run --rm -v $(pwd):/opt/fiware-orion --entrypoint /bin/bash $TEST_IMAGE_NAME -c "
