@@ -145,7 +145,7 @@ void logInfoHttpNotificationNoResponse
     effectivePayload = (char*) payload;
   }
 
-  LM_I(("Notif delivered (subId: %s): %s %s%s, payload (%d bytes): %s, response code: %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, reason));
+  LM_W(("Notif failure (subId: %s): %s %s%s, payload (%d bytes): %s, reason: %s", subId, verb, endpoint, resource, strlen(payload), effectivePayload, reason));
 
   if (cleanAfterUse)
   {

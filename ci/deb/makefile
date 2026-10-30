@@ -40,6 +40,14 @@ ifndef MONGO_HOST
 	MONGO_HOST=localhost
 endif
 
+# COVERAGE (typically set in the environment) builds the functional test binary instrumented with gcov,
+# which requires DEBUG build type (see CMakeLists.txt)
+ifdef COVERAGE
+	FUNCTIONAL_CMAKE_FLAGS=-DCMAKE_BUILD_TYPE=DEBUG -DCOVERAGE=True
+else
+	FUNCTIONAL_CMAKE_FLAGS=-DCMAKE_BUILD_TYPE=RELEASE
+endif
+
 prepare:
 	@echo '------------------------------------- prepare  -----------------------------------------'
 
@@ -76,7 +84,7 @@ build_functional: prepare
 
 	rm -Rf BUILD_FUNCTIONAL || true && mkdir -p BUILD_FUNCTIONAL || true
 
-	cd BUILD_FUNCTIONAL && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
+	cd BUILD_FUNCTIONAL && cmake .. $(FUNCTIONAL_CMAKE_FLAGS) -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 	cd BUILD_FUNCTIONAL && make -j$(CPU_COUNT)
 
 install_functional: install

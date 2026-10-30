@@ -12,8 +12,8 @@
 <br>
 [![Documentation badge](https://img.shields.io/readthedocs/fiware-orion.svg)](https://fiware-orion.rtfd.io)
 ![Compliance Tests](https://github.com/telefonicaid/fiware-orion/workflows/Compliance%20Tests/badge.svg)
-![Unit Tests](https://github.com/telefonicaid/fiware-orion/workflows/Unit%20Tests/badge.svg)
-![Functional Tests](https://github.com/telefonicaid/fiware-orion/workflows/Functional%20Tests/badge.svg)
+![CI](https://github.com/telefonicaid/fiware-orion/actions/workflows/ci.yml/badge.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/telefonicaid/fiware-orion/badge.svg?branch=master)](https://coveralls.io/github/telefonicaid/fiware-orion?branch=master)
 ![Status](https://fiware.github.io/catalogue/badges/statuses/status-full.svg)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4520/badge)](https://bestpractices.coreinfrastructure.org/projects/4520)
 
@@ -93,8 +93,8 @@ recommended to have a look to the brief
 ### Introductory presentations
 
 -   Orion Context Broker
-    [(en)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20260521/287659689)
-    [(jp)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20260522/287668972)
+    [(en)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20260623/288207216)
+    [(jp)](https://www.slideshare.net/slideshow/orion-context-broker-introduction-20260624/288215602)
 -   NGSIv2 Overview for Developers That Already Know NGSIv1
     [(en)](https://www.slideshare.net/fermingalan/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220523)
     [(jp)](https://www.slideshare.net/fisuda/orion-context-broker-ngsiv2-overview-for-developers-that-already-know-ngsiv1-20220526)

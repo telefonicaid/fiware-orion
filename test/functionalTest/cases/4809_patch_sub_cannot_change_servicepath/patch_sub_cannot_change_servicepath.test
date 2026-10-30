@@ -1,0 +1,275 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PATCH subscription cannot change service path
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create subscription SUB1 in service path /AA
+# 02. PATCH SUB1 with service path /BB, see 404 Not Found
+# 03. GET subscriptions in service path /BB, see nothing
+# 04. GET subscriptions in service path /AA, see SUB1 unchanged
+# 05. PATCH SUB1 with service path /AA, see 204 No Content
+# 06. PATCH SUB1 without service path, see 204 No Content
+# 07. GET subscriptions in service path /AA, see SUB1 updated (and still in /AA)
+# 08. PATCH unexisting subscription with service path /AA, see 404 Not Found
+#
+
+echo "01. Create subscription SUB1 in service path /AA"
+echo "================================================"
+payload='{
+  "description": "SUB1",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*",
+        "type": "Room"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://localhost:1234"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload" --servicePath /AA
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. PATCH SUB1 with service path /BB, see 404 Not Found"
+echo "======================================================="
+payload='{
+  "description": "SUB1 modified in /BB"
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" --servicePath /BB -X PATCH
+echo
+echo
+
+
+echo "03. GET subscriptions in service path /BB, see nothing"
+echo "======================================================"
+orionCurl --url /v2/subscriptions --servicePath /BB
+echo
+echo
+
+
+echo "04. GET subscriptions in service path /AA, see SUB1 unchanged"
+echo "============================================================="
+orionCurl --url /v2/subscriptions --servicePath /AA
+echo
+echo
+
+
+echo "05. PATCH SUB1 with service path /AA, see 204 No Content"
+echo "========================================================"
+payload='{
+  "description": "SUB1 modified in /AA"
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" --servicePath /AA -X PATCH
+echo
+echo
+
+
+echo "06. PATCH SUB1 without service path, see 204 No Content"
+echo "======================================================="
+payload='{
+  "throttling": 5
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID --payload "$payload" -X PATCH
+echo
+echo
+
+
+echo "07. GET subscriptions in service path /AA, see SUB1 updated (and still in /AA)"
+echo "=============================================================================="
+orionCurl --url /v2/subscriptions --servicePath /AA
+echo
+echo
+
+
+echo "08. PATCH unexisting subscription with service path /AA, see 404 Not Found"
+echo "=========================================================================="
+payload='{
+  "description": "foo"
+}'
+orionCurl --url /v2/subscriptions/123456789012345678901234 --payload "$payload" --servicePath /AA -X PATCH
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription SUB1 in service path /AA
+================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. PATCH SUB1 with service path /BB, see 404 Not Found
+=======================================================
+HTTP/1.1 404 Not Found
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
+
+{
+    "description": "subscription id not found",
+    "error": "NotFound"
+}
+
+
+03. GET subscriptions in service path /BB, see nothing
+======================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 2
+
+[]
+
+
+04. GET subscriptions in service path /AA, see SUB1 unchanged
+=============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 322
+
+[
+    {
+        "description": "SUB1",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:1234"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "Room"
+                }
+            ]
+        }
+    }
+]
+
+
+05. PATCH SUB1 with service path /AA, see 204 No Content
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. PATCH SUB1 without service path, see 204 No Content
+=======================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. GET subscriptions in service path /AA, see SUB1 updated (and still in /AA)
+==============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 353
+
+[
+    {
+        "description": "SUB1 modified in /AA",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attrs": [],
+            "attrsFormat": "normalized",
+            "covered": false,
+            "http": {
+                "url": "http://localhost:1234"
+            },
+            "onlyChangedAttrs": false
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attrs": [],
+                "notifyOnMetadataChange": true
+            },
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "Room"
+                }
+            ]
+        },
+        "throttling": 5
+    }
+]
+
+
+08. PATCH unexisting subscription with service path /AA, see 404 Not Found
+==========================================================================
+HTTP/1.1 404 Not Found
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 62
+
+{
+    "description": "subscription id not found",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
