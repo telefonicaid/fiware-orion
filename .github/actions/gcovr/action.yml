@@ -22,7 +22,9 @@ runs:
         # --exclude-throw-branches skips the branches gcov creates for C++ exception paths (any call that may throw),
         # which are not decisions in our code and are never taken by the tests
         # (see discussion here: https://github.com/telefonicaid/fiware-orion/pull/4823#issuecomment-6493603740)
-        GCOVR_FILTERS: ${{ inputs.filters == 'true' && '--filter ''src/'' --exclude ''.*parseArgs.*'' --exclude ''.*logMsg.*'' --exclude-throw-branches' || '' }}
+        # --exclude-branches-by-pattern skips the branches inside the LM_* logging macros (log level and trace checks),
+        # which are not decisions in our code and would add "noise" to condition coverage
+        GCOVR_FILTERS: ${{ inputs.filters == 'true' && '--filter ''src/'' --exclude ''.*parseArgs.*'' --exclude ''.*logMsg.*'' --exclude-throw-branches --exclude-branches-by-pattern ''.*\bLM_[A-Z0-9]+\s*\(''' || '' }}
         GCOVR_ARGS: ${{ inputs.gcovr-args }}
       run: |
         docker run --rm -v $(pwd):/opt/fiware-orion --entrypoint /bin/bash $TEST_IMAGE_NAME -c "
