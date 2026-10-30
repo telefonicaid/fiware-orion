@@ -1,23 +1,15 @@
 name: Unit Tests
 
+# Called from ci.yml, which runs the coverage analysis (sonar.yml) after the tests
 on:
-  push:
-     branches:
-      - master
-  pull_request:
-    branches:
-      - master
-      - '!checkvalgrind**'
-
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 env:
   TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
 
 jobs:
   unit:
+    name: Unit tests
     runs-on: ubuntu-22.04
 
     services:
@@ -27,8 +19,26 @@ jobs:
           - 27017:27017
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Run unit tests
+        env:
+          REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         run: |
-          docker run  --network host -t --rm -e REPO_ACCESS_TOKEN=${{ secrets.REPO_ACCESS_TOKEN }} -v $(pwd):/opt/fiware-orion ${{ env.TEST_IMAGE_NAME }} build -miqts unit
+          docker run --network host --rm -e REPO_ACCESS_TOKEN=$REPO_ACCESS_TOKEN -v $(pwd):/opt/fiware-orion \
+            ${{ env.TEST_IMAGE_NAME }} build -miqts unit
+
+      # Unit tests are always built with coverage (see build_unit in ci/deb/makefile)
+      - name: Generate coverage report
+        if: ${{ !cancelled() }}
+        uses: ./.github/actions/gcovr
+        with:
+          gcovr-args: -j 4 --json -o coverage-unit.json BUILD_UNIT
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-unit
+          path: coverage-unit.json

@@ -1,0 +1,68 @@
+name: Sonar
+
+# Called from ci.yml once unit and functional tests have uploaded their coverage reports
+on:
+  workflow_call:
+
+env:
+  TEST_IMAGE_NAME: telefonicaiot/fiware-orion:ci
+
+jobs:
+  sonar:
+    name: Build and analyze
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+
+      # Merge unit and functional coverage into a single Cobertura report
+      - name: Merge coverage reports
+        uses: ./.github/actions/gcovr
+        with:
+          filters: "false"
+          gcovr-args: --add-tracefile 'coverage-*.json' --xml -o coverage.xml --print-summary
+
+      - name: Fix paths in coverage report
+        run: |
+          ls -l coverage-*.json
+          sed -i 's#/opt/fiware-orion/\?##g' coverage.xml
+
+      # Same merged report used by Sonar, published in Coveralls (public coverage figures)
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: coverage.xml
+          format: cobertura
+          fail-on-error: false
+
+      - name: Run cppcheck
+        run: |
+          docker run --rm -v $(pwd):/opt/fiware-orion --entrypoint /bin/bash ${{ env.TEST_IMAGE_NAME }} -c "
+            apt-get -y -q update &&
+            apt-get -y -q install cppcheck &&
+            cd /opt/fiware-orion &&
+            cppcheck --xml --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2> cppcheck-result.xml &&
+            sed -i 's#/opt/fiware-orion/##g' cppcheck-result.xml
+          "
+
+      - uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      # We do not recommend to use this in a pull request. Prefer using pull request
+      # decoration instead.
+      # - uses: SonarSource/sonarqube-quality-gate-action@v1
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
