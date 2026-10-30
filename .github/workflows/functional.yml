@@ -39,10 +39,9 @@ jobs:
         uses: actions/checkout@v4
 
       # COVERAGE builds the binary instrumented with gcov (DEBUG build type), otherwise RELEASE
-      # build type is used (see ci/deb/makefile). Coverage builds remove LM_T traces, so tests checking
-      # them in the log fail there: only the RELEASE run validates the tests
+      # build type is used (see ci/deb/makefile). Both builds keep LM_T traces, so all tests are expected
+      # to pass in both runs
       - name: Run functional test
-        continue-on-error: ${{ inputs.coverage }}
         env:
           REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
           FT_FROM_IX: ${{ matrix.batch.FT_FROM_IX }}
