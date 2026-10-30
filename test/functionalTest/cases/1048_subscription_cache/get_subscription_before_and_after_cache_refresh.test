@@ -60,7 +60,9 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         "format" : "normalized",
         "failsCounter" : NumberLong(4),
         "count" : NumberLong(10),
+        "accumulatedNotificationDuration" : NumberLong(12),
         "lastNotification" : NumberLong(1577872800),
+        "lastNotificationDuration" : NumberLong(8),
         "lastFailure" : NumberLong(1577872800),
         "lastSuccess" : NumberLong(1577869200),
         "lastFailureReason" : "Could not connect to server",
@@ -72,25 +74,29 @@ brokerStart CB 0 IPv4 -subCacheIval 2 --cache
 --SHELL--
 
 #
-# Dynamic fields set A (failure situation, as lastNotification==lastFailure)
-# - lastNotification:   2020-01-01T10:00:00Z (1577872800)
-# - lastSuccess:        2020-01-01T09:00:00Z (1577869200)
-# - lastFailure:        2020-01-01T10:00:00Z (1577872800)
-# - lastSuccessCode:    200
-# - lastFailureReason:  Could not connect to server
-# - count:              10
-# - failsCounter:       4
+# Relevant fields in step 00
+# - lastNotification:                2020-01-01T10:00:00Z (1577872800)
+# - lastNotificationDuration:        8
+# - lastSuccess:                     2020-01-01T09:00:00Z (1577869200)
+# - lastSuccessCode:                 200
+# - lastFailure:                     2020-01-01T10:00:00Z (1577872800)
+# - lastFailureReason:               Could not connect to server
+# - count:                           10
+# - accumulatedNotificationDuration: 12
+# - failsCounter:                    4
 # - status:             failed (last changed: 2020-01-01T10:00:00Z)
 #
 # Dynamic fields set B (success situation, as lastNotification==lastSuccess)
-# - lastNotification:   2020-01-01T11:00:00Z (1577876400)
-# - lastSuccess:        2020-01-01T11:00:00Z (1577876400)
-# - lastFailure:        2020-01-01T10:00:00Z (1577872800)
-# - lastSuccessCode:    204
-# - lastFailureReason:  Cannot connect again
-# - count:              25
-# - failsCounter:       8
-# - status:             inactive (last changed: 2020-01-01T11:00:00Z > status last changed in set A)
+# - lastNotification:                2020-01-01T11:00:00Z (1577876400)
+# - lastNotificationDuration:        10
+# - lastSuccess:                     2020-01-01T11:00:00Z (1577876400)
+# - lastFailure:                     2020-01-01T10:00:00Z (1577872800)
+# - lastSuccessCode:                 204
+# - lastFailureReason:               Cannot connect again
+# - count:                           25
+# - accumulatedNotificationDuration: 22
+# - failsCounter:                    8
+# - status:                          inactive (last changed: 2020-01-01T11:00:00Z > status last changed in set A)
 #
 # 00. (Done before starting context Broker) Insert crafted subscription in DB with specific dynamic fields set A
 # 01. GET /v2/subscriptions and see dynamic fields set A
@@ -137,14 +143,16 @@ echo "====================================="
 mongoCmd ${CB_DB_NAME} 'db.csubs.updateOne({_id: ObjectId("61960a51596aa2623032357d")}, {
   $set: {
     lastNotification: NumberLong("1577876400"),
+    lastNotificationDuration: NumberLong("10"),
     lastSuccess: NumberLong("1577876400"),
     lastFailure: NumberLong("1577872800"),
     lastSuccessCode: NumberLong("204"),
     lastFailureReason: "Timeout",
     count: NumberLong("25"),
+    accumulatedNotificationDuration: NumberLong("22"),
     failsCounter: NumberLong("8"),
     status: "inactive",
-    statusLastChange: 1578733200
+    statusLastChange: 1578733200,
   }
 })'
 echo
@@ -176,12 +184,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 551
+Content-Length: 617
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": 12,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -192,6 +201,7 @@ Content-Length: 551
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "2020-01-01T10:00:00.000Z",
+            "lastNotificationDuration": 8,
             "lastSuccess": "2020-01-01T09:00:00.000Z",
             "lastSuccessCode": 200,
             "maxFailsLimit": 1,
@@ -226,12 +236,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 533
+Content-Length: 600
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": 22,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -242,6 +253,7 @@ Content-Length: 533
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Timeout",
             "lastNotification": "2020-01-01T11:00:00.000Z",
+            "lastNotificationDuration": 10,
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,
@@ -271,12 +283,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 516
+Content-Length: 583
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": 22,
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -286,6 +299,7 @@ Content-Length: 516
             "lastFailure": "2020-01-01T10:00:00.000Z",
             "lastFailureReason": "Timeout",
             "lastNotification": "2020-01-01T11:00:00.000Z",
+            "lastNotificationDuration": 10,
             "lastSuccess": "2020-01-01T11:00:00.000Z",
             "lastSuccessCode": 204,
             "maxFailsLimit": 1,

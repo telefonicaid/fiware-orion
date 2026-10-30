@@ -173,12 +173,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 463
+Content-Length: 536
 
 {
     "description": "HTTP sub",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -187,6 +188,7 @@ Content-Length: 463
             "url": "http://localhost:9997/noresponse"
         },
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
@@ -214,12 +216,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 499
+Content-Length: 570
 
 {
     "description": "HTTP sub",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -231,6 +234,7 @@ Content-Length: 499
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Timeout was reached",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "onlyChangedAttrs": false,
         "timesSent": 1
     },

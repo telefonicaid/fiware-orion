@@ -31,6 +31,7 @@
 #include <netdb.h>                              // gethostbyname
 #include <arpa/inet.h>                          // inet_ntoa
 #include <netinet/tcp.h>                        // TCP_NODELAY
+#include <time.h>
 #include <curl/curl.h>
 
 #include <string>
@@ -256,6 +257,7 @@ int httpRequestSend
    const std::string&                         ngsiv2AttrFormat,
    std::string*                               outP,
    long long*                                 statusCodeP,
+   long long*                                 httpRequestDurationMsP,
    const std::map<std::string, std::string>&  extraHeaders,
    const std::string&                         acceptFormat,
    long                                       timeoutInMilliseconds,
@@ -299,6 +301,9 @@ int httpRequestSend
   struct curl_slist*              headers            = NULL;
   MemoryStruct*                   httpResponse       = NULL;
   CURLcode                        res;
+  struct timespec                 notificationStartTime;
+  struct timespec                 notificationEndTime;
+  long long                       httpRequestDurationMs = 0;
   int                             outgoingMsgSize    = 0;
   std::string                     content_type(orig_content_type);
   std::map<std::string, bool>     usedExtraHeaders;
@@ -319,7 +324,7 @@ int httpRequestSend
   }
 
   // Note that the corresponding lmTransactionEnd() is not done in this function, but in the caller, as we
-  // need to wait to subNotificationErrorStatus() before ending (or the logs in this operation
+  // need to wait to subNotificationOutcome() before ending (or the logs in this operation
   // will show unwanted N/A fields)
   std::string protocol = _protocol + "//";
   correlatorIdSet(fiwareCorrelation.c_str());
@@ -627,7 +632,17 @@ int httpRequestSend
   //
   LM_T(LmtOldInfo, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
 
+  clock_gettime(CLOCK_MONOTONIC, &notificationStartTime);
   res = curl_easy_perform(curl);
+  clock_gettime(CLOCK_MONOTONIC, &notificationEndTime);
+  long long start_ns = (long long)notificationStartTime.tv_sec * 1000000000LL + notificationStartTime.tv_nsec;
+  long long end_ns   = (long long)notificationEndTime.tv_sec * 1000000000LL + notificationEndTime.tv_nsec;
+  httpRequestDurationMs = (end_ns - start_ns) / 1000000LL;
+  if (httpRequestDurationMsP != NULL)
+  {
+    *httpRequestDurationMsP = httpRequestDurationMs;
+  }
+
   if (res != CURLE_OK)
   {
     //

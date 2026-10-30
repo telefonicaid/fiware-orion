@@ -883,36 +883,38 @@ void subCacheItemInsert
   //
   // First the non-complex values
   //
-  cSubP->tenant                = (tenant[0] == 0)? NULL : strdup(tenant);
-  cSubP->servicePath           = strdup(servicePath);
-  cSubP->subscriptionId        = strdup(subscriptionId);
-  cSubP->expirationTime        = expirationTime;
-  cSubP->maxFailsLimit         = maxFailsLimit;
-  cSubP->throttling            = throttling;
-  cSubP->lastNotificationTime  = lastNotificationTime;
-  cSubP->lastFailure           = lastNotificationFailureTime;
-  cSubP->lastSuccess           = lastNotificationSuccessTime;
-  cSubP->lastFailureReason     = lastFailureReason;
-  cSubP->lastSuccessCode       = lastSuccessCode;
-  cSubP->renderFormat          = renderFormat;
-  cSubP->next                  = NULL;
-  cSubP->count                 = 0;
-  cSubP->failsCounter          = 0;
-  cSubP->status                = status;
-  cSubP->statusLastChange      = statusLastChange;
-  cSubP->jexlExpression        = jexlExpression;
-  cSubP->expression.q          = q;
-  cSubP->expression.geometry   = geometry;
-  cSubP->expression.coords     = coords;
-  cSubP->expression.georel     = georel;
-  cSubP->blacklist             = blacklist;
-  cSubP->onlyChanged           = onlyChanged;
-  cSubP->covered               = covered;
-  cSubP->notifyOnMetadataChange= notifyOnMetadataChange;
-  cSubP->notifyConditionV      = conditionAttrs;
-  cSubP->subAltTypeV           = altTypes;
-  cSubP->attributes            = attributes;
-  cSubP->metadata              = metadata;
+  cSubP->tenant                    = (tenant[0] == 0)? NULL : strdup(tenant);
+  cSubP->servicePath               = strdup(servicePath);
+  cSubP->subscriptionId            = strdup(subscriptionId);
+  cSubP->expirationTime            = expirationTime;
+  cSubP->maxFailsLimit             = maxFailsLimit;
+  cSubP->throttling                = throttling;
+  cSubP->lastNotificationTime      = lastNotificationTime;
+  cSubP->lastNotificationDuration  = -1;
+  cSubP->lastFailure               = lastNotificationFailureTime;
+  cSubP->lastSuccess               = lastNotificationSuccessTime;
+  cSubP->lastFailureReason         = lastFailureReason;
+  cSubP->lastSuccessCode           = lastSuccessCode;
+  cSubP->renderFormat              = renderFormat;
+  cSubP->next                      = NULL;
+  cSubP->count                     = 0;
+  cSubP->notificationDurationDelta = 0;
+  cSubP->failsCounter              = 0;
+  cSubP->status                    = status;
+  cSubP->statusLastChange          = statusLastChange;
+  cSubP->jexlExpression            = jexlExpression;
+  cSubP->expression.q              = q;
+  cSubP->expression.geometry       = geometry;
+  cSubP->expression.coords         = coords;
+  cSubP->expression.georel         = georel;
+  cSubP->blacklist                 = blacklist;
+  cSubP->onlyChanged               = onlyChanged;
+  cSubP->covered                   = covered;
+  cSubP->notifyOnMetadataChange    = notifyOnMetadataChange;
+  cSubP->notifyConditionV          = conditionAttrs;
+  cSubP->subAltTypeV               = altTypes;
+  cSubP->attributes                = attributes;
+  cSubP->metadata                  = metadata;
 
   // empty cache entry, no relation with DB actually exists
   // (thus validity flag set to false)
@@ -1171,6 +1173,8 @@ void subCacheRefresh(void)
 typedef struct CachedSubSaved
 {
   int64_t      lastNotificationTime;
+  int64_t      lastNotificationDuration;
+  int64_t      notificationDurationDelta;
   int64_t      count;
   int64_t      failsCounter;
   int64_t      lastFailure;
@@ -1236,15 +1240,17 @@ void subCacheSync(void)
 
     CachedSubSaved* cssP       = new CachedSubSaved();
 
-    cssP->lastNotificationTime = cSubP->lastNotificationTime;
-    cssP->count                = cSubP->count;
-    cssP->failsCounter         = cSubP->failsCounter;
-    cssP->lastFailure          = cSubP->lastFailure;
-    cssP->lastSuccess          = cSubP->lastSuccess;
-    cssP->lastFailureReason    = cSubP->lastFailureReason;
-    cssP->lastSuccessCode      = cSubP->lastSuccessCode;
-    cssP->status               = cSubP->status;
-    cssP->statusLastChange     = cSubP->statusLastChange;
+    cssP->lastNotificationTime      = cSubP->lastNotificationTime;
+    cssP->count                     = cSubP->count;
+    cssP->lastNotificationDuration  = cSubP->lastNotificationDuration;
+    cssP->notificationDurationDelta = cSubP->notificationDurationDelta;
+    cssP->failsCounter              = cSubP->failsCounter;
+    cssP->lastFailure               = cSubP->lastFailure;
+    cssP->lastSuccess               = cSubP->lastSuccess;
+    cssP->lastFailureReason         = cSubP->lastFailureReason;
+    cssP->lastSuccessCode           = cSubP->lastSuccessCode;
+    cssP->status                    = cSubP->status;
+    cssP->statusLastChange          = cSubP->statusLastChange;
 
     savedSubV[cSubP->subscriptionId] = cssP;
     cSubP = cSubP->next;
@@ -1268,22 +1274,39 @@ void subCacheSync(void)
     // Note that count and failsCounter are special: they are update in DB
     // using $inc and not $set and they are flushed during the cache refresh process.
     // There aren't pointer for them
-    int64_t*      lastNotificationTimeP = NULL;
-    int64_t*      lastFailureP          = NULL;
-    int64_t*      lastSuccessP          = NULL;
-    std::string*  failureReasonP        = NULL;
-    int64_t*      statusCodeP           = NULL;
-    std::string*  statusP               = NULL;
-    double*       statusLastChangeP     = NULL;
+    int64_t*      lastNotificationTimeP     = NULL;
+    int64_t*      lastNotificationDurationP = NULL;
+    int64_t*      lastFailureP              = NULL;
+    int64_t*      lastSuccessP              = NULL;
+    std::string*  failureReasonP            = NULL;
+    int64_t*      statusCodeP               = NULL;
+    std::string*  statusP                   = NULL;
+    double*       statusLastChangeP         = NULL;
 
     if (cssP != NULL)
     {
-      if (cssP->lastNotificationTime > cSubP->lastNotificationTime)
+      bool lastNotificationTimeIsNewer        = (cssP->lastNotificationTime > cSubP->lastNotificationTime);
+      bool lastNotificationTimeIsNewerOrEqual = (cssP->lastNotificationTime >= cSubP->lastNotificationTime);
+
+      if (lastNotificationTimeIsNewer)
       {
         // cssP->lastNotificationTime is newer than what's currently in DB => update in cSubP and DB
         cSubP->lastNotificationTime = cssP->lastNotificationTime;
         lastNotificationTimeP = &cSubP->lastNotificationTime;
       }
+
+      //the notification trigger and completion can happen in different cache synchronization cycles. In this case:
+      // - The trigger updates lastNotificationTime in cycle N.
+      // - The completion updates lastNotificationDuration in cycle N+1.
+      // Consequently, during cycle N+1, the timestamps in memory and DB are equal (newer or equal is true),
+      // but the durations differ. Using 'lastNotificationTimeIsNewerOrEqual' ensures the duration is
+      // correctly synchronized to the database rather than being ignored due to identical timestamps.
+      if (lastNotificationTimeIsNewerOrEqual && (cssP->lastNotificationDuration >= 0) && (cssP->lastNotificationDuration != cSubP->lastNotificationDuration))
+      {
+        cSubP->lastNotificationDuration = cssP->lastNotificationDuration;
+        lastNotificationDurationP       = &cSubP->lastNotificationDuration;
+      }
+
 
       if (cssP->lastFailure > cSubP->lastFailure)
       {
@@ -1323,7 +1346,9 @@ void subCacheSync(void)
                                 cSubP->subscriptionId,
                                 cssP->count,
                                 cssP->failsCounter,
+                                cssP->notificationDurationDelta,
                                 lastNotificationTimeP,
+                                lastNotificationDurationP,
                                 lastFailureP,
                                 lastSuccessP,
                                 failureReasonP,
@@ -1397,16 +1422,18 @@ void subCacheStart(void)
 extern bool noCache;
 /* ****************************************************************************
 *
-* subNotificationErrorStatus -
+* subNotificationOutcome -
 *
 * This function marks a subscription to be erroneous, i.e. notifications are
 * not working.
 * A timestamp for this last failure is set for the sub-item in the sub-cache  and
 * the consecutive number of notification errors for the subscription is incremented.
 *
-* If error == true, then the subscription is marked as non-erroneous.
+* If error == false, then the subscription is marked as non-erroneous.
+*
+* The notification duration metrics are updated if a valid notificationDurationMs is provided.
 */
-void subNotificationErrorStatus
+void subNotificationOutcome
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
@@ -1414,7 +1441,8 @@ void subNotificationErrorStatus
   long long           statusCode,
   const std::string&  failureReason,
   long long           failsCounter,
-  long long           maxFailsLimit
+  long long           maxFailsLimit,
+  long long           notificationDurationMs
 )
 {
   bool maxFailsReached = maxFailsLimit > 0 && failsCounter >= maxFailsLimit;
@@ -1439,12 +1467,12 @@ void subNotificationErrorStatus
         statusLastChange = getCurrentTime();
       }
       // fails == 1, lastSuccess == -1, statusCode == -1, status == "" | "inactive"
-      mongoSubUpdateOnNotif(tenant, subscriptionId, 1, now, now, -1, failureReason, -1, status, statusLastChange);
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 1, now, now, -1, failureReason, -1, status, statusLastChange, notificationDurationMs);
     }
     else
     {
       // fails = 0, lastFailure == -1, failureReason == "", status == ""
-      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, now, -1, now, "", statusCode, "", -1);
+      mongoSubUpdateOnNotif(tenant, subscriptionId, 0, now, -1, now, "", statusCode, "", -1, notificationDurationMs);
     }
 
     return;
@@ -1491,6 +1519,12 @@ void subNotificationErrorStatus
     subP->lastSuccess             = now;
     subP->lastSuccessCode         = statusCode;
     subP->failsCounterFromDbValid = false;
+  }
+
+  if (notificationDurationMs >= 0)
+  {
+    subP->lastNotificationDuration  = notificationDurationMs;
+    subP->notificationDurationDelta += notificationDurationMs;
   }
 
   cacheSemGive(__FUNCTION__, "Looking up an item for lastSuccess/Failure");

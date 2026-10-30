@@ -736,9 +736,11 @@ def giveme500():
     return Response(status=500)
 
 
+# Delays response. Accept optional delay path parameter (in seconds), defaulting to 60s.
+@app.route("/givemeDelay/<int:delay>", methods=['POST'])
 @app.route("/givemeDelay", methods=['POST'])
-def givemeDelay():
-    sleep(60)
+def givemeDelay(delay=60):
+    sleep(delay)
     return Response(status=200)
 
 

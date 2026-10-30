@@ -66,6 +66,7 @@ extern int httpRequestSend
   const std::string&                         ngisv2AttrFormat,
   std::string*                               outP,
   long long*                                 statusCodeP,
+  long long*                                 httpRequestDurationMsP,
   const std::map<std::string, std::string>&  extraHeaders,
   const std::string&                         acceptFormat          = "",
   long                                       timeoutInMilliseconds = -1,
