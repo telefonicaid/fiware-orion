@@ -58,7 +58,7 @@ endif
 # so some error categories are ignored when lcov 2.x (or later) is detected
 LCOV_MAJOR:=$(shell lcov --version 2>/dev/null | sed -n 's/.*[Vv]ersion[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -n1)
 ifeq ($(shell [ "0$(LCOV_MAJOR)" -ge 2 ] 2>/dev/null && echo yes),yes)
-    LCOV_IGNORE=--ignore-errors unused,unused --ignore-errors empty,empty --ignore-errors mismatch,mismatch --ignore-errors negative,negative --ignore-errors inconsistent,inconsistent --ignore-errors source,source --ignore-errors gcov,gcov
+    LCOV_IGNORE=--ignore-errors unused,unused --ignore-errors empty,empty --ignore-errors mismatch,mismatch --ignore-errors inconsistent,inconsistent --ignore-errors source,source --ignore-errors gcov,gcov
     GENHTML_IGNORE=--ignore-errors unused,unused --ignore-errors empty,empty --ignore-errors inconsistent,inconsistent --ignore-errors source,source
 else
     LCOV_IGNORE=
