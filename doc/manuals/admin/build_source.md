@@ -162,3 +162,5 @@ You can generate coverage reports for the Orion Context Broker using the followi
 * Run coverage
 
         make coverage INSTALL_DIR=~
+
+*NOTE*: coverage information is also reported in [Coveralls](https://coveralls.io/github/telefonicaid/fiware-orion?branch=master). Note that the configuration used for Coveralls (automated by a GitHub Action based on `gcovr`, see [specific configuration](https://github.com/telefonicaid/fiware-orion/blob/master/.github/actions/gcovr/action.yml) for details) is different from the one used for `make coverage` (based on `lcov`, see coverage related targets in `makefile` for details). Although in general both are pretty similar, the Coveralls metrics are considered richer and more accurate than the ones provided by local `make coverage` execution, which is somewhat deprecated.
