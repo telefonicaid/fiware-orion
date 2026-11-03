@@ -54,15 +54,28 @@ ifndef MONGO_HOST
     MONGO_HOST=localhost
 endif
 
+# lcov 2.x is stricter than lcov 1.x (e.g. unused exclude patterns are errors),
+# so some error categories are ignored when lcov 2.x (or later) is detected
+LCOV_MAJOR:=$(shell lcov --version 2>/dev/null | sed -n 's/.*[Vv]ersion[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -n1)
+ifeq ($(shell [ "0$(LCOV_MAJOR)" -ge 2 ] 2>/dev/null && echo yes),yes)
+    LCOV_IGNORE=--ignore-errors unused,unused --ignore-errors empty,empty --ignore-errors mismatch,mismatch --ignore-errors inconsistent,inconsistent --ignore-errors source,source --ignore-errors gcov,gcov
+    GENHTML_IGNORE=--ignore-errors unused,unused --ignore-errors empty,empty --ignore-errors inconsistent,inconsistent --ignore-errors source,source
+else
+    LCOV_IGNORE=
+    GENHTML_IGNORE=
+endif
+LCOV=lcov $(LCOV_IGNORE)
+GENHTML=genhtml $(GENHTML_IGNORE)
+
 # Macros
 define CLEAN_COVERAGE_REPORT
-	lcov -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
+	$(LCOV) -r coverage/broker.info "/usr/include/*" -o coverage/broker.info
+	$(LCOV) -r coverage/broker.info "/usr/local/include/*" -o coverage/broker.info
+	$(LCOV) -r coverage/broker.info "/opt/local/include/google/*" -o coverage/broker.info
 	# Remove unit test libraries and libraries developed before contextBroker project init
-	lcov -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
-	lcov -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
+	$(LCOV) -r coverage/broker.info "*/test/unittests/*" -o coverage/broker.info
+	$(LCOV) -r coverage/broker.info "*/src/lib/logMsg/*" -o coverage/broker.info
+	$(LCOV) -r coverage/broker.info "*/src/lib/parseArgs/*" -o coverage/broker.info
 endef
 
 all: prepare_release release
@@ -241,39 +254,39 @@ test: unit_test functional_test
 
 coverage: coverage_functional_test coverage_unit_test
 	rm -rf coverage
-	lcov --capture --directory BUILD_UNITTEST --output-file BUILD_UNITTEST/coverage.info
-	lcov --capture --directory BUILD_COVERAGE --output-file BUILD_COVERAGE/coverage.info
+	$(LCOV) --capture --directory BUILD_UNITTEST --output-file BUILD_UNITTEST/coverage.info
+	$(LCOV) --capture --directory BUILD_COVERAGE --output-file BUILD_COVERAGE/coverage.info
 	mkdir coverage
 	# Generate test report
 	echo "Generating coverage report"
-	lcov --add-tracefile BUILD_UNITTEST/coverage.info --add-tracefile BUILD_COVERAGE/coverage.info --output-file coverage/broker.info
+	$(LCOV) --add-tracefile BUILD_UNITTEST/coverage.info --add-tracefile BUILD_COVERAGE/coverage.info --output-file coverage/broker.info
 	$(CLEAN_COVERAGE_REPORT)
-	genhtml -o coverage coverage/broker.info
+	$(GENHTML) -o coverage coverage/broker.info
 
 coverage_unit_test: build_unit_test_coverage
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
-	lcov -i --zerocounters --directory BUILD_UNITTEST/
-	lcov --capture --initial --directory BUILD_UNITTEST -b BUILD_UNITTEST --output-file coverage/broker.init.info
+	$(LCOV) --zerocounters --directory BUILD_UNITTEST/
+	$(LCOV) --capture --initial --directory BUILD_UNITTEST -b BUILD_UNITTEST --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
 	BUILD_UNITTEST/test/unittests/unitTest -t 0-255 -dbURI mongodb://${MONGO_HOST} --gtest_output=xml:BUILD_UNITTEST/unit_test.xml
 	# Generate test report
 	echo "Generating coverage report"
-	lcov --directory BUILD_UNITTEST --capture -b BUILD_UNITTEST --output-file coverage/broker.test.info 
-	lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
+	$(LCOV) --directory BUILD_UNITTEST --capture -b BUILD_UNITTEST --output-file coverage/broker.test.info 
+	$(LCOV) --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
 	$(CLEAN_COVERAGE_REPORT)
 	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
-	lcov -r coverage/broker.info "*/src/app/*" -o coverage/broker.info
-	genhtml -o coverage coverage/broker.info
+	$(LCOV) -r coverage/broker.info "*/src/app/*" -o coverage/broker.info
+	$(GENHTML) -o coverage coverage/broker.info
 
 coverage_functional_test: install_coverage
 	# Init coverage
 	echo "Initializing coverage files"
 	mkdir -p coverage
-	lcov -i --zerocounters --directory BUILD_COVERAGE/
-	lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
+	$(LCOV) --zerocounters --directory BUILD_COVERAGE/
+	$(LCOV) --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
 	if [ -z "${CONTEXTBROKER_TESTENV_SOURCED}" ]; then \
@@ -289,10 +302,10 @@ coverage_functional_test: install_coverage
 	@xsltproc scripts/cmake2junit.xsl BUILD_COVERAGE/Testing/`cat BUILD_COVERAGE/Testing/TAG| head -n1`/Test.xml  > BUILD_COVERAGE/functional_test.xml
 	# Generate test report
 	echo "Generating coverage report"
-	lcov --directory BUILD_COVERAGE --capture -b BUILD_COVERAGE --output-file coverage/broker.test.info 
-	lcov --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
+	$(LCOV) --directory BUILD_COVERAGE --capture -b BUILD_COVERAGE --output-file coverage/broker.test.info 
+	$(LCOV) --add-tracefile coverage/broker.init.info --add-tracefile coverage/broker.test.info --output-file coverage/broker.info
 	$(CLEAN_COVERAGE_REPORT)
-	genhtml -o coverage coverage/broker.info
+	$(GENHTML) -o coverage coverage/broker.info
 
 valgrind: install_debug
 	@echo For detailed info: tail -f /tmp/valgrindTestSuiteLog
