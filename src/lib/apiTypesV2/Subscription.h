@@ -84,6 +84,8 @@ struct Notification
   long long                failsCounter;
   long long                maxFailsLimit;
   long long                lastNotification;
+  long long                lastNotificationDuration;
+  long long                accumulatedNotificationDuration;
   HttpInfo                 httpInfo;     // subscription would have either httpInfo or mqttInfo, but not both
   MqttInfo                 mqttInfo;
   KafkaInfo                kafkaInfo;
@@ -105,6 +107,8 @@ struct Notification
     failsCounter(0),
     maxFailsLimit(-1),
     lastNotification(-1),
+    lastNotificationDuration(-1),
+    accumulatedNotificationDuration(0),
     httpInfo(),
     mqttInfo(),
     kafkaInfo(),

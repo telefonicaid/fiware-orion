@@ -161,12 +161,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 475
+Content-Length: 540
 
 {
     "expires": "2050-04-05T14:00:00.000Z",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -174,6 +175,7 @@ Content-Length: 475
             "url": "http://localhost:9997/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,

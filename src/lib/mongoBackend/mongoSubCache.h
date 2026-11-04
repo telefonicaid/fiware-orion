@@ -57,6 +57,8 @@ extern int mongoSubCacheItemInsert
   const char*            subscriptionId,
   const char*            servicePath,
   long long              lastNotificationTime,
+  long long              lastNotificationDuration,
+  long long              notificationDurationDelta,
   long long              lastFailure,
   const std::string&     lastFailureReason,
   long long              lastSuccess,
@@ -106,7 +108,8 @@ extern void mongoSubUpdateOnNotif
   const std::string&  failureReason,
   long long           statusCode,
   const std::string&  status,
-  double              statusLastChange
+  double              statusLastChange,
+  long long           notificationDurationMs = -1
 );
 
 
@@ -123,7 +126,9 @@ extern void mongoSubUpdateOnCacheSync
   const std::string&  subId,
   long long           count,
   long long           failsCounter,
+  long long           notificationDurationDelta,
   int64_t*            lastNotificationTimeP,
+  int64_t*            lastNotificationDurationP,
   int64_t*            lastFailureP,
   int64_t*            lastSuccessP,
   std::string*        failureReasonP,

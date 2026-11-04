@@ -256,11 +256,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 528
+Content-Length: 593
 
 {
     "id": "620e0d04219c8378695c822b",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -271,6 +272,7 @@ Content-Length: 528
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,
@@ -324,11 +326,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 530
+Content-Length: 595
 
 {
     "id": "620e0d04219c8378695c822b",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -339,6 +342,7 @@ Content-Length: 530
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,
@@ -392,11 +396,12 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 528
+Content-Length: 593
 
 {
     "id": "620e0d04219c8378695c822b",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -407,6 +412,7 @@ Content-Length: 528
         "lastFailure": "REGEX(.*)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "2022-02-25T10:23:30.000Z",
         "lastSuccessCode": 404,
         "onlyChangedAttrs": false,

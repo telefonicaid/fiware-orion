@@ -84,6 +84,8 @@
 #define CSUB_DESCRIPTION             "description"
 #define CSUB_EXPIRATION              "expiration"
 #define CSUB_LASTNOTIFICATION        "lastNotification"
+#define CSUB_LASTNOTIFICATIONDURATION          "lastNotificationDuration"
+#define CSUB_ACCUMULATEDNOTIFICATIONDURATION   "accumulatedNotificationDuration"
 #define CSUB_REFERENCE               "reference"
 #define CSUB_CONDITIONS              "conditions"
 #define CSUB_JEXL_EXPR               "jexlExpression"

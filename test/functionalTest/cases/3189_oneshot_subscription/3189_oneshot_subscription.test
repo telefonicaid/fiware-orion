@@ -330,12 +330,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 505
+Content-Length: 570
 
 {
     "description": "A subscription to get info about Room1",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [
             "temperature"
         ],
@@ -345,6 +346,7 @@ Content-Length: 505
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,
@@ -382,12 +384,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 504
+Content-Length: 569
 
 {
     "description": "A subscription to get info about Room1",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [
             "temperature"
         ],
@@ -397,6 +400,7 @@ Content-Length: 504
             "url": "http://localhost:REGEX(\d+)/notify"
         },
         "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(.*)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,

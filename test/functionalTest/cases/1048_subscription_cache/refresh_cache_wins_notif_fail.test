@@ -205,12 +205,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 465
+Content-Length: 530
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -221,6 +222,7 @@ Content-Length: 465
             "lastFailure": "202REGEX(.*)",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "202REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -284,12 +286,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 465
+Content-Length: 530
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -300,6 +303,7 @@ Content-Length: 465
             "lastFailure": "202REGEX(.*)",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "202REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -323,6 +327,7 @@ Content-Length: 465
 06. Get doc in DB after cache refresh and see lastNotification/Failure in the present and reason 'could not connect' and count 1 and failsCounter 1
 ===================================================================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -348,6 +353,7 @@ Content-Length: 465
     "lastFailure": REGEX(1[6-9]\d+),
     "lastFailureReason": "Could not connect to server",
     "lastNotification": REGEX(1[6-9]\d+),
+    "lastNotificationDuration": REGEX(\d+),
     "metadata": [],
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",

@@ -295,7 +295,7 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* rkmessage,
                          kConn->endpoint.c_str(),
                          rd_kafka_topic_name(rkmessage->rkt)));
 
-    subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, false, -1, "");
+    subNotificationOutcome(ctx->tenant, ctx->subscriptionId, false, -1, "");
 
   }
   else
@@ -304,7 +304,7 @@ void kafkaOnPublishCallback(rd_kafka_t* rk, const rd_kafka_message_t* rkmessage,
           kConn->endpoint.c_str(),
           rd_kafka_err2str(rkmessage->err)));
 
-    subNotificationErrorStatus(ctx->tenant, ctx->subscriptionId, true, -1, "");
+    subNotificationOutcome(ctx->tenant, ctx->subscriptionId, true, -1, "");
 
   }
 

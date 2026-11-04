@@ -107,6 +107,8 @@ struct CachedSubscription
   int64_t                          throttling;
   int64_t                          expirationTime;
   int64_t                          lastNotificationTime;
+  int64_t                          lastNotificationDuration;
+  int64_t                          notificationDurationDelta;
   std::string                      status;
   double                           statusLastChange;
   int64_t                          count;
@@ -343,9 +345,9 @@ extern void subCacheStatisticsReset(const char* by);
 
 /* ****************************************************************************
 *
-* subNotificationErrorStatus -
+* subNotificationOutcome -
 */
-extern void subNotificationErrorStatus
+extern void subNotificationOutcome
 (
   const std::string&  tenant,
   const std::string&  subscriptionId,
@@ -353,7 +355,8 @@ extern void subNotificationErrorStatus
   long long           statusCode,
   const std::string&  failureReason,
   long long           failsCounter = -1,
-  long long           maxFailsLimit = -1
+  long long           maxFailsLimit = -1,
+  long long           notificationDurationMs = -1
 );
 
 #endif  // SRC_LIB_CACHE_SUBCACHE_H_

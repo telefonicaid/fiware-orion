@@ -1,0 +1,706 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Verify HTTP notification duration metrics lifecycle during protocol changes (HTTP -> MQTT/Kafka -> HTTP)
+
+--SHELL-INIT--
+dbInit CB
+
+# Start broker with cache sync interval of 4s
+brokerStart CB 0 IPv4 -subCacheIval 4 --cache
+accumulatorStart
+
+--SHELL--
+
+##
+# 01. Create initial HTTP subscription
+# 02. Get Query subscription before notification: verify duration metrics are not present
+# 03. Create entity (triggers notification)
+# 04. Get Query subscription: verify duration metrics are present
+# 05. PATCH subscription description
+# 06. Get Query subscription: verify duration metrics are preserved
+# 07. PATCH subscription protocol to MQTT
+# 08. Check DB directly after patch to MQTT: verify duration metrics are removed
+# 09. Get Query subscription: verify duration metrics are removed
+# 10. PATCH subscription protocol back to HTTP
+# 11. Get Query subscription: verify duration metrics remain absent (reset)
+# 12. Trigger another notification by updating entity
+# 13. Get Query subscription: verify duration metrics re-appear
+# 14. PATCH subscription protocol to Kafka
+# 15. Get Query subscription: verify duration metrics are removed
+# 16. PATCH subscription protocol back to HTTP
+# 17. Get Query subscription: verify duration metrics remain absent (reset)
+# 18. PATCH subscription description again
+# 19. Get Query subscription: verify duration metrics remain absent (reset)
+#
+
+echo "01. Create initial HTTP subscription"
+echo "===================================="
+sub_payload='{
+    "subject": {
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    },
+    "notification": {
+        "http": {
+            "url": "http://localhost:'${LISTENER_PORT}'/notify"
+        }
+    }
+}'
+orionCurl -X POST --url /v2/subscriptions --payload "$sub_payload"
+echo
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+echo "02. Get Query subscription before notification: verify duration metrics are not present"
+echo "======================================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "03. Create entity (triggers notification)"
+echo "========================================="
+payload='{
+    "id": "E",
+    "type": "T",
+    "A": {
+        "type": "Number",
+        "value": 10
+    }
+}'
+orionCurl -X POST --url /v2/entities --payload "$payload"
+echo
+echo
+
+echo "04. Get Query subscription: verify duration metrics are present"
+echo "================================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "05. PATCH subscription description"
+echo "=================================="
+payload='{
+  "description": "Modified sub"
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+
+echo "06. Get Query subscription: verify duration metrics are preserved"
+echo "================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "07. PATCH subscription protocol to MQTT"
+echo "======================================="
+payload='{
+    "notification": {
+        "mqtt": {
+            "url": "mqtt://localhost:1883",
+            "topic": "testTopic"
+        }
+    }
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+
+echo "08. Check DB directly after patch to MQTT: verify duration metrics are removed"
+echo "=============================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$SUB_ID'")}, {_id:0, expiration:0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+
+echo "09. Get Query subscription: verify duration metrics are removed"
+echo "==============================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "10. PATCH subscription protocol back to HTTP"
+echo "============================================"
+payload='{
+    "notification": {
+        "http": {
+            "url": "http://localhost:'${LISTENER_PORT}'/notify"
+        }
+    }
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+
+echo "11. Get Query subscription: verify duration metrics remain absent (reset)"
+echo "=========================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "12. Trigger another notification by updating entity"
+echo "==================================================="
+payload='{
+    "value": 30
+}'
+orionCurl -X PUT --url /v2/entities/E/attrs/A/value --payload "$payload"
+echo
+echo
+
+echo "13. Get Query subscription: verify duration metrics re-appear"
+echo "=============================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "14. PATCH subscription protocol to Kafka"
+echo "========================================"
+payload='{
+    "notification": {
+        "kafka": {
+            "url": "kafka://localhost:9092",
+            "topic": "testTopicKafka"
+        }
+    }
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+
+echo "15. Get Query subscription: verify duration metrics are removed"
+echo "================================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "16. PATCH subscription protocol back to HTTP"
+echo "============================================"
+payload='{
+    "notification": {
+        "http": {
+            "url": "http://localhost:'${LISTENER_PORT}'/notify"
+        }
+    }
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+
+echo "17. Get Query subscription: verify duration metrics remain absent (reset)"
+echo "=========================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+echo "18. PATCH subscription description again"
+echo "========================================"
+payload='{
+    "description": "Modified sub again"
+}'
+orionCurl -X PATCH --url /v2/subscriptions/$SUB_ID --payload "$payload"
+echo
+
+echo "19. Get Query subscription: verify duration metrics remain absent (reset)"
+echo "=========================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+--REGEXPECT--
+01. Create initial HTTP subscription
+====================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+02. Get Query subscription before notification: verify duration metrics are not present
+=======================================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 295
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Create entity (triggers notification)
+=========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+04. Get Query subscription: verify duration metrics are present
+================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. PATCH subscription description
+==================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+06. Get Query subscription: verify duration metrics are preserved
+=================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+07. PATCH subscription protocol to MQTT
+=======================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+08. Check DB directly after patch to MQTT: verify duration metrics are removed
+==============================================================================
+{
+    "altTypes": [],
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [],
+    "covered": false,
+    "custom": false,
+    "description": "Modified sub",
+    "entities": [
+        {
+            "id": "E",
+            "isPattern": false,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "format": "normalized",
+    "jexlExpression": "",
+    "maxFailsLimit": -1,
+    "metadata": [],
+    "notifyOnMetadataChange": true,
+    "onlyChanged": false,
+    "qos": 0,
+    "reference": "mqtt://localhost:1883",
+    "retain": false,
+    "servicePath": "/#",
+    "status": "active",
+    "statusLastChange": REGEX(1[6-9]\d+\.\d+),
+    "throttling": 0,
+    "topic": "testTopic"
+}
+
+09. Get Query subscription: verify duration metrics are removed
+===============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 483
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "mqtt": {
+            "qos": 0,
+            "retain": false,
+            "topic": "testTopic",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+10. PATCH subscription protocol back to HTTP
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+11. Get Query subscription: verify duration metrics remain absent (reset)
+==========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 447
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+12. Trigger another notification by updating entity
+===================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+13. Get Query subscription: verify duration metrics re-appear
+==============================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX(\d+),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+14. PATCH subscription protocol to Kafka
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+15. Get Query subscription: verify duration metrics are removed
+================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 467
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafka": {
+            "topic": "testTopicKafka",
+            "url": "kafka://localhost:9092"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+16. PATCH subscription protocol back to HTTP
+============================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+17. Get Query subscription: verify duration metrics remain absent (reset)
+==========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 447
+
+{
+    "description": "Modified sub",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+18. PATCH subscription description again
+========================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+19. Get Query subscription: verify duration metrics remain absent (reset)
+==========================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 453
+
+{
+    "description": "Modified sub again",
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://localhost:9997/notify"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB

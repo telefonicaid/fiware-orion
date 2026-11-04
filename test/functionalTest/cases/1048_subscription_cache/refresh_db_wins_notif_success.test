@@ -58,8 +58,10 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         },
         "format" : "normalized",
         "lastNotification" : NumberLong(2524644000),
+        "lastNotificationDuration" : NumberLong(8),
         "lastSuccess" : NumberLong(2524644000),
-        "lastSuccessCode": NumberLong(211)
+        "lastSuccessCode": NumberLong(211),
+        "accumulatedNotificationDuration" : NumberLong(12)
 })'
 
 # t 100 -> MongoDB interactions
@@ -73,8 +75,10 @@ accumulatorStart
 #
 # Relevant fields in step 00
 # - lastNotification:   2050-01-01T10:00:00Z (2524644000)
+# - lastNotificationDuration: 8
 # - lastSuccess:        2050-01-01T10:00:00Z (2524644000)
 # - lastSuccessCode:    211
+# - accumulatedNotificationDuration: 12
 # - status:             active (last changed: 2050-01-01T10:00:00Z)
 #
 # 00. (Done before starting Context Broker) Insert crafted subscription in DB with lastNotification/Success in a far future and status code 211
@@ -136,8 +140,8 @@ echo
 echo
 
 
-echo "06. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1"
-echo "======================================================================================================================"
+echo "06. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1, accumulatedNotificationDuration incremented but lastNotificationDuration preserved"
+echo "=========================================================================================================================================================================================================="
 mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({ _id: ObjectId("61960a51596aa2623032357d")}, {_id:0, expiration: 0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
 echo
 echo
@@ -154,12 +158,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 406
+Content-Length: 472
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -167,6 +172,7 @@ Content-Length: 406
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "2050-01-01T10:00:00.000Z",
             "lastSuccessCode": 211,
             "onlyChangedAttrs": false
@@ -204,12 +210,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 420
+Content-Length: 486
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -217,6 +224,7 @@ Content-Length: 420
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "2050-01-01T10:00:00.000Z",
             "lastSuccessCode": 211,
             "onlyChangedAttrs": false,
@@ -242,6 +250,7 @@ Content-Length: 420
 04. Get doc in DB before cache refresh and see lastNotification/Success in a far future and status code 211 but no count
 ========================================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -263,6 +272,7 @@ Content-Length: 420
     },
     "format": "normalized",
     "lastNotification": 2524644000,
+    "lastNotificationDuration": REGEX(\d+),
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],
@@ -282,12 +292,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 420
+Content-Length: 486
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -295,6 +306,7 @@ Content-Length: 420
                 "url": "http://localhost:9997/notify"
             },
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "2050-01-01T10:00:00.000Z",
             "lastSuccessCode": 211,
             "onlyChangedAttrs": false,
@@ -317,9 +329,10 @@ Content-Length: 420
 ]
 
 
-06. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1
-======================================================================================================================
+06. Get doc in DB after cache refresh and see lastNotification/Success in a far future and status code 211 and count 1, accumulatedNotificationDuration incremented but lastNotificationDuration preserved
+==========================================================================================================================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -343,6 +356,7 @@ Content-Length: 420
     "failsCounter": 0,
     "format": "normalized",
     "lastNotification": 2524644000,
+    "lastNotificationDuration": 8,
     "lastSuccess": 2524644000,
     "lastSuccessCode": 211,
     "metadata": [],

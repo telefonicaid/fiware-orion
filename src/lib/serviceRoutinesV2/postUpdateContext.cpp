@@ -215,6 +215,7 @@ static bool updateForward
                       "",
                       &out,
                       &statusCode,
+                      NULL,
                       noHeaders,
                       mimeType);
 
