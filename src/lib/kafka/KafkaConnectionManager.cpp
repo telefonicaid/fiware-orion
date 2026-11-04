@@ -137,6 +137,18 @@ void KafkaConnectionManager::teardown(void)
   }
   connections.clear();
 
+  for (unsigned int ix = 0; ix < retiredConnections.size(); ++ix)
+  {
+    KafkaConnection* cP       = retiredConnections[ix];
+    std::string      endpoint = cP->endpoint;
+
+    disconnect(cP->producer, endpoint);
+    cP->producer = NULL;
+
+    delete cP;
+  }
+  retiredConnections.clear();
+
   // Global cleanup of librdkafka (wait up to KAFKA_DESTROY_TIMEOUT_MS seconds)
   int wait_time_ms = KAFKA_DESTROY_TIMEOUT_MS;
   while (rd_kafka_wait_destroyed(wait_time_ms) == -1)
@@ -227,11 +239,11 @@ void KafkaConnectionManager::semGive(void)
 */
 void KafkaConnectionManager::dispatchKafkaCallbacks()
 {
+  semTake();
   // We copy the producers under the semaphore to minimize critical section time.
   std::vector<rd_kafka_t*> producers;
   producers.reserve(connections.size());
 
-  semTake();
   for (std::map<std::string, KafkaConnection*>::iterator it = connections.begin(); it != connections.end(); ++it)
   {
     KafkaConnection* k = it->second;
@@ -248,6 +260,8 @@ void KafkaConnectionManager::dispatchKafkaCallbacks()
     // 0 ms: does not block; if you call frequently, this is sufficient
     rd_kafka_poll(producers[ix], 0);
   }
+
+  destroyRetiredConnections();
 }
 
 
@@ -268,6 +282,54 @@ void KafkaConnectionManager::disconnect(rd_kafka_t* producer, const std::string&
            endpoint.c_str(), rd_kafka_err2str(err)));
     }
     rd_kafka_destroy(producer);     // Free resources (equivalent to mosquitto_destroy)
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* KafkaConnectionManager::retireConnection -
+*
+* Moves a connection from active connections map to retiredConnections.
+* NOTE: Must be called with sem held!
+*/
+void KafkaConnectionManager::retireConnection(const std::string& connectionKey, KafkaConnection* kConn)
+{
+  std::map<std::string, KafkaConnection*>::iterator it = connections.find(connectionKey);
+  if (it != connections.end() && it->second == kConn)
+  {
+    connections.erase(it);
+    retiredConnections.push_back(kConn);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* KafkaConnectionManager::destroyRetiredConnections -
+*
+* Flushes and destroys retired connections outside the semaphore.
+*/
+void KafkaConnectionManager::destroyRetiredConnections(void)
+{
+  std::vector<KafkaConnection*> toDestroy;
+
+  semTake();
+  for (unsigned int ix = 0; ix < retiredConnections.size(); ++ix)
+  {
+    toDestroy.push_back(retiredConnections[ix]);
+  }
+  retiredConnections.clear();
+  semGive();
+
+  for (unsigned int ix = 0; ix < toDestroy.size(); ++ix)
+  {
+    KafkaConnection* cP = toDestroy[ix];
+    disconnect(cP->producer, cP->endpoint);
+    cP->producer = NULL;
+    delete cP;
   }
 }
 
@@ -675,11 +737,19 @@ bool KafkaConnectionManager::sendKafkaNotification(
 
   if (resultCode != RD_KAFKA_RESP_ERR_NO_ERROR)
   {
-    LM_E(("Kafka notification failed to %s on topic %s", endpoint.c_str(), topic.c_str()));
+    LM_E(("Kafka notification failed to %s on topic %s: %s", endpoint.c_str(), topic.c_str(), rd_kafka_err2str((rd_kafka_resp_err_t) resultCode)));
     delete ctx;
-    disconnect(kConn->producer, endpoint);
-    connections.erase(connectionKey);
-    delete kConn;
+    if (headers)
+    {
+      rd_kafka_headers_destroy(headers);
+    }
+
+    char errstr[512] = {0};
+    if (resultCode == RD_KAFKA_RESP_ERR__FATAL || rd_kafka_fatal_error(producer, errstr, sizeof(errstr)) != RD_KAFKA_RESP_ERR_NO_ERROR)
+    {
+      LM_E(("Fatal Kafka error detected on %s: %s, retiring connection", endpoint.c_str(), errstr[0] ? errstr : rd_kafka_err2str((rd_kafka_resp_err_t) resultCode)));
+      retireConnection(connectionKey, kConn);
+    }
     retval = false;
   }
   else
