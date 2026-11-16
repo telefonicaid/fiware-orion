@@ -164,4 +164,4 @@ aarch64 アーキテクチャの場合、apt-get を使用して libxslt をイ�
 
         make coverage INSTALL_DIR=~
 
-*注意*: デバッグトレースに依存する機能テストは、カバレッジ実行時に失敗すると予想されます（例：notification_different_sizes や not_posix_regex_idpattern.test）。これは、デバッグトレースで使用される LM_T マクロが、条件カバレッジに「ノイズ」を追加するため、カバレッジコードビルドで無効化されているためです。これにより、カバレッジレポートの有用性が向上します。
+*注意*: カバレッジ情報は、[Coveralls](https://coveralls.io/github/telefonicaid/fiware-orion?branch=master) でも確認できます。Coveralls 用の設定（`gcovr` を使用し、GitHub Action によって自動化されています。詳細は[該当する設定ファイル](https://github.com/telefonicaid/fiware-orion/blob/master/.github/actions/gcovr/action.yml)を参照してください）は、`make coverage` で使用される設定（`lcov` を使用。詳細は `makefile` 内のカバレッジ関連ターゲットを参照してください）とは異なります。両者は概ね似ていますが、Coveralls で得られるメトリクスの方が、ローカルで `make coverage` を実行した場合よりも詳細かつ正確です。なお、ローカルでの `make coverage` 実行は、現在では非推奨に近い状態となっています。
