@@ -299,6 +299,7 @@ static bool queryForward
                       "",
                       &out,
                       &statusCode,
+                      NULL,
                       noHeaders,
                       mimeType,
                       -1,  // default timeout

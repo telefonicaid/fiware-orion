@@ -128,12 +128,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 566
+Content-Length: 631
 
 [
     {
         "id": "REGEX([0-9a-f]{24})",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -145,6 +146,7 @@ Content-Length: 566
                 "url": "http://localhost:REGEX(\d+)/v2/entities/E/attrs"
             },
             "lastNotification": "REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "lastSuccess": "REGEX(.*)",
             "lastSuccessCode": 204,
             "onlyChangedAttrs": false,

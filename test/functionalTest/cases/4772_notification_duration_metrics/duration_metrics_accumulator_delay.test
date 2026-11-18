@@ -1,0 +1,363 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Verify lastNotificationDuration and accumulatedNotificationDuration calculation with delays
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -subCacheIval 1 --cache
+accumulatorStart
+
+
+--SHELL--
+
+#
+# 00. (Done before starting Context Broker) Start Broker with cache enabled and start accumulator
+# 01. Create subscription with a 10-second delay endpoint
+# 02. Trigger first notification by creating entity
+#     (Wait 12s for the delayed notification to be completed)
+# 03. Get Query subscription to verify duration metrics after first notification
+# 04. Trigger second notification by updating entity
+#     (Wait 12s for the delayed notification to be completed)
+# 05. Get Query subscription to verify duration metrics after second notification
+# 06. Trigger third notification by updating entity
+#     (Wait 12s for the delayed notification to be completed)
+# 07. Get Query subscription to verify duration metrics after third notification
+# 08. Check DB directly after third notification: verify accumulated notification duration is correct
+#
+
+
+echo "01. Create subscription with a 10-second delay endpoint"
+echo "======================================================="
+payload='{
+    "subject": {
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ],
+        "condition": {
+            "attrs": [ "A" ]
+         }
+    },
+    "notification": {
+        "http": {
+            "url": "http://localhost:'${LISTENER_PORT}'/givemeDelay/10",
+            "timeout": 15000
+        },
+        "attrs": []
+    },
+    "status": "active"
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+id=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "02. Trigger first notification by creating entity"
+echo "================================================="
+payload='
+{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": "1"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+# Wait for the delayed notification to be completed
+sleep 12s
+
+echo "03. Get Query subscription to verify duration metrics after first notification"
+echo "=============================================================================="
+orionCurl --url /v2/subscriptions/$id
+echo
+echo
+
+
+echo "04. Trigger second notification by updating entity"
+echo "=================================================="
+payload='{"A": {"value": "2"}}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+# Wait for the delayed notification to be completed
+sleep 12s
+
+echo "05. Get Query subscription to verify duration metrics after second notification"
+echo "==============================================================================="
+orionCurl --url /v2/subscriptions/$id
+echo
+echo
+
+
+echo "06. Trigger third notification by updating entity"
+echo "================================================="
+payload='{"A": {"value": "3"}}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+# Wait for the delayed notification to be completed
+sleep 12s
+
+echo "07. Get Query subscription to verify duration metrics after third notification"
+echo "=============================================================================="
+orionCurl --url /v2/subscriptions/$id
+echo
+echo
+
+echo "08. Check DB directly after third notification: verify accumulated notification duration is correct"
+echo "=================================================================================================="
+mongoCmd ${CB_DB_NAME} 'db.csubs.findOne({_id: ObjectId("'$id'")}, {_id:0, expiration:0})' | python ${SCRIPT_HOME}/jsonBeautifier.py
+echo
+echo
+
+
+--REGEXPECT--
+01. Create subscription with a 10-second delay endpoint
+=======================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. Trigger first notification by creating entity
+=================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+03. Get Query subscription to verify duration metrics after first notification
+==============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "timeout": 15000,
+            "url": "http://localhost:9997/givemeDelay/10"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 1
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+04. Trigger second notification by updating entity
+==================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+05. Get Query subscription to verify duration metrics after second notification
+===============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX((19|20|21|22)\d\d\d),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "timeout": 15000,
+            "url": "http://localhost:9997/givemeDelay/10"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 2
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+06. Trigger third notification by updating entity
+=================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. Get Query subscription to verify duration metrics after third notification
+==============================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: REGEX(\d+)
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "accumulatedNotificationDuration": REGEX((29|30|31|32)\d\d\d),
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "timeout": 15000,
+            "url": "http://localhost:9997/givemeDelay/10"
+        },
+        "lastNotification": "REGEX(.*)",
+        "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+        "lastSuccess": "REGEX(.*)",
+        "lastSuccessCode": 200,
+        "onlyChangedAttrs": false,
+        "timesSent": 3
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [
+                "A"
+            ],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "idPattern": ".*",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+08. Check DB directly after third notification: verify accumulated notification duration is correct
+==================================================================================================
+{
+    "accumulatedNotificationDuration": REGEX((29|30|31|32)\d\d\d),
+    "altTypes": [],
+    "attrs": [],
+    "blacklist": false,
+    "conditions": [
+        "A"
+    ],
+    "count": 3,
+    "covered": false,
+    "custom": false,
+    "entities": [
+        {
+            "id": ".*",
+            "isPattern": true,
+            "isTypePattern": false,
+            "type": "T"
+        }
+    ],
+    "expression": {
+        "coords": "",
+        "geometry": "",
+        "georel": "",
+        "mq": "",
+        "q": ""
+    },
+    "failsCounter": 0,
+    "format": "normalized",
+    "jexlExpression": "",
+    "lastNotification": REGEX(1[6-9]\d+),
+    "lastNotificationDuration": REGEX((9|10|11)\d\d\d),
+    "lastSuccess": REGEX(1[6-9]\d+),
+    "lastSuccessCode": 200,
+    "maxFailsLimit": -1,
+    "metadata": [],
+    "notifyOnMetadataChange": true,
+    "onlyChanged": false,
+    "reference": "http://localhost:9997/givemeDelay/10",
+    "servicePath": "/#",
+    "status": "active",
+    "statusLastChange": REGEX(1[6-9]\d+\.\d+),
+    "throttling": 0,
+    "timeout": 15000
+}
+
+
+--TEARDOWN--
+accumulatorStop
+brokerStop CB
+dbDrop CB

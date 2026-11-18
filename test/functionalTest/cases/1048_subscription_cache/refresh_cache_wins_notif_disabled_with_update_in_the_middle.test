@@ -244,12 +244,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 485
+Content-Length: 550
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -260,6 +261,7 @@ Content-Length: 485
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "maxFailsLimit": 1,
             "onlyChangedAttrs": false,
             "timesSent": 2
@@ -367,13 +369,14 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 522
+Content-Length: 587
 
 [
     {
         "description": "A little description",
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -384,6 +387,7 @@ Content-Length: 522
             "lastFailure": "REGEX(.*)",
             "lastFailureReason": "Could not connect to server",
             "lastNotification": "REGEX(.*)",
+            "lastNotificationDuration": REGEX(\d+),
             "maxFailsLimit": 1,
             "onlyChangedAttrs": false,
             "timesSent": 2
@@ -408,6 +412,7 @@ Content-Length: 522
 09. Get doc in DB after cache refresh and see status inactive changed in the present and count 2, failsCounter 2 + description
 ==============================================================================================================================
 {
+    "accumulatedNotificationDuration": REGEX(\d+),
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -434,6 +439,7 @@ Content-Length: 522
     "lastFailure": REGEX(1[6-9]\d+),
     "lastFailureReason": "Could not connect to server",
     "lastNotification": REGEX(1[6-9]\d+),
+    "lastNotificationDuration": REGEX(\d+),
     "maxFailsLimit": 1,
     "metadata": [],
     "notifyOnMetadataChange": true,

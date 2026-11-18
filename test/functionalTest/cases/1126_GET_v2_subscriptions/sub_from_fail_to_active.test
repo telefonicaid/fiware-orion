@@ -183,12 +183,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 491
+Content-Length: 556
 
 {
     "description": "The sub",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -199,6 +200,7 @@ Content-Length: 491
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "onlyChangedAttrs": false,
         "timesSent": 1
     },
@@ -237,12 +239,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 537
+Content-Length: 602
 
 {
     "description": "The sub",
     "id": "REGEX([0-9a-f]{24})",
     "notification": {
+        "accumulatedNotificationDuration": REGEX(\d+),
         "attrs": [],
         "attrsFormat": "normalized",
         "covered": false,
@@ -252,6 +255,7 @@ Content-Length: 537
         "lastFailure": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastFailureReason": "Could not connect to server",
         "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
+        "lastNotificationDuration": REGEX(\d+),
         "lastSuccess": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.000Z)",
         "lastSuccessCode": 200,
         "onlyChangedAttrs": false,

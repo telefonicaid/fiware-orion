@@ -1,2 +1,3 @@
+- Add: HTTP notification duration metrics (lastNotificationDuration and accumulatedNotificationDuration) to subscriptions (#4772)
 - Fix: use WARN level and "Notif failure" message for notifications failing to reach destination (#4800)
 - Fix: PATCH /v2/subscriptions/{id} no longer allows to change the subscription service path, returning 404 Not Found if Fiware-ServicePath header doesn't match the subscription one (#4809)

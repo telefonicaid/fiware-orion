@@ -58,8 +58,10 @@ mongoCmd ${CB_DB_NAME} 'db.csubs.insertOne({
         },
         "format" : "normalized",
         "lastNotification" : NumberLong(2524644000),
+        "lastNotificationDuration" : NumberLong(8),
         "lastFailure" : NumberLong(2524644000),
-        "lastFailureReason": "some reason"
+        "lastFailureReason": "some reason",
+        "accumulatedNotificationDuration" : NumberLong(12)
 })'
 
 # t 100 -> MongoDB interactions
@@ -171,12 +173,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 418
+Content-Length: 484
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -186,6 +189,7 @@ Content-Length: 418
             "lastFailure": "2050-01-01T10:00:00.000Z",
             "lastFailureReason": "some reason",
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false
         },
         "status": "active",
@@ -221,12 +225,13 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 449
+Content-Length: 515
 
 [
     {
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -237,6 +242,7 @@ Content-Length: 449
             "lastFailure": "2050-01-01T10:00:00.000Z",
             "lastFailureReason": "some reason",
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -260,6 +266,7 @@ Content-Length: 449
 04. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter
 =================================================================================================================================================
 {
+    "accumulatedNotificationDuration": 12,
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -283,6 +290,7 @@ Content-Length: 449
     "lastFailure": 2524644000,
     "lastFailureReason": "some reason",
     "lastNotification": 2524644000,
+    "lastNotificationDuration": 8,
     "metadata": [],
     "onlyChanged": false,
     "reference": "http://localhost:9997/notify",
@@ -305,6 +313,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
 06. Get doc in DB before cache refresh and see lastNotification/Failure in a far future and reason 'some reason' but no count and no failsCounter + description
 ===============================================================================================================================================================
 {
+    "accumulatedNotificationDuration": 12,
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -329,6 +338,7 @@ Fiware-Correlator: REGEX([0-9a-f\-]{36})
     "lastFailure": 2524644000,
     "lastFailureReason": "some reason",
     "lastNotification": 2524644000,
+    "lastNotificationDuration": 8,
     "metadata": [],
     "notifyOnMetadataChange": true,
     "onlyChanged": false,
@@ -347,13 +357,14 @@ HTTP/1.1 200 OK
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
 Content-Type: application/json
-Content-Length: 486
+Content-Length: 552
 
 [
     {
         "description": "A little description",
         "id": "61960a51596aa2623032357d",
         "notification": {
+            "accumulatedNotificationDuration": REGEX(\d+),
             "attrs": [],
             "attrsFormat": "normalized",
             "covered": false,
@@ -364,6 +375,7 @@ Content-Length: 486
             "lastFailure": "2050-01-01T10:00:00.000Z",
             "lastFailureReason": "some reason",
             "lastNotification": "2050-01-01T10:00:00.000Z",
+            "lastNotificationDuration": REGEX(\d+),
             "onlyChangedAttrs": false,
             "timesSent": 1
         },
@@ -387,6 +399,7 @@ Content-Length: 486
 08. Get doc in DB after cache refresh and see lastNotification/Failure in a far future and reason 'some reason' and count 1 and failsCounter 1 + description
 ============================================================================================================================================================
 {
+    "accumulatedNotificationDuration": 12,
     "attrs": [],
     "blacklist": false,
     "conditions": [],
@@ -413,6 +426,7 @@ Content-Length: 486
     "lastFailure": 2524644000,
     "lastFailureReason": "some reason",
     "lastNotification": 2524644000,
+    "lastNotificationDuration": 8,
     "metadata": [],
     "notifyOnMetadataChange": true,
     "onlyChanged": false,
