@@ -2378,7 +2378,7 @@ LmStatus lmOut
       }
       else
       {
-        snprintf(line, logLineMaxSize, format, text);
+        snprintf(line, logLineMaxSize, "%s", text);
       }
     }
 
