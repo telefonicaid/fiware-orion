@@ -27,8 +27,8 @@ KAFKA subscription multibroker
 dbInit CB s1
 
 # tracelevel 164 is the one for KAFKA notification logs
-brokerStart CB 164 IPV4 -multiservice -kafkaMaxAge 1
 kafkaCreateTopics "${KAFKA_BOOTSTRAP_A}" sub1 sub2
+brokerStart CB 164 IPV4 -multiservice -kafkaMaxAge 1
 accumulatorStart --pretty-print --bootstrapServers "${KAFKA_BOOTSTRAP_A}" --kafkaTopic "^sub.*"
 
 --SHELL--
