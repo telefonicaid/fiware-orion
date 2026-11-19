@@ -81,7 +81,11 @@ void setExpiration(const Subscription& sub, orion::BSONObjBuilder* b)
 *
 * setContextReferences -
 */
-static void setContextReferences(const std::vector<ngsiv2::ContextReference>& contextReferences, orion::BSONObjBuilder* b)
+static void setContextReferences
+(
+  const std::vector<ngsiv2::ContextReference>&  contextReferences,
+  orion::BSONObjBuilder*                        b
+)
 {
   if (contextReferences.size() > 0)
   {

@@ -83,7 +83,8 @@ void contextReferencesFill(const orion::BSONObj& bo, std::vector<ContextReferenc
   {
     if (crElements[ix].type() != orion::Object)
     {
-      LM_E(("Runtime Error (csub contextReferences item must be Object but is %s)", orion::bsonType2String(crElements[ix].type())));
+      LM_E(("Runtime Error (csub contextReferences item must be Object but is %s)",
+            orion::bsonType2String(crElements[ix].type())));
       continue;
     }
 

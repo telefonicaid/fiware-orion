@@ -529,7 +529,8 @@ static bool addContextReferences
     resolved.type = typeSub.value;
 
     // If id or type resolve to null or empty string, the reference is not queried (it will be null in context)
-    bool valid = (idSub.status != ResolveNull) && (typeSub.status != ResolveNull) && (!resolved.id.empty()) && (!resolved.type.empty());
+    bool valid = (idSub.status != ResolveNull) && (typeSub.status != ResolveNull) &&
+                 (!resolved.id.empty()) && (!resolved.type.empty());
 
     resolvedV.push_back(resolved);
     validV.push_back(valid);
@@ -556,7 +557,8 @@ static bool addContextReferences
     {
       for (unsigned int jx = 0; jx < cerV.size(); jx++)
       {
-        if ((cerV[jx]->entity.entityId.id == resolvedV[ix].id) && (cerV[jx]->entity.entityId.type == resolvedV[ix].type))
+        if ((cerV[jx]->entity.entityId.id == resolvedV[ix].id) &&
+            (cerV[jx]->entity.entityId.type == resolvedV[ix].type))
         {
           enP = &cerV[jx]->entity;
           break;

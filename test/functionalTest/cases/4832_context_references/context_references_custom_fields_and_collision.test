@@ -1,0 +1,275 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+Context references in different custom notification fields and attribute named contextReferences
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create entity E2/T2 with A=1 and B=foo
+# 02. Create custom sub (for E/T) with contextReferences E2/T2 using ngsi payload, headers and qs
+# 03. Create custom sub (for F/T) with contextReferences E2/T2 using text payload
+# 04. Create entity E/T with attribute named contextReferences
+# 05. Create entity F/T with A=0
+# 06. Dump accumulator and see two notifications
+#     first with refA=1, refB=foo, x-ref-b: foo header and refA=1 query param
+#     (attribute named contextReferences in E/T doesn't take precedence in JEXL context)
+#     second with 11 text payload
+#
+
+
+echo "01. Create entity E2/T2 with A=1 and B=foo"
+echo "=========================================="
+payload='{
+  "id": "E2",
+  "type": "T2",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  },
+  "B": {
+    "value": "foo",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create custom sub (for E/T) with contextReferences E2/T2 using ngsi payload, headers and qs"
+echo "==============================================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "contextReferences": [
+        { "id": "E2", "type": "T2" }
+      ],
+      "headers": {
+        "x-ref-b": "${contextReferences[0].B}"
+      },
+      "qs": {
+        "refA": "${contextReferences[0].A}"
+      },
+      "ngsi": {
+        "refA": {
+          "value": "${contextReferences[0].A}",
+          "type": "Number"
+        },
+        "refB": {
+          "value": "${contextReferences[0].B}",
+          "type": "Text"
+        }
+      }
+    },
+    "attrs": [ "refA", "refB" ]
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "03. Create custom sub (for F/T) with contextReferences E2/T2 using text payload"
+echo "==============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "F",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "contextReferences": [
+        { "id": "E2", "type": "T2" }
+      ],
+      "payload": "${contextReferences[0].A+10}",
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E/T with attribute named contextReferences"
+echo "============================================================"
+payload='{
+  "id": "E",
+  "type": "T",
+  "contextReferences": {
+    "value": "this attribute is ignored in JEXL context",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create entity F/T with A=0"
+echo "=============================="
+payload='{
+  "id": "F",
+  "type": "T",
+  "A": {
+    "value": 0,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "06. Dump accumulator and see two notifications"
+echo "=============================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E2/T2 with A=1 and B=foo
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T2
+Content-Length: 0
+
+
+
+02. Create custom sub (for E/T) with contextReferences E2/T2 using ngsi payload, headers and qs
+===============================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Create custom sub (for F/T) with contextReferences E2/T2 using text payload
+===============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+04. Create entity E/T with attribute named contextReferences
+============================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+05. Create entity F/T with A=0
+==============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/F?type=T
+Content-Length: 0
+
+
+
+06. Dump accumulator and see two notifications
+==============================================
+POST http://127.0.0.1:REGEX(\d+)/notify?refA=1
+Fiware-Servicepath: /
+Content-Length: 176
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+X-Ref-B: foo
+
+{
+    "data": [
+        {
+            "id": "E",
+            "refA": {
+                "metadata": {},
+                "type": "Number",
+                "value": 1
+            },
+            "refB": {
+                "metadata": {},
+                "type": "Text",
+                "value": "foo"
+            },
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 2
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: text/plain
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+11
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop
