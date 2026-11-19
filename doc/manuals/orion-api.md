@@ -2378,6 +2378,9 @@ Some considerations to take into account when using custom notifications:
   `Ngsiv2-AttrsFormat` header is set to `custom`. However, note that if NGSI patching is used
   (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
   notification (given that the notification format is actually the same).
+* When the payload generation is customized (using `payload`, `json` or `ngsi`) fields that are
+  designed to specify notifications in NGSIv2 standard format are ignored. In particular, the
+  [`notification.covered`](#covered-subscriptions) and [`noficiation.onlyChangedAttr`](#subscriptionnotification) doesn't have any effect.
 
 ## JEXL support in custom notifications
 
@@ -3610,6 +3613,10 @@ And if you try to create/update a subscription with that you will get a 400 Bad 
     "error": "BadRequest"
 }
 ```
+
+Note that if `"covered": true` and `"onlyChangedAttrs": true` are used in the same subscription, then the
+later takes precedence over the former (i.e. not all the covered attributed are included, but only the
+ones that change).
 
 ## Subscriptions based in alteration type
 
@@ -5100,7 +5107,8 @@ A `notification` object contains the following subfields:
 Regarding `onlyChangedAttrs` field, as an example, if `attrs` is `[A, B, C]` for a given subscription, the default behavior 
 (when `onlyChangedAttrs` is `false`) and the triggering update modified only A, then A, B and C are notified (in other 
 words, the triggering update doesn't matter). However, if `onlyChangedAttrs` is `true` and the triggering update only 
-modified A then only A is included in the notification.
+modified A then only A is included in the notification. Note also that if `"covered": true` and `"onlyChangedAttrs": true`
+are used in the same subscription, then the later takes precedence over the former (i.e. not all the covered attributed are included, but only the ones that change).
 
 Regarding `lastFailureReason` and `lastSuccessCode`, both can be used to analyze possible problems with notifications. 
 See section in the [problem diagnosis procedures document](admin/diagnosis.md#diagnose-notification-reception-problems)
