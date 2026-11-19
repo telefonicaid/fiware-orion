@@ -1,0 +1,559 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Covered subscription combined with onlyChangedAttrs (using ngsi in custom notification)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -subCacheIval 1
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# NOTE: subscription updates takes its time to propagate into csubs cache. Thus, we have introduced
+# some sleep (=1.5*subCacheIval). These sleeps are not needed if this tests is run with --noCache flag
+#
+# 01. Create entity E-T with A, B
+# 02. Create subscription for A, B, C, D with covered:true and onlyChangedAttrs:false
+# 03. Update E-T with A=11
+# 04. Dump & reset, see notifications A=11, B=2, C=null, D=null (context is not lost)
+# 05. Update subscription to A, B, C, D with covered:true and onlyChangedAttrs:true
+# 06. Update E-T with A=111
+# 07. Dump & reset, see notifications A=111 (B, C and D removed by onlyChangedAttrs, as ngsi uses NGSIv2 standard format)
+# 08. Update subscription to A, B, C, D with covered:false and onlyChangedAttrs:true
+# 09. Update E-T with A=1111
+# 10. Dump & reset, see notifications A=1111 (B, C and D removed by onlyChangedAttrs, as ngsi uses NGSIv2 standard format)
+# 11. Update subscription to A, B, C, D with covered:false and onlyChangedAttrs:false
+# 12. Update E-T with A=11111
+# 13. Dump & reset, see notifications A=11111, B=2, C=null, D=null (context is not lost)
+#
+
+echo "01. Create entity E-T with A, B"
+echo "==============================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  },
+  "B": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo '02. Create subscription for A, B, C with covered:true and onlyChangedAttrs:false'
+echo '================================================================================'
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "ngsi": {
+        "A": {
+          "value": "${A}",
+          "type": "Calculated"
+        },
+        "B": {
+          "value": "${B}",
+          "type": "Calculated"
+        },
+        "C": {
+          "value": "${C}",
+          "type": "Calculated"
+        },
+        "D": {
+          "value": "${D}",
+          "type": "Calculated"
+        }
+      }
+    },
+    "attrs": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "covered": true,
+    "onlyChangedAttrs": false
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+subId=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+echo
+echo
+
+
+echo "03. Update E-T with A=11"
+echo "========================"
+payload='{
+  "A": {
+    "value": 11,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "04. Dump & reset, see notifications A=11, B=2, C=null, D=null (context is not lost)"
+echo "==================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "05. Update subscription to A, B, C, D with covered:true and onlyChangedAttrs:true"
+echo "================================================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "ngsi": {
+        "A": {
+          "value": "${A}",
+          "type": "Calculated"
+        },
+        "B": {
+          "value": "${B}",
+          "type": "Calculated"
+        },
+        "C": {
+          "value": "${C}",
+          "type": "Calculated"
+        },
+        "D": {
+          "value": "${D}",
+          "type": "Calculated"
+        }
+      }
+    },
+    "attrs": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "covered": true,
+    "onlyChangedAttrs": true
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+sleep 1.5s
+
+
+echo "06. Update E-T with A=111"
+echo "========================"
+payload='{
+  "A": {
+    "value": 111,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "07. Dump & reset, see notifications A=111 (B, C and D removed by onlyChangedAttrs, as ngsi uses NGSIv2 standard format)"
+echo "======================================================================================================================="
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "08. Update subscription to A, B, C, D with covered:false and onlyChangedAttrs:true"
+echo "=================================================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "ngsi": {
+        "A": {
+          "value": "${A}",
+          "type": "Calculated"
+        },
+        "B": {
+          "value": "${B}",
+          "type": "Calculated"
+        },
+        "C": {
+          "value": "${C}",
+          "type": "Calculated"
+        },
+        "D": {
+          "value": "${D}",
+          "type": "Calculated"
+        }
+      }
+    },
+    "attrs": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "covered": false,
+    "onlyChangedAttrs": true
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+sleep 1.5s
+
+
+echo "09. Update E-T with A=1111"
+echo "=========================="
+payload='{
+  "A": {
+    "value": 1111,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "10. Dump & reset, see notifications A=1111 (B, C and D removed by onlyChangedAttrs, as ngsi uses NGSIv2 standard format)"
+echo "========================================================================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+echo "11. Update subscription to A, B, C, D with covered:false and onlyChangedAttrs:false"
+echo "==================================================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://localhost:'$LISTENER_PORT'/notify",
+      "ngsi": {
+        "A": {
+          "value": "${A}",
+          "type": "Calculated"
+        },
+        "B": {
+          "value": "${B}",
+          "type": "Calculated"
+        },
+        "C": {
+          "value": "${C}",
+          "type": "Calculated"
+        },
+        "D": {
+          "value": "${D}",
+          "type": "Calculated"
+        }
+      }
+    },
+    "attrs": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "covered": false,
+    "onlyChangedAttrs": false
+  }
+}'
+orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
+echo
+echo
+
+
+sleep 1.5s
+
+
+echo "12. Update E-T with A=11111"
+echo "==========================="
+payload='{
+  "A": {
+    "value": 11111,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs --payload "$payload"
+echo
+echo
+
+
+echo "13. Dump & reset, see notifications A=11111, B=2, C=null, D=null (context is not lost)"
+echo "======================================================================================"
+accumulatorDump
+accumulatorReset
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E-T with A, B
+===============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+02. Create subscription for A, B, C with covered:true and onlyChangedAttrs:false
+================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+03. Update E-T with A=11
+========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. Dump & reset, see notifications A=11, B=2, C=null, D=null (context is not lost)
+===================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 283
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 11
+            },
+            "B": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 2
+            },
+            "C": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "D": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+05. Update subscription to A, B, C, D with covered:true and onlyChangedAttrs:true
+=================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. Update E-T with A=111
+========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+07. Dump & reset, see notifications A=111 (B, C and D removed by onlyChangedAttrs, as ngsi uses NGSIv2 standard format)
+=======================================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 128
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 111
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+08. Update subscription to A, B, C, D with covered:false and onlyChangedAttrs:true
+==================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+09. Update E-T with A=1111
+==========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+10. Dump & reset, see notifications A=1111 (B, C and D removed by onlyChangedAttrs, as ngsi uses NGSIv2 standard format)
+========================================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 129
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 1111
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+11. Update subscription to A, B, C, D with covered:false and onlyChangedAttrs:false
+===================================================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+12. Update E-T with A=11111
+===========================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+13. Dump & reset, see notifications A=11111, B=2, C=null, D=null (context is not lost)
+======================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 286
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: normalized
+Host: localhost:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "data": [
+        {
+            "A": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 11111
+            },
+            "B": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": 2
+            },
+            "C": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "D": {
+                "metadata": {},
+                "type": "Calculated",
+                "value": null
+            },
+            "id": "E",
+            "type": "T"
+        }
+    ],
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

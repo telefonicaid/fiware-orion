@@ -2378,9 +2378,12 @@ Some considerations to take into account when using custom notifications:
   `Ngsiv2-AttrsFormat` header is set to `custom`. However, note that if NGSI patching is used
   (i.e. `ngsi` field) then `Ngsiv2-AttrsFormat: normalized` is used, as in a regular
   notification (given that the notification format is actually the same).
-* When the payload generation is customized (using `payload`, `json` or `ngsi`) fields that are
+* When the payload generation is customized (using `payload` or `json`) fields that are
   designed to specify notifications in NGSIv2 standard format are ignored. In particular, the
-  [`notification.covered`](#covered-subscriptions) and [`noficiation.onlyChangedAttr`](#subscriptionnotification) doesn't have any effect.
+  [`notification.covered`](#covered-subscriptions) and [`notification.onlyChangedAttrs`](#subscriptionnotification) doesn't have any effect.
+  However, note that if NGSI patching is used (i.e. `ngsi` field) the notification is in NGSIv2 standard format,
+  so these fields are taken into account (e.g. if `onlyChangedAttrs` is `true`, attributes set by the `ngsi`
+  field are removed from the notification if they were not modified by the triggering update).
 
 ## JEXL support in custom notifications
 
