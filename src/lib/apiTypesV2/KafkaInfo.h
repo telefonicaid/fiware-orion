@@ -31,6 +31,7 @@
 #include "parse/CompoundValueNode.h"
 #include "apiTypesV2/CustomPayloadType.h"
 #include "apiTypesV2/Entity.h"
+#include "apiTypesV2/ContextReference.h"
 
 namespace ngsiv2
 {
@@ -55,6 +56,8 @@ struct KafkaInfo
   Entity                     ngsi;     // either payload, json or ngsi is used (depending on payloadType)
   CustomPayloadType          payloadType;
   bool                       includePayload;
+
+  std::vector<ContextReference>  contextReferences;
 
   bool          providedAuth;
   std::string   user;

@@ -121,6 +121,11 @@ std::string KafkaInfo::toJson()
     {
       jh.addRaw("headers", objectToJson(headers));
     }
+
+    if (contextReferences.size() != 0)
+    {
+      jh.addRaw("contextReferences", vectorToJson(contextReferences));
+    }
   }
 
   return jh.str();
@@ -267,6 +272,8 @@ void KafkaInfo::fill(const orion::BSONObj& bo)
       orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
       headers.toStringMap(&this->headers);
     }
+
+    contextReferencesFill(bo, &this->contextReferences);
   }
 }
 
@@ -293,6 +300,7 @@ void KafkaInfo::fill(const KafkaInfo& _kafkaInfo)
   this->passwd           = _kafkaInfo.passwd;
   this->securityProtocol = _kafkaInfo.securityProtocol;
   this->saslMechanism    = _kafkaInfo.saslMechanism;
+  this->contextReferences = _kafkaInfo.contextReferences;
 
   this->json = _kafkaInfo.json == NULL ? NULL : _kafkaInfo.json->clone();
 

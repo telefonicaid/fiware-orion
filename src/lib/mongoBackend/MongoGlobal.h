@@ -241,6 +241,20 @@ extern void pruneContextElements
 
 /* ****************************************************************************
 *
+* contextReferencesQuery -
+*/
+extern bool contextReferencesQuery
+(
+  const std::vector<ngsiv2::ContextReference>&  crV,
+  const std::string&                            tenant,
+  const std::string&                            servicePath,
+  ContextElementResponseVector*                 cerV
+);
+
+
+
+/* ****************************************************************************
+*
 * registrationsQuery -
 */
 extern bool registrationsQuery

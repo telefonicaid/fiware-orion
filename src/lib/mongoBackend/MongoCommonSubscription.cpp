@@ -79,10 +79,33 @@ void setExpiration(const Subscription& sub, orion::BSONObjBuilder* b)
 
 /* ****************************************************************************
 *
+* setContextReferences -
+*/
+static void setContextReferences
+(
+  const std::vector<ngsiv2::ContextReference>&  contextReferences,
+  orion::BSONObjBuilder*                        b
+)
+{
+  if (contextReferences.size() > 0)
+  {
+    orion::BSONArray contextReferencesArr = ngsiv2::contextReferencesToBson(contextReferences);
+
+    b->append(CSUB_CONTEXT_REFERENCES, contextReferencesArr);
+    LM_T(LmtMongo, ("Subscription contextReferences: %s", contextReferencesArr.toString().c_str()));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * setCustomHttpInfo -
 */
 static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b)
 {
+  setContextReferences(httpInfo.contextReferences, b);
+
   if (httpInfo.verb != NOVERB)
   {
     std::string method = verbName(httpInfo.verb);
@@ -192,6 +215,8 @@ static void setCustomHttpInfo(const HttpInfo& httpInfo, orion::BSONObjBuilder* b
 */
 static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBuilder* b)
 {
+  setContextReferences(mqttInfo.contextReferences, b);
+
   if (mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
   {
     if (!mqttInfo.includePayload)
@@ -262,6 +287,8 @@ static void setCustomMqttInfo(const ngsiv2::MqttInfo& mqttInfo, orion::BSONObjBu
 */
 static void setCustomKafkaInfo(const ngsiv2::KafkaInfo& kafkaInfo, orion::BSONObjBuilder* b)
 {
+  setContextReferences(kafkaInfo.contextReferences, b);
+
   if (kafkaInfo.headers.size() > 0)
   {
     orion::BSONObjBuilder headersBuilder;

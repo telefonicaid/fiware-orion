@@ -34,6 +34,7 @@
 #include "parse/CompoundValueNode.h"
 #include "apiTypesV2/CustomPayloadType.h"
 #include "apiTypesV2/Entity.h"
+#include "apiTypesV2/ContextReference.h"
 
 
 
@@ -56,6 +57,7 @@ struct HttpInfo
   bool                                custom;
   bool                                includePayload;
   long long                           timeout;
+  std::vector<ContextReference>       contextReferences;
 
   HttpInfo();
 

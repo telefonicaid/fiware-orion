@@ -92,6 +92,11 @@ std::string MqttInfo::toJson()
       jh.addRaw("ngsi", this->ngsi.toJson(NGSI_V2_NORMALIZED, true));
       break;
     }
+
+    if (contextReferences.size() != 0)
+    {
+      jh.addRaw("contextReferences", vectorToJson(contextReferences));
+    }
   }
 
   return jh.str();
@@ -206,6 +211,8 @@ void MqttInfo::fill(const orion::BSONObj& bo)
         this->ngsi.attributeVector.fill(getObjectFieldF(ngsiObj, ENT_ATTRS));
       }
     }
+
+    contextReferencesFill(bo, &this->contextReferences);
   }
 }
 
@@ -228,6 +235,7 @@ void MqttInfo::fill(const MqttInfo& _mqttInfo)
   this->providedAuth   = _mqttInfo.providedAuth;
   this->user           = _mqttInfo.user;
   this->passwd         = _mqttInfo.passwd;
+  this->contextReferences = _mqttInfo.contextReferences;
 
   this->json = _mqttInfo.json == NULL ? NULL : _mqttInfo.json->clone();
 
