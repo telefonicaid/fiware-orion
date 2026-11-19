@@ -77,6 +77,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
     unsetB->append(CSUB_KAFKA_SASL_MECHANISM,    1);
     unsetB->append(CSUB_KAFKAKEY, 1);
 
+    if (sub.notification.httpInfo.contextReferences.empty())
+    {
+      unsetB->append(CSUB_CONTEXT_REFERENCES, 1);
+    }
+
     if  (sub.notification.httpInfo.payloadType == ngsiv2::CustomPayloadType::Text)
     {
       unsetB->append(CSUB_JSON, 1);
@@ -112,6 +117,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PASSWD, 1);
     }
 
+    if (sub.notification.mqttInfo.contextReferences.empty())
+    {
+      unsetB->append(CSUB_CONTEXT_REFERENCES, 1);
+    }
+
     if  (sub.notification.mqttInfo.payloadType == ngsiv2::CustomPayloadType::Text)
     {
       unsetB->append(CSUB_JSON, 1);
@@ -145,6 +155,11 @@ void setNotificationInfo(const Subscription& sub, orion::BSONObjBuilder* setB, o
       unsetB->append(CSUB_PASSWD, 1);
       unsetB->append(CSUB_KAFKA_SECURITY_PROTOCOL, 1);
       unsetB->append(CSUB_KAFKA_SASL_MECHANISM,    1);
+    }
+
+    if (sub.notification.kafkaInfo.contextReferences.empty())
+    {
+      unsetB->append(CSUB_CONTEXT_REFERENCES, 1);
     }
 
     if  (sub.notification.kafkaInfo.payloadType == ngsiv2::CustomPayloadType::Text)

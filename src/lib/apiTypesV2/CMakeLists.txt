@@ -32,6 +32,7 @@ SET (SOURCES
     GeoFilter.cpp
     Expression.cpp
     KafkaInfo.cpp
+    ContextReference.cpp
 )
 
 SET (HEADERS
@@ -47,6 +48,7 @@ SET (HEADERS
     GeoFilter.h
     Expression.h
     KafkaInfo.h
+    ContextReference.h
 )
 
 

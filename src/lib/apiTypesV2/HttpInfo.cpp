@@ -106,6 +106,11 @@ std::string HttpInfo::toJson()
     {
       jh.addRaw("headers", objectToJson(headers));
     }
+
+    if (contextReferences.size() != 0)
+    {
+      jh.addRaw("contextReferences", vectorToJson(contextReferences));
+    }
   }
 
   return jh.str();
@@ -232,6 +237,8 @@ void HttpInfo::fill(const orion::BSONObj& bo)
       orion::BSONObj headers = getObjectFieldF(bo, CSUB_HEADERS);
       headers.toStringMap(&this->headers);
     }
+
+    contextReferencesFill(bo, &this->contextReferences);
   }
 }
 
@@ -252,6 +259,7 @@ void HttpInfo::fill(const HttpInfo& _httpInfo)
   this->custom         = _httpInfo.custom;
   this->includePayload = _httpInfo.includePayload;
   this->timeout        = _httpInfo.timeout;
+  this->contextReferences = _httpInfo.contextReferences;
 
   this->json = _httpInfo.json == NULL? NULL : _httpInfo.json->clone();
 

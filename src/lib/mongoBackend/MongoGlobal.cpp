@@ -1605,6 +1605,92 @@ void pruneContextElements
 
 /* ****************************************************************************
 *
+* contextReferencesQuery -
+*
+* Retrieves from DB the entities referred by crV (id and type exact match) in the given
+* tenant and service path, using a single query. Entities not found are just not included
+* in the cerV output vector, so the caller has to match the results with the references.
+*
+* Memory for the ContextElementResponse objects pushed into cerV is allocated with new, so
+* the caller is responsible of releasing it (e.g. using cerV->release()).
+*/
+bool contextReferencesQuery
+(
+  const std::vector<ngsiv2::ContextReference>&  crV,
+  const std::string&                            tenant,
+  const std::string&                            servicePath,
+  ContextElementResponseVector*                 cerV
+)
+{
+  if (crV.empty())
+  {
+    return true;
+  }
+
+  std::string idString          = std::string("_id.") + ENT_ENTITY_ID;
+  std::string typeString        = std::string("_id.") + ENT_ENTITY_TYPE;
+  std::string servicePathString = std::string("_id.") + ENT_SERVICE_PATH;
+
+  orion::BSONObjBuilder queryBuilder;
+
+  if (crV.size() == 1)
+  {
+    queryBuilder.append(idString,   crV[0].id);
+    queryBuilder.append(typeString, crV[0].type);
+  }
+  else
+  {
+    orion::BSONArrayBuilder orArray;
+    for (unsigned int ix = 0; ix < crV.size(); ++ix)
+    {
+      orion::BSONObjBuilder bob;
+      bob.append(idString,   crV[ix].id);
+      bob.append(typeString, crV[ix].type);
+      orArray.append(bob.obj());
+    }
+    queryBuilder.append("$or", orArray.arr());
+  }
+
+  if (!servicePath.empty())
+  {
+    queryBuilder.append(servicePathString, servicePath);
+  }
+
+  orion::BSONObj   query = queryBuilder.obj();
+  orion::DBCursor  cursor;
+  std::string      err;
+
+  LM_T(LmtMongo, ("contextReferences query: %s", query.toString().c_str()));
+
+  TIME_STAT_MONGO_READ_WAIT_START();
+  orion::DBConnection connection = orion::getMongoConnection();
+
+  if (!orion::collectionQuery(connection, composeDatabaseName(tenant), COL_ENTITIES, query, &cursor, &err))
+  {
+    orion::releaseMongoConnection(connection);
+    TIME_STAT_MONGO_READ_WAIT_STOP();
+    LM_E(("Runtime Error (error querying contextReferences entities: %s)", err.c_str()));
+    return false;
+  }
+  TIME_STAT_MONGO_READ_WAIT_STOP();
+
+  orion::BSONObj  r;
+  StringList      emptyAttrL;  // empty list means all attributes
+  while (cursor.next(&r))
+  {
+    LM_T(LmtMongo, ("retrieved contextReferences document: '%s'", r.toString().c_str()));
+    cerV->push_back(new ContextElementResponse(r, emptyAttrL));
+  }
+
+  orion::releaseMongoConnection(connection);
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * registrationsQuery -
 */
 bool registrationsQuery
