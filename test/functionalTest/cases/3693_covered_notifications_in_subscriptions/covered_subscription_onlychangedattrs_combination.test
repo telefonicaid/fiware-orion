@@ -25,11 +25,14 @@ Covered subscription combined with onlyChangedAttrs
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -subCacheIval 1
 accumulatorStart --pretty-print
 
 --SHELL--
 
+#
+# NOTE: subscription updates takes its time to propagate into csubs cache. Thus, we have introduced
+# some sleep (=1.5*subCacheIval). These sleeps are not needed if this tests is run with --noCache flag
 #
 # 01. Create entity E-T with A, B
 # 02. Create subscription for A, B, C, D with covered:true and onlyChangedAttrs:false
@@ -139,6 +142,9 @@ echo
 echo
 
 
+sleep 1.5s
+
+
 echo "06. Update E-T with A=111"
 echo "========================"
 payload='{
@@ -182,6 +188,9 @@ echo
 echo
 
 
+sleep 1.5s
+
+
 echo "09. Update E-T with A=1111"
 echo "=========================="
 payload='{
@@ -223,6 +232,9 @@ payload='{
 orionCurl --url /v2/subscriptions/${subId} --payload "$payload" -X PATCH
 echo
 echo
+
+
+sleep 1.5s
 
 
 echo "12. Update E-T with A=11111"
