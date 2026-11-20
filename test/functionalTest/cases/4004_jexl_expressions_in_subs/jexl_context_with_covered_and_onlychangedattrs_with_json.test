@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Covered subscription combined with onlyChangedAttrs
+Covered subscription combined with onlyChangedAttrs (using json in custom notification)
 
 --SHELL-INIT--
 dbInit CB
