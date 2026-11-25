@@ -17,6 +17,7 @@
 	* [`mongoInit()`](#mongoinit)
 	* [`entitiesQuery()`](#entitiesquery)
 	* [`registrationsQuery()`](#registrationsquery) 
+	* [`contextReferencesQuery()`](#contextreferencesquery)
 
 ## Introduction
 
@@ -332,7 +333,7 @@ _MB-11: mongoCreateSubscription_
 
 * `mongoCreateSubscription()` is invoked from a service routine (step 1). This is `postSubscriptions()` (which resides in `lib/serviceRoutinesV2/postSubscriptions.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore).  
-* This function builds a BSON object that will be at the end the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setHttpInfo()`, etc.) (step 3).
+* This function builds a BSON object that will be at the end the one to be persisted in the database, using different `set*()` functions (`setExpiration()`, `setHttpInfo()`, etc.) (step 3). In the case of custom notifications, the `contextReferences` field is set as part of `setCustomHttpInfo()`, `setCustomMqttInfo()` and `setCustomKafkaInfo()`.
 * The BSON object corresponding to the new subscription is inserted in the database using `collectionInsert()` in the `connectionOperations` module (steps 4 and 5).
 * If the subscription cache is enabled  (i.e. `noCache` set to `false`), the new subscription is inserted in the subscription cache (step 6). `insertInCache()` uses the subscription cache semaphore internally (see [this document for details](semaphores.md#subscription-cache-semaphore)).
 * If the request semaphore was taken in step 2, then it is released before returning (step 7).
@@ -354,7 +355,7 @@ _MB-12: mongoUpdateSubscription_
 
 * `mongoUpdateSubscription()` is invoked from a service routine (step 1). This is from `patchSubscription()` (which resides in `lib/serviceRoutinesV2/patchSubscription.cpp`).
 * Depending on `-reqMutexPolicy`, the request semaphore may be taken (write mode) (step 2). See [this document for details](semaphores.md#mongo-request-semaphore). 
-* The subscription is updated in DB using MongoDB `$set`/`$unset` operators. This operation is done in the function `colletionFindAndModify()` in the `connectionOperations` module (steps 3 and 4).
+* The subscription is updated in DB using MongoDB `$set`/`$unset` operators (e.g. `contextReferences` is unset if the new `notification` doesn't include it). This operation is done in the function `colletionFindAndModify()` in the `connectionOperations` module (steps 3 and 4).
 * In case the subscription cache is enabled  (i.e. `noCache` set to `false`) the subscription is updated in the subscription cache based in the result from `collectionFindAndModify()` in the previous step (step 5). `updateInCache()` uses the subscription cache semaphore internally.
 * If the request semaphore was taken in step 2, then it is released before returning (step 6).
 
@@ -555,5 +556,15 @@ It is used by several functions:
 
 * `mongoQueryContext()` in the `mongoQueryContext` module, in order to locate Context Providers for forwarding of the query. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
 * `searchContextProviders()` in the `MongoCommonUpdate` module, in order to locate Context Providers for forwarding of the update. Note that the forwarding is not done within the **mongoBackend** library, but from the calling **serviceRoutine**.
+
+[Top](#top)
+
+#### `contextReferencesQuery()`
+
+This function searches the database (`entities` collection, [described as part of the database model in the administration documentation](../admin/database_model.md#entities-collection)) for the entities referred in the `contextReferences` field of a custom notification (see [Context references](../orion-api.md#context-references) in the Orion API documentation). It takes into account service (also named "tenant") and service path (the one of the entity triggering the notification).
+
+All the references are retrieved using a single query (an `$or` of `_id.id`/`_id.type` conditions, or a simple condition in the case of one single reference) done with `collectionQuery()` in the `connectionOperations` module. The result is saved in a `ContextElementResponseVector` object, as output parameter. Matching the result with the corresponding references (and setting `null` for the ones not found) is a responsibility of the caller.
+
+It is used by `addContextReferences()` in the `Notifier` module of the [ngsiNotify](sourceCode.md#srclibngsinotify) library, as part of the building of custom notifications. Note that in this case **mongoBackend** is invoked from **ngsiNotify**, not from a service routine.
 
 [Top](#top)

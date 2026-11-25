@@ -414,6 +414,8 @@ Using the [CLI parameter](../admin/cli.md) `-notificationMode`, Orion can be sta
 
 This module is always invoked from `processNotification()` due to attribute update/creation (see the diagram [MD-01](mongoBackend.md#flow-md-01)).
 
+In the case of custom notifications (`httpCustom`, `mqttCustom` or `kafkaCustom`), the `SenderThreadParams` object is built by `buildSenderParamsCustom()` in the `Notifier` module. This function creates the expression context (`buildExprContext()`) and, if the subscription uses [`contextReferences`](../orion-api.md#context-references) (and JEXL is available), it calls `addContextReferences()`, which resolves the `id`/`type` macros of each reference, retrieves the referred entities from the database (using `contextReferencesQuery()` in the [**mongoBackend**](#srclibmongobackend) library, see [this section](mongoBackend.md#contextreferencesquery)) and adds them to the expression context in the `contextReferences` key. Note that this database query is done as part of building the `SenderThreadParams` object (i.e. step 1 in the diagrams below), so it takes place in the thread processing the update request and not in the notification sending threads.
+
 The following four images demonstrate the program flow for context entity notifications without and with thread pool, both in the case
 of HTTP and MQTT/KAFKA notifications.
 
@@ -422,7 +424,7 @@ of HTTP and MQTT/KAFKA notifications.
 
 _NF-01: HTTP Notification on entity-attribute Update/Creation without thread pool_
 
-* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1). In the case of custom notifications using `contextReferences`, the database is queried during this step to retrieve the referred entities (see above).
 * `pthread_create()` is called to create a new thread for sending of the notifications and without awaiting any result, the control is returned to mongoBackend (step 2).
 * `pthread_create()` spawns the new thread which has `startSenderThread()` as starting point (step 3).
 * `startSenderThread()` calls to `doNotify()` function, which sends the notification corresponding to the `SenderThreadParams` object (steps 4, 5 and 6). The response from the receiver of the notification is waited on (with a timeout).
@@ -441,7 +443,7 @@ _NF-01b: MQTT/KAFKA Notification on entity-attribute Update/Creation without thr
 
 _NF-03: HTTP Notification on entity-attribute Update/Creation with thread pool_
 
-* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1).
+* A `SenderThreadParams` object is built with the parameters corresponding to the notification (step 1). In the case of custom notifications using `contextReferences`, the database is queried during this step to retrieve the referred entities (see above).
 * A `ServiceQueue` is selected depending the service associated to the notification. If no queue exists for the service
   associated to the notification, then the default `ServiceQueue` is used. The `try_push()` method in the selected
   `ServiceQueue` is used to put the notification in the right queue (step 2).
