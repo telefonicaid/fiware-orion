@@ -2621,7 +2621,7 @@ of the subscription:
 
 * If the entity is found, its [simplified entity representation](#simplified-entity-representation) in
   `keyValues` mode (i.e. `id`, `type` and the attribute values) is used
-* If the entity is not found (or the evaluation of the `id` or `type` macro results in null or empty string), `null` is used
+* If the entity is not found (or the evaluation of the `id` or `type` macro results in an error, null or empty string), `null` is used
 
 Referred entities are searched in the same service (i.e. `fiware-service`) and service path (i.e. the one
 of the entity triggering the notification).
@@ -2685,7 +2685,9 @@ Some additional considerations:
 
 * `contextReferences` only has effect when Orion is built using cjexl. Otherwise (i.e. when only basic
   replacement is available), it is stored in the subscription but ignored at notification time.
-* In the case the evaluation of an `id` or `type` macro results in an error, the notification is not sent.
+* In the case the evaluation of an `id` or `type` macro results in an error, the corresponding element in the
+  `contextReferences` JEXL context element is `null` (the same as if the macro were ok but the referred entity
+  is not found in the database).
 * Referred entities are retrieved from the database each time a notification is processed, so
   using `contextReferences` may have a performance impact (specially in notification intensive scenarios).
 * In the rare case an attribute named `contextReferences` is used (which is an anti-pattern strongly

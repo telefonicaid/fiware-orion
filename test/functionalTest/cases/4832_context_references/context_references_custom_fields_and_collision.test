@@ -35,12 +35,13 @@ accumulatorStart --pretty-print
 # 01. Create entity E2/T2 with A=1 and B=foo
 # 02. Create custom sub (for E/T) with contextReferences E2/T2 using ngsi payload, headers and qs
 # 03. Create custom sub (for F/T) with contextReferences E2/T2 using text payload
-# 04. Create entity E/T with attribute named contextReferences
-# 05. Create entity F/T with A=0
-# 06. Dump accumulator and see two notifications
-#     first with refA=1, refB=foo, x-ref-b: foo header and refA=1 query param
-#     (attribute named contextReferences in E/T doesn't take precedence in JEXL context)
-#     second with 11 text payload
+# 04. Create entity E/T with attribute named contextReferences (triggers sub of step 02)
+# 05. Dump accumulator and see one notification (for E) with refA=1, refB=foo, x-ref-b: foo header and refA=1 query param
+#     (attribute named contextReferences in E/T doesn't take precedence in JEXL context and it is not
+#     included in the notification, as notification attrs is [refA, refB])
+# 06. Reset accumulator
+# 07. Create entity F/T with A=0 (triggers sub of step 03)
+# 08. Dump accumulator and see one notification with 11 text payload
 #
 
 
@@ -134,8 +135,8 @@ echo
 echo
 
 
-echo "04. Create entity E/T with attribute named contextReferences"
-echo "============================================================"
+echo "04. Create entity E/T with attribute named contextReferences (triggers sub of step 02)"
+echo "======================================================================================"
 payload='{
   "id": "E",
   "type": "T",
@@ -149,8 +150,22 @@ echo
 echo
 
 
-echo "05. Create entity F/T with A=0"
-echo "=============================="
+echo "05. Dump accumulator and see one notification (for E) with refA=1, refB=foo, x-ref-b: foo header and refA=1 query param"
+echo "======================================================================================================================="
+accumulatorDump
+echo
+echo
+
+
+echo "06. Reset accumulator"
+echo "====================="
+accumulatorReset
+echo
+echo
+
+
+echo "07. Create entity F/T with A=0 (triggers sub of step 03)"
+echo "========================================================"
 payload='{
   "id": "F",
   "type": "T",
@@ -164,8 +179,8 @@ echo
 echo
 
 
-echo "06. Dump accumulator and see two notifications"
-echo "=============================================="
+echo "08. Dump accumulator and see one notification with 11 text payload"
+echo "=================================================================="
 accumulatorDump
 echo
 echo
@@ -202,8 +217,8 @@ Content-Length: 0
 
 
 
-04. Create entity E/T with attribute named contextReferences
-============================================================
+04. Create entity E/T with attribute named contextReferences (triggers sub of step 02)
+======================================================================================
 HTTP/1.1 201 Created
 Date: REGEX(.*)
 Fiware-Correlator: REGEX([0-9a-f\-]{36})
@@ -212,18 +227,8 @@ Content-Length: 0
 
 
 
-05. Create entity F/T with A=0
-==============================
-HTTP/1.1 201 Created
-Date: REGEX(.*)
-Fiware-Correlator: REGEX([0-9a-f\-]{36})
-Location: /v2/entities/F?type=T
-Content-Length: 0
-
-
-
-06. Dump accumulator and see two notifications
-==============================================
+05. Dump accumulator and see one notification (for E) with refA=1, refB=foo, x-ref-b: foo header and refA=1 query param
+=======================================================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify?refA=1
 Fiware-Servicepath: /
 Content-Length: 176
@@ -255,6 +260,24 @@ X-Ref-B: foo
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 =======================================
+
+
+06. Reset accumulator
+=====================
+
+
+07. Create entity F/T with A=0 (triggers sub of step 03)
+========================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/F?type=T
+Content-Length: 0
+
+
+
+08. Dump accumulator and see one notification with 11 text payload
+==================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /
 Content-Length: 2

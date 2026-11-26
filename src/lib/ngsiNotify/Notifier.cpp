@@ -488,11 +488,10 @@ static bool resolveKafkaKey(const ngsiv2::Notification& notification,
 * context built so far), retrieves the referred entities from DB (using a single query,
 * in the same service and service path of the notified entity) and adds them to the
 * expression context as a list under the "contextReferences" key. Each item in that list
-* is the keyValues representation of the referred entity or null if the entity is not found.
-*
-* Return false if some problem occur
+* is the keyValues representation of the referred entity or null if the entity is not found
+* (or if the resolution of id or type macros fails).
 */
-static bool addContextReferences
+static void addContextReferences
 (
   ExprContextObject*                            exprContextP,
   const std::vector<ngsiv2::ContextReference>&  contextReferences,
@@ -503,7 +502,7 @@ static bool addContextReferences
   // Note that lists are not supported in basic mode expression context
   if ((contextReferences.empty()) || (exprContextP->isBasic()))
   {
-    return true;
+    return;
   }
 
   std::vector<ngsiv2::ContextReference>  resolvedV;  // same size than contextReferences
@@ -512,24 +511,16 @@ static bool addContextReferences
 
   for (unsigned int ix = 0; ix < contextReferences.size(); ix++)
   {
-    ResolveResult idSub = macroSubstitute(contextReferences[ix].id, exprContextP, "", true);
-    if (idSub.status == ResolveError)
-    {
-      return false;
-    }
-
+    ResolveResult idSub   = macroSubstitute(contextReferences[ix].id, exprContextP, "", true);
     ResolveResult typeSub = macroSubstitute(contextReferences[ix].type, exprContextP, "", true);
-    if (typeSub.status == ResolveError)
-    {
-      return false;
-    }
 
     ngsiv2::ContextReference resolved;
     resolved.id   = idSub.value;
     resolved.type = typeSub.value;
 
-    // If id or type resolve to null or empty string, the reference is not queried (it will be null in context)
-    bool valid = (idSub.status != ResolveNull) && (typeSub.status != ResolveNull) &&
+    // If id or type resolution fails or resolves to null or empty string, the reference is not
+    // queried (it will be null in context)
+    bool valid = (idSub.status == ResolveOk) && (typeSub.status == ResolveOk) &&
                  (!resolved.id.empty()) && (!resolved.type.empty());
 
     resolvedV.push_back(resolved);
@@ -588,8 +579,6 @@ static bool addContextReferences
   exprContextP->add("contextReferences", contextReferencesList);
 
   cerV.release();
-
-  return true;
 }
 
 
@@ -651,10 +640,7 @@ static SenderThreadParams* buildSenderParamsCustom
     break;
   }
 
-  if (!addContextReferences(&exprContext, *contextReferencesP, tenant, en.servicePath))
-  {
-    return NULL;
-  }
+  addContextReferences(&exprContext, *contextReferencesP, tenant, en.servicePath);
 
   //
   // 1. Verb/Method
