@@ -1,0 +1,683 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Context references in subscriptions CRUD (httpCustom, mqttCustom and kafkaCustom)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create httpCustom sub with contextReferences E2/T2 and ${refId}/${refType}
+# 02. GET sub and see contextReferences E2/T2 and ${refId}/${refType}
+# 03. Update sub with httpCustom without contextReferences
+# 04. GET sub and see no contextReferences
+# 05. Update sub with httpCustom with contextReferences E3/T3
+# 06. GET sub and see contextReferences E3/T3
+# 07. Update sub with http (no custom)
+# 08. GET sub and see no contextReferences
+# 09. Create mqttCustom sub with contextReferences E4/T4
+# 10. GET sub and see contextReferences E4/T4
+# 11. Update sub with mqttCustom without contextReferences
+# 12. GET sub and see no contextReferences
+# 13. Create kafkaCustom sub with contextReferences E5/T5 and ${id}X/${type}X
+# 14. GET sub and see contextReferences E5/T5 and ${id}X/${type}X
+# 15. Update sub with httpCustom with contextReferences E6/T6
+# 16. GET sub and see httpCustom with contextReferences E6/T6
+#
+
+
+echo "01. Create httpCustom sub with contextReferences E2/T2 and \${refId}/\${refType}"
+echo "==============================================================================="
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "payload": "${contextReferences[0].A}",
+      "contextReferences": [
+        { "id": "E2", "type": "T2" },
+        { "id": "${refId}", "type": "${refType}" }
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "02. GET sub and see contextReferences E2/T2 and \${refId}/\${refType}"
+echo "===================================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "03. Update sub with httpCustom without contextReferences"
+echo "========================================================"
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "payload": "${A}"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "04. GET sub and see no contextReferences"
+echo "========================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "05. Update sub with httpCustom with contextReferences E3/T3"
+echo "==========================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "payload": "${contextReferences[0].A}",
+      "contextReferences": [
+        { "id": "E3", "type": "T3" }
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "06. GET sub and see contextReferences E3/T3"
+echo "==========================================="
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "07. Update sub with http (no custom)"
+echo "===================================="
+payload='{
+  "notification": {
+    "http": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. GET sub and see no contextReferences"
+echo "========================================"
+orionCurl --url /v2/subscriptions/$SUB_ID
+echo
+echo
+
+
+echo "09. Create mqttCustom sub with contextReferences E4/T4"
+echo "======================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "sub2",
+      "payload": "${contextReferences[0].A}",
+      "contextReferences": [
+        { "id": "E4", "type": "T4" }
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID2=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "10. GET sub and see contextReferences E4/T4"
+echo "==========================================="
+orionCurl --url /v2/subscriptions/$SUB_ID2
+echo
+echo
+
+
+echo "11. Update sub with mqttCustom without contextReferences"
+echo "========================================================"
+payload='{
+  "notification": {
+    "mqttCustom": {
+      "url": "mqtt://localhost:1883",
+      "topic": "sub2",
+      "payload": "${A}"
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID2 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "12. GET sub and see no contextReferences"
+echo "========================================"
+orionCurl --url /v2/subscriptions/$SUB_ID2
+echo
+echo
+
+
+echo "13. Create kafkaCustom sub with contextReferences E5/T5 and \${id}X/\${type}X"
+echo "============================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "kafkaCustom": {
+      "url": "kafka://localhost:9092",
+      "topic": "sub3",
+      "payload": "${contextReferences[0].A}",
+      "contextReferences": [
+        { "id": "E5", "type": "T5" },
+        { "id": "${id}X", "type": "${type}X" }
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+SUB_ID3=$(echo "$_responseHeaders" | grep Location | awk -F/ '{ print $4 }' | tr -d "\r\n")
+
+
+echo "14. GET sub and see contextReferences E5/T5 and \${id}X/\${type}X"
+echo "================================================================"
+orionCurl --url /v2/subscriptions/$SUB_ID3
+echo
+echo
+
+
+echo "15. Update sub with httpCustom with contextReferences E6/T6"
+echo "==========================================================="
+payload='{
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "contextReferences": [
+        { "id": "E6", "type": "T6" }
+      ]
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions/$SUB_ID3 -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "16. GET sub and see httpCustom with contextReferences E6/T6"
+echo "==========================================================="
+orionCurl --url /v2/subscriptions/$SUB_ID3
+echo
+echo
+
+
+--REGEXPECT--
+01. Create httpCustom sub with contextReferences E2/T2 and ${refId}/${refType}
+===============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+02. GET sub and see contextReferences E2/T2 and ${refId}/${refType}
+====================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 423
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "contextReferences": [
+                {
+                    "id": "E2",
+                    "type": "T2"
+                },
+                {
+                    "id": "${refId}",
+                    "type": "${refType}"
+                }
+            ],
+            "payload": "${contextReferences[0].A}",
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+03. Update sub with httpCustom without contextReferences
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+04. GET sub and see no contextReferences
+========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 318
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "payload": "${A}",
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+05. Update sub with httpCustom with contextReferences E3/T3
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+06. GET sub and see contextReferences E3/T3
+===========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 385
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "contextReferences": [
+                {
+                    "id": "E3",
+                    "type": "T3"
+                }
+            ],
+            "payload": "${contextReferences[0].A}",
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+07. Update sub with http (no custom)
+====================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. GET sub and see no contextReferences
+========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 295
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "http": {
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+09. Create mqttCustom sub with contextReferences E4/T4
+======================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+10. GET sub and see contextReferences E4/T4
+===========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 416
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "contextReferences": [
+                {
+                    "id": "E4",
+                    "type": "T4"
+                }
+            ],
+            "payload": "${contextReferences[0].A}",
+            "qos": 0,
+            "retain": false,
+            "topic": "sub2",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+11. Update sub with mqttCustom without contextReferences
+========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+12. GET sub and see no contextReferences
+========================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 349
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "mqttCustom": {
+            "payload": "${A}",
+            "qos": 0,
+            "retain": false,
+            "topic": "sub2",
+            "url": "mqtt://localhost:1883"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+13. Create kafkaCustom sub with contextReferences E5/T5 and ${id}X/${type}X
+============================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+14. GET sub and see contextReferences E5/T5 and ${id}X/${type}X
+================================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 429
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "kafkaCustom": {
+            "contextReferences": [
+                {
+                    "id": "E5",
+                    "type": "T5"
+                },
+                {
+                    "id": "${id}X",
+                    "type": "${type}X"
+                }
+            ],
+            "payload": "${contextReferences[0].A}",
+            "topic": "sub3",
+            "url": "kafka://localhost:9092"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+15. Update sub with httpCustom with contextReferences E6/T6
+===========================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+16. GET sub and see httpCustom with contextReferences E6/T6
+===========================================================
+HTTP/1.1 200 OK
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Content-Type: application/json
+Content-Length: 347
+
+{
+    "id": "REGEX([0-9a-f]{24})",
+    "notification": {
+        "attrs": [],
+        "attrsFormat": "normalized",
+        "covered": false,
+        "httpCustom": {
+            "contextReferences": [
+                {
+                    "id": "E6",
+                    "type": "T6"
+                }
+            ],
+            "url": "http://127.0.0.1:9997/notify"
+        },
+        "onlyChangedAttrs": false
+    },
+    "status": "active",
+    "subject": {
+        "condition": {
+            "attrs": [],
+            "notifyOnMetadataChange": true
+        },
+        "entities": [
+            {
+                "id": "E",
+                "type": "T"
+            }
+        ]
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

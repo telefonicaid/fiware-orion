@@ -1,0 +1,345 @@
+# Copyright 2026 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
+
+--NAME--
+Context references in JEXL context (basic case)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+accumulatorStart --pretty-print
+
+--SHELL--
+
+#
+# 01. Create entity E2/T2 with A=1 and B=foo
+# 02. Create entity E3/T with A=2
+# 03. Create entity E3/TX with A=3 and C={x:1,y:[1,2]}
+# 04. Create entity E5/TX with A=5
+# 05. Create custom sub with contextReferences E2/T2, ${refId}/T, ${refId}/${refType} and ${(refList|split(','))[1]}/${refType}
+# 06. Create entity E with refId=E3, refType=TX and refList=E4,E5,E6
+# 07. Update entity E with refId=E9 and refList=E4,E6
+# 08. Dump accumulator and see two notifications
+#     first:  r0={E2/T2}, r0A=1, r0B=foo, r1={E3/T}, r2={E3/TX}, r3={E5/TX}
+#     second: r0={E2/T2}, r0A=1, r0B=foo, r1=null, r2=null, r3=null
+#
+
+
+echo "01. Create entity E2/T2 with A=1 and B=foo"
+echo "=========================================="
+payload='{
+  "id": "E2",
+  "type": "T2",
+  "A": {
+    "value": 1,
+    "type": "Number"
+  },
+  "B": {
+    "value": "foo",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "02. Create entity E3/T with A=2"
+echo "==============================="
+payload='{
+  "id": "E3",
+  "type": "T",
+  "A": {
+    "value": 2,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "03. Create entity E3/TX with A=3 and C={x:1,y:[1,2]}"
+echo "===================================================="
+payload='{
+  "id": "E3",
+  "type": "TX",
+  "A": {
+    "value": 3,
+    "type": "Number"
+  },
+  "C": {
+    "value": {
+      "x": 1,
+      "y": [ 1, 2 ]
+    },
+    "type": "StructuredValue"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "04. Create entity E5/TX with A=5"
+echo "================================"
+payload='{
+  "id": "E5",
+  "type": "TX",
+  "A": {
+    "value": 5,
+    "type": "Number"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "05. Create custom sub with contextReferences E2/T2, \${refId}/T, \${refId}/\${refType} and \${(refList|split(','))[1]}/\${refType}"
+echo "============================================================================================================================"
+payload='{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+      "contextReferences": [
+        { "id": "E2", "type": "T2" },
+        { "id": "${refId}", "type": "T" },
+        { "id": "${refId}", "type": "${refType}" },
+        { "id": "${(refList|split('"','"'))[1]}", "type": "${refType}" }
+      ],
+      "json": {
+        "r0": "${contextReferences[0]}",
+        "r0A": "${contextReferences[0].A}",
+        "r0B": "${contextReferences[0].B}",
+        "r1": "${contextReferences[1]}",
+        "r2": "${contextReferences[2]}",
+        "r3": "${contextReferences[3]}"
+      }
+    }
+  }
+}'
+orionCurl --url /v2/subscriptions --payload "$payload"
+echo
+echo
+
+
+echo "06. Create entity E with refId=E3, refType=TX and refList=E4,E5,E6"
+echo "=================================================================="
+payload='{
+  "id": "E",
+  "type": "T",
+  "refId": {
+    "value": "E3",
+    "type": "Text"
+  },
+  "refType": {
+    "value": "TX",
+    "type": "Text"
+  },
+  "refList": {
+    "value": "E4,E5,E6",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload"
+echo
+echo
+
+
+echo "07. Update entity E with refId=E9 and refList=E4,E6"
+echo "==================================================="
+payload='{
+  "refId": {
+    "value": "E9",
+    "type": "Text"
+  },
+  "refList": {
+    "value": "E4,E6",
+    "type": "Text"
+  }
+}'
+orionCurl --url /v2/entities/E/attrs -X PATCH --payload "$payload"
+echo
+echo
+
+
+echo "08. Dump accumulator and see two notifications"
+echo "=============================================="
+accumulatorDump
+echo
+echo
+
+
+--REGEXPECT--
+01. Create entity E2/T2 with A=1 and B=foo
+==========================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E2?type=T2
+Content-Length: 0
+
+
+
+02. Create entity E3/T with A=2
+===============================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=T
+Content-Length: 0
+
+
+
+03. Create entity E3/TX with A=3 and C={x:1,y:[1,2]}
+====================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E3?type=TX
+Content-Length: 0
+
+
+
+04. Create entity E5/TX with A=5
+================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E5?type=TX
+Content-Length: 0
+
+
+
+05. Create custom sub with contextReferences E2/T2, ${refId}/T, ${refId}/${refType} and ${(refList|split(','))[1]}/${refType}
+============================================================================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/subscriptions/REGEX([0-9a-f]{24})
+Content-Length: 0
+
+
+
+06. Create entity E with refId=E3, refType=TX and refList=E4,E5,E6
+==================================================================
+HTTP/1.1 201 Created
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+Location: /v2/entities/E?type=T
+Content-Length: 0
+
+
+
+07. Update entity E with refId=E9 and refList=E4,E6
+===================================================
+HTTP/1.1 204 No Content
+Date: REGEX(.*)
+Fiware-Correlator: REGEX([0-9a-f\-]{36})
+
+
+
+08. Dump accumulator and see two notifications
+==============================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 192
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "r0": {
+        "A": 1,
+        "B": "foo",
+        "id": "E2",
+        "type": "T2"
+    },
+    "r0A": 1,
+    "r0B": "foo",
+    "r1": {
+        "A": 2,
+        "id": "E3",
+        "type": "T"
+    },
+    "r2": {
+        "A": 3,
+        "C": {
+            "x": 1,
+            "y": [
+                1,
+                2
+            ]
+        },
+        "id": "E3",
+        "type": "TX"
+    },
+    "r3": {
+        "A": 5,
+        "id": "E5",
+        "type": "TX"
+    }
+}
+=======================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Fiware-Servicepath: /
+Content-Length: 96
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Ngsiv2-Attrsformat: custom
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+Fiware-Correlator: REGEX([0-9a-f\-]{36}); cbnotif=1
+
+{
+    "r0": {
+        "A": 1,
+        "B": "foo",
+        "id": "E2",
+        "type": "T2"
+    },
+    "r0A": 1,
+    "r0B": "foo",
+    "r1": null,
+    "r2": null,
+    "r3": null
+}
+=======================================
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+accumulatorStop

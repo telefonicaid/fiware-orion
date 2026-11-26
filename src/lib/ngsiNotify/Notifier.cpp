@@ -44,6 +44,7 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsiNotify/Notifier.h"
 #include "expressions/exprMgr.h"
+#include "mongoBackend/MongoGlobal.h"
 
 
 
@@ -481,6 +482,109 @@ static bool resolveKafkaKey(const ngsiv2::Notification& notification,
 
 /* ****************************************************************************
 *
+* addContextReferences -
+*
+* Resolves the macros in id and type of each context reference (using the expression
+* context built so far), retrieves the referred entities from DB (using a single query,
+* in the same service and service path of the notified entity) and adds them to the
+* expression context as a list under the "contextReferences" key. Each item in that list
+* is the keyValues representation of the referred entity or null if the entity is not found
+* (or if the resolution of id or type macros fails).
+*/
+static void addContextReferences
+(
+  ExprContextObject*                            exprContextP,
+  const std::vector<ngsiv2::ContextReference>&  contextReferences,
+  const std::string&                            tenant,
+  const std::string&                            servicePath
+)
+{
+  // Note that lists are not supported in basic mode expression context
+  if ((contextReferences.empty()) || (exprContextP->isBasic()))
+  {
+    return;
+  }
+
+  std::vector<ngsiv2::ContextReference>  resolvedV;  // same size than contextReferences
+  std::vector<bool>                      validV;     // same size than contextReferences
+  std::vector<ngsiv2::ContextReference>  queryV;     // only valid references
+
+  for (unsigned int ix = 0; ix < contextReferences.size(); ix++)
+  {
+    ResolveResult idSub   = macroSubstitute(contextReferences[ix].id, exprContextP, "", true);
+    ResolveResult typeSub = macroSubstitute(contextReferences[ix].type, exprContextP, "", true);
+
+    ngsiv2::ContextReference resolved;
+    resolved.id   = idSub.value;
+    resolved.type = typeSub.value;
+
+    // If id or type resolution fails or resolves to null or empty string, the reference is not
+    // queried (it will be null in context)
+    bool valid = (idSub.status == ResolveOk) && (typeSub.status == ResolveOk) &&
+                 (!resolved.id.empty()) && (!resolved.type.empty());
+
+    resolvedV.push_back(resolved);
+    validV.push_back(valid);
+
+    if (valid)
+    {
+      queryV.push_back(resolved);
+    }
+  }
+
+  ContextElementResponseVector cerV;
+  if (!queryV.empty())
+  {
+    // In the case of DB error (already logged), all the references will be null in context
+    contextReferencesQuery(queryV, tenant, servicePath, &cerV);
+  }
+
+  ExprContextList contextReferencesList;
+  for (unsigned int ix = 0; ix < resolvedV.size(); ix++)
+  {
+    Entity* enP = NULL;
+
+    if (validV[ix])
+    {
+      for (unsigned int jx = 0; jx < cerV.size(); jx++)
+      {
+        if ((cerV[jx]->entity.entityId.id == resolvedV[ix].id) &&
+            (cerV[jx]->entity.entityId.type == resolvedV[ix].type))
+        {
+          enP = &cerV[jx]->entity;
+          break;
+        }
+      }
+    }
+
+    if (enP == NULL)
+    {
+      contextReferencesList.add();
+    }
+    else
+    {
+      ExprContextObject entityContext(false);
+      entityContext.add("id",   enP->entityId.id);
+      entityContext.add("type", enP->entityId.type);
+      for (unsigned int jx = 0; jx < enP->attributeVector.size(); jx++)
+      {
+        enP->attributeVector[jx]->addToContext(&entityContext, false);
+      }
+      contextReferencesList.add(entityContext);
+    }
+  }
+
+  // Note that in JEXL if the key already exists, it is updated, so attribute with name "contextReferences"
+  // will never be appear in context
+  exprContextP->add("contextReferences", contextReferencesList);
+
+  cerV.release();
+}
+
+
+
+/* ****************************************************************************
+*
 * buildSenderParamsCustom -
 */
 static SenderThreadParams* buildSenderParamsCustom
@@ -518,6 +622,25 @@ static SenderThreadParams* buildSenderParamsCustom
   // Used by several macroSubstitute() calls along this function
   ExprContextObject exprContext(basic);
   buildExprContext(&exprContext, notifyCerP, tenant, xauthToken);
+
+  //
+  // 0. Context references (added to expression context)
+  //
+  const std::vector<ngsiv2::ContextReference>* contextReferencesP;
+  switch (notification.type)
+  {
+  case ngsiv2::HttpNotification:
+    contextReferencesP = &notification.httpInfo.contextReferences;
+    break;
+  case ngsiv2::MqttNotification:
+    contextReferencesP = &notification.mqttInfo.contextReferences;
+    break;
+  default:
+    contextReferencesP = &notification.kafkaInfo.contextReferences;
+    break;
+  }
+
+  addContextReferences(&exprContext, *contextReferencesP, tenant, en.servicePath);
 
   //
   // 1. Verb/Method

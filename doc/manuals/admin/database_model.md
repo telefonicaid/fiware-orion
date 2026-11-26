@@ -331,6 +331,9 @@ notifications. It is a number between 0 and 1800000. If defined to 0 or omitted,
     in the Orion API. More detail of this functionality [here](../orion-api.md#ngsi-payload-patching).
     The value of this field is an object with a `attrs` key which value is a simplified version of
     `attrs` in [the entities collection](#entities-collection).
+-   **contextReferences**: optional field to store the array of entity references (each item is an object with
+    `id` and `type` fields) for notification customization functionality in the Orion API. More detail of this
+    functionality [here](../orion-api.md#context-references).
 -   **lastFailure**: the time (as integer number, meaning seconds) when last notification failure occurred.
     Not present if the subscription has never failed.
 -   **lastFailureReason**: text describing the cause of the last failure.

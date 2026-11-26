@@ -1038,6 +1038,88 @@ static std::string parseKafkaKey(ConnectionInfo* ciP, SubscriptionUpdate* subsP,
 
 /* ****************************************************************************
 *
+* parseContextReferences -
+*
+* Parse the (optional) contextReferences field in httpCustom, mqttCustom or kafkaCustom.
+* Note that id and type are not checked for forbidden chars, as they may include
+* macros (e.g. JEXL expressions)
+*/
+static std::string parseContextReferences
+(
+  ConnectionInfo*                         ciP,
+  std::vector<ngsiv2::ContextReference>*  crV,
+  const Value&                            custom,
+  const std::string&                      fieldDesc
+)
+{
+  if (!custom.HasMember("contextReferences"))
+  {
+    return "";
+  }
+
+  const Value& contextReferences = custom["contextReferences"];
+
+  if (!contextReferences.IsArray())
+  {
+    return badInput(ciP, fieldDesc + " is not an array");
+  }
+
+  if (contextReferences.Empty())
+  {
+    return badInput(ciP, fieldDesc + " is empty");
+  }
+
+  for (Value::ConstValueIterator iter = contextReferences.Begin(); iter != contextReferences.End(); ++iter)
+  {
+    if (!iter->IsObject())
+    {
+      return badInput(ciP, fieldDesc + " item is not an object");
+    }
+
+    for (Value::ConstMemberIterator mIter = iter->MemberBegin(); mIter != iter->MemberEnd(); ++mIter)
+    {
+      std::string name = mIter->name.GetString();
+      if ((name != "id") && (name != "type"))
+      {
+        return badInput(ciP, "unrecognized field in " + fieldDesc + " item: /" + name + "/");
+      }
+    }
+
+    ngsiv2::ContextReference cr;
+
+    Opt<std::string> idOpt = getStringMust(*iter, "id", "id in " + fieldDesc + " item");
+    if (!idOpt.ok())
+    {
+      return badInput(ciP, idOpt.error);
+    }
+    if (idOpt.value.empty())
+    {
+      return badInput(ciP, "id in " + fieldDesc + " item is empty");
+    }
+
+    Opt<std::string> typeOpt = getStringMust(*iter, "type", "type in " + fieldDesc + " item");
+    if (!typeOpt.ok())
+    {
+      return badInput(ciP, typeOpt.error);
+    }
+    if (typeOpt.value.empty())
+    {
+      return badInput(ciP, "type in " + fieldDesc + " item is empty");
+    }
+
+    cr.id   = idOpt.value;
+    cr.type = typeOpt.value;
+
+    crV->push_back(cr);
+  }
+
+  return "";
+}
+
+
+
+/* ****************************************************************************
+*
 * parseNotification -
 */
 static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* subsP, const Value& notification)
@@ -1273,6 +1355,16 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       return r;
     }
 
+    // contextReferences
+    r = parseContextReferences(ciP,
+                               &subsP->notification.httpInfo.contextReferences,
+                               httpCustom,
+                               "notification httpCustom contextReferences");
+    if (!r.empty())
+    {
+      return r;
+    }
+
     subsP->notification.httpInfo.custom = true;
   }
   else if (notification.HasMember("mqtt"))
@@ -1378,6 +1470,16 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
                            &subsP->notification.mqttInfo.ngsi,
                            mqttCustom);
 
+    if (!r.empty())
+    {
+      return r;
+    }
+
+    // contextReferences
+    r = parseContextReferences(ciP,
+                               &subsP->notification.mqttInfo.contextReferences,
+                               mqttCustom,
+                               "notification mqttCustom contextReferences");
     if (!r.empty())
     {
       return r;
@@ -1504,6 +1606,16 @@ static std::string parseNotification(ConnectionInfo* ciP, SubscriptionUpdate* su
       {
         return r;
       }
+    }
+
+    // contextReferences
+    r = parseContextReferences(ciP,
+                               &subsP->notification.kafkaInfo.contextReferences,
+                               kafkaCustom,
+                               "notification kafkaCustom contextReferences");
+    if (!r.empty())
+    {
+      return r;
     }
 
     subsP->notification.kafkaInfo.custom = true;

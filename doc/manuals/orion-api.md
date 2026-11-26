@@ -76,6 +76,7 @@
     - [JEXL support in custom notifications](#jexl-support-in-custom-notifications)
       - [JEXL usage example](#jexl-usage-example)
       - [Metadata support](#metadata-support)
+      - [Context references](#context-references)
       - [Evaluation priority](#evaluation-priority)
       - [Available Transformations](#available-transformations)
         - [`uppercase`](#uppercase)
@@ -2091,11 +2092,13 @@ In case of `httpCustom`:
 * `method`, lets the clients select the HTTP method to be used for delivering
 the notification, but note that only valid HTTP verbs can be used: GET, PUT, POST, DELETE, PATCH,
 HEAD, OPTIONS, TRACE, and CONNECT.
+* `id` and `type` in `contextReferences` items (see [Context references](#context-references) section)
 
 In case of `mqttCustom`:
 
 * `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
+* `id` and `type` in `contextReferences` items (see [Context references](#context-references) section)
 
 In case of `kafkaCustom`:
 
@@ -2105,6 +2108,7 @@ In case of `kafkaCustom`:
 * `payload`, `json` and `ngsi` (all them payload related fields)
 * `topic`
 * `key`
+* `id` and `type` in `contextReferences` items (see [Context references](#context-references) section)
 
 Macro substitution for templates is based on the syntax `${<JEXL expression>}`. The support to JEXL
 is explained in [JEXL support in custom notifications](#jexl-support-in-custom-notifications) section. The following identifiers are included in
@@ -2119,6 +2123,8 @@ the context evaluated by the JEXL expression:
 * `authToken: for the authorization token (i.e. `x-auth-token` header value) in the
   update request triggering the subscription.
 * All the attributes in the entity triggering the notification (included in the update triggering the notification or not)
+* `contextReferences`: for the entities referred in the `contextReferences` field of the custom notification
+  (only if that field is used). More detail in [Context references](#context-references) section.
 
 In the rare case an attribute was named in the same way of the `service`, `servicePath` or
 `authToken` (e.g. an attribute which name is `service`) then the attribute value takes precedence.
@@ -2604,6 +2610,95 @@ For instance, the expression `${metadata.A.MD1}` will result in the value of the
 Note that [builtin metadata](#builtin-metadata) are automatically added to the `metadata` context key. For instance, the `${A-metadata.A.previousValue}` expression will provide the difference between the current value of `A` (in the update request) and the previous one (before the update request).
 
 Finally, note that in the rare case an attribute named `metadata` is used (which is an anti-pattern strongly discouraged) it will not be added to the context, as the `metadata` with metadata values will take precedence.
+
+### Context references
+
+Information from other entities (different from the one triggering the notification) can be included in the
+JEXL evaluation context using the `contextReferences` field in `httpCustom`, `mqttCustom` or `kafkaCustom`.
+The value of this field is an array of objects, each one identifying an entity by `id` and `type`
+(both mandatory strings). JEXL macros (i.e. `${...}`) can be used in `id` and `type`. They are evaluated
+using the context of the entity triggering the notification (i.e. without the information coming from
+`contextReferences`).
+
+At notification time, Orion retrieves all the referred entities from the database (using a single query)
+and adds a special context key named `contextReferences` to the JEXL evaluation context. Its value is an
+array, which each item corresponding to the item in the same position in the `contextReferences` field
+of the subscription:
+
+* If the entity is found, its [simplified entity representation](#simplified-entity-representation) in
+  `keyValues` mode (i.e. `id`, `type` and the attribute values) is used
+* If the entity is not found (or the evaluation of the `id` or `type` macro results in an error, null or empty string), `null` is used
+
+Referred entities are searched in the same service (i.e. `fiware-service`) and service path (i.e. the one
+of the entity triggering the notification).
+
+For instance, considering this subscription:
+
+```
+{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://foobar",
+      "contextReferences": [
+        { "id": "E2", "type": "T2" },
+        { "id": "${refId}", "type": "T" },
+        { "id": "${refId}", "type": "${refType}" },
+        { "id": "${(refList|split(','))[1]}", "type": "${refType}" }
+      ],
+      "json": {
+        "refs": "${contextReferences}"
+      }
+    }
+  }
+}
+```
+
+and an update on entity `E` (shown in keyValues representation)
+
+```
+{
+  "id": "E",
+  "type": "T",
+  "refId": "E3",
+  "refType": "TX",
+  "refList": "E4,E5,E6"
+}
+```
+
+the `contextReferences` key in the JEXL context would be:
+
+```
+[
+  <E2/T2 entity keyValues representation (or null if not found)>,
+  <E3/T entity keyValues representation (or null if not found)>,
+  <E3/TX entity keyValues representation (or null if not found)>,
+  <E5/TX entity keyValues representation (or null if not found)>
+]
+```
+
+so, for instance, `${contextReferences[0].temperature}` could be used in any template field to get
+the value of the `temperature` attribute of entity `E2/T2`.
+
+Some additional considerations:
+
+* `contextReferences` only has effect when Orion is built using cjexl. Otherwise (i.e. when only basic
+  replacement is available), it is stored in the subscription but ignored at notification time.
+* In the case the evaluation of an `id` or `type` macro results in an error, the corresponding element in the
+  `contextReferences` JEXL context element is `null` (the same as if the macro were ok but the referred entity
+  is not found in the database).
+* Referred entities are retrieved from the database each time a notification is processed, so
+  using `contextReferences` may have a performance impact (specially in notification intensive scenarios).
+* In the rare case an attribute named `contextReferences` is used (which is an anti-pattern strongly
+  discouraged) it will not be added to the context, as the `contextReferences` with the referred entities
+  will take precedence.
 
 ### Evaluation priority
 
@@ -5178,6 +5273,7 @@ A `httpCustom` object contains the following subfields.
 | `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
 | `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
 | `timeout` | ✓        | number | Maximum time (in milliseconds) the subscription waits for the response. The maximum value allowed for this parameter is 1800000 (30 minutes). If `timeout` is defined to 0 or omitted, then the value passed as `-httpTimeout` CLI parameter is used. See section in the [Command line options](admin/cli.md#command-line-options) for more details. |
+| `contextReferences` | ✓ | array | Array of objects (each one with `id` and `type` string fields, JEXL macros allowed) identifying entities to be included in the JEXL evaluation context. Must not be empty. See [Context references](#context-references) section for more details. |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
@@ -5198,6 +5294,7 @@ A `mqttCustom` object contains the following subfields.
 | `payload` | ✓        | string | Text-based payload to be used in notifications. In case of empty string or omitted, the default payload (see [Notification Messages](#notification-messages) sections) is used. If `null`, notification will not include any payload. |
 | `json`    | ✓        | object | JSON-based payload to be used in notifications. See [JSON Payloads](#json-payloads) section for more details. |
 | `ngsi`    | ✓        | object | NGSI patching for payload to be used in notifications. See [NGSI payload patching](#ngsi-payload-patching) section for more details. |
+| `contextReferences` | ✓ | array | Array of objects (each one with `id` and `type` string fields, JEXL macros allowed) identifying entities to be included in the JEXL evaluation context. Must not be empty. See [Context references](#context-references) section for more details. |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
@@ -5221,6 +5318,7 @@ A `kafkaCustom` object contains the following subfields.
 | `passwd`           | ✓        | string   | Passphrase used for Kafka SASL authentication. Must be used together with `user`. It is always obfuscated when retrieving subscription information (e.g. `GET /v2/subscriptions`).                                                    |
 | `saslMechanism`    | ✓        | string   | SASL mechanism to use when authentication is enabled. Allowed values: `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`. Mandatory if `user`/`passwd` are set.                                                                                |
 | `securityProtocol` | ✓        | string   | Kafka security protocol to use when authentication is enabled. Allowed values: `SASL_PLAINTEXT`, `SASL_SSL`. If omitted, `SASL_SSL` is used by default when authentication is enabled (i.e. when `user` and `passwd` are set).        |
+| `contextReferences` | ✓        | array    | Array of objects (each one with `id` and `type` string fields, JEXL macros allowed) identifying entities to be included in the JEXL evaluation context. Must not be empty. See [Context references](#context-references) section for more details. |
 
 `payload`, `json` or `ngsi` cannot be used at the same time, they are mutually exclusive.
 
