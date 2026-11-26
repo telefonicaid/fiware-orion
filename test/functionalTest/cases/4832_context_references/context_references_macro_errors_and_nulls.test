@@ -21,9 +21,6 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 # JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
---NAME--
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
-# JEXL_EXPR_FLAVOUR - to mark the test has to execute only when contextBroker includes jexl-expr flavour
 
 --NAME--
 Context references with macro errors, null and empty values in id or type
