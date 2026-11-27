@@ -404,6 +404,15 @@ Orionは、[CLI パラメータ](../admin/cli.md) `-notificationMode` を使用�
 
 このモジュールは、属性の更新/作成により、常に `processNotification()` から呼び出されます (図 [MD-01](mongoBackend.md#flow-md-01) を参照)。
 
+カスタム通知 (`httpCustom`、`mqttCustom`、または `kafkaCustom`) の場合、`SenderThreadParams` オブジェクトは
+`Notifier` モジュールの `buildSenderParamsCustom()` によって構築されます。この関数は式コンテキスト (`buildExprContext()`)
+を作成します。サブスクリプションで [`contextReferences`](../orion-api.md#context-references) が使用されている場合 (かつ
+JEXL が利用可能な場合) 、`addContextReferences()` が呼び出されます。この関数は、各参照に含まれる `id` や `type`
+といったマクロを解決し、[**mongoBackend**](#srclibmongobackend) ライブラリ内の `contextReferencesQuery()`
+を使用してデータベースから参照先のエンティティを取得し、それらを式コンテキストの `contextReferences` キーに追加します。
+なお、このデータベースクエリは `SenderThreadParams` オブジェクトの構築プロセスの一部 (以下の図におけるステップ 1)
+として実行されるため、通知送信スレッドではなく、更新リクエストを処理するスレッド内で行われます。
+
 次の4つの図は、HTTP 通知とMQTT/KAFKA 通知の両方の場合に、スレッド・プールがある場合とない場合の
 コンテキスト・エンティティ通知のプログラム・フローを示しています。
 
@@ -412,7 +421,7 @@ Orionは、[CLI パラメータ](../admin/cli.md) `-notificationMode` を使用�
 
 _NF-01: スレッド・プールなしのエンティティ属性更新/作成に関する HTTP 通知_
 
-* `SenderThreadParams` オブジェクトは、通知に対応するパラメータで構築されます (ステップ 1)
+* `SenderThreadParams` オブジェクトは、通知に対応するパラメータで構築されます (ステップ 1)。`contextReferences` を使用するカスタム通知の場合、このステップでデータベースに対してクエリが実行され、参照されているエンティティが取得されます (前述の通り)
 * `pthread_create()` は、通知を送信するための新しいスレッドを作成するために呼び出され、結果を待たずに、mongoBackend に戻ります (ステップ2)
 * `pthread_create()`は、startSenderThread() を起点とする新しいスレッドを生成します (ステップ3)
 * `startSenderThread()` は、`SenderThreadParams` オブジェクトに対応する通知を送信する `doNotify()` 関数を呼び出します (ステップ4,5および6)。通知の受信者からのレスポンスが待機されます (タイムアウトあり)。
@@ -431,7 +440,7 @@ _NF-01b: スレッド・プールなしのエンティティ属性の更新/作�
 
 _NF-03: スレッド・プールによるエンティティ属性の更新/作成に関する HTTP 通知_
 
-* `SenderThreadParams` オブジェクトは、通知に対応するパラメータで構築されます (ステップ 1)
+* `SenderThreadParams` オブジェクトは、通知に対応するパラメータで構築されます (ステップ 1) 。`contextReferences` を使用するカスタム通知の場合、このステップでデータベースに対してクエリが実行され、参照されているエンティティが取得されます (前述の通り)
 * 通知に関連付けられているサービスに応じて、 `ServiceQueue` が選択されます。通知に関連付けられたサービスのキューが
   存在しない場合は、デフォルトの `ServiceQueue` が使用されます。選択した `ServiceQueue` の `try_push()` メソッドを
   使用して、通知を適切なキューに入れます (ステップ2)

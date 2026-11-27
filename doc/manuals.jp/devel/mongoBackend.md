@@ -17,6 +17,7 @@
 	* [`mongoInit()`](#mongoinit)
 	* [`entitiesQuery()`](#entitiesquery)
 	* [`registrationsQuery()`](#registrationsquery) 
+        * [`contextReferencesQuery()`](#contextreferencesquery)
 
 <a name="introduction"></a>
 ## イントロダクション
@@ -339,7 +340,7 @@ _MB-11: mongoCreateSubscription_
 
 * `mongoAttributesForEntityType()` はサービス・ルーチン (ステップ 1) から呼び出されます。これは、`getEntityType()` (`lib/serviceRoutinesV2/getEntityType.cpp` 内) から呼び出される場合があります
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください。
-* この関数は、さまざまな `set*()` 関数 (`setExpiration()`, `setHttpInfo()` など) を使用して、最終的にデータベースに保存される BSON オブジェクトになる BSON オブジェクトを構築します (ステップ3)
+* この関数は、さまざまな `set*()` 関数 (`setExpiration()`, `setHttpInfo()` など) を使用して、最終的にデータベースに保存される BSON オブジェクトになる BSON オブジェクトを構築します (ステップ3)。カスタム通知の場合、`contextReferences` フィールドは `setCustomHttpInfo()`、`setCustomMqttInfo()`、および `setCustomKafkaInfo()` の一部として設定されます。
 * 新しいサブスクリプションに対応する BSON オブジェクトは、`connectionOperations` モジュールの `collectionInsert()` を使用してデータベースに挿入されます (ステップ4 および5)
 * サブスクリプション・キャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、新しいサブスクリプションがサブスクリプション・キャッシュに挿入されます (ステップ6)。`insertInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します ([詳細はこのドキュメント](semaphores.md#subscription-cache-semaphore) を参照)
 * リクエスト・セマフォがステップ2 で取得された場合は、戻る前に解放されます (ステップ7)
@@ -362,7 +363,7 @@ _MB-12: mongoUpdateSubscription_
 
 * `mongoUpdateSubscription()` はサービス・ルーチン (ステップ 1) から呼び出されます。これは `patchSubscription()` (`lib/serviceRoutinesV2/patchSubscription.cpp` 内) から呼び出されます
 * `-reqMutexPolicy` に応じて、リクエスト・セマフォが取られます (書き込みモード) (ステップ2)。詳細については、[このドキュメント](semaphores.md#mongo-request-semaphore)を参照してください
-* サブスクリプションは、MongoDB の `$set`/`$unset` 演算子を使用して DB で更新されます。この操作は、`connectionOperations` モジュールの関数 `colletionFindAndModify()` で実行されます (ステップ3および4)
+* サブスクリプションは、MongoDBの `$set` および `$unset` 演算子を使用してデータベース上で更新されます (例：新しい `notification` に `contextReferences` が含まれていない場合は、それが `$unset` されます) 。この操作は、`connectionOperations` モジュールの `colletionFindAndModify()` 関数内で実行されます (ステップ3および4)
 * サブスクリプションキャッシュが有効になっている場合 (つまり、`noCache` が `false` に設定されている場合)、サブスクリプションは、前のステップ (ステップ5) の `collectionFindAndModify()` の結果に基づいてサブスクリプション・キャッシュで更新されます。`updateInCache()` は、サブスクリプション・キャッシュ・セマフォを内部的に使用します。
 * リクエスト・セマフォがステップ2で取得された場合、戻る前に解放されます (ステップ6)
 
@@ -575,5 +576,25 @@ _MB-27: mongoRegistrationDelete_
 
 * `mongoQueryContext` モジュールの `mongoQueryContext()`, クエリの転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
 * `MongoCommonUpdate` モジュールの `searchContextProviders()`, 更新の転送のためにコンテキスト・プロバイダを見つけるために使用します。転送は **mongoBackend** ライブラリ内ではなく、呼び出す **serviceRoutine** から行われることに注意してください
+
+[Top](#top)
+
+<a name="contextreferencesquery"></a> 
+
+#### `contextReferencesQuery()`
+
+この関数は、カスタム通知の `contextReferences` フィールドで参照されているエンティティを、データベース
+(`entities` コレクション。管理ドキュメントのデータベースモデルに関するセクション [../admin/database_model.md#entities-collection]
+を参照) から検索します。検索にあたっては、サービス (「テナント」とも呼ばれます) およびサービス・パス
+(通知のトリガーとなったエンティティのサービス・パス) が考慮されます。
+
+すべての参照は、`connectionOperations` モジュール内の `collectionQuery()` を使用した単一のクエリによって取得されます
+(参照が1つの場合は単純な条件、複数の場合は `_id.id` / `_id.type` の条件を `$or` で結合したクエリとなります) 。
+取得結果は、出力パラメータである `ContextElementResponseVector` オブジェクトに格納されます。結果と対応する参照を照合し、
+見つからなかった参照に対して `null` を設定する処理は、呼び出し元 (呼び出し側のコード) の役割となります。
+
+この関数は、[ngsiNotify](sourceCode.md#srclibngsinotify) ライブラリの `Notifier` モジュール内にある `addContextReferences()`
+によって、カスタム通知を構築するプロセスの一部として使用されます。なお、この場合、`mongoBackend` はサービスルーチンからではなく、
+`ngsiNotify` から呼び出される点に注意してください。
 
 [Top](#top)

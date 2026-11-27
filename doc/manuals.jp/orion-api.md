@@ -76,6 +76,7 @@
     - [カスタム通知での JEXL サポート (JEXL support in custom notifications)](#jexl-support-in-custom-notifications)
       - [JEXL 使用例 (JEXL usage example)](#jexl-usage-example)
       - [メタデータのサポート (Metadata support)](#metadata-support)
+      - [コンテキスト・リファレンス (Context references](#context-references)
       - [評価の優先順位](#evaluation-priority)
       - [利用可能な変換 (Available Transformations)](#available-transformations)
         - [`uppercase`](#uppercase)
@@ -2077,11 +2078,13 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
 -   `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 -   `method` は、クライアントが通知の配信に使用する HTTP メソッドを選択できるようにしますが、有効な HTTP
     動詞のみを使用できることに注意してください: GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS, TRACE および CONNECT
+-   `contextReferences` 内の各項目における `id` および `type` ([Context references](#context-references) セクションを参照)
 
 `mqttCustom` の場合:
 
 -   `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 -   `topic`
+-   `contextReferences` 内の各項目における `id` および `type` ([Context references](#context-references) セクションを参照)
 
 `kafkaCustom` の場合:
 
@@ -2091,6 +2094,7 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
 - `payload`, `json`, `ngsi` (すべてペイロード関連のフィールド)
 - `topic`
 - `key`
+- `contextReferences` 内の各項目における `id` および `type` ([Context references](#context-references) セクションを参照)
 
 テンプレートのマクロ置換は、構文 `${<JEXL expression>}` に基づいています。JEXL のサポートについては、
 [カスタム通知での JEXL サポート](#jexl-support-in-custom-notifications) セクションで説明されています。JEXL 式によって評価されるコンテキストには、
@@ -2105,6 +2109,8 @@ TTL モニタスレッドのデフォルトのスリープ間隔は MongoDB で�
 -   `authToken: サブスクリプションをトリガーする更新リクエスト内の認証トークン
     (つまり、`x-auth-token` ヘッダ値)
 -   通知をトリガーするエンティティ内のすべての属性（通知をトリガーする更新に含まれているかどうか）
+-   `contextReferences`: カスタム通知の `contextReferences` フィールドで参照されるエンティティ用
+    (当該フィールドが使用されている場合のみ)。詳細は [Context references](#context-references) セクションを参照してください
 
 まれに、属性の名前が `service`、`servicePath`、または `authToken` と同じ名前になっている場合
 (名前が `service` である属性など)、属性値が優先されます。
@@ -2602,6 +2608,100 @@ Orion は、この機能を提供するために cjexl ライブラリに依存�
 [組み込みメタデータ](#builtin-metadata) は、`metadata` コンテキスト キーに自動的に追加されることに注意してください。たとえば、`${A-metadata.A.previousValue}` 式は、`A` の現在の値 (更新要求内) と以前の値 (更新要求前) の差を提供します。
 
 最後に、まれに `metadata` という名前の属性が使用される場合 (これはアンチパターンであり、強く推奨されません)、メタデータ値を持つ `metadata` が優先されるため、コンテキストに追加されないことに注意してください。
+
+<a name="context-references"></a>
+
+### コンテキスト・リファレンス (Context references)
+
+通知のトリガーとなったエンティティ以外のエンティティに関する情報を、`httpCustom`、`mqttCustom`、または
+`kafkaCustom` 内の `contextReferences` フィールドを使用して、JEXL評価コンテキストに含めることができます。
+このフィールドの値はオブジェクトの配列であり、各オブジェクトは `id` と `type` (いずれも必須の文字列)
+によってエンティティを特定します。`id` および `type` には、JEXLマクロ (例: `${...}`) を使用可能です。
+これらは、通知のトリガーとなったエンティティのコンテキスト (つまり、`contextReferences`
+から取得される情報を含まないコンテキスト) に基づいて評価されます。
+
+通知の際、Orion は (単一のクエリを使用して) データベースから参照先のエンティティをすべて取得し、
+JEXL 評価コンテキストに `contextReferences` という特別なコンテキスト・キーを追加します。
+このキーの値は配列となっており、各要素はサブスクリプションの `contextReferences`
+フィールド内の対応する位置にある項目と一致します。
+
+* エンティティが見つかった場合、`keyValues` モードにおける、その[簡略化されたエンティティ表現](#simplified-entity-representation)
+  (すなわち `id`、`type`、および属性値を含むもの) が使用されます
+* エンティティが見つからない場合 (あるいは `id` や `type` のマクロ評価の結果がエラー、null、または空文字列となった場合)、
+  `null` が使用されます。
+
+参照先のエンティティは、通知のトリガーとなったエンティティと同じサービス (`fiware-service`)
+およびサービス・パス内で検索されます。
+
+参照先エンティティは、同一のサービス (すなわち `fiware-service`) およびサービス・パス
+(たとえば、通知のトリガーとなったエンティティのサービス・パス) 内で検索されます。
+
+例えば、以下のようなサブスクリプションを考えてみましょう:
+
+```
+{
+  "subject": {
+    "entities": [
+      {
+        "id": "E",
+        "type": "T"
+      }
+    ]
+  },
+  "notification": {
+    "httpCustom": {
+      "url": "http://foobar",
+      "contextReferences": [
+        { "id": "E2", "type": "T2" },
+        { "id": "${refId}", "type": "T" },
+        { "id": "${refId}", "type": "${refType}" },
+        { "id": "${(refList|split(','))[1]}", "type": "${refType}" }
+      ],
+      "json": {
+        "refs": "${contextReferences}"
+      }
+    }
+  }
+}
+```
+
+そして、エンティティ `E` に関する更新 (keyValues 形式で表示)
+
+```
+{
+  "id": "E",
+  "type": "T",
+  "refId": "E3",
+  "refType": "TX",
+  "refList": "E4,E5,E6"
+}
+```
+
+JEXL コンテキスト内の `contextReferences` キーは、以下のようになります:
+
+```
+[
+  <E2/T2 entity keyValues representation (or null if not found)>,
+  <E3/T entity keyValues representation (or null if not found)>,
+  <E3/TX entity keyValues representation (or null if not found)>,
+  <E5/TX entity keyValues representation (or null if not found)>
+]
+```
+
+例えば、テンプレート内の任意のフィールドで `${contextReferences[0].temperature}` を使用すれば、
+エンティティ `E2/T2` の `temperature` 属性の値を取得できます。
+
+その他の留意事項：
+
+* `contextReferences` は、Orion が cjexl を使用してビルドされている場合にのみ有効です。それ以外の場合
+  (基本的な置換機能のみが利用可能な場合) は、サブスクリプションには保存されますが、通知時には無視されます
+* `id` または `type` マクロの評価中にエラーが発生した場合、`contextReferences` の JEXL コンテキスト内における該当要素は
+  `null` となります (これは、マクロの評価は正常に行われたものの、参照先のエンティティがデータベース内に
+  見つからなかった場合と同じ挙動です)
+* 参照先のエンティティは、通知が処理されるたびにデータベースから取得されます。そのため、`contextReferences`
+  を使用するとパフォーマンスに影響が及ぶ可能性があります (特に、通知が頻繁に発生するようなシナリオでは顕著です)
+* `contextReferences` という名称の属性が使用されるという稀なケース (これは強く非推奨とされるアンチパターンです) では、
+  その属性はコンテキストに追加されません。参照先エンティティを含む `contextReferences` が優先されるためです
 
 <a name="evaluation-priority"></a>
 
@@ -5330,6 +5430,7 @@ KAFKA 通知の詳細については、[KAFKA 通知](user/kafka_notifications.m
 | `json`     | ✓          | object | 通知で使用される JSON ベースのペイロード。詳細については、[JSON ペイロード](#json-payloads) セクションを参照してください                                                                                                                                                                                                                            |
 | `ngsi`     | ✓          | object | 通知で使用されるペイロードの NGSI パッチ。詳細については、[NGSI ペイロードのパッチ適用](#ngsi-payload-patching) セクションを参照してください                                                                                                                                                                                                        |
 | `timeout`  | ✓          | number | サブスクリプションがレスポンスを待機する最大時間 (ミリ秒単位)。このパラメータに許可される最大値は1800000 (30分) です。`timeout` が0に定義されているか省略されている場合、`-httpTimeout` CLI パラメータとして渡された値が使用されます。詳細については、[コマンドライン・オプション](admin/cli.md#command-line-options)のセクションを参照してください |
+| `contextReferences` | ✓ | array | JEXL 評価コンテキストに含めるエンティティを指定するオブジェクトの配列 (各オブジェクトには `id` および `type` フィールドが含まれ、JEXL マクロの使用が可能)。空であってはなりません。詳細については、「[コンテキスト参照](#context-references)」セクションを参照してください |
 
 `payload`, `json` または `ngsi` は同時に使用できません。相互に排他的です。
 
@@ -5352,6 +5453,7 @@ KAFKA 通知の詳細については、[KAFKA 通知](user/kafka_notifications.m
 | `payload`  | ✓          | string  | 通知で使用されるテキスト・ベースのペイロード。空の文字列または省略された場合、デフォルトのペイロード ([通知メッセージ](#notification-messages)のセクションを参照) が使用されます。`null` の場合、通知にはペイロードは含まれません |
 | `json`     | ✓          | object  | 通知で使用される JSON ベースのペイロード。詳細については、[JSON ペイロード](#json-payloads) セクションを参照してください                                                                                                          |
 | `ngsi`     | ✓          | object  | 通知で使用されるペイロードの NGSI パッチ。詳細については、[NGSI ペイロードのパッチ適用](#ngsi-payload-patching) セクションを参照してください                                                                                      |
+| `contextReferences` | ✓ | array | JEXL 評価コンテキストに含めるエンティティを指定するオブジェクトの配列 (各オブジェクトには `id` および `type` フィールドが含まれ、JEXL マクロの使用が可能)。空であってはなりません。詳細については、「[コンテキスト参照](#context-references)」セクションを参照してください |
 
 `payload`, `json` または `ngsi` は同時に使用できません。相互に排他的です。
 
@@ -5378,6 +5480,7 @@ MQTT 通知の詳細については、[MQTT 通知](user/mqtt_notifications.md)�
 | `passwd`           | ✓          | string  | Kafka SASL 認証に使用されるパスフレーズ。`user` と組み合わせて使用する必要があります。サブスクリプション情報を取得する際（例：`GET /v2/subscriptions`）には、常に難読化されます                                                                                |
 | `saslMechanism`    | ✓          | string  | 認証が有効になっている場合に使用する SASL メカニズム。指定可能な値は、`PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512` です。`user`/`passwd` が設定されている場合は必須です                                                                                           |
 | `securityProtocol` | ✓          | string  | 認証が有効になっている場合に使用する Kafka セキュリティ・プロトコル。指定可能な値は `SASL_PLAINTEXT` と `SASL_SSL` です。省略した場合、認証が有効になっている場合 (つまり、`user` と `passwd` が設定されている場合) は、デフォルトで `SASL_SSL` が使用されます |
+| `contextReferences` | ✓ | array | JEXL 評価コンテキストに含めるエンティティを指定するオブジェクトの配列 (各オブジェクトには `id` および `type` フィールドが含まれ、JEXL マクロの使用が可能)。空であってはなりません。詳細については、「[コンテキスト参照](#context-references)」セクションを参照してください |
 
 `payload`、`json`、`ngsi` は同時に使用できません。これらは相互に排他的です。
 
